@@ -5,6 +5,8 @@ VisualStudioVersion = 15.0.26430.16
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "vulkan-graphics-examples", "vulkan-graphics-examples\vulkan-graphics-examples.vcxproj", "{F8172ACD-126E-4B67-BCF4-D9E277FC3E3B}"
 EndProject
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "graphics-framework", "graphics-framework\graphics-framework.vcxproj", "{A756B90F-B3A9-4015-9D83-160B6AD8C99D}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|x64 = Debug|x64
@@ -21,6 +23,14 @@ Global
 		{F8172ACD-126E-4B67-BCF4-D9E277FC3E3B}.Release|x64.Build.0 = Release|x64
 		{F8172ACD-126E-4B67-BCF4-D9E277FC3E3B}.Release|x86.ActiveCfg = Release|Win32
 		{F8172ACD-126E-4B67-BCF4-D9E277FC3E3B}.Release|x86.Build.0 = Release|Win32
+		{A756B90F-B3A9-4015-9D83-160B6AD8C99D}.Debug|x64.ActiveCfg = Debug|x64
+		{A756B90F-B3A9-4015-9D83-160B6AD8C99D}.Debug|x64.Build.0 = Debug|x64
+		{A756B90F-B3A9-4015-9D83-160B6AD8C99D}.Debug|x86.ActiveCfg = Debug|Win32
+		{A756B90F-B3A9-4015-9D83-160B6AD8C99D}.Debug|x86.Build.0 = Debug|Win32
+		{A756B90F-B3A9-4015-9D83-160B6AD8C99D}.Release|x64.ActiveCfg = Release|x64
+		{A756B90F-B3A9-4015-9D83-160B6AD8C99D}.Release|x64.Build.0 = Release|x64
+		{A756B90F-B3A9-4015-9D83-160B6AD8C99D}.Release|x86.ActiveCfg = Release|Win32
+		{A756B90F-B3A9-4015-9D83-160B6AD8C99D}.Release|x86.Build.0 = Release|Win32
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

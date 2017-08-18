@@ -18,6 +18,12 @@
       <Platform>x64</Platform>
     </ProjectConfiguration>
   </ItemGroup>
+  <ItemGroup>
+    <ClCompile Include="..\..\framework\src\framework\app_base.cpp" />
+  </ItemGroup>
+  <ItemGroup>
+    <ClInclude Include="..\..\framework\include\framework\app_base.hpp" />
+  </ItemGroup>
   <PropertyGroup Label="Globals">
     <VCProjectVersion>15.0</VCProjectVersion>
     <ProjectGuid>{A756B90F-B3A9-4015-9D83-160B6AD8C99D}</ProjectGuid>
@@ -71,19 +77,23 @@
   <PropertyGroup Label="UserMacros" />
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
     <TargetExt>.lib</TargetExt>
-    <IncludePath>$(GS_PROJECT_ROOT)\libs\glm;$(GS_PROJECT_ROOT)\libs\glfw\include;$(GS_PROJECT_ROOT)\libs\VulkanSDK\1.0.49.0\Include;$(IncludePath)</IncludePath>
+    <IncludePath>$(GS_PROJECT_ROOT)\framework\include\framework;$(GS_PROJECT_ROOT)\libs\plog.git\include;$(GS_PROJECT_ROOT)\libs\glm;$(GS_PROJECT_ROOT)\libs\glfw\include;$(GS_PROJECT_ROOT)\libs\VulkanSDK\1.0.49.0\Include;$(IncludePath)</IncludePath>
+    <OutDir>$(GS_PROJECT_ROOT)\lib\Win32</OutDir>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
     <TargetExt>.lib</TargetExt>
-    <IncludePath>$(GS_PROJECT_ROOT)\libs\glm;$(GS_PROJECT_ROOT)\libs\glfw\include;$(GS_PROJECT_ROOT)\libs\VulkanSDK\1.0.49.0\Include;$(IncludePath)</IncludePath>
+    <IncludePath>$(GS_PROJECT_ROOT)\framework\include\framework;$(GS_PROJECT_ROOT)\libs\plog.git\include;$(GS_PROJECT_ROOT)\libs\glm;$(GS_PROJECT_ROOT)\libs\glfw\include;$(GS_PROJECT_ROOT)\libs\VulkanSDK\1.0.49.0\Include;$(IncludePath)</IncludePath>
+    <OutDir>$(GS_PROJECT_ROOT)\lib\Win32</OutDir>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
     <TargetExt>.lib</TargetExt>
-    <IncludePath>$(GS_PROJECT_ROOT)\libs\glm;$(GS_PROJECT_ROOT)\libs\glfw\include;$(GS_PROJECT_ROOT)\libs\VulkanSDK\1.0.49.0\Include;$(IncludePath)</IncludePath>
+    <IncludePath>$(GS_PROJECT_ROOT)\framework\include\framework;$(GS_PROJECT_ROOT)\libs\plog.git\include;$(GS_PROJECT_ROOT)\libs\glm;$(GS_PROJECT_ROOT)\libs\glfw\include;$(GS_PROJECT_ROOT)\libs\VulkanSDK\1.0.49.0\Include;$(IncludePath)</IncludePath>
+    <OutDir>$(GS_PROJECT_ROOT)\lib\X64</OutDir>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
     <TargetExt>.lib</TargetExt>
-    <IncludePath>$(GS_PROJECT_ROOT)\libs\glm;$(GS_PROJECT_ROOT)\libs\glfw\include;$(GS_PROJECT_ROOT)\libs\VulkanSDK\1.0.49.0\Include;$(IncludePath)</IncludePath>
+    <IncludePath>$(GS_PROJECT_ROOT)\framework\include\framework;$(GS_PROJECT_ROOT)\libs\plog.git\include;$(GS_PROJECT_ROOT)\libs\glm;$(GS_PROJECT_ROOT)\libs\glfw\include;$(GS_PROJECT_ROOT)\libs\VulkanSDK\1.0.49.0\Include;$(IncludePath)</IncludePath>
+    <OutDir>$(GS_PROJECT_ROOT)\lib\X64</OutDir>
   </PropertyGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
     <ClCompile>
@@ -141,8 +151,6 @@
       <AdditionalDependencies>vulkan-1.lib;glfw3.lib;%(AdditionalDependencies)</AdditionalDependencies>
     </Lib>
   </ItemDefinitionGroup>
-  <ItemGroup>
-  </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">
   </ImportGroup>

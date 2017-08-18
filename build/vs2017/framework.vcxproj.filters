@@ -9,13 +9,19 @@
     </Filter>
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="..\..\framework\include\framework\context.hpp">
+      <Filter>include</Filter>
+    </ClInclude>
     <ClInclude Include="..\..\framework\include\framework\app_base.hpp">
-      <Filter>src</Filter>
+      <Filter>include</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>
+    <ClCompile Include="..\..\framework\src\framework\context.cpp">
+      <Filter>src</Filter>
+    </ClCompile>
     <ClCompile Include="..\..\framework\src\framework\app_base.cpp">
-      <Filter>include</Filter>
+      <Filter>src</Filter>
     </ClCompile>
   </ItemGroup>
 </Project>

@@ -15,12 +15,21 @@
     <ClInclude Include="..\..\framework\include\framework\app_base.hpp">
       <Filter>include</Filter>
     </ClInclude>
+    <ClInclude Include="..\..\framework\include\framework\macro.hpp">
+      <Filter>include</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\framework\include\framework\vulkanExt.hpp">
+      <Filter>include</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="..\..\framework\src\framework\context.cpp">
       <Filter>src</Filter>
     </ClCompile>
     <ClCompile Include="..\..\framework\src\framework\app_base.cpp">
+      <Filter>src</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\framework\src\framework\vulkanExt.cpp">
       <Filter>src</Filter>
     </ClCompile>
   </ItemGroup>

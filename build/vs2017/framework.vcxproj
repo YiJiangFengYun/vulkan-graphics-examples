@@ -21,10 +21,13 @@
   <ItemGroup>
     <ClCompile Include="..\..\framework\src\framework\app_base.cpp" />
     <ClCompile Include="..\..\framework\src\framework\context.cpp" />
+    <ClCompile Include="..\..\framework\src\framework\vulkanExt.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="..\..\framework\include\framework\app_base.hpp" />
     <ClInclude Include="..\..\framework\include\framework\context.hpp" />
+    <ClInclude Include="..\..\framework\include\framework\macro.hpp" />
+    <ClInclude Include="..\..\framework\include\framework\vulkanExt.hpp" />
   </ItemGroup>
   <PropertyGroup Label="Globals">
     <VCProjectVersion>15.0</VCProjectVersion>

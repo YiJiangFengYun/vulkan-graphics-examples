@@ -3,7 +3,6 @@
 #include <plog/Log.h>
 #include <plog/Appenders/DebugOutputAppender.h>
 
-
 fw::AppBase::AppBase(int width, int height, const char *title)
 	:m_width(width), m_height(height), m_title(title),
 	m_pWindow(nullptr), m_context(nullptr)
@@ -60,4 +59,10 @@ void fw::AppBase::_onWindowResized(int width, int height)
 {
 	m_width = width;
 	m_height = height;
+}
+
+void fw::onWindowResized(GLFWwindow* window, int width, int height)
+{
+	fw::AppBase* const instance = (fw::AppBase*)glfwGetWindowUserPointer(window);
+	instance->_onWindowResized(width, height);
 }

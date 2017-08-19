@@ -30,14 +30,8 @@ namespace fw
 		void _initVulkan();
 		void _onWindowResized(int width, int height);
 
-		friend static void onWindowResized(GLFWwindow *window, int width, int height);
+		friend void onWindowResized(GLFWwindow *window, int width, int height);
 	};
-
-	static void onWindowResized(GLFWwindow* window, int width, int height)
-	{
-		AppBase* const instance = (AppBase*)glfwGetWindowUserPointer(window);
-		instance->_onWindowResized(width, height);
-	}
 }
 
 #endif // !FW_APP_BASE_H

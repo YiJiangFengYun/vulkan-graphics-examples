@@ -139,6 +139,7 @@ void fw::Context::_createSurface(GLFWwindow* window)
 		throw std::system_error(result, "fw::Context::_createSurface");
 	}
 	m_surface = surface;
+	LOG(plog::debug) << "Create successfully surface.";
 }
 
 void fw::Context::_pickPhysicalDevice()
@@ -157,7 +158,7 @@ void fw::Context::_pickPhysicalDevice()
 
 	for (auto it = physicalDevices.cbegin(); it != physicalDevices.cend();)
 	{
-		fw::Bool32 isSuitable = [&](const vk::PhysicalDevice physicalDevice)->fw::Bool32
+		fw::Bool32 isSuitable = [&](const vk::PhysicalDevice& physicalDevice)->fw::Bool32
 		{
 			const vk::PhysicalDeviceProperties deviceProperties = physicalDevice.getProperties();
 			const vk::PhysicalDeviceFeatures deviceFeatures = physicalDevice.getFeatures();
@@ -209,8 +210,8 @@ void fw::Context::_pickPhysicalDevice()
 	}
 
 	const std::vector<const char*>& deviceExtensions = deviceExtensionNames;
-	std::sort(physicalDevices.cbegin(), physicalDevices.cend(), 
-		[&](const vk::PhysicalDevice physicalDevice1, const vk::PhysicalDevice physicalDevice2) {
+	std::sort(physicalDevices.begin(), physicalDevices.end(), 
+		[&](const vk::PhysicalDevice& physicalDevice1, const vk::PhysicalDevice& physicalDevice2) {
 		int32_t result = 0;
 		const vk::PhysicalDeviceProperties deviceProperties1 = physicalDevice1.getProperties();
 		const vk::PhysicalDeviceProperties deviceProperties2 = physicalDevice2.getProperties();
@@ -230,11 +231,56 @@ void fw::Context::_pickPhysicalDevice()
 	});
 
 	m_physicalDevice = *physicalDevices.cbegin();
+	//m_physicalDevice = VkPhysicalDevice(*physicalDevices.b)
+	LOG(plog::debug) << "Pick successfully physical device.";
 }
 
 void fw::Context::_createLogicDevice()
 {
+	UsedQueueFamily usedQueueFamily = UsedQueueFamily::findQueueFamilies(m_physicalDevice, m_surface);
+	std::vector<vk::DeviceQueueCreateInfo> queueCreateInfos;
+	std::set<int32_t> uniqueFamilyIndices = { usedQueueFamily.graphicsFamily, usedQueueFamily.presentFamily };
 
+	queueCreateInfos.resize(uniqueFamilyIndices.size());
+	float queuePriority = 1.0f;
+
+	size_t index = 0;
+	for (int32_t queueFamilyIndex : uniqueFamilyIndices)
+	{
+		vk::DeviceQueueCreateInfo queueCreateInfo = {
+			vk::DeviceQueueCreateFlags(),
+			static_cast<uint32_t>(queueFamilyIndex),
+			uint32_t(1),
+			&queuePriority
+		};
+		queueCreateInfos[index] = queueCreateInfo;
+		++index;
+	}
+
+	vk::PhysicalDeviceFeatures deviceFeatures = {};
+	deviceFeatures.samplerAnisotropy = VK_TRUE;
+
+	vk::DeviceCreateInfo createInfo = {
+		vk::DeviceCreateFlags(),
+		static_cast<uint32_t>(queueCreateInfos.size()),
+		queueCreateInfos.data(),
+		0,
+		nullptr,
+		static_cast<uint32_t>(deviceExtensionNames.size()),
+		deviceExtensionNames.data(),
+		&deviceFeatures
+	};
+
+#ifdef ENABLE_VALIDATION_LAYERS
+	createInfo.enabledLayerCount = static_cast<uint32_t>(validationlayers.size());
+	createInfo.ppEnabledLayerNames = validationlayers.data();
+#endif // ENABLE_VALIDATION_LAYERS
+
+	m_device = m_physicalDevice.createDevice(createInfo);
+	m_graphicsQueue = m_device.getQueue(usedQueueFamily.graphicsFamily, 0);
+	m_presentQueue = m_device.getQueue(usedQueueFamily.presentFamily, 0);
+
+	LOG(plog::debug) << "Create successfully logic device.";
 }
 
 std::vector<const char*> fw::Context::_getRequiredExtensions()
@@ -254,7 +300,7 @@ std::vector<const char*> fw::Context::_getRequiredExtensions()
 
 	requiredExtensions.resize(requiredExtensionCount);
 
-	for (int32_t i = 0; i < glfwExtensionCount; ++i)
+	for (uint32_t i = 0; i < glfwExtensionCount; ++i)
 	{
 		requiredExtensions[i] = glfwExtensions[i];
 	}
@@ -339,7 +385,7 @@ VKAPI_ATTR VkBool32 VKAPI_CALL fw::debugCallback(
 }
 #endif // DEBUG
 
-bool fw::checkDeviceExtensionSupport(vk::PhysicalDevice physicalDevice, std::vector<const char*> deviceExtensionNames)
+bool fw::checkDeviceExtensionSupport(const vk::PhysicalDevice& physicalDevice, std::vector<const char*> deviceExtensionNames)
 {
 	auto extensionProperties = physicalDevice.enumerateDeviceExtensionProperties();
 
@@ -353,7 +399,7 @@ bool fw::checkDeviceExtensionSupport(vk::PhysicalDevice physicalDevice, std::vec
 	return requiredExtensionNames.empty();
 }
 
-fw::UsedQueueFamily fw::UsedQueueFamily::findQueueFamilies(vk::PhysicalDevice physicalDevice, VkSurfaceKHR surface)
+fw::UsedQueueFamily fw::UsedQueueFamily::findQueueFamilies(const vk::PhysicalDevice& physicalDevice, const VkSurfaceKHR& surface)
 {
 	UsedQueueFamily data;
 
@@ -384,7 +430,7 @@ fw::UsedQueueFamily fw::UsedQueueFamily::findQueueFamilies(vk::PhysicalDevice ph
 	return data;
 }
 
-fw::SwapChainSupportDetails fw::SwapChainSupportDetails::querySwapChainSupport(vk::PhysicalDevice physicalDevice, vk::SurfaceKHR surface) {
+fw::SwapChainSupportDetails fw::SwapChainSupportDetails::querySwapChainSupport(const vk::PhysicalDevice& physicalDevice, const vk::SurfaceKHR& surface) {
 	SwapChainSupportDetails details;
 	details.capabilities = physicalDevice.getSurfaceCapabilitiesKHR(surface);
 	details.formats = physicalDevice.getSurfaceFormatsKHR(surface);

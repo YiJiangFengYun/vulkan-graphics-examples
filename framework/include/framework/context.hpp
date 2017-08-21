@@ -20,26 +20,26 @@ namespace fw
 		VK_KHR_SWAPCHAIN_EXTENSION_NAME
 	};
 
-	bool checkDeviceExtensionSupport(vk::PhysicalDevice physicalDevice, std::vector<const char*> deviceExtensionNames);
+	bool checkDeviceExtensionSupport(const vk::PhysicalDevice& physicalDevice, std::vector<const char*> deviceExtensionNames);
 
 	struct UsedQueueFamily
 	{
-		uint32_t graphicsFamily = -1;
-		uint32_t presentFamily = -1;
+		int32_t graphicsFamily = -1;
+		int32_t presentFamily = -1;
 
 		Bool32 isComplete()
 		{
 			return graphicsFamily >= 0 && presentFamily >= 0;
 		}
 
-		UsedQueueFamily static findQueueFamilies(vk::PhysicalDevice physicalDevice, VkSurfaceKHR surface);
+		UsedQueueFamily static findQueueFamilies(const vk::PhysicalDevice& physicalDevice, const VkSurfaceKHR& surface);
 	};
 
 	struct SwapChainSupportDetails {
 		vk::SurfaceCapabilitiesKHR capabilities;
 		std::vector<vk::SurfaceFormatKHR> formats;
 		std::vector<vk::PresentModeKHR> presentModes;
-		SwapChainSupportDetails static querySwapChainSupport(vk::PhysicalDevice physicalDevice, vk::SurfaceKHR surface);
+		SwapChainSupportDetails static querySwapChainSupport(const vk::PhysicalDevice& physicalDevice, const vk::SurfaceKHR& surface);
 	};
 
 	class Context
@@ -57,6 +57,8 @@ namespace fw
 		vk::SurfaceKHR m_surface;
 		vk::PhysicalDevice m_physicalDevice;
 		vk::Device m_device;
+		vk::Queue m_graphicsQueue;
+		vk::Queue m_presentQueue;
 		bool _checkValidationLayerSupport();
 		void _createSurface(GLFWwindow* window);
 		void _pickPhysicalDevice();

@@ -3,7 +3,7 @@
 #include <plog/Log.h>
 #include <plog/Appenders/DebugOutputAppender.h>
 
-fw::AppBase::AppBase(int width, int height, const char *title)
+fw::AppBase::AppBase(int32_t width, int32_t height, const char *title)
 	:m_width(width), m_height(height), m_title(title),
 	m_pWindow(nullptr), m_context(nullptr)
 {
@@ -52,16 +52,16 @@ void fw::AppBase::run()
 void fw::AppBase::_initVulkan()
 {
 	m_context = std::unique_ptr<Context>(new Context(m_title, VK_MAKE_VERSION(1, 0, 0), "No Engine", VK_MAKE_VERSION(1, 0, 0)));
-	m_context->init();
+	m_context->init(m_pWindow);
 }
 
-void fw::AppBase::_onWindowResized(int width, int height)
+void fw::AppBase::_onWindowResized(int32_t width, int32_t height)
 {
 	m_width = width;
 	m_height = height;
 }
 
-void fw::onWindowResized(GLFWwindow* window, int width, int height)
+void fw::onWindowResized(GLFWwindow* window, int32_t width, int32_t height)
 {
 	fw::AppBase* const instance = (fw::AppBase*)glfwGetWindowUserPointer(window);
 	instance->_onWindowResized(width, height);

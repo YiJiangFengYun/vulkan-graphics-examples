@@ -1,19 +1,33 @@
-#include <plog/Log.h>
-#include <GLFW/glfw3.h>
-
 #include "context.hpp"
+
+#include <plog/Log.h>
+#include <map>
+#include <set>
+
 
 fw::Context::Context(const char* appName, uint32_t appVersion, const char* engineName, uint32_t engineVersion)
 	:m_appName(appName), m_appVersion(appVersion),
 	m_engineName(engineName), m_engineVersion(engineVersion),
-	m_instance(nullptr),
-	m_debugReportCallBack(nullptr)
+	m_instance(),
+	m_debugReportCallBack(),
+	m_surface(),
+	m_device()
 {
 
 }
 
 fw::Context::~Context()
 {
+	if (m_device != vk::Device())
+	{
+		m_device.destroy();
+	}
+
+	if (m_surface != vk::SurfaceKHR())
+	{
+		vkDestroySurfaceKHR(m_instance, m_surface, nullptr);
+	}
+
 #ifdef DEBUG
 	if (m_debugReportCallBack != vk::DebugReportCallbackEXT(nullptr))
 	{
@@ -27,7 +41,7 @@ fw::Context::~Context()
 	}
 }
 
-void fw::Context::init()
+void fw::Context::init(GLFWwindow* window)
 {
 #ifdef ENABLE_VALIDATION_LAYERS
 	if (_checkValidationLayerSupport() == false)
@@ -78,8 +92,9 @@ void fw::Context::init()
 #ifdef DEBUG
 	_setupDebugCallBack();
 #endif // DEBUG
-
-
+	_createSurface(window);
+	_pickPhysicalDevice();
+	_createLogicDevice();
 }
 
 bool fw::Context::_checkValidationLayerSupport()
@@ -115,6 +130,113 @@ bool fw::Context::_checkValidationLayerSupport()
 	return true;
 }
 
+void fw::Context::_createSurface(GLFWwindow* window)
+{
+	VkSurfaceKHR surface;
+	auto result = static_cast<vk::Result > (glfwCreateWindowSurface(m_instance, window, nullptr, &surface));
+	if ( result != vk::Result::eSuccess)
+	{
+		throw std::system_error(result, "fw::Context::_createSurface");
+	}
+	m_surface = surface;
+}
+
+void fw::Context::_pickPhysicalDevice()
+{
+	auto physicalDevices = m_instance.enumeratePhysicalDevices();
+
+	LOG(plog::debug) << "physical device num: " + physicalDevices.size() << std::endl;
+
+	if (physicalDevices.size() == 0)
+	{
+		throw std::runtime_error("Failed to find GPUs with VULKAN support");
+	}
+
+	const size_t size = physicalDevices.size();
+	const vk::SurfaceKHR surface = m_surface;
+
+	for (auto it = physicalDevices.cbegin(); it != physicalDevices.cend();)
+	{
+		fw::Bool32 isSuitable = [&](const vk::PhysicalDevice physicalDevice)->fw::Bool32
+		{
+			const vk::PhysicalDeviceProperties deviceProperties = physicalDevice.getProperties();
+			const vk::PhysicalDeviceFeatures deviceFeatures = physicalDevice.getFeatures();
+			//Application can't function without geometry shaders
+			if (deviceFeatures.geometryShader == VK_FALSE)
+			{
+				return FW_FALSE;
+			}
+
+			//Application can't function without queue family that supports graphics commands.
+			if (UsedQueueFamily::findQueueFamilies(physicalDevice, surface).isComplete() == FW_FALSE)
+			{
+				return FW_FALSE;
+			}
+
+			//Application can't function without support of device for swap chain extension.
+			if (checkDeviceExtensionSupport(physicalDevice, deviceExtensionNames) == FW_FALSE)
+			{
+				return FW_FALSE;
+			}
+
+			//Application can't function without adequate support of device for swap chain.
+			SwapChainSupportDetails swapChainSupportDetails = SwapChainSupportDetails::querySwapChainSupport(physicalDevice, surface);
+			if (swapChainSupportDetails.formats.empty() || swapChainSupportDetails.presentModes.empty())
+			{
+				return FW_FALSE;
+			}
+
+			//Application can't function without feature of sampler anisotropy.
+			if (deviceFeatures.samplerAnisotropy == VK_FALSE)
+			{
+				return FW_FALSE;
+			}
+		}(*it);
+
+		if (isSuitable == false)
+		{
+			physicalDevices.erase(it);
+		}
+		else
+		{
+			++it;
+		}
+	}
+
+	if (physicalDevices.size() == 0)
+	{
+		throw std::runtime_error("failed to find a suitable GPU!");
+	}
+
+	const std::vector<const char*>& deviceExtensions = deviceExtensionNames;
+	std::sort(physicalDevices.cbegin(), physicalDevices.cend(), 
+		[&](const vk::PhysicalDevice physicalDevice1, const vk::PhysicalDevice physicalDevice2) {
+		int32_t result = 0;
+		const vk::PhysicalDeviceProperties deviceProperties1 = physicalDevice1.getProperties();
+		const vk::PhysicalDeviceProperties deviceProperties2 = physicalDevice2.getProperties();
+		const vk::PhysicalDeviceFeatures deviceFeatures1 = physicalDevice1.getFeatures();
+		const vk::PhysicalDeviceFeatures deviceFeatures2 = physicalDevice2.getFeatures();
+		if (result == 0)
+		{
+			int32_t value1 = static_cast<int32_t>(deviceProperties1.deviceType == vk::PhysicalDeviceType::eDiscreteGpu);
+			int32_t value2 = static_cast<int32_t>(deviceProperties2.deviceType == vk::PhysicalDeviceType::eDiscreteGpu);
+			result = value1 - value2;
+		}
+		if (result == 0)
+		{
+			result = deviceProperties1.limits.maxImageDimension2D - deviceProperties2.limits.maxImageDimension2D;
+		}
+		return result > 0;
+	});
+
+	m_physicalDevice = *physicalDevices.cbegin();
+}
+
+void fw::Context::_createLogicDevice()
+{
+
+}
+
 std::vector<const char*> fw::Context::_getRequiredExtensions()
 {
 	std::vector<const char*> requiredExtensions;
@@ -145,7 +267,6 @@ std::vector<const char*> fw::Context::_getRequiredExtensions()
 }
 
 #ifdef DEBUG
-
 void fw::Context::_setupDebugCallBack()
 {
 	vk::DebugReportCallbackCreateInfoEXT createInfo = {
@@ -217,4 +338,57 @@ VKAPI_ATTR VkBool32 VKAPI_CALL fw::debugCallback(
 	return VK_FALSE;
 }
 #endif // DEBUG
+
+bool fw::checkDeviceExtensionSupport(vk::PhysicalDevice physicalDevice, std::vector<const char*> deviceExtensionNames)
+{
+	auto extensionProperties = physicalDevice.enumerateDeviceExtensionProperties();
+
+	std::set<std::string> requiredExtensionNames(deviceExtensionNames.begin(), deviceExtensionNames.end());
+
+	for (const auto& extPro : extensionProperties)
+	{
+		requiredExtensionNames.erase(extPro.extensionName);
+	}
+
+	return requiredExtensionNames.empty();
+}
+
+fw::UsedQueueFamily fw::UsedQueueFamily::findQueueFamilies(vk::PhysicalDevice physicalDevice, VkSurfaceKHR surface)
+{
+	UsedQueueFamily data;
+
+	auto queueFamilyProperties = physicalDevice.getQueueFamilyProperties();
+
+	int i = 0;
+	for (const auto& queueFamilyProperty : queueFamilyProperties)
+	{
+		if (queueFamilyProperty.queueCount > 0 && queueFamilyProperty.queueFlags & vk::QueueFlagBits::eGraphics)
+		{
+			data.graphicsFamily = i;
+		}
+
+		vk::Bool32 presentSupport = VK_FALSE;
+		physicalDevice.getSurfaceSupportKHR(i, surface, &presentSupport);
+		if (queueFamilyProperty.queueCount > 0 && presentSupport)
+		{
+			data.presentFamily = i;
+		}
+
+		if (data.isComplete()) {
+			break;
+		}
+
+		++i;
+	}
+
+	return data;
+}
+
+fw::SwapChainSupportDetails fw::SwapChainSupportDetails::querySwapChainSupport(vk::PhysicalDevice physicalDevice, vk::SurfaceKHR surface) {
+	SwapChainSupportDetails details;
+	details.capabilities = physicalDevice.getSurfaceCapabilitiesKHR(surface);
+	details.formats = physicalDevice.getSurfaceFormatsKHR(surface);
+	details.presentModes = physicalDevice.getSurfacePresentModesKHR(surface);
+	return details;
+}
 

@@ -20,6 +20,11 @@ fw::Context::Context(const char* appName, uint32_t appVersion, const char* engin
 
 fw::Context::~Context()
 {
+	for (const auto& imageView : m_swapchainImageViews)
+	{
+		m_device.destroyImageView(imageView);
+	}
+
 	if (m_swapchain != vk::SwapchainKHR(nullptr))
 	{
 		m_device.destroySwapchainKHR(m_swapchain);
@@ -102,7 +107,7 @@ void fw::Context::init(GLFWwindow* window)
 	_createSurface(window);
 	_pickPhysicalDevice();
 	_createLogicDevice();
-	_createSwapChain(window);
+	_createSwapchain(window);
 }
 
 void fw::Context::resize(GLFWwindow* window)
@@ -117,7 +122,7 @@ void fw::Context::resize(GLFWwindow* window)
 
 
 	//recreate.
-	_createSwapChain(window);
+	_createSwapchain(window);
 }
 
 bool fw::Context::_checkValidationLayerSupport()
@@ -306,7 +311,7 @@ void fw::Context::_createLogicDevice()
 	LOG(plog::debug) << "Create successfully logic device.";
 }
 
-void fw::Context::_createSwapChain(GLFWwindow* window)
+void fw::Context::_createSwapchain(GLFWwindow* window)
 {
 	SwapChainSupportDetails details = SwapChainSupportDetails::querySwapChainSupport(m_physicalDevice, m_surface);
 	vk::SurfaceFormatKHR surfaceFormat = details.chooseSurfaceFormat();
@@ -361,6 +366,11 @@ void fw::Context::_createSwapChain(GLFWwindow* window)
 	m_swapchainExtent = extent;
 }
 
+void fw::Context::_createSwapchainImageViews()
+{
+
+}
+
 std::vector<const char*> fw::Context::_getRequiredExtensions()
 {
 	std::vector<const char*> requiredExtensions;
@@ -388,6 +398,31 @@ std::vector<const char*> fw::Context::_getRequiredExtensions()
 #endif // ENABLE_VALIDATION_LAYERS
 
 	return requiredExtensions;
+}
+
+vk::ImageView fw::Context::_createImageView(vk::Image image, vk::Format format, vk::ImageAspectFlags aspectFlags)
+{
+	vk::ImageViewCreateInfo createInfo = {
+		vk::ImageViewCreateFlags(),
+		image,
+		vk::ImageViewType::e2D,
+		format,
+		{
+			vk::ComponentSwizzle::eIdentity,
+			vk::ComponentSwizzle::eIdentity,
+			vk::ComponentSwizzle::eIdentity,
+			vk::ComponentSwizzle::eIdentity
+		},
+		{
+			aspectFlags,
+			uint32_t(0),
+			uint32_t(1),
+			uint32_t(0),
+			uint32_t(1)
+         }
+	};
+
+	return m_device.createImageView(createInfo);
 }
 
 #ifdef DEBUG

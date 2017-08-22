@@ -67,13 +67,16 @@ namespace fw
 		std::vector<vk::Image> m_swapchainImages;
 		vk::Format m_swapchainImageFormat;
 		vk::Extent2D m_swapchainExtent;
+		std::vector<vk::ImageView> m_swapchainImageViews;
 		bool _checkValidationLayerSupport();
 		void _createSurface(GLFWwindow* window);
 		void _pickPhysicalDevice();
 		void _createLogicDevice();
-		void _createSwapChain(GLFWwindow* window);
+		void _createSwapchain(GLFWwindow* window);
+		void _createSwapchainImageViews();
 		// tool methods
 		std::vector<const char*> _getRequiredExtensions();
+		vk::ImageView _createImageView(vk::Image image, vk::Format format, vk::ImageAspectFlags aspectFlags);
 #ifdef DEBUG
 		vk::DebugReportCallbackEXT m_debugReportCallBack;
 		void _setupDebugCallBack();

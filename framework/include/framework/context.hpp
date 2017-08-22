@@ -40,6 +40,9 @@ namespace fw
 		std::vector<vk::SurfaceFormatKHR> formats;
 		std::vector<vk::PresentModeKHR> presentModes;
 		SwapChainSupportDetails static querySwapChainSupport(const vk::PhysicalDevice& physicalDevice, const vk::SurfaceKHR& surface);
+	    vk::SurfaceFormatKHR chooseSurfaceFormat();
+		vk::PresentModeKHR choosePresentMode();
+		vk::Extent2D chooseExtent(GLFWwindow* window);
 	};
 
 	class Context
@@ -48,6 +51,7 @@ namespace fw
 		Context(const char* appName, uint32_t appVersion, const char* engineName, uint32_t engineVersion);
 		~Context();
 		void init(GLFWwindow* pWindow);
+		void resize(GLFWwindow* window);
 	private:
 		const char* m_appName;
 		uint32_t m_appVersion;
@@ -59,10 +63,15 @@ namespace fw
 		vk::Device m_device;
 		vk::Queue m_graphicsQueue;
 		vk::Queue m_presentQueue;
+		vk::SwapchainKHR m_swapchain;
+		std::vector<vk::Image> m_swapchainImages;
+		vk::Format m_swapchainImageFormat;
+		vk::Extent2D m_swapchainExtent;
 		bool _checkValidationLayerSupport();
 		void _createSurface(GLFWwindow* window);
 		void _pickPhysicalDevice();
 		void _createLogicDevice();
+		void _createSwapChain(GLFWwindow* window);
 		// tool methods
 		std::vector<const char*> _getRequiredExtensions();
 #ifdef DEBUG

@@ -2,6 +2,7 @@
 
 #include <plog/Log.h>
 #include <map>
+#include <unordered_map>
 #include <set>
 
 
@@ -11,21 +12,27 @@ fw::Context::Context(const char* appName, uint32_t appVersion, const char* engin
 	m_instance(),
 	m_debugReportCallBack(),
 	m_surface(),
-	m_device()
+	m_device(),
+	m_swapchain()
 {
 
 }
 
 fw::Context::~Context()
 {
-	if (m_device != vk::Device())
+	if (m_swapchain != vk::SwapchainKHR(nullptr))
+	{
+		m_device.destroySwapchainKHR(m_swapchain);
+	}
+
+	if (m_device != vk::Device(nullptr))
 	{
 		m_device.destroy();
 	}
 
-	if (m_surface != vk::SurfaceKHR())
+	if (m_surface != vk::SurfaceKHR(nullptr))
 	{
-		vkDestroySurfaceKHR(m_instance, m_surface, nullptr);
+		m_instance.destroySurfaceKHR(m_surface);
 	}
 
 #ifdef DEBUG
@@ -95,6 +102,22 @@ void fw::Context::init(GLFWwindow* window)
 	_createSurface(window);
 	_pickPhysicalDevice();
 	_createLogicDevice();
+	_createSwapChain(window);
+}
+
+void fw::Context::resize(GLFWwindow* window)
+{
+	LOG(plog::debug) << "Context resize.";
+
+	//clear up old datas.
+	if (m_swapchain != vk::SwapchainKHR(nullptr))
+	{
+		vkDestroySwapchainKHR(m_device, m_swapchain, nullptr);
+	}
+
+
+	//recreate.
+	_createSwapChain(window);
 }
 
 bool fw::Context::_checkValidationLayerSupport()
@@ -283,6 +306,61 @@ void fw::Context::_createLogicDevice()
 	LOG(plog::debug) << "Create successfully logic device.";
 }
 
+void fw::Context::_createSwapChain(GLFWwindow* window)
+{
+	SwapChainSupportDetails details = SwapChainSupportDetails::querySwapChainSupport(m_physicalDevice, m_surface);
+	vk::SurfaceFormatKHR surfaceFormat = details.chooseSurfaceFormat();
+	vk::PresentModeKHR presentMode = details.choosePresentMode();
+	vk::Extent2D extent = details.chooseExtent(window);
+
+	//LOG(plog::debug) << "Swapchain surface format: " << surfaceFormat.format
+
+	uint32_t minImageCount = details.capabilities.minImageCount + 1;
+	if (details.capabilities.maxImageCount > 0 && minImageCount > details.capabilities.maxImageCount)
+	{
+		minImageCount = details.capabilities.maxImageCount;
+	}
+
+
+	vk::SwapchainCreateInfoKHR createInfo = {
+		vk::SwapchainCreateFlagsKHR(),
+		m_surface,
+		minImageCount,
+		surfaceFormat.format,
+		surfaceFormat.colorSpace,
+		extent,
+		uint32_t(1),
+		vk::ImageUsageFlagBits::eColorAttachment,
+		vk::SharingMode::eExclusive,
+		uint32_t(0),
+		nullptr,
+		details.capabilities.currentTransform,
+		vk::CompositeAlphaFlagBitsKHR::eOpaque,
+		presentMode,
+		VkBool32(VK_TRUE),
+		vk::SwapchainKHR(nullptr)
+	};
+
+	UsedQueueFamily usedQueueFamily = UsedQueueFamily::findQueueFamilies(m_physicalDevice, m_surface);
+	if (usedQueueFamily.graphicsFamily != usedQueueFamily.presentFamily)
+	{
+		std::vector<uint32_t> queueFamilyIndices = { 
+			(uint32_t)usedQueueFamily.graphicsFamily, 
+			(uint32_t)usedQueueFamily.presentFamily 
+		};
+		createInfo.imageSharingMode = vk::SharingMode::eConcurrent;
+		createInfo.queueFamilyIndexCount = static_cast<uint32_t>(queueFamilyIndices.size());
+		createInfo.pQueueFamilyIndices = queueFamilyIndices.data();
+	}
+
+	m_swapchain = m_device.createSwapchainKHR(createInfo);
+	LOG(plog::debug) << "Create successfully swapchain.";
+
+	m_swapchainImages =  m_device.getSwapchainImagesKHR(m_swapchain);
+	m_swapchainImageFormat = surfaceFormat.format;
+	m_swapchainExtent = extent;
+}
+
 std::vector<const char*> fw::Context::_getRequiredExtensions()
 {
 	std::vector<const char*> requiredExtensions;
@@ -436,5 +514,70 @@ fw::SwapChainSupportDetails fw::SwapChainSupportDetails::querySwapChainSupport(c
 	details.formats = physicalDevice.getSurfaceFormatsKHR(surface);
 	details.presentModes = physicalDevice.getSurfacePresentModesKHR(surface);
 	return details;
+}
+
+vk::SurfaceFormatKHR fw::SwapChainSupportDetails::chooseSurfaceFormat()
+{
+	if (this->formats.size() == 1 && this->formats[0].format == vk::Format::eUndefined)
+	{
+		return { vk::Format::eB8G8R8A8Unorm, vk::ColorSpaceKHR::eSrgbNonlinear };
+	}
+
+	for (const auto& format : this->formats)
+	{
+		if (format.format == vk::Format::eB8G8R8A8Unorm &&
+			format.colorSpace == vk::ColorSpaceKHR::eSrgbNonlinear)
+		{
+			return format;
+		}
+	}
+
+	return this->formats[0];
+}
+
+vk::PresentModeKHR fw::SwapChainSupportDetails::choosePresentMode()
+{
+	std::unordered_map<vk::PresentModeKHR, uint32_t> presentModeAndCores = {
+		{ vk::PresentModeKHR::eMailbox, 0 },
+		{ vk::PresentModeKHR::eFifo, 1 },
+		{ vk::PresentModeKHR::eImmediate, 2 }
+	};
+
+	vk::PresentModeKHR currPresentMode = vk::PresentModeKHR::eImmediate;
+	uint32_t currCore = presentModeAndCores[currPresentMode];
+	for (const auto& presentMode : this->presentModes)
+	{
+		auto iterator = presentModeAndCores.find(presentMode);
+
+		if (iterator != presentModeAndCores.end() && iterator->second < currCore)
+		{
+			currPresentMode = iterator->first;
+			currCore = iterator->second;
+		}
+	}
+
+	return currPresentMode;
+}
+
+vk::Extent2D fw::SwapChainSupportDetails::chooseExtent(GLFWwindow* window)
+{
+	if (capabilities.currentExtent.width != std::numeric_limits<uint32_t>::max())
+	{
+		return capabilities.currentExtent;
+	}
+	else
+	{
+		int width, height;
+		glfwGetWindowSize(window, &width, &height);
+
+		VkExtent2D actualExtent = { static_cast<uint32_t>(width), static_cast<uint32_t>(height) };
+
+		actualExtent.width = std::max(capabilities.minImageExtent.width,
+			std::min(capabilities.maxImageExtent.width, actualExtent.width));
+		actualExtent.height = std::max(capabilities.minImageExtent.height,
+			std::min(capabilities.maxImageExtent.height, actualExtent.height));
+
+		return actualExtent;
+	}
 }
 

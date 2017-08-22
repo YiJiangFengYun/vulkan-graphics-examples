@@ -59,6 +59,7 @@ void fw::AppBase::_onWindowResized(int32_t width, int32_t height)
 {
 	m_width = width;
 	m_height = height;
+	m_context->resize(m_pWindow);
 }
 
 void fw::onWindowResized(GLFWwindow* window, int32_t width, int32_t height)

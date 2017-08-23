@@ -91,7 +91,7 @@ void fw::AppBase::_init()
 #ifdef ENABLE_VALIDATION_LAYERS
 	if (_checkValidationLayerSupport() == false)
 	{
-		throw std::runtime_error("validation layers requested is not available!");
+		throw std::runtime_error("Validation layers requested is not available!");
 	}
 #endif // ENABLE_VALIDATION_LAYERS
 	vk::ApplicationInfo appInfo = { m_appName, m_appVersion, m_engineName, m_engineVersion, VK_API_VERSION_1_0 };
@@ -139,7 +139,7 @@ void fw::AppBase::_init()
 #endif // DEBUG
 
 	GLFWwindow* pWindow = _createWindow(m_width, m_height, m_title);
-	vk::SurfaceKHR surface = _createSurface(pWindow);
+	vk::SurfaceKHR surface = _createVKSurface(pWindow);
 
 	_pickPhysicalDevice(surface);
 	_createLogicDevice(surface);
@@ -186,7 +186,7 @@ GLFWwindow* fw::AppBase::_createWindow(uint32_t width, uint32_t height, const ch
 	return glfwCreateWindow(width, height, title, nullptr, nullptr);
 }
 
-vk::SurfaceKHR fw::AppBase::_createSurface(GLFWwindow* pWindow)
+vk::SurfaceKHR fw::AppBase::_createVKSurface(GLFWwindow* pWindow)
 {
 	VkSurfaceKHR surface;
 	auto result = static_cast<vk::Result > (glfwCreateWindowSurface(m_instance, pWindow, nullptr, &surface));
@@ -205,7 +205,7 @@ void fw::AppBase::_pickPhysicalDevice(vk::SurfaceKHR surface)
 
 	if (physicalDevices.size() == 0)
 	{
-		throw std::runtime_error("Failed to find GPUs with VULKAN support");
+		throw std::runtime_error("Failed to find GPUs with VULKAN support.");
 	}
 
 	const size_t size = physicalDevices.size();
@@ -260,7 +260,7 @@ void fw::AppBase::_pickPhysicalDevice(vk::SurfaceKHR surface)
 
 	if (physicalDevices.size() == 0)
 	{
-		throw std::runtime_error("failed to find a suitable GPU!");
+		throw std::runtime_error("Failed to find a suitable GPU!");
 	}
 
 	const std::vector<const char*>& deviceExtensions = deviceExtensionNames;
@@ -339,7 +339,8 @@ void fw::AppBase::_createLogicDevice(vk::SurfaceKHR surface)
 
 void fw::AppBase::_createSurface(GLFWwindow *pwindow, vk::SurfaceKHR surface)
 {
-	m_pSurface.reset(new Surface(pwindow, surface, m_instance, m_physicalDevice, m_device));
+	m_pSurface.reset(new Surface(pwindow, surface, m_instance, m_physicalDevice, m_device,
+		m_graphicsQueue, m_presentQueue));
 }
 
 

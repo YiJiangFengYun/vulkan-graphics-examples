@@ -5,51 +5,56 @@
 #include <unordered_map>
 #include <set>
 
+vk::Format fw::Surface::DEFAULT_DEPTH_FORMAT(vk::Format::eD32SfloatS8Uint);
 
 fw::Surface::Surface(uint32_t width, uint32_t height, const char* title,
-	vk::Instance instance, vk::PhysicalDevice physicalDevice, vk::Device device)
+	vk::Instance instance, vk::PhysicalDevice physicalDevice, vk::Device device,
+	vk::Queue graphicsQueue, vk::Queue presentQueue)
 {
 	m_vkInstance = instance;
 	m_physicalDevice = physicalDevice;
 	m_device = device;
+	m_graphicsQueue = graphicsQueue;
+	m_presentQueue = presentQueue;
+	m_depthFormat = DEFAULT_DEPTH_FORMAT;
 	_createWindow(width, height, title);
 	_createSurface();
 	_createSwapchain();
 	_createSwapchainImageViews();
+	_createCommandPool();
+	_createRenderPass();
+	_createDepthResources();
 }
 
 fw::Surface::Surface(GLFWwindow *pWindow, vk::SurfaceKHR surface,
-	vk::Instance instance, vk::PhysicalDevice physicalDevice, vk::Device device)
+	vk::Instance instance, vk::PhysicalDevice physicalDevice, vk::Device device,
+	vk::Queue graphicsQueue, vk::Queue presentQueue)
 {
 	m_pWindow = pWindow;
 	m_surface = surface;
 	m_vkInstance = instance;
 	m_physicalDevice = physicalDevice;
 	m_device = device;
+	m_graphicsQueue = graphicsQueue;
+	m_presentQueue = presentQueue;
+	m_depthFormat = DEFAULT_DEPTH_FORMAT;
 	glfwSetWindowUserPointer(pWindow, this);
 	_createSwapchain();
 	_createSwapchainImageViews();
+	_createCommandPool();
+	_createRenderPass();
+	_createDepthResources();
 }
 
 fw::Surface::~Surface()
 {
-	for (const auto& imageView : m_swapchainImageViews)
-	{
-		m_device.destroyImageView(imageView);
-	}
-
-	if (m_swapchain != vk::SwapchainKHR(nullptr))
-	{
-		m_device.destroySwapchainKHR(m_swapchain);
-	}
-
-	if (m_surface != vk::SurfaceKHR(nullptr))
-	{
-		m_vkInstance.destroySurfaceKHR(m_surface);
-	}
-
-	if (m_pWindow != nullptr)
-		glfwDestroyWindow(m_pWindow);
+	_destroyDepthResources();
+	_destroyRenderPass();
+	_destroyCommandPool();
+	_destroySwapchainImageViews();
+	_destroySwapchain();
+	_destroySurface();
+	_destroyWindow();
 }
 
 GLFWwindow *fw::Surface::getWindow() const
@@ -65,6 +70,12 @@ void fw::Surface::_createWindow(uint32_t width, uint32_t height, const char* tit
 	glfwSetWindowSizeCallback(m_pWindow, fw::onWindowResized);
 }
 
+void fw::Surface::_destroyWindow()
+{
+	if (m_pWindow != nullptr)
+		glfwDestroyWindow(m_pWindow);
+}
+
 void fw::Surface::_createSurface()
 {
 	VkSurfaceKHR surface;
@@ -75,6 +86,14 @@ void fw::Surface::_createSurface()
 	}
 	m_surface = surface;
 	LOG(plog::debug) << "Create successfully surface.";
+}
+
+void fw::Surface::_destroySurface()
+{
+	if (m_surface != vk::SurfaceKHR(nullptr))
+	{
+		m_vkInstance.destroySurfaceKHR(m_surface);
+	}
 }
 
 void fw::Surface::_createSwapchain()
@@ -132,12 +151,218 @@ void fw::Surface::_createSwapchain()
 	m_swapchainExtent = extent;
 }
 
-void fw::Surface::_createSwapchainImageViews()
+void fw::Surface::_destroySwapchain()
 {
-
+	if (m_swapchain != vk::SwapchainKHR(nullptr))
+	{
+		m_device.destroySwapchainKHR(m_swapchain);
+	}
 }
 
-vk::ImageView fw::Surface::_createImageView(vk::Image image, vk::Format format, vk::ImageAspectFlags aspectFlags)
+void fw::Surface::_createSwapchainImageViews()
+{
+	size_t num = m_swapchainImages.size();
+	m_swapchainImageViews.resize(m_swapchainImages.size());
+
+	for (size_t i = 0; i < num; ++i)
+	{
+		_createImageView(m_swapchainImages[i], m_swapchainImageFormat, vk::ImageAspectFlagBits::eColor, m_swapchainImageViews[i]);
+	}
+}
+
+void fw::Surface::_destroySwapchainImageViews()
+{
+	for (const auto& imageView : m_swapchainImageViews)
+	{
+		m_device.destroyImageView(imageView);
+	}
+}
+
+void fw::Surface::_createCommandPool()
+{
+	UsedQueueFamily queueFamilyIndices = UsedQueueFamily::findQueueFamilies(m_physicalDevice, m_surface);
+
+	vk::CommandPoolCreateInfo createInfo = {
+		vk::CommandPoolCreateFlags(),
+		static_cast<uint32_t>(queueFamilyIndices.graphicsFamily)
+	};
+	m_commandPool = m_device.createCommandPool(createInfo, nullptr);
+}
+
+void fw::Surface::_destroyCommandPool()
+{
+	if (m_commandPool != vk::CommandPool(nullptr))
+	{
+		m_device.destroyCommandPool(m_commandPool);
+	}
+}
+
+void fw::Surface::_createRenderPass()
+{
+	vk::AttachmentDescription colorAttachment = {
+		vk::AttachmentDescriptionFlags(),
+		m_swapchainImageFormat,
+		vk::SampleCountFlagBits::e1,
+		vk::AttachmentLoadOp::eClear,
+		vk::AttachmentStoreOp::eStore,
+		vk::AttachmentLoadOp::eDontCare,
+		vk::AttachmentStoreOp::eDontCare,
+		vk::ImageLayout::eUndefined,
+		vk::ImageLayout::ePresentSrcKHR
+	};
+
+	vk::AttachmentDescription depthAttachment = {
+		vk::AttachmentDescriptionFlags(),
+		m_depthFormat,
+		vk::SampleCountFlagBits::e1,
+		vk::AttachmentLoadOp::eClear,
+		vk::AttachmentStoreOp::eDontCare,
+		vk::AttachmentLoadOp::eDontCare,
+		vk::AttachmentStoreOp::eDontCare,
+		vk::ImageLayout::eUndefined,
+		vk::ImageLayout::eDepthStencilAttachmentOptimal
+	};
+
+	vk::AttachmentReference colorAttachmentRef = {
+		uint32_t(0),
+		vk::ImageLayout::eColorAttachmentOptimal
+	};
+
+	vk::AttachmentReference depthAttachmentRef = {
+		uint32_t(1),
+		vk::ImageLayout::eDepthStencilAttachmentOptimal
+	};
+
+	vk::SubpassDescription subpass = {
+		vk::SubpassDescriptionFlags(),
+		vk::PipelineBindPoint::eGraphics,
+		0,
+		nullptr,
+		1,
+		&colorAttachmentRef,
+		nullptr,
+		&depthAttachmentRef,
+		0,
+		nullptr
+	};
+
+	vk::SubpassDependency dependency = {
+		VK_SUBPASS_EXTERNAL,
+		0,
+		vk::PipelineStageFlagBits::eColorAttachmentOutput,
+		vk::PipelineStageFlagBits::eColorAttachmentOutput,
+		vk::AccessFlags(),
+		vk::AccessFlagBits::eColorAttachmentRead | vk::AccessFlagBits::eColorAttachmentWrite,
+		vk::DependencyFlags()
+	};
+
+	std::array<vk::AttachmentDescription, 2> attachments = { colorAttachment, depthAttachment };
+	vk::RenderPassCreateInfo renderPassCreateInfo = {
+		vk::RenderPassCreateFlags(),
+		static_cast<uint32_t>(attachments.size()),
+		attachments.data(),
+		static_cast<uint32_t>(1),
+		&subpass,
+		static_cast<uint32_t>(1),
+		&dependency
+	};
+
+	m_renderPass = m_device.createRenderPass(renderPassCreateInfo);
+}
+
+void fw::Surface::_destroyRenderPass()
+{
+	if (m_renderPass != vk::RenderPass(nullptr))
+	{
+		m_device.destroyRenderPass(m_renderPass);
+		m_renderPass = nullptr;
+	}
+}
+
+void fw::Surface::_createDepthResources()
+{
+	_checkDepthFormat();
+	_createImage(m_swapchainExtent.width, 
+		m_swapchainExtent.height, 
+		m_depthFormat, 
+		vk::ImageTiling::eOptimal,
+		vk::ImageUsageFlagBits::eDepthStencilAttachment,
+		vk::MemoryPropertyFlagBits::eDeviceLocal,
+		m_depthImage,
+		m_depthImageMemory);
+	_createImageView(m_depthImage, m_depthFormat, vk::ImageAspectFlagBits::eDepth, m_depthImageView);
+	_transitionImageLayout(m_depthImage, m_depthFormat, vk::ImageLayout::eUndefined,
+		vk::ImageLayout::eDepthStencilAttachmentOptimal);
+}
+
+void fw::Surface::_destroyDepthResources()
+{
+	if (m_depthImageView != vk::ImageView(nullptr))
+	{
+		m_device.destroyImageView(m_depthImageView);
+		m_depthImageView = nullptr;
+	}
+	if (m_depthImage != vk::Image(nullptr))
+	{
+		m_device.destroyImage(m_depthImage);
+		m_depthImage = nullptr;
+	}
+	if (m_depthImageMemory != vk::DeviceMemory(nullptr))
+	{
+		m_device.freeMemory(m_depthImageMemory);
+		m_depthImageMemory = nullptr;
+	}
+}
+
+void fw::Surface::_createImage(uint32_t width, uint32_t height, vk::Format format, vk::ImageTiling tiling,
+	vk::ImageUsageFlags usage, vk::MemoryPropertyFlags properties, vk::Image& image, vk::DeviceMemory& imageMemory)
+{
+	vk::ImageCreateInfo createInfo = {
+		vk::ImageCreateFlags(),
+		vk::ImageType::e2D,
+		format,
+		{
+			width,
+			height,
+			uint32_t(1)
+		},
+		1,
+		1,
+		vk::SampleCountFlagBits::e1,
+		tiling,
+		usage,
+		vk::SharingMode::eExclusive,
+		0,
+		nullptr,
+		vk::ImageLayout::eUndefined
+	};
+
+	UsedQueueFamily usedQueueFamily = UsedQueueFamily::findQueueFamilies(m_physicalDevice, m_surface);
+	if (usedQueueFamily.graphicsFamily != usedQueueFamily.presentFamily)
+	{
+		std::vector<uint32_t> queueFamilyIndices = {
+			(uint32_t)usedQueueFamily.graphicsFamily,
+			(uint32_t)usedQueueFamily.presentFamily
+		};
+		createInfo.sharingMode = vk::SharingMode::eConcurrent;
+		createInfo.queueFamilyIndexCount = static_cast<uint32_t>(queueFamilyIndices.size());
+		createInfo.pQueueFamilyIndices = queueFamilyIndices.data();
+	}
+	image = m_device.createImage(createInfo, nullptr);
+
+	auto memRequirements = m_device.getImageMemoryRequirements(image);
+
+	vk::MemoryAllocateInfo allocInfo = {
+		memRequirements.size,
+		_findMemoryType(memRequirements.memoryTypeBits, properties)
+	};
+
+	imageMemory = m_device.allocateMemory(allocInfo, nullptr);
+
+	m_device.bindImageMemory(image, imageMemory, vk::DeviceSize(0));
+}
+
+void fw::Surface::_createImageView(vk::Image image, vk::Format format, vk::ImageAspectFlags aspectFlags, vk::ImageView& imageView)
 {
 	vk::ImageViewCreateInfo createInfo = {
 		vk::ImageViewCreateFlags(),
@@ -159,7 +384,112 @@ vk::ImageView fw::Surface::_createImageView(vk::Image image, vk::Format format, 
          }
 	};
 
-	return m_device.createImageView(createInfo);
+	imageView = m_device.createImageView(createInfo);
+}
+
+void fw::Surface::_transitionImageLayout(vk::Image image, vk::Format format, 
+	vk::ImageLayout oldLayout, vk::ImageLayout newLayout) {
+	vk::CommandBuffer commandBuffer = _beginSingleTimeCommands();
+
+	vk::ImageMemoryBarrier barrier = {};
+	barrier.oldLayout = oldLayout;
+	barrier.newLayout = newLayout;
+	barrier.srcQueueFamilyIndex = VK_QUEUE_FAMILY_IGNORED;
+	barrier.dstQueueFamilyIndex = VK_QUEUE_FAMILY_IGNORED;
+	barrier.image = image;
+
+	if (newLayout == vk::ImageLayout::eDepthStencilAttachmentOptimal)
+	{
+		barrier.subresourceRange.aspectMask = vk::ImageAspectFlagBits::eDepth | vk::ImageAspectFlagBits::eStencil;
+	}
+	else
+	{
+		barrier.subresourceRange.aspectMask = vk::ImageAspectFlagBits::eColor;
+	}
+	barrier.subresourceRange.baseMipLevel = 0;
+	barrier.subresourceRange.levelCount = 1;
+	barrier.subresourceRange.baseArrayLayer = 0;
+	barrier.subresourceRange.layerCount = 1;
+
+	if (oldLayout == vk::ImageLayout::eUndefined && newLayout == vk::ImageLayout::eTransferDstOptimal)
+	{
+		barrier.srcAccessMask = vk::AccessFlags();
+		barrier.dstAccessMask = vk::AccessFlagBits::eTransferWrite;
+	}
+	else if (oldLayout == vk::ImageLayout::eTransferDstOptimal && newLayout == vk::ImageLayout::eShaderReadOnlyOptimal)
+	{
+		barrier.srcAccessMask = vk::AccessFlagBits::eTransferWrite;
+		barrier.dstAccessMask = vk::AccessFlagBits::eShaderRead;
+	}
+	else if (oldLayout == vk::ImageLayout::eUndefined && newLayout == vk::ImageLayout::eDepthStencilAttachmentOptimal)
+	{
+		barrier.srcAccessMask = vk::AccessFlags();
+		barrier.dstAccessMask = vk::AccessFlagBits::eDepthStencilAttachmentRead | 
+			vk::AccessFlagBits::eDepthStencilAttachmentWrite;
+	}
+	else
+	{
+		throw std::invalid_argument("Unsupported layout transition!");
+	}
+
+	commandBuffer.pipelineBarrier(vk::PipelineStageFlagBits::eTopOfPipe,
+		vk::PipelineStageFlagBits::eTopOfPipe,
+		vk::DependencyFlags(),
+		nullptr,
+		nullptr,
+		barrier
+		);
+
+	_endSingleTimeCommands(commandBuffer);
+}
+
+uint32_t fw::Surface::_findMemoryType(uint32_t typeFilter, vk::MemoryPropertyFlags properties)
+{
+	vk::PhysicalDeviceMemoryProperties memProperties = m_physicalDevice.getMemoryProperties();
+	for (uint32_t i = 0; i < memProperties.memoryTypeCount; ++i)
+	{
+		if (typeFilter & (1 << i) && (memProperties.memoryTypes[i].propertyFlags & properties) == properties)
+		{
+			return i;
+		}
+	}
+
+	throw std::runtime_error("Failed to find suitable memory type!");
+
+}
+
+vk::CommandBuffer fw::Surface::_beginSingleTimeCommands() {
+	vk::CommandBufferAllocateInfo allocateInfo = {
+		m_commandPool,
+		vk::CommandBufferLevel::ePrimary,
+		uint32_t(1)
+	};
+	vk::CommandBuffer commandBuffer = m_device.allocateCommandBuffers(allocateInfo)[0];
+
+	vk::CommandBufferBeginInfo beginInfo = {
+		vk::CommandBufferUsageFlags(vk::CommandBufferUsageFlagBits::eOneTimeSubmit)
+	};
+	commandBuffer.begin(beginInfo);
+
+	return commandBuffer;
+}
+
+void fw::Surface::_endSingleTimeCommands(vk::CommandBuffer commandBuffer) {
+	commandBuffer.end();
+	vk::SubmitInfo submitInfo = { 0, nullptr, nullptr, 1, &commandBuffer, 0, nullptr };
+	m_graphicsQueue.submit(submitInfo, nullptr);
+	m_graphicsQueue.waitIdle();
+	m_device.freeCommandBuffers(m_commandPool, commandBuffer);
+}
+
+void fw::Surface::_checkDepthFormat()
+{
+	auto props = m_physicalDevice.getFormatProperties(m_depthFormat);
+	if ((props.optimalTilingFeatures & vk::FormatFeatureFlagBits::eDepthStencilAttachment) !=
+		vk::FormatFeatureFlagBits::eDepthStencilAttachment)
+	{
+		throw std::runtime_error("Depth format is be supported!");
+	}
 }
 
 void fw::Surface::_onWindowResized(int32_t width, int32_t height)
@@ -167,14 +497,15 @@ void fw::Surface::_onWindowResized(int32_t width, int32_t height)
 	LOG(plog::debug) << "Context resize.";
 
 	//clear up old datas.
-	if (m_swapchain != vk::SwapchainKHR(nullptr))
-	{
-		vkDestroySwapchainKHR(m_device, m_swapchain, nullptr);
-	}
+	_destroyDepthResources();
+	_destroySwapchainImageViews();
+	_destroySwapchain();
 
 
 	//recreate.
 	_createSwapchain();
+	_createSwapchainImageViews();
+	_createDepthResources();
 }
 
 void fw::onWindowResized(GLFWwindow* window, int32_t width, int32_t height)

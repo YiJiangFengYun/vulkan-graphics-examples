@@ -18,10 +18,10 @@
     <ClInclude Include="..\..\framework\include\framework\surface.hpp">
       <Filter>include</Filter>
     </ClInclude>
-    <ClInclude Include="..\..\framework\include\framework\families.hpp">
+    <ClInclude Include="..\..\framework\include\framework\vulkan_ext.hpp">
       <Filter>include</Filter>
     </ClInclude>
-    <ClInclude Include="..\..\framework\include\framework\vulkan_ext.hpp">
+    <ClInclude Include="..\..\framework\include\framework\queue_family.hpp">
       <Filter>include</Filter>
     </ClInclude>
   </ItemGroup>
@@ -32,10 +32,10 @@
     <ClCompile Include="..\..\framework\src\framework\surface.cpp">
       <Filter>src</Filter>
     </ClCompile>
-    <ClCompile Include="..\..\framework\src\framework\families.cpp">
+    <ClCompile Include="..\..\framework\src\framework\vulkan_ext.cpp">
       <Filter>src</Filter>
     </ClCompile>
-    <ClCompile Include="..\..\framework\src\framework\vulkan_ext.cpp">
+    <ClCompile Include="..\..\framework\src\framework\queue_family.cpp">
       <Filter>src</Filter>
     </ClCompile>
   </ItemGroup>

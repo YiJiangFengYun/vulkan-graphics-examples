@@ -55,8 +55,9 @@ namespace fw
 		void _createLogicDevice(vk::SurfaceKHR surface);
 		void _createSurface(GLFWwindow *pwindow, vk::SurfaceKHR surface);
 
+		//tool methods.
 		GLFWwindow* _createWindow(uint32_t width, uint32_t height, const char* title);
-		vk::SurfaceKHR _createSurface(GLFWwindow* pWindow);
+		vk::SurfaceKHR _createVKSurface(GLFWwindow* pWindow);
 		std::vector<const char*> _getRequiredExtensions();
 #ifdef DEBUG
 		vk::DebugReportCallbackEXT m_debugReportCallBack;

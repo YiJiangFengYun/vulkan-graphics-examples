@@ -24,6 +24,7 @@ fw::Surface::Surface(uint32_t width, uint32_t height, const char* title,
 	_createCommandPool();
 	_createRenderPass();
 	_createDepthResources();
+	_createFramebuffers();
 }
 
 fw::Surface::Surface(GLFWwindow *pWindow, vk::SurfaceKHR surface,
@@ -39,15 +40,18 @@ fw::Surface::Surface(GLFWwindow *pWindow, vk::SurfaceKHR surface,
 	m_presentQueue = presentQueue;
 	m_depthFormat = DEFAULT_DEPTH_FORMAT;
 	glfwSetWindowUserPointer(pWindow, this);
+	glfwSetWindowSizeCallback(pWindow, fw::onWindowResized);
 	_createSwapchain();
 	_createSwapchainImageViews();
 	_createCommandPool();
 	_createRenderPass();
 	_createDepthResources();
+	_createFramebuffers();
 }
 
 fw::Surface::~Surface()
 {
+	_destroyFramebuffers();
 	_destroyDepthResources();
 	_destroyRenderPass();
 	_destroyCommandPool();
@@ -314,6 +318,40 @@ void fw::Surface::_destroyDepthResources()
 	}
 }
 
+void fw::Surface::_createFramebuffers()
+{
+	size_t count = m_swapchainImageViews.size();
+	m_swapchainFramebuffers.resize(count);
+	for (size_t i = 0; i < count; ++i)
+	{
+		std::array<vk::ImageView, 2> attachments = { m_swapchainImageViews[i], m_depthImageView };
+		vk::FramebufferCreateInfo createInfo = {
+			vk::FramebufferCreateFlags(),
+			m_renderPass,
+			static_cast<uint32_t>(attachments.size()),
+			attachments.data(),
+			m_swapchainExtent.width,
+			m_swapchainExtent.height,
+			static_cast<uint32_t>(1) 
+		};
+
+		m_swapchainFramebuffers[i] = m_device.createFramebuffer(createInfo);
+	}
+}
+
+void fw::Surface::_destroyFramebuffers()
+{
+	size_t num = m_swapchainFramebuffers.size();
+	for (size_t i = 0; i < num; ++i)
+	{
+		if (m_swapchainFramebuffers[i] != vk::Framebuffer(nullptr))
+		{
+			m_device.destroyFramebuffer(m_swapchainFramebuffers[i]);
+			m_swapchainFramebuffers[i] = nullptr;
+		}
+	}
+}
+
 void fw::Surface::_createImage(uint32_t width, uint32_t height, vk::Format format, vk::ImageTiling tiling,
 	vk::ImageUsageFlags usage, vk::MemoryPropertyFlags properties, vk::Image& image, vk::DeviceMemory& imageMemory)
 {
@@ -497,6 +535,7 @@ void fw::Surface::_onWindowResized(int32_t width, int32_t height)
 	LOG(plog::debug) << "Context resize.";
 
 	//clear up old datas.
+	_destroyFramebuffers();
 	_destroyDepthResources();
 	_destroySwapchainImageViews();
 	_destroySwapchain();
@@ -506,6 +545,7 @@ void fw::Surface::_onWindowResized(int32_t width, int32_t height)
 	_createSwapchain();
 	_createSwapchainImageViews();
 	_createDepthResources();
+	_createFramebuffers();
 }
 
 void fw::onWindowResized(GLFWwindow* window, int32_t width, int32_t height)

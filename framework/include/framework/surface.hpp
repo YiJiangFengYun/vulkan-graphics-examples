@@ -49,6 +49,7 @@ namespace fw
 		vk::ImageView m_depthImageView;
 		vk::DeviceMemory m_depthImageMemory;
 		vk::Format m_depthFormat;
+		std::vector<vk::Framebuffer> m_swapchainFramebuffers;
 
 		//aggregations
 		vk::Instance m_vkInstance;
@@ -72,6 +73,8 @@ namespace fw
 		void _checkDepthFormat();
 		void _createDepthResources();
 		void _destroyDepthResources();
+		void _createFramebuffers();
+		void _destroyFramebuffers();
 
 		// tool methods
 		void _createImage(uint32_t width, uint32_t height, vk::Format format, vk::ImageTiling tiling,

@@ -15,13 +15,13 @@
     <ClInclude Include="..\..\framework\include\framework\macro.hpp">
       <Filter>include</Filter>
     </ClInclude>
-    <ClInclude Include="..\..\framework\include\framework\vulkanExt.hpp">
-      <Filter>include</Filter>
-    </ClInclude>
     <ClInclude Include="..\..\framework\include\framework\surface.hpp">
       <Filter>include</Filter>
     </ClInclude>
     <ClInclude Include="..\..\framework\include\framework\families.hpp">
+      <Filter>include</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\framework\include\framework\vulkan_ext.hpp">
       <Filter>include</Filter>
     </ClInclude>
   </ItemGroup>
@@ -29,13 +29,13 @@
     <ClCompile Include="..\..\framework\src\framework\app_base.cpp">
       <Filter>src</Filter>
     </ClCompile>
-    <ClCompile Include="..\..\framework\src\framework\vulkanExt.cpp">
-      <Filter>src</Filter>
-    </ClCompile>
     <ClCompile Include="..\..\framework\src\framework\surface.cpp">
       <Filter>src</Filter>
     </ClCompile>
     <ClCompile Include="..\..\framework\src\framework\families.cpp">
+      <Filter>src</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\framework\src\framework\vulkan_ext.cpp">
       <Filter>src</Filter>
     </ClCompile>
   </ItemGroup>

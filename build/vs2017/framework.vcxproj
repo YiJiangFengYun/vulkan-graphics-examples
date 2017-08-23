@@ -22,14 +22,14 @@
     <ClCompile Include="..\..\framework\src\framework\app_base.cpp" />
     <ClCompile Include="..\..\framework\src\framework\families.cpp" />
     <ClCompile Include="..\..\framework\src\framework\surface.cpp" />
-    <ClCompile Include="..\..\framework\src\framework\vulkanExt.cpp" />
+    <ClCompile Include="..\..\framework\src\framework\vulkan_ext.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="..\..\framework\include\framework\app_base.hpp" />
     <ClInclude Include="..\..\framework\include\framework\families.hpp" />
     <ClInclude Include="..\..\framework\include\framework\macro.hpp" />
     <ClInclude Include="..\..\framework\include\framework\surface.hpp" />
-    <ClInclude Include="..\..\framework\include\framework\vulkanExt.hpp" />
+    <ClInclude Include="..\..\framework\include\framework\vulkan_ext.hpp" />
   </ItemGroup>
   <PropertyGroup Label="Globals">
     <VCProjectVersion>15.0</VCProjectVersion>

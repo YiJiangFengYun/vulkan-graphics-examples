@@ -1,10 +1,10 @@
-#ifndef FW_FAMILIES_H
-#define FW_FAMILIES_H
+#ifndef GFW_FAMILIES_H
+#define GFW_FAMILIES_H
 
 #include <vulkan/vulkan.hpp>
 #include "macro.hpp"
 
-namespace fw
+namespace gfw
 {
 	struct UsedQueueFamily
 	{
@@ -20,5 +20,5 @@ namespace fw
 	};
 }
 
-#endif // !FW_FAMILIES_H
+#endif // !GFW_FAMILIES_H
 

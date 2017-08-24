@@ -4,7 +4,7 @@
 #include <plog/Appenders/DebugOutputAppender.h>
 #include <set>
 
-fw::AppBase::AppBase(int32_t width, int32_t height, const char *title)
+gfw::AppBase::AppBase(int32_t width, int32_t height, const char *title)
 	:m_appName("vulkan graphics"), 
 	m_appVersion(VK_MAKE_VERSION(1, 0, 0)), 
 	m_engineName("No engine"),
@@ -16,7 +16,7 @@ fw::AppBase::AppBase(int32_t width, int32_t height, const char *title)
 	_init();
 }
 
-fw::AppBase::~AppBase()
+gfw::AppBase::~AppBase()
 {
 	m_pSurface.reset(nullptr);
 
@@ -29,7 +29,7 @@ fw::AppBase::~AppBase()
 #ifdef DEBUG
 	if (m_debugReportCallBack != vk::DebugReportCallbackEXT(nullptr))
 	{
-		fw::destroyDebugReportCallbackEXT(m_instance, m_debugReportCallBack, nullptr);
+		gfw::destroyDebugReportCallbackEXT(m_instance, m_debugReportCallBack, nullptr);
 	}
 #endif // DEBUG
 
@@ -41,7 +41,7 @@ fw::AppBase::~AppBase()
 	glfwTerminate();
 }
 
-void fw::AppBase::run()
+void gfw::AppBase::run()
 {
 	while (!glfwWindowShouldClose(m_pSurface->getGLFWWindow()))
 	{
@@ -50,32 +50,32 @@ void fw::AppBase::run()
 	//vkDeviceWaitIdle(device);
 }
 
-vk::Instance fw::AppBase::getVKInstance()
+vk::Instance gfw::AppBase::getVKInstance()
 {
 	return m_instance;
 }
 
-vk::PhysicalDevice fw::AppBase::getPhysicalDevice()
+vk::PhysicalDevice gfw::AppBase::getPhysicalDevice()
 {
 	return m_physicalDevice;
 }
 
-vk::Device fw::AppBase::getDevice()
+vk::Device gfw::AppBase::getDevice()
 {
 	return m_device;
 }
 
-vk::Queue fw::AppBase::getGraphicsQueue()
+vk::Queue gfw::AppBase::getGraphicsQueue()
 {
 	return m_graphicsQueue;
 }
 
-vk::Queue fw::AppBase::getPresentQueue()
+vk::Queue gfw::AppBase::getPresentQueue()
 {
 	return m_presentQueue;
 }
 
-void fw::AppBase::_init()
+void gfw::AppBase::_init()
 {
 	//init default log to write to the windows debug output
 	static plog::DebugOutputAppender<plog::TxtFormatter> debugOutputAppender;
@@ -148,7 +148,7 @@ void fw::AppBase::_init()
 	LOG(plog::debug) << "Application initialization complete.";
 }
 
-bool fw::AppBase::_checkValidationLayerSupport()
+bool gfw::AppBase::_checkValidationLayerSupport()
 {
 	//query available layers.
 	auto avaibleLayers = vk::enumerateInstanceLayerProperties();
@@ -181,23 +181,23 @@ bool fw::AppBase::_checkValidationLayerSupport()
 	return true;
 }
 
-GLFWwindow* fw::AppBase::_createWindow(uint32_t width, uint32_t height, const char* title)
+GLFWwindow* gfw::AppBase::_createWindow(uint32_t width, uint32_t height, const char* title)
 {
 	return glfwCreateWindow(width, height, title, nullptr, nullptr);
 }
 
-vk::SurfaceKHR fw::AppBase::_createVKSurface(GLFWwindow* pWindow)
+vk::SurfaceKHR gfw::AppBase::_createVKSurface(GLFWwindow* pWindow)
 {
 	VkSurfaceKHR surface;
 	auto result = static_cast<vk::Result > (glfwCreateWindowSurface(m_instance, pWindow, nullptr, &surface));
 	if (result != vk::Result::eSuccess)
 	{
-		throw std::system_error(result, "fw::AppBase::_createSurface");
+		throw std::system_error(result, "gfw::AppBase::_createSurface");
 	}
 	return surface;
 }
 
-void fw::AppBase::_pickPhysicalDevice(vk::SurfaceKHR surface)
+void gfw::AppBase::_pickPhysicalDevice(vk::SurfaceKHR surface)
 {
 	auto physicalDevices = m_instance.enumeratePhysicalDevices();
 
@@ -212,39 +212,39 @@ void fw::AppBase::_pickPhysicalDevice(vk::SurfaceKHR surface)
 
 	for (auto it = physicalDevices.cbegin(); it != physicalDevices.cend();)
 	{
-		fw::Bool32 isSuitable = [&](const vk::PhysicalDevice& physicalDevice)->fw::Bool32
+		gfw::Bool32 isSuitable = [&](const vk::PhysicalDevice& physicalDevice)->gfw::Bool32
 		{
 			const vk::PhysicalDeviceProperties deviceProperties = physicalDevice.getProperties();
 			const vk::PhysicalDeviceFeatures deviceFeatures = physicalDevice.getFeatures();
 			//Application can't function without geometry shaders
 			if (deviceFeatures.geometryShader == VK_FALSE)
 			{
-				return FW_FALSE;
+				return GFW_FALSE;
 			}
 
 			//Application can't function without queue family that supports graphics commands.
-			if (UsedQueueFamily::findQueueFamilies(physicalDevice, surface).isComplete() == FW_FALSE)
+			if (UsedQueueFamily::findQueueFamilies(physicalDevice, surface).isComplete() == GFW_FALSE)
 			{
-				return FW_FALSE;
+				return GFW_FALSE;
 			}
 
 			//Application can't function without support of device for swap chain extension.
-			if (checkDeviceExtensionSupport(physicalDevice, deviceExtensionNames) == FW_FALSE)
+			if (checkDeviceExtensionSupport(physicalDevice, deviceExtensionNames) == GFW_FALSE)
 			{
-				return FW_FALSE;
+				return GFW_FALSE;
 			}
 
 			//Application can't function without adequate support of device for swap chain.
 			SwapChainSupportDetails swapChainSupportDetails = SwapChainSupportDetails::querySwapChainSupport(physicalDevice, surface);
 			if (swapChainSupportDetails.formats.empty() || swapChainSupportDetails.presentModes.empty())
 			{
-				return FW_FALSE;
+				return GFW_FALSE;
 			}
 
 			//Application can't function without feature of sampler anisotropy.
 			if (deviceFeatures.samplerAnisotropy == VK_FALSE)
 			{
-				return FW_FALSE;
+				return GFW_FALSE;
 			}
 		}(*it);
 
@@ -289,7 +289,7 @@ void fw::AppBase::_pickPhysicalDevice(vk::SurfaceKHR surface)
 	LOG(plog::debug) << "Pick successfully physical device.";
 }
 
-void fw::AppBase::_createLogicDevice(vk::SurfaceKHR surface)
+void gfw::AppBase::_createLogicDevice(vk::SurfaceKHR surface)
 {
 	UsedQueueFamily usedQueueFamily = UsedQueueFamily::findQueueFamilies(m_physicalDevice, surface);
 	std::vector<vk::DeviceQueueCreateInfo> queueCreateInfos;
@@ -337,14 +337,14 @@ void fw::AppBase::_createLogicDevice(vk::SurfaceKHR surface)
 	LOG(plog::debug) << "Create successfully logic device.";
 }
 
-void fw::AppBase::_createSurface(GLFWwindow *pwindow, vk::SurfaceKHR surface)
+void gfw::AppBase::_createSurface(GLFWwindow *pwindow, vk::SurfaceKHR surface)
 {
 	m_pSurface.reset(new Window(pwindow, surface, m_instance, m_physicalDevice, m_device,
 		m_graphicsQueue, m_presentQueue));
 }
 
 
-std::vector<const char*> fw::AppBase::_getRequiredExtensions()
+std::vector<const char*> gfw::AppBase::_getRequiredExtensions()
 {
 	std::vector<const char*> requiredExtensions;
 
@@ -374,7 +374,7 @@ std::vector<const char*> fw::AppBase::_getRequiredExtensions()
 }
 
 #ifdef DEBUG
-void fw::AppBase::_setupDebugCallBack()
+void gfw::AppBase::_setupDebugCallBack()
 {
 	vk::DebugReportCallbackCreateInfoEXT createInfo = {
 		vk::DebugReportFlagBitsEXT::eDebug |
@@ -387,12 +387,12 @@ void fw::AppBase::_setupDebugCallBack()
 	};
 
 	VkDebugReportCallbackEXT callback;
-	fw::createDebugReportCallbackEXT(m_instance, &VkDebugReportCallbackCreateInfoEXT(createInfo),
+	gfw::createDebugReportCallbackEXT(m_instance, &VkDebugReportCallbackCreateInfoEXT(createInfo),
 		nullptr, &callback);
 	m_debugReportCallBack = callback;
 }
 
-void fw::AppBase::_onDebugCallBack(vk::DebugReportFlagsEXT flags, vk::DebugReportObjectTypeEXT objType,
+void gfw::AppBase::_onDebugCallBack(vk::DebugReportFlagsEXT flags, vk::DebugReportObjectTypeEXT objType,
 	uint64_t obj, size_t location, int32_t code, const char* layerPrefix,
 	const char* msg)
 {
@@ -424,7 +424,7 @@ void fw::AppBase::_onDebugCallBack(vk::DebugReportFlagsEXT flags, vk::DebugRepor
 #endif // DEBUG
 
 #ifdef DEBUG
-VKAPI_ATTR VkBool32 VKAPI_CALL fw::debugCallback(
+VKAPI_ATTR VkBool32 VKAPI_CALL gfw::debugCallback(
 	VkDebugReportFlagsEXT flags,
 	VkDebugReportObjectTypeEXT objType,
 	uint64_t obj,
@@ -446,7 +446,7 @@ VKAPI_ATTR VkBool32 VKAPI_CALL fw::debugCallback(
 }
 #endif // DEBUG
 
-bool fw::checkDeviceExtensionSupport(const vk::PhysicalDevice& physicalDevice, std::vector<const char*> deviceExtensionNames)
+bool gfw::checkDeviceExtensionSupport(const vk::PhysicalDevice& physicalDevice, std::vector<const char*> deviceExtensionNames)
 {
 	auto extensionProperties = physicalDevice.enumerateDeviceExtensionProperties();
 

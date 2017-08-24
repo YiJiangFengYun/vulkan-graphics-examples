@@ -1,12 +1,12 @@
-#ifndef FW_APP_BASE_H
-#define FW_APP_BASE_H
+#ifndef GFW_APP_BASE_H
+#define GFW_APP_BASE_H
 
 #include <memory>
 #include "macro.hpp"
 #include "window.hpp"
 #include <GLFW/glfw3.h>
 
-namespace fw
+namespace gfw
 {
 #ifdef DEBUG
 #define ENABLE_VALIDATION_LAYERS
@@ -47,7 +47,7 @@ namespace fw
 		int32_t m_width;
 		int32_t m_height;
 		const char *m_title;
-		std::unique_ptr<fw::Window> m_pSurface;
+		std::unique_ptr<gfw::Window> m_pSurface;
 
 		void _init();
 		bool _checkValidationLayerSupport();
@@ -78,4 +78,4 @@ namespace fw
 	};
 }
 
-#endif // !FW_APP_BASE_H
+#endif // !GFW_APP_BASE_H

@@ -1,6 +1,6 @@
 #include "app/vulkan_ext.hpp"
 
-VkResult fw::createDebugReportCallbackEXT(VkInstance instance, const VkDebugReportCallbackCreateInfoEXT* pCreateInfo,
+VkResult gfw::createDebugReportCallbackEXT(VkInstance instance, const VkDebugReportCallbackCreateInfoEXT* pCreateInfo,
 	const VkAllocationCallbacks* pAllocator, VkDebugReportCallbackEXT* pCallback)
 {
 	auto func = (PFN_vkCreateDebugReportCallbackEXT)vkGetInstanceProcAddr(instance, "vkCreateDebugReportCallbackEXT");
@@ -14,7 +14,7 @@ VkResult fw::createDebugReportCallbackEXT(VkInstance instance, const VkDebugRepo
 	}
 }
 
-void fw::destroyDebugReportCallbackEXT(VkInstance instance, VkDebugReportCallbackEXT callback,
+void gfw::destroyDebugReportCallbackEXT(VkInstance instance, VkDebugReportCallbackEXT callback,
 	const VkAllocationCallbacks* pAllocator)
 {
 	auto func = (PFN_vkDestroyDebugReportCallbackEXT)vkGetInstanceProcAddr(instance, "vkDestroyDebugReportCallbackEXT");

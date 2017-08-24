@@ -1,5 +1,5 @@
-#ifndef FW_MACRO_H
-#define FW_MACRO_H
+#ifndef GFW_MACRO_H
+#define GFW_MACRO_H
 
 
 #ifdef _DEBUG
@@ -10,15 +10,15 @@
 #define GLFW_INCLUDE_VULKAN
 #endif // !GLFW_INCLUDE_VULKAN
 
-#define FW_FALSE 0
-#define FW_TRUE 1
+#define GFW_FALSE 0
+#define GFW_TRUE 1
 
-namespace fw
+namespace gfw
 { 
 	using Bool32 = uint32_t;
 }
 
-#endif // !FW_MACRO_H
+#endif // !GFW_MACRO_H
 
 
 

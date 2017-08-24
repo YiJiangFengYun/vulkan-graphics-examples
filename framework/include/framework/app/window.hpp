@@ -1,5 +1,5 @@
-#ifndef FW_CONTEXT_H
-#define FW_CONTEXT_H
+#ifndef GFW_CONTEXT_H
+#define GFW_CONTEXT_H
 
 #include <vector>
 #include <vulkan/vulkan.hpp>
@@ -8,7 +8,7 @@
 #include <GLFW/glfw3.h>
 #include "queue_family.hpp"
 
-namespace fw
+namespace gfw
 {
 	struct SwapChainSupportDetails {
 		vk::SurfaceCapabilitiesKHR capabilities;
@@ -94,5 +94,5 @@ namespace fw
 
 
 
-#endif // !FW_CONTEXT_H
+#endif // !GFW_CONTEXT_H
 

@@ -1,9 +1,9 @@
-#ifndef FW_VULKAN_EXT_H
-#define FW_VULKAN_EXT_H
+#ifndef GFW_VULKAN_EXT_H
+#define GFW_VULKAN_EXT_H
 
 #include <vulkan/vulkan.h>
 
-namespace fw
+namespace gfw
 {
 	VkResult createDebugReportCallbackEXT(VkInstance instance, const VkDebugReportCallbackCreateInfoEXT* pCreateInfo,
 		const VkAllocationCallbacks* pAllocator, VkDebugReportCallbackEXT* pCallback);
@@ -12,4 +12,4 @@ namespace fw
 		const VkAllocationCallbacks* pAllocator);
 }
 
-#endif // !FW_VULKAN_EXT_H
+#endif // !GFW_VULKAN_EXT_H

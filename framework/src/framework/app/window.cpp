@@ -5,9 +5,9 @@
 #include <unordered_map>
 #include <set>
 
-vk::Format fw::Window::DEFAULT_DEPTH_FORMAT(vk::Format::eD32SfloatS8Uint);
+vk::Format gfw::Window::DEFAULT_DEPTH_FORMAT(vk::Format::eD32SfloatS8Uint);
 
-fw::Window::Window(uint32_t width, uint32_t height, const char* title,
+gfw::Window::Window(uint32_t width, uint32_t height, const char* title,
 	vk::Instance instance, vk::PhysicalDevice physicalDevice, vk::Device device,
 	vk::Queue graphicsQueue, vk::Queue presentQueue)
 {
@@ -27,7 +27,7 @@ fw::Window::Window(uint32_t width, uint32_t height, const char* title,
 	_createFramebuffers();
 }
 
-fw::Window::Window(GLFWwindow *pWindow, vk::SurfaceKHR surface,
+gfw::Window::Window(GLFWwindow *pWindow, vk::SurfaceKHR surface,
 	vk::Instance instance, vk::PhysicalDevice physicalDevice, vk::Device device,
 	vk::Queue graphicsQueue, vk::Queue presentQueue)
 {
@@ -40,7 +40,7 @@ fw::Window::Window(GLFWwindow *pWindow, vk::SurfaceKHR surface,
 	m_presentQueue = presentQueue;
 	m_depthFormat = DEFAULT_DEPTH_FORMAT;
 	glfwSetWindowUserPointer(pWindow, this);
-	glfwSetWindowSizeCallback(pWindow, fw::onWindowResized);
+	glfwSetWindowSizeCallback(pWindow, gfw::onWindowResized);
 	_createSwapchain();
 	_createSwapchainImageViews();
 	_createCommandPool();
@@ -49,7 +49,7 @@ fw::Window::Window(GLFWwindow *pWindow, vk::SurfaceKHR surface,
 	_createFramebuffers();
 }
 
-fw::Window::~Window()
+gfw::Window::~Window()
 {
 	_destroyFramebuffers();
 	_destroyDepthResources();
@@ -61,38 +61,38 @@ fw::Window::~Window()
 	_destroyWindow();
 }
 
-GLFWwindow *fw::Window::getGLFWWindow() const
+GLFWwindow *gfw::Window::getGLFWWindow() const
 {
 	return m_pWindow;
 }
 
-void fw::Window::_createWindow(uint32_t width, uint32_t height, const char* title)
+void gfw::Window::_createWindow(uint32_t width, uint32_t height, const char* title)
 {
 	m_pWindow = glfwCreateWindow(width, height, title, nullptr, nullptr);
 
 	glfwSetWindowUserPointer(m_pWindow, this);
-	glfwSetWindowSizeCallback(m_pWindow, fw::onWindowResized);
+	glfwSetWindowSizeCallback(m_pWindow, gfw::onWindowResized);
 }
 
-void fw::Window::_destroyWindow()
+void gfw::Window::_destroyWindow()
 {
 	if (m_pWindow != nullptr)
 		glfwDestroyWindow(m_pWindow);
 }
 
-void fw::Window::_createSurface()
+void gfw::Window::_createSurface()
 {
 	VkSurfaceKHR surface;
 	auto result = static_cast<vk::Result > (glfwCreateWindowSurface(m_vkInstance, m_pWindow, nullptr, &surface));
 	if ( result != vk::Result::eSuccess)
 	{
-		throw std::system_error(result, "fw::Context::_createSurface");
+		throw std::system_error(result, "gfw::Context::_createSurface");
 	}
 	m_surface = surface;
 	LOG(plog::debug) << "Create successfully surface.";
 }
 
-void fw::Window::_destroySurface()
+void gfw::Window::_destroySurface()
 {
 	if (m_surface != vk::SurfaceKHR(nullptr))
 	{
@@ -100,7 +100,7 @@ void fw::Window::_destroySurface()
 	}
 }
 
-void fw::Window::_createSwapchain()
+void gfw::Window::_createSwapchain()
 {
 	SwapChainSupportDetails details = SwapChainSupportDetails::querySwapChainSupport(m_physicalDevice, m_surface);
 	vk::SurfaceFormatKHR surfaceFormat = details.chooseSurfaceFormat();
@@ -155,7 +155,7 @@ void fw::Window::_createSwapchain()
 	m_swapchainExtent = extent;
 }
 
-void fw::Window::_destroySwapchain()
+void gfw::Window::_destroySwapchain()
 {
 	if (m_swapchain != vk::SwapchainKHR(nullptr))
 	{
@@ -163,7 +163,7 @@ void fw::Window::_destroySwapchain()
 	}
 }
 
-void fw::Window::_createSwapchainImageViews()
+void gfw::Window::_createSwapchainImageViews()
 {
 	size_t num = m_swapchainImages.size();
 	m_swapchainImageViews.resize(m_swapchainImages.size());
@@ -174,7 +174,7 @@ void fw::Window::_createSwapchainImageViews()
 	}
 }
 
-void fw::Window::_destroySwapchainImageViews()
+void gfw::Window::_destroySwapchainImageViews()
 {
 	for (const auto& imageView : m_swapchainImageViews)
 	{
@@ -182,7 +182,7 @@ void fw::Window::_destroySwapchainImageViews()
 	}
 }
 
-void fw::Window::_createCommandPool()
+void gfw::Window::_createCommandPool()
 {
 	UsedQueueFamily queueFamilyIndices = UsedQueueFamily::findQueueFamilies(m_physicalDevice, m_surface);
 
@@ -193,7 +193,7 @@ void fw::Window::_createCommandPool()
 	m_commandPool = m_device.createCommandPool(createInfo, nullptr);
 }
 
-void fw::Window::_destroyCommandPool()
+void gfw::Window::_destroyCommandPool()
 {
 	if (m_commandPool != vk::CommandPool(nullptr))
 	{
@@ -201,7 +201,7 @@ void fw::Window::_destroyCommandPool()
 	}
 }
 
-void fw::Window::_createRenderPass()
+void gfw::Window::_createRenderPass()
 {
 	vk::AttachmentDescription colorAttachment = {
 		vk::AttachmentDescriptionFlags(),
@@ -274,7 +274,7 @@ void fw::Window::_createRenderPass()
 	m_renderPass = m_device.createRenderPass(renderPassCreateInfo);
 }
 
-void fw::Window::_destroyRenderPass()
+void gfw::Window::_destroyRenderPass()
 {
 	if (m_renderPass != vk::RenderPass(nullptr))
 	{
@@ -283,7 +283,7 @@ void fw::Window::_destroyRenderPass()
 	}
 }
 
-void fw::Window::_createDepthResources()
+void gfw::Window::_createDepthResources()
 {
 	_checkDepthFormat();
 	_createImage(m_swapchainExtent.width, 
@@ -299,7 +299,7 @@ void fw::Window::_createDepthResources()
 		vk::ImageLayout::eDepthStencilAttachmentOptimal);
 }
 
-void fw::Window::_destroyDepthResources()
+void gfw::Window::_destroyDepthResources()
 {
 	if (m_depthImageView != vk::ImageView(nullptr))
 	{
@@ -318,7 +318,7 @@ void fw::Window::_destroyDepthResources()
 	}
 }
 
-void fw::Window::_createFramebuffers()
+void gfw::Window::_createFramebuffers()
 {
 	size_t count = m_swapchainImageViews.size();
 	m_swapchainFramebuffers.resize(count);
@@ -339,7 +339,7 @@ void fw::Window::_createFramebuffers()
 	}
 }
 
-void fw::Window::_destroyFramebuffers()
+void gfw::Window::_destroyFramebuffers()
 {
 	size_t num = m_swapchainFramebuffers.size();
 	for (size_t i = 0; i < num; ++i)
@@ -352,7 +352,7 @@ void fw::Window::_destroyFramebuffers()
 	}
 }
 
-void fw::Window::_createImage(uint32_t width, uint32_t height, vk::Format format, vk::ImageTiling tiling,
+void gfw::Window::_createImage(uint32_t width, uint32_t height, vk::Format format, vk::ImageTiling tiling,
 	vk::ImageUsageFlags usage, vk::MemoryPropertyFlags properties, vk::Image& image, vk::DeviceMemory& imageMemory)
 {
 	vk::ImageCreateInfo createInfo = {
@@ -400,7 +400,7 @@ void fw::Window::_createImage(uint32_t width, uint32_t height, vk::Format format
 	m_device.bindImageMemory(image, imageMemory, vk::DeviceSize(0));
 }
 
-void fw::Window::_createImageView(vk::Image image, vk::Format format, vk::ImageAspectFlags aspectFlags, vk::ImageView& imageView)
+void gfw::Window::_createImageView(vk::Image image, vk::Format format, vk::ImageAspectFlags aspectFlags, vk::ImageView& imageView)
 {
 	vk::ImageViewCreateInfo createInfo = {
 		vk::ImageViewCreateFlags(),
@@ -425,7 +425,7 @@ void fw::Window::_createImageView(vk::Image image, vk::Format format, vk::ImageA
 	imageView = m_device.createImageView(createInfo);
 }
 
-void fw::Window::_transitionImageLayout(vk::Image image, vk::Format format,
+void gfw::Window::_transitionImageLayout(vk::Image image, vk::Format format,
 	vk::ImageLayout oldLayout, vk::ImageLayout newLayout) {
 	vk::CommandBuffer commandBuffer = _beginSingleTimeCommands();
 
@@ -481,7 +481,7 @@ void fw::Window::_transitionImageLayout(vk::Image image, vk::Format format,
 	_endSingleTimeCommands(commandBuffer);
 }
 
-uint32_t fw::Window::_findMemoryType(uint32_t typeFilter, vk::MemoryPropertyFlags properties)
+uint32_t gfw::Window::_findMemoryType(uint32_t typeFilter, vk::MemoryPropertyFlags properties)
 {
 	vk::PhysicalDeviceMemoryProperties memProperties = m_physicalDevice.getMemoryProperties();
 	for (uint32_t i = 0; i < memProperties.memoryTypeCount; ++i)
@@ -496,7 +496,7 @@ uint32_t fw::Window::_findMemoryType(uint32_t typeFilter, vk::MemoryPropertyFlag
 
 }
 
-vk::CommandBuffer fw::Window::_beginSingleTimeCommands() {
+vk::CommandBuffer gfw::Window::_beginSingleTimeCommands() {
 	vk::CommandBufferAllocateInfo allocateInfo = {
 		m_commandPool,
 		vk::CommandBufferLevel::ePrimary,
@@ -512,7 +512,7 @@ vk::CommandBuffer fw::Window::_beginSingleTimeCommands() {
 	return commandBuffer;
 }
 
-void fw::Window::_endSingleTimeCommands(vk::CommandBuffer commandBuffer) {
+void gfw::Window::_endSingleTimeCommands(vk::CommandBuffer commandBuffer) {
 	commandBuffer.end();
 	vk::SubmitInfo submitInfo = { 0, nullptr, nullptr, 1, &commandBuffer, 0, nullptr };
 	m_graphicsQueue.submit(submitInfo, nullptr);
@@ -520,7 +520,7 @@ void fw::Window::_endSingleTimeCommands(vk::CommandBuffer commandBuffer) {
 	m_device.freeCommandBuffers(m_commandPool, commandBuffer);
 }
 
-void fw::Window::_checkDepthFormat()
+void gfw::Window::_checkDepthFormat()
 {
 	auto props = m_physicalDevice.getFormatProperties(m_depthFormat);
 	if ((props.optimalTilingFeatures & vk::FormatFeatureFlagBits::eDepthStencilAttachment) !=
@@ -530,7 +530,7 @@ void fw::Window::_checkDepthFormat()
 	}
 }
 
-void fw::Window::_onWindowResized(int32_t width, int32_t height)
+void gfw::Window::_onWindowResized(int32_t width, int32_t height)
 {
 	LOG(plog::debug) << "Context resize.";
 
@@ -548,14 +548,14 @@ void fw::Window::_onWindowResized(int32_t width, int32_t height)
 	_createFramebuffers();
 }
 
-void fw::onWindowResized(GLFWwindow* window, int32_t width, int32_t height)
+void gfw::onWindowResized(GLFWwindow* window, int32_t width, int32_t height)
 {
-	fw::Window* const instance = (fw::Window*)glfwGetWindowUserPointer(window);
+	gfw::Window* const instance = (gfw::Window*)glfwGetWindowUserPointer(window);
 	instance->_onWindowResized(width, height);
 }
 
 
-fw::SwapChainSupportDetails fw::SwapChainSupportDetails::querySwapChainSupport(const vk::PhysicalDevice& physicalDevice, const vk::SurfaceKHR& surface) {
+gfw::SwapChainSupportDetails gfw::SwapChainSupportDetails::querySwapChainSupport(const vk::PhysicalDevice& physicalDevice, const vk::SurfaceKHR& surface) {
 	SwapChainSupportDetails details;
 	details.capabilities = physicalDevice.getSurfaceCapabilitiesKHR(surface);
 	details.formats = physicalDevice.getSurfaceFormatsKHR(surface);
@@ -563,7 +563,7 @@ fw::SwapChainSupportDetails fw::SwapChainSupportDetails::querySwapChainSupport(c
 	return details;
 }
 
-vk::SurfaceFormatKHR fw::SwapChainSupportDetails::chooseSurfaceFormat()
+vk::SurfaceFormatKHR gfw::SwapChainSupportDetails::chooseSurfaceFormat()
 {
 	if (this->formats.size() == 1 && this->formats[0].format == vk::Format::eUndefined)
 	{
@@ -582,7 +582,7 @@ vk::SurfaceFormatKHR fw::SwapChainSupportDetails::chooseSurfaceFormat()
 	return this->formats[0];
 }
 
-vk::PresentModeKHR fw::SwapChainSupportDetails::choosePresentMode()
+vk::PresentModeKHR gfw::SwapChainSupportDetails::choosePresentMode()
 {
 	std::unordered_map<vk::PresentModeKHR, uint32_t> presentModeAndCores = {
 		{ vk::PresentModeKHR::eMailbox, 0 },
@@ -606,7 +606,7 @@ vk::PresentModeKHR fw::SwapChainSupportDetails::choosePresentMode()
 	return currPresentMode;
 }
 
-vk::Extent2D fw::SwapChainSupportDetails::chooseExtent(GLFWwindow* window)
+vk::Extent2D gfw::SwapChainSupportDetails::chooseExtent(GLFWwindow* window)
 {
 	if (capabilities.currentExtent.width != std::numeric_limits<uint32_t>::max())
 	{

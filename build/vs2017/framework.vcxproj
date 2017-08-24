@@ -19,17 +19,19 @@
     </ProjectConfiguration>
   </ItemGroup>
   <ItemGroup>
-    <ClCompile Include="..\..\framework\src\framework\app_base.cpp" />
-    <ClCompile Include="..\..\framework\src\framework\queue_family.cpp" />
-    <ClCompile Include="..\..\framework\src\framework\surface.cpp" />
-    <ClCompile Include="..\..\framework\src\framework\vulkan_ext.cpp" />
+    <ClCompile Include="..\..\framework\src\framework\app\app_base.cpp" />
+    <ClCompile Include="..\..\framework\src\framework\app\queue_family.cpp" />
+    <ClCompile Include="..\..\framework\src\framework\app\vulkan_ext.cpp" />
+    <ClCompile Include="..\..\framework\src\framework\app\window.cpp" />
+    <ClCompile Include="..\..\framework\src\framework\world\scene.cpp" />
   </ItemGroup>
   <ItemGroup>
-    <ClInclude Include="..\..\framework\include\framework\app_base.hpp" />
-    <ClInclude Include="..\..\framework\include\framework\macro.hpp" />
-    <ClInclude Include="..\..\framework\include\framework\queue_family.hpp" />
-    <ClInclude Include="..\..\framework\include\framework\surface.hpp" />
-    <ClInclude Include="..\..\framework\include\framework\vulkan_ext.hpp" />
+    <ClInclude Include="..\..\framework\include\framework\app\app_base.hpp" />
+    <ClInclude Include="..\..\framework\include\framework\app\macro.hpp" />
+    <ClInclude Include="..\..\framework\include\framework\app\queue_family.hpp" />
+    <ClInclude Include="..\..\framework\include\framework\app\vulkan_ext.hpp" />
+    <ClInclude Include="..\..\framework\include\framework\app\window.hpp" />
+    <ClInclude Include="..\..\framework\include\framework\world\scene.hpp" />
   </ItemGroup>
   <PropertyGroup Label="Globals">
     <VCProjectVersion>15.0</VCProjectVersion>

@@ -7,36 +7,54 @@
     <Filter Include="src">
       <UniqueIdentifier>{92326229-821d-4df5-865a-eeb0b098d0e0}</UniqueIdentifier>
     </Filter>
+    <Filter Include="src\app">
+      <UniqueIdentifier>{ccca9082-5e3d-4478-a158-7bfb9f8f6af4}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="include\app">
+      <UniqueIdentifier>{5a7ad6bb-4076-456f-9f67-b45500aeb2bf}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="include\world">
+      <UniqueIdentifier>{1ad2d87d-0b84-4886-80f2-2c8a6d19aa11}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="src\world">
+      <UniqueIdentifier>{fb6f33a7-d86c-4e22-b41d-e8041af0c377}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
-    <ClInclude Include="..\..\framework\include\framework\app_base.hpp">
-      <Filter>include</Filter>
-    </ClInclude>
-    <ClInclude Include="..\..\framework\include\framework\macro.hpp">
-      <Filter>include</Filter>
-    </ClInclude>
-    <ClInclude Include="..\..\framework\include\framework\surface.hpp">
-      <Filter>include</Filter>
-    </ClInclude>
-    <ClInclude Include="..\..\framework\include\framework\vulkan_ext.hpp">
-      <Filter>include</Filter>
-    </ClInclude>
-    <ClInclude Include="..\..\framework\include\framework\queue_family.hpp">
-      <Filter>include</Filter>
-    </ClInclude>
+    <ClCompile Include="..\..\framework\src\framework\app\app_base.cpp">
+      <Filter>src\app</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\framework\src\framework\app\queue_family.cpp">
+      <Filter>src\app</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\framework\src\framework\app\vulkan_ext.cpp">
+      <Filter>src\app</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\framework\src\framework\app\window.cpp">
+      <Filter>src\app</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\framework\src\framework\world\scene.cpp">
+      <Filter>src\world</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
-    <ClCompile Include="..\..\framework\src\framework\app_base.cpp">
-      <Filter>src</Filter>
-    </ClCompile>
-    <ClCompile Include="..\..\framework\src\framework\surface.cpp">
-      <Filter>src</Filter>
-    </ClCompile>
-    <ClCompile Include="..\..\framework\src\framework\vulkan_ext.cpp">
-      <Filter>src</Filter>
-    </ClCompile>
-    <ClCompile Include="..\..\framework\src\framework\queue_family.cpp">
-      <Filter>src</Filter>
-    </ClCompile>
+    <ClInclude Include="..\..\framework\include\framework\app\app_base.hpp">
+      <Filter>include\app</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\framework\include\framework\app\macro.hpp">
+      <Filter>include\app</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\framework\include\framework\app\queue_family.hpp">
+      <Filter>include\app</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\framework\include\framework\app\vulkan_ext.hpp">
+      <Filter>include\app</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\framework\include\framework\app\window.hpp">
+      <Filter>include\app</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\framework\include\framework\world\scene.hpp">
+      <Filter>include\world</Filter>
+    </ClInclude>
   </ItemGroup>
 </Project>

@@ -1,13 +1,13 @@
-#include "surface.hpp"
+#include "window.hpp"
 
 #include <plog/Log.h>
 #include <map>
 #include <unordered_map>
 #include <set>
 
-vk::Format fw::Surface::DEFAULT_DEPTH_FORMAT(vk::Format::eD32SfloatS8Uint);
+vk::Format fw::Window::DEFAULT_DEPTH_FORMAT(vk::Format::eD32SfloatS8Uint);
 
-fw::Surface::Surface(uint32_t width, uint32_t height, const char* title,
+fw::Window::Window(uint32_t width, uint32_t height, const char* title,
 	vk::Instance instance, vk::PhysicalDevice physicalDevice, vk::Device device,
 	vk::Queue graphicsQueue, vk::Queue presentQueue)
 {
@@ -27,7 +27,7 @@ fw::Surface::Surface(uint32_t width, uint32_t height, const char* title,
 	_createFramebuffers();
 }
 
-fw::Surface::Surface(GLFWwindow *pWindow, vk::SurfaceKHR surface,
+fw::Window::Window(GLFWwindow *pWindow, vk::SurfaceKHR surface,
 	vk::Instance instance, vk::PhysicalDevice physicalDevice, vk::Device device,
 	vk::Queue graphicsQueue, vk::Queue presentQueue)
 {
@@ -49,7 +49,7 @@ fw::Surface::Surface(GLFWwindow *pWindow, vk::SurfaceKHR surface,
 	_createFramebuffers();
 }
 
-fw::Surface::~Surface()
+fw::Window::~Window()
 {
 	_destroyFramebuffers();
 	_destroyDepthResources();
@@ -61,12 +61,12 @@ fw::Surface::~Surface()
 	_destroyWindow();
 }
 
-GLFWwindow *fw::Surface::getWindow() const
+GLFWwindow *fw::Window::getGLFWWindow() const
 {
 	return m_pWindow;
 }
 
-void fw::Surface::_createWindow(uint32_t width, uint32_t height, const char* title)
+void fw::Window::_createWindow(uint32_t width, uint32_t height, const char* title)
 {
 	m_pWindow = glfwCreateWindow(width, height, title, nullptr, nullptr);
 
@@ -74,13 +74,13 @@ void fw::Surface::_createWindow(uint32_t width, uint32_t height, const char* tit
 	glfwSetWindowSizeCallback(m_pWindow, fw::onWindowResized);
 }
 
-void fw::Surface::_destroyWindow()
+void fw::Window::_destroyWindow()
 {
 	if (m_pWindow != nullptr)
 		glfwDestroyWindow(m_pWindow);
 }
 
-void fw::Surface::_createSurface()
+void fw::Window::_createSurface()
 {
 	VkSurfaceKHR surface;
 	auto result = static_cast<vk::Result > (glfwCreateWindowSurface(m_vkInstance, m_pWindow, nullptr, &surface));
@@ -92,7 +92,7 @@ void fw::Surface::_createSurface()
 	LOG(plog::debug) << "Create successfully surface.";
 }
 
-void fw::Surface::_destroySurface()
+void fw::Window::_destroySurface()
 {
 	if (m_surface != vk::SurfaceKHR(nullptr))
 	{
@@ -100,7 +100,7 @@ void fw::Surface::_destroySurface()
 	}
 }
 
-void fw::Surface::_createSwapchain()
+void fw::Window::_createSwapchain()
 {
 	SwapChainSupportDetails details = SwapChainSupportDetails::querySwapChainSupport(m_physicalDevice, m_surface);
 	vk::SurfaceFormatKHR surfaceFormat = details.chooseSurfaceFormat();
@@ -155,7 +155,7 @@ void fw::Surface::_createSwapchain()
 	m_swapchainExtent = extent;
 }
 
-void fw::Surface::_destroySwapchain()
+void fw::Window::_destroySwapchain()
 {
 	if (m_swapchain != vk::SwapchainKHR(nullptr))
 	{
@@ -163,7 +163,7 @@ void fw::Surface::_destroySwapchain()
 	}
 }
 
-void fw::Surface::_createSwapchainImageViews()
+void fw::Window::_createSwapchainImageViews()
 {
 	size_t num = m_swapchainImages.size();
 	m_swapchainImageViews.resize(m_swapchainImages.size());
@@ -174,7 +174,7 @@ void fw::Surface::_createSwapchainImageViews()
 	}
 }
 
-void fw::Surface::_destroySwapchainImageViews()
+void fw::Window::_destroySwapchainImageViews()
 {
 	for (const auto& imageView : m_swapchainImageViews)
 	{
@@ -182,7 +182,7 @@ void fw::Surface::_destroySwapchainImageViews()
 	}
 }
 
-void fw::Surface::_createCommandPool()
+void fw::Window::_createCommandPool()
 {
 	UsedQueueFamily queueFamilyIndices = UsedQueueFamily::findQueueFamilies(m_physicalDevice, m_surface);
 
@@ -193,7 +193,7 @@ void fw::Surface::_createCommandPool()
 	m_commandPool = m_device.createCommandPool(createInfo, nullptr);
 }
 
-void fw::Surface::_destroyCommandPool()
+void fw::Window::_destroyCommandPool()
 {
 	if (m_commandPool != vk::CommandPool(nullptr))
 	{
@@ -201,7 +201,7 @@ void fw::Surface::_destroyCommandPool()
 	}
 }
 
-void fw::Surface::_createRenderPass()
+void fw::Window::_createRenderPass()
 {
 	vk::AttachmentDescription colorAttachment = {
 		vk::AttachmentDescriptionFlags(),
@@ -274,7 +274,7 @@ void fw::Surface::_createRenderPass()
 	m_renderPass = m_device.createRenderPass(renderPassCreateInfo);
 }
 
-void fw::Surface::_destroyRenderPass()
+void fw::Window::_destroyRenderPass()
 {
 	if (m_renderPass != vk::RenderPass(nullptr))
 	{
@@ -283,7 +283,7 @@ void fw::Surface::_destroyRenderPass()
 	}
 }
 
-void fw::Surface::_createDepthResources()
+void fw::Window::_createDepthResources()
 {
 	_checkDepthFormat();
 	_createImage(m_swapchainExtent.width, 
@@ -299,7 +299,7 @@ void fw::Surface::_createDepthResources()
 		vk::ImageLayout::eDepthStencilAttachmentOptimal);
 }
 
-void fw::Surface::_destroyDepthResources()
+void fw::Window::_destroyDepthResources()
 {
 	if (m_depthImageView != vk::ImageView(nullptr))
 	{
@@ -318,7 +318,7 @@ void fw::Surface::_destroyDepthResources()
 	}
 }
 
-void fw::Surface::_createFramebuffers()
+void fw::Window::_createFramebuffers()
 {
 	size_t count = m_swapchainImageViews.size();
 	m_swapchainFramebuffers.resize(count);
@@ -339,7 +339,7 @@ void fw::Surface::_createFramebuffers()
 	}
 }
 
-void fw::Surface::_destroyFramebuffers()
+void fw::Window::_destroyFramebuffers()
 {
 	size_t num = m_swapchainFramebuffers.size();
 	for (size_t i = 0; i < num; ++i)
@@ -352,7 +352,7 @@ void fw::Surface::_destroyFramebuffers()
 	}
 }
 
-void fw::Surface::_createImage(uint32_t width, uint32_t height, vk::Format format, vk::ImageTiling tiling,
+void fw::Window::_createImage(uint32_t width, uint32_t height, vk::Format format, vk::ImageTiling tiling,
 	vk::ImageUsageFlags usage, vk::MemoryPropertyFlags properties, vk::Image& image, vk::DeviceMemory& imageMemory)
 {
 	vk::ImageCreateInfo createInfo = {
@@ -400,7 +400,7 @@ void fw::Surface::_createImage(uint32_t width, uint32_t height, vk::Format forma
 	m_device.bindImageMemory(image, imageMemory, vk::DeviceSize(0));
 }
 
-void fw::Surface::_createImageView(vk::Image image, vk::Format format, vk::ImageAspectFlags aspectFlags, vk::ImageView& imageView)
+void fw::Window::_createImageView(vk::Image image, vk::Format format, vk::ImageAspectFlags aspectFlags, vk::ImageView& imageView)
 {
 	vk::ImageViewCreateInfo createInfo = {
 		vk::ImageViewCreateFlags(),
@@ -425,7 +425,7 @@ void fw::Surface::_createImageView(vk::Image image, vk::Format format, vk::Image
 	imageView = m_device.createImageView(createInfo);
 }
 
-void fw::Surface::_transitionImageLayout(vk::Image image, vk::Format format, 
+void fw::Window::_transitionImageLayout(vk::Image image, vk::Format format,
 	vk::ImageLayout oldLayout, vk::ImageLayout newLayout) {
 	vk::CommandBuffer commandBuffer = _beginSingleTimeCommands();
 
@@ -481,7 +481,7 @@ void fw::Surface::_transitionImageLayout(vk::Image image, vk::Format format,
 	_endSingleTimeCommands(commandBuffer);
 }
 
-uint32_t fw::Surface::_findMemoryType(uint32_t typeFilter, vk::MemoryPropertyFlags properties)
+uint32_t fw::Window::_findMemoryType(uint32_t typeFilter, vk::MemoryPropertyFlags properties)
 {
 	vk::PhysicalDeviceMemoryProperties memProperties = m_physicalDevice.getMemoryProperties();
 	for (uint32_t i = 0; i < memProperties.memoryTypeCount; ++i)
@@ -496,7 +496,7 @@ uint32_t fw::Surface::_findMemoryType(uint32_t typeFilter, vk::MemoryPropertyFla
 
 }
 
-vk::CommandBuffer fw::Surface::_beginSingleTimeCommands() {
+vk::CommandBuffer fw::Window::_beginSingleTimeCommands() {
 	vk::CommandBufferAllocateInfo allocateInfo = {
 		m_commandPool,
 		vk::CommandBufferLevel::ePrimary,
@@ -512,7 +512,7 @@ vk::CommandBuffer fw::Surface::_beginSingleTimeCommands() {
 	return commandBuffer;
 }
 
-void fw::Surface::_endSingleTimeCommands(vk::CommandBuffer commandBuffer) {
+void fw::Window::_endSingleTimeCommands(vk::CommandBuffer commandBuffer) {
 	commandBuffer.end();
 	vk::SubmitInfo submitInfo = { 0, nullptr, nullptr, 1, &commandBuffer, 0, nullptr };
 	m_graphicsQueue.submit(submitInfo, nullptr);
@@ -520,7 +520,7 @@ void fw::Surface::_endSingleTimeCommands(vk::CommandBuffer commandBuffer) {
 	m_device.freeCommandBuffers(m_commandPool, commandBuffer);
 }
 
-void fw::Surface::_checkDepthFormat()
+void fw::Window::_checkDepthFormat()
 {
 	auto props = m_physicalDevice.getFormatProperties(m_depthFormat);
 	if ((props.optimalTilingFeatures & vk::FormatFeatureFlagBits::eDepthStencilAttachment) !=
@@ -530,7 +530,7 @@ void fw::Surface::_checkDepthFormat()
 	}
 }
 
-void fw::Surface::_onWindowResized(int32_t width, int32_t height)
+void fw::Window::_onWindowResized(int32_t width, int32_t height)
 {
 	LOG(plog::debug) << "Context resize.";
 
@@ -550,7 +550,7 @@ void fw::Surface::_onWindowResized(int32_t width, int32_t height)
 
 void fw::onWindowResized(GLFWwindow* window, int32_t width, int32_t height)
 {
-	fw::Surface* const instance = (fw::Surface*)glfwGetWindowUserPointer(window);
+	fw::Window* const instance = (fw::Window*)glfwGetWindowUserPointer(window);
 	instance->_onWindowResized(width, height);
 }
 

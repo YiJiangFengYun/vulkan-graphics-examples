@@ -20,17 +20,17 @@ namespace fw
 		vk::Extent2D chooseExtent(GLFWwindow* window);
 	};
 
-	class Surface
+	class Window
 	{
 	public:
-		Surface(uint32_t width, uint32_t height, const char* title, 
+		Window(uint32_t width, uint32_t height, const char* title,
 			vk::Instance instance, vk::PhysicalDevice physicalDevice, vk::Device device,
 			vk::Queue graphicsQueue, vk::Queue presentQueue);
-		Surface(GLFWwindow *pWindow, vk::SurfaceKHR surface,
+		Window(GLFWwindow *pWindow, vk::SurfaceKHR surface,
 			vk::Instance instance, vk::PhysicalDevice physicalDevice, vk::Device device,
 			vk::Queue graphicsQueue, vk::Queue presentQueue);
-		~Surface();
-		GLFWwindow *getWindow() const;
+		~Window();
+		GLFWwindow *getGLFWWindow() const;
 	private:
 		//static
 		static vk::Format DEFAULT_DEPTH_FORMAT;

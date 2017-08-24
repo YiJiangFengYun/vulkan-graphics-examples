@@ -3,7 +3,7 @@
 
 #include <memory>
 #include "macro.hpp"
-#include "surface.hpp"
+#include "window.hpp"
 #include <GLFW/glfw3.h>
 
 namespace fw
@@ -47,7 +47,7 @@ namespace fw
 		int32_t m_width;
 		int32_t m_height;
 		const char *m_title;
-		std::unique_ptr<fw::Surface> m_pSurface;
+		std::unique_ptr<fw::Window> m_pSurface;
 
 		void _init();
 		bool _checkValidationLayerSupport();

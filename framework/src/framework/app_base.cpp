@@ -43,7 +43,7 @@ fw::AppBase::~AppBase()
 
 void fw::AppBase::run()
 {
-	while (!glfwWindowShouldClose(m_pSurface->getWindow()))
+	while (!glfwWindowShouldClose(m_pSurface->getGLFWWindow()))
 	{
 		glfwPollEvents();
 	}
@@ -339,7 +339,7 @@ void fw::AppBase::_createLogicDevice(vk::SurfaceKHR surface)
 
 void fw::AppBase::_createSurface(GLFWwindow *pwindow, vk::SurfaceKHR surface)
 {
-	m_pSurface.reset(new Surface(pwindow, surface, m_instance, m_physicalDevice, m_device,
+	m_pSurface.reset(new Window(pwindow, surface, m_instance, m_physicalDevice, m_device,
 		m_graphicsQueue, m_presentQueue));
 }
 

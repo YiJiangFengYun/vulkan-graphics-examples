@@ -72,8 +72,9 @@ namespace gfw {
 
 	vk::CommandBuffer Window::beginRender()
 	{
-		_beginRender();
+		return _beginRender();
 	}
+
 	void Window::endRender()
 	{
 		_endRender();
@@ -432,6 +433,7 @@ namespace gfw {
 		};
 
 		m_currCommandBuffer.beginRenderPass(renderPassBeginInfo, vk::SubpassContents::eInline);
+		return m_currCommandBuffer;
 	}
 
 	void Window::_endRender()

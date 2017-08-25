@@ -3,6 +3,7 @@
 #include <plog/Log.h>
 #include <plog/Appenders/DebugOutputAppender.h>
 #include <set>
+#include <thread>
 
 namespace gfw {
 	AppBase::AppBase(uint32_t width, uint32_t height, const char *title)
@@ -45,29 +46,33 @@ namespace gfw {
 
 	void AppBase::run()
 	{
+		//std::thread thread_test;
+
 		while (m_pWindow->windowShouldClose() == GFW_FALSE)
 		{
-			m_pWindow->update();
-
-			//remove closed windows.
+			//remove closed child(sub) windows.
 			m_pSubWindows.erase(std::remove_if(m_pSubWindows.begin(), m_pSubWindows.end(), [](const std::shared_ptr<Window>& item) {
 				return item->windowShouldClose();
 			}), m_pSubWindows.end());
 
+			//update windows.
+			m_pWindow->update();
 			for (auto& window : m_pSubWindows)
 			{
 				window->update();
 			}
+
+			//render windows.
 
 			glfwPollEvents();
 		}
 		//vkDeviceWaitIdle(device);
 	}
 
-	void AppBase::createSubWindow(uint32_t width, uint32_t height, const char *title)
+	/*void AppBase::createSubWindow(uint32_t width, uint32_t height, const char *title)
 	{
 		_createSubWindow(width, height, title);
-	}
+	}*/
 
 	vk::Instance AppBase::getVKInstance()
 	{
@@ -265,6 +270,8 @@ namespace gfw {
 				{
 					return GFW_FALSE;
 				}
+
+				return GFW_TRUE;
 			}(*it);
 
 			if (isSuitable == false)
@@ -362,13 +369,13 @@ namespace gfw {
 			m_graphicsQueue, m_presentQueue));
 	}
 
-	std::shared_ptr<Window> AppBase::_createSubWindow(uint32_t width, uint32_t height, const char* title)
+	/*std::shared_ptr<Window> AppBase::_createSubWindow(uint32_t width, uint32_t height, const char* title)
 	{
 		std::shared_ptr<Window> window(new Window(width, height, title, m_instance, m_physicalDevice,
 			m_device, m_graphicsQueue, m_presentQueue));
 		m_pSubWindows.push_back(window);
 		return window;
-	}
+	}*/
 
 
 	std::vector<const char*> AppBase::_getRequiredExtensions()

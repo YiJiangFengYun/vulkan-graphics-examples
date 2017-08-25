@@ -27,7 +27,14 @@ namespace gfw
 		AppBase(uint32_t width, uint32_t height, const char *title);
 		~AppBase();
 		void virtual run();
-		void createSubWindow(uint32_t width, uint32_t height, const char *title);
+
+		template<typename Window_T>
+		void createSubWindow(uint32_t width, uint32_t height, const char *title)
+		{
+			std::shared_ptr<Window_T> window(new Window_T(width, height, title, m_instance, m_physicalDevice,
+				m_device, m_graphicsQueue, m_presentQueue));
+			m_pSubWindows.push_back(window);
+		}
 
 		//gettor methods
 		vk::Instance getVKInstance();
@@ -55,12 +62,12 @@ namespace gfw
 		std::shared_ptr<gfw::Window> m_pWindow;
 		std::vector<std::shared_ptr<gfw::Window>> m_pSubWindows;
 
+
 		void _init();
 		bool _checkValidationLayerSupport();
 		void _pickPhysicalDevice(vk::SurfaceKHR surface);
 		void _createLogicDevice(vk::SurfaceKHR surface);
 		void _createWindow(GLFWwindow *pwindow, vk::SurfaceKHR surface);
-		std::shared_ptr<Window> _createSubWindow(uint32_t width, uint32_t height, const char* title);
 
 		//tool methods.
 		GLFWwindow* _createGLFWWindow(uint32_t width, uint32_t height, const char* title);

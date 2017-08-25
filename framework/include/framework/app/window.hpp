@@ -1,6 +1,7 @@
 #ifndef GFW_CONTEXT_H
 #define GFW_CONTEXT_H
 
+#include <memory>
 #include <vector>
 #include <vulkan/vulkan.hpp>
 #include "macro.hpp"
@@ -29,7 +30,7 @@ namespace gfw
 		Window(GLFWwindow *pWindow, vk::SurfaceKHR surface,
 			vk::Instance instance, vk::PhysicalDevice physicalDevice, vk::Device device,
 			vk::Queue graphicsQueue, vk::Queue presentQueue);
-		~Window();
+		virtual ~Window();
 		void update();
 		vk::CommandBuffer beginRender();
 		void endRender();

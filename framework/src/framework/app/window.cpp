@@ -61,6 +61,16 @@ gfw::Window::~Window()
 	_destroyWindow();
 }
 
+void gfw::Window::update()
+{
+
+}
+
+gfw::Bool32 gfw::Window::windowShouldClose()
+{
+	return glfwWindowShouldClose(m_pWindow);
+}
+
 GLFWwindow *gfw::Window::getGLFWWindow() const
 {
 	return m_pWindow;
@@ -77,7 +87,10 @@ void gfw::Window::_createWindow(uint32_t width, uint32_t height, const char* tit
 void gfw::Window::_destroyWindow()
 {
 	if (m_pWindow != nullptr)
+	{
 		glfwDestroyWindow(m_pWindow);
+		m_pWindow = nullptr;
+	}
 }
 
 void gfw::Window::_createSurface()
@@ -97,6 +110,7 @@ void gfw::Window::_destroySurface()
 	if (m_surface != vk::SurfaceKHR(nullptr))
 	{
 		m_vkInstance.destroySurfaceKHR(m_surface);
+		m_surface = nullptr;
 	}
 }
 
@@ -160,6 +174,7 @@ void gfw::Window::_destroySwapchain()
 	if (m_swapchain != vk::SwapchainKHR(nullptr))
 	{
 		m_device.destroySwapchainKHR(m_swapchain);
+		m_swapchain = nullptr;
 	}
 }
 
@@ -180,6 +195,7 @@ void gfw::Window::_destroySwapchainImageViews()
 	{
 		m_device.destroyImageView(imageView);
 	}
+	m_swapchainImageViews.resize(0);
 }
 
 void gfw::Window::_createCommandPool()
@@ -198,6 +214,7 @@ void gfw::Window::_destroyCommandPool()
 	if (m_commandPool != vk::CommandPool(nullptr))
 	{
 		m_device.destroyCommandPool(m_commandPool);
+		m_commandPool = nullptr;
 	}
 }
 

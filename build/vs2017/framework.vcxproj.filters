@@ -19,6 +19,9 @@
     <Filter Include="src\world">
       <UniqueIdentifier>{fb6f33a7-d86c-4e22-b41d-e8041af0c377}</UniqueIdentifier>
     </Filter>
+    <Filter Include="include\util">
+      <UniqueIdentifier>{cc1c0b45-3f2d-421a-b22b-920a17a4fbd2}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="..\..\framework\src\framework\app\app_base.cpp">
@@ -34,6 +37,9 @@
       <Filter>src\app</Filter>
     </ClCompile>
     <ClCompile Include="..\..\framework\src\framework\world\scene.cpp">
+      <Filter>src\world</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\framework\src\framework\world\entity.cpp">
       <Filter>src\world</Filter>
     </ClCompile>
   </ItemGroup>
@@ -55,6 +61,12 @@
     </ClInclude>
     <ClInclude Include="..\..\framework\include\framework\world\scene.hpp">
       <Filter>include\world</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\framework\include\framework\world\entity.hpp">
+      <Filter>include\world</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\framework\include\framework\util\macro_util.hpp">
+      <Filter>include\util</Filter>
     </ClInclude>
   </ItemGroup>
 </Project>

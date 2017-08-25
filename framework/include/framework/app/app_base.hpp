@@ -24,9 +24,12 @@ namespace gfw
 	class AppBase
 	{
 	public:
-		AppBase(int32_t width, int32_t height, const char *title);
+		AppBase(uint32_t width, uint32_t height, const char *title);
 		~AppBase();
 		void virtual run();
+		void createSubWindow(uint32_t width, uint32_t height, const char *title);
+
+		//gettor methods
 		vk::Instance getVKInstance();
 		vk::PhysicalDevice getPhysicalDevice();
 		vk::Device getDevice();
@@ -35,6 +38,8 @@ namespace gfw
 	protected:
 
 	private:
+		AppBase(const AppBase&);
+
 		const char* m_appName;
 		uint32_t m_appVersion;
 		const char* m_engineName;
@@ -47,16 +52,18 @@ namespace gfw
 		int32_t m_width;
 		int32_t m_height;
 		const char *m_title;
-		std::unique_ptr<gfw::Window> m_pSurface;
+		std::shared_ptr<gfw::Window> m_pWindow;
+		std::vector<std::shared_ptr<gfw::Window>> m_pSubWindows;
 
 		void _init();
 		bool _checkValidationLayerSupport();
 		void _pickPhysicalDevice(vk::SurfaceKHR surface);
 		void _createLogicDevice(vk::SurfaceKHR surface);
-		void _createSurface(GLFWwindow *pwindow, vk::SurfaceKHR surface);
+		void _createWindow(GLFWwindow *pwindow, vk::SurfaceKHR surface);
+		std::shared_ptr<Window> _createSubWindow(uint32_t width, uint32_t height, const char* title);
 
 		//tool methods.
-		GLFWwindow* _createWindow(uint32_t width, uint32_t height, const char* title);
+		GLFWwindow* _createGLFWWindow(uint32_t width, uint32_t height, const char* title);
 		vk::SurfaceKHR _createVKSurface(GLFWwindow* pWindow);
 		std::vector<const char*> _getRequiredExtensions();
 #ifdef DEBUG

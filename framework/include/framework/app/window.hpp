@@ -30,8 +30,12 @@ namespace gfw
 			vk::Instance instance, vk::PhysicalDevice physicalDevice, vk::Device device,
 			vk::Queue graphicsQueue, vk::Queue presentQueue);
 		~Window();
+		void update();
+		gfw::Bool32 windowShouldClose();
 		GLFWwindow *getGLFWWindow() const;
 	private:
+		Window(const Window&);
+
 		//static
 		static vk::Format DEFAULT_DEPTH_FORMAT;
 

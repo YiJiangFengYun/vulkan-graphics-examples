@@ -23,6 +23,7 @@
     <ClCompile Include="..\..\framework\src\framework\app\queue_family.cpp" />
     <ClCompile Include="..\..\framework\src\framework\app\vulkan_ext.cpp" />
     <ClCompile Include="..\..\framework\src\framework\app\window.cpp" />
+    <ClCompile Include="..\..\framework\src\framework\world\entity.cpp" />
     <ClCompile Include="..\..\framework\src\framework\world\scene.cpp" />
   </ItemGroup>
   <ItemGroup>
@@ -31,6 +32,8 @@
     <ClInclude Include="..\..\framework\include\framework\app\queue_family.hpp" />
     <ClInclude Include="..\..\framework\include\framework\app\vulkan_ext.hpp" />
     <ClInclude Include="..\..\framework\include\framework\app\window.hpp" />
+    <ClInclude Include="..\..\framework\include\framework\util\macro_util.hpp" />
+    <ClInclude Include="..\..\framework\include\framework\world\entity.hpp" />
     <ClInclude Include="..\..\framework\include\framework\world\scene.hpp" />
   </ItemGroup>
   <PropertyGroup Label="Globals">

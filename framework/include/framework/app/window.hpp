@@ -31,6 +31,8 @@ namespace gfw
 			vk::Queue graphicsQueue, vk::Queue presentQueue);
 		~Window();
 		void update();
+		vk::CommandBuffer beginRender();
+		void endRender();
 		gfw::Bool32 windowShouldClose();
 		GLFWwindow *getGLFWWindow() const;
 	private:
@@ -54,6 +56,11 @@ namespace gfw
 		vk::DeviceMemory m_depthImageMemory;
 		vk::Format m_depthFormat;
 		std::vector<vk::Framebuffer> m_swapchainFramebuffers;
+		vk::Semaphore m_imageAvailableSemaphore;
+		vk::Semaphore m_renderFinishedSemaphore;
+
+		//temp memebers.
+		vk::CommandBuffer m_currCommandBuffer;
 
 		//aggregations
 		vk::Instance m_vkInstance;
@@ -79,6 +86,10 @@ namespace gfw
 		void _destroyDepthResources();
 		void _createFramebuffers();
 		void _destroyFramebuffers();
+		void _createSemaphores();
+		void _destroySemaphores();
+		vk::CommandBuffer _beginRender();
+		void _endRender();
 
 		// tool methods
 		void _createImage(uint32_t width, uint32_t height, vk::Format format, vk::ImageTiling tiling,

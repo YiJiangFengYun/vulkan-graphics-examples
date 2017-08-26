@@ -1,0 +1,33 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <ItemGroup>
+    <Filter Include="include">
+      <UniqueIdentifier>{93042209-0f15-403f-b33d-633f101842f7}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="src">
+      <UniqueIdentifier>{92326229-821d-4df5-865a-eeb0b098d0e0}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="include\graphics">
+      <UniqueIdentifier>{19e20fb8-d5b0-4d01-bf50-245626f59e9c}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="src\graphics">
+      <UniqueIdentifier>{9229891f-1c6d-44d6-b0e6-03dda2d1a1cd}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="include\graphics\texture">
+      <UniqueIdentifier>{12584484-c077-498f-9bf8-d45cb2b39d28}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="src\graphics\texture">
+      <UniqueIdentifier>{7339c612-5a20-4e50-8bf6-28fe4cdd3c11}</UniqueIdentifier>
+    </Filter>
+  </ItemGroup>
+  <ItemGroup>
+    <ClCompile Include="..\..\framework\src\graphics\texture\texture.cpp">
+      <Filter>src\graphics\texture</Filter>
+    </ClCompile>
+  </ItemGroup>
+  <ItemGroup>
+    <ClInclude Include="..\..\framework\include\graphics\texture\texture.hpp">
+      <Filter>include\graphics\texture</Filter>
+    </ClInclude>
+  </ItemGroup>
+</Project>

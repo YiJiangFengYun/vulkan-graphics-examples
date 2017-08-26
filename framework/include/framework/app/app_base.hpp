@@ -79,8 +79,7 @@ namespace gfw
 		std::vector<std::shared_ptr<gfw::Window>> m_pSubWindows;
 
 		//threads
-		ThreadMaster m_threadMaster;
-
+		//ThreadMaster m_threadMaster; 
 		//std::mutex m_subWindowsMutex;
 
 		void _init();

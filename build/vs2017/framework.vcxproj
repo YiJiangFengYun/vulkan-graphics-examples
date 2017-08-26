@@ -121,6 +121,7 @@
       <AdditionalLibraryDirectories>$(GS_PROJECT_ROOT)\libs\VulkanSDK\1.0.49.0\Lib;$(GS_PROJECT_ROOT)\libs\glfw\lib-win64;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
       <AdditionalDependencies>vulkan-1.lib;glfw3.lib;%(AdditionalDependencies)</AdditionalDependencies>
     </Lib>
+    <BuildLog />
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
     <ClCompile>
@@ -132,6 +133,7 @@
       <AdditionalLibraryDirectories>$(GS_PROJECT_ROOT)\libs\VulkanSDK\1.0.49.0\Lib32;$(GS_PROJECT_ROOT)\libs\glfw\lib-win32;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
       <AdditionalDependencies>vulkan-1.lib;glfw3.lib;%(AdditionalDependencies)</AdditionalDependencies>
     </Lib>
+    <BuildLog />
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
     <ClCompile>
@@ -149,6 +151,7 @@
       <AdditionalLibraryDirectories>$(GS_PROJECT_ROOT)\libs\VulkanSDK\1.0.49.0\Lib32;$(GS_PROJECT_ROOT)\libs\glfw\lib-win32;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
       <AdditionalDependencies>vulkan-1.lib;glfw3.lib;%(AdditionalDependencies)</AdditionalDependencies>
     </Lib>
+    <BuildLog />
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
     <ClCompile>
@@ -166,6 +169,7 @@
       <AdditionalLibraryDirectories>$(GS_PROJECT_ROOT)\libs\VulkanSDK\1.0.49.0\Lib;$(GS_PROJECT_ROOT)\libs\glfw\lib-win64;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
       <AdditionalDependencies>vulkan-1.lib;glfw3.lib;%(AdditionalDependencies)</AdditionalDependencies>
     </Lib>
+    <BuildLog />
   </ItemDefinitionGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">

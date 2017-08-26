@@ -3,11 +3,12 @@
 
 #include <memory>
 #include <vector>
+#include <mutex>
 #include <vulkan/vulkan.hpp>
-#include "macro.hpp"
-#include "vulkan_ext.hpp"
+#include "framework/app/macro.hpp"
+#include "framework/app/vulkan_ext.hpp"
 #include <GLFW/glfw3.h>
-#include "queue_family.hpp"
+#include "framework/app/queue_family.hpp"
 
 namespace gfw
 {
@@ -31,18 +32,17 @@ namespace gfw
 			vk::Instance instance, vk::PhysicalDevice physicalDevice, vk::Device device,
 			vk::Queue graphicsQueue, vk::Queue presentQueue);
 		virtual ~Window();
-		void update();
-		vk::CommandBuffer beginRender();
-		void endRender();
+		void run();
+		void Window::windowSetShouldClose(Bool32 value);
 		gfw::Bool32 windowShouldClose();
 		GLFWwindow *getGLFWWindow() const;
 	private:
 		Window(const Window&);
 
-		//static
+		//--static
 		static vk::Format DEFAULT_DEPTH_FORMAT;
 
-		//compositions
+		//--compositions
 		GLFWwindow *m_pWindow;
 		vk::SurfaceKHR m_surface;
 		vk::SwapchainKHR m_swapchain;
@@ -60,10 +60,12 @@ namespace gfw
 		vk::Semaphore m_imageAvailableSemaphore;
 		vk::Semaphore m_renderFinishedSemaphore;
 
+		//std::mutex m_windowMutex;
+
 		//temp memebers.
 		vk::CommandBuffer m_currCommandBuffer;
 
-		//aggregations
+		//--aggregations
 		vk::Instance m_vkInstance;
 		vk::PhysicalDevice m_physicalDevice;
 		vk::Device m_device;
@@ -89,6 +91,10 @@ namespace gfw
 		void _destroyFramebuffers();
 		void _createSemaphores();
 		void _destroySemaphores();
+
+		void _update();
+		void _render();
+
 		vk::CommandBuffer _beginRender();
 		void _endRender();
 

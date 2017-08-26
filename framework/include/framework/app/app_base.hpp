@@ -2,9 +2,11 @@
 #define GFW_APP_BASE_H
 
 #include <memory>
-#include "macro.hpp"
-#include "window.hpp"
+#include <mutex>
+#include "framework/app/macro.hpp"
+#include "framework/app/window.hpp"
 #include <GLFW/glfw3.h>
+#include "framework/util/thread_master.hpp"
 
 namespace gfw
 {
@@ -33,7 +35,21 @@ namespace gfw
 		{
 			std::shared_ptr<Window_T> window(new Window_T(width, height, title, m_instance, m_physicalDevice,
 				m_device, m_graphicsQueue, m_presentQueue));
+			/*{
+				auto& subWindowsMutex = m_subWindowsMutex;
+				std::lock_guard <std::mutex> lg(subWindowsMutex);
+				std::vector<std::shared_ptr<Window>>& pSubWindows = m_pSubWindows;*/
 			m_pSubWindows.push_back(window);
+
+			//	//create new thread to run window.
+			//	m_threadMaster.appendThread([&](std::shared_ptr<Window_T> window) {
+			//		window->run();
+			//		{
+			//			std::lock_guard <std::mutex> lg(subWindowsMutex);
+			//			pSubWindows.erase(window);
+			//		}
+			//	}, window);
+			//}
 		}
 
 		//gettor methods
@@ -62,6 +78,10 @@ namespace gfw
 		std::shared_ptr<gfw::Window> m_pWindow;
 		std::vector<std::shared_ptr<gfw::Window>> m_pSubWindows;
 
+		//threads
+		ThreadMaster m_threadMaster;
+
+		//std::mutex m_subWindowsMutex;
 
 		void _init();
 		bool _checkValidationLayerSupport();

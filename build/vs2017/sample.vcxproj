@@ -103,7 +103,7 @@
       <WarningLevel>Level3</WarningLevel>
       <Optimization>Disabled</Optimization>
       <PreprocessorDefinitions>WIN32;_DEBUG;_CONSOLE;%(PreprocessorDefinitions)</PreprocessorDefinitions>
-      <AdditionalIncludeDirectories>$(GS_PROJECT_ROOT)\samples\include\sample;$(GS_PROJECT_ROOT)\framework\include;$(GS_PROJECT_ROOT)\libs\plog.git\include;$(GS_PROJECT_ROOT)\libs\VulkanSDK\1.0.49.0\Include;$(GS_PROJECT_ROOT)\libs\glfw\include;$(GS_PROJECT_ROOT)\libs\glm;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>$(GS_PROJECT_ROOT)\samples\include;$(GS_PROJECT_ROOT)\framework\include;$(GS_PROJECT_ROOT)\libs\plog.git\include;$(GS_PROJECT_ROOT)\libs\VulkanSDK\1.0.49.0\Include;$(GS_PROJECT_ROOT)\libs\glfw\include;$(GS_PROJECT_ROOT)\libs\glm;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
     </ClCompile>
     <Link>
       <SubSystem>Console</SubSystem>
@@ -118,7 +118,7 @@
       <WarningLevel>Level3</WarningLevel>
       <Optimization>Disabled</Optimization>
       <PreprocessorDefinitions>_DEBUG;_CONSOLE;%(PreprocessorDefinitions)</PreprocessorDefinitions>
-      <AdditionalIncludeDirectories>$(GS_PROJECT_ROOT)\samples\include\sample;$(GS_PROJECT_ROOT)\framework\include;$(GS_PROJECT_ROOT)\libs\plog.git\include;$(GS_PROJECT_ROOT)\libs\VulkanSDK\1.0.49.0\Include;$(GS_PROJECT_ROOT)\libs\glfw\include;$(GS_PROJECT_ROOT)\libs\glm;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>$(GS_PROJECT_ROOT)\samples\include;$(GS_PROJECT_ROOT)\framework\include;$(GS_PROJECT_ROOT)\libs\plog.git\include;$(GS_PROJECT_ROOT)\libs\VulkanSDK\1.0.49.0\Include;$(GS_PROJECT_ROOT)\libs\glfw\include;$(GS_PROJECT_ROOT)\libs\glm;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
     </ClCompile>
     <Link>
       <SubSystem>Console</SubSystem>
@@ -135,7 +135,7 @@
       <FunctionLevelLinking>true</FunctionLevelLinking>
       <IntrinsicFunctions>true</IntrinsicFunctions>
       <PreprocessorDefinitions>WIN32;NDEBUG;_CONSOLE;%(PreprocessorDefinitions)</PreprocessorDefinitions>
-      <AdditionalIncludeDirectories>$(GS_PROJECT_ROOT)\framework\include;$(GS_PROJECT_ROOT)\libs\plog.git\include;$(GS_PROJECT_ROOT)\libs\VulkanSDK\1.0.49.0\Include;$(GS_PROJECT_ROOT)\libs\glfw\include;$(GS_PROJECT_ROOT)\libs\glm;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>$(GS_PROJECT_ROOT)\samples\include;$(GS_PROJECT_ROOT)\framework\include;$(GS_PROJECT_ROOT)\libs\plog.git\include;$(GS_PROJECT_ROOT)\libs\VulkanSDK\1.0.49.0\Include;$(GS_PROJECT_ROOT)\libs\glfw\include;$(GS_PROJECT_ROOT)\libs\glm;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
     </ClCompile>
     <Link>
       <SubSystem>Console</SubSystem>
@@ -154,7 +154,7 @@
       <FunctionLevelLinking>true</FunctionLevelLinking>
       <IntrinsicFunctions>true</IntrinsicFunctions>
       <PreprocessorDefinitions>NDEBUG;_CONSOLE;%(PreprocessorDefinitions)</PreprocessorDefinitions>
-      <AdditionalIncludeDirectories>$(GS_PROJECT_ROOT)\framework\include;$(GS_PROJECT_ROOT)\libs\plog.git\include;$(GS_PROJECT_ROOT)\libs\VulkanSDK\1.0.49.0\Include;$(GS_PROJECT_ROOT)\libs\glfw\include;$(GS_PROJECT_ROOT)\libs\glm;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>$(GS_PROJECT_ROOT)\samples\include;$(GS_PROJECT_ROOT)\framework\include;$(GS_PROJECT_ROOT)\libs\plog.git\include;$(GS_PROJECT_ROOT)\libs\VulkanSDK\1.0.49.0\Include;$(GS_PROJECT_ROOT)\libs\glfw\include;$(GS_PROJECT_ROOT)\libs\glm;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
     </ClCompile>
     <Link>
       <SubSystem>Console</SubSystem>

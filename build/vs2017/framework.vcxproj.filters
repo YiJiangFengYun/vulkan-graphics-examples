@@ -7,66 +7,81 @@
     <Filter Include="src">
       <UniqueIdentifier>{92326229-821d-4df5-865a-eeb0b098d0e0}</UniqueIdentifier>
     </Filter>
-    <Filter Include="src\app">
-      <UniqueIdentifier>{ccca9082-5e3d-4478-a158-7bfb9f8f6af4}</UniqueIdentifier>
+    <Filter Include="include\framework">
+      <UniqueIdentifier>{dbc93ddc-2dd4-470a-8bbb-90168f50fac8}</UniqueIdentifier>
     </Filter>
-    <Filter Include="include\app">
+    <Filter Include="include\framework\app">
       <UniqueIdentifier>{5a7ad6bb-4076-456f-9f67-b45500aeb2bf}</UniqueIdentifier>
     </Filter>
-    <Filter Include="include\world">
+    <Filter Include="include\framework\util">
+      <UniqueIdentifier>{cc1c0b45-3f2d-421a-b22b-920a17a4fbd2}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="include\framework\world">
       <UniqueIdentifier>{1ad2d87d-0b84-4886-80f2-2c8a6d19aa11}</UniqueIdentifier>
     </Filter>
-    <Filter Include="src\world">
-      <UniqueIdentifier>{fb6f33a7-d86c-4e22-b41d-e8041af0c377}</UniqueIdentifier>
+    <Filter Include="src\framework">
+      <UniqueIdentifier>{84646f6f-be73-47b0-8834-cfb9516a77c9}</UniqueIdentifier>
     </Filter>
-    <Filter Include="include\util">
-      <UniqueIdentifier>{cc1c0b45-3f2d-421a-b22b-920a17a4fbd2}</UniqueIdentifier>
+    <Filter Include="src\framework\app">
+      <UniqueIdentifier>{ccca9082-5e3d-4478-a158-7bfb9f8f6af4}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="src\framework\util">
+      <UniqueIdentifier>{bc987f71-3747-4791-a7af-0d52b05eb072}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="src\framework\world">
+      <UniqueIdentifier>{fb6f33a7-d86c-4e22-b41d-e8041af0c377}</UniqueIdentifier>
     </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="..\..\framework\src\framework\app\app_base.cpp">
-      <Filter>src\app</Filter>
+      <Filter>src\framework\app</Filter>
     </ClCompile>
     <ClCompile Include="..\..\framework\src\framework\app\queue_family.cpp">
-      <Filter>src\app</Filter>
+      <Filter>src\framework\app</Filter>
     </ClCompile>
     <ClCompile Include="..\..\framework\src\framework\app\vulkan_ext.cpp">
-      <Filter>src\app</Filter>
+      <Filter>src\framework\app</Filter>
     </ClCompile>
     <ClCompile Include="..\..\framework\src\framework\app\window.cpp">
-      <Filter>src\app</Filter>
+      <Filter>src\framework\app</Filter>
     </ClCompile>
     <ClCompile Include="..\..\framework\src\framework\world\scene.cpp">
-      <Filter>src\world</Filter>
+      <Filter>src\framework\world</Filter>
     </ClCompile>
     <ClCompile Include="..\..\framework\src\framework\world\entity.cpp">
-      <Filter>src\world</Filter>
+      <Filter>src\framework\world</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\framework\src\framework\util\thread_master.cpp">
+      <Filter>src\framework\util</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="..\..\framework\include\framework\app\app_base.hpp">
-      <Filter>include\app</Filter>
+      <Filter>include\framework\app</Filter>
     </ClInclude>
     <ClInclude Include="..\..\framework\include\framework\app\macro.hpp">
-      <Filter>include\app</Filter>
+      <Filter>include\framework\app</Filter>
     </ClInclude>
     <ClInclude Include="..\..\framework\include\framework\app\queue_family.hpp">
-      <Filter>include\app</Filter>
+      <Filter>include\framework\app</Filter>
     </ClInclude>
     <ClInclude Include="..\..\framework\include\framework\app\vulkan_ext.hpp">
-      <Filter>include\app</Filter>
+      <Filter>include\framework\app</Filter>
     </ClInclude>
     <ClInclude Include="..\..\framework\include\framework\app\window.hpp">
-      <Filter>include\app</Filter>
+      <Filter>include\framework\app</Filter>
     </ClInclude>
     <ClInclude Include="..\..\framework\include\framework\world\scene.hpp">
-      <Filter>include\world</Filter>
+      <Filter>include\framework\world</Filter>
     </ClInclude>
     <ClInclude Include="..\..\framework\include\framework\world\entity.hpp">
-      <Filter>include\world</Filter>
+      <Filter>include\framework\world</Filter>
     </ClInclude>
     <ClInclude Include="..\..\framework\include\framework\util\macro_util.hpp">
-      <Filter>include\util</Filter>
+      <Filter>include\framework\util</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\framework\include\framework\util\thread_master.hpp">
+      <Filter>include\framework\util</Filter>
     </ClInclude>
   </ItemGroup>
 </Project>

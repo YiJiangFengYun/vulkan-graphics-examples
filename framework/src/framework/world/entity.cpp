@@ -1,4 +1,4 @@
-#include "world/entity.hpp"
+#include "framework/world/entity.hpp"
 
 namespace gfw
 {

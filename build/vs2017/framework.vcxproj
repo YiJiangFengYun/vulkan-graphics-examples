@@ -23,6 +23,7 @@
     <ClCompile Include="..\..\framework\src\framework\app\queue_family.cpp" />
     <ClCompile Include="..\..\framework\src\framework\app\vulkan_ext.cpp" />
     <ClCompile Include="..\..\framework\src\framework\app\window.cpp" />
+    <ClCompile Include="..\..\framework\src\framework\util\thread_master.cpp" />
     <ClCompile Include="..\..\framework\src\framework\world\entity.cpp" />
     <ClCompile Include="..\..\framework\src\framework\world\scene.cpp" />
   </ItemGroup>
@@ -33,6 +34,7 @@
     <ClInclude Include="..\..\framework\include\framework\app\vulkan_ext.hpp" />
     <ClInclude Include="..\..\framework\include\framework\app\window.hpp" />
     <ClInclude Include="..\..\framework\include\framework\util\macro_util.hpp" />
+    <ClInclude Include="..\..\framework\include\framework\util\thread_master.hpp" />
     <ClInclude Include="..\..\framework\include\framework\world\entity.hpp" />
     <ClInclude Include="..\..\framework\include\framework\world\scene.hpp" />
   </ItemGroup>
@@ -89,24 +91,24 @@
   <PropertyGroup Label="UserMacros" />
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
     <TargetExt>.lib</TargetExt>
-    <IncludePath>$(GS_PROJECT_ROOT)\framework\include\framework;$(GS_PROJECT_ROOT)\libs\plog.git\include;$(GS_PROJECT_ROOT)\libs\glm;$(GS_PROJECT_ROOT)\libs\glfw\include;$(GS_PROJECT_ROOT)\libs\VulkanSDK\1.0.49.0\Include;$(IncludePath)</IncludePath>
+    <IncludePath>$(GS_PROJECT_ROOT)\framework\include;$(GS_PROJECT_ROOT)\libs\plog.git\include;$(GS_PROJECT_ROOT)\libs\glm;$(GS_PROJECT_ROOT)\libs\glfw\include;$(GS_PROJECT_ROOT)\libs\VulkanSDK\1.0.49.0\Include;$(IncludePath)</IncludePath>
     <OutDir>$(GS_PROJECT_ROOT)\lib\Win32\</OutDir>
     <IntDir>$(ProjectName)\$(Configuration)\</IntDir>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
     <TargetExt>.lib</TargetExt>
-    <IncludePath>$(GS_PROJECT_ROOT)\framework\include\framework;$(GS_PROJECT_ROOT)\libs\plog.git\include;$(GS_PROJECT_ROOT)\libs\glm;$(GS_PROJECT_ROOT)\libs\glfw\include;$(GS_PROJECT_ROOT)\libs\VulkanSDK\1.0.49.0\Include;$(IncludePath)</IncludePath>
+    <IncludePath>$(GS_PROJECT_ROOT)\framework\include;$(GS_PROJECT_ROOT)\libs\plog.git\include;$(GS_PROJECT_ROOT)\libs\glm;$(GS_PROJECT_ROOT)\libs\glfw\include;$(GS_PROJECT_ROOT)\libs\VulkanSDK\1.0.49.0\Include;$(IncludePath)</IncludePath>
     <OutDir>$(GS_PROJECT_ROOT)\lib\Win32</OutDir>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
     <TargetExt>.lib</TargetExt>
-    <IncludePath>$(GS_PROJECT_ROOT)\framework\include\framework;$(GS_PROJECT_ROOT)\libs\plog.git\include;$(GS_PROJECT_ROOT)\libs\glm;$(GS_PROJECT_ROOT)\libs\glfw\include;$(GS_PROJECT_ROOT)\libs\VulkanSDK\1.0.49.0\Include;$(IncludePath)</IncludePath>
+    <IncludePath>$(GS_PROJECT_ROOT)\framework\include;$(GS_PROJECT_ROOT)\libs\plog.git\include;$(GS_PROJECT_ROOT)\libs\glm;$(GS_PROJECT_ROOT)\libs\glfw\include;$(GS_PROJECT_ROOT)\libs\VulkanSDK\1.0.49.0\Include;$(IncludePath)</IncludePath>
     <OutDir>$(GS_PROJECT_ROOT)\lib\X64\</OutDir>
     <IntDir>$(ProjectName)\$(Platform)\$(Configuration)\</IntDir>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
     <TargetExt>.lib</TargetExt>
-    <IncludePath>$(GS_PROJECT_ROOT)\framework\include\framework;$(GS_PROJECT_ROOT)\libs\plog.git\include;$(GS_PROJECT_ROOT)\libs\glm;$(GS_PROJECT_ROOT)\libs\glfw\include;$(GS_PROJECT_ROOT)\libs\VulkanSDK\1.0.49.0\Include;$(IncludePath)</IncludePath>
+    <IncludePath>$(GS_PROJECT_ROOT)\framework\include;$(GS_PROJECT_ROOT)\libs\plog.git\include;$(GS_PROJECT_ROOT)\libs\glm;$(GS_PROJECT_ROOT)\libs\glfw\include;$(GS_PROJECT_ROOT)\libs\VulkanSDK\1.0.49.0\Include;$(IncludePath)</IncludePath>
     <OutDir>$(GS_PROJECT_ROOT)\lib\X64</OutDir>
   </PropertyGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">

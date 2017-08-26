@@ -1,7 +1,7 @@
 #include <exception>
 #include "vulkan/vulkan.h"
-#include "window.hpp"
-#include "app.hpp"
+#include "sample/window.hpp"
+#include "sample/app.hpp"
 
 const uint32_t WINDOW_WIDTH = 800;
 const uint32_t WINDOW_HEIGHT = 600;

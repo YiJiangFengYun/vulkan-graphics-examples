@@ -1,4 +1,4 @@
-#include "app/app_base.hpp"
+#include "framework/app/app_base.hpp"
 
 #include <plog/Log.h>
 #include <plog/Appenders/DebugOutputAppender.h>
@@ -6,6 +6,12 @@
 #include <thread>
 
 namespace gfw {
+
+	void runWindow(std::shared_ptr<Window> pSubWindow)
+	{
+		pSubWindow->run();
+	}
+
 	AppBase::AppBase(uint32_t width, uint32_t height, const char *title)
 		:m_appName("vulkan graphics"),
 		m_appVersion(VK_MAKE_VERSION(1, 0, 0)),
@@ -55,17 +61,18 @@ namespace gfw {
 				return item->windowShouldClose();
 			}), m_pSubWindows.end());
 
-			//update windows.
-			m_pWindow->update();
-			for (auto& window : m_pSubWindows)
+			m_pWindow->run();
+			ThreadMaster threadMaster;
+			for (const auto& pSubWindow : m_pSubWindows)
 			{
-				window->update();
-			}
+				threadMaster.appendThread(std::shared_ptr<std::thread>(new std::thread(runWindow, pSubWindow)));
+			};
 
-			//render windows.
+			threadMaster.join();
 
 			glfwPollEvents();
 		}
+
 		//vkDeviceWaitIdle(device);
 	}
 

@@ -1,4 +1,4 @@
-#include "window.hpp"
+#include "sample/window.hpp"
 
 namespace app
 {

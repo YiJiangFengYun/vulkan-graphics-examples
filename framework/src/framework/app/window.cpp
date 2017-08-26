@@ -1,4 +1,4 @@
-#include "app/window.hpp"
+#include "framework/app/window.hpp"
 
 #include <plog/Log.h>
 #include <map>
@@ -65,24 +65,29 @@ namespace gfw {
 		_destroyWindow();
 	}
 
-	void Window::update()
+	void Window::run()
 	{
-
+		LOG(plog::debug) << "Window run" << std::endl;
+		_update();
+		_render();
 	}
 
-	vk::CommandBuffer Window::beginRender()
+	void Window::windowSetShouldClose(Bool32 value)
 	{
-		return _beginRender();
-	}
-
-	void Window::endRender()
-	{
-		_endRender();
+		//{
+		//	//synchronization
+		//	std::lock_guard<std::mutex> lg(m_windowMutex);
+			glfwSetWindowShouldClose(m_pWindow, value);
+		//}
 	}
 
 	Bool32 Window::windowShouldClose()
 	{
-		return glfwWindowShouldClose(m_pWindow);
+		//{
+		//	//synchronization
+		//	std::lock_guard<std::mutex> lg(m_windowMutex);
+			return glfwWindowShouldClose(m_pWindow);
+		//}
 	}
 
 	GLFWwindow *Window::getGLFWWindow() const
@@ -397,6 +402,16 @@ namespace gfw {
 	{
 		m_device.destroySemaphore(m_renderFinishedSemaphore);
 		m_device.destroySemaphore(m_imageAvailableSemaphore);
+	}
+
+	void Window::_update()
+	{
+	}
+
+	void Window::_render()
+	{
+		/*_beginRender();
+		_endRender();*/
 	}
 
 	vk::CommandBuffer Window::_beginRender()

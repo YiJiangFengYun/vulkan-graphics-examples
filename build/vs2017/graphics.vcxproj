@@ -19,10 +19,17 @@
     </ProjectConfiguration>
   </ItemGroup>
   <ItemGroup>
+    <ClCompile Include="..\..\framework\src\graphics\device\device.cpp" />
     <ClCompile Include="..\..\framework\src\graphics\texture\texture.cpp" />
+    <ClCompile Include="..\..\framework\src\graphics\texture\texture_1d.cpp" />
+    <ClCompile Include="..\..\framework\src\graphics\texture\texture_option.cpp" />
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="..\..\framework\include\graphics\device\device.hpp" />
+    <ClInclude Include="..\..\framework\include\graphics\global.hpp" />
     <ClInclude Include="..\..\framework\include\graphics\texture\texture.hpp" />
+    <ClInclude Include="..\..\framework\include\graphics\texture\texture_1d.hpp" />
+    <ClInclude Include="..\..\framework\include\graphics\texture\texture_option.hpp" />
   </ItemGroup>
   <PropertyGroup Label="Globals">
     <VCProjectVersion>15.0</VCProjectVersion>

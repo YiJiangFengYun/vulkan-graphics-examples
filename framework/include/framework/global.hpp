@@ -1,5 +1,5 @@
-#ifndef GFW_MACRO_H
-#define GFW_MACRO_H
+#ifndef GFW_GLOBAL_H
+#define GFW_GLOBAL_H
 
 
 #ifdef _DEBUG
@@ -13,12 +13,15 @@
 #define GFW_FALSE 0
 #define GFW_TRUE 1
 
+#include <cstdint>
+
 namespace gfw
 { 
-	using Bool32 = uint32_t;
+	typedef uint32_t Bool32;
+	extern void initLog();
 }
 
-#endif // !GFW_MACRO_H
+#endif // !GFW_GLOBAL_H
 
 
 

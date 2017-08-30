@@ -2,7 +2,7 @@
 #define GFW_FAMILIES_H
 
 #include <vulkan/vulkan.hpp>
-#include "framework/app/macro.hpp"
+#include "framework/global.hpp"
 
 namespace gfw
 {

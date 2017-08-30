@@ -108,9 +108,7 @@ namespace gfw {
 
 	void AppBase::_init()
 	{
-		//init default log to write to the windows debug output
-		static plog::DebugOutputAppender<plog::TxtFormatter> debugOutputAppender;
-		plog::init(plog::verbose, &debugOutputAppender);
+		initLog();
 
 		LOG(plog::debug) << "Application initialization.";
 

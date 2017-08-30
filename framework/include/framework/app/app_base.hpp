@@ -3,7 +3,7 @@
 
 #include <memory>
 #include <mutex>
-#include "framework/app/macro.hpp"
+#include "framework/global.hpp"
 #include "framework/app/window.hpp"
 #include <GLFW/glfw3.h>
 #include "framework/util/thread_master.hpp"

@@ -39,6 +39,9 @@
     <ClCompile Include="..\..\framework\src\graphics\texture\texture_1d.cpp">
       <Filter>src\graphics\texture</Filter>
     </ClCompile>
+    <ClCompile Include="..\..\framework\src\graphics\global.cpp">
+      <Filter>src\graphics</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="..\..\framework\include\graphics\texture\texture.hpp">

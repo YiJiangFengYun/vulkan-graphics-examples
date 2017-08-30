@@ -17,6 +17,11 @@ namespace kgs
 	{
 	}
 
+	vk::PhysicalDevice Device::getPhysicalDevice()
+	{
+		return m_physicalDevice;
+	}
+
 	vk::Device Device::getNativeDevice()
 	{
 		return m_nativeDevice;

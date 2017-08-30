@@ -54,12 +54,12 @@
     <ClCompile Include="..\..\framework\src\framework\util\thread_master.cpp">
       <Filter>src\framework\util</Filter>
     </ClCompile>
+    <ClCompile Include="..\..\framework\src\framework\global.cpp">
+      <Filter>src\framework</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="..\..\framework\include\framework\app\app_base.hpp">
-      <Filter>include\framework\app</Filter>
-    </ClInclude>
-    <ClInclude Include="..\..\framework\include\framework\app\macro.hpp">
       <Filter>include\framework\app</Filter>
     </ClInclude>
     <ClInclude Include="..\..\framework\include\framework\app\queue_family.hpp">
@@ -82,6 +82,9 @@
     </ClInclude>
     <ClInclude Include="..\..\framework\include\framework\util\thread_master.hpp">
       <Filter>include\framework\util</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\framework\include\framework\global.hpp">
+      <Filter>include\framework</Filter>
     </ClInclude>
   </ItemGroup>
 </Project>

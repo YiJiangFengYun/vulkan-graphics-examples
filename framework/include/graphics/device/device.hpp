@@ -12,7 +12,9 @@ namespace kgs
 		Device(const Device& device);
 		~Device();
 		vk::Device getNativeDevice();
+		vk::PhysicalDevice getPhysicalDevice();
 	private:
+		vk::PhysicalDevice m_physicalDevice;
 		vk::Device m_nativeDevice;
 	};
 }

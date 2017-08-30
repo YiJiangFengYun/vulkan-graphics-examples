@@ -483,18 +483,6 @@ namespace gfw {
 			nullptr,
 			vk::ImageLayout::eUndefined
 		};
-
-		UsedQueueFamily usedQueueFamily = UsedQueueFamily::findQueueFamilies(m_physicalDevice, m_surface);
-		if (usedQueueFamily.graphicsFamily != usedQueueFamily.presentFamily)
-		{
-			std::vector<uint32_t> queueFamilyIndices = {
-				(uint32_t)usedQueueFamily.graphicsFamily,
-				(uint32_t)usedQueueFamily.presentFamily
-			};
-			createInfo.sharingMode = vk::SharingMode::eConcurrent;
-			createInfo.queueFamilyIndexCount = static_cast<uint32_t>(queueFamilyIndices.size());
-			createInfo.pQueueFamilyIndices = queueFamilyIndices.data();
-		}
 		image = m_device.createImage(createInfo, nullptr);
 
 		auto memRequirements = m_device.getImageMemoryRequirements(image);

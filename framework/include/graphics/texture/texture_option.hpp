@@ -1,18 +1,32 @@
 #ifndef KGS_TEXTURE_TYPE_H
 #define KGS_TEXTURE_TYPE_H
 
+#include <utility>
+#include <Array>
+#include <map>
+#include <vulkan/vulkan.hpp>
+
 namespace kgs
 {
 	enum class TextureType
 	{
-		UNDEFINED,
 		TEX_1D,
+		TEX_1D_ARRAY,
 		TEX_2D,
+		TEX_2D_ARRAY,
 		TEX_3D,
 		CUBE,
-		TEX_2D_ARRAY,
-		BEGIN_RANGE = UNDEFINED,
-		END_RANGE = TEX_2D_ARRAY,
+		CUBE_ARRARY,
+		BEGIN_RANGE = TEX_1D,
+		END_RANGE = CUBE_ARRARY,
+		RANGE_SIZE = (END_RANGE - BEGIN_RANGE + 1)
+	};
+
+	enum class TextureFormat
+	{
+		R8G8B8A8_UNORM,
+		BEGIN_RANGE = R8G8B8A8_UNORM,
+		END_RANGE = R8G8B8A8_UNORM,
 		RANGE_SIZE = (END_RANGE - BEGIN_RANGE + 1)
 	};
 
@@ -23,7 +37,7 @@ namespace kgs
 		TRILINEAR,
 		BEGIN_RANGE = NEAREST,
 		END_RANGE = TRILINEAR,
-		RANGE_SIZE = (BEGIN_RANGE - END_RANGE + 1)
+		RANGE_SIZE = (END_RANGE - BEGIN_RANGE + 1)
 	};
 
 	enum class SamplerAddressMode
@@ -35,8 +49,15 @@ namespace kgs
 		MIRROR_CLAMP_TO_EDGE,
 		BEGIN_RANGE = REPEAT,
 		END_RANGE = MIRROR_CLAMP_TO_EDGE,
-		RANGE_SIZE = (BEGIN_RANGE - END_RANGE + 1)
+		RANGE_SIZE = (END_RANGE - BEGIN_RANGE + 1)
 	};
+
+	extern std::map<TextureType, std::string> mapTextureTypeToName;
+	extern std::array<std::pair<TextureType, vk::ImageType>, static_cast<size_t>(TextureType::RANGE_SIZE)> arrTextureTypeToVKImageType;
+	extern std::array<std::pair<TextureFormat, vk::Format>, static_cast<size_t>(TextureFormat::RANGE_SIZE)> arrFormatToVKFormat;
+	extern std::array<std::pair<TextureType, vk::ImageViewType>, static_cast<size_t>(TextureType::RANGE_SIZE)> arrTextureTypeToVKImageViewType;
+	extern std::array<std::tuple<FilterMode, vk::Filter, vk::SamplerMipmapMode>, static_cast<size_t>(FilterMode::RANGE_SIZE)> arrFilerModeToVK;
+	extern std::array<std::pair<SamplerAddressMode, vk::SamplerAddressMode>, static_cast<size_t>(SamplerAddressMode::RANGE_SIZE)> arrSamplerAddressModeToVK;
 }
 
 

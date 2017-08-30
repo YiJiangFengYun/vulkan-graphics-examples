@@ -5,7 +5,7 @@
 #include <vector>
 #include <mutex>
 #include <vulkan/vulkan.hpp>
-#include "framework/app/macro.hpp"
+#include "framework/global.hpp"
 #include "framework/app/vulkan_ext.hpp"
 #include <GLFW/glfw3.h>
 #include "framework/app/queue_family.hpp"

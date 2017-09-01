@@ -20,7 +20,6 @@ namespace kgs
 		void apply(Bool32 updateMipmaps = KGS_TRUE, Bool32 makeUnreadable = KGS_FALSE);
 	private:
 		Texture1D();
-		uint32_t m_width;
 	};
 }
 

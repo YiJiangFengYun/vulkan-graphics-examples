@@ -15,7 +15,7 @@
 #define KGS_TRUE 1
 
 #include <cstdint>
-
+#include <plog/Log.h>
 
 namespace kgs
 {

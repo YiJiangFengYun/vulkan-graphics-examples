@@ -1,6 +1,5 @@
 #include "graphics/global.hpp"
 
-#include <plog/Log.h>
 #include <plog/Appenders/DebugOutputAppender.h>
 
 namespace kgs

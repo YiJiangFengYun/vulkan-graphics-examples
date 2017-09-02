@@ -9,6 +9,7 @@
 #include "framework/app/vulkan_ext.hpp"
 #include <GLFW/glfw3.h>
 #include "framework/app/queue_family.hpp"
+#include "foundation/wrapper.hpp"
 
 namespace gfw
 {
@@ -26,16 +27,16 @@ namespace gfw
 	{
 	public:
 		Window(uint32_t width, uint32_t height, const char* title,
-			vk::Instance instance, vk::PhysicalDevice physicalDevice, vk::Device device,
-			vk::Queue graphicsQueue, vk::Queue presentQueue);
-		Window(GLFWwindow *pWindow, vk::SurfaceKHR surface,
-			vk::Instance instance, vk::PhysicalDevice physicalDevice, vk::Device device,
-			vk::Queue graphicsQueue, vk::Queue presentQueue);
+			std::shared_ptr<vk::Instance> pInstance, std::shared_ptr<vk::PhysicalDevice> pPhysicalDevice,
+			std::shared_ptr<vk::Device> device, vk::Queue graphicsQueue, vk::Queue presentQueue);
+		Window(std::shared_ptr<GLFWwindow> pWindow, std::shared_ptr<vk::SurfaceKHR> pSurface,
+			std::shared_ptr<vk::Instance> pInstance, std::shared_ptr<vk::PhysicalDevice> pPhysicalDevice,
+			std::shared_ptr<vk::Device> device, vk::Queue graphicsQueue, vk::Queue presentQueue);
 		virtual ~Window();
 		void run();
 		void Window::windowSetShouldClose(Bool32 value);
 		gfw::Bool32 windowShouldClose();
-		GLFWwindow *getGLFWWindow() const;
+		std::shared_ptr<GLFWwindow> getGLFWWindow() const;
 	private:
 		Window(const Window&);
 
@@ -43,69 +44,61 @@ namespace gfw
 		static vk::Format DEFAULT_DEPTH_FORMAT;
 
 		//--compositions
-		GLFWwindow *m_pWindow;
-		vk::SurfaceKHR m_surface;
-		vk::SwapchainKHR m_swapchain;
+		std::shared_ptr<GLFWwindow> m_pWindow;
+		std::shared_ptr<vk::SurfaceKHR> m_pSurface;
+		std::shared_ptr<vk::SwapchainKHR> m_pSwapchain;
 		std::vector<vk::Image> m_swapchainImages;
 		vk::Format m_swapchainImageFormat;
 		vk::Extent2D m_swapchainExtent;
-		std::vector<vk::ImageView> m_swapchainImageViews;
-		vk::CommandPool m_commandPool;
-		vk::RenderPass m_renderPass;
-		vk::Image m_depthImage;
-		vk::ImageView m_depthImageView;
-		vk::DeviceMemory m_depthImageMemory;
+		std::vector<std::shared_ptr<vk::ImageView>> m_pSwapchainImageViews;
+		std::shared_ptr<vk::CommandPool> m_pCommandPool;
+		std::shared_ptr<vk::RenderPass> m_pRenderPass;
+		std::shared_ptr<vk::Image> m_pDepthImage;
+		std::shared_ptr<vk::ImageView> m_pDepthImageView;
+		std::shared_ptr<vk::DeviceMemory> m_pDepthImageMemory;
 		vk::Format m_depthFormat;
-		std::vector<vk::Framebuffer> m_swapchainFramebuffers;
-		vk::Semaphore m_imageAvailableSemaphore;
-		vk::Semaphore m_renderFinishedSemaphore;
+		std::vector<std::shared_ptr<vk::Framebuffer>> m_pSwapchainFramebuffers;
+		std::shared_ptr<vk::Semaphore> m_pImageAvailableSemaphore;
+		std::shared_ptr<vk::Semaphore> m_pRenderFinishedSemaphore;
 
 		//std::mutex m_windowMutex;
 
 		//temp memebers.
-		vk::CommandBuffer m_currCommandBuffer;
+		std::shared_ptr<vk::CommandBuffer> m_pCurrCommandBuffer;
 
 		//--aggregations
-		vk::Instance m_vkInstance;
-		vk::PhysicalDevice m_physicalDevice;
-		vk::Device m_device;
+		std::shared_ptr<vk::Instance> m_pVKInstance;
+		std::shared_ptr<vk::PhysicalDevice> m_pPhysicalDevice;
+		std::shared_ptr<vk::Device> m_pDevice;
 		vk::Queue m_graphicsQueue;
 		vk::Queue m_presentQueue;
 
 		void _createWindow(uint32_t width, uint32_t height, const char* title);
-		void _destroyWindow();
 		void _createSurface();
-		void _destroySurface();
 		void _createSwapchain();
-		void _destroySwapchain();
 		void _createSwapchainImageViews();
-		void _destroySwapchainImageViews();
 		void _createCommandPool();
-		void _destroyCommandPool();
 		void _createRenderPass();
-		void _destroyRenderPass();
 		void _checkDepthFormat();
 		void _createDepthResources();
-		void _destroyDepthResources();
 		void _createFramebuffers();
-		void _destroyFramebuffers();
 		void _createSemaphores();
-		void _destroySemaphores();
 
 		void _update();
 		void _render();
 
-		vk::CommandBuffer _beginRender();
+		std::shared_ptr<vk::CommandBuffer> _beginRender();
 		void _endRender();
 
 		// tool methods
 		void _createImage(uint32_t width, uint32_t height, vk::Format format, vk::ImageTiling tiling,
-			vk::ImageUsageFlags usage, vk::MemoryPropertyFlags properties, vk::Image& image, vk::DeviceMemory& imageMemory);
-		void _createImageView(vk::Image image, vk::Format format, vk::ImageAspectFlags aspectFlags, vk::ImageView& imageView);
+			vk::ImageUsageFlags usage, vk::MemoryPropertyFlags properties,
+			std::shared_ptr<vk::Image>& pImage, std::shared_ptr<vk::DeviceMemory>& pImageMemory);
+		std::shared_ptr<vk::ImageView> _createImageView(vk::Image image, vk::Format format, vk::ImageAspectFlags aspectFlags);
 		void _transitionImageLayout(vk::Image image, vk::Format format, vk::ImageLayout oldLayout, vk::ImageLayout newLayout);
 		uint32_t _findMemoryType(uint32_t typeFilter, vk::MemoryPropertyFlags properties);
-		vk::CommandBuffer _beginSingleTimeCommands();
-		void _endSingleTimeCommands(vk::CommandBuffer commandBuffer);
+		std::shared_ptr<vk::CommandBuffer> _beginSingleTimeCommands();
+		void _endSingleTimeCommands(std::shared_ptr<vk::CommandBuffer> pCommandBuffer);
 
 		//event handlers
 		void _onWindowResized(int32_t width, int32_t height);

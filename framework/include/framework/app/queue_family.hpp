@@ -16,7 +16,7 @@ namespace gfw
 			return graphicsFamily >= 0 && presentFamily >= 0;
 		}
 
-		UsedQueueFamily static findQueueFamilies(const vk::PhysicalDevice& physicalDevice, const VkSurfaceKHR& surface);
+		UsedQueueFamily static findQueueFamilies(const vk::PhysicalDevice& physicalDevice, const vk::SurfaceKHR& surface);
 	};
 }
 

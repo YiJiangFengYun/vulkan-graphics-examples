@@ -2,16 +2,21 @@
 
 namespace kgs
 {
-	Device::Device(vk::PhysicalDevice physicalDevice, vk::Device nativeDevice, vk::Queue graphicsQueue, vk::CommandPool commandPool)
-		:m_physicalDevice(physicalDevice),
-		m_nativeDevice(nativeDevice),
+	Device::Device(std::shared_ptr<vk::PhysicalDevice> pPhysicalDevice,
+		std::shared_ptr<vk::Device> pNativeDevice, vk::Queue graphicsQueue,
+		std::shared_ptr<vk::CommandPool> pCommandPool)
+		:m_pPhysicalDevice(pPhysicalDevice),
+		m_pNativeDevice(pNativeDevice),
 		m_graphicsQueue(graphicsQueue),
-		m_commandPool(commandPool)
+		m_pCommandPool(pCommandPool)
 	{
 	}
 
 	Device::Device(const Device& device)
-		:m_nativeDevice(device.m_nativeDevice)
+		:m_pPhysicalDevice(device.m_pPhysicalDevice),
+		m_pNativeDevice(device.m_pNativeDevice),
+		m_graphicsQueue(device.m_graphicsQueue),
+		m_pCommandPool(device.m_pCommandPool)
 	{
 
 	}
@@ -20,14 +25,14 @@ namespace kgs
 	{
 	}
 
-	vk::PhysicalDevice Device::getPhysicalDevice()
+	std::shared_ptr<vk::PhysicalDevice> Device::getPPhysicalDevice()
 	{
-		return m_physicalDevice;
+		return m_pPhysicalDevice;
 	}
 
-	vk::Device Device::getNativeDevice()
+	std::shared_ptr<vk::Device> Device::getPNativeDevice()
 	{
-		return m_nativeDevice;
+		return m_pNativeDevice;
 	}
 
 	vk::Queue Device::getGraphicsQueue()
@@ -35,8 +40,8 @@ namespace kgs
 		return m_graphicsQueue;
 	}
 
-	vk::CommandPool Device::getCommandPool()
+	std::shared_ptr<vk::CommandPool> Device::getPCommandPool()
 	{
-		return m_commandPool;
+		return m_pCommandPool;
 	}
 }

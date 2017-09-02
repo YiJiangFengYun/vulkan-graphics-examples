@@ -1,6 +1,6 @@
 #include "framework/app/queue_family.hpp"
 
-gfw::UsedQueueFamily gfw::UsedQueueFamily::findQueueFamilies(const vk::PhysicalDevice& physicalDevice, const VkSurfaceKHR& surface)
+gfw::UsedQueueFamily gfw::UsedQueueFamily::findQueueFamilies(const vk::PhysicalDevice& physicalDevice, const vk::SurfaceKHR& surface)
 {
 	UsedQueueFamily data;
 

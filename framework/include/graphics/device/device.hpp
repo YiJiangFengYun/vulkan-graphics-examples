@@ -8,18 +8,20 @@ namespace kgs
 	class Device
 	{
 	public:
-		Device(vk::PhysicalDevice physicalDevice, vk::Device nativeDevice, vk::Queue graphicsQueue, vk::CommandPool commandPool);
+		Device(std::shared_ptr<vk::PhysicalDevice> pPhysicalDevice, 
+			std::shared_ptr<vk::Device> pNativeDevice, vk::Queue graphicsQueue, 
+			std::shared_ptr<vk::CommandPool> pCommandPool);
 		Device(const Device& device);
 		~Device();
-		vk::Device getNativeDevice();
-		vk::PhysicalDevice getPhysicalDevice();
+		std::shared_ptr<vk::PhysicalDevice> getPPhysicalDevice();
+		std::shared_ptr<vk::Device> getPNativeDevice();
 		vk::Queue getGraphicsQueue();
-		vk::CommandPool getCommandPool();
+		std::shared_ptr<vk::CommandPool> getPCommandPool();
 	private:
-		vk::PhysicalDevice m_physicalDevice;
-		vk::Device m_nativeDevice;
+		std::shared_ptr<vk::PhysicalDevice> m_pPhysicalDevice;
+		std::shared_ptr<vk::Device> m_pNativeDevice;
 		vk::Queue m_graphicsQueue;
-		vk::CommandPool m_commandPool;
+		std::shared_ptr<vk::CommandPool> m_pCommandPool;
 	};
 }
 

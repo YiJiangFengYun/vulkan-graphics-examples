@@ -11,7 +11,7 @@ namespace kgs
 		m_depth(1U),
 		m_arrayLength(1U)
 	{
-		
+
 	}
 
 	Texture::~Texture()
@@ -25,7 +25,7 @@ namespace kgs
 		{
 			// calculate num of mip maps
 			// numLevels = 1 + floor(log2(max(w, h, d)))
-			m_mipMapLevels = std::floor(std::log2(std::max(m_width, m_height, m_depth))) + 1;
+			m_mipMapLevels = static_cast<uint32_t>(std::floor(std::log2(std::max({ m_width, m_height, m_depth }))) + 1);
 		}
 		else
 		{
@@ -214,30 +214,22 @@ namespace kgs
 			imageLayout
 		};
 
-		vk::Device nativeDevice = m_device.getNativeDevice();
-		m_image = nativeDevice.createImage(createInfo, nullptr);
+		auto pDevice = m_device.getPNativeDevice();
+		m_pImage = fd::createImage(pDevice, createInfo);
 
-		auto memRequirements = nativeDevice.getImageMemoryRequirements(m_image);
+		auto memRequirements = pDevice->getImageMemoryRequirements(*m_pImage);
 
 		vk::MemoryAllocateInfo allocInfo = {
 			memRequirements.size,
 			_findMemoryType(memRequirements.memoryTypeBits, vk::MemoryPropertyFlagBits::eDeviceLocal)
 		};
 
-		m_memory = nativeDevice.allocateMemory(allocInfo, nullptr);
+		m_pMemory = fd::allocateMemory(pDevice, allocInfo);
 
-		nativeDevice.bindImageMemory(m_image, m_memory, vk::DeviceSize(0));
+		pDevice->bindImageMemory(*m_pImage, *m_pMemory, vk::DeviceSize(0));
 
 		m_vkImageLayout = imageLayout;
 	}
-
-	void Texture::_destroyImage()
-	{
-		vk::Device nativeDevice = m_device.getNativeDevice();
-		nativeDevice.destroyImage(m_image);
-		nativeDevice.freeMemory(m_memory);
-	}
-
 
 	void Texture::_createImageView()
 	{
@@ -286,7 +278,7 @@ namespace kgs
 
 		vk::ImageViewCreateInfo createInfo = {
 			vk::ImageViewCreateFlags(),
-			m_image,
+			*m_pImage,
 			vkImageViewType,
 			vkFormat,
 			{
@@ -304,14 +296,8 @@ namespace kgs
 			}
 		};
 
-		vk::Device nativeDevice = m_device.getNativeDevice();
-		m_imageView = nativeDevice.createImageView(createInfo);
-	}
-
-	void Texture::_destroyImageView()
-	{
-		vk::Device nativeDevice = m_device.getNativeDevice();
-		nativeDevice.destroyImageView(m_imageView);
+		auto pDevice = m_device.getPNativeDevice();
+		m_pImageView = fd::createImageView(pDevice, createInfo);
 	}
 
 	void Texture::_createSampler(FilterMode filterMode, SamplerAddressMode samplerAddressMode, float anisotropy)
@@ -356,14 +342,8 @@ namespace kgs
 			VkBool32(VK_FALSE)
 		};
 
-		vk::Device nativeDevice = m_device.getNativeDevice();
-		m_sampler = nativeDevice.createSampler(createInfo);
-	}
-
-	void Texture::_destroySampler()
-	{
-		vk::Device nativeDevice = m_device.getNativeDevice();
-		nativeDevice.destroySampler(m_sampler);
+		auto pDevice = m_device.getPNativeDevice();
+		m_pSampler = fd::createSampler(pDevice, createInfo);
 	}
 
 	std::vector<Color> Texture::_getPixels(uint32_t layer, uint32_t mipLevel)
@@ -398,7 +378,7 @@ namespace kgs
 	{
 		_resizeColorsData(mipLevel);
 #ifdef DEBUG
-		if(layer >= m_arrayLayer)
+		if (layer >= m_arrayLayer)
 		{
 			LOG(plog::warning) << "Invalid layer.";
 			return;
@@ -410,7 +390,7 @@ namespace kgs
 		size_t colorsSize = colors.size();
 		for (size_t i = 0, j = start; i < oneLayerSize && j < size; ++i, ++j)
 		{
-			if(i < colorsSize)arrTempColors[mipLevel][j] = colors[i];
+			if (i < colorsSize)arrTempColors[mipLevel][j] = colors[i];
 		}
 	}
 
@@ -436,107 +416,127 @@ namespace kgs
 
 	void Texture::_apply(Bool32 updateMipmaps, Bool32 makeUnreadable)
 	{
-		vk::Device device = m_device.getNativeDevice();
-		vk::CommandBuffer commandBuffer = _beginSingleTimeCommands();
-		//create first level image data using staging buffer.
-			if (arrTempColors.size() == 0)
-			{
-				LOG(plog::warning) << "Texture data is empty at mipmap level 0.";
-				return;
-			}
-			if (arrTempColors[0].size() < m_arrayLayer)
-			{
-				LOG(plog::warning) << "Texture data is not enough for array layer: " << m_arrayLayer << " at mipmap level 0.";
-				return;
-			}
-
-			//create staging buffer.
-			uint32_t imageSize = (m_width * m_height * m_depth) * sizeof(Color32);
-			vk::Buffer stagingBuffer;
-			vk::DeviceMemory stagingBufferMemory;
-			_createBuffer(imageSize, vk::BufferUsageFlagBits::eTransferSrc,
-				vk::MemoryPropertyFlagBits::eHostVisible | vk::MemoryPropertyFlagBits::eHostCoherent,
-				stagingBuffer, stagingBufferMemory);
-
-			void *data = device.mapMemory(stagingBufferMemory, 0, imageSize);
-			memcpy(data, arrTempColors[0].data(), static_cast<size_t>(imageSize));
-			vkUnmapMemory(device, stagingBufferMemory);
-
-			//transfer image from initial current image layout to dst layout.
-			//here use undefined layout not to use curr layout of image, it can clear image old data.
-			_tranImageLayout(commandBuffer, m_image, vk::ImageLayout::eUndefined, vk::ImageLayout::eTransferDstOptimal,
-			 0, 1, 0, m_arrayLayer);
-
-			//copy the first mip of the chain.
-			_copyBufferToImage(commandBuffer, stagingBuffer, m_image, m_width, m_height, m_depth, 0, 0, m_arrayLayer);
-		
-
-		//todo handle manual mip map
-		if (updateMipmaps == false)
+		if (updateMipmaps)
 		{
-			throw std::invalid_argument("UpdateMipmaps argument must be true now.");
+			_applyWithGenMipMap();
 		}
 		else
 		{
+			_applyDirect();
+		}
+		if (makeUnreadable)
+		{
+			//clear really colors data with reallocate.
+			std::vector<std::vector<Color32>>().swap(arrTempColors);
+		}
+	}
+
+	void Texture::_applyWithGenMipMap()
+	{
+		auto pDevice = m_device.getPNativeDevice();
+		auto pCommandBuffer = _beginSingleTimeCommands();
+		//create first level image data using staging buffer.
+		if (arrTempColors.size() == 0)
+		{
+			LOG(plog::warning) << "Texture data is empty at mipmap level 0.";
+			return;
+		}
+		if (arrTempColors[0].size() < m_arrayLayer)
+		{
+			LOG(plog::warning) << "Texture data is not enough for array layer: " << m_arrayLayer << " at mipmap level 0.";
+			return;
+		}
+
+		//create staging buffer.
+		uint32_t imageSize = (m_width * m_height * m_depth) * sizeof(Color32);
+		std::shared_ptr<vk::Buffer> pStagingBuffer;
+		std::shared_ptr<vk::DeviceMemory> pStagingBufferMemory;
+		_createBuffer(imageSize, vk::BufferUsageFlagBits::eTransferSrc,
+			vk::MemoryPropertyFlagBits::eHostVisible | vk::MemoryPropertyFlagBits::eHostCoherent,
+			pStagingBuffer, pStagingBufferMemory);
+
+		void *data = pDevice->mapMemory(*pStagingBufferMemory, 0, imageSize);
+		//try
+		//{
+			memcpy(data, arrTempColors[0].data(), static_cast<size_t>(imageSize));
+		//}
+		//catch (std::exception e)
+		//{
+			//throw e;
+		//}
+		//finally
+		//{
+			pDevice->unmapMemory(*pStagingBufferMemory);
+		//}
+
+		//transfer image from initial current image layout to dst layout.
+		//here use undefined layout not to use curr layout of image, it can clear image old data.
+		_tranImageLayout(pCommandBuffer, *m_pImage, vk::ImageLayout::eUndefined, vk::ImageLayout::eTransferDstOptimal,
+			0, 1, 0, m_arrayLayer);
+
+		//copy the first mip of the chain.
+		_copyBufferToImage(pCommandBuffer, *pStagingBuffer, *m_pImage, m_width, m_height, m_depth, 0, 0, m_arrayLayer);
+
 #ifdef DEBUG
-			//check format.
-			vk::PhysicalDevice physicalDevice = m_device.getPhysicalDevice();
-			auto formatProperties = physicalDevice.getFormatProperties(m_vkFormat);
-			if ((formatProperties.optimalTilingFeatures & vk::FormatFeatureFlagBits::eBlitSrc) == vk::FormatFeatureFlags())
-			{
-				throw std::runtime_error("The texture format don't support for blit source, mip-chain generation requires it.");
-			}
-			if ((formatProperties.optimalTilingFeatures & vk::FormatFeatureFlagBits::eBlitDst) == vk::FormatFeatureFlags())
-			{
-				throw std::runtime_error("The texture format don't support for blit destination, mip-chain generation requires it.");
-			}
+		//check format.
+		auto pPhysicalDevice = m_device.getPPhysicalDevice();
+		auto formatProperties = pPhysicalDevice->getFormatProperties(m_vkFormat);
+		if ((formatProperties.optimalTilingFeatures & vk::FormatFeatureFlagBits::eBlitSrc) == vk::FormatFeatureFlags())
+		{
+			throw std::runtime_error("The texture format don't support for blit source, mip-chain generation requires it.");
+		}
+		if ((formatProperties.optimalTilingFeatures & vk::FormatFeatureFlagBits::eBlitDst) == vk::FormatFeatureFlags())
+		{
+			throw std::runtime_error("The texture format don't support for blit destination, mip-chain generation requires it.");
+		}
 #endif // DEBUG
 
-			//transition first mip level to transfer source for read during blit.
-			_tranImageLayout(commandBuffer, m_image, vk::ImageLayout::eTransferDstOptimal, vk::ImageLayout::eTransferSrcOptimal, 0, 1, 0, m_arrayLayer);
+		//transition first mip level to transfer source for read during blit.
+		_tranImageLayout(pCommandBuffer, *m_pImage, vk::ImageLayout::eTransferDstOptimal, vk::ImageLayout::eTransferSrcOptimal, 0, 1, 0, m_arrayLayer);
 
-			for (uint32_t i = 1; i < m_mipMapLevels; ++i) {
-				vk::ImageBlit blit;
-				blit.srcSubresource.aspectMask = vk::ImageAspectFlagBits::eColor;
-				blit.srcSubresource.baseArrayLayer = 0;
-				blit.srcSubresource.layerCount = m_arrayLayer;
-				blit.srcSubresource.mipLevel = i - 1;
-				blit.dstSubresource.aspectMask = vk::ImageAspectFlagBits::eColor;
-				blit.dstSubresource.baseArrayLayer = 0;
-				blit.dstSubresource.layerCount = m_arrayLayer;
-				blit.dstSubresource.mipLevel = i;
+		for (uint32_t i = 1; i < m_mipMapLevels; ++i)
+		{
+			vk::ImageBlit blit;
+			blit.srcSubresource.aspectMask = vk::ImageAspectFlagBits::eColor;
+			blit.srcSubresource.baseArrayLayer = 0;
+			blit.srcSubresource.layerCount = m_arrayLayer;
+			blit.srcSubresource.mipLevel = i - 1;
+			blit.dstSubresource.aspectMask = vk::ImageAspectFlagBits::eColor;
+			blit.dstSubresource.baseArrayLayer = 0;
+			blit.dstSubresource.layerCount = m_arrayLayer;
+			blit.dstSubresource.mipLevel = i;
 
-				// each mipmap is the size divided by two
-				blit.srcOffsets[1] = vk::Offset3D(std::max(1u, m_width >> (i - 1)),
-					std::max(1u, m_height >> (i - 1)),
-					std::max(1u, m_depth >> (i - 1)));
+			// each mipmap is the size divided by two
+			blit.srcOffsets[1] = vk::Offset3D(std::max(1u, m_width >> (i - 1)),
+				std::max(1u, m_height >> (i - 1)),
+				std::max(1u, m_depth >> (i - 1)));
 
-				blit.dstOffsets[1] = vk::Offset3D(std::max(1u, m_width >> i),
-					std::max(1u, m_height >> i),
-					std::max(1u, m_depth >> i));
+			blit.dstOffsets[1] = vk::Offset3D(std::max(1u, m_width >> i),
+				std::max(1u, m_height >> i),
+				std::max(1u, m_depth >> i));
 
-				// transferDst go to transferSrc because this mipmap will be the source for the next iteration (the next level)
-				_tranImageLayout(commandBuffer, m_image, vk::ImageLayout::eUndefined, vk::ImageLayout::eTransferDstOptimal,
-					i, 1, 0, m_arrayLayer);
+			// transferDst go to transferSrc because this mipmap will be the source for the next iteration (the next level)
+			_tranImageLayout(pCommandBuffer, *m_pImage, vk::ImageLayout::eUndefined, vk::ImageLayout::eTransferDstOptimal,
+				i, 1, 0, m_arrayLayer);
 
-				commandBuffer.blitImage(m_image, vk::ImageLayout::eTransferSrcOptimal,
-					m_image, vk::ImageLayout::eTransferDstOptimal, blit,
-					vk::Filter::eLinear);
+			pCommandBuffer->blitImage(*m_pImage, vk::ImageLayout::eTransferSrcOptimal,
+				*m_pImage, vk::ImageLayout::eTransferDstOptimal, blit,
+				vk::Filter::eLinear);
 
-				_tranImageLayout(commandBuffer, m_image, vk::ImageLayout::eTransferDstOptimal, vk::ImageLayout::eTransferSrcOptimal,
-					i, 1, 0, m_arrayLayer);
-			}
-
-			//transfer all level and all layer to shader read layout.
-			_tranImageLayout(commandBuffer, m_image, vk::ImageLayout::eTransferSrcOptimal, vk::ImageLayout::eShaderReadOnlyOptimal,
-				0, m_mipMapLevels, 0, m_arrayLayer);
-
-			_endSingleTimeCommands(commandBuffer);
-
-			//clear staging buffer resource.
-			device.freeMemory(stagingBufferMemory);
-			device.destroyBuffer(stagingBuffer);
+			_tranImageLayout(pCommandBuffer, *m_pImage, vk::ImageLayout::eTransferDstOptimal, vk::ImageLayout::eTransferSrcOptimal,
+				i, 1, 0, m_arrayLayer);
 		}
+
+		//transfer all level and all layer to shader read layout.
+		_tranImageLayout(pCommandBuffer, *m_pImage, vk::ImageLayout::eTransferSrcOptimal, vk::ImageLayout::eShaderReadOnlyOptimal,
+			0, m_mipMapLevels, 0, m_arrayLayer);
+
+		_endSingleTimeCommands(pCommandBuffer);
+	}
+
+	void Texture::_applyDirect()
+	{
+		
 	}
 
 	void Texture::_resizeColorsData(uint32_t mipLevel)
@@ -547,7 +547,7 @@ namespace kgs
 	}
 
 	void Texture::_createBuffer(vk::DeviceSize size, vk::BufferUsageFlags usage, vk::MemoryPropertyFlags properties,
-		vk::Buffer& buffer, vk::DeviceMemory& bufferMemory)
+		std::shared_ptr<vk::Buffer>& pBuffer, std::shared_ptr<vk::DeviceMemory>& pBufferMemory)
 	{
 		vk::BufferCreateInfo createInfo = {
 			vk::BufferCreateFlags(),
@@ -556,20 +556,21 @@ namespace kgs
 			vk::SharingMode::eExclusive
 		};
 
-		vk::Device device = m_device.getNativeDevice();
-		buffer = device.createBuffer(createInfo);
+		auto pDevice = m_device.getPNativeDevice();
+		pBuffer = fd::createBuffer(pDevice, createInfo);
 
-		vk::MemoryRequirements memReqs = device.getBufferMemoryRequirements(buffer);
+		vk::MemoryRequirements memReqs = pDevice->getBufferMemoryRequirements(*pBuffer);
 		vk::MemoryAllocateInfo allocateInfo = {
 			memReqs.size,
 			_findMemoryType(memReqs.memoryTypeBits, properties)
 		};
-		bufferMemory = device.allocateMemory(allocateInfo);
 
-		vkBindBufferMemory(device, buffer, bufferMemory, 0);
+		pBufferMemory = fd::allocateMemory(pDevice, allocateInfo);
+
+		pDevice->bindBufferMemory(*pBuffer, *pBufferMemory, 0);
 	}
 
-	void  Texture::_tranImageLayout(vk::CommandBuffer commandBuffer, vk::Image image,
+	void  Texture::_tranImageLayout(std::shared_ptr<vk::CommandBuffer> pCommandBuffer, vk::Image image,
 		vk::ImageLayout oldLayout, vk::ImageLayout newLayout,
 		uint32_t baseMipLevel, uint32_t levelCount,
 		uint32_t baseArrayLayer, uint32_t layerCount)
@@ -612,14 +613,14 @@ namespace kgs
 			}
 		}
 
-		commandBuffer.pipelineBarrier(vk::PipelineStageFlagBits::eTopOfPipe,
+		pCommandBuffer->pipelineBarrier(vk::PipelineStageFlagBits::eTopOfPipe,
 			vk::PipelineStageFlagBits::eTopOfPipe,
 			vk::DependencyFlags(),
 			nullptr, nullptr,
 			barrier);
 	}
 
-	void Texture::_copyBufferToImage(vk::CommandBuffer commandBuffer, vk::Buffer buffer, vk::Image image,
+	void Texture::_copyBufferToImage(std::shared_ptr<vk::CommandBuffer> pCommandBuffer, vk::Buffer buffer, vk::Image image,
 		uint32_t width, uint32_t height, uint32_t depth, uint32_t mipLevel,
 		uint32_t baseArrayLayer, uint32_t layerCount)
 	{
@@ -629,13 +630,13 @@ namespace kgs
 			vk::Extent3D(width, height, depth)
 		};
 
-		commandBuffer.copyBufferToImage(buffer, image, vk::ImageLayout::eTransferDstOptimal, copyInfo);
+		pCommandBuffer->copyBufferToImage(buffer, image, vk::ImageLayout::eTransferDstOptimal, copyInfo);
 	}
 
 	uint32_t Texture::_findMemoryType(uint32_t typeFilter, vk::MemoryPropertyFlags properties)
 	{
-		vk::PhysicalDevice physicalDevice = m_device.getPhysicalDevice();
-		vk::PhysicalDeviceMemoryProperties memProperties = physicalDevice.getMemoryProperties();
+		auto pPhysicalDevice = m_device.getPPhysicalDevice();
+		vk::PhysicalDeviceMemoryProperties memProperties = pPhysicalDevice->getMemoryProperties();
 		for (uint32_t i = 0; i < memProperties.memoryTypeCount; ++i)
 		{
 			if (typeFilter & (1 << i) && (memProperties.memoryTypes[i].propertyFlags & properties) == properties)
@@ -648,32 +649,32 @@ namespace kgs
 
 	}
 
-	vk::CommandBuffer Texture::_beginSingleTimeCommands() {
-		vk::Device device = m_device.getNativeDevice();
-		vk::CommandPool commandPool = m_device.getCommandPool();
+	std::shared_ptr<vk::CommandBuffer> Texture::_beginSingleTimeCommands() {
+		auto pDevice = m_device.getPNativeDevice();
+		auto pCommandPool = m_device.getPCommandPool();
 		vk::CommandBufferAllocateInfo allocateInfo = {
-			commandPool,
+			*pCommandPool,
 			vk::CommandBufferLevel::ePrimary,
 			uint32_t(1)
 		};
-		vk::CommandBuffer commandBuffer = device.allocateCommandBuffers(allocateInfo)[0];
+
+		auto pCommandBuffer = fd::allocateCommandBuffer(pDevice, pCommandPool, allocateInfo);
 
 		vk::CommandBufferBeginInfo beginInfo = {
 			vk::CommandBufferUsageFlags(vk::CommandBufferUsageFlagBits::eOneTimeSubmit)
 		};
-		commandBuffer.begin(beginInfo);
+		pCommandBuffer->begin(beginInfo);
 
-		return commandBuffer;
+		return pCommandBuffer;
 	}
 
-	void Texture::_endSingleTimeCommands(vk::CommandBuffer commandBuffer) {
-		vk::Device device = m_device.getNativeDevice();
-		vk::Queue graphicsQueue = m_device.getGraphicsQueue();
-		vk::CommandPool commandPool = m_device.getCommandPool();
-		commandBuffer.end();
-		vk::SubmitInfo submitInfo = { 0, nullptr, nullptr, 1, &commandBuffer, 0, nullptr };
+	void Texture::_endSingleTimeCommands(std::shared_ptr<vk::CommandBuffer> pCommandBuffer) {
+		auto pDevice = m_device.getPNativeDevice();
+		auto graphicsQueue = m_device.getGraphicsQueue();
+		auto commandPool = m_device.getPCommandPool();
+		pCommandBuffer->end();
+		vk::SubmitInfo submitInfo = { 0, nullptr, nullptr, 1, pCommandBuffer.get(), 0, nullptr };
 		graphicsQueue.submit(submitInfo, nullptr);
 		graphicsQueue.waitIdle();
-		device.freeCommandBuffers(commandPool, commandBuffer);
 	}
 }

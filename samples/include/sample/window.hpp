@@ -9,8 +9,8 @@ namespace app
 	{
 	public:
 		Window(uint32_t width, uint32_t height, const char* title,
-			vk::Instance instance, vk::PhysicalDevice physicalDevice, vk::Device device,
-			vk::Queue graphicsQueue, vk::Queue presentQueue);
+			std::shared_ptr<vk::Instance> pInstance, std::shared_ptr<vk::PhysicalDevice> pPhysicalDevice,
+			std::shared_ptr<vk::Device> device, vk::Queue graphicsQueue, vk::Queue presentQueue);
 
 	private:
 

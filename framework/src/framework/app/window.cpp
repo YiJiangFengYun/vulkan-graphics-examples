@@ -9,12 +9,12 @@ namespace gfw {
 	vk::Format Window::DEFAULT_DEPTH_FORMAT(vk::Format::eD32SfloatS8Uint);
 
 	Window::Window(uint32_t width, uint32_t height, const char* title,
-		vk::Instance instance, vk::PhysicalDevice physicalDevice, vk::Device device,
-		vk::Queue graphicsQueue, vk::Queue presentQueue)
+		std::shared_ptr<vk::Instance> pInstance, std::shared_ptr<vk::PhysicalDevice> pPhysicalDevice, 
+		std::shared_ptr<vk::Device> device, vk::Queue graphicsQueue, vk::Queue presentQueue)
 	{
-		m_vkInstance = instance;
-		m_physicalDevice = physicalDevice;
-		m_device = device;
+		m_pVKInstance = pInstance;
+		m_pPhysicalDevice = pPhysicalDevice;
+		m_pDevice = device;
 		m_graphicsQueue = graphicsQueue;
 		m_presentQueue = presentQueue;
 		m_depthFormat = DEFAULT_DEPTH_FORMAT;
@@ -29,20 +29,20 @@ namespace gfw {
 		_createSemaphores();
 	}
 
-	Window::Window(GLFWwindow *pWindow, vk::SurfaceKHR surface,
-		vk::Instance instance, vk::PhysicalDevice physicalDevice, vk::Device device,
-		vk::Queue graphicsQueue, vk::Queue presentQueue)
+	Window::Window(std::shared_ptr<GLFWwindow> pWindow, std::shared_ptr<vk::SurfaceKHR> pSurface,
+		std::shared_ptr<vk::Instance> pInstance, std::shared_ptr<vk::PhysicalDevice> pPhysicalDevice,
+		std::shared_ptr<vk::Device> device, vk::Queue graphicsQueue, vk::Queue presentQueue)
 	{
 		m_pWindow = pWindow;
-		m_surface = surface;
-		m_vkInstance = instance;
-		m_physicalDevice = physicalDevice;
-		m_device = device;
+		m_pSurface = pSurface;
+		m_pVKInstance = pInstance;
+		m_pPhysicalDevice = pPhysicalDevice;
+		m_pDevice = device;
 		m_graphicsQueue = graphicsQueue;
 		m_presentQueue = presentQueue;
 		m_depthFormat = DEFAULT_DEPTH_FORMAT;
-		glfwSetWindowUserPointer(pWindow, this);
-		glfwSetWindowSizeCallback(pWindow, onWindowResized);
+		glfwSetWindowUserPointer(pWindow.get(), this);
+		glfwSetWindowSizeCallback(pWindow.get(), onWindowResized);
 		_createSwapchain();
 		_createSwapchainImageViews();
 		_createCommandPool();
@@ -54,15 +54,6 @@ namespace gfw {
 
 	Window::~Window()
 	{
-		_destroySemaphores();
-		_destroyFramebuffers();
-		_destroyDepthResources();
-		_destroyRenderPass();
-		_destroyCommandPool();
-		_destroySwapchainImageViews();
-		_destroySwapchain();
-		_destroySurface();
-		_destroyWindow();
 	}
 
 	void Window::run()
@@ -77,7 +68,7 @@ namespace gfw {
 		//{
 		//	//synchronization
 		//	std::lock_guard<std::mutex> lg(m_windowMutex);
-			glfwSetWindowShouldClose(m_pWindow, value);
+			glfwSetWindowShouldClose(m_pWindow.get(), value);
 		//}
 	}
 
@@ -86,59 +77,35 @@ namespace gfw {
 		//{
 		//	//synchronization
 		//	std::lock_guard<std::mutex> lg(m_windowMutex);
-			return glfwWindowShouldClose(m_pWindow);
+			return glfwWindowShouldClose(m_pWindow.get());
 		//}
 	}
 
-	GLFWwindow *Window::getGLFWWindow() const
+	std::shared_ptr<GLFWwindow> Window::getGLFWWindow() const
 	{
 		return m_pWindow;
 	}
 
 	void Window::_createWindow(uint32_t width, uint32_t height, const char* title)
 	{
-		m_pWindow = glfwCreateWindow(width, height, title, nullptr, nullptr);
+		m_pWindow = fd::createGLFWWindow(width, height, title);
 
-		glfwSetWindowUserPointer(m_pWindow, this);
-		glfwSetWindowSizeCallback(m_pWindow, onWindowResized);
-	}
-
-	void Window::_destroyWindow()
-	{
-		if (m_pWindow != nullptr)
-		{
-			glfwDestroyWindow(m_pWindow);
-			m_pWindow = nullptr;
-		}
+		glfwSetWindowUserPointer(m_pWindow.get(), this);
+		glfwSetWindowSizeCallback(m_pWindow.get(), onWindowResized);
 	}
 
 	void Window::_createSurface()
 	{
-		VkSurfaceKHR surface;
-		auto result = static_cast<vk::Result > (glfwCreateWindowSurface(m_vkInstance, m_pWindow, nullptr, &surface));
-		if (result != vk::Result::eSuccess)
-		{
-			throw std::system_error(result, "gfw::Context::_createSurface");
-		}
-		m_surface = surface;
+		m_pSurface = fd::createSurface(m_pVKInstance, m_pWindow);
 		LOG(plog::debug) << "Create successfully surface.";
-	}
-
-	void Window::_destroySurface()
-	{
-		if (m_surface != vk::SurfaceKHR(nullptr))
-		{
-			m_vkInstance.destroySurfaceKHR(m_surface);
-			m_surface = nullptr;
-		}
 	}
 
 	void Window::_createSwapchain()
 	{
-		SwapChainSupportDetails details = SwapChainSupportDetails::querySwapChainSupport(m_physicalDevice, m_surface);
+		SwapChainSupportDetails details = SwapChainSupportDetails::querySwapChainSupport(*m_pPhysicalDevice, *m_pSurface);
 		vk::SurfaceFormatKHR surfaceFormat = details.chooseSurfaceFormat();
 		vk::PresentModeKHR presentMode = details.choosePresentMode();
-		vk::Extent2D extent = details.chooseExtent(m_pWindow);
+		vk::Extent2D extent = details.chooseExtent(m_pWindow.get());
 
 		//LOG(plog::debug) << "Swapchain surface format: " << surfaceFormat.format
 
@@ -151,7 +118,7 @@ namespace gfw {
 
 		vk::SwapchainCreateInfoKHR createInfo = {
 			vk::SwapchainCreateFlagsKHR(),
-			m_surface,
+			*m_pSurface,
 			minImageCount,
 			surfaceFormat.format,
 			surfaceFormat.colorSpace,
@@ -168,7 +135,7 @@ namespace gfw {
 			vk::SwapchainKHR(nullptr)
 		};
 
-		UsedQueueFamily usedQueueFamily = UsedQueueFamily::findQueueFamilies(m_physicalDevice, m_surface);
+		UsedQueueFamily usedQueueFamily = UsedQueueFamily::findQueueFamilies(*m_pPhysicalDevice, *m_pSurface);
 		if (usedQueueFamily.graphicsFamily != usedQueueFamily.presentFamily)
 		{
 			std::vector<uint32_t> queueFamilyIndices = {
@@ -180,61 +147,34 @@ namespace gfw {
 			createInfo.pQueueFamilyIndices = queueFamilyIndices.data();
 		}
 
-		m_swapchain = m_device.createSwapchainKHR(createInfo);
+		m_pSwapchain = fd::createSwapchainKHR(m_pDevice, createInfo);
 		LOG(plog::debug) << "Create successfully swapchain.";
 
-		m_swapchainImages = m_device.getSwapchainImagesKHR(m_swapchain);
+		m_swapchainImages = m_pDevice->getSwapchainImagesKHR(*m_pSwapchain);
 		m_swapchainImageFormat = surfaceFormat.format;
 		m_swapchainExtent = extent;
-	}
-
-	void Window::_destroySwapchain()
-	{
-		if (m_swapchain != vk::SwapchainKHR(nullptr))
-		{
-			m_device.destroySwapchainKHR(m_swapchain);
-			m_swapchain = nullptr;
-		}
 	}
 
 	void Window::_createSwapchainImageViews()
 	{
 		size_t num = m_swapchainImages.size();
-		m_swapchainImageViews.resize(m_swapchainImages.size());
+		m_pSwapchainImageViews.resize(m_swapchainImages.size());
 
 		for (size_t i = 0; i < num; ++i)
 		{
-			_createImageView(m_swapchainImages[i], m_swapchainImageFormat, vk::ImageAspectFlagBits::eColor, m_swapchainImageViews[i]);
+			m_pSwapchainImageViews[i] = _createImageView(m_swapchainImages[i], m_swapchainImageFormat, vk::ImageAspectFlagBits::eColor);
 		}
-	}
-
-	void Window::_destroySwapchainImageViews()
-	{
-		for (const auto& imageView : m_swapchainImageViews)
-		{
-			m_device.destroyImageView(imageView);
-		}
-		m_swapchainImageViews.resize(0);
 	}
 
 	void Window::_createCommandPool()
 	{
-		UsedQueueFamily queueFamilyIndices = UsedQueueFamily::findQueueFamilies(m_physicalDevice, m_surface);
+		UsedQueueFamily queueFamilyIndices = UsedQueueFamily::findQueueFamilies(*m_pPhysicalDevice, *m_pSurface);
 
 		vk::CommandPoolCreateInfo createInfo = {
 			vk::CommandPoolCreateFlags(),
 			static_cast<uint32_t>(queueFamilyIndices.graphicsFamily)
 		};
-		m_commandPool = m_device.createCommandPool(createInfo, nullptr);
-	}
-
-	void Window::_destroyCommandPool()
-	{
-		if (m_commandPool != vk::CommandPool(nullptr))
-		{
-			m_device.destroyCommandPool(m_commandPool);
-			m_commandPool = nullptr;
-		}
+		m_pCommandPool = fd::createCommandPool(m_pDevice, createInfo);
 	}
 
 	void Window::_createRenderPass()
@@ -297,7 +237,7 @@ namespace gfw {
 		};
 
 		std::array<vk::AttachmentDescription, 2> attachments = { colorAttachment, depthAttachment };
-		vk::RenderPassCreateInfo renderPassCreateInfo = {
+		vk::RenderPassCreateInfo createInfo = {
 			vk::RenderPassCreateFlags(),
 			static_cast<uint32_t>(attachments.size()),
 			attachments.data(),
@@ -306,17 +246,7 @@ namespace gfw {
 			static_cast<uint32_t>(1),
 			&dependency
 		};
-
-		m_renderPass = m_device.createRenderPass(renderPassCreateInfo);
-	}
-
-	void Window::_destroyRenderPass()
-	{
-		if (m_renderPass != vk::RenderPass(nullptr))
-		{
-			m_device.destroyRenderPass(m_renderPass);
-			m_renderPass = nullptr;
-		}
+		m_pRenderPass = fd::createRenderPass(m_pDevice, createInfo);
 	}
 
 	void Window::_createDepthResources()
@@ -328,42 +258,23 @@ namespace gfw {
 			vk::ImageTiling::eOptimal,
 			vk::ImageUsageFlagBits::eDepthStencilAttachment,
 			vk::MemoryPropertyFlagBits::eDeviceLocal,
-			m_depthImage,
-			m_depthImageMemory);
-		_createImageView(m_depthImage, m_depthFormat, vk::ImageAspectFlagBits::eDepth, m_depthImageView);
-		_transitionImageLayout(m_depthImage, m_depthFormat, vk::ImageLayout::eUndefined,
+			m_pDepthImage,
+			m_pDepthImageMemory);
+		m_pDepthImageView = _createImageView(*m_pDepthImage, m_depthFormat, vk::ImageAspectFlagBits::eDepth);
+		_transitionImageLayout(*m_pDepthImage, m_depthFormat, vk::ImageLayout::eUndefined,
 			vk::ImageLayout::eDepthStencilAttachmentOptimal);
-	}
-
-	void Window::_destroyDepthResources()
-	{
-		if (m_depthImageView != vk::ImageView(nullptr))
-		{
-			m_device.destroyImageView(m_depthImageView);
-			m_depthImageView = nullptr;
-		}
-		if (m_depthImage != vk::Image(nullptr))
-		{
-			m_device.destroyImage(m_depthImage);
-			m_depthImage = nullptr;
-		}
-		if (m_depthImageMemory != vk::DeviceMemory(nullptr))
-		{
-			m_device.freeMemory(m_depthImageMemory);
-			m_depthImageMemory = nullptr;
-		}
 	}
 
 	void Window::_createFramebuffers()
 	{
-		size_t count = m_swapchainImageViews.size();
-		m_swapchainFramebuffers.resize(count);
+		size_t count = m_pSwapchainImageViews.size();
+		m_pSwapchainFramebuffers.resize(count);
 		for (size_t i = 0; i < count; ++i)
 		{
-			std::array<vk::ImageView, 2> attachments = { m_swapchainImageViews[i], m_depthImageView };
+			std::array<vk::ImageView, 2> attachments = { *m_pSwapchainImageViews[i], *m_pDepthImageView };
 			vk::FramebufferCreateInfo createInfo = {
 				vk::FramebufferCreateFlags(),
-				m_renderPass,
+				*m_pRenderPass,
 				static_cast<uint32_t>(attachments.size()),
 				attachments.data(),
 				m_swapchainExtent.width,
@@ -371,20 +282,7 @@ namespace gfw {
 				static_cast<uint32_t>(1)
 			};
 
-			m_swapchainFramebuffers[i] = m_device.createFramebuffer(createInfo);
-		}
-	}
-
-	void Window::_destroyFramebuffers()
-	{
-		size_t num = m_swapchainFramebuffers.size();
-		for (size_t i = 0; i < num; ++i)
-		{
-			if (m_swapchainFramebuffers[i] != vk::Framebuffer(nullptr))
-			{
-				m_device.destroyFramebuffer(m_swapchainFramebuffers[i]);
-				m_swapchainFramebuffers[i] = nullptr;
-			}
+			m_pSwapchainFramebuffers[i] = fd::createFrameBuffer(m_pDevice, createInfo);
 		}
 	}
 
@@ -394,14 +292,8 @@ namespace gfw {
 			vk::SemaphoreCreateFlags()
 		};
 
-		m_imageAvailableSemaphore = m_device.createSemaphore(createInfo);
-		m_renderFinishedSemaphore = m_device.createSemaphore(createInfo);
-	}
-
-	void Window::_destroySemaphores()
-	{
-		m_device.destroySemaphore(m_renderFinishedSemaphore);
-		m_device.destroySemaphore(m_imageAvailableSemaphore);
+		m_pImageAvailableSemaphore = fd::createSemaphore(m_pDevice, createInfo);
+		m_pRenderFinishedSemaphore = fd::createSemaphore(m_pDevice, createInfo);
 	}
 
 	void Window::_update()
@@ -414,55 +306,56 @@ namespace gfw {
 		_endRender();*/
 	}
 
-	vk::CommandBuffer Window::_beginRender()
+	std::shared_ptr<vk::CommandBuffer> Window::_beginRender()
 	{
 		vk::CommandBufferAllocateInfo allocateInfo = {
-			m_commandPool,
+			*m_pCommandPool,
 			vk::CommandBufferLevel::ePrimary,
 			static_cast<uint32_t>(1)
 		};
 
-		m_currCommandBuffer = m_device.allocateCommandBuffers(allocateInfo)[0];
+		m_pCurrCommandBuffer = fd::allocateCommandBuffer(m_pDevice, m_pCommandPool, allocateInfo);
 
 		vk::CommandBufferBeginInfo beginInfo = {
 			vk::CommandBufferUsageFlags()
 		};
 
-		m_currCommandBuffer.begin(beginInfo);
+		m_pCurrCommandBuffer->begin(beginInfo);
 
 
-		uint32_t imageIndex = m_device.acquireNextImageKHR(m_swapchain,
+		uint32_t imageIndex = m_pDevice->acquireNextImageKHR(*m_pSwapchain,
 			std::numeric_limits<uint64_t>::max(),
-			m_imageAvailableSemaphore, nullptr).value;
+			*m_pImageAvailableSemaphore, nullptr).value;
 
 		std::array<vk::ClearValue, 2> clearValues = {};
 		clearValues[0] = vk::ClearColorValue();
 		clearValues[1] = vk::ClearDepthStencilValue(1.0f, 0);
 
 		vk::RenderPassBeginInfo renderPassBeginInfo = {
-			m_renderPass,
-			m_swapchainFramebuffers[imageIndex],
+			*m_pRenderPass,
+			*m_pSwapchainFramebuffers[imageIndex],
 			vk::Rect2D({0, 0}, m_swapchainExtent),
 			static_cast<uint32_t>(clearValues.size()),
 			clearValues.data()
 		};
 
-		m_currCommandBuffer.beginRenderPass(renderPassBeginInfo, vk::SubpassContents::eInline);
-		return m_currCommandBuffer;
+		m_pCurrCommandBuffer->beginRenderPass(renderPassBeginInfo, vk::SubpassContents::eInline);
+		return m_pCurrCommandBuffer;
 	}
 
 	void Window::_endRender()
 	{
-		m_currCommandBuffer.endRenderPass();
+		m_pCurrCommandBuffer->endRenderPass();
 
-		m_currCommandBuffer.end();
+		m_pCurrCommandBuffer->end();
 
 		//free command buffer created when begin of render.
-		m_device.freeCommandBuffers(m_commandPool, m_currCommandBuffer);
+		m_pCurrCommandBuffer = nullptr;
 	}
 
 	void Window::_createImage(uint32_t width, uint32_t height, vk::Format format, vk::ImageTiling tiling,
-		vk::ImageUsageFlags usage, vk::MemoryPropertyFlags properties, vk::Image& image, vk::DeviceMemory& imageMemory)
+		vk::ImageUsageFlags usage, vk::MemoryPropertyFlags properties, 
+		std::shared_ptr<vk::Image>& pImage, std::shared_ptr<vk::DeviceMemory>& pImageMemory)
 	{
 		vk::ImageCreateInfo createInfo = {
 			vk::ImageCreateFlags(),
@@ -483,21 +376,21 @@ namespace gfw {
 			nullptr,
 			vk::ImageLayout::eUndefined
 		};
-		image = m_device.createImage(createInfo, nullptr);
 
-		auto memRequirements = m_device.getImageMemoryRequirements(image);
+		pImage = fd::createImage(m_pDevice, createInfo);
+
+		auto memRequirements = m_pDevice->getImageMemoryRequirements(*pImage);
 
 		vk::MemoryAllocateInfo allocInfo = {
 			memRequirements.size,
 			_findMemoryType(memRequirements.memoryTypeBits, properties)
 		};
 
-		imageMemory = m_device.allocateMemory(allocInfo, nullptr);
-
-		m_device.bindImageMemory(image, imageMemory, vk::DeviceSize(0));
+		pImageMemory = fd::allocateMemory(m_pDevice, allocInfo);
+		m_pDevice->bindImageMemory(*pImage, *pImageMemory, vk::DeviceSize(0));
 	}
 
-	void Window::_createImageView(vk::Image image, vk::Format format, vk::ImageAspectFlags aspectFlags, vk::ImageView& imageView)
+	std::shared_ptr<vk::ImageView> Window::_createImageView(vk::Image image, vk::Format format, vk::ImageAspectFlags aspectFlags)
 	{
 		vk::ImageViewCreateInfo createInfo = {
 			vk::ImageViewCreateFlags(),
@@ -519,12 +412,12 @@ namespace gfw {
 			}
 		};
 
-		imageView = m_device.createImageView(createInfo);
+		return fd::createImageView(m_pDevice, createInfo);
 	}
 
 	void Window::_transitionImageLayout(vk::Image image, vk::Format format,
 		vk::ImageLayout oldLayout, vk::ImageLayout newLayout) {
-		vk::CommandBuffer commandBuffer = _beginSingleTimeCommands();
+		auto commandBuffer = _beginSingleTimeCommands();
 
 		vk::ImageMemoryBarrier barrier = {};
 		barrier.oldLayout = oldLayout;
@@ -567,7 +460,7 @@ namespace gfw {
 			throw std::invalid_argument("Unsupported layout transition!");
 		}
 
-		commandBuffer.pipelineBarrier(vk::PipelineStageFlagBits::eTopOfPipe,
+		commandBuffer->pipelineBarrier(vk::PipelineStageFlagBits::eTopOfPipe,
 			vk::PipelineStageFlagBits::eTopOfPipe,
 			vk::DependencyFlags(),
 			nullptr,
@@ -580,7 +473,7 @@ namespace gfw {
 
 	uint32_t Window::_findMemoryType(uint32_t typeFilter, vk::MemoryPropertyFlags properties)
 	{
-		vk::PhysicalDeviceMemoryProperties memProperties = m_physicalDevice.getMemoryProperties();
+		vk::PhysicalDeviceMemoryProperties memProperties = m_pPhysicalDevice->getMemoryProperties();
 		for (uint32_t i = 0; i < memProperties.memoryTypeCount; ++i)
 		{
 			if (typeFilter & (1 << i) && (memProperties.memoryTypes[i].propertyFlags & properties) == properties)
@@ -593,33 +486,33 @@ namespace gfw {
 
 	}
 
-	vk::CommandBuffer Window::_beginSingleTimeCommands() {
+	std::shared_ptr<vk::CommandBuffer> Window::_beginSingleTimeCommands() {
 		vk::CommandBufferAllocateInfo allocateInfo = {
-			m_commandPool,
+			*m_pCommandPool,
 			vk::CommandBufferLevel::ePrimary,
 			uint32_t(1)
 		};
-		vk::CommandBuffer commandBuffer = m_device.allocateCommandBuffers(allocateInfo)[0];
+		auto pCommandBuffer = fd::allocateCommandBuffer(m_pDevice, m_pCommandPool, allocateInfo);
 
 		vk::CommandBufferBeginInfo beginInfo = {
 			vk::CommandBufferUsageFlags(vk::CommandBufferUsageFlagBits::eOneTimeSubmit)
 		};
-		commandBuffer.begin(beginInfo);
+		pCommandBuffer->begin(beginInfo);
 
-		return commandBuffer;
+		return pCommandBuffer;
 	}
 
-	void Window::_endSingleTimeCommands(vk::CommandBuffer commandBuffer) {
-		commandBuffer.end();
-		vk::SubmitInfo submitInfo = { 0, nullptr, nullptr, 1, &commandBuffer, 0, nullptr };
+	void Window::_endSingleTimeCommands(std::shared_ptr<vk::CommandBuffer> pCommandBuffer) {
+		pCommandBuffer->end();
+		vk::SubmitInfo submitInfo = { 0, nullptr, nullptr, 1, pCommandBuffer.get(), 0, nullptr };
 		m_graphicsQueue.submit(submitInfo, nullptr);
 		m_graphicsQueue.waitIdle();
-		m_device.freeCommandBuffers(m_commandPool, commandBuffer);
+		pCommandBuffer = nullptr;
 	}
 
 	void Window::_checkDepthFormat()
 	{
-		auto props = m_physicalDevice.getFormatProperties(m_depthFormat);
+		auto props = m_pPhysicalDevice->getFormatProperties(m_depthFormat);
 		if ((props.optimalTilingFeatures & vk::FormatFeatureFlagBits::eDepthStencilAttachment) !=
 			vk::FormatFeatureFlagBits::eDepthStencilAttachment)
 		{
@@ -630,13 +523,6 @@ namespace gfw {
 	void Window::_onWindowResized(int32_t width, int32_t height)
 	{
 		LOG(plog::debug) << "Context resize.";
-
-		//clear up old datas.
-		_destroyFramebuffers();
-		_destroyDepthResources();
-		_destroySwapchainImageViews();
-		_destroySwapchain();
-
 
 		//recreate.
 		_createSwapchain();

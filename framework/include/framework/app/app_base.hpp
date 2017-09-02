@@ -4,8 +4,9 @@
 #include <memory>
 #include <mutex>
 #include "framework/global.hpp"
-#include "framework/app/window.hpp"
 #include <GLFW/glfw3.h>
+#include "foundation/wrapper.hpp"
+#include "framework/app/window.hpp"
 #include "framework/util/thread_master.hpp"
 
 namespace gfw
@@ -33,8 +34,8 @@ namespace gfw
 		template<typename Window_T>
 		void createSubWindow(uint32_t width, uint32_t height, const char *title)
 		{
-			std::shared_ptr<Window_T> window(new Window_T(width, height, title, m_instance, m_physicalDevice,
-				m_device, m_graphicsQueue, m_presentQueue));
+			std::shared_ptr<Window_T> window(new Window_T(width, height, title, m_pInstance, m_pPhysicalDevice,
+				m_pDevice, m_graphicsQueue, m_presentQueue));
 			/*{
 				auto& subWindowsMutex = m_subWindowsMutex;
 				std::lock_guard <std::mutex> lg(subWindowsMutex);
@@ -53,9 +54,9 @@ namespace gfw
 		}
 
 		//gettor methods
-		vk::Instance getVKInstance();
-		vk::PhysicalDevice getPhysicalDevice();
-		vk::Device getDevice();
+		std::shared_ptr<vk::Instance> getPVKInstance();
+		std::shared_ptr<vk::PhysicalDevice> getPPhysicalDevice();
+		std::shared_ptr<vk::Device> getPDevice();
 		vk::Queue getGraphicsQueue();
 		vk::Queue getPresentQueue();
 	protected:
@@ -67,9 +68,9 @@ namespace gfw
 		uint32_t m_appVersion;
 		const char* m_engineName;
 		uint32_t m_engineVersion;
-		vk::Instance m_instance;
-		vk::PhysicalDevice m_physicalDevice;
-		vk::Device m_device;
+		std::shared_ptr<vk::Instance> m_pInstance;
+		std::shared_ptr<vk::PhysicalDevice> m_pPhysicalDevice;
+		std::shared_ptr<vk::Device> m_pDevice;
 		vk::Queue m_graphicsQueue;
 		vk::Queue m_presentQueue;
 		int32_t m_width;
@@ -84,13 +85,13 @@ namespace gfw
 
 		void _init();
 		bool _checkValidationLayerSupport();
-		void _pickPhysicalDevice(vk::SurfaceKHR surface);
-		void _createLogicDevice(vk::SurfaceKHR surface);
-		void _createWindow(GLFWwindow *pwindow, vk::SurfaceKHR surface);
+		void _pickPhysicalDevice(std::shared_ptr<vk::SurfaceKHR> psurface);
+		void _createLogicDevice(std::shared_ptr<vk::SurfaceKHR> pSurface);
+		void _createWindow(std::shared_ptr<GLFWwindow> pWindow, std::shared_ptr<vk::SurfaceKHR> pSurface);
 
 		//tool methods.
-		GLFWwindow* _createGLFWWindow(uint32_t width, uint32_t height, const char* title);
-		vk::SurfaceKHR _createVKSurface(GLFWwindow* pWindow);
+		std::shared_ptr<GLFWwindow> AppBase::_createGLFWWindow(uint32_t width, uint32_t height, const char* title);
+		std::shared_ptr<vk::SurfaceKHR> AppBase::_createVKSurface(std::shared_ptr<GLFWwindow> pWindow);
 		std::vector<const char*> _getRequiredExtensions();
 #ifdef DEBUG
 		vk::DebugReportCallbackEXT m_debugReportCallBack;

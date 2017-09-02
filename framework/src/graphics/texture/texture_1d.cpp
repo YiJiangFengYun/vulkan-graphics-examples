@@ -15,9 +15,6 @@ namespace kgs
 
 	Texture1D::~Texture1D()
 	{
-		_destroySampler();
-		_destroyImageView();
-		_destroyImage();
 	}
 
 	std::vector<Color> Texture1D::getPixels(uint32_t mipLevel)

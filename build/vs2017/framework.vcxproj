@@ -119,8 +119,7 @@
       <SDLCheck>true</SDLCheck>
     </ClCompile>
     <Lib>
-      <AdditionalLibraryDirectories>$(GS_PROJECT_ROOT)\libs\VulkanSDK\1.0.49.0\Lib;$(GS_PROJECT_ROOT)\libs\glfw\lib-win64;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
-      <AdditionalDependencies>vulkan-1.lib;glfw3.lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <AdditionalLibraryDirectories>$(GS_PROJECT_ROOT)\lib\X64;$(GS_PROJECT_ROOT)\libs\VulkanSDK\1.0.49.0\Lib;$(GS_PROJECT_ROOT)\libs\glfw\lib-win64;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
     </Lib>
     <BuildLog />
   </ItemDefinitionGroup>
@@ -131,8 +130,7 @@
       <SDLCheck>true</SDLCheck>
     </ClCompile>
     <Lib>
-      <AdditionalLibraryDirectories>$(GS_PROJECT_ROOT)\libs\VulkanSDK\1.0.49.0\Lib32;$(GS_PROJECT_ROOT)\libs\glfw\lib-win32;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
-      <AdditionalDependencies>vulkan-1.lib;glfw3.lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <AdditionalLibraryDirectories>$(GS_PROJECT_ROOT)\lib\Win32;$(GS_PROJECT_ROOT)\libs\VulkanSDK\1.0.49.0\Lib32;$(GS_PROJECT_ROOT)\libs\glfw\lib-win32;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
     </Lib>
     <BuildLog />
   </ItemDefinitionGroup>
@@ -149,8 +147,7 @@
       <OptimizeReferences>true</OptimizeReferences>
     </Link>
     <Lib>
-      <AdditionalLibraryDirectories>$(GS_PROJECT_ROOT)\libs\VulkanSDK\1.0.49.0\Lib32;$(GS_PROJECT_ROOT)\libs\glfw\lib-win32;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
-      <AdditionalDependencies>vulkan-1.lib;glfw3.lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <AdditionalLibraryDirectories>$(GS_PROJECT_ROOT)\lib\Win32;$(GS_PROJECT_ROOT)\libs\VulkanSDK\1.0.49.0\Lib32;$(GS_PROJECT_ROOT)\libs\glfw\lib-win32;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
     </Lib>
     <BuildLog />
   </ItemDefinitionGroup>
@@ -167,8 +164,7 @@
       <OptimizeReferences>true</OptimizeReferences>
     </Link>
     <Lib>
-      <AdditionalLibraryDirectories>$(GS_PROJECT_ROOT)\libs\VulkanSDK\1.0.49.0\Lib;$(GS_PROJECT_ROOT)\libs\glfw\lib-win64;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
-      <AdditionalDependencies>vulkan-1.lib;glfw3.lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <AdditionalLibraryDirectories>$(GS_PROJECT_ROOT)\lib\X64;$(GS_PROJECT_ROOT)\libs\VulkanSDK\1.0.49.0\Lib;$(GS_PROJECT_ROOT)\libs\glfw\lib-win64;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
     </Lib>
     <BuildLog />
   </ItemDefinitionGroup>

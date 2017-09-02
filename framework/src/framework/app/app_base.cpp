@@ -29,23 +29,12 @@ namespace gfw {
 		m_pWindow = nullptr;
 		m_pSubWindows.resize(0);
 
-		if (m_device != vk::Device(nullptr))
-		{
-			m_device.destroy();
-
-		}
-
 #ifdef DEBUG
 		if (m_debugReportCallBack != vk::DebugReportCallbackEXT(nullptr))
 		{
-			destroyDebugReportCallbackEXT(m_instance, m_debugReportCallBack, nullptr);
+			destroyDebugReportCallbackEXT(*m_pInstance, m_debugReportCallBack, nullptr);
 		}
 #endif // DEBUG
-
-		if (m_instance != vk::Instance(nullptr))
-		{
-			m_instance.destroy();
-		}
 
 		glfwTerminate();
 	}
@@ -81,19 +70,19 @@ namespace gfw {
 		_createSubWindow(width, height, title);
 	}*/
 
-	vk::Instance AppBase::getVKInstance()
+	std::shared_ptr<vk::Instance> AppBase::getPVKInstance()
 	{
-		return m_instance;
+		return m_pInstance;
 	}
 
-	vk::PhysicalDevice AppBase::getPhysicalDevice()
+	std::shared_ptr<vk::PhysicalDevice> AppBase::getPPhysicalDevice()
 	{
-		return m_physicalDevice;
+		return m_pPhysicalDevice;
 	}
 
-	vk::Device AppBase::getDevice()
+	std::shared_ptr<vk::Device> AppBase::getPDevice()
 	{
-		return m_device;
+		return m_pDevice;
 	}
 
 	vk::Queue AppBase::getGraphicsQueue()
@@ -161,18 +150,18 @@ namespace gfw {
 #endif // ENABLE_VALIDATION_LAYERS
 
 		//create vulkan instance
-		m_instance = vk::createInstance(createInfo);
+		m_pInstance = fd::createInstance(createInfo);
 
 #ifdef DEBUG
 		_setupDebugCallBack();
 #endif // DEBUG
 
-		GLFWwindow* pWindow = _createGLFWWindow(m_width, m_height, m_title);
-		vk::SurfaceKHR surface = _createVKSurface(pWindow);
+		auto pWindow = _createGLFWWindow(m_width, m_height, m_title);
+		auto pSurface = _createVKSurface(pWindow);
 
-		_pickPhysicalDevice(surface);
-		_createLogicDevice(surface);
-		_createWindow(pWindow, surface);
+		_pickPhysicalDevice(pSurface);
+		_createLogicDevice(pSurface);
+		_createWindow(pWindow, pSurface);
 
 		LOG(plog::debug) << "Application initialization complete.";
 	}
@@ -210,25 +199,19 @@ namespace gfw {
 		return true;
 	}
 
-	GLFWwindow* AppBase::_createGLFWWindow(uint32_t width, uint32_t height, const char* title)
+	std::shared_ptr<GLFWwindow> AppBase::_createGLFWWindow(uint32_t width, uint32_t height, const char* title)
 	{
-		return glfwCreateWindow(width, height, title, nullptr, nullptr);
+		return fd::createGLFWWindow(width, height, title);
 	}
 
-	vk::SurfaceKHR AppBase::_createVKSurface(GLFWwindow* pWindow)
+	std::shared_ptr<vk::SurfaceKHR> AppBase::_createVKSurface(std::shared_ptr<GLFWwindow> pWindow)
 	{
-		VkSurfaceKHR surface;
-		auto result = static_cast<vk::Result > (glfwCreateWindowSurface(m_instance, pWindow, nullptr, &surface));
-		if (result != vk::Result::eSuccess)
-		{
-			throw std::system_error(result, "AppBase::_createSurface");
-		}
-		return surface;
+		return fd::createSurface(m_pInstance, pWindow);
 	}
 
-	void AppBase::_pickPhysicalDevice(vk::SurfaceKHR surface)
+	void AppBase::_pickPhysicalDevice(std::shared_ptr<vk::SurfaceKHR> pSurface)
 	{
-		auto physicalDevices = m_instance.enumeratePhysicalDevices();
+		auto physicalDevices = m_pInstance->enumeratePhysicalDevices();
 
 		LOG(plog::debug) << "physical device num: " + physicalDevices.size() << std::endl;
 
@@ -252,7 +235,7 @@ namespace gfw {
 				}
 
 				//Application can't function without queue family that supports graphics commands.
-				if (UsedQueueFamily::findQueueFamilies(physicalDevice, surface).isComplete() == GFW_FALSE)
+				if (UsedQueueFamily::findQueueFamilies(physicalDevice, *pSurface).isComplete() == GFW_FALSE)
 				{
 					return GFW_FALSE;
 				}
@@ -264,7 +247,7 @@ namespace gfw {
 				}
 
 				//Application can't function without adequate support of device for swap chain.
-				SwapChainSupportDetails swapChainSupportDetails = SwapChainSupportDetails::querySwapChainSupport(physicalDevice, surface);
+				SwapChainSupportDetails swapChainSupportDetails = SwapChainSupportDetails::querySwapChainSupport(physicalDevice, *pSurface);
 				if (swapChainSupportDetails.formats.empty() || swapChainSupportDetails.presentModes.empty())
 				{
 					return GFW_FALSE;
@@ -315,14 +298,13 @@ namespace gfw {
 			return result > 0;
 		});
 
-		m_physicalDevice = *physicalDevices.cbegin();
-		//m_physicalDevice = VkPhysicalDevice(*physicalDevices.b)
+		m_pPhysicalDevice = std::shared_ptr<vk::PhysicalDevice>(new vk::PhysicalDevice(*physicalDevices.cbegin()));
 		LOG(plog::debug) << "Pick successfully physical device.";
 	}
 
-	void AppBase::_createLogicDevice(vk::SurfaceKHR surface)
+	void AppBase::_createLogicDevice(std::shared_ptr<vk::SurfaceKHR> pSurface)
 	{
-		UsedQueueFamily usedQueueFamily = UsedQueueFamily::findQueueFamilies(m_physicalDevice, surface);
+		UsedQueueFamily usedQueueFamily = UsedQueueFamily::findQueueFamilies(*m_pPhysicalDevice, *pSurface);
 		std::vector<vk::DeviceQueueCreateInfo> queueCreateInfos;
 		std::set<int32_t> uniqueFamilyIndices = { usedQueueFamily.graphicsFamily, usedQueueFamily.presentFamily };
 
@@ -361,16 +343,16 @@ namespace gfw {
 		createInfo.ppEnabledLayerNames = validationlayers.data();
 #endif // ENABLE_VALIDATION_LAYERS
 
-		m_device = m_physicalDevice.createDevice(createInfo);
-		m_graphicsQueue = m_device.getQueue(usedQueueFamily.graphicsFamily, 0);
-		m_presentQueue = m_device.getQueue(usedQueueFamily.presentFamily, 0);
+		m_pDevice = fd::createDevice(m_pPhysicalDevice, createInfo);
+		m_graphicsQueue = m_pDevice->getQueue(usedQueueFamily.graphicsFamily, 0);
+		m_presentQueue = m_pDevice->getQueue(usedQueueFamily.presentFamily, 0);
 
 		LOG(plog::debug) << "Create successfully logic device.";
 	}
 
-	void AppBase::_createWindow(GLFWwindow *pwindow, vk::SurfaceKHR surface)
+	void AppBase::_createWindow(std::shared_ptr<GLFWwindow> pWindow, std::shared_ptr<vk::SurfaceKHR> pSurface)
 	{
-		m_pWindow.reset(new Window(pwindow, surface, m_instance, m_physicalDevice, m_device,
+		m_pWindow.reset(new Window(pWindow, pSurface, m_pInstance, m_pPhysicalDevice, m_pDevice,
 			m_graphicsQueue, m_presentQueue));
 	}
 
@@ -426,7 +408,7 @@ namespace gfw {
 		};
 
 		VkDebugReportCallbackEXT callback;
-		createDebugReportCallbackEXT(m_instance, &VkDebugReportCallbackCreateInfoEXT(createInfo),
+		createDebugReportCallbackEXT(*m_pInstance, &VkDebugReportCallbackCreateInfoEXT(createInfo),
 			nullptr, &callback);
 		m_debugReportCallBack = callback;
 	}

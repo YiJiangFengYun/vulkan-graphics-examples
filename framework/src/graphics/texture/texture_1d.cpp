@@ -6,11 +6,14 @@ namespace kgs
 		:Texture(device, format, mipMap)
 	{
 		m_type = TextureType::TEX_1D;
-		_caculateMipMapLevels();
-		_caculateArrayLayer();
+		_updateMipMapLevels();
+		_updateArrayLayer();
+		_updateVkFormat();
+		_updateVkFilter();
+	    _updateVkSamplerAddressMode();
 		_createImage();
 		_createImageView();
-		_createSampler(m_filterMode, m_samplerAddressMode, m_anisotropy);
+		_createSampler();
 	}
 
 	Texture1D::~Texture1D()

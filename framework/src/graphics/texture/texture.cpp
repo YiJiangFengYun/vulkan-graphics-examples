@@ -2,6 +2,8 @@
 
 namespace kgs
 {
+	inline uint32_t caculateImageSizeWithMipmapLevel(uint32_t size, uint32_t mipmapLevel);
+
 	Texture::Texture(Device device, TextureFormat format, Bool32 mipMap)
 		:m_device(device),
 		m_format(format),
@@ -19,7 +21,7 @@ namespace kgs
 
 	}
 
-	void Texture::_caculateMipMapLevels()
+	void Texture::_updateMipMapLevels()
 	{
 		if (m_mipMap)
 		{
@@ -33,7 +35,7 @@ namespace kgs
 		}
 	}
 
-	void Texture::_caculateArrayLayer()
+	void Texture::_updateArrayLayer()
 	{
 		uint32_t arraylayer;
 		switch (m_type)
@@ -69,7 +71,7 @@ namespace kgs
 		m_arrayLayer = arraylayer;
 	}
 
-	void Texture::_caculateVkFormat()
+	void Texture::_updateVkFormat()
 	{
 		vk::Format vkFormat;
 		for (const auto& item : arrFormatToVKFormat)
@@ -88,6 +90,31 @@ namespace kgs
 #endif // DEBUG
 
 		m_vkFormat = vkFormat;
+	}
+
+	void Texture::_updateVkFilter()
+	{
+		vk::Filter vkFiler;
+		vk::SamplerMipmapMode vkSamplerMipmapMode;
+		for (const auto& item : arrFilerModeToVK)
+		{
+			if (std::get<0>(item) == m_filterMode)
+			{
+				vkFiler = std::get<1>(item);
+				m_vkSamplerMipmapMode = std::get<2>(item);
+			}
+		}
+	}
+
+	void Texture::_updateVkSamplerAddressMode()
+	{
+		for (const auto& item : arrSamplerAddressModeToVK)
+		{
+			if (item.first == m_samplerAddressMode)
+			{
+				m_vkSamplerAddressMode = item.second;
+			}
+		}
 	}
 
 	void Texture::_createImage()
@@ -300,40 +327,20 @@ namespace kgs
 		m_pImageView = fd::createImageView(pDevice, createInfo);
 	}
 
-	void Texture::_createSampler(FilterMode filterMode, SamplerAddressMode samplerAddressMode, float anisotropy)
+	void Texture::_createSampler()
 	{
-		vk::Filter vkFiler;
-		vk::SamplerMipmapMode vkSamplerMipmapMode;
-		for (const auto& item : arrFilerModeToVK)
-		{
-			if (std::get<0>(item) == filterMode)
-			{
-				vkFiler = std::get<1>(item);
-				vkSamplerMipmapMode = std::get<2>(item);
-			}
-		}
-
-		vk::SamplerAddressMode vkSamplerAddressMode;
-		for (const auto& item : arrSamplerAddressModeToVK)
-		{
-			if (item.first == samplerAddressMode)
-			{
-				vkSamplerAddressMode = item.second;
-			}
-		}
-
 
 		vk::SamplerCreateInfo createInfo = {
 			vk::SamplerCreateFlags(),
-			vkFiler,
-			vkFiler,
-			vkSamplerMipmapMode,
-			vkSamplerAddressMode,
-			vkSamplerAddressMode,
-			vkSamplerAddressMode,
+			m_vkFilter,
+			m_vkFilter,
+			m_vkSamplerMipmapMode,
+			m_vkSamplerAddressMode,
+			m_vkSamplerAddressMode,
+			m_vkSamplerAddressMode,
 			0.0f,
-			anisotropy == 0.0f ? VkBool32(VK_FALSE) : VkBool32(VK_TRUE),
-			anisotropy,
+			m_anisotropy == 0.0f ? VkBool32(VK_FALSE) : VkBool32(VK_TRUE),
+			m_anisotropy,
 			VkBool32(VK_FALSE),
 			vk::CompareOp::eNever,
 			0.0f,
@@ -348,28 +355,28 @@ namespace kgs
 
 	std::vector<Color> Texture::_getPixels(uint32_t layer, uint32_t mipLevel)
 	{
-		if (arrTempColors.size() <= mipLevel) return {};
+		if (m_arrTempColors.size() <= mipLevel) return {};
 		size_t oneLayerCount = m_width * m_height * m_depth;
 		size_t start = oneLayerCount * layer;
-		size_t size = arrTempColors[mipLevel].size();
+		size_t size = m_arrTempColors[mipLevel].size();
 		std::vector<Color> result(oneLayerCount);
 		for (size_t i = start, j = 0; i < size && j < oneLayerCount; ++i, ++j)
 		{
-			result[j] = arrTempColors[mipLevel][i];
+			result[j] = m_arrTempColors[mipLevel][i];
 		}
 		return result;
 	}
 
 	std::vector<Color32> Texture::_getPixels32(uint32_t layer, uint32_t mipLevel)
 	{
-		if (arrTempColors.size() <= mipLevel) return {};
+		if (m_arrTempColors.size() <= mipLevel) return {};
 		size_t oneLayerCount = m_width * m_height * m_depth;
 		size_t start = oneLayerCount * layer;
-		size_t size = arrTempColors[mipLevel].size();
+		size_t size = m_arrTempColors[mipLevel].size();
 		std::vector<Color32> result(oneLayerCount);
 		for (size_t i = start, j = 0; i < size && j < oneLayerCount; ++i, ++j)
 		{
-			result[j] = arrTempColors[mipLevel][i];
+			result[j] = m_arrTempColors[mipLevel][i];
 		}
 		return result;
 	}
@@ -390,7 +397,7 @@ namespace kgs
 		size_t colorsSize = colors.size();
 		for (size_t i = 0, j = start; i < oneLayerSize && j < size; ++i, ++j)
 		{
-			if (i < colorsSize)arrTempColors[mipLevel][j] = colors[i];
+			if (i < colorsSize)m_arrTempColors[mipLevel][j] = colors[i];
 		}
 	}
 
@@ -410,7 +417,7 @@ namespace kgs
 		size_t colorsSize = colors.size();
 		for (size_t i = 0, j = start; i < oneLayerSize && j < size; ++i, ++j)
 		{
-			if (i < colorsSize)arrTempColors[mipLevel][j] = colors[i];
+			if (i < colorsSize)m_arrTempColors[mipLevel][j] = colors[i];
 		}
 	}
 
@@ -427,7 +434,7 @@ namespace kgs
 		if (makeUnreadable)
 		{
 			//clear really colors data with reallocate.
-			std::vector<std::vector<Color32>>().swap(arrTempColors);
+			std::vector<std::vector<Color32>>().swap(m_arrTempColors);
 		}
 	}
 
@@ -436,19 +443,14 @@ namespace kgs
 		auto pDevice = m_device.getPNativeDevice();
 		auto pCommandBuffer = _beginSingleTimeCommands();
 		//create first level image data using staging buffer.
-		if (arrTempColors.size() == 0)
+		if (m_arrTempColors.size() == 0)
 		{
 			LOG(plog::warning) << "Texture data is empty at mipmap level 0.";
 			return;
 		}
-		if (arrTempColors[0].size() < m_arrayLayer)
-		{
-			LOG(plog::warning) << "Texture data is not enough for array layer: " << m_arrayLayer << " at mipmap level 0.";
-			return;
-		}
 
 		//create staging buffer.
-		uint32_t imageSize = (m_width * m_height * m_depth) * sizeof(Color32);
+		uint32_t imageSize = (m_width * m_height * m_depth * m_arrayLayer) * sizeof(Color32);
 		std::shared_ptr<vk::Buffer> pStagingBuffer;
 		std::shared_ptr<vk::DeviceMemory> pStagingBufferMemory;
 		_createBuffer(imageSize, vk::BufferUsageFlagBits::eTransferSrc,
@@ -456,18 +458,8 @@ namespace kgs
 			pStagingBuffer, pStagingBufferMemory);
 
 		void *data = pDevice->mapMemory(*pStagingBufferMemory, 0, imageSize);
-		//try
-		//{
-			memcpy(data, arrTempColors[0].data(), static_cast<size_t>(imageSize));
-		//}
-		//catch (std::exception e)
-		//{
-			//throw e;
-		//}
-		//finally
-		//{
-			pDevice->unmapMemory(*pStagingBufferMemory);
-		//}
+		memcpy(data, m_arrTempColors[0].data(), static_cast<size_t>(imageSize));
+		pDevice->unmapMemory(*pStagingBufferMemory);
 
 		//transfer image from initial current image layout to dst layout.
 		//here use undefined layout not to use curr layout of image, it can clear image old data.
@@ -507,13 +499,13 @@ namespace kgs
 			blit.dstSubresource.mipLevel = i;
 
 			// each mipmap is the size divided by two
-			blit.srcOffsets[1] = vk::Offset3D(std::max(1u, m_width >> (i - 1)),
-				std::max(1u, m_height >> (i - 1)),
-				std::max(1u, m_depth >> (i - 1)));
+			blit.srcOffsets[1] = vk::Offset3D(caculateImageSizeWithMipmapLevel(m_width, i - 1),
+				caculateImageSizeWithMipmapLevel(m_height, i - 1),
+				caculateImageSizeWithMipmapLevel(m_depth, i - 1));
 
-			blit.dstOffsets[1] = vk::Offset3D(std::max(1u, m_width >> i),
-				std::max(1u, m_height >> i),
-				std::max(1u, m_depth >> i));
+			blit.dstOffsets[1] = vk::Offset3D(caculateImageSizeWithMipmapLevel(m_width, i),
+				caculateImageSizeWithMipmapLevel(m_height, i),
+				caculateImageSizeWithMipmapLevel(m_depth, i));
 
 			// transferDst go to transferSrc because this mipmap will be the source for the next iteration (the next level)
 			_tranImageLayout(pCommandBuffer, *m_pImage, vk::ImageLayout::eUndefined, vk::ImageLayout::eTransferDstOptimal,
@@ -536,14 +528,55 @@ namespace kgs
 
 	void Texture::_applyDirect()
 	{
-		
+		if (m_arrTempColors.size() < m_mipMapLevels)
+		{
+			throw std::runtime_error("Pixels data is not enough to create mipmap texture.");
+		}
+
+		auto pDevice = m_device.getPNativeDevice();
+
+		//create image data using staging buffer mipmap level by mipmap level.
+		for (uint32_t i = 0; i < m_mipMapLevels; ++i)
+		{
+			auto pCommandBuffer = _beginSingleTimeCommands();
+			//create staging buffer.
+			uint32_t imageSize = m_arrTempColors[i].size() * sizeof(Color32);
+			std::shared_ptr<vk::Buffer> pStagingBuffer;
+			std::shared_ptr<vk::DeviceMemory> pStagingBufferMemory;
+			_createBuffer(imageSize, vk::BufferUsageFlagBits::eTransferSrc,
+				vk::MemoryPropertyFlagBits::eHostVisible | vk::MemoryPropertyFlagBits::eHostCoherent,
+				pStagingBuffer, pStagingBufferMemory);
+
+			void *data = pDevice->mapMemory(*pStagingBufferMemory, 0, imageSize);
+			memcpy(data, m_arrTempColors[i].data(), static_cast<size_t>(imageSize));
+			pDevice->unmapMemory(*pStagingBufferMemory);
+
+			//transfer image from initial current image layout to dst layout.
+			//here use undefined layout not to use curr layout of image, it can clear image old data.
+			_tranImageLayout(pCommandBuffer, *m_pImage, vk::ImageLayout::eUndefined, vk::ImageLayout::eTransferDstOptimal,
+				i, 1, 0, m_arrayLayer);
+
+			uint32_t width = caculateImageSizeWithMipmapLevel(m_width, i);
+			uint32_t height = caculateImageSizeWithMipmapLevel(m_height, i);
+			uint32_t depth = caculateImageSizeWithMipmapLevel(m_depth, i);
+			_copyBufferToImage(pCommandBuffer, *pStagingBuffer, *m_pImage, width, height, depth, i, 0, m_arrayLayer);
+
+			//transfer all layer to shader read layout.
+			_tranImageLayout(pCommandBuffer, *m_pImage, vk::ImageLayout::eTransferDstOptimal, vk::ImageLayout::eShaderReadOnlyOptimal,
+				i, 1, 0, m_arrayLayer);
+
+			_endSingleTimeCommands(pCommandBuffer);
+		}
 	}
 
 	void Texture::_resizeColorsData(uint32_t mipLevel)
 	{
-		size_t size = m_width * m_height * m_depth * m_arrayLayer;
-		if (arrTempColors.size() < mipLevel + 1)arrTempColors.resize(mipLevel + 1);
-		arrTempColors[mipLevel].resize(size);
+		uint32_t width = caculateImageSizeWithMipmapLevel(m_width, mipLevel);
+		uint32_t height = caculateImageSizeWithMipmapLevel(m_height, mipLevel);
+		uint32_t depth = caculateImageSizeWithMipmapLevel(m_depth, mipLevel);
+		size_t size = width * height * depth * m_arrayLayer;
+		if (m_arrTempColors.size() < mipLevel + 1)m_arrTempColors.resize(mipLevel + 1);
+		m_arrTempColors[mipLevel].resize(size);
 	}
 
 	void Texture::_createBuffer(vk::DeviceSize size, vk::BufferUsageFlags usage, vk::MemoryPropertyFlags properties,
@@ -676,5 +709,10 @@ namespace kgs
 		vk::SubmitInfo submitInfo = { 0, nullptr, nullptr, 1, pCommandBuffer.get(), 0, nullptr };
 		graphicsQueue.submit(submitInfo, nullptr);
 		graphicsQueue.waitIdle();
+	}
+
+	inline uint32_t caculateImageSizeWithMipmapLevel(uint32_t size, uint32_t mipmapLevel)
+	{
+		return std::max(1u, size >> mipmapLevel);
 	}
 }

@@ -32,9 +32,12 @@ namespace kgs
 		uint32_t m_arrayLayer;
 		vk::Format m_vkFormat;
 		vk::ImageLayout m_vkImageLayout; //recode texture current image layout state.
+		vk::Filter m_vkFilter;
+		vk::SamplerMipmapMode m_vkSamplerMipmapMode;
+		vk::SamplerAddressMode m_vkSamplerAddressMode;
 
 		//temp
-	    std::vector<std::vector<Color32>> arrTempColors;
+	    std::vector<std::vector<Color32>> m_arrTempColors;
 
 		//--aggregations
 		Device m_device;
@@ -44,12 +47,14 @@ namespace kgs
 		std::shared_ptr<vk::ImageView> m_pImageView;
 		std::shared_ptr<vk::Sampler> m_pSampler;
 		
-		void _caculateMipMapLevels();
-		void _caculateArrayLayer();
-		void _caculateVkFormat();
+		void _updateMipMapLevels();
+		void _updateArrayLayer();
+		void _updateVkFormat();
+		void _updateVkFilter();
+		void _updateVkSamplerAddressMode();
 		void _createImage();
 		void _createImageView();
-		void _createSampler(FilterMode filterMode, SamplerAddressMode samplerAddressMode, float anisotropy);
+		void _createSampler();
 
 		std::vector<Color> _getPixels(uint32_t layer, uint32_t mipLevel = 0);
 		std::vector<Color32> _getPixels32(uint32_t layer, uint32_t mipLevel = 0);
@@ -62,7 +67,6 @@ namespace kgs
 
 		void _createBuffer(vk::DeviceSize size, vk::BufferUsageFlags usage, vk::MemoryPropertyFlags properties,
 			std::shared_ptr<vk::Buffer>& pBuffer, std::shared_ptr<vk::DeviceMemory>& pBufferMemory);
-
 		void  _tranImageLayout(std::shared_ptr<vk::CommandBuffer> pCommandBuffer, vk::Image image,
 			vk::ImageLayout oldLayout, vk::ImageLayout newLayout,
 			uint32_t baseMipLevel, uint32_t levelCount,

@@ -21,6 +21,62 @@ namespace kgs
 
 	}
 
+	float Texture::getAnisotropy()
+	{
+		return m_anisotropy;
+	}
+
+	void Texture::setAnisotropy(float value)
+	{
+		m_anisotropy = value;
+		//Need to receate sampler when chaning anisotropy.
+		_createSampler();
+	}
+
+	FilterMode Texture::getFilterMode()
+	{
+		return m_filterMode;
+	}
+
+	void Texture::setFilterMode(FilterMode value)
+	{
+		m_filterMode = value;
+		//Need to receate sampler when chaning filterMode.
+		_createSampler();
+	}
+
+	SamplerAddressMode Texture::getSamplerAddressMode()
+	{
+		return m_samplerAddressMode;
+	}
+
+	void Texture::setSamplerAddressMode(SamplerAddressMode value)
+	{
+		m_samplerAddressMode = value;
+		//Need to receate sampler when chaning sampler address mode.
+		_createSampler();
+	}
+
+	TextureType Texture::getType()
+	{
+		return m_type;
+	}
+
+	TextureFormat Texture::getFormat()
+	{
+		return m_format;
+	}
+
+	Bool32 Texture::isMipmap()
+	{
+		return m_mipMap;
+	}
+
+	uint32_t Texture::getMipmapLevel()
+	{
+		return m_mipMapLevels;
+	}
+
 	void Texture::_updateMipMapLevels()
 	{
 		if (m_mipMap)

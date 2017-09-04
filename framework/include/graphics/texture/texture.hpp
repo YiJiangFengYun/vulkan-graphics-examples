@@ -14,7 +14,17 @@ namespace kgs
 	public:
 		Texture(Device device, TextureFormat format, Bool32 mipMap);
 		~Texture();
+		float getAnisotropy();
+		void setAnisotropy(float value);
+		FilterMode getFilterMode();
+		void setFilterMode(FilterMode value);
+		SamplerAddressMode getSamplerAddressMode();
+		void setSamplerAddressMode(SamplerAddressMode value);
 
+		TextureType getType();
+		TextureFormat getFormat();
+		Bool32 isMipmap();
+		uint32_t getMipmapLevel();
 	protected:
 		//--compositions
 		uint32_t m_width;
@@ -31,7 +41,7 @@ namespace kgs
 		uint32_t m_mipMapLevels;
 		uint32_t m_arrayLayer;
 		vk::Format m_vkFormat;
-		vk::ImageLayout m_vkImageLayout; //recode texture current image layout state.
+		vk::ImageLayout m_vkImageLayout; //record texture current image layout state.
 		vk::Filter m_vkFilter;
 		vk::SamplerMipmapMode m_vkSamplerMipmapMode;
 		vk::SamplerAddressMode m_vkSamplerAddressMode;
@@ -67,7 +77,7 @@ namespace kgs
 
 		void _createBuffer(vk::DeviceSize size, vk::BufferUsageFlags usage, vk::MemoryPropertyFlags properties,
 			std::shared_ptr<vk::Buffer>& pBuffer, std::shared_ptr<vk::DeviceMemory>& pBufferMemory);
-		void  _tranImageLayout(std::shared_ptr<vk::CommandBuffer> pCommandBuffer, vk::Image image,
+		void _tranImageLayout(std::shared_ptr<vk::CommandBuffer> pCommandBuffer, vk::Image image,
 			vk::ImageLayout oldLayout, vk::ImageLayout newLayout,
 			uint32_t baseMipLevel, uint32_t levelCount,
 			uint32_t baseArrayLayer, uint32_t layerCount);

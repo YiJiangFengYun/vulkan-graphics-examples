@@ -111,12 +111,12 @@ namespace kgs
 		}
 		case TextureType::CUBE:
 		{
-			arraylayer = 6U;
+			arraylayer = static_cast<uint32_t>(CubemapFace::RANGE_SIZE);
 			break;
 		}
 		case TextureType::CUBE_ARRARY:
 		{
-			arraylayer = 6U * m_arrayLength;
+			arraylayer = static_cast<uint32_t>(CubemapFace::RANGE_SIZE) * m_arrayLength;
 			break;
 		}
 		default:

@@ -52,6 +52,19 @@ namespace kgs
 		RANGE_SIZE = (END_RANGE - BEGIN_RANGE + 1)
 	};
 
+	enum class CubemapFace
+	{
+		POSITIVE_X,
+		NEGATIVE_X,
+		POSITIVE_Y,
+		NEGATIVE_Y,
+		POSITIVE_Z,
+		NEGATIVE_Z,
+		BEGIN_RANGE = POSITIVE_X,
+		END_RANGE = NEGATIVE_Z,
+		RANGE_SIZE = (END_RANGE - BEGIN_RANGE + 1)
+	};
+
 	extern std::map<TextureType, std::string> mapTextureTypeToName;
 	extern std::array<std::pair<TextureType, vk::ImageType>, static_cast<size_t>(TextureType::RANGE_SIZE)> arrTextureTypeToVKImageType;
 	extern std::array<std::pair<TextureFormat, vk::Format>, static_cast<size_t>(TextureFormat::RANGE_SIZE)> arrFormatToVKFormat;

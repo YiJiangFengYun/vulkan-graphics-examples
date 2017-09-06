@@ -17,12 +17,22 @@
 #include <cstdint>
 #include <plog/Log.h>
 
+#define MainColorName "_Color"
+#define MainTextureName "_MainTex";
+
+
 namespace kgs
 {
 	typedef uint32_t Bool32;
 	typedef unsigned char Byte;
 	typedef glm::tvec4<float> Color;
 	typedef glm::tvec4<Byte> Color32;
+	typedef glm::vec2 Vector2;
+	typedef glm::vec3 Vector3;
+	typedef glm::vec4 Vector4;
+	typedef glm::mat2x2 Matrix2x2;
+	typedef glm::mat3x3 Matrix3x3;
+	typedef glm::mat4x4 Matrix4x4;
 
 	extern void initLog();
 	extern void initGraphics();

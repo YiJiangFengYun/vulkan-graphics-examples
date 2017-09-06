@@ -18,9 +18,15 @@
     <ClInclude Include="..\..\framework\include\foundation\wrapper.hpp">
       <Filter>include\foundation</Filter>
     </ClInclude>
+    <ClInclude Include="..\..\framework\include\foundation\util.hpp">
+      <Filter>include\foundation</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="..\..\framework\src\foundation\wrapper.cpp">
+      <Filter>src\foundation</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\framework\src\foundation\util.cpp">
       <Filter>src\foundation</Filter>
     </ClCompile>
   </ItemGroup>

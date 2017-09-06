@@ -75,6 +75,9 @@
     <ClCompile Include="..\..\framework\src\graphics\material\pass.cpp">
       <Filter>src\graphics\material</Filter>
     </ClCompile>
+    <ClCompile Include="..\..\framework\src\graphics\material\pass_option.cpp">
+      <Filter>src\graphics\material</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="..\..\framework\include\graphics\texture\texture.hpp">
@@ -117,6 +120,9 @@
       <Filter>include\graphics\material</Filter>
     </ClInclude>
     <ClInclude Include="..\..\framework\include\graphics\material\pass.hpp">
+      <Filter>include\graphics\material</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\framework\include\graphics\material\pass_option.hpp">
       <Filter>include\graphics\material</Filter>
     </ClInclude>
   </ItemGroup>

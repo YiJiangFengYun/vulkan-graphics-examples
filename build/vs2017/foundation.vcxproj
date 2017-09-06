@@ -19,9 +19,11 @@
     </ProjectConfiguration>
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="..\..\framework\include\foundation\util.hpp" />
     <ClInclude Include="..\..\framework\include\foundation\wrapper.hpp" />
   </ItemGroup>
   <ItemGroup>
+    <ClCompile Include="..\..\framework\src\foundation\util.cpp" />
     <ClCompile Include="..\..\framework\src\foundation\wrapper.cpp" />
   </ItemGroup>
   <PropertyGroup Label="Globals">

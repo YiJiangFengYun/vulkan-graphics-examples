@@ -21,15 +21,33 @@
   <ItemGroup>
     <ClCompile Include="..\..\framework\src\graphics\device\device.cpp" />
     <ClCompile Include="..\..\framework\src\graphics\global.cpp" />
+    <ClCompile Include="..\..\framework\src\graphics\material\material.cpp" />
+    <ClCompile Include="..\..\framework\src\graphics\material\pass.cpp" />
+    <ClCompile Include="..\..\framework\src\graphics\material\shader.cpp" />
     <ClCompile Include="..\..\framework\src\graphics\texture\texture.cpp" />
     <ClCompile Include="..\..\framework\src\graphics\texture\texture_1d.cpp" />
+    <ClCompile Include="..\..\framework\src\graphics\texture\texture_1d_array.cpp" />
+    <ClCompile Include="..\..\framework\src\graphics\texture\texture_2d.cpp" />
+    <ClCompile Include="..\..\framework\src\graphics\texture\texture_2d_array.cpp" />
+    <ClCompile Include="..\..\framework\src\graphics\texture\texture_3d.cpp" />
+    <ClCompile Include="..\..\framework\src\graphics\texture\texture_cube.cpp" />
+    <ClCompile Include="..\..\framework\src\graphics\texture\texture_cube_array.cpp" />
     <ClCompile Include="..\..\framework\src\graphics\texture\texture_option.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="..\..\framework\include\graphics\device\device.hpp" />
     <ClInclude Include="..\..\framework\include\graphics\global.hpp" />
+    <ClInclude Include="..\..\framework\include\graphics\material\material.hpp" />
+    <ClInclude Include="..\..\framework\include\graphics\material\pass.hpp" />
+    <ClInclude Include="..\..\framework\include\graphics\material\shader.hpp" />
     <ClInclude Include="..\..\framework\include\graphics\texture\texture.hpp" />
     <ClInclude Include="..\..\framework\include\graphics\texture\texture_1d.hpp" />
+    <ClInclude Include="..\..\framework\include\graphics\texture\texture_1d_array.hpp" />
+    <ClInclude Include="..\..\framework\include\graphics\texture\texture_2d.hpp" />
+    <ClInclude Include="..\..\framework\include\graphics\texture\texture_2d_array.hpp" />
+    <ClInclude Include="..\..\framework\include\graphics\texture\texture_3d.hpp" />
+    <ClInclude Include="..\..\framework\include\graphics\texture\texture_cube.hpp" />
+    <ClInclude Include="..\..\framework\include\graphics\texture\texture_cube_array.hpp" />
     <ClInclude Include="..\..\framework\include\graphics\texture\texture_option.hpp" />
   </ItemGroup>
   <PropertyGroup Label="Globals">

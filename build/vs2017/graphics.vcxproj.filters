@@ -25,6 +25,12 @@
     <Filter Include="src\graphics\device">
       <UniqueIdentifier>{6ed20f87-1e83-4f46-8a00-10f2409dae14}</UniqueIdentifier>
     </Filter>
+    <Filter Include="include\graphics\material">
+      <UniqueIdentifier>{c45d271f-9d93-4b6a-8098-4289c8ae304c}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="src\graphics\material">
+      <UniqueIdentifier>{632c8a20-f18d-4e91-b9af-69bf64f5b626}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="..\..\framework\src\graphics\texture\texture.cpp">
@@ -42,6 +48,33 @@
     <ClCompile Include="..\..\framework\src\graphics\global.cpp">
       <Filter>src\graphics</Filter>
     </ClCompile>
+    <ClCompile Include="..\..\framework\src\graphics\texture\texture_2d_array.cpp">
+      <Filter>src\graphics\texture</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\framework\src\graphics\texture\texture_3d.cpp">
+      <Filter>src\graphics\texture</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\framework\src\graphics\texture\texture_cube.cpp">
+      <Filter>src\graphics\texture</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\framework\src\graphics\texture\texture_cube_array.cpp">
+      <Filter>src\graphics\texture</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\framework\src\graphics\texture\texture_1d_array.cpp">
+      <Filter>src\graphics\texture</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\framework\src\graphics\texture\texture_2d.cpp">
+      <Filter>src\graphics\texture</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\framework\src\graphics\material\material.cpp">
+      <Filter>src\graphics\material</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\framework\src\graphics\material\shader.cpp">
+      <Filter>src\graphics\material</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\framework\src\graphics\material\pass.cpp">
+      <Filter>src\graphics\material</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="..\..\framework\include\graphics\texture\texture.hpp">
@@ -58,6 +91,33 @@
     </ClInclude>
     <ClInclude Include="..\..\framework\include\graphics\global.hpp">
       <Filter>include\graphics</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\framework\include\graphics\texture\texture_cube.hpp">
+      <Filter>include\graphics\texture</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\framework\include\graphics\texture\texture_cube_array.hpp">
+      <Filter>include\graphics\texture</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\framework\include\graphics\texture\texture_1d_array.hpp">
+      <Filter>include\graphics\texture</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\framework\include\graphics\texture\texture_2d.hpp">
+      <Filter>include\graphics\texture</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\framework\include\graphics\texture\texture_2d_array.hpp">
+      <Filter>include\graphics\texture</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\framework\include\graphics\texture\texture_3d.hpp">
+      <Filter>include\graphics\texture</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\framework\include\graphics\material\material.hpp">
+      <Filter>include\graphics\material</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\framework\include\graphics\material\shader.hpp">
+      <Filter>include\graphics\material</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\framework\include\graphics\material\pass.hpp">
+      <Filter>include\graphics\material</Filter>
     </ClInclude>
   </ItemGroup>
 </Project>

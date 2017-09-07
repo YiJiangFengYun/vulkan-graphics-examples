@@ -173,4 +173,14 @@ namespace fd
 			pDevice->destroySampler(*p);
 		});
 	}
+
+	std::shared_ptr<vk::ShaderModule> createShaderModule(const std::shared_ptr<vk::Device> pDevice,
+		const vk::ShaderModuleCreateInfo & createInfo, vk::Optional<const vk::AllocationCallbacks> allocator)
+	{
+		auto shaderModule = pDevice->createShaderModule(createInfo, allocator);
+		return std::shared_ptr<vk::ShaderModule>(new vk::ShaderModule(shaderModule),
+			[pDevice](vk::ShaderModule *p) {
+			pDevice->destroyShaderModule(*p);
+		});
+	}
 }

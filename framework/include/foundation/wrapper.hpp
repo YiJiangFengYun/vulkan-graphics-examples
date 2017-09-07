@@ -52,6 +52,9 @@ namespace fd
 
 	extern std::shared_ptr<vk::Sampler> createSampler(const std::shared_ptr<vk::Device> pDevice,
 		const vk::SamplerCreateInfo & createInfo, vk::Optional<const vk::AllocationCallbacks> allocator = nullptr);
+
+	extern std::shared_ptr<vk::ShaderModule> createShaderModule(const std::shared_ptr<vk::Device> pDevice,
+		const vk::ShaderModuleCreateInfo & createInfo, vk::Optional<const vk::AllocationCallbacks> allocator = nullptr);
 }
 
 #endif // !FD_VK_WRAPPER_H

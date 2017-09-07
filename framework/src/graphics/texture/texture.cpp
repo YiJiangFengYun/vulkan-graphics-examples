@@ -4,8 +4,8 @@ namespace kgs
 {
 	inline uint32_t caculateImageSizeWithMipmapLevel(uint32_t size, uint32_t mipmapLevel);
 
-	Texture::Texture(Device device, TextureFormat format, Bool32 mipMap)
-		:m_device(device),
+	Texture::Texture(TextureFormat format, Bool32 mipMap)
+		:m_pContext(pContext),
 		m_format(format),
 		m_mipMap(mipMap),
 		m_width(1U),
@@ -13,7 +13,7 @@ namespace kgs
 		m_depth(1U),
 		m_arrayLength(1U)
 	{
-
+		
 	}
 
 	Texture::~Texture()
@@ -297,7 +297,7 @@ namespace kgs
 			imageLayout
 		};
 
-		auto pDevice = m_device.getPNativeDevice();
+		auto pDevice = m_pContext->getPNativeDevice();
 		m_pImage = fd::createImage(pDevice, createInfo);
 
 		auto memRequirements = pDevice->getImageMemoryRequirements(*m_pImage);
@@ -379,7 +379,7 @@ namespace kgs
 			}
 		};
 
-		auto pDevice = m_device.getPNativeDevice();
+		auto pDevice = m_pContext->getPNativeDevice();
 		m_pImageView = fd::createImageView(pDevice, createInfo);
 	}
 
@@ -405,7 +405,7 @@ namespace kgs
 			VkBool32(VK_FALSE)
 		};
 
-		auto pDevice = m_device.getPNativeDevice();
+		auto pDevice = m_pContext->getPNativeDevice();
 		m_pSampler = fd::createSampler(pDevice, createInfo);
 	}
 
@@ -496,7 +496,7 @@ namespace kgs
 
 	void Texture::_applyWithGenMipMap()
 	{
-		auto pDevice = m_device.getPNativeDevice();
+		auto pDevice = m_pContext->getPNativeDevice();
 		auto pCommandBuffer = _beginSingleTimeCommands();
 		//create first level image data using staging buffer.
 		if (m_arrTempColors.size() == 0)
@@ -527,7 +527,7 @@ namespace kgs
 
 #ifdef DEBUG
 		//check format.
-		auto pPhysicalDevice = m_device.getPPhysicalDevice();
+		auto pPhysicalDevice = m_pContext->getPPhysicalDevice();
 		auto formatProperties = pPhysicalDevice->getFormatProperties(m_vkFormat);
 		if ((formatProperties.optimalTilingFeatures & vk::FormatFeatureFlagBits::eBlitSrc) == vk::FormatFeatureFlags())
 		{
@@ -589,7 +589,7 @@ namespace kgs
 			throw std::runtime_error("Pixels data is not enough to create mipmap texture.");
 		}
 
-		auto pDevice = m_device.getPNativeDevice();
+		auto pDevice = m_pContext->getPNativeDevice();
 
 		//create image data using staging buffer mipmap level by mipmap level.
 		for (uint32_t i = 0; i < m_mipMapLevels; ++i)
@@ -645,7 +645,7 @@ namespace kgs
 			vk::SharingMode::eExclusive
 		};
 
-		auto pDevice = m_device.getPNativeDevice();
+		auto pDevice = m_pContext->getPNativeDevice();
 		pBuffer = fd::createBuffer(pDevice, createInfo);
 
 		vk::MemoryRequirements memReqs = pDevice->getBufferMemoryRequirements(*pBuffer);
@@ -724,7 +724,7 @@ namespace kgs
 
 	uint32_t Texture::_findMemoryType(uint32_t typeFilter, vk::MemoryPropertyFlags properties)
 	{
-		auto pPhysicalDevice = m_device.getPPhysicalDevice();
+		auto pPhysicalDevice = m_pContext->getPPhysicalDevice();
 		vk::PhysicalDeviceMemoryProperties memProperties = pPhysicalDevice->getMemoryProperties();
 		for (uint32_t i = 0; i < memProperties.memoryTypeCount; ++i)
 		{
@@ -739,8 +739,8 @@ namespace kgs
 	}
 
 	std::shared_ptr<vk::CommandBuffer> Texture::_beginSingleTimeCommands() {
-		auto pDevice = m_device.getPNativeDevice();
-		auto pCommandPool = m_device.getPCommandPool();
+		auto pDevice = m_pContext->getPNativeDevice();
+		auto pCommandPool = m_pContext->getPCommandPool();
 		vk::CommandBufferAllocateInfo allocateInfo = {
 			*pCommandPool,
 			vk::CommandBufferLevel::ePrimary,
@@ -758,9 +758,9 @@ namespace kgs
 	}
 
 	void Texture::_endSingleTimeCommands(std::shared_ptr<vk::CommandBuffer> pCommandBuffer) {
-		auto pDevice = m_device.getPNativeDevice();
-		auto graphicsQueue = m_device.getGraphicsQueue();
-		auto commandPool = m_device.getPCommandPool();
+		auto pDevice = m_pContext->getPNativeDevice();
+		auto graphicsQueue = m_pContext->getGraphicsQueue();
+		auto commandPool = m_pContext->getPCommandPool();
 		pCommandBuffer->end();
 		vk::SubmitInfo submitInfo = { 0, nullptr, nullptr, 1, pCommandBuffer.get(), 0, nullptr };
 		graphicsQueue.submit(submitInfo, nullptr);

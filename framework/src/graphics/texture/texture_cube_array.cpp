@@ -2,8 +2,8 @@
 
 namespace kgs
 {
-	TextureCubeArray::TextureCubeArray(Device device, TextureFormat format, Bool32 mipMap, uint32_t size, uint32_t arraylength)
-		:Texture(device, format, mipMap)
+	TextureCubeArray::TextureCubeArray(TextureFormat format, Bool32 mipMap, uint32_t size, uint32_t arraylength)
+		:Texture(format, mipMap)
 	{
 		m_type = TextureType::CUBE_ARRARY;
 		m_width = size;

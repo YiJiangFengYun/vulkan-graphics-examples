@@ -2,8 +2,8 @@
 
 namespace kgs
 {
-	Texture3D::Texture3D(Device device, TextureFormat format, Bool32 mipMap, uint32_t width, uint32_t height, uint32_t depth)
-		:Texture(device, format, mipMap)
+	Texture3D::Texture3D(TextureFormat format, Bool32 mipMap, uint32_t width, uint32_t height, uint32_t depth)
+		:Texture(format, mipMap)
 	{
 		m_type = TextureType::TEX_3D;
 		m_width = width;

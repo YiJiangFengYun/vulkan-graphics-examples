@@ -11,7 +11,7 @@ namespace kgs
 	class Texture3D : public Texture
 	{
 	public:
-		Texture3D(Device device, TextureFormat format, Bool32 mipmap, uint32_t width, uint32_t height, uint32_t depth);
+		Texture3D(TextureFormat format, Bool32 mipmap, uint32_t width, uint32_t height, uint32_t depth);
 		~Texture3D();
 		std::vector<Color> getPixels(uint32_t mipLevel = 0);
 		std::vector<Color32> getPixels32(uint32_t mipLevel = 0);

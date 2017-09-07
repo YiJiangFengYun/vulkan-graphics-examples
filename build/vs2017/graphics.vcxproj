@@ -19,7 +19,7 @@
     </ProjectConfiguration>
   </ItemGroup>
   <ItemGroup>
-    <ClCompile Include="..\..\framework\src\graphics\device\device.cpp" />
+    <ClCompile Include="..\..\framework\src\graphics\context.cpp" />
     <ClCompile Include="..\..\framework\src\graphics\global.cpp" />
     <ClCompile Include="..\..\framework\src\graphics\material\material.cpp" />
     <ClCompile Include="..\..\framework\src\graphics\material\pass.cpp" />
@@ -36,7 +36,7 @@
     <ClCompile Include="..\..\framework\src\graphics\texture\texture_option.cpp" />
   </ItemGroup>
   <ItemGroup>
-    <ClInclude Include="..\..\framework\include\graphics\device\device.hpp" />
+    <ClInclude Include="..\..\framework\include\graphics\context.hpp" />
     <ClInclude Include="..\..\framework\include\graphics\global.hpp" />
     <ClInclude Include="..\..\framework\include\graphics\material\material.hpp" />
     <ClInclude Include="..\..\framework\include\graphics\material\pass.hpp" />

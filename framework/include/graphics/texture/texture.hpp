@@ -5,14 +5,14 @@
 #include "foundation/wrapper.hpp"
 #include "graphics/global.hpp"
 #include "graphics/texture/texture_option.hpp"
-#include "graphics/device/device.hpp"
+#include "graphics/context.hpp"
 
 namespace kgs
 {
 	class Texture
 	{
 	public:
-		Texture(Device device, TextureFormat format, Bool32 mipMap);
+		Texture(TextureFormat format, Bool32 mipMap);
 		~Texture();
 		float getAnisotropy();
 		void setAnisotropy(float value);
@@ -50,7 +50,7 @@ namespace kgs
 	    std::vector<std::vector<Color32>> m_arrTempColors;
 
 		//--aggregations
-		Device m_device;
+		std::shared_ptr<Context> m_pContext;
 
 		std::shared_ptr<vk::Image> m_pImage;
 		std::shared_ptr<vk::DeviceMemory> m_pMemory;

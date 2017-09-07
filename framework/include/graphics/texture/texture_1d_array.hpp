@@ -11,7 +11,7 @@ namespace kgs
 	class Texture1DArray : public Texture
 	{
 	public:
-		Texture1DArray(Device device, TextureFormat format, Bool32 mipmap, uint32_t width, uint32_t arraylength);
+		Texture1DArray(TextureFormat format, Bool32 mipmap, uint32_t width, uint32_t arraylength);
 		~Texture1DArray();
 		std::vector<Color> getPixels(uint32_t arrayIndex, uint32_t mipLevel = 0);
 		std::vector<Color32> getPixels32(uint32_t arrayIndex, uint32_t mipLevel = 0);

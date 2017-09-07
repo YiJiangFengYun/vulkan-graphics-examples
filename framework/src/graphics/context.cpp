@@ -1,8 +1,8 @@
-#include "graphics/device/device.hpp"
+#include "graphics/context.hpp"
 
 namespace kgs
 {
-	Device::Device(std::shared_ptr<vk::PhysicalDevice> pPhysicalDevice,
+	Context::Context(std::shared_ptr<vk::PhysicalDevice> pPhysicalDevice,
 		std::shared_ptr<vk::Device> pNativeDevice, vk::Queue graphicsQueue,
 		std::shared_ptr<vk::CommandPool> pCommandPool)
 		:m_pPhysicalDevice(pPhysicalDevice),
@@ -12,7 +12,7 @@ namespace kgs
 	{
 	}
 
-	Device::Device(const Device& device)
+	Context::Context(const Context& device)
 		:m_pPhysicalDevice(device.m_pPhysicalDevice),
 		m_pNativeDevice(device.m_pNativeDevice),
 		m_graphicsQueue(device.m_graphicsQueue),
@@ -21,26 +21,26 @@ namespace kgs
 
 	}
 
-	Device::~Device()
+	Context::~Context()
 	{
 	}
 
-	std::shared_ptr<vk::PhysicalDevice> Device::getPPhysicalDevice()
+	std::shared_ptr<vk::PhysicalDevice> Context::getPPhysicalDevice()
 	{
 		return m_pPhysicalDevice;
 	}
 
-	std::shared_ptr<vk::Device> Device::getPNativeDevice()
+	std::shared_ptr<vk::Device> Context::getPNativeDevice()
 	{
 		return m_pNativeDevice;
 	}
 
-	vk::Queue Device::getGraphicsQueue()
+	vk::Queue Context::getGraphicsQueue()
 	{
 		return m_graphicsQueue;
 	}
 
-	std::shared_ptr<vk::CommandPool> Device::getPCommandPool()
+	std::shared_ptr<vk::CommandPool> Context::getPCommandPool()
 	{
 		return m_pCommandPool;
 	}

@@ -2,8 +2,8 @@
 
 namespace kgs
 {
-	Texture1D::Texture1D(Device device, TextureFormat format, Bool32 mipMap, uint32_t width)
-		:Texture(device, format, mipMap)
+	Texture1D::Texture1D(TextureFormat format, Bool32 mipMap, uint32_t width)
+		:Texture(format, mipMap)
 	{
 		m_type = TextureType::TEX_1D;
 		m_width = width;

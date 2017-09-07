@@ -5,14 +5,14 @@
 
 namespace kgs
 {
-	class Device
+	class Context
 	{
 	public:
-		Device(std::shared_ptr<vk::PhysicalDevice> pPhysicalDevice, 
+		Context(std::shared_ptr<vk::PhysicalDevice> pPhysicalDevice,
 			std::shared_ptr<vk::Device> pNativeDevice, vk::Queue graphicsQueue, 
 			std::shared_ptr<vk::CommandPool> pCommandPool);
-		Device(const Device& device);
-		~Device();
+		Context(const Context& device);
+		~Context();
 		std::shared_ptr<vk::PhysicalDevice> getPPhysicalDevice();
 		std::shared_ptr<vk::Device> getPNativeDevice();
 		vk::Queue getGraphicsQueue();

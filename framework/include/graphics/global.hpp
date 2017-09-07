@@ -16,6 +16,7 @@
 
 #include <cstdint>
 #include <plog/Log.h>
+#include "graphics/context.hpp"
 
 #define MainColorName "_Color"
 #define MainTextureName "_MainTex";
@@ -34,8 +35,12 @@ namespace kgs
 	typedef glm::mat3x3 Matrix3x3;
 	typedef glm::mat4x4 Matrix4x4;
 
+
+	std::shared_ptr<Context> pContext;
 	extern void initLog();
-	extern void initGraphics();
+	extern void initGraphics(std::shared_ptr<vk::PhysicalDevice> pPhysicalDevice,
+		std::shared_ptr<vk::Device> pNativeDevice, vk::Queue graphicsQueue,
+		std::shared_ptr<vk::CommandPool> pCommandPool);
 }
 
 

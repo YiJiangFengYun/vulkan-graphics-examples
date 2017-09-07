@@ -2,8 +2,8 @@
 
 namespace kgs
 {
-	Texture2D::Texture2D(Device device, TextureFormat format, Bool32 mipMap, uint32_t width, uint32_t height)
-		:Texture(device, format, mipMap)
+	Texture2D::Texture2D(TextureFormat format, Bool32 mipMap, uint32_t width, uint32_t height)
+		:Texture(format, mipMap)
 	{
 		m_type = TextureType::TEX_2D;
 		m_width = width;

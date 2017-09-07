@@ -2,8 +2,8 @@
 
 namespace kgs
 {
-	Texture2DArray::Texture2DArray(Device device, TextureFormat format, Bool32 mipMap, uint32_t width, uint32_t height, uint32_t arraylength)
-		:Texture(device, format, mipMap)
+	Texture2DArray::Texture2DArray(TextureFormat format, Bool32 mipMap, uint32_t width, uint32_t height, uint32_t arraylength)
+		:Texture(format, mipMap)
 	{
 		m_type = TextureType::TEX_2D_ARRAY;
 		m_width = width;

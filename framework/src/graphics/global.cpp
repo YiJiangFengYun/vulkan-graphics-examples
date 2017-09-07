@@ -11,8 +11,11 @@ namespace kgs
 		plog::init(plog::verbose, &debugOutputAppender);
 	}
 
-	void initGraphics()
+	void initGraphics(std::shared_ptr<vk::PhysicalDevice> pPhysicalDevice,
+		std::shared_ptr<vk::Device> pNativeDevice, vk::Queue graphicsQueue,
+		std::shared_ptr<vk::CommandPool> pCommandPool)
 	{
 		initLog();
+		pContext = std::shared_ptr<Context>(new Context(pPhysicalDevice, pNativeDevice, graphicsQueue, pCommandPool));
 	}
 }

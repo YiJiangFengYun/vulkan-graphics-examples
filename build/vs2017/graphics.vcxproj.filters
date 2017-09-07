@@ -19,12 +19,6 @@
     <Filter Include="src\graphics\texture">
       <UniqueIdentifier>{7339c612-5a20-4e50-8bf6-28fe4cdd3c11}</UniqueIdentifier>
     </Filter>
-    <Filter Include="include\graphics\device">
-      <UniqueIdentifier>{7c96726a-d03a-41da-9613-91bfcd921733}</UniqueIdentifier>
-    </Filter>
-    <Filter Include="src\graphics\device">
-      <UniqueIdentifier>{6ed20f87-1e83-4f46-8a00-10f2409dae14}</UniqueIdentifier>
-    </Filter>
     <Filter Include="include\graphics\material">
       <UniqueIdentifier>{c45d271f-9d93-4b6a-8098-4289c8ae304c}</UniqueIdentifier>
     </Filter>
@@ -38,9 +32,6 @@
     </ClCompile>
     <ClCompile Include="..\..\framework\src\graphics\texture\texture_option.cpp">
       <Filter>src\graphics\texture</Filter>
-    </ClCompile>
-    <ClCompile Include="..\..\framework\src\graphics\device\device.cpp">
-      <Filter>src\graphics\device</Filter>
     </ClCompile>
     <ClCompile Include="..\..\framework\src\graphics\texture\texture_1d.cpp">
       <Filter>src\graphics\texture</Filter>
@@ -78,6 +69,9 @@
     <ClCompile Include="..\..\framework\src\graphics\material\pass_option.cpp">
       <Filter>src\graphics\material</Filter>
     </ClCompile>
+    <ClCompile Include="..\..\framework\src\graphics\context.cpp">
+      <Filter>src\graphics</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="..\..\framework\include\graphics\texture\texture.hpp">
@@ -85,9 +79,6 @@
     </ClInclude>
     <ClInclude Include="..\..\framework\include\graphics\texture\texture_option.hpp">
       <Filter>include\graphics\texture</Filter>
-    </ClInclude>
-    <ClInclude Include="..\..\framework\include\graphics\device\device.hpp">
-      <Filter>include\graphics\device</Filter>
     </ClInclude>
     <ClInclude Include="..\..\framework\include\graphics\texture\texture_1d.hpp">
       <Filter>include\graphics\texture</Filter>
@@ -124,6 +115,9 @@
     </ClInclude>
     <ClInclude Include="..\..\framework\include\graphics\material\pass_option.hpp">
       <Filter>include\graphics\material</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\framework\include\graphics\context.hpp">
+      <Filter>include\graphics</Filter>
     </ClInclude>
   </ItemGroup>
 </Project>

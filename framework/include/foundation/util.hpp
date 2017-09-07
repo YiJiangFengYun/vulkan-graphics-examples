@@ -2,6 +2,8 @@
 #define FD_UTIL_H
 
 #include <cstdint>
+#include <array>
+#include <vector>
 
 namespace fd
 {

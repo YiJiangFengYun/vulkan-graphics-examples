@@ -2,6 +2,11 @@
 #define KGS_SHADER_H
 
 #include <cstdint>
+#include <vector>
+#include <fstream>
+#include <vulkan/vulkan.hpp>
+#include <foundation/wrapper.hpp>
+#include "graphics/global.hpp"
 
 namespace kgs
 {
@@ -9,10 +14,30 @@ namespace kgs
 	{
 	public:
 		Shader();
+		//Shader(std::string vertShaderPath);
+		//Shader(std::string fragShaderPath);
+		Shader(std::string vertShaderPath, std::string fragShaderPath);
 		~Shader();
 
+		//void load(std::string vertShaderPath);
+		//void load(std::string fragShaderPath);
+		void load(std::string vertShaderPath, std::string fragShaderPath);
+
+		std::shared_ptr<vk::ShaderModule> getPVertShaderModule();
+		std::shared_ptr<vk::ShaderModule> getPFragShaderModule();
+
 	private:
+		//compositions
 		uint32_t m_renderQueueId;
+		std::shared_ptr<vk::ShaderModule> m_pVertShaderModule;
+		std::shared_ptr<vk::ShaderModule> m_pFragShaderModule;
+
+		//aggregations.
+		std::shared_ptr<Context> m_pContext;
+
+		//tool methods
+		std::shared_ptr<vk::ShaderModule> _createShaderModule(const std::vector<char>& code);
+		std::vector<char> _readFile(const std::string& filePath);
 	};
 }
 

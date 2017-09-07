@@ -36,7 +36,7 @@ namespace kgs
 	typedef glm::mat4x4 Matrix4x4;
 
 
-	std::shared_ptr<Context> pContext;
+	extern std::shared_ptr<Context> pContext;
 	extern void initLog();
 	extern void initGraphics(std::shared_ptr<vk::PhysicalDevice> pPhysicalDevice,
 		std::shared_ptr<vk::Device> pNativeDevice, vk::Queue graphicsQueue,

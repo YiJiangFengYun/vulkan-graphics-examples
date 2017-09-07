@@ -4,6 +4,7 @@
 
 namespace kgs
 {
+	std::shared_ptr<Context> pContext;
 	void initLog()
 	{
 		//init default log to write to the windows debug output

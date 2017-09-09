@@ -2,6 +2,7 @@
 #define KGS_PASS_H
 
 #include <unordered_map>
+#include "graphics/util/find_memory.hpp"
 #include "graphics/material/shader.hpp"
 #include "graphics/material/pass_option.hpp"
 #include "graphics/texture/texture.hpp"
@@ -16,6 +17,7 @@ namespace kgs
 		struct LayoutBindingInfo
 		{
 			std::string name;
+			MaterialData::DataType dataType;
 			std::uint32_t binding;
 			DescriptorType descriptorType;
 			ShaderStageFlags stageFlags;
@@ -40,6 +42,10 @@ namespace kgs
 		std::shared_ptr<Shader> m_pShader;
 		std::shared_ptr<MaterialData> m_pMaterialData;
 		void _updateDescriptorSetAndLayout();
+		void _updateDescriptorSetContent();
+
+		//tool methods
+		void createBuffer(vk::DeviceSize size, std::shared_ptr<vk::Buffer>& pBuffer, std::shared_ptr<vk::DeviceMemory> pBufferMemory);
 	};
 }
 

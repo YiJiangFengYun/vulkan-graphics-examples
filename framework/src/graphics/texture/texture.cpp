@@ -304,7 +304,7 @@ namespace kgs
 
 		vk::MemoryAllocateInfo allocInfo = {
 			memRequirements.size,
-			_findMemoryType(memRequirements.memoryTypeBits, vk::MemoryPropertyFlagBits::eDeviceLocal)
+			kgs::_findMemoryType(m_pContext->getPPhysicalDevice(), memRequirements.memoryTypeBits, vk::MemoryPropertyFlagBits::eDeviceLocal)
 		};
 
 		m_pMemory = fd::allocateMemory(pDevice, allocInfo);
@@ -651,7 +651,7 @@ namespace kgs
 		vk::MemoryRequirements memReqs = pDevice->getBufferMemoryRequirements(*pBuffer);
 		vk::MemoryAllocateInfo allocateInfo = {
 			memReqs.size,
-			_findMemoryType(memReqs.memoryTypeBits, properties)
+			kgs::_findMemoryType(m_pContext->getPPhysicalDevice(), memReqs.memoryTypeBits, properties)
 		};
 
 		pBufferMemory = fd::allocateMemory(pDevice, allocateInfo);
@@ -720,22 +720,6 @@ namespace kgs
 		};
 
 		pCommandBuffer->copyBufferToImage(buffer, image, vk::ImageLayout::eTransferDstOptimal, copyInfo);
-	}
-
-	uint32_t Texture::_findMemoryType(uint32_t typeFilter, vk::MemoryPropertyFlags properties)
-	{
-		auto pPhysicalDevice = m_pContext->getPPhysicalDevice();
-		vk::PhysicalDeviceMemoryProperties memProperties = pPhysicalDevice->getMemoryProperties();
-		for (uint32_t i = 0; i < memProperties.memoryTypeCount; ++i)
-		{
-			if (typeFilter & (1 << i) && (memProperties.memoryTypes[i].propertyFlags & properties) == properties)
-			{
-				return i;
-			}
-		}
-
-		throw std::runtime_error("Failed to find suitable memory type!");
-
 	}
 
 	std::shared_ptr<vk::CommandBuffer> Texture::_beginSingleTimeCommands() {

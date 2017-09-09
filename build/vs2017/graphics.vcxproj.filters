@@ -84,6 +84,9 @@
     <ClCompile Include="..\..\framework\src\graphics\util\util.cpp">
       <Filter>src\graphics\util</Filter>
     </ClCompile>
+    <ClCompile Include="..\..\framework\src\graphics\util\find_memory.cpp">
+      <Filter>src\graphics\util</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="..\..\framework\include\graphics\texture\texture.hpp">
@@ -135,6 +138,9 @@
       <Filter>include\graphics\material</Filter>
     </ClInclude>
     <ClInclude Include="..\..\framework\include\graphics\util\util.hpp">
+      <Filter>include\graphics\util</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\framework\include\graphics\util\find_memory.hpp">
       <Filter>include\graphics\util</Filter>
     </ClInclude>
   </ItemGroup>

@@ -10,11 +10,27 @@ namespace kgs
 {
 	struct MaterialData
 	{
+		enum class DataType
+		{
+			FLOAT,
+			FLOAT_ARRAY,
+			INT,
+			INT_ARRAY,
+			COLOR,
+			COLOR_ARRAY,
+			VECTOR,
+			VECTOR_ARRAY,
+			MATRIX,
+			MATRIX_ARRAY,
+			TEXTURE,
+			TEXTURE_OFFSET,
+			TEXTURE_SCALE,
+			BEGIN_RANGE = FLOAT,
+			END_RANGE = TEXTURE_SCALE,
+			RANGE_SIZE = (END_RANGE - BEGIN_RANGE + 1)
+		};
+
 		//--aggregations
-		std::vector<Color> arrColors;
-		std::unordered_map<std::string, Color> mapColors;
-		std::vector<std::vector<Color>> arrColorArrays;
-		std::unordered_map<std::string, std::vector<Color>> mapColorArrays;
 
 		std::vector<float> arrFloats;
 		std::unordered_map<std::string, float> mapFloats;
@@ -26,6 +42,11 @@ namespace kgs
 		std::vector<std::vector<int32_t>> arrIntArrays;
 		std::unordered_map<std::string, std::vector<int32_t>> mapIntArrays;
 
+		std::vector<Color> arrColors;
+		std::unordered_map<std::string, Color> mapColors;
+		std::vector<std::vector<Color>> arrColorArrays;
+		std::unordered_map<std::string, std::vector<Color>> mapColorArrays;
+
 		std::vector<Vector4> arrVectors;
 		std::unordered_map<std::string, Vector4> mapVectors;
 		std::vector<std::vector<Vector4>> arrVectorArrays;
@@ -36,7 +57,6 @@ namespace kgs
 		std::vector<std::vector<Matrix4x4>> arrMatrixArrays;
 		std::unordered_map<std::string, std::vector<Matrix4x4>> mapMatrixArrays;
 
-		std::shared_ptr<Texture> mainTexture;
 		std::vector<std::shared_ptr<Texture>> arrTextures;
 		std::unordered_map<std::string, std::shared_ptr<Texture>> mapTextures;
 		std::vector<Vector2> arrTextureOffsets;
@@ -44,6 +64,32 @@ namespace kgs
 		std::vector<Vector2> arrTextureScales;
 		std::unordered_map<std::string, Vector2> mapTextureScales;
 		//--aggregations
+
+		std::vector<void*> arrTypeToMap;
+
+		MaterialData():
+			arrTypeToMap({
+			&mapFloats,
+			&mapFloatArrays,
+			&mapInts,
+			&mapIntArrays,
+			&mapColors,
+			&mapColorArrays,
+			&mapVectors,
+			&mapVectorArrays,
+			&mapMatrixs,
+			&mapMatrixArrays,
+			&mapTextures,
+			&mapTextureOffsets,
+			&mapTextureScales
+		})
+		{
+#ifdef DEBUG
+			if (static_cast<uint32_t>(arrTypeToMap.size()) != static_cast<uint32_t>(DataType::RANGE_SIZE))
+				throw std::length_error("Map count is not equal to data type count.");
+#endif // DEBUG
+
+		}
 	};
 } //namespace kgs
 

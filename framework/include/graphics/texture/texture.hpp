@@ -3,6 +3,7 @@
 
 #include <vulkan/vulkan.hpp>
 #include "foundation/wrapper.hpp"
+#include "graphics/util/find_memory.hpp"
 #include "graphics/global.hpp"
 #include "graphics/texture/texture_option.hpp"
 #include "graphics/context.hpp"
@@ -87,7 +88,6 @@ namespace kgs
 		void _resizeColorsData(uint32_t mipLevel);
 
 		//tool methods
-		uint32_t _findMemoryType(uint32_t typeFilter, vk::MemoryPropertyFlags properties);
 		std::shared_ptr<vk::CommandBuffer> _beginSingleTimeCommands();
 		void _endSingleTimeCommands(std::shared_ptr<vk::CommandBuffer> pCommandBuffer);
 	};

@@ -103,4 +103,53 @@ namespace kgs
 		};
 		m_pDescriptorSet = fd::allocateDescriptorSet(pDevice, m_pDescriptorPool, allocateInfo);
 	}
+
+	void Pass::_updateDescriptorSetContent()
+	{
+		//get total number of unimform buffer variables.
+		int32_t uniformBufferCount;
+		for (const auto& item : m_binds)
+		{
+			if (item.descriptorType == DescriptorType::UNIFORM_BUFFER)
+				++uniformBufferCount;
+		}
+
+		//get total size of uniform buffer data and their offsets and sizes for each.
+		size_t totalSize;
+		std::vector<uint32_t> offsets(uniformBufferCount);
+		std::vector<uint32_t> sizes(uniformBufferCount);
+		for (const auto& item : m_binds)
+		{
+			if (item.descriptorType == DescriptorType::UNIFORM_BUFFER)
+			{
+				//auto map = static_cast<std::unordered_map<std::string, void*>>(*(m_pMaterialData->arrTypeToMap[static_cast<uint32_t>(item.dataType)]));
+			}
+		}
+		
+	}
+
+	void Pass::createBuffer(vk::DeviceSize size, std::shared_ptr<vk::Buffer>& pBuffer, std::shared_ptr<vk::DeviceMemory> pBufferMemory)
+	{
+		vk::BufferCreateInfo createInfo = {
+			vk::BufferCreateFlags(),
+			size,
+			vk::BufferUsageFlagBits::eUniformBuffer,
+			vk::SharingMode::eExclusive
+		};
+
+		auto pDevice = m_pContext->getPNativeDevice();
+		pBuffer = fd::createBuffer(pDevice, createInfo);
+
+		vk::MemoryRequirements memReqs = pDevice->getBufferMemoryRequirements(*pBuffer);
+		vk::MemoryAllocateInfo allocateInfo = {
+			memReqs.size,
+			kgs::_findMemoryType(m_pContext->getPPhysicalDevice(), 
+			memReqs.memoryTypeBits, 
+			vk::MemoryPropertyFlagBits::eHostVisible | vk::MemoryPropertyFlagBits::eHostCoherent)
+		};
+
+		pBufferMemory = fd::allocateMemory(pDevice, allocateInfo);
+
+		pDevice->bindBufferMemory(*pBuffer, *pBufferMemory, 0);
+	}
 }

@@ -55,6 +55,15 @@ namespace fd
 
 	extern std::shared_ptr<vk::ShaderModule> createShaderModule(const std::shared_ptr<vk::Device> pDevice,
 		const vk::ShaderModuleCreateInfo & createInfo, vk::Optional<const vk::AllocationCallbacks> allocator = nullptr);
+
+	extern std::shared_ptr<vk::DescriptorSetLayout> createDescriptorSetLayout(const std::shared_ptr<vk::Device> pDevice,
+		const vk::DescriptorSetLayoutCreateInfo & createInfo, vk::Optional<const vk::AllocationCallbacks> allocator = nullptr);
+
+	extern std::shared_ptr<vk::DescriptorPool> createDescriptorPool(const std::shared_ptr<vk::Device> pDevice,
+		const vk::DescriptorPoolCreateInfo & createInfo, vk::Optional < const vk::AllocationCallbacks > allocator = nullptr);
+
+	extern std::shared_ptr<vk::DescriptorSet> allocateDescriptorSet(const std::shared_ptr<vk::Device> pDevice,
+		const std::shared_ptr<vk::DescriptorPool> pDescriptorPool, vk::DescriptorSetAllocateInfo & allocateInfo);
 }
 
 #endif // !FD_VK_WRAPPER_H

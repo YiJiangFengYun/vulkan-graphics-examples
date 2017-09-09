@@ -61,7 +61,7 @@ namespace kgs
 		Color m_mainColor;
 		Vector2 m_mainTextureOffset;
 		Vector2 m_mainTextureScale;
-		std::shared_ptr<MaterialData> m_data;
+		std::shared_ptr<MaterialData> m_pData;
 		//--compositions
 
 		//--aggregations

@@ -183,4 +183,36 @@ namespace fd
 			pDevice->destroyShaderModule(*p);
 		});
 	}
+
+	std::shared_ptr<vk::DescriptorSetLayout> createDescriptorSetLayout(const std::shared_ptr<vk::Device> pDevice,
+		const vk::DescriptorSetLayoutCreateInfo & createInfo, vk::Optional<const vk::AllocationCallbacks> allocator)
+	{
+		auto descriptorSetLayout = pDevice->createDescriptorSetLayout(createInfo, allocator);
+		return std::shared_ptr<vk::DescriptorSetLayout>(new vk::DescriptorSetLayout(descriptorSetLayout),
+			[pDevice](vk::DescriptorSetLayout *p) {
+			pDevice->destroyDescriptorSetLayout(*p);
+		});
+	}
+
+	std::shared_ptr<vk::DescriptorPool> createDescriptorPool(const std::shared_ptr<vk::Device> pDevice,
+		const vk::DescriptorPoolCreateInfo & createInfo, vk::Optional < const vk::AllocationCallbacks > allocator)
+	{
+		auto descriptorPool = pDevice->createDescriptorPool(createInfo, allocator);
+		return std::shared_ptr<vk::DescriptorPool>(new vk::DescriptorPool(descriptorPool), 
+			[pDevice](vk::DescriptorPool *p) {
+			pDevice->destroyDescriptorPool(*p);
+		});
+	}
+
+	std::shared_ptr<vk::DescriptorSet> allocateDescriptorSet(const std::shared_ptr<vk::Device> pDevice,
+		const std::shared_ptr<vk::DescriptorPool> pDescriptorPool, vk::DescriptorSetAllocateInfo & allocateInfo)
+	{
+		allocateInfo.setDescriptorPool(*pDescriptorPool);
+		allocateInfo.setDescriptorSetCount(1u);
+		auto descriptorSet = pDevice->allocateDescriptorSets(allocateInfo)[0];
+		return std::shared_ptr<vk::DescriptorSet>(new vk::DescriptorSet(descriptorSet), 
+			[pDevice, pDescriptorPool](vk::DescriptorSet *p) {
+			pDevice->freeDescriptorSets(*pDescriptorPool, *p);
+		});
+	}
 }

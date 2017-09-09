@@ -2,7 +2,8 @@
 
 namespace kgs
 {
-	Material::Material()
+	Material::Material():
+		m_data(new MaterialData())
 	{
 	}
 
@@ -42,131 +43,131 @@ namespace kgs
 
 	Color Material::getColor(std::string name)
 	{
-		return getValue(name, m_mapColors, m_arrColors);
+		return getValue(name, m_data->mapColors, m_data->arrColors);
 	}
 
 	void Material::setColor(std::string name, Color value)
 	{
-		setValue(name, value, m_mapColors, m_arrColors);
+		setValue(name, value, m_data->mapColors, m_data->arrColors);
 	}
 
 	std::vector<Color> Material::getColorArray(std::string name)
 	{
-		return getValue(name, m_mapColorArrays, m_arrColorArrays);
+		return getValue(name, m_data->mapColorArrays, m_data->arrColorArrays);
 	}
 
 	void Material::setColorArray(std::string name, std::vector<Color> values)
 	{
-		setValue(name, values, m_mapColorArrays, m_arrColorArrays);
+		setValue(name, values, m_data->mapColorArrays, m_data->arrColorArrays);
 	}
 
 	float Material::getFloat(std::string name)
 	{
-		return getValue(name, m_mapFloats, m_arrFloats);
+		return getValue(name, m_data->mapFloats, m_data->arrFloats);
 	}
 
 	void Material::setFloat(std::string name, float value)
 	{
-		setValue(name, value, m_mapFloats, m_arrFloats);
+		setValue(name, value, m_data->mapFloats, m_data->arrFloats);
 	}
 
 	std::vector<float> Material::getFloatArray(std::string name)
 	{
-		return getValue(name, m_mapFloatArrays, m_arrFloatArrays);
+		return getValue(name, m_data->mapFloatArrays, m_data->arrFloatArrays);
 	}
 
 	void Material::setFloatArray(std::string name, std::vector<float> values)
 	{
-		setValue(name, values, m_mapFloatArrays, m_arrFloatArrays);
+		setValue(name, values, m_data->mapFloatArrays, m_data->arrFloatArrays);
 	}
 
 	int32_t Material::getInt(std::string name)
 	{
-		return getValue(name, m_mapInts, m_arrInts);
+		return getValue(name, m_data->mapInts, m_data->arrInts);
 	}
 
 	void Material::setInt(std::string name, int32_t value)
 	{
-		setValue(name, value, m_mapInts, m_arrInts);
+		setValue(name, value, m_data->mapInts, m_data->arrInts);
 	}
 
 	std::vector<int32_t> Material::getIntArray(std::string name)
 	{
-		return getValue(name, m_mapIntArrays, m_arrIntArrays);
+		return getValue(name, m_data->mapIntArrays, m_data->arrIntArrays);
 	}
 
 	void Material::setIntArray(std::string name, std::vector<int32_t> values)
 	{
-		setValue(name, values, m_mapIntArrays, m_arrIntArrays);
+		setValue(name, values, m_data->mapIntArrays, m_data->arrIntArrays);
 	}
 
 	Vector4 Material::getVector(std::string name)
 	{
-		return getValue(name, m_mapVectors, m_arrVectors);
+		return getValue(name, m_data->mapVectors, m_data->arrVectors);
 	}
 
 	void Material::setVector(std::string name, Vector4 value)
 	{
-		setValue(name, value, m_mapVectors, m_arrVectors);
+		setValue(name, value, m_data->mapVectors, m_data->arrVectors);
 	}
 
 	std::vector<Vector4> Material::getVectorArray(std::string name)
 	{
-		return getValue(name, m_mapVectorArrays, m_arrVectorArrays);
+		return getValue(name, m_data->mapVectorArrays, m_data->arrVectorArrays);
 	}
 
 	void Material::setVectorArray(std::string name, std::vector<Vector4> values)
 	{
-		setValue(name, values, m_mapVectorArrays, m_arrVectorArrays);
+		setValue(name, values, m_data->mapVectorArrays, m_data->arrVectorArrays);
 	}
 
 	Matrix4x4 Material::getMatrix(std::string name)
 	{
-		return getValue(name, m_mapMatrixs, m_arrMatrixs);
+		return getValue(name, m_data->mapMatrixs, m_data->arrMatrixs);
 	}
 
 	void Material::setMatrix(std::string name, Matrix4x4 value)
 	{
-		setValue(name, value, m_mapMatrixs, m_arrMatrixs);
+		setValue(name, value, m_data->mapMatrixs, m_data->arrMatrixs);
 	}
 
 	std::vector<Matrix4x4> Material::getMatrixArray(std::string name)
 	{
-		return getValue(name, m_mapMatrixArrays, m_arrMatrixArrays);
+		return getValue(name, m_data->mapMatrixArrays, m_data->arrMatrixArrays);
 	}
 
 	void Material::setMatrixArray(std::string name, std::vector<Matrix4x4> values)
 	{
-		setValue(name, values, m_mapMatrixArrays, m_arrMatrixArrays);
+		setValue(name, values, m_data->mapMatrixArrays, m_data->arrMatrixArrays);
 	}
 
 	std::shared_ptr<Texture> Material::getTexture(std::string name)
 	{
-		return getValue(name, m_mapTextures, m_arrTextures);
+		return getValue(name, m_data->mapTextures, m_data->arrTextures);
 	}
 
 	void Material::setTexture(std::string name, std::shared_ptr<Texture> value)
 	{
-		setValue(name, value, m_mapTextures, m_arrTextures);
+		setValue(name, value, m_data->mapTextures, m_data->arrTextures);
 	}
 
 	Vector2 Material::getTextureOffset(std::string name)
 	{
-		return getValue(name, m_mapTextureOffsets, m_arrTextureOffsets);
+		return getValue(name, m_data->mapTextureOffsets, m_data->arrTextureOffsets);
 	}
 
 	void Material::setTextureOffset(std::string name, Vector2 value)
 	{
-		setValue(name, value, m_mapTextureOffsets, m_arrTextureOffsets);
+		setValue(name, value, m_data->mapTextureOffsets, m_data->arrTextureOffsets);
 	}
 
 	Vector2 Material::getTextureScale(std::string name)
 	{
-		return getValue(name, m_mapTextureScales, m_arrTextureScales);
+		return getValue(name, m_data->mapTextureScales, m_data->arrTextureScales);
 	}
 
 	void Material::setTextureScale(std::string name, Vector2 value)
 	{
-		setValue(name, value, m_mapTextureScales, m_arrTextureScales);
+		setValue(name, value, m_data->mapTextureScales, m_data->arrTextureScales);
 	}
 }

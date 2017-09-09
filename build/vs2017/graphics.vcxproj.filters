@@ -25,6 +25,12 @@
     <Filter Include="src\graphics\material">
       <UniqueIdentifier>{632c8a20-f18d-4e91-b9af-69bf64f5b626}</UniqueIdentifier>
     </Filter>
+    <Filter Include="src\graphics\util">
+      <UniqueIdentifier>{ed6d1597-b27f-4b8e-949c-f5d60d7c1656}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="include\graphics\util">
+      <UniqueIdentifier>{1a106b77-ae9d-4acb-83ba-a1c6a62c4d01}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="..\..\framework\src\graphics\texture\texture.cpp">
@@ -72,6 +78,12 @@
     <ClCompile Include="..\..\framework\src\graphics\context.cpp">
       <Filter>src\graphics</Filter>
     </ClCompile>
+    <ClCompile Include="..\..\framework\src\graphics\material\material_data.cpp">
+      <Filter>src\graphics\material</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\framework\src\graphics\util\util.cpp">
+      <Filter>src\graphics\util</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="..\..\framework\include\graphics\texture\texture.hpp">
@@ -118,6 +130,12 @@
     </ClInclude>
     <ClInclude Include="..\..\framework\include\graphics\context.hpp">
       <Filter>include\graphics</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\framework\include\graphics\material\material_data.hpp">
+      <Filter>include\graphics\material</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\framework\include\graphics\util\util.hpp">
+      <Filter>include\graphics\util</Filter>
     </ClInclude>
   </ItemGroup>
 </Project>

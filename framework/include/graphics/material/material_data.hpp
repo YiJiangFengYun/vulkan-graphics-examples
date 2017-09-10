@@ -4,6 +4,7 @@
 #include <vector>
 #include <unordered_map>
 #include "graphics/global.hpp"
+#include "graphics/util/util.hpp"
 #include "graphics/texture/texture.hpp"
 
 namespace kgs
@@ -65,31 +66,137 @@ namespace kgs
 		std::unordered_map<std::string, Vector2> mapTextureScales;
 		//--aggregations
 
-		std::vector<void*> arrTypeToMap;
 
-		MaterialData():
-			arrTypeToMap({
-			&mapFloats,
-			&mapFloatArrays,
-			&mapInts,
-			&mapIntArrays,
-			&mapColors,
-			&mapColorArrays,
-			&mapVectors,
-			&mapVectorArrays,
-			&mapMatrixs,
-			&mapMatrixArrays,
-			&mapTextures,
-			&mapTextureOffsets,
-			&mapTextureScales
-		})
+		//type enum to value type
+		template <DataType type>
+		class ValueTypeOfType
 		{
-#ifdef DEBUG
-			if (static_cast<uint32_t>(arrTypeToMap.size()) != static_cast<uint32_t>(DataType::RANGE_SIZE))
-				throw std::length_error("Map count is not equal to data type count.");
-#endif // DEBUG
+			typedef void value_t;
+		};
 
-		}
+
+		template<>
+		class ValueTypeOfType<DataType::FLOAT>
+		{
+			typedef float value_t;
+		};
+
+		template<>
+		class ValueTypeOfType<DataType::FLOAT_ARRAY>
+		{
+			typedef std::vector<float> value_t;
+		};
+
+		template<>
+		class ValueTypeOfType<DataType::INT>
+		{
+			typedef uint32_t value_t;
+		};
+
+		template<>
+		class ValueTypeOfType<DataType::INT_ARRAY>
+		{
+			typedef std::vector<uint32_t> value_t;
+		};
+
+		template<>
+		class ValueTypeOfType<DataType::COLOR>
+		{
+			typedef Color value_t;
+		};
+
+		template<>
+		class ValueTypeOfType<DataType::COLOR_ARRAY>
+		{
+			typedef std::vector<Color> value_t;
+		};
+
+		template<>
+		class ValueTypeOfType<DataType::VECTOR>
+		{
+			typedef Vector4 value_t;
+		};
+
+		template<>
+		class ValueTypeOfType<DataType::VECTOR_ARRAY>
+		{
+			typedef std::vector<Vector4> value_t;
+		};
+
+		template<>
+		class ValueTypeOfType<DataType::MATRIX>
+		{
+			typedef Matrix4x4 value_t;
+		};
+
+		template<>
+		class ValueTypeOfType<DataType::MATRIX_ARRAY>
+		{
+			typedef std::vector<Matrix4x4> value_t;
+		};
+
+		template<>
+		class ValueTypeOfType<DataType::TEXTURE>
+		{
+			typedef Texture value_t;
+		};
+
+		template<>
+		class ValueTypeOfType<DataType::TEXTURE_OFFSET>
+		{
+			typedef Vector2 value_t;
+		};
+
+		template<>
+		class ValueTypeOfType<DataType::TEXTURE_SCALE>
+		{
+			typedef Vector2 value_t;
+		};
+
+
+		uint32_t getDataValueSize(std::string name, DataType type);
+
+		template <DataType type, typename T = ValueTypeOfType<type>::value_t>
+		T getDataValue(std::string name) {}
+
+		template<>
+		float getDataValue<DataType::FLOAT>(std::string name);
+
+		template<>
+		std::vector<float> getDataValue<DataType::FLOAT_ARRAY>(std::string name);
+
+		template<>
+		int getDataValue<DataType::INT>(std::string name);
+
+		template<>
+		std::vector<int> getDataValue<DataType::INT_ARRAY>(std::string name);
+
+		template<>
+		Color getDataValue<DataType::COLOR>(std::string name);
+
+		template<>
+		std::vector<Color> getDataValue<DataType::COLOR_ARRAY>(std::string name);
+
+		template<>
+		Vector4 getDataValue<DataType::VECTOR>(std::string name);
+
+		template<>
+		std::vector<Vector4> getDataValue<DataType::VECTOR_ARRAY>(std::string name);
+
+		template<>
+		Matrix4x4 getDataValue<DataType::MATRIX>(std::string name);
+
+		template<>
+		std::vector<Matrix4x4> getDataValue<DataType::MATRIX_ARRAY>(std::string name);
+
+		template<>
+		std::shared_ptr<Texture> getDataValue<DataType::TEXTURE>(std::string name);
+
+		template<>
+		Vector2 getDataValue<DataType::TEXTURE_OFFSET>(std::string name);
+
+		template<>
+		Vector2 getDataValue<DataType::TEXTURE_SCALE>(std::string name);
 	};
 } //namespace kgs
 

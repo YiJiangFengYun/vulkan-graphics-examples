@@ -7,6 +7,7 @@
 #include "graphics/material/pass_option.hpp"
 #include "graphics/texture/texture.hpp"
 #include "graphics/material/material_data.hpp"
+#include "graphics/util/util.hpp"
 
 namespace kgs
 {
@@ -20,6 +21,7 @@ namespace kgs
 			MaterialData::DataType dataType;
 			std::uint32_t binding;
 			DescriptorType descriptorType;
+			std::uint32_t descriptorCount;
 			ShaderStageFlags stageFlags;
 		};
 
@@ -33,6 +35,8 @@ namespace kgs
 	private:
 		//compositons
 		std::vector<LayoutBindingInfo> m_binds;
+		std::shared_ptr<vk::Buffer> m_pUniformBuffer;
+		std::shared_ptr<vk::DeviceMemory> m_pUniformBufferMemory;
 		std::shared_ptr<vk::DescriptorSetLayout> m_pDescriptorSetLayout;
 		std::shared_ptr<vk::DescriptorPool> m_pDescriptorPool;
 		std::shared_ptr<vk::DescriptorSet> m_pDescriptorSet;
@@ -41,8 +45,12 @@ namespace kgs
 		std::shared_ptr<Context> m_pContext;
 		std::shared_ptr<Shader> m_pShader;
 		std::shared_ptr<MaterialData> m_pMaterialData;
-		void _updateDescriptorSetAndLayout();
-		void _updateDescriptorSetContent();
+		void _createDescriptorSetLayout();
+		void _createUniformBuffer();
+		void _createDescriptorSet();
+		void _updateDescriptorBufferInfo();
+		void _updateDescriptorImageInfo();
+		void _applyBufferContent();
 
 		//tool methods
 		void createBuffer(vk::DeviceSize size, std::shared_ptr<vk::Buffer>& pBuffer, std::shared_ptr<vk::DeviceMemory> pBufferMemory);

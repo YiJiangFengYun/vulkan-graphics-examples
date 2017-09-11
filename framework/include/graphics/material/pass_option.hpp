@@ -51,6 +51,33 @@ namespace kgs
 
 		return result;
 	}
+
+	inline vk::DescriptorType tranDescriptorTypeToVK(DescriptorType type)
+	{
+		vk::DescriptorType vkType;
+#ifdef DEBUG
+		Bool32 isHave = KGS_FALSE;
+#endif // DEBUG
+		for (const auto& item2 : arrDescriptorTypeToVK)
+		{
+			if (item2.first == type)
+			{
+				vkType = item2.second;
+#ifdef DEBUG
+				isHave = KGS_TRUE;
+#endif // DEBUG
+				break;
+			}
+		}
+
+#ifdef DEBUG
+		if (isHave == KGS_FALSE)
+		{
+			throw std::runtime_error("Invalid descriptor type ");
+		}
+#endif // DEBUG
+		return vkType;
+	}
 }
 
 #endif // !KGS_PASS_OPTION_H

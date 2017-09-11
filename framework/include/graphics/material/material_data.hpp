@@ -69,95 +69,124 @@ namespace kgs
 
 		//type enum to value type
 		template <DataType type>
-		class ValueTypeOfType
+		class ValueTypeInfo
 		{
 			typedef void value_t;
+			typedef void base_t;
+			Bool32 isArray = KGS_FALSE;
 		};
 
 
 		template<>
-		class ValueTypeOfType<DataType::FLOAT>
+		class ValueTypeInfo<DataType::FLOAT>
 		{
 			typedef float value_t;
+			typedef float base_t;
+			Bool32 isArray = KGS_FALSE;
 		};
 
 		template<>
-		class ValueTypeOfType<DataType::FLOAT_ARRAY>
+		class ValueTypeInfo<DataType::FLOAT_ARRAY>
 		{
 			typedef std::vector<float> value_t;
+			typedef float base_t;
+			Bool32 isArray = KGS_TRUE;
 		};
 
 		template<>
-		class ValueTypeOfType<DataType::INT>
+		class ValueTypeInfo<DataType::INT>
 		{
-			typedef uint32_t value_t;
+			typedef int32_t value_t;
+			typedef int32_t base_t;
+			Bool32 isArray = KGS_FALSE;
 		};
 
 		template<>
-		class ValueTypeOfType<DataType::INT_ARRAY>
+		class ValueTypeInfo<DataType::INT_ARRAY>
 		{
-			typedef std::vector<uint32_t> value_t;
+			typedef std::vector<int32_t> value_t;
+			typedef int32_t base_t;
+			Bool32 isArray = KGS_TRUE;
 		};
 
 		template<>
-		class ValueTypeOfType<DataType::COLOR>
+		class ValueTypeInfo<DataType::COLOR>
 		{
 			typedef Color value_t;
+			typedef Color base_t;
+			Bool32 isArray = KGS_FALSE;
 		};
 
 		template<>
-		class ValueTypeOfType<DataType::COLOR_ARRAY>
+		class ValueTypeInfo<DataType::COLOR_ARRAY>
 		{
 			typedef std::vector<Color> value_t;
+			typedef Color base_t;
+			Bool32 isArray = KGS_TRUE;
 		};
 
 		template<>
-		class ValueTypeOfType<DataType::VECTOR>
+		class ValueTypeInfo<DataType::VECTOR>
 		{
 			typedef Vector4 value_t;
+			typedef Vector4 base_t;
+			Bool32 isArray = KGS_FALSE;
 		};
 
 		template<>
-		class ValueTypeOfType<DataType::VECTOR_ARRAY>
+		class ValueTypeInfo<DataType::VECTOR_ARRAY>
 		{
 			typedef std::vector<Vector4> value_t;
+			typedef Vector4 base_t;
+			Bool32 isArray = KGS_TRUE;
 		};
 
 		template<>
-		class ValueTypeOfType<DataType::MATRIX>
+		class ValueTypeInfo<DataType::MATRIX>
 		{
 			typedef Matrix4x4 value_t;
+			typedef Matrix4x4 base_t;
+			Bool32 isArray = KGS_FALSE;
 		};
 
 		template<>
-		class ValueTypeOfType<DataType::MATRIX_ARRAY>
+		class ValueTypeInfo<DataType::MATRIX_ARRAY>
 		{
 			typedef std::vector<Matrix4x4> value_t;
+			typedef Matrix4x4 base_t;
+			Bool32 isArray = KGS_TRUE;
 		};
 
 		template<>
-		class ValueTypeOfType<DataType::TEXTURE>
+		class ValueTypeInfo<DataType::TEXTURE>
 		{
-			typedef Texture value_t;
+			typedef std::shared_ptr<Texture> value_t;
+			typedef std::shared_ptr<Texture> base_t;
+			Bool32 isArray = KGS_FALSE;
 		};
 
 		template<>
-		class ValueTypeOfType<DataType::TEXTURE_OFFSET>
-		{
-			typedef Vector2 value_t;
-		};
-
-		template<>
-		class ValueTypeOfType<DataType::TEXTURE_SCALE>
+		class ValueTypeInfo<DataType::TEXTURE_OFFSET>
 		{
 			typedef Vector2 value_t;
+			typedef Vector2 base_t;
+			Bool32 isArray = KGS_FALSE;
 		};
 
+		template<>
+		class ValueTypeInfo<DataType::TEXTURE_SCALE>
+		{
+			typedef Vector2 value_t;
+			typedef Vector2 base_t;
+			Bool32 isArray = KGS_FALSE;
+		};
 
-		uint32_t getDataValueSize(std::string name, DataType type);
+		uint32_t static getDataBaseType(DataType dataType);
+		uint32_t getDataValueSize(std::string name, DataType dataType);
+		void memCopyDataValue(std::string name, DataType dataType, void* dst, uint32_t offset);
 
-		template <DataType type, typename T = ValueTypeOfType<type>::value_t>
-		T getDataValue(std::string name) {}
+		template <DataType type>
+		ValueTypeInfo<type>::value_t getDataValue(std::string name) {}
 
 		template<>
 		float getDataValue<DataType::FLOAT>(std::string name);
@@ -166,10 +195,10 @@ namespace kgs
 		std::vector<float> getDataValue<DataType::FLOAT_ARRAY>(std::string name);
 
 		template<>
-		int getDataValue<DataType::INT>(std::string name);
+		int32_t getDataValue<DataType::INT>(std::string name);
 
 		template<>
-		std::vector<int> getDataValue<DataType::INT_ARRAY>(std::string name);
+		std::vector<int32_t> getDataValue<DataType::INT_ARRAY>(std::string name);
 
 		template<>
 		Color getDataValue<DataType::COLOR>(std::string name);

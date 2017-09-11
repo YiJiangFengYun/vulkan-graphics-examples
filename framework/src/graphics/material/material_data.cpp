@@ -2,72 +2,175 @@
 
 namespace kgs
 {
+	uint32_t MaterialData::getDataBaseType(DataType dataType)
+	{
+		switch (dataType)
+		{
+		case MaterialData::DataType::FLOAT:
+		case MaterialData::DataType::FLOAT_ARRAY:
+		{
+			return sizeof(float);
+		}
+		case MaterialData::DataType::INT:
+		case MaterialData::DataType::INT_ARRAY:
+		{
+			return sizeof(int32_t);
+		}
+		case MaterialData::DataType::COLOR:
+		case MaterialData::DataType::COLOR_ARRAY:
+		{
+			return sizeof(Color);
+		}
+		case MaterialData::DataType::VECTOR:
+		case MaterialData::DataType::VECTOR_ARRAY:
+		{
+			return sizeof(Vector4);
+		}
+		case MaterialData::DataType::MATRIX:
+		case MaterialData::DataType::MATRIX_ARRAY:
+		{
+			return sizeof(Matrix4x4);
+		}
+		case MaterialData::DataType::TEXTURE_OFFSET:
+		case MaterialData::DataType::TEXTURE_SCALE:
+		{
+			return sizeof(Vector2);
+		}
+		default:
+			throw std::runtime_error("Invalid data type for getting its used memory size");
+		}
+	}
+
 	uint32_t MaterialData::getDataValueSize(std::string name, DataType dataType)
 	{
 		switch (dataType)
 		{
 		case MaterialData::DataType::FLOAT:
 		{
-			return sizeof(getValue(name, mapFloats, arrFloats, KGS_TRUE));
-			break;
+			return sizeof(float);
 		}
 		case MaterialData::DataType::FLOAT_ARRAY:
 		{
-			return sizeof(getValue(name, mapFloatArrays, arrFloatArrays, KGS_TRUE));
-			break;
+			auto arr = getValue(name, mapFloatArrays, arrFloatArrays, KGS_TRUE);
+			return sizeof(float) * arr.size();
 		}
 		case MaterialData::DataType::INT:
 		{
-			return sizeof(getValue(name, mapInts, arrInts, KGS_TRUE));
-			break;
+			return sizeof(int32_t);
 		}
 		case MaterialData::DataType::INT_ARRAY:
 		{
-			return sizeof(getValue(name, mapIntArrays, arrIntArrays, KGS_TRUE));
-			break;
+			auto arr = getValue(name, mapIntArrays, arrIntArrays, KGS_TRUE);
+			return sizeof(int32_t) * arr.size();
 		}
 		case MaterialData::DataType::COLOR:
 		{
-			return sizeof(getValue(name, mapColors, arrColors, KGS_TRUE));
-			break;
+			return sizeof(Color);
 		}
 		case MaterialData::DataType::COLOR_ARRAY:
 		{
-			return sizeof(getValue(name, mapColorArrays, arrColorArrays, KGS_TRUE));
-			break;
+			auto arr = getValue(name, mapColorArrays, arrColorArrays, KGS_TRUE);
+			return sizeof(Color) * arr.size();
 		}
 		case MaterialData::DataType::VECTOR:
 		{
-			return sizeof(getValue(name, mapVectors, arrVectors, KGS_TRUE));
-			break;
+			return sizeof(Vector4);
 		}
 		case MaterialData::DataType::VECTOR_ARRAY:
 		{
-			return sizeof(getValue(name, mapVectorArrays, arrVectorArrays, KGS_TRUE));
-			break;
+			auto arr = getValue(name, mapVectorArrays, arrVectorArrays, KGS_TRUE);
+			return sizeof(Vector4) * arr.size();
 		}
 		case MaterialData::DataType::MATRIX:
 		{
-			return sizeof(getValue(name, mapMatrixs, arrMatrixs, KGS_TRUE));
-			break;
+			return sizeof(Matrix4x4);
 		}
 		case MaterialData::DataType::MATRIX_ARRAY:
 		{
-			return sizeof(getValue(name, mapMatrixArrays, arrMatrixArrays, KGS_TRUE));
-			break;
+			auto arr = getValue(name, mapMatrixArrays, arrMatrixArrays, KGS_TRUE);
+			return sizeof(Matrix4x4) * arr.size();
 		}
 		case MaterialData::DataType::TEXTURE_OFFSET:
 		{
-			return sizeof(getValue(name, mapTextureOffsets, arrTextureOffsets, KGS_TRUE));
-			break;
+			return sizeof(Vector2);
 		}
 		case MaterialData::DataType::TEXTURE_SCALE:
 		{
-			return sizeof(getValue(name, mapTextureScales, arrTextureScales, KGS_TRUE));
-			break;
+			return sizeof(Vector2);
 		}
 		default:
 			throw std::runtime_error("Invalid data type for getting its used memory size");
+		}
+	}
+
+	void MaterialData::memCopyDataValue(std::string name, DataType dataType, void* dst, uint32_t offset)
+	{
+		char *ptr = static_cast<char *>(ptr);
+		ptr += offset;
+		switch (dataType)
+		{
+		case MaterialData::DataType::FLOAT:
+		{
+			auto value = getValue(name, mapFloats, arrFloats, KGS_TRUE);
+			std::memcpy(ptr, &value, sizeof(float));
+		}
+		case MaterialData::DataType::FLOAT_ARRAY:
+		{
+			auto arr = getValue(name, mapFloatArrays, arrFloatArrays, KGS_TRUE);
+			std::memcpy(ptr, arr.data(), sizeof(float) * arr.size());
+		}
+		case MaterialData::DataType::INT:
+		{
+			auto value = getValue(name, mapInts, arrInts, KGS_TRUE);
+			std::memcpy(ptr, &value, sizeof(int32_t));
+		}
+		case MaterialData::DataType::INT_ARRAY:
+		{
+			auto arr = getValue(name, mapIntArrays, arrIntArrays, KGS_TRUE);
+			std::memcpy(ptr, arr.data(), sizeof(int32_t) * arr.size());
+		}
+		case MaterialData::DataType::COLOR:
+		{
+			auto value = getValue(name, mapColors, arrColors, KGS_TRUE);
+			std::memcpy(ptr, &value, sizeof(Color));
+		}
+		case MaterialData::DataType::COLOR_ARRAY:
+		{
+			auto arr = getValue(name, mapColorArrays, arrColorArrays, KGS_TRUE);
+			std::memcpy(ptr, arr.data(), sizeof(Color) * arr.size());
+		}
+		case MaterialData::DataType::VECTOR:
+		{
+			auto value = getValue(name, mapVectors, arrVectors, KGS_TRUE);
+			std::memcpy(ptr, &value, sizeof(Vector4));
+		}
+		case MaterialData::DataType::VECTOR_ARRAY:
+		{
+			auto arr = getValue(name, mapVectorArrays, arrVectorArrays, KGS_TRUE);
+			std::memcpy(ptr, arr.data(), sizeof(Vector4) * arr.size());
+		}
+		case MaterialData::DataType::MATRIX:
+		{
+			auto value = getValue(name, mapMatrixs, arrMatrixs, KGS_TRUE);
+			std::memcpy(ptr, &value, sizeof(Matrix4x4));
+		}
+		case MaterialData::DataType::MATRIX_ARRAY:
+		{
+			auto arr = getValue(name, mapMatrixArrays, arrMatrixArrays, KGS_TRUE);
+			std::memcpy(ptr, arr.data(), sizeof(Matrix4x4) * arr.size());
+		}
+		case MaterialData::DataType::TEXTURE_OFFSET:
+		{
+			auto value = getValue(name, mapTextureOffsets, arrTextureOffsets, KGS_TRUE);
+			std::memcpy(ptr, &value, sizeof(Vector2));
+		}
+		case MaterialData::DataType::TEXTURE_SCALE:
+		{
+			auto value = getValue(name, mapTextureScales, arrTextureScales, KGS_TRUE);
+			std::memcpy(ptr, &value, sizeof(Vector2));
+		}
+		default:
+			throw std::runtime_error("Invalid data type for copying its data to memory.");
 		}
 	}
 
@@ -84,13 +187,13 @@ namespace kgs
 	}
 
 	template<>
-	int MaterialData::getDataValue<MaterialData::DataType::INT>(std::string name)
+	int32_t MaterialData::getDataValue<MaterialData::DataType::INT>(std::string name)
 	{
 		return getValue(name, mapInts, arrInts);
 	}
 
 	template<>
-	std::vector<int> MaterialData::getDataValue<MaterialData::DataType::INT_ARRAY>(std::string name)
+	std::vector<int32_t> MaterialData::getDataValue<MaterialData::DataType::INT_ARRAY>(std::string name)
 	{
 		return getValue(name, mapIntArrays, arrIntArrays);
 	}

@@ -82,6 +82,26 @@ namespace kgs
 		return m_vkImageLayout;
 	}
 
+	std::shared_ptr<vk::Image> Texture::_getPImage()
+	{
+		return m_pImage;
+	}
+
+	std::shared_ptr<vk::DeviceMemory> Texture::_getPImageMemory()
+	{
+		return m_pMemory;
+	}
+
+	std::shared_ptr<vk::ImageView> Texture::_getPImageView()
+	{
+		return m_pImageView;
+	}
+
+	std::shared_ptr<vk::Sampler> Texture::_getPSampler()
+	{
+		return m_pSampler;
+	}
+
 	void Texture::_updateMipMapLevels()
 	{
 		if (m_mipMap)

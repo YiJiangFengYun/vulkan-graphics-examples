@@ -67,7 +67,7 @@ namespace kgs
 		return m_format;
 	}
 
-	Bool32 Texture::isMipmap()
+	Bool32 Texture::getIsMipmap()
 	{
 		return m_mipMap;
 	}
@@ -75,6 +75,11 @@ namespace kgs
 	uint32_t Texture::getMipmapLevel()
 	{
 		return m_mipMapLevels;
+	}
+
+	vk::ImageLayout Texture::_getImageLayout()
+	{
+		return m_vkImageLayout;
 	}
 
 	void Texture::_updateMipMapLevels()
@@ -580,6 +585,8 @@ namespace kgs
 			0, m_mipMapLevels, 0, m_arrayLayer);
 
 		_endSingleTimeCommands(pCommandBuffer);
+
+		m_vkImageLayout = vk::ImageLayout::eShaderReadOnlyOptimal;
 	}
 
 	void Texture::_applyDirect()
@@ -623,6 +630,8 @@ namespace kgs
 
 			_endSingleTimeCommands(pCommandBuffer);
 		}
+
+		m_vkImageLayout = vk::ImageLayout::eShaderReadOnlyOptimal;
 	}
 
 	void Texture::_resizeColorsData(uint32_t mipLevel)

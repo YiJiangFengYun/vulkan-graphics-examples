@@ -24,8 +24,10 @@ namespace kgs
 
 		TextureType getType();
 		TextureFormat getFormat();
-		Bool32 isMipmap();
+		Bool32 getIsMipmap();
 		uint32_t getMipmapLevel();
+
+		vk::ImageLayout _getImageLayout();
 	protected:
 		//--compositions
 		uint32_t m_width;

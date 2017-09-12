@@ -18,10 +18,6 @@
 #include <plog/Log.h>
 #include "graphics/context.hpp"
 
-#define MainColorName "_Color"
-#define MainTextureName "_MainTex";
-
-
 namespace kgs
 {
 	typedef uint32_t Bool32;

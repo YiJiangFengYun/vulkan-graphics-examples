@@ -2,7 +2,7 @@
 
 namespace kgs
 {
-	Material::Material():
+	Material::Material() :
 		m_pData(new MaterialData())
 	{
 	}
@@ -169,6 +169,46 @@ namespace kgs
 	void Material::setTextureScale(std::string name, Vector2 value)
 	{
 		setValue(name, value, m_pData->mapTextureScales, m_pData->arrTextureScales);
+	}
+
+	std::shared_ptr<Texture> Material::getMainTexture()
+	{
+		return getTexture(MainTextureName);
+	}
+
+	void Material::setMainTexture(std::shared_ptr<Texture> value)
+	{
+		setTexture(MainTextureName, value);
+	}
+
+	Vector2 Material::getMainTextureOffset()
+	{
+		return getTextureOffset(MainTextureName);
+	}
+
+	void Material::setMainTextureOffset(Vector2 value)
+	{
+		setTextureOffset(MainTextureName, value);
+	}
+
+	Vector2 Material::getMainTextureScale()
+	{
+		return getTextureScale(MainTextureName);
+	}
+
+	void Material::setMainTextureScale(Vector2 value)
+	{
+		setTextureScale(MainTextureName, value);
+	}
+
+	Color Material::getMainColor()
+	{
+		return getColor(MainColorName);
+	}
+	
+	void Material::setMainColor(Color value)
+	{
+		setColor(MainColorName, value);
 	}
 
 	void Material::apply()

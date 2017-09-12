@@ -10,6 +10,9 @@
 #include "graphics/texture/texture.hpp"
 #include "graphics/material/material_data.hpp"
 
+#define MainColorName "_Color"
+#define MainTextureName "_MainTex"
+
 namespace kgs
 {
 	class Material
@@ -23,11 +26,6 @@ namespace kgs
 		std::shared_ptr<Pass> getPass(std::string name);
 		void setPass(std::string name, std::shared_ptr<Pass> pass);
 
-		Color getColor(std::string name);
-		void setColor(std::string name, Color value);
-		std::vector<Color> getColorArray(std::string name);
-		void setColorArray(std::string name, std::vector<Color> values);
-		
 		float getFloat(std::string name);
 		void setFloat(std::string name, float value);
 		std::vector<float> getFloatArray(std::string name);
@@ -37,6 +35,11 @@ namespace kgs
 		void setInt(std::string name, int32_t value);
 		std::vector<int32_t> getIntArray(std::string name);
 		void setIntArray(std::string name, std::vector<int32_t> values);
+
+		Color getColor(std::string name);
+		void setColor(std::string name, Color value);
+		std::vector<Color> getColorArray(std::string name);
+		void setColorArray(std::string name, std::vector<Color> values);
 
 		Vector4 getVector(std::string name);
 		void setVector(std::string name, Vector4 value);
@@ -54,6 +57,16 @@ namespace kgs
 		void setTextureOffset(std::string name, Vector2 value);
 		Vector2 getTextureScale(std::string name);
 		void setTextureScale(std::string name, Vector2 value);
+
+		std::shared_ptr<Texture> getMainTexture();
+		void setMainTexture(std::shared_ptr<Texture> value);
+		Vector2 getMainTextureOffset();
+		void setMainTextureOffset(Vector2 value);
+		Vector2 getMainTextureScale();
+		void setMainTextureScale(Vector2 value);
+
+		Color getMainColor();
+		void setMainColor(Color value);
 
 		void apply();
 

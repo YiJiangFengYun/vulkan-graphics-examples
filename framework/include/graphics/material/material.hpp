@@ -55,12 +55,11 @@ namespace kgs
 		Vector2 getTextureScale(std::string name);
 		void setTextureScale(std::string name, Vector2 value);
 
+		void apply();
+
 	private:
 		//--compositions
 		uint32_t m_renderQueue;
-		Color m_mainColor;
-		Vector2 m_mainTextureOffset;
-		Vector2 m_mainTextureScale;
 		std::shared_ptr<MaterialData> m_pData;
 		//--compositions
 

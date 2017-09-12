@@ -170,4 +170,12 @@ namespace kgs
 	{
 		setValue(name, value, m_pData->mapTextureScales, m_pData->arrTextureScales);
 	}
+
+	void Material::apply()
+	{
+		for (const auto& item : m_arrPasses)
+		{
+			item->apply();
+		}
+	}
 }

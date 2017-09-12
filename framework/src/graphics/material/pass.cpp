@@ -32,6 +32,12 @@ namespace kgs
 		_updateDescriptorBufferInfo();
 	}
 
+	void Pass::apply()
+	{
+		_updateDescriptorImageInfo();
+		_applyBufferContent();
+	}
+
 	void Pass::_createDescriptorSetLayout()
 	{
 		std::vector<vk::DescriptorSetLayoutBinding> bindings(m_binds.size());
@@ -115,7 +121,6 @@ namespace kgs
 
 	void Pass::_updateDescriptorBufferInfo()
 	{
-
 		//get total number of unimform buffer variables.
 		int32_t count;
 		for (const auto& item : m_binds)
@@ -152,18 +157,51 @@ namespace kgs
 			}
 		}
 
-		/*VkDescriptorImageInfo imageInfo = {};
-		imageInfo.imageLayout = VK_IMAGE_LAYOUT_SHADER_READ_ONLY_OPTIMAL;
-		imageInfo.imageView = textureImageView;
-		imageInfo.sampler = textureSampler;*/
+		auto pDevice = m_pContext->getPNativeDevice();
+		pDevice->updateDescriptorSets(writes, nullptr);
+	}
 
-		/*descriptorSetWrites[1].sType = VK_STRUCTURE_TYPE_WRITE_DESCRIPTOR_SET;
-		descriptorSetWrites[1].dstSet = descriptorSet;
-		descriptorSetWrites[1].dstBinding = 1;
-		descriptorSetWrites[1].dstArrayElement = 0;
-		descriptorSetWrites[1].descriptorType = VK_DESCRIPTOR_TYPE_COMBINED_IMAGE_SAMPLER;
-		descriptorSetWrites[1].descriptorCount = 1;
-		descriptorSetWrites[1].pImageInfo = &imageInfo;*/
+	void Pass::_updateDescriptorImageInfo()
+	{
+		//get total number of unimform buffer variables.
+		int32_t count;
+		for (const auto& item : m_binds)
+		{
+			if (item.descriptorType == DescriptorType::COMBINED_IMAGE_SAMPLER)
+				++count;
+		}
+
+		std::vector<vk::WriteDescriptorSet> writes(count);
+
+		uint32_t index;
+		for (const auto& item : m_binds)
+		{
+			if (item.descriptorType == DescriptorType::COMBINED_IMAGE_SAMPLER)
+			{
+#ifdef DEBUG
+				if (item.dataType != MaterialData::DataType::TEXTURE)
+					throw std::runtime_error("The data type of binding should be is TEXTURE when its type is COMBINED_IMAGE_SAMPLER");
+				if (item.descriptorCount != 1)
+					throw std::runtime_error("The descriptor count of binding shoubld be 1 when its type is COMBINED_IMAGE_SAMPLER");
+#endif // DEBUG
+				std::shared_ptr<Texture> pTexture = m_pMaterialData->getDataValue<MaterialData::DataType::TEXTURE>(item.name);
+				vk::DescriptorImageInfo imageInfo;
+				if (pTexture != nullptr)
+				{
+					imageInfo.sampler = *pTexture->_getPSampler();
+					imageInfo.imageView = *pTexture->_getPImageView();
+					imageInfo.imageLayout = pTexture->_getImageLayout();
+				}
+
+				writes[index].dstSet = *m_pDescriptorSet;
+				writes[index].dstBinding = item.binding;
+				writes[index].descriptorType = tranDescriptorTypeToVK(item.descriptorType);
+				writes[index].dstArrayElement = 0;
+				writes[index].descriptorCount = item.descriptorCount;
+				writes[index].pImageInfo = &imageInfo;
+				++index;
+			}
+		}
 
 		auto pDevice = m_pContext->getPNativeDevice();
 		pDevice->updateDescriptorSets(writes, nullptr);
@@ -185,16 +223,18 @@ namespace kgs
 		std::vector<uint32_t> offsets(uniformBufferCount);
 		std::vector<std::string> names(uniformBufferCount);
 		std::vector<MaterialData::DataType> types(uniformBufferCount);
+		std::vector<uint32_t> descriptorCounts(uniformBufferCount);
 		uint32_t index;
 		uint32_t size;
 		for (const auto& item : m_binds)
 		{
 			if (item.descriptorType == DescriptorType::UNIFORM_BUFFER)
 			{
+				offsets[index] = offset;
 				types[index] = item.dataType;
 				names[index] = item.name;
-				size = m_pMaterialData->getDataValueSize(item.name, item.dataType);
-				offsets[index] = offset;
+				descriptorCounts[index] = item.descriptorCount;
+				size = sizeof(MaterialData::getDataBaseType(item.dataType)) * item.descriptorCount;
 				totalSize += size;
 				offset += size;
 				++index;
@@ -206,7 +246,7 @@ namespace kgs
 		pDevice->mapMemory(*m_pUniformBufferMemory, 0, static_cast<vk::DeviceSize>(totalSize), vk::MemoryMapFlags(), &data);
 		for (int32_t i = 0; i < uniformBufferCount; ++i)
 		{
-			m_pMaterialData->memCopyDataValue(names[i], types[i], data, offsets[i]);
+			m_pMaterialData->memCopyDataValue(names[i], types[i], data, offsets[i], descriptorCounts[i]);
 		}
 		pDevice->unmapMemory(*m_pUniformBufferMemory);
 	}

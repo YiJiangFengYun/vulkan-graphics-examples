@@ -1,6 +1,7 @@
 #ifndef KGS_MATERIAL_DATA_H
 #define KGS_MATERIAL_DATA_H
 
+#include <algorithm>
 #include <vector>
 #include <unordered_map>
 #include "graphics/global.hpp"
@@ -181,10 +182,6 @@ namespace kgs
 			Bool32 isArray = KGS_FALSE;
 		};
 
-		uint32_t static getDataBaseType(DataType dataType);
-		uint32_t getDataValueSize(std::string name, DataType dataType);
-		void memCopyDataValue(std::string name, DataType dataType, void* dst, uint32_t offset);
-
 		template <DataType type>
 		ValueTypeInfo<type>::value_t getDataValue(std::string name) {}
 
@@ -226,6 +223,12 @@ namespace kgs
 
 		template<>
 		Vector2 getDataValue<DataType::TEXTURE_SCALE>(std::string name);
+
+		uint32_t static getDataBaseType(DataType dataType);
+
+		uint32_t getDataValueSize(std::string name, DataType dataType);
+
+		void memCopyDataValue(std::string name, DataType dataType, void* dst, uint32_t offset, uint32_t maxElementCount);
 	};
 } //namespace kgs
 

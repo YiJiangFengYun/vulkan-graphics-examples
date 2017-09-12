@@ -103,7 +103,7 @@ namespace kgs
 		}
 	}
 
-	void MaterialData::memCopyDataValue(std::string name, DataType dataType, void* dst, uint32_t offset)
+	void MaterialData::memCopyDataValue(std::string name, DataType dataType, void* dst, uint32_t offset, uint32_t maxElementCount)
 	{
 		char *ptr = static_cast<char *>(ptr);
 		ptr += offset;
@@ -117,7 +117,7 @@ namespace kgs
 		case MaterialData::DataType::FLOAT_ARRAY:
 		{
 			auto arr = getValue(name, mapFloatArrays, arrFloatArrays, KGS_TRUE);
-			std::memcpy(ptr, arr.data(), sizeof(float) * arr.size());
+			std::memcpy(ptr, arr.data(), sizeof(float) * std::min(static_cast<uint32_t>(arr.size()), maxElementCount));
 		}
 		case MaterialData::DataType::INT:
 		{
@@ -127,7 +127,7 @@ namespace kgs
 		case MaterialData::DataType::INT_ARRAY:
 		{
 			auto arr = getValue(name, mapIntArrays, arrIntArrays, KGS_TRUE);
-			std::memcpy(ptr, arr.data(), sizeof(int32_t) * arr.size());
+			std::memcpy(ptr, arr.data(), sizeof(int32_t) * std::min(static_cast<uint32_t>(arr.size()), maxElementCount));
 		}
 		case MaterialData::DataType::COLOR:
 		{
@@ -137,7 +137,7 @@ namespace kgs
 		case MaterialData::DataType::COLOR_ARRAY:
 		{
 			auto arr = getValue(name, mapColorArrays, arrColorArrays, KGS_TRUE);
-			std::memcpy(ptr, arr.data(), sizeof(Color) * arr.size());
+			std::memcpy(ptr, arr.data(), sizeof(Color) * std::min(static_cast<uint32_t>(arr.size()), maxElementCount));
 		}
 		case MaterialData::DataType::VECTOR:
 		{
@@ -147,7 +147,7 @@ namespace kgs
 		case MaterialData::DataType::VECTOR_ARRAY:
 		{
 			auto arr = getValue(name, mapVectorArrays, arrVectorArrays, KGS_TRUE);
-			std::memcpy(ptr, arr.data(), sizeof(Vector4) * arr.size());
+			std::memcpy(ptr, arr.data(), sizeof(Vector4) * std::min(static_cast<uint32_t>(arr.size()), maxElementCount));
 		}
 		case MaterialData::DataType::MATRIX:
 		{
@@ -157,7 +157,7 @@ namespace kgs
 		case MaterialData::DataType::MATRIX_ARRAY:
 		{
 			auto arr = getValue(name, mapMatrixArrays, arrMatrixArrays, KGS_TRUE);
-			std::memcpy(ptr, arr.data(), sizeof(Matrix4x4) * arr.size());
+			std::memcpy(ptr, arr.data(), sizeof(Matrix4x4) * std::min(static_cast<uint32_t>(arr.size()), maxElementCount));
 		}
 		case MaterialData::DataType::TEXTURE_OFFSET:
 		{

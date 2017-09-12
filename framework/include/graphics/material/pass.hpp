@@ -28,6 +28,7 @@ namespace kgs
 		Pass();
 		Pass(std::shared_ptr<MaterialData> pMaterialData);
 		~Pass();
+		void apply();
 
 		void _setMaterialData(std::shared_ptr<MaterialData> pMaterialData);
 	protected:

@@ -26,6 +26,7 @@
     <ClCompile Include="..\..\framework\src\graphics\material\pass.cpp" />
     <ClCompile Include="..\..\framework\src\graphics\material\pass_option.cpp" />
     <ClCompile Include="..\..\framework\src\graphics\material\shader.cpp" />
+    <ClCompile Include="..\..\framework\src\graphics\mesh\mesh.cpp" />
     <ClCompile Include="..\..\framework\src\graphics\texture\texture.cpp" />
     <ClCompile Include="..\..\framework\src\graphics\texture\texture_1d.cpp" />
     <ClCompile Include="..\..\framework\src\graphics\texture\texture_1d_array.cpp" />
@@ -46,6 +47,7 @@
     <ClInclude Include="..\..\framework\include\graphics\material\pass.hpp" />
     <ClInclude Include="..\..\framework\include\graphics\material\pass_option.hpp" />
     <ClInclude Include="..\..\framework\include\graphics\material\shader.hpp" />
+    <ClInclude Include="..\..\framework\include\graphics\mesh\mesh.hpp" />
     <ClInclude Include="..\..\framework\include\graphics\texture\texture.hpp" />
     <ClInclude Include="..\..\framework\include\graphics\texture\texture_1d.hpp" />
     <ClInclude Include="..\..\framework\include\graphics\texture\texture_1d_array.hpp" />

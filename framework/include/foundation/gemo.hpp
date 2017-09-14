@@ -13,8 +13,8 @@ namespace fd
 	{
 	public:
 		typedef VecType value_type;
-		typedef value_type::length_type length_type;
-		typedef value_type::value_type vec_value_type;
+		typedef typename value_type::length_type length_type;
+		typedef typename value_type::value_type vec_value_type;
 
 		Ray()
 		{
@@ -31,7 +31,7 @@ namespace fd
 #endif // DEBUG
 		}
 
-		Ray(const Ray<VecType>& target) :
+		Ray(const Ray<value_type>& target) :
 			m_origin(target.m_origin),
 			m_direction(target.m_direction),
 			m_isUpdateCache(target.m_isUpdateCache),
@@ -40,7 +40,7 @@ namespace fd
 		{
 		}
 
-		Ray& operator =(const Ray<VecType>& target)
+		Ray& operator =(const Ray<value_type>& target)
 		{
 			m_origin = target.m_origin;
 			m_direction = target.m_direction;
@@ -104,7 +104,7 @@ namespace fd
 		value_type m_invDir;
 		value_type m_signs;
 
-		inline _updateCache()
+		inline void _updateCache()
 		{
 			if (m_isUpdateCache)
 			{
@@ -121,31 +121,31 @@ namespace fd
 	};
 
 	template <typename VecType = glm::vec3>
-	class Bound
+	class Bounds
 	{
 	public:
 		typedef VecType value_type;
-		typedef value_type::length_type length_type;
-		typedef value_type::value_type vec_value_type;
-		Bound()
+		typedef typename value_type::length_type length_type;
+		typedef typename value_type::value_type vec_value_type;
+		Bounds()
 		{
 			_updateSize();
 		}
 
-		Bound(value_type min, value_type max):
+		Bounds(value_type min, value_type max):
 			m_min(min), m_max(max)
 		{
 			_updateSize();
 		}
 
-		Bound(const Bound<VecType>& target):
+		Bounds(const Bounds<value_type>& target):
 			m_min(target.m_min),
 			m_max(target.m_max),
 			m_size(target.m_size)
 		{
 		}
 
-		Bound& operator =(const Bound<VecType>& target)
+		Bounds& operator =(const Bounds<value_type>& target)
 		{
 			m_min = target.m_min;
 			m_max = target.m_max;
@@ -220,7 +220,7 @@ namespace fd
 		}
 
 		/*Expand the bounds by increasing its size by amount along each side.*/
-		void expand(value_type::value_type amount)
+		void expand(vec_value_type amount)
 		{
 			vec_value_type halt = amount / 2;
 			length_type length = value_type::length();
@@ -235,17 +235,17 @@ namespace fd
 		/*Does ray intersect this bounding box?
           if true, return the distance to the ray's origin will be returned,
           or else return number -1.*/
-		vec_value_type intersectRay(Ray<VecType> ray)
+		vec_value_type intersectRay(Ray<value_type> ray)
 		{
 			////reference:
 			//// http://www.scratchapixel.com/lessons/3d-basic-rendering/minimal-ray-tracer-rendering-simple-shapes/ray-box-intersection
 			vec_value_type tMin, tMax, tYMin, tYMax, tZMin, tZMax;
-			VecType origin = ray.getOrigin();
-			VecType dir = ray.getDirection();
-			VecType invDir = ray.getInvDir();
-			VecType signs = ray.getSigns();
+			value_type origin = ray.getOrigin();
+			value_type dir = ray.getDirection();
+			value_type invDir = ray.getInvDir();
+			value_type signs = ray.getSigns();
 			vec_value_type Epsilon = std::numeric_limits<vec_value_type>::epsilon();
-			VecType minMax[2] = { m_min, m_max };
+			value_type minMax[2] = { m_min, m_max };
 			if (Math.abs(dir[0]) > Epsilon)
 			{
 				tMin = (minMax[1 - signs[0]][0] - origin[0]) * invDir[0];
@@ -324,9 +324,9 @@ namespace fd
 		}
 
 		/*Does another bounding box intersect with this bounding box?*/
-		Bool32 isIntersects(Bound<VecType> bounds)
+		Bool32 isIntersects(Bounds<value_type> bounds)
 		{
-			vec_value_type length = VecType::length();
+			vec_value_type length = value_type::length();
 			for (vec_value_type i = 0; i < length; ++i)
 			{
 				if (m_min[i] > bounds.m_max[i] || m_max[i] < bounds.m_min[i])
@@ -336,14 +336,14 @@ namespace fd
 		}
 
 		/*The smallest squared distance between the point and this bounding box.*/
-		vec_value_type getSqrDistance(VecType point)
+		vec_value_type getSqrDistance(value_type point)
 		{
-			VecType closestPoint = getClosestPoint(point);
+			value_type closestPoint = getClosestPoint(point);
 			closestPoint -= point;
 			return glm::dot(closestPoint, closestPoint);
 		}
 
-		~Bound()
+		~Bounds()
 		{
 
 		}

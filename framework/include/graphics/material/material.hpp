@@ -2,8 +2,6 @@
 #define KGS_MATERIAL_H
 
 #include <memory>
-#include <vector>
-#include <unordered_map>
 #include "graphics/global.hpp"
 #include "graphics/util/util.hpp"
 #include "graphics/material/pass.hpp"

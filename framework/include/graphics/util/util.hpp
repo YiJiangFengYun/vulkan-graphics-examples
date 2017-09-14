@@ -1,9 +1,15 @@
 #ifndef KGS_UTIL_H
 #define KGS_UTIL_H
+
+#include <string>
+#include <unordered_map>
+#include <vector>
+#include "graphics/global.hpp"
+
 namespace kgs
 {
 	template <typename T>
-	inline T getValue(std::string key, std::unordered_map<std::string, T>& map, std::vector<T>& arr, Bool32 isThrowNotExist = KGS_FALSE)
+	inline T getValue(std::string name, std::unordered_map<std::string, T>& map, std::vector<T>& arr, Bool32 isThrowNotExist = KGS_FALSE)
 	{
 		auto iterator = map.find(name);
 		if (iterator == map.end())
@@ -21,7 +27,7 @@ namespace kgs
 	}
 
 	template <typename T>
-	inline void setValue(std::string key, T value, std::unordered_map<std::string, T>& map, std::vector<T>& arr)
+	inline void setValue(std::string name, T value, std::unordered_map<std::string, T>& map, std::vector<T>& arr)
 	{
 		auto iterator = map.find(name);
 		if (iterator == map.end())

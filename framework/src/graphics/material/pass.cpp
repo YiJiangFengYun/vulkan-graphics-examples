@@ -70,8 +70,8 @@ namespace kgs
 	void Pass::_createUniformBuffer()
 	{
 		//get total size of uniform buffer datas and their offsets and sizes for each one.
-		uint32_t totalSize;
-		uint32_t size;
+		uint32_t totalSize = 0u;
+		uint32_t size = 0u;
 		for (const auto& item : m_binds)
 		{
 			if (item.descriptorType == DescriptorType::UNIFORM_BUFFER)
@@ -105,7 +105,7 @@ namespace kgs
 				++index;
 			}
 
-			vk::DescriptorPoolCreateInfo createInfo = { vk::DescriptorPoolCreateFlags(), 1u, poolSizeInfos.size(), poolSizeInfos.data() };
+			vk::DescriptorPoolCreateInfo createInfo = { vk::DescriptorPoolCreateFlags(), 1u, static_cast<uint32_t>(poolSizeInfos.size()), poolSizeInfos.data() };
 			m_pDescriptorPool = fd::createDescriptorPool(pDevice, createInfo);
 		}
 
@@ -122,7 +122,7 @@ namespace kgs
 	void Pass::_updateDescriptorBufferInfo()
 	{
 		//get total number of unimform buffer variables.
-		int32_t count;
+		int32_t count = 0u;
 		for (const auto& item : m_binds)
 		{
 			if (item.descriptorType == DescriptorType::UNIFORM_BUFFER)
@@ -131,9 +131,9 @@ namespace kgs
 
 		std::vector<vk::WriteDescriptorSet> writes(count);
 
-		uint32_t offset;
-		uint32_t index;
-		uint32_t size;
+		uint32_t offset = 0u;
+		uint32_t index = 0u;
+		uint32_t size = 0u;
 		for (const auto& item : m_binds)
 		{
 			if (item.descriptorType == DescriptorType::UNIFORM_BUFFER)
@@ -164,7 +164,7 @@ namespace kgs
 	void Pass::_updateDescriptorImageInfo()
 	{
 		//get total number of unimform buffer variables.
-		int32_t count;
+		int32_t count = 0u;
 		for (const auto& item : m_binds)
 		{
 			if (item.descriptorType == DescriptorType::COMBINED_IMAGE_SAMPLER)
@@ -173,7 +173,7 @@ namespace kgs
 
 		std::vector<vk::WriteDescriptorSet> writes(count);
 
-		uint32_t index;
+		uint32_t index = 0u;
 		for (const auto& item : m_binds)
 		{
 			if (item.descriptorType == DescriptorType::COMBINED_IMAGE_SAMPLER)
@@ -196,7 +196,7 @@ namespace kgs
 				writes[index].dstSet = *m_pDescriptorSet;
 				writes[index].dstBinding = item.binding;
 				writes[index].descriptorType = tranDescriptorTypeToVK(item.descriptorType);
-				writes[index].dstArrayElement = 0;
+				writes[index].dstArrayElement = 0u;
 				writes[index].descriptorCount = item.descriptorCount;
 				writes[index].pImageInfo = &imageInfo;
 				++index;
@@ -210,7 +210,7 @@ namespace kgs
 	void Pass::_applyBufferContent()
 	{
 		//get total number of unimform buffer variables.
-		int32_t uniformBufferCount;
+		int32_t uniformBufferCount = 0u;
 		for (const auto& item : m_binds)
 		{
 			if (item.descriptorType == DescriptorType::UNIFORM_BUFFER)
@@ -218,14 +218,14 @@ namespace kgs
 		}
 
 		//get total size of uniform buffer datas and their offsets and sizes for each one.
-		uint32_t totalSize;
-		uint32_t offset;
+		uint32_t totalSize = 0u;
+		uint32_t offset = 0u;
 		std::vector<uint32_t> offsets(uniformBufferCount);
 		std::vector<std::string> names(uniformBufferCount);
 		std::vector<MaterialData::DataType> types(uniformBufferCount);
 		std::vector<uint32_t> descriptorCounts(uniformBufferCount);
-		uint32_t index;
-		uint32_t size;
+		uint32_t index = 0u;
+		uint32_t size = 0u;
 		for (const auto& item : m_binds)
 		{
 			if (item.descriptorType == DescriptorType::UNIFORM_BUFFER)

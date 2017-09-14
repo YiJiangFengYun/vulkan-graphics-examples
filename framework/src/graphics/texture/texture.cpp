@@ -176,7 +176,7 @@ namespace kgs
 	void Texture::_updateVkFilter()
 	{
 		vk::Filter vkFiler;
-		vk::SamplerMipmapMode vkSamplerMipmapMode;
+		//vk::SamplerMipmapMode vkSamplerMipmapMode;
 		for (const auto& item : arrFilerModeToVK)
 		{
 			if (std::get<0>(item) == m_filterMode)
@@ -623,7 +623,7 @@ namespace kgs
 		{
 			auto pCommandBuffer = _beginSingleTimeCommands();
 			//create staging buffer.
-			uint32_t imageSize = m_arrTempColors[i].size() * sizeof(Color32);
+			uint32_t imageSize = static_cast<uint32_t>(m_arrTempColors[i].size() * sizeof(Color32));
 			std::shared_ptr<vk::Buffer> pStagingBuffer;
 			std::shared_ptr<vk::DeviceMemory> pStagingBufferMemory;
 			_createBuffer(imageSize, vk::BufferUsageFlagBits::eTransferSrc,

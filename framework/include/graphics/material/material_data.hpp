@@ -70,7 +70,7 @@ namespace kgs
 
 		//type enum to value type
 		template <DataType type>
-		class ValueTypeInfo
+		struct ValueTypeInfo
 		{
 			typedef void value_t;
 			typedef void base_t;
@@ -79,7 +79,7 @@ namespace kgs
 
 
 		template<>
-		class ValueTypeInfo<DataType::FLOAT>
+		struct ValueTypeInfo<DataType::FLOAT>
 		{
 			typedef float value_t;
 			typedef float base_t;
@@ -87,7 +87,7 @@ namespace kgs
 		};
 
 		template<>
-		class ValueTypeInfo<DataType::FLOAT_ARRAY>
+		struct ValueTypeInfo<DataType::FLOAT_ARRAY>
 		{
 			typedef std::vector<float> value_t;
 			typedef float base_t;
@@ -95,7 +95,7 @@ namespace kgs
 		};
 
 		template<>
-		class ValueTypeInfo<DataType::INT>
+		struct ValueTypeInfo<DataType::INT>
 		{
 			typedef int32_t value_t;
 			typedef int32_t base_t;
@@ -103,7 +103,7 @@ namespace kgs
 		};
 
 		template<>
-		class ValueTypeInfo<DataType::INT_ARRAY>
+		struct ValueTypeInfo<DataType::INT_ARRAY>
 		{
 			typedef std::vector<int32_t> value_t;
 			typedef int32_t base_t;
@@ -111,7 +111,7 @@ namespace kgs
 		};
 
 		template<>
-		class ValueTypeInfo<DataType::COLOR>
+		struct ValueTypeInfo<DataType::COLOR>
 		{
 			typedef Color value_t;
 			typedef Color base_t;
@@ -119,7 +119,7 @@ namespace kgs
 		};
 
 		template<>
-		class ValueTypeInfo<DataType::COLOR_ARRAY>
+		struct ValueTypeInfo<DataType::COLOR_ARRAY>
 		{
 			typedef std::vector<Color> value_t;
 			typedef Color base_t;
@@ -127,7 +127,7 @@ namespace kgs
 		};
 
 		template<>
-		class ValueTypeInfo<DataType::VECTOR>
+		struct ValueTypeInfo<DataType::VECTOR>
 		{
 			typedef Vector4 value_t;
 			typedef Vector4 base_t;
@@ -135,7 +135,7 @@ namespace kgs
 		};
 
 		template<>
-		class ValueTypeInfo<DataType::VECTOR_ARRAY>
+		struct ValueTypeInfo<DataType::VECTOR_ARRAY>
 		{
 			typedef std::vector<Vector4> value_t;
 			typedef Vector4 base_t;
@@ -143,7 +143,7 @@ namespace kgs
 		};
 
 		template<>
-		class ValueTypeInfo<DataType::MATRIX>
+		struct ValueTypeInfo<DataType::MATRIX>
 		{
 			typedef Matrix4x4 value_t;
 			typedef Matrix4x4 base_t;
@@ -151,7 +151,7 @@ namespace kgs
 		};
 
 		template<>
-		class ValueTypeInfo<DataType::MATRIX_ARRAY>
+		struct ValueTypeInfo<DataType::MATRIX_ARRAY>
 		{
 			typedef std::vector<Matrix4x4> value_t;
 			typedef Matrix4x4 base_t;
@@ -159,7 +159,7 @@ namespace kgs
 		};
 
 		template<>
-		class ValueTypeInfo<DataType::TEXTURE>
+		struct ValueTypeInfo<DataType::TEXTURE>
 		{
 			typedef std::shared_ptr<Texture> value_t;
 			typedef std::shared_ptr<Texture> base_t;
@@ -167,7 +167,7 @@ namespace kgs
 		};
 
 		template<>
-		class ValueTypeInfo<DataType::TEXTURE_OFFSET>
+		struct ValueTypeInfo<DataType::TEXTURE_OFFSET>
 		{
 			typedef Vector2 value_t;
 			typedef Vector2 base_t;
@@ -175,7 +175,7 @@ namespace kgs
 		};
 
 		template<>
-		class ValueTypeInfo<DataType::TEXTURE_SCALE>
+		struct ValueTypeInfo<DataType::TEXTURE_SCALE>
 		{
 			typedef Vector2 value_t;
 			typedef Vector2 base_t;
@@ -183,46 +183,10 @@ namespace kgs
 		};
 
 		template <DataType type>
-		ValueTypeInfo<type>::value_t getDataValue(std::string name) {}
-
-		template<>
-		float getDataValue<DataType::FLOAT>(std::string name);
-
-		template<>
-		std::vector<float> getDataValue<DataType::FLOAT_ARRAY>(std::string name);
-
-		template<>
-		int32_t getDataValue<DataType::INT>(std::string name);
-
-		template<>
-		std::vector<int32_t> getDataValue<DataType::INT_ARRAY>(std::string name);
-
-		template<>
-		Color getDataValue<DataType::COLOR>(std::string name);
-
-		template<>
-		std::vector<Color> getDataValue<DataType::COLOR_ARRAY>(std::string name);
-
-		template<>
-		Vector4 getDataValue<DataType::VECTOR>(std::string name);
-
-		template<>
-		std::vector<Vector4> getDataValue<DataType::VECTOR_ARRAY>(std::string name);
-
-		template<>
-		Matrix4x4 getDataValue<DataType::MATRIX>(std::string name);
-
-		template<>
-		std::vector<Matrix4x4> getDataValue<DataType::MATRIX_ARRAY>(std::string name);
-
-		template<>
-		std::shared_ptr<Texture> getDataValue<DataType::TEXTURE>(std::string name);
-
-		template<>
-		Vector2 getDataValue<DataType::TEXTURE_OFFSET>(std::string name);
-
-		template<>
-		Vector2 getDataValue<DataType::TEXTURE_SCALE>(std::string name);
+		typename ValueTypeInfo<type>::value_t getDataValue(std::string name) 
+		{
+			return {};
+		}
 
 		uint32_t static getDataBaseType(DataType dataType);
 
@@ -230,6 +194,84 @@ namespace kgs
 
 		void memCopyDataValue(std::string name, DataType dataType, void* dst, uint32_t offset, uint32_t maxElementCount);
 	};
+
+	template<>
+	float MaterialData::getDataValue<MaterialData::DataType::FLOAT>(std::string name)
+	{
+		return getValue(name, mapFloats, arrFloats);
+	}
+
+	template<>
+	std::vector<float> MaterialData::getDataValue<MaterialData::DataType::FLOAT_ARRAY>(std::string name)
+	{
+		return getValue(name, mapFloatArrays, arrFloatArrays);
+	}
+
+	template<>
+	int32_t MaterialData::getDataValue<MaterialData::DataType::INT>(std::string name)
+	{
+		return getValue(name, mapInts, arrInts);
+	}
+
+	template<>
+	std::vector<int32_t> MaterialData::getDataValue<MaterialData::DataType::INT_ARRAY>(std::string name)
+	{
+		return getValue(name, mapIntArrays, arrIntArrays);
+	}
+
+	template<>
+	Color MaterialData::getDataValue<MaterialData::DataType::COLOR>(std::string name)
+	{
+		return getValue(name, mapColors, arrColors);
+	}
+
+	template<>
+	std::vector<Color> MaterialData::getDataValue<MaterialData::DataType::COLOR_ARRAY>(std::string name)
+	{
+		return getValue(name, mapColorArrays, arrColorArrays);
+	}
+
+	template<>
+	Vector4 MaterialData::getDataValue<MaterialData::DataType::VECTOR>(std::string name)
+	{
+		return getValue(name, mapVectors, arrVectors);
+	}
+
+	template<>
+	std::vector<Vector4> MaterialData::getDataValue<MaterialData::DataType::VECTOR_ARRAY>(std::string name)
+	{
+		return getValue(name, mapVectorArrays, arrVectorArrays);
+	}
+
+	template<>
+	Matrix4x4 MaterialData::getDataValue<MaterialData::DataType::MATRIX>(std::string name)
+	{
+		return getValue(name, mapMatrixs, arrMatrixs);
+	}
+
+	template<>
+	std::vector<Matrix4x4> MaterialData::getDataValue<MaterialData::DataType::MATRIX_ARRAY>(std::string name)
+	{
+		return getValue(name, mapMatrixArrays, arrMatrixArrays);
+	}
+
+	template<>
+	std::shared_ptr<Texture> MaterialData::getDataValue<MaterialData::DataType::TEXTURE>(std::string name)
+	{
+		return getValue(name, mapTextures, arrTextures);
+	}
+
+	template<>
+	Vector2 MaterialData::getDataValue<MaterialData::DataType::TEXTURE_OFFSET>(std::string name)
+	{
+		return getValue(name, mapTextureOffsets, arrTextureOffsets);
+	}
+
+	template<>
+	Vector2 MaterialData::getDataValue<MaterialData::DataType::TEXTURE_SCALE>(std::string name)
+	{
+		return getValue(name, mapTextureScales, arrTextureScales);
+	}
 } //namespace kgs
 
 #endif // !KGS_MATERIAL_DATA_H

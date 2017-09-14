@@ -167,6 +167,8 @@ namespace fd
 			_updateSize();
 		}
 
+		/* Sets the bounds to the min and max value of the box.
+           Using this function is faster than assigning min and max separately.*/
 		void setMinMax(value_type min, value_type max)
 		{
 			m_min = min;
@@ -188,7 +190,9 @@ namespace fd
 			_updateMax();
 		}
 
-		
+		/* The closest point on the bounding box.
+           If the point is inside the bounding box, unmodified point position will be returned.
+		*/
 		value_type getClosestPoint(value_type point)
 		{
 			length_type length = value_type::length();
@@ -202,6 +206,8 @@ namespace fd
 			return result;
 		}
 
+		/*Is point contained in the bounding box?
+          If the point passed into Contains is inside the bounding box a value of True is returned.*/
 		Bool32 isContains(value_type point)
 		{
 			length_type length = value_type::length();
@@ -213,6 +219,7 @@ namespace fd
 			return true;
 		}
 
+		/*Expand the bounds by increasing its size by amount along each side.*/
 		void expand(value_type::value_type amount)
 		{
 			vec_value_type halt = amount / 2;
@@ -225,104 +232,95 @@ namespace fd
 			}
 		}
 
+		/*Does ray intersect this bounding box?
+          if true, return the distance to the ray's origin will be returned,
+          or else return number -1.*/
 		vec_value_type intersectRay(Ray<VecType> ray)
 		{
 			////reference:
 			//// http://www.scratchapixel.com/lessons/3d-basic-rendering/minimal-ray-tracer-rendering-simple-shapes/ray-box-intersection
-			//VecType origin = ray.getOrigin();
-			//VecType dir = ray.getDirection();
-			//VecType invDir = ray.getInvDir();
-			//VecType signs = ray.getSigns();
-			//var minMaxValues : Vector.<Vector.<Number>> = m_minMaxValuesContainerHelper;
-			//if (minMaxValues == null)
-			//{
-			//	m_minMaxValuesContainerHelper = minMaxValues = new Vector.<Vector.<Number>>(2);
-			//	minMaxValues.fixed = true;
-			//}
-			//minMaxValues[0] = minMax[0].values;
-			//minMaxValues[1] = minMax[1].values;
+			vec_value_type tMin, tMax, tYMin, tYMax, tZMin, tZMax;
+			VecType origin = ray.getOrigin();
+			VecType dir = ray.getDirection();
+			VecType invDir = ray.getInvDir();
+			VecType signs = ray.getSigns();
+			vec_value_type Epsilon = std::numeric_limits<vec_value_type>::epsilon();
+			VecType minMax[2] = { m_min, m_max };
+			if (Math.abs(dir[0]) > Epsilon)
+			{
+				tMin = (minMax[1 - signs[0]][0] - origin[0]) * invDir[0];
+				tMax = (minMax[signs[0]][0] - origin[0]) * invDir[0];
 
-			//var origin_values : Vector.<Number> = origin.values;
-			//var dir_values : Vector.<Number> = dir.values;
-			//var inDir_values : Vector.<Number> = inDir.values;
+				if (tMax < 0) return -1; //ray is only positive direction. if tMax < 0, tMax and tMin < 0.
+			}
+			else
+			{
+				if (dir[0] < minMax[0][0] || dir[0] > minMax[1][0]) return -1;
 
-			//var default_precision : Number = Geom.default_precision;
-			//if (Math.abs(dir_values[0]) > default_precision)
-			//{
-			//	tMin = (minMaxValues[1 - signs[0]][0] - origin_values[0]) * inDir_values[0];
-			//	tMax = (minMaxValues[signs[0]][0] - origin_values[0]) * inDir_values[0];
+				tMin = std::numeric_limits<vec_value_type>::min();
+				tMax = std::numeric_limits<vec_value_type>::max();
+			}
 
-			//	if (tMax < 0) return -1; //ray is only positive direction. if tMax < 0, tMax and tMin < 0.
-			//}
-			//else
-			//{
-			//	if (dir_values[0] < minMaxValues[0][0] || dir_values[0] > minMaxValues[1][0]) return -1;
+			if (Math.abs(dir[1]) > Epsilon)
+			{
+				tYMin = (minMax[1 - signs[1]][1] - origin[1]) * invDir[1];
+				tYMax = (minMax[signs[1]][1] - origin[1]) * invDir[1];
 
-			//	tMin = Number.MIN_VALUE;
-			//	tMax = Number.MAX_VALUE;
-			//}
+				if (tYMax < 0) return -1; //ray is only positive direction. if tMax < 0, tMax and tMin < 0.
+			}
+			else
+			{
+				if (dir[1] < minMax[0][1] || dir[1] > minMax[1][1]) return -1;
 
-			//if (Math.abs(dir_values[1]) > default_precision)
-			//{
-			//	tYMin = (minMaxValues[1 - signs[1]][1] - origin_values[1]) * inDir_values[1];
-			//	tYMax = (minMaxValues[signs[1]][1] - origin_values[1]) * inDir_values[1];
+				tYMin = std::numeric_limits<vec_value_type>::min();
+				tYMax = std::numeric_limits<vec_value_type>::max();
+			}
 
-			//	if (tYMax < 0) return -1; //ray is only positive direction. if tMax < 0, tMax and tMin < 0.
-			//}
-			//else
-			//{
-			//	if (dir_values[1] < minMaxValues[0][1] || dir_values[1] > minMaxValues[1][1]) return -1;
-
-			//	tYMin = Number.MIN_VALUE;
-			//	tYMax = Number.MAX_VALUE;
-			//}
-
-			//if ((tMin > tYMax) || (tYMin > tMax))
-			//{
-			//	return -1;
-			//}
-			//if (tYMin > tMin) tMin = tYMin;
-			//if (tYMax < tMax) tMax = tYMax;
+			if ((tMin > tYMax) || (tYMin > tMax))
+			{
+				return -1;
+			}
+			if (tYMin > tMin) tMin = tYMin;
+			if (tYMax < tMax) tMax = tYMax;
 
 
-			//if (Math.abs(dir_values[2]) > default_precision)
-			//{
-			//	tZMin = (minMaxValues[1 - signs[2]][2] - origin_values[2]) * inDir_values[2];
-			//	tZMax = (minMaxValues[signs[2]][2] - origin_values[2]) * inDir_values[2];
+			if (Math.abs(dir[2]) > Epsilon)
+			{
+				tZMin = (minMax[1 - signs[2]][2] - origin[2]) * invDir[2];
+				tZMax = (minMax[signs[2]][2] - origin[2]) * invDir[2];
 
-			//	if (tZMax < 0) return -1; //ray is only positive direction. if tMax < 0, tMax and tMin < 0.
-			//}
-			//else
-			//{
-			//	if (dir_values[2] < minMaxValues[0][2] || dir_values[2] > minMaxValues[1][2]) return -1;
+				if (tZMax < 0) return -1; //ray is only positive direction. if tMax < 0, tMax and tMin < 0.
+			}
+			else
+			{
+				if (dir[2] < minMax[0][2] || dir[2] > minMax[1][2]) return -1;
 
-			//	tZMin = Number.MIN_VALUE;
-			//	tZMax = Number.MAX_VALUE;
-			//}
+				tZMin = std::numeric_limits<vec_value_type>::min();
+				tZMax = std::numeric_limits<vec_value_type>::max();
+			}
 
-			//if ((tMin > tZMax) || (tZMin > tMax))
-			//{
-			//	return -1;
-			//}
-			//if (tZMin > tMin) tMin = tZMin;
-			//if (tZMax < tMax) tMax = tZMax;
+			if ((tMin > tZMax) || (tZMin > tMax))
+			{
+				return -1;
+			}
+			if (tZMin > tMin) tMin = tZMin;
+			if (tZMax < tMax) tMax = tZMax;
 
-			////            if(tMin == Number.MIN_VALUE || tMax == Number.MAX_VALUE) return -1; // it is not possible.
+			//calculate distance.
+			vec_value_type d;
+			if (tMin < 0)
+			{
+				d = tMax;
+			}
+			else
+			{
+				d = tMin;
+			}
 
-			////calculate distance.
-			//var d : Number;
-			//if (tMin < 0)
-			//{
-			//	d = tMax;
-			//}
-			//else
-			//{
-			//	d = tMin;
-			//}
-
-			//return d * dir.magnitude;
+			return d * glm::length(dir);
 		}
 
+		/*Does another bounding box intersect with this bounding box?*/
 		Bool32 isIntersects(Bound<VecType> bounds)
 		{
 			vec_value_type length = VecType::length();
@@ -334,6 +332,7 @@ namespace fd
 			return true;
 		}
 
+		/*The smallest squared distance between the point and this bounding box.*/
 		vec_value_type getSqrDistance(VecType point)
 		{
 			VecType closestPoint = getClosestPoint(point);

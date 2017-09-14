@@ -306,6 +306,9 @@ namespace fd
 			if (tZMin > tMin) tMin = tZMin;
 			if (tZMax < tMax) tMax = tZMax;
 
+			//            if(tMin == std::numeric_limits<vec_value_type>::min() || 
+			//                 tMax == std::numeric_limits<vec_value_type>::max()) return -1; // it is not possible.
+
 			//calculate distance.
 			vec_value_type d;
 			if (tMin < 0)

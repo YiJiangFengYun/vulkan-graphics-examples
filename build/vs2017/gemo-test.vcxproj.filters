@@ -1,0 +1,22 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <ItemGroup>
+    <Filter Include="include">
+      <UniqueIdentifier>{91b4d046-4469-4b1a-abfe-3c373385f27a}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="src">
+      <UniqueIdentifier>{60c5cfcf-4bea-4bd6-8fd2-43d67b31f7cc}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="include\gemo-test">
+      <UniqueIdentifier>{5380c5a4-24d7-47b7-bfc2-58317fa553b7}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="src\gemo-test">
+      <UniqueIdentifier>{ee786f7f-b541-4c40-9d05-bd818ee0feac}</UniqueIdentifier>
+    </Filter>
+  </ItemGroup>
+  <ItemGroup>
+    <ClCompile Include="..\..\test\src\gemo-test\main.cpp">
+      <Filter>src\gemo-test</Filter>
+    </ClCompile>
+  </ItemGroup>
+</Project>

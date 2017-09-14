@@ -3,11 +3,18 @@
 #include <framework/global.hpp>
 #include <foundation/gemo.hpp>
 
+void testBounds();
+
 int main()
 {
 	gfw::init(); //init framework module, and it also init foundation and graphics modules at the same time.
+	testBounds();
+	return 0;
+}
 
-	fd::Bounds<glm::vec3> bounds(glm::vec3(0, 0, 0), glm::vec3(10, 10, 10));
+void testBounds()
+{
+	/*fd::Bounds<glm::vec3> bounds(glm::vec3(0, 0, 0), glm::vec3(10, 10, 10));
 	fd::Ray<glm::vec3> ray(glm::vec3(0, -1, 0), glm::vec3(1, 0, 0));
 	float result = bounds.intersectRay(ray);
 
@@ -26,6 +33,5 @@ int main()
 	else
 	{
 		LOG(plog::debug) << "The bounds intersect with the ray, the distance to the ray origin is: " << result << std::endl;
-	}
-	return 0;
+	}*/
 }

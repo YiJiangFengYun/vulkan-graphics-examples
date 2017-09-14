@@ -110,7 +110,7 @@ namespace fd
 			{
 				m_isUpdateCache = FD_FALSE;
 				length_type length = value_type::length();
-				for (length_type i = 0; i < length_type; ++i)
+				for (length_type i = 0; i < length; ++i)
 				{
 					m_invDir[i] = 1 / m_direction[i];
 					//negative is 0 and positive is 1, it is better to be used as array index.
@@ -235,93 +235,93 @@ namespace fd
 		/*Does ray intersect this bounding box?
           if true, return the distance to the ray's origin will be returned,
           or else return number -1.*/
-		vec_value_type intersectRay(Ray<value_type> ray)
-		{
-			////reference:
-			//// http://www.scratchapixel.com/lessons/3d-basic-rendering/minimal-ray-tracer-rendering-simple-shapes/ray-box-intersection
-			vec_value_type tMin, tMax, tYMin, tYMax, tZMin, tZMax;
-			value_type origin = ray.getOrigin();
-			value_type dir = ray.getDirection();
-			value_type invDir = ray.getInvDir();
-			value_type signs = ray.getSigns();
-			vec_value_type Epsilon = std::numeric_limits<vec_value_type>::epsilon();
-			value_type minMax[2] = { m_min, m_max };
-			if (Math.abs(dir[0]) > Epsilon)
-			{
-				tMin = (minMax[1 - signs[0]][0] - origin[0]) * invDir[0];
-				tMax = (minMax[signs[0]][0] - origin[0]) * invDir[0];
+		//vec_value_type intersectRay(Ray<value_type> ray)
+		//{
+		//	////reference:
+		//	//// http://www.scratchapixel.com/lessons/3d-basic-rendering/minimal-ray-tracer-rendering-simple-shapes/ray-box-intersection
+		//	vec_value_type tMin, tMax, tYMin, tYMax, tZMin, tZMax;
+		//	value_type origin = ray.getOrigin();
+		//	value_type dir = ray.getDirection();
+		//	value_type invDir = ray.getInvDir();
+		//	value_type signs = ray.getSigns();
+		//	vec_value_type Epsilon = std::numeric_limits<vec_value_type>::epsilon();
+		//	value_type minMax[2] = { m_min, m_max };
+		//	if (glm::abs(dir[0]) > Epsilon)
+		//	{
+		//		tMin = (minMax[static_cast<size_t>(1 - signs[0])][0] - origin[0]) * invDir[0];
+		//		tMax = (minMax[static_cast<size_t>(signs[0])][0] - origin[0]) * invDir[0];
 
-				if (tMax < 0) return -1; //ray is only positive direction. if tMax < 0, tMax and tMin < 0.
-			}
-			else
-			{
-				if (dir[0] < minMax[0][0] || dir[0] > minMax[1][0]) return -1;
+		//		if (tMax < 0) return -1; //ray is only positive direction. if tMax < 0, tMax and tMin < 0.
+		//	}
+		//	else
+		//	{
+		//		if (dir[0] < minMax[0][0] || dir[0] > minMax[1][0]) return -1;
 
-				tMin = std::numeric_limits<vec_value_type>::min();
-				tMax = std::numeric_limits<vec_value_type>::max();
-			}
+		//		tMin = - std::numeric_limits<vec_value_type>::max();
+		//		tMax = std::numeric_limits<vec_value_type>::max();
+		//	}
 
-			if (Math.abs(dir[1]) > Epsilon)
-			{
-				tYMin = (minMax[1 - signs[1]][1] - origin[1]) * invDir[1];
-				tYMax = (minMax[signs[1]][1] - origin[1]) * invDir[1];
+		//	if (glm::abs(dir[1]) > Epsilon)
+		//	{
+		//		tYMin = (minMax[static_cast<size_t>(1 - signs[1])][1] - origin[1]) * invDir[1];
+		//		tYMax = (minMax[static_cast<size_t>(signs[1])][1] - origin[1]) * invDir[1];
 
-				if (tYMax < 0) return -1; //ray is only positive direction. if tMax < 0, tMax and tMin < 0.
-			}
-			else
-			{
-				if (dir[1] < minMax[0][1] || dir[1] > minMax[1][1]) return -1;
+		//		if (tYMax < 0) return -1; //ray is only positive direction. if tMax < 0, tMax and tMin < 0.
+		//	}
+		//	else
+		//	{
+		//		if (dir[1] < minMax[0][1] || dir[1] > minMax[1][1]) return -1;
 
-				tYMin = std::numeric_limits<vec_value_type>::min();
-				tYMax = std::numeric_limits<vec_value_type>::max();
-			}
+		//		tYMin = - std::numeric_limits<vec_value_type>::max();
+		//		tYMax = std::numeric_limits<vec_value_type>::max();
+		//	}
 
-			if ((tMin > tYMax) || (tYMin > tMax))
-			{
-				return -1;
-			}
-			if (tYMin > tMin) tMin = tYMin;
-			if (tYMax < tMax) tMax = tYMax;
+		//	if ((tMin > tYMax) || (tYMin > tMax))
+		//	{
+		//		return -1;
+		//	}
+		//	if (tYMin > tMin) tMin = tYMin;
+		//	if (tYMax < tMax) tMax = tYMax;
 
 
-			if (Math.abs(dir[2]) > Epsilon)
-			{
-				tZMin = (minMax[1 - signs[2]][2] - origin[2]) * invDir[2];
-				tZMax = (minMax[signs[2]][2] - origin[2]) * invDir[2];
+		//	if (glm::abs(dir[2]) > Epsilon)
+		//	{
+		//		tZMin = (minMax[static_cast<size_t>(1 - signs[2])][2] - origin[2]) * invDir[2];
+		//		tZMax = (minMax[static_cast<size_t>(signs[2])][2] - origin[2]) * invDir[2];
 
-				if (tZMax < 0) return -1; //ray is only positive direction. if tMax < 0, tMax and tMin < 0.
-			}
-			else
-			{
-				if (dir[2] < minMax[0][2] || dir[2] > minMax[1][2]) return -1;
+		//		if (tZMax < 0) return -1; //ray is only positive direction. if tMax < 0, tMax and tMin < 0.
+		//	}
+		//	else
+		//	{
+		//		if (dir[2] < minMax[0][2] || dir[2] > minMax[1][2]) return -1;
 
-				tZMin = std::numeric_limits<vec_value_type>::min();
-				tZMax = std::numeric_limits<vec_value_type>::max();
-			}
+		//		tZMin = - std::numeric_limits<vec_value_type>::max();
+		//		tZMax = std::numeric_limits<vec_value_type>::max();
+		//	}
 
-			if ((tMin > tZMax) || (tZMin > tMax))
-			{
-				return -1;
-			}
-			if (tZMin > tMin) tMin = tZMin;
-			if (tZMax < tMax) tMax = tZMax;
+		//	if ((tMin > tZMax) || (tZMin > tMax))
+		//	{
+		//		return -1;
+		//	}
+		//	if (tZMin > tMin) tMin = tZMin;
+		//	if (tZMax < tMax) tMax = tZMax;
 
-			//            if(tMin == std::numeric_limits<vec_value_type>::min() || 
-			//                 tMax == std::numeric_limits<vec_value_type>::max()) return -1; // it is not possible.
+		//	//            if(tMin == std::numeric_limits<vec_value_type>::min() || 
+		//	//                 tMax == std::numeric_limits<vec_value_type>::max()) return -1; // it is not possible.
 
-			//calculate distance.
-			vec_value_type d;
-			if (tMin < 0)
-			{
-				d = tMax;
-			}
-			else
-			{
-				d = tMin;
-			}
+		//	//calculate distance.
+		//	vec_value_type d;
+		//	if (tMin < 0)
+		//	{
+		//		d = tMax;
+		//	}
+		//	else
+		//	{
+		//		d = tMin;
+		//	}
 
-			return d * glm::length(dir);
-		}
+		//	return d * glm::length(dir);
+		//}
 
 		/*Does another bounding box intersect with this bounding box?*/
 		Bool32 isIntersects(Bounds<value_type> bounds)

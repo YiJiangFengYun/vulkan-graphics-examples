@@ -97,8 +97,6 @@ namespace gfw {
 
 	void AppBase::_init()
 	{
-		initLog();
-
 		LOG(plog::debug) << "Application initialization.";
 
 		glfwInit();

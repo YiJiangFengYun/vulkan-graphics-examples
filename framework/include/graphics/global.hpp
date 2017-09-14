@@ -15,7 +15,6 @@
 #define KGS_TRUE 1
 
 #include <cstdint>
-#include <plog/Log.h>
 #include "graphics/context.hpp"
 
 namespace kgs
@@ -31,10 +30,9 @@ namespace kgs
 	typedef glm::tvec4<float> Color;
 	typedef glm::tvec4<Byte> Color32;
 
-
+	extern Bool32 isInited;
 	extern std::shared_ptr<Context> pContext;
-	extern void initLog();
-	extern void initGraphics(std::shared_ptr<vk::PhysicalDevice> pPhysicalDevice,
+	extern void init(std::shared_ptr<vk::PhysicalDevice> pPhysicalDevice,
 		std::shared_ptr<vk::Device> pNativeDevice, vk::Queue graphicsQueue,
 		std::shared_ptr<vk::CommandPool> pCommandPool);
 }

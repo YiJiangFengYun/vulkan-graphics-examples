@@ -1,14 +1,11 @@
 #include "framework/global.hpp"
 
-#include <plog/Log.h>
-#include <plog/Appenders/DebugOutputAppender.h>
-
+#include "graphics/global.hpp"
 namespace gfw
 {
-	void initLog()
+	Bool32 isInited = GFW_FALSE;
+	void init()
 	{
-		//init default log to write to the windows debug output
-		static plog::DebugOutputAppender<plog::TxtFormatter> debugOutputAppender;
-		plog::init(plog::verbose, &debugOutputAppender);
+		isInited = GFW_TRUE;
 	}
 }

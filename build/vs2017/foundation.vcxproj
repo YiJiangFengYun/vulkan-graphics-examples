@@ -26,6 +26,7 @@
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="..\..\framework\src\foundation\gemo.cpp" />
+    <ClCompile Include="..\..\framework\src\foundation\global.cpp" />
     <ClCompile Include="..\..\framework\src\foundation\util.cpp" />
     <ClCompile Include="..\..\framework\src\foundation\wrapper.cpp" />
   </ItemGroup>

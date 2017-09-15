@@ -15,7 +15,9 @@
 #define KGS_TRUE 1
 
 #include <cstdint>
+#include <foundation/gemo.hpp>
 #include "graphics/context.hpp"
+
 
 namespace kgs
 {
@@ -29,6 +31,8 @@ namespace kgs
 	typedef glm::mat4x4 Matrix4x4;
 	typedef glm::tvec4<float> Color;
 	typedef glm::tvec4<Byte> Color32;
+	typedef fd::Bounds<glm::vec2> Bound2;
+	typedef fd::Bounds<glm::vec3> Bound3;
 
 	extern Bool32 isInited;
 	extern std::shared_ptr<Context> pContext;

@@ -232,6 +232,7 @@ namespace fd
 			}
 		}
 
+		//todo
 		/*Does ray intersect this bounding box?
           if true, return the distance to the ray's origin will be returned,
           or else return number -1.*/

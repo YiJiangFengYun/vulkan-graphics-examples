@@ -155,5 +155,8 @@
     <ClInclude Include="..\..\framework\include\graphics\mesh\mesh.hpp">
       <Filter>include\graphics\mesh</Filter>
     </ClInclude>
+    <ClInclude Include="..\..\framework\include\graphics\graphics.hpp">
+      <Filter>include\graphics</Filter>
+    </ClInclude>
   </ItemGroup>
 </Project>

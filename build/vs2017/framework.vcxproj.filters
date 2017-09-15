@@ -86,5 +86,8 @@
     <ClInclude Include="..\..\framework\include\framework\global.hpp">
       <Filter>include\framework</Filter>
     </ClInclude>
+    <ClInclude Include="..\..\framework\include\framework\framework.hpp">
+      <Filter>include\framework</Filter>
+    </ClInclude>
   </ItemGroup>
 </Project>

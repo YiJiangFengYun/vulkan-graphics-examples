@@ -33,6 +33,7 @@
     <ClInclude Include="..\..\framework\include\framework\app\queue_family.hpp" />
     <ClInclude Include="..\..\framework\include\framework\app\vulkan_ext.hpp" />
     <ClInclude Include="..\..\framework\include\framework\app\window.hpp" />
+    <ClInclude Include="..\..\framework\include\framework\framework.hpp" />
     <ClInclude Include="..\..\framework\include\framework\global.hpp" />
     <ClInclude Include="..\..\framework\include\framework\util\macro_util.hpp" />
     <ClInclude Include="..\..\framework\include\framework\util\thread_master.hpp" />

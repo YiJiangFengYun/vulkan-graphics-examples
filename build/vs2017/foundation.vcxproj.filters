@@ -27,6 +27,9 @@
     <ClInclude Include="..\..\framework\include\foundation\global.hpp">
       <Filter>include\foundation</Filter>
     </ClInclude>
+    <ClInclude Include="..\..\framework\include\foundation\foundation.hpp">
+      <Filter>include\foundation</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="..\..\framework\src\foundation\wrapper.cpp">

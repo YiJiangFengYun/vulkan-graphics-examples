@@ -42,6 +42,7 @@
   <ItemGroup>
     <ClInclude Include="..\..\framework\include\graphics\context.hpp" />
     <ClInclude Include="..\..\framework\include\graphics\global.hpp" />
+    <ClInclude Include="..\..\framework\include\graphics\graphics.hpp" />
     <ClInclude Include="..\..\framework\include\graphics\material\material.hpp" />
     <ClInclude Include="..\..\framework\include\graphics\material\material_data.hpp" />
     <ClInclude Include="..\..\framework\include\graphics\material\pass.hpp" />

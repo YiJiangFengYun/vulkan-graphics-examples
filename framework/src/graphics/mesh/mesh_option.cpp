@@ -8,5 +8,5 @@ namespace kgs
 		std::pair<PrimitiveTopology, vk::PrimitiveTopology>(PrimitiveTopology::LINE_STRIP, vk::PrimitiveTopology::eLineStrip),
 		std::pair<PrimitiveTopology, vk::PrimitiveTopology>(PrimitiveTopology::TRIANGLE_LIST, vk::PrimitiveTopology::eTriangleList),
 		std::pair<PrimitiveTopology, vk::PrimitiveTopology>(PrimitiveTopology::TRIANGLE_STRIP, vk::PrimitiveTopology::eTriangleStrip)
-	}
+	};
 } //namespace kgs

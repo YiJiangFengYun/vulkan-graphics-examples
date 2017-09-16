@@ -24,37 +24,17 @@ namespace kgs
 		std::shared_ptr<Pass> getPass(std::string name);
 		void setPass(std::string name, std::shared_ptr<Pass> pass);
 
-		float getFloat(std::string name);
-		void setFloat(std::string name, float value);
-		std::vector<float> getFloatArray(std::string name);
-		void setFloatArray(std::string name, std::vector<float> values);
+		template <MaterialData::DataType dataType>
+		typename MaterialData::ValueTypeInfo<dataType>::value_t getData(std::string name)
+		{
+			return m_pData->getDataValue<dataType>(name);
+		}
 
-		int32_t getInt(std::string name);
-		void setInt(std::string name, int32_t value);
-		std::vector<int32_t> getIntArray(std::string name);
-		void setIntArray(std::string name, std::vector<int32_t> values);
-
-		Color getColor(std::string name);
-		void setColor(std::string name, Color value);
-		std::vector<Color> getColorArray(std::string name);
-		void setColorArray(std::string name, std::vector<Color> values);
-
-		Vector4 getVector(std::string name);
-		void setVector(std::string name, Vector4 value);
-		std::vector<Vector4> getVectorArray(std::string name);
-		void setVectorArray(std::string name, std::vector<Vector4> values);
-
-		Matrix4x4 getMatrix(std::string name);
-		void setMatrix(std::string name, Matrix4x4 value);
-		std::vector<Matrix4x4> getMatrixArray(std::string name);
-		void setMatrixArray(std::string name, std::vector<Matrix4x4> values);
-
-		std::shared_ptr<Texture> getTexture(std::string name);
-		void setTexture(std::string name, std::shared_ptr<Texture> value);
-		Vector2 getTextureOffset(std::string name);
-		void setTextureOffset(std::string name, Vector2 value);
-		Vector2 getTextureScale(std::string name);
-		void setTextureScale(std::string name, Vector2 value);
+		template <MaterialData::DataType dataType>
+		void setData(std::string name, typename MaterialData::ValueTypeInfo<dataType>::value_t value)
+		{
+			m_pData->setDataValue<dataType>(name, value);
+		}
 
 		std::shared_ptr<Texture> getMainTexture();
 		void setMainTexture(std::shared_ptr<Texture> value);

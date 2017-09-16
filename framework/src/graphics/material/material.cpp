@@ -41,174 +41,44 @@ namespace kgs
 		setValue(name, pass, m_mapPasses, m_arrPasses);
 	}
 
-	Color Material::getColor(std::string name)
-	{
-		return getValue(name, m_pData->mapColors, m_pData->arrColors);
-	}
-
-	void Material::setColor(std::string name, Color value)
-	{
-		setValue(name, value, m_pData->mapColors, m_pData->arrColors);
-	}
-
-	std::vector<Color> Material::getColorArray(std::string name)
-	{
-		return getValue(name, m_pData->mapColorArrays, m_pData->arrColorArrays);
-	}
-
-	void Material::setColorArray(std::string name, std::vector<Color> values)
-	{
-		setValue(name, values, m_pData->mapColorArrays, m_pData->arrColorArrays);
-	}
-
-	float Material::getFloat(std::string name)
-	{
-		return getValue(name, m_pData->mapFloats, m_pData->arrFloats);
-	}
-
-	void Material::setFloat(std::string name, float value)
-	{
-		setValue(name, value, m_pData->mapFloats, m_pData->arrFloats);
-	}
-
-	std::vector<float> Material::getFloatArray(std::string name)
-	{
-		return getValue(name, m_pData->mapFloatArrays, m_pData->arrFloatArrays);
-	}
-
-	void Material::setFloatArray(std::string name, std::vector<float> values)
-	{
-		setValue(name, values, m_pData->mapFloatArrays, m_pData->arrFloatArrays);
-	}
-
-	int32_t Material::getInt(std::string name)
-	{
-		return getValue(name, m_pData->mapInts, m_pData->arrInts);
-	}
-
-	void Material::setInt(std::string name, int32_t value)
-	{
-		setValue(name, value, m_pData->mapInts, m_pData->arrInts);
-	}
-
-	std::vector<int32_t> Material::getIntArray(std::string name)
-	{
-		return getValue(name, m_pData->mapIntArrays, m_pData->arrIntArrays);
-	}
-
-	void Material::setIntArray(std::string name, std::vector<int32_t> values)
-	{
-		setValue(name, values, m_pData->mapIntArrays, m_pData->arrIntArrays);
-	}
-
-	Vector4 Material::getVector(std::string name)
-	{
-		return getValue(name, m_pData->mapVectors, m_pData->arrVectors);
-	}
-
-	void Material::setVector(std::string name, Vector4 value)
-	{
-		setValue(name, value, m_pData->mapVectors, m_pData->arrVectors);
-	}
-
-	std::vector<Vector4> Material::getVectorArray(std::string name)
-	{
-		return getValue(name, m_pData->mapVectorArrays, m_pData->arrVectorArrays);
-	}
-
-	void Material::setVectorArray(std::string name, std::vector<Vector4> values)
-	{
-		setValue(name, values, m_pData->mapVectorArrays, m_pData->arrVectorArrays);
-	}
-
-	Matrix4x4 Material::getMatrix(std::string name)
-	{
-		return getValue(name, m_pData->mapMatrixs, m_pData->arrMatrixs);
-	}
-
-	void Material::setMatrix(std::string name, Matrix4x4 value)
-	{
-		setValue(name, value, m_pData->mapMatrixs, m_pData->arrMatrixs);
-	}
-
-	std::vector<Matrix4x4> Material::getMatrixArray(std::string name)
-	{
-		return getValue(name, m_pData->mapMatrixArrays, m_pData->arrMatrixArrays);
-	}
-
-	void Material::setMatrixArray(std::string name, std::vector<Matrix4x4> values)
-	{
-		setValue(name, values, m_pData->mapMatrixArrays, m_pData->arrMatrixArrays);
-	}
-
-	std::shared_ptr<Texture> Material::getTexture(std::string name)
-	{
-		return getValue(name, m_pData->mapTextures, m_pData->arrTextures);
-	}
-
-	void Material::setTexture(std::string name, std::shared_ptr<Texture> value)
-	{
-		setValue(name, value, m_pData->mapTextures, m_pData->arrTextures);
-	}
-
-	Vector2 Material::getTextureOffset(std::string name)
-	{
-		return getValue(name, m_pData->mapTextureOffsets, m_pData->arrTextureOffsets);
-	}
-
-	void Material::setTextureOffset(std::string name, Vector2 value)
-	{
-		setValue(name, value, m_pData->mapTextureOffsets, m_pData->arrTextureOffsets);
-	}
-
-	Vector2 Material::getTextureScale(std::string name)
-	{
-		return getValue(name, m_pData->mapTextureScales, m_pData->arrTextureScales);
-	}
-
-	void Material::setTextureScale(std::string name, Vector2 value)
-	{
-		setValue(name, value, m_pData->mapTextureScales, m_pData->arrTextureScales);
-	}
-
 	std::shared_ptr<Texture> Material::getMainTexture()
 	{
-		return getTexture(MainTextureName);
+		return getData<MaterialData::DataType::TEXTURE>(MainTextureName);
 	}
 
 	void Material::setMainTexture(std::shared_ptr<Texture> value)
 	{
-		setTexture(MainTextureName, value);
+		setData<MaterialData::DataType::TEXTURE>(MainTextureName, value);
 	}
 
 	Vector2 Material::getMainTextureOffset()
 	{
-		return getTextureOffset(MainTextureName);
+		return getData<MaterialData::DataType::TEXTURE_OFFSET>(MainTextureName);
 	}
 
 	void Material::setMainTextureOffset(Vector2 value)
 	{
-		setTextureOffset(MainTextureName, value);
+		setData<MaterialData::DataType::TEXTURE_OFFSET>(MainTextureName, value);
 	}
 
 	Vector2 Material::getMainTextureScale()
 	{
-		return getTextureScale(MainTextureName);
+		return getData<MaterialData::DataType::TEXTURE_SCALE>(MainTextureName);
 	}
 
 	void Material::setMainTextureScale(Vector2 value)
 	{
-		setTextureScale(MainTextureName, value);
+		setData<MaterialData::DataType::TEXTURE_SCALE>(MainTextureName, value);
 	}
 
 	Color Material::getMainColor()
 	{
-		return getColor(MainColorName);
+		return getData<MaterialData::DataType::COLOR>(MainColorName);
 	}
 	
 	void Material::setMainColor(Color value)
 	{
-		setColor(MainColorName, value);
+		setData<MaterialData::DataType::COLOR>(MainColorName, value);
 	}
 
 	void Material::apply()

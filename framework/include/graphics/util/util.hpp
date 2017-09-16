@@ -9,6 +9,13 @@
 namespace kgs
 {
 	template <typename T>
+	inline Bool32 isHas(std::string name, std::unordered_map<std::string, T>& map, std::vector<T>& arr)
+	{
+		auto iterator = map.find(name);
+		return iterator != map.end();
+	}
+
+	template <typename T>
 	inline T getValue(std::string name, std::unordered_map<std::string, T>& map, std::vector<T>& arr, Bool32 isThrowNotExist = KGS_FALSE)
 	{
 		auto iterator = map.find(name);

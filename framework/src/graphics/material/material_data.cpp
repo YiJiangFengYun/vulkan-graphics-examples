@@ -174,6 +174,14 @@ namespace kgs
 		}
 	}
 
+	//-----------------this used to eliminate ide warning----------------
+	template <MaterialData::DataType type>
+	typename MaterialData::ValueTypeInfo<type>::value_t MaterialData::getDataValue(std::string name) { return {}; }
+
+	template<MaterialData::DataType type>
+	void MaterialData::setDataValue(std::string name, typename MaterialData::ValueTypeInfo<type>::value_t value) {}
+
+
 	template<>
 	float MaterialData::getDataValue<MaterialData::DataType::FLOAT>(std::string name)
 	{

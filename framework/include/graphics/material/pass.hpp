@@ -9,8 +9,16 @@
 #include "graphics/material/material_data.hpp"
 #include "graphics/util/util.hpp"
 
-#define MainColorName "_Color"
 #define MainTextureName "_MainTex"
+#define MainColorName "_Color"
+#define MainTextureOffsetName "_MainTexOffset"
+#define MainTextureScaleName "_MainTexScale"
+
+#define MainTextureBinding 0
+#define MainColorBinding 1
+#define MainTextureOffsetBinding 2
+#define MainTextureScaleBinding 3
+#define OtherMinBinding 4
 
 namespace kgs
 {
@@ -25,10 +33,32 @@ namespace kgs
 			DescriptorType descriptorType;
 			std::uint32_t descriptorCount;
 			ShaderStageFlags stageFlags;
+
+			LayoutBindingInfo(std::string name,
+				MaterialData::DataType dataType,
+				std::uint32_t binding,
+				DescriptorType descriptorType,
+				std::uint32_t descriptorCount,
+				ShaderStageFlags stageFlags):
+				name(name),
+				dataType(dataType),
+				binding(binding),
+				descriptorType(descriptorType),
+				descriptorCount(descriptorCount),
+				stageFlags(stageFlags)
+			{
+			
+			}
+
+			Bool32 operator ==(const LayoutBindingInfo& target) const
+			{
+				return name == target.name && dataType == target.dataType && binding == target.binding &&
+					descriptorType == target.descriptorType && descriptorCount == target.descriptorCount &&
+					stageFlags == target.stageFlags;
+			}
 		};
 
 		Pass();
-		Pass(std::shared_ptr<MaterialData> pMaterialData);
 		~Pass();
 
 		template <MaterialData::DataType dataType>
@@ -38,9 +68,24 @@ namespace kgs
 		}
 
 		template <MaterialData::DataType dataType>
-		void setData(std::string name, typename MaterialData::ValueTypeInfo<dataType>::value_t value)
+		void setData(std::string name, 
+			typename MaterialData::ValueTypeInfo<dataType>::value_t value, 
+			uint32_t binding = OtherMinBinding, 
+			DescriptorType descriptorType = DescriptorType::UNIFORM_BUFFER, 
+			ShaderStageFlags stageFlags = ShaderStageFlagBits::VERTEX)
 		{
 			m_pData->setDataValue<dataType>(name, value);
+			//update layout binding information.
+			uint32_t descriptorCount = static_cast<uint32_t>(sizeof(value) / sizeof(typename MaterialData::ValueTypeInfo<dataType>::base_t));
+			LayoutBindingInfo info(
+				name,
+				dataType,
+				binding,
+				descriptorType,
+				descriptorCount,
+				stageFlags
+			);
+			setValue(name, info, m_mapLayoutBinds, m_arrLayoutBinds);
 		}
 
 		std::shared_ptr<Texture> getMainTexture();
@@ -54,14 +99,11 @@ namespace kgs
 		void setMainColor(Color value);
 
 		void apply();
-
-		void _setMaterialData(std::shared_ptr<MaterialData> pMaterialData);
-	protected:
-		void virtual _createBindLayout() = 0;
 	private:
 		//compositons
 		std::shared_ptr<MaterialData> m_pData;
-		std::vector<LayoutBindingInfo> m_binds;
+		std::vector<LayoutBindingInfo> m_arrLayoutBinds;
+		std::unordered_map<std::string, LayoutBindingInfo> m_mapLayoutBinds;
 		std::shared_ptr<vk::Buffer> m_pUniformBuffer;
 		std::shared_ptr<vk::DeviceMemory> m_pUniformBufferMemory;
 		std::shared_ptr<vk::DescriptorSetLayout> m_pDescriptorSetLayout;
@@ -71,7 +113,6 @@ namespace kgs
 		//aggregations
 		std::shared_ptr<Context> m_pContext;
 		std::shared_ptr<Shader> m_pShader;
-		std::shared_ptr<MaterialData> m_pMaterialData;
 		void _createDescriptorSetLayout();
 		void _createUniformBuffer();
 		void _createDescriptorSet();

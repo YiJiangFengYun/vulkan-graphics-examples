@@ -173,5 +173,83 @@ namespace kgs
 			throw std::runtime_error("Invalid data type for copying its data to memory.");
 		}
 	}
+
+	template<>
+	float MaterialData::getDataValue<MaterialData::DataType::FLOAT>(std::string name)
+	{
+		return getValue(name, mapFloats, arrFloats);
+	}
+
+	template<>
+	std::vector<float> MaterialData::getDataValue<MaterialData::DataType::FLOAT_ARRAY>(std::string name)
+	{
+		return getValue(name, mapFloatArrays, arrFloatArrays);
+	}
+
+	template<>
+	int32_t MaterialData::getDataValue<MaterialData::DataType::INT>(std::string name)
+	{
+		return getValue(name, mapInts, arrInts);
+	}
+
+	template<>
+	std::vector<int32_t> MaterialData::getDataValue<MaterialData::DataType::INT_ARRAY>(std::string name)
+	{
+		return getValue(name, mapIntArrays, arrIntArrays);
+	}
+
+	template<>
+	Color MaterialData::getDataValue<MaterialData::DataType::COLOR>(std::string name)
+	{
+		return getValue(name, mapColors, arrColors);
+	}
+
+	template<>
+	std::vector<Color> MaterialData::getDataValue<MaterialData::DataType::COLOR_ARRAY>(std::string name)
+	{
+		return getValue(name, mapColorArrays, arrColorArrays);
+	}
+
+	template<>
+	Vector4 MaterialData::getDataValue<MaterialData::DataType::VECTOR>(std::string name)
+	{
+		return getValue(name, mapVectors, arrVectors);
+	}
+
+	template<>
+	std::vector<Vector4> MaterialData::getDataValue<MaterialData::DataType::VECTOR_ARRAY>(std::string name)
+	{
+		return getValue(name, mapVectorArrays, arrVectorArrays);
+	}
+
+	template<>
+	Matrix4x4 MaterialData::getDataValue<MaterialData::DataType::MATRIX>(std::string name)
+	{
+		return getValue(name, mapMatrixs, arrMatrixs);
+	}
+
+	template<>
+	std::vector<Matrix4x4> MaterialData::getDataValue<MaterialData::DataType::MATRIX_ARRAY>(std::string name)
+	{
+		return getValue(name, mapMatrixArrays, arrMatrixArrays);
+	}
+
+	template<>
+	std::shared_ptr<Texture> MaterialData::getDataValue<MaterialData::DataType::TEXTURE>(std::string name)
+	{
+		return getValue(name, mapTextures, arrTextures);
+	}
+
+	template<>
+	Vector2 MaterialData::getDataValue<MaterialData::DataType::TEXTURE_OFFSET>(std::string name)
+	{
+		return getValue(name, mapTextureOffsets, arrTextureOffsets);
+	}
+
+	template<>
+	Vector2 MaterialData::getDataValue<MaterialData::DataType::TEXTURE_SCALE>(std::string name)
+	{
+		return getValue(name, mapTextureScales, arrTextureScales);
+	}
 }
 

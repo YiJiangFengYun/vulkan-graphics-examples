@@ -14,46 +14,46 @@ namespace kgs
 
 	std::shared_ptr<Texture> Pass::getMainTexture()
 	{
-		return getData<MaterialData::DataType::TEXTURE>(MainTextureName);
+		return getData<MaterialData::DataType::TEXTURE>(MAIN_TEXTURE_NAME);
 	}
 
 	void Pass::setMainTexture(std::shared_ptr<Texture> value)
 	{
-		setData<MaterialData::DataType::TEXTURE>(MainTextureName, value, MainTextureBinding, 
+		setData<MaterialData::DataType::TEXTURE>(MAIN_TEXTURE_NAME, value, MAIN_TEXTURE_BINDING, 
 			DescriptorType::COMBINED_IMAGE_SAMPLER, ShaderStageFlagBits::FRAGMENT);
 	}
 
 	Vector2 Pass::getMainTextureOffset()
 	{
-		return getData<MaterialData::DataType::TEXTURE_OFFSET>(MainTextureName);
+		return getData<MaterialData::DataType::TEXTURE_OFFSET>(MAIN_TEXTURE_NAME);
 	}
 
 	void Pass::setMainTextureOffset(Vector2 value)
 	{
-		setData<MaterialData::DataType::TEXTURE_OFFSET>(MainTextureName, value, MainTextureOffsetBinding, 
+		setData<MaterialData::DataType::TEXTURE_OFFSET>(MAIN_TEXTURE_NAME, value, MAIN_TEXTURE_OFFSET_BINDING, 
 			DescriptorType::UNIFORM_BUFFER, ShaderStageFlagBits::FRAGMENT);
 	}
 
 	Vector2 Pass::getMainTextureScale()
 	{
-		return getData<MaterialData::DataType::TEXTURE_SCALE>(MainTextureName);
+		return getData<MaterialData::DataType::TEXTURE_SCALE>(MAIN_TEXTURE_NAME);
 	}
 
 	void Pass::setMainTextureScale(Vector2 value)
 	{
-		setData<MaterialData::DataType::TEXTURE_SCALE>(MainTextureName, value, MainTextureScaleBinding,
+		setData<MaterialData::DataType::TEXTURE_SCALE>(MAIN_TEXTURE_NAME, value, MAIN_TEXTURE_SCALE_BINDING,
 			DescriptorType::UNIFORM_BUFFER, ShaderStageFlagBits::FRAGMENT);
 	}
 
 	Color Pass::getMainColor()
 	{
-		return getData<MaterialData::DataType::COLOR>(MainColorName);
+		return getData<MaterialData::DataType::COLOR>(MAIN_COLOR_NAME);
 	}
 
 	void Pass::setMainColor(Color value)
 	{
-		setData<MaterialData::DataType::COLOR>(MainColorName, value,
-			MainColorBinding, DescriptorType::UNIFORM_BUFFER, ShaderStageFlagBits::VERTEX);
+		setData<MaterialData::DataType::COLOR>(MAIN_COLOR_NAME, value,
+			MAIN_COLOR_BINDING, DescriptorType::UNIFORM_BUFFER, ShaderStageFlagBits::VERTEX);
 	}
 
 	void Pass::apply()

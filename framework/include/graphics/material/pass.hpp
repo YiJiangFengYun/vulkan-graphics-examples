@@ -9,9 +9,11 @@
 #include "graphics/material/material_data.hpp"
 #include "graphics/util/util.hpp"
 
+#define MainColorName "_Color"
+#define MainTextureName "_MainTex"
+
 namespace kgs
 {
-
 	class Pass
 	{
 	public:
@@ -28,6 +30,29 @@ namespace kgs
 		Pass();
 		Pass(std::shared_ptr<MaterialData> pMaterialData);
 		~Pass();
+
+		template <MaterialData::DataType dataType>
+		typename MaterialData::ValueTypeInfo<dataType>::value_t getData(std::string name)
+		{
+			return m_pData->getDataValue<dataType>(name);
+		}
+
+		template <MaterialData::DataType dataType>
+		void setData(std::string name, typename MaterialData::ValueTypeInfo<dataType>::value_t value)
+		{
+			m_pData->setDataValue<dataType>(name, value);
+		}
+
+		std::shared_ptr<Texture> getMainTexture();
+		void setMainTexture(std::shared_ptr<Texture> value);
+		Vector2 getMainTextureOffset();
+		void setMainTextureOffset(Vector2 value);
+		Vector2 getMainTextureScale();
+		void setMainTextureScale(Vector2 value);
+
+		Color getMainColor();
+		void setMainColor(Color value);
+
 		void apply();
 
 		void _setMaterialData(std::shared_ptr<MaterialData> pMaterialData);
@@ -35,6 +60,7 @@ namespace kgs
 		void virtual _createBindLayout() = 0;
 	private:
 		//compositons
+		std::shared_ptr<MaterialData> m_pData;
 		std::vector<LayoutBindingInfo> m_binds;
 		std::shared_ptr<vk::Buffer> m_pUniformBuffer;
 		std::shared_ptr<vk::DeviceMemory> m_pUniformBufferMemory;

@@ -2,8 +2,7 @@
 
 namespace kgs
 {
-	Material::Material() :
-		m_pData(new MaterialData())
+	Material::Material()
 	{
 	}
 
@@ -39,46 +38,6 @@ namespace kgs
 	void Material::setPass(std::string name, std::shared_ptr<Pass> pass)
 	{
 		setValue(name, pass, m_mapPasses, m_arrPasses);
-	}
-
-	std::shared_ptr<Texture> Material::getMainTexture()
-	{
-		return getData<MaterialData::DataType::TEXTURE>(MainTextureName);
-	}
-
-	void Material::setMainTexture(std::shared_ptr<Texture> value)
-	{
-		setData<MaterialData::DataType::TEXTURE>(MainTextureName, value);
-	}
-
-	Vector2 Material::getMainTextureOffset()
-	{
-		return getData<MaterialData::DataType::TEXTURE_OFFSET>(MainTextureName);
-	}
-
-	void Material::setMainTextureOffset(Vector2 value)
-	{
-		setData<MaterialData::DataType::TEXTURE_OFFSET>(MainTextureName, value);
-	}
-
-	Vector2 Material::getMainTextureScale()
-	{
-		return getData<MaterialData::DataType::TEXTURE_SCALE>(MainTextureName);
-	}
-
-	void Material::setMainTextureScale(Vector2 value)
-	{
-		setData<MaterialData::DataType::TEXTURE_SCALE>(MainTextureName, value);
-	}
-
-	Color Material::getMainColor()
-	{
-		return getData<MaterialData::DataType::COLOR>(MainColorName);
-	}
-	
-	void Material::setMainColor(Color value)
-	{
-		setData<MaterialData::DataType::COLOR>(MainColorName, value);
 	}
 
 	void Material::apply()

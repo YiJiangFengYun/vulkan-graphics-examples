@@ -3,12 +3,14 @@
 namespace kgs
 {
 	Pass::Pass() :
-		m_pContext(pContext)
+		m_pContext(pContext),
+		m_pData(new MaterialData())
 	{
 	}
 
 	Pass::Pass(std::shared_ptr<MaterialData> pMaterialData) :
 		m_pContext(pContext),
+		m_pData(new MaterialData()),
 		m_pMaterialData(pMaterialData)
 	{
 		_createBindLayout();
@@ -20,6 +22,46 @@ namespace kgs
 
 	Pass::~Pass()
 	{
+	}
+
+	std::shared_ptr<Texture> Pass::getMainTexture()
+	{
+		return getData<MaterialData::DataType::TEXTURE>(MainTextureName);
+	}
+
+	void Pass::setMainTexture(std::shared_ptr<Texture> value)
+	{
+		setData<MaterialData::DataType::TEXTURE>(MainTextureName, value);
+	}
+
+	Vector2 Pass::getMainTextureOffset()
+	{
+		return getData<MaterialData::DataType::TEXTURE_OFFSET>(MainTextureName);
+	}
+
+	void Pass::setMainTextureOffset(Vector2 value)
+	{
+		setData<MaterialData::DataType::TEXTURE_OFFSET>(MainTextureName, value);
+	}
+
+	Vector2 Pass::getMainTextureScale()
+	{
+		return getData<MaterialData::DataType::TEXTURE_SCALE>(MainTextureName);
+	}
+
+	void Pass::setMainTextureScale(Vector2 value)
+	{
+		setData<MaterialData::DataType::TEXTURE_SCALE>(MainTextureName, value);
+	}
+
+	Color Pass::getMainColor()
+	{
+		return getData<MaterialData::DataType::COLOR>(MainColorName);
+	}
+
+	void Pass::setMainColor(Color value)
+	{
+		setData<MaterialData::DataType::COLOR>(MainColorName, value);
 	}
 
 	void Pass::_setMaterialData(std::shared_ptr<MaterialData> pMaterialData)

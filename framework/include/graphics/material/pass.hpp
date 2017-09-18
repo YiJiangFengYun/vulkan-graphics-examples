@@ -9,16 +9,16 @@
 #include "graphics/material/material_data.hpp"
 #include "graphics/util/util.hpp"
 
-#define MAIN_TEXTURE_NAME "_MainTex"
-#define MAIN_COLOR_NAME "_Color"
-#define MAIN_TEXTURE_OFFSET_NAME "_MainTexOffset"
-#define MAIN_TEXTURE_SCALE_NAME "_MainTexScale"
+#define KGS_M_MAIN_TEXTURE_NAME "_MainTex"
+#define KGS_M_MAIN_COLOR_NAME "_Color"
+#define KGS_M_MAIN_TEXTURE_OFFSET_NAME "_MainTexOffset"
+#define KGS_M_MAIN_TEXTURE_SCALE_NAME "_MainTexScale"
 
-#define MAIN_TEXTURE_BINDING 0
-#define MAIN_COLOR_BINDING 1
-#define MAIN_TEXTURE_OFFSET_BINDING 2
-#define MAIN_TEXTURE_SCALE_BINDING 3
-#define OTHER_MIN_BINDING 4
+#define KGS_M_MAIN_TEXTURE_BINDING 0
+#define KGS_M_MAIN_COLOR_BINDING 1
+#define KGS_M_MAIN_TEXTURE_OFFSET_BINDING 2
+#define KGS_M_MAIN_TEXTURE_SCALE_BINDING 3
+#define KGS_M_OTHER_MIN_BINDING 4
 
 namespace kgs
 {
@@ -70,7 +70,7 @@ namespace kgs
 		template <MaterialData::DataType dataType>
 		void setData(std::string name, 
 			typename MaterialData::ValueTypeInfo<dataType>::value_t value, 
-			uint32_t binding = OTHER_MIN_BINDING, 
+			uint32_t binding = KGS_M_OTHER_MIN_BINDING, 
 			DescriptorType descriptorType = DescriptorType::UNIFORM_BUFFER, 
 			ShaderStageFlags stageFlags = ShaderStageFlagBits::VERTEX)
 		{

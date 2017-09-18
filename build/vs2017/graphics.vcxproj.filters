@@ -99,6 +99,9 @@
     <ClCompile Include="..\..\framework\src\graphics\mesh\mesh_option.cpp">
       <Filter>src\graphics\mesh</Filter>
     </ClCompile>
+    <ClCompile Include="..\..\framework\src\graphics\mesh\mesh_data.cpp">
+      <Filter>src\graphics\mesh</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="..\..\framework\include\graphics\texture\texture.hpp">

@@ -62,21 +62,21 @@ namespace kgs
 		~Pass();
 
 		template <MaterialData::DataType dataType>
-		typename MaterialData::ValueTypeInfo<dataType>::value_t getData(std::string name)
+		typename MaterialData::DataTypeInfo<dataType>::value_t getData(std::string name)
 		{
 			return m_pData->getDataValue<dataType>(name);
 		}
 
 		template <MaterialData::DataType dataType>
 		void setData(std::string name, 
-			typename MaterialData::ValueTypeInfo<dataType>::value_t value, 
+			typename MaterialData::DataTypeInfo<dataType>::value_t value, 
 			uint32_t binding = KGS_M_OTHER_MIN_BINDING, 
 			DescriptorType descriptorType = DescriptorType::UNIFORM_BUFFER, 
 			ShaderStageFlags stageFlags = ShaderStageFlagBits::VERTEX)
 		{
 			m_pData->setDataValue<dataType>(name, value);
 			//update layout binding information.
-			uint32_t descriptorCount = static_cast<uint32_t>(sizeof(value) / sizeof(typename MaterialData::ValueTypeInfo<dataType>::base_t));
+			uint32_t descriptorCount = static_cast<uint32_t>(sizeof(value) / sizeof(typename MaterialData::DataTypeInfo<dataType>::base_t));
 			LayoutBindingInfo info(
 				name,
 				dataType,

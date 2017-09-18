@@ -184,7 +184,7 @@ namespace kgs
 		template<DataType type>
 		void setDataValue(std::string name, typename DataTypeInfo<type>::value_t value);
 
-		uint32_t static getDataBaseType(DataType dataType);
+		uint32_t static getDataBaseTypeSize(DataType dataType);
 
 		uint32_t getDataValueSize(std::string name, DataType dataType);
 

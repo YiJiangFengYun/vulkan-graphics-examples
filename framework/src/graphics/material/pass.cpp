@@ -104,7 +104,7 @@ namespace kgs
 		{
 			if (item.descriptorType == DescriptorType::UNIFORM_BUFFER)
 			{
-				size = sizeof(MaterialData::getDataBaseType(item.dataType)) * item.descriptorCount;
+				size = sizeof(MaterialData::getDataBaseTypeSize(item.dataType)) * item.descriptorCount;
 				totalSize += size;
 			}
 		}
@@ -169,7 +169,7 @@ namespace kgs
 				std::vector<vk::DescriptorBufferInfo> bufferInfos(item.descriptorCount);
 				for (uint32_t i = 0; i < item.descriptorCount; ++i)
 				{
-					size = sizeof(MaterialData::getDataBaseType(item.dataType));
+					size = sizeof(MaterialData::getDataBaseTypeSize(item.dataType));
 					bufferInfos[i].buffer = *m_pUniformBuffer;
 					bufferInfos[i].offset = offset;
 					bufferInfos[i].range = size;
@@ -262,7 +262,7 @@ namespace kgs
 				types[index] = item.dataType;
 				names[index] = item.name;
 				descriptorCounts[index] = item.descriptorCount;
-				size = sizeof(MaterialData::getDataBaseType(item.dataType)) * item.descriptorCount;
+				size = sizeof(MaterialData::getDataBaseTypeSize(item.dataType)) * item.descriptorCount;
 				totalSize += size;
 				offset += size;
 				++index;

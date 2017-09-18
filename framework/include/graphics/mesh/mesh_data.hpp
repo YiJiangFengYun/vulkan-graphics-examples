@@ -2,7 +2,10 @@
 #define KGS_MESH_DATA_H
 
 #include <cstdint>
+#include <vector>
+#include <unordered_map>
 #include "graphics/global.hpp"
+#include "graphics/util/util.hpp"
 
 namespace kgs
 {
@@ -108,6 +111,35 @@ namespace kgs
 			DataType dataType = DataType::VECTOR_3;
 		};
 
+		std::vector<float> arrFloats;
+		std::unordered_map<std::string, float> mapFloats;
+
+		std::vector<int32_t> arrInts;
+		std::unordered_map<std::string, int32_t> mapInts;
+
+		std::vector<Vector2> arrVector2s;
+		std::unordered_map <std::string, Vector2> mapVector2s;
+
+		std::vector<Vector3> arrVector3s;
+		std::unordered_map<std::string, Vector3> mapVector3s;
+
+		std::vector<Vector4> arrVector4s;
+		std::unordered_map<std::string, Vector4> mapVector4s;
+
+		std::vector<Color32> arrColor32s;
+		std::unordered_map<std::string, Color32> mapColor32s;
+
+		template <DataType type>
+		typename DataTypeInfo<type>::value_t getDataValue(std::string name);
+
+		template <DataType type>
+		void setDataValue(std::string name, typename DataTypeInfo<type>::value_t value);
+
+		uint32_t static getDataBaseTypeSize(DataType dataType);
+
+		uint32_t static getDataValueSize(std::string name, DataType dataType);
+
+		void memCopyDataValue(std::string name, DataType dataType, void* dst, uint32_t offset, uint32_t maxElementCount);
 
 	};
 }

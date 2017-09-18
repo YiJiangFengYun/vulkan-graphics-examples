@@ -18,55 +18,9 @@
       <Platform>x64</Platform>
     </ProjectConfiguration>
   </ItemGroup>
-  <ItemGroup>
-    <ClCompile Include="..\..\framework\src\graphics\context.cpp" />
-    <ClCompile Include="..\..\framework\src\graphics\global.cpp" />
-    <ClCompile Include="..\..\framework\src\graphics\material\material.cpp" />
-    <ClCompile Include="..\..\framework\src\graphics\material\material_data.cpp" />
-    <ClCompile Include="..\..\framework\src\graphics\material\pass.cpp" />
-    <ClCompile Include="..\..\framework\src\graphics\material\pass_option.cpp" />
-    <ClCompile Include="..\..\framework\src\graphics\material\shader.cpp" />
-    <ClCompile Include="..\..\framework\src\graphics\mesh\mesh.cpp" />
-    <ClCompile Include="..\..\framework\src\graphics\mesh\mesh_option.cpp" />
-    <ClCompile Include="..\..\framework\src\graphics\texture\texture.cpp" />
-    <ClCompile Include="..\..\framework\src\graphics\texture\texture_1d.cpp" />
-    <ClCompile Include="..\..\framework\src\graphics\texture\texture_1d_array.cpp" />
-    <ClCompile Include="..\..\framework\src\graphics\texture\texture_2d.cpp" />
-    <ClCompile Include="..\..\framework\src\graphics\texture\texture_2d_array.cpp" />
-    <ClCompile Include="..\..\framework\src\graphics\texture\texture_3d.cpp" />
-    <ClCompile Include="..\..\framework\src\graphics\texture\texture_cube.cpp" />
-    <ClCompile Include="..\..\framework\src\graphics\texture\texture_cube_array.cpp" />
-    <ClCompile Include="..\..\framework\src\graphics\texture\texture_option.cpp" />
-    <ClCompile Include="..\..\framework\src\graphics\util\find_memory.cpp" />
-    <ClCompile Include="..\..\framework\src\graphics\util\util.cpp" />
-  </ItemGroup>
-  <ItemGroup>
-    <ClInclude Include="..\..\framework\include\graphics\context.hpp" />
-    <ClInclude Include="..\..\framework\include\graphics\global.hpp" />
-    <ClInclude Include="..\..\framework\include\graphics\graphics.hpp" />
-    <ClInclude Include="..\..\framework\include\graphics\material\material.hpp" />
-    <ClInclude Include="..\..\framework\include\graphics\material\material_data.hpp" />
-    <ClInclude Include="..\..\framework\include\graphics\material\pass.hpp" />
-    <ClInclude Include="..\..\framework\include\graphics\material\pass_option.hpp" />
-    <ClInclude Include="..\..\framework\include\graphics\material\shader.hpp" />
-    <ClInclude Include="..\..\framework\include\graphics\mesh\mesh.hpp" />
-    <ClInclude Include="..\..\framework\include\graphics\mesh\mesh_data.hpp" />
-    <ClInclude Include="..\..\framework\include\graphics\mesh\mesh_option.hpp" />
-    <ClInclude Include="..\..\framework\include\graphics\texture\texture.hpp" />
-    <ClInclude Include="..\..\framework\include\graphics\texture\texture_1d.hpp" />
-    <ClInclude Include="..\..\framework\include\graphics\texture\texture_1d_array.hpp" />
-    <ClInclude Include="..\..\framework\include\graphics\texture\texture_2d.hpp" />
-    <ClInclude Include="..\..\framework\include\graphics\texture\texture_2d_array.hpp" />
-    <ClInclude Include="..\..\framework\include\graphics\texture\texture_3d.hpp" />
-    <ClInclude Include="..\..\framework\include\graphics\texture\texture_cube.hpp" />
-    <ClInclude Include="..\..\framework\include\graphics\texture\texture_cube_array.hpp" />
-    <ClInclude Include="..\..\framework\include\graphics\texture\texture_option.hpp" />
-    <ClInclude Include="..\..\framework\include\graphics\util\find_memory.hpp" />
-    <ClInclude Include="..\..\framework\include\graphics\util\util.hpp" />
-  </ItemGroup>
   <PropertyGroup Label="Globals">
     <VCProjectVersion>15.0</VCProjectVersion>
-    <ProjectGuid>{C1225BF6-5118-407D-B349-02286D5B179C}</ProjectGuid>
+    <ProjectGuid>{4F3426AE-EA32-4391-AE63-18F1FE9155FB}</ProjectGuid>
     <RootNamespace>graphicsframework</RootNamespace>
     <WindowsTargetPlatformVersion>10.0.14393.0</WindowsTargetPlatformVersion>
   </PropertyGroup>

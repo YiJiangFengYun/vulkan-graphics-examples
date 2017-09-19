@@ -23,8 +23,10 @@ namespace kgs
 	class Mesh
 	{
 	public:
-		typedef typename MeshData::DataTypeInfo<MeshTypeInfo<meshType>::baseType>::value_t base_data_t;
-		typedef typename MeshData::DataTypeInfo<MeshTypeInfo<meshType>::arrType>::value_t arr_data_t;
+		typedef typename MeshTypeInfo<meshType>::baseType BaseDataType;
+		typedef typename MeshTypeInfo<meshType>::arrType ArrayDataType;
+		typedef typename MeshData::DataTypeInfo<BaseDataType>::ValueType BaseValueType;
+		typedef typename MeshData::DataTypeInfo<ArrayDataType>::ValueType ArrayValueType;
 		struct LayoutInfo
 		{
 			std::string name;
@@ -74,31 +76,31 @@ namespace kgs
 		}
 
 		//vertex
-		arr_data_t getVertices() const
+		ArrayValueType getVertices() const
 		{
-			
+			m_pData->getDataValue<
 		}
 
-		void setVertices(arr_data_t vertices);
+		void setVertices(ArrayValueType vertices);
 
 		//color
 		std::vector<Color32> getColors() const;
 		void setColors(std::vector<Color32> colors);
 
 		//normal
-		arr_data_t getNormals() const;
-		void setNormals(arr_data_t normals);
+		ArrayValueType getNormals() const;
+		void setNormals(ArrayValueType normals);
 
 		//tangent
-		arr_data_t getTangents() const;
-		void setTangents(arr_data_t tangents);
+		ArrayValueType getTangents() const;
+		void setTangents(ArrayValueType tangents);
 
 		//uv
 		template<UVType uvType>
-		typename MeshData::DataTypeInfo<UVTypeInfo<uvType>::arrType>::value_t getUVs(uint32_t uvIndex);
+		typename MeshData::DataTypeInfo<UVTypeInfo<uvType>::arrType>::ValueType getUVs(uint32_t uvIndex);
 
 		template<UVType uvType>
-		void setUVs(typename MeshData::DataTypeInfo<UVTypeInfo<uvType>::arrType>::value_t uvs, uint32_t uvIndex);
+		void setUVs(typename MeshData::DataTypeInfo<UVTypeInfo<uvType>::arrType>::ValueType uvs, uint32_t uvIndex);
 
 		//index
 		std::vector<uint32_t> getIndices(uint32_t subMeshIndex) const;
@@ -113,7 +115,7 @@ namespace kgs
 		void setSubMeshCount(uint32_t value);
 
 		/*The bounding volume of the mesh*/
-		fd::Bounds<base_data_t> getBounds();
+		fd::Bounds<BaseValueType> getBounds();
 
 		/**Vertex colors of the Mesh multiplied to verties*/
 		Color getMultipliedColor() const;
@@ -130,7 +132,7 @@ namespace kgs
 		MeshType m_meshType = meshType;
 		uint32_t m_vertexCount;
 		std::shared_ptr<MeshData> m_pData;
-		fd::Bounds<base_data_t> m_bounds;
+		fd::Bounds<BaseValueType> m_bounds;
 		Color m_multipliedColor;
 		Color m_addedColor;
 	};

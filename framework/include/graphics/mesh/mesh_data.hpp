@@ -33,92 +33,92 @@ namespace kgs
 		template <DataType type>
 		struct DataTypeInfo
 		{
-			typedef void value_t;
-			typedef void base_t;
+			typedef void ValueType;
+			typedef void BaseType;
 		};
 
 		template<>
 		struct DataTypeInfo<DataType::FLOAT>
 		{
-			typedef float value_t;
-			typedef float base_t;
+			typedef float ValueType;
+			typedef float BaseType;
 		};
 
 		template<>
 		struct DataTypeInfo<DataType::FLOAT_ARRAY>
 		{
-			typedef std::vector<float> value_t;
-			typedef float base_t;
+			typedef std::vector<float> ValueType;
+			typedef float BaseType;
 		};
 
 		template<>
 		struct DataTypeInfo<DataType::INT>
 		{
-			typedef int32_t value_t;
-			typedef int32_t  base_t;
+			typedef int32_t ValueType;
+			typedef int32_t  BaseType;
 		};
 
 		template<>
 		struct DataTypeInfo<DataType::INT_ARRAY>
 		{
-			typedef std::vector<int32_t> value_t;
-			typedef int32_t  base_t;
+			typedef std::vector<int32_t> ValueType;
+			typedef int32_t  BaseType;
 		};
 
 		template<>
 		struct DataTypeInfo<DataType::VECTOR_2>
 		{
-			typedef Vector2 value_t;
-			typedef Vector2 base_t;
+			typedef Vector2 ValueType;
+			typedef Vector2 BaseType;
 		};
 
 		template<>
 		struct DataTypeInfo<DataType::VECTOR_2_ARRAY>
 		{
-			typedef std::vector<Vector2> value_t;
-			typedef Vector2 base_t;
+			typedef std::vector<Vector2> ValueType;
+			typedef Vector2 BaseType;
 		};
 
 		template<>
 		struct DataTypeInfo<DataType::VECTOR_3>
 		{
-			typedef Vector3 value_t;
-			typedef Vector3 base_t;
+			typedef Vector3 ValueType;
+			typedef Vector3 BaseType;
 		};
 
 		template<>
 		struct DataTypeInfo<DataType::VECTOR_3_ARRAY>
 		{
-			typedef std::vector<Vector3> value_t;
-			typedef Vector3 base_t;
+			typedef std::vector<Vector3> ValueType;
+			typedef Vector3 BaseType;
 		};
 
 		template<>
 		struct DataTypeInfo<DataType::VECTOR_4>
 		{
-			typedef Vector4 value_t;
-			typedef Vector4 base_t;
+			typedef Vector4 ValueType;
+			typedef Vector4 BaseType;
 		};
 
 		template<>
 		struct DataTypeInfo<DataType::VECTOR_4_ARRAY>
 		{
-			typedef std::vector<Vector4> value_t;
-			typedef Vector4 base_t;
+			typedef std::vector<Vector4> ValueType;
+			typedef Vector4 BaseType;
 		};
 
 		template<>
 		struct DataTypeInfo<DataType::COLOR_32>
 		{
-			typedef Color32 value_t;
-			typedef Color32 base_t;
+			typedef Color32 ValueType;
+			typedef Color32 BaseType;
 		};
 
 		template<>
 		struct DataTypeInfo<DataType::COLOR_32_ARRAY>
 		{
-			typedef std::vector<Color32> value_t;
-			typedef Color32 base_t;
+			typedef std::vector<Color32> ValueType;
+			typedef Color32 BaseType;
 		};
 
 		std::vector<float> arrFloats;
@@ -158,10 +158,10 @@ namespace kgs
 		std::unordered_map<std::string, std::vector<Color32>> mapColor32Arrays;
 
 		template <DataType type>
-		typename DataTypeInfo<type>::value_t getDataValue(std::string name);
+		typename DataTypeInfo<type>::ValueType getDataValue(std::string name);
 
 		template <DataType type>
-		void setDataValue(std::string name, typename DataTypeInfo<type>::value_t value);
+		void setDataValue(std::string name, typename DataTypeInfo<type>::ValueType value);
 
 		uint32_t static getDataBaseTypeSize(DataType dataType);
 

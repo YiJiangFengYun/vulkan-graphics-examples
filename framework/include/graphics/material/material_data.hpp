@@ -36,8 +36,8 @@ namespace kgs
 		template <DataType type>
 		struct DataTypeInfo
 		{
-			typedef void value_t;
-			typedef void base_t;
+			typedef void ValueType;
+			typedef void BaseType;
 			Bool32 isArray = KGS_FALSE;
 		};
 
@@ -45,104 +45,104 @@ namespace kgs
 		template<>
 		struct DataTypeInfo<DataType::FLOAT>
 		{
-			typedef float value_t;
-			typedef float base_t;
+			typedef float ValueType;
+			typedef float BaseType;
 			Bool32 isArray = KGS_FALSE;
 		};
 
 		template<>
 		struct DataTypeInfo<DataType::FLOAT_ARRAY>
 		{
-			typedef std::vector<float> value_t;
-			typedef float base_t;
+			typedef std::vector<float> ValueType;
+			typedef float BaseType;
 			Bool32 isArray = KGS_TRUE;
 		};
 
 		template<>
 		struct DataTypeInfo<DataType::INT>
 		{
-			typedef int32_t value_t;
-			typedef int32_t base_t;
+			typedef int32_t ValueType;
+			typedef int32_t BaseType;
 			Bool32 isArray = KGS_FALSE;
 		};
 
 		template<>
 		struct DataTypeInfo<DataType::INT_ARRAY>
 		{
-			typedef std::vector<int32_t> value_t;
-			typedef int32_t base_t;
+			typedef std::vector<int32_t> ValueType;
+			typedef int32_t BaseType;
 			Bool32 isArray = KGS_TRUE;
 		};
 
 		template<>
 		struct DataTypeInfo<DataType::COLOR>
 		{
-			typedef Color value_t;
-			typedef Color base_t;
+			typedef Color ValueType;
+			typedef Color BaseType;
 			Bool32 isArray = KGS_FALSE;
 		};
 
 		template<>
 		struct DataTypeInfo<DataType::COLOR_ARRAY>
 		{
-			typedef std::vector<Color> value_t;
-			typedef Color base_t;
+			typedef std::vector<Color> ValueType;
+			typedef Color BaseType;
 			Bool32 isArray = KGS_TRUE;
 		};
 
 		template<>
 		struct DataTypeInfo<DataType::VECTOR>
 		{
-			typedef Vector4 value_t;
-			typedef Vector4 base_t;
+			typedef Vector4 ValueType;
+			typedef Vector4 BaseType;
 			Bool32 isArray = KGS_FALSE;
 		};
 
 		template<>
 		struct DataTypeInfo<DataType::VECTOR_ARRAY>
 		{
-			typedef std::vector<Vector4> value_t;
-			typedef Vector4 base_t;
+			typedef std::vector<Vector4> ValueType;
+			typedef Vector4 BaseType;
 			Bool32 isArray = KGS_TRUE;
 		};
 
 		template<>
 		struct DataTypeInfo<DataType::MATRIX>
 		{
-			typedef Matrix4x4 value_t;
-			typedef Matrix4x4 base_t;
+			typedef Matrix4x4 ValueType;
+			typedef Matrix4x4 BaseType;
 			Bool32 isArray = KGS_FALSE;
 		};
 
 		template<>
 		struct DataTypeInfo<DataType::MATRIX_ARRAY>
 		{
-			typedef std::vector<Matrix4x4> value_t;
-			typedef Matrix4x4 base_t;
+			typedef std::vector<Matrix4x4> ValueType;
+			typedef Matrix4x4 BaseType;
 			Bool32 isArray = KGS_TRUE;
 		};
 
 		template<>
 		struct DataTypeInfo<DataType::TEXTURE>
 		{
-			typedef std::shared_ptr<Texture> value_t;
-			typedef std::shared_ptr<Texture> base_t;
+			typedef std::shared_ptr<Texture> ValueType;
+			typedef std::shared_ptr<Texture> BaseType;
 			Bool32 isArray = KGS_FALSE;
 		};
 
 		template<>
 		struct DataTypeInfo<DataType::TEXTURE_OFFSET>
 		{
-			typedef Vector2 value_t;
-			typedef Vector2 base_t;
+			typedef Vector2 ValueType;
+			typedef Vector2 BaseType;
 			Bool32 isArray = KGS_FALSE;
 		};
 
 		template<>
 		struct DataTypeInfo<DataType::TEXTURE_SCALE>
 		{
-			typedef Vector2 value_t;
-			typedef Vector2 base_t;
+			typedef Vector2 ValueType;
+			typedef Vector2 BaseType;
 			Bool32 isArray = KGS_FALSE;
 		};
 
@@ -179,10 +179,10 @@ namespace kgs
 		std::unordered_map<std::string, Vector2> mapTextureScales;
 
 		template <DataType type>
-		typename DataTypeInfo<type>::value_t getDataValue(std::string name);
+		typename DataTypeInfo<type>::ValueType getDataValue(std::string name);
 
 		template<DataType type>
-		void setDataValue(std::string name, typename DataTypeInfo<type>::value_t value);
+		void setDataValue(std::string name, typename DataTypeInfo<type>::ValueType value);
 
 		uint32_t static getDataBaseTypeSize(DataType dataType);
 

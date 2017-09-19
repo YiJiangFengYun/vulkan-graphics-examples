@@ -12,16 +12,16 @@ namespace fd
 	class Ray
 	{
 	public:
-		typedef VecType value_type;
-		typedef typename value_type::length_type length_type;
-		typedef typename value_type::value_type vec_value_type;
+		typedef VecType ValueType;
+		typedef typename ValueType::length_type length_type;
+		typedef typename ValueType::value_type vec_value_type;
 
 		Ray()
 		{
 
 		}
 
-		Ray(value_type origin, value_type direction):
+		Ray(ValueType origin, ValueType direction):
 			m_origin(origin), m_direction(direction), m_isUpdateCache(FD_TRUE)
 		{
 #ifdef DEBUG
@@ -31,7 +31,7 @@ namespace fd
 #endif // DEBUG
 		}
 
-		Ray(const Ray<value_type>& target) :
+		Ray(const Ray<ValueType>& target) :
 			m_origin(target.m_origin),
 			m_direction(target.m_direction),
 			m_isUpdateCache(target.m_isUpdateCache),
@@ -40,7 +40,7 @@ namespace fd
 		{
 		}
 
-		Ray& operator =(const Ray<value_type>& target)
+		Ray& operator =(const Ray<ValueType>& target)
 		{
 			m_origin = target.m_origin;
 			m_direction = target.m_direction;
@@ -50,44 +50,44 @@ namespace fd
 			return *this;
 		}
 
-		value_type getOrigin()
+		ValueType getOrigin()
 		{
 			return m_origin;
 		}
 
-		void setOrigin(value_type origin)
+		void setOrigin(ValueType origin)
 		{
 			m_origin = origin;
 			m_isUpdateCache = true;
 		}
 
-		value_type getDirection()
+		ValueType getDirection()
 		{
 			return m_direction;
 		}
 
-		void setDirection(value_type direction)
+		void setDirection(ValueType direction)
 		{
 			m_direction = direction;
 			m_isUpdateCache = true;
 		}
 
-		value_type getInvDir()
+		ValueType getInvDir()
 		{
 			_updateCache();
 			return m_invDir;
 		}
 
-		value_type getSigns()
+		ValueType getSigns()
 		{
 			_updateCache();
 			return m_signs;
 		}
 
 		/*Returns a point at distance units along the ray.*/
-		value_type getPoint(vec_value_type distance)
+		ValueType getPoint(vec_value_type distance)
 		{
-			value_type direction = m_direction;
+			ValueType direction = m_direction;
 			glm::normalize(direction);
 			direction *= distance;
 			direction += m_origin;
@@ -96,20 +96,20 @@ namespace fd
 
 
 	private:
-		value_type m_origin;
-		value_type m_direction;
+		ValueType m_origin;
+		ValueType m_direction;
 
 		//cache
 		Bool32 m_isUpdateCache;
-		value_type m_invDir;
-		value_type m_signs;
+		ValueType m_invDir;
+		ValueType m_signs;
 
 		inline void _updateCache()
 		{
 			if (m_isUpdateCache)
 			{
 				m_isUpdateCache = FD_FALSE;
-				length_type length = value_type::length();
+				length_type length = ValueType::length();
 				for (length_type i = 0; i < length; ++i)
 				{
 					m_invDir[i] = 1 / m_direction[i];
@@ -124,28 +124,28 @@ namespace fd
 	class Bounds
 	{
 	public:
-		typedef VecType value_type;
-		typedef typename value_type::length_type length_type;
-		typedef typename value_type::value_type vec_value_type;
+		typedef VecType ValueType;
+		typedef typename ValueType::length_type length_type;
+		typedef typename ValueType::value_type vec_value_type;
 		Bounds()
 		{
 			_updateSize();
 		}
 
-		Bounds(value_type min, value_type max):
+		Bounds(ValueType min, ValueType max):
 			m_min(min), m_max(max)
 		{
 			_updateSize();
 		}
 
-		Bounds(const Bounds<value_type>& target):
+		Bounds(const Bounds<ValueType>& target):
 			m_min(target.m_min),
 			m_max(target.m_max),
 			m_size(target.m_size)
 		{
 		}
 
-		Bounds& operator =(const Bounds<value_type>& target)
+		Bounds& operator =(const Bounds<ValueType>& target)
 		{
 			m_min = target.m_min;
 			m_max = target.m_max;
@@ -153,15 +153,15 @@ namespace fd
 			return *this;
 		}
 
-		value_type getMin() { return m_min; }
-		void setMin(value_type value)
+		ValueType getMin() { return m_min; }
+		void setMin(ValueType value)
 		{
 			m_min = value;
 			_updateSize();
 		}
 
-		value_type getMax() { return m_max; }
-		void setMax(value_type value)
+		ValueType getMax() { return m_max; }
+		void setMax(ValueType value)
 		{
 			m_max = value;
 			_updateSize();
@@ -169,18 +169,18 @@ namespace fd
 
 		/* Sets the bounds to the min and max value of the box.
            Using this function is faster than assigning min and max separately.*/
-		void setMinMax(value_type min, value_type max)
+		void setMinMax(ValueType min, ValueType max)
 		{
 			m_min = min;
 			m_max = max;
 			_updateSize();
 		}
 
-		value_type getSize() { return m_size; }
-		void setSize(value_type size)
+		ValueType getSize() { return m_size; }
+		void setSize(ValueType size)
 		{
 #ifdef DEBUG
-			length_type length = value_type::length();
+			length_type length = ValueType::length();
 			for (length_type i = 0; i < length; ++i)
 			{
 				if (size[i] < 0)throw std::invalid_argument("Invalid size of Bounds");
@@ -193,10 +193,10 @@ namespace fd
 		/* The closest point on the bounding box.
            If the point is inside the bounding box, unmodified point position will be returned.
 		*/
-		value_type getClosestPoint(value_type point)
+		ValueType getClosestPoint(ValueType point)
 		{
-			length_type length = value_type::length();
-			value_type result;
+			length_type length = ValueType::length();
+			ValueType result;
 			for (length_type i = 0; i < length; ++i)
 			{
 				if (point[i] < m_min[i]) result[i] = m_min[i];
@@ -208,9 +208,9 @@ namespace fd
 
 		/*Is point contained in the bounding box?
           If the point passed into Contains is inside the bounding box a value of True is returned.*/
-		Bool32 isContains(value_type point)
+		Bool32 isContains(ValueType point)
 		{
-			length_type length = value_type::length();
+			length_type length = ValueType::length();
 			for (length_type i = 0; i < length; ++i)
 			{
 				if (point[i] < m_min[i] || point[i] > m_max[i])
@@ -223,7 +223,7 @@ namespace fd
 		void expand(vec_value_type amount)
 		{
 			vec_value_type halt = amount / 2;
-			length_type length = value_type::length();
+			length_type length = ValueType::length();
 			for (length_type i = 0; i < length; ++i)
 			{
 				m_min[i] -= halt;
@@ -236,17 +236,17 @@ namespace fd
 		/*Does ray intersect this bounding box?
           if true, return the distance to the ray's origin will be returned,
           or else return number -1.*/
-		//vec_value_type intersectRay(Ray<value_type> ray)
+		//vec_value_type intersectRay(Ray<ValueType> ray)
 		//{
 		//	////reference:
 		//	//// http://www.scratchapixel.com/lessons/3d-basic-rendering/minimal-ray-tracer-rendering-simple-shapes/ray-box-intersection
 		//	vec_value_type tMin, tMax, tYMin, tYMax, tZMin, tZMax;
-		//	value_type origin = ray.getOrigin();
-		//	value_type dir = ray.getDirection();
-		//	value_type invDir = ray.getInvDir();
-		//	value_type signs = ray.getSigns();
+		//	ValueType origin = ray.getOrigin();
+		//	ValueType dir = ray.getDirection();
+		//	ValueType invDir = ray.getInvDir();
+		//	ValueType signs = ray.getSigns();
 		//	vec_value_type Epsilon = std::numeric_limits<vec_value_type>::epsilon();
-		//	value_type minMax[2] = { m_min, m_max };
+		//	ValueType minMax[2] = { m_min, m_max };
 		//	if (glm::abs(dir[0]) > Epsilon)
 		//	{
 		//		tMin = (minMax[static_cast<size_t>(1 - signs[0])][0] - origin[0]) * invDir[0];
@@ -325,9 +325,9 @@ namespace fd
 		//}
 
 		/*Does another bounding box intersect with this bounding box?*/
-		Bool32 isIntersects(Bounds<value_type> bounds)
+		Bool32 isIntersects(Bounds<ValueType> bounds)
 		{
-			vec_value_type length = value_type::length();
+			vec_value_type length = ValueType::length();
 			for (vec_value_type i = 0; i < length; ++i)
 			{
 				if (m_min[i] > bounds.m_max[i] || m_max[i] < bounds.m_min[i])
@@ -337,9 +337,9 @@ namespace fd
 		}
 
 		/*The smallest squared distance between the point and this bounding box.*/
-		vec_value_type getSqrDistance(value_type point)
+		vec_value_type getSqrDistance(ValueType point)
 		{
-			value_type closestPoint = getClosestPoint(point);
+			ValueType closestPoint = getClosestPoint(point);
 			closestPoint -= point;
 			return glm::dot(closestPoint, closestPoint);
 		}
@@ -350,13 +350,13 @@ namespace fd
 		}
 
 	private:
-		value_type m_min;
-		value_type m_max;
-		value_type m_size;
+		ValueType m_min;
+		ValueType m_max;
+		ValueType m_size;
 
 		inline void _updateSize()
 		{
-			length_type length = value_type::length();
+			length_type length = ValueType::length();
 			for (length_type i = 0; i < length; ++i)
 			{
 				m_size[i] = m_max[i] - m_min[i];
@@ -372,7 +372,7 @@ namespace fd
 
 		inline void _updateMax()
 		{
-			length_type length = value_type::length();
+			length_type length = ValueType::length();
 			for (length_type i = 0; i < length; ++i)
 			{
 				m_max[i] = m_min[i] + m_size[i];

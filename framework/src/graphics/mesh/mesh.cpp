@@ -2,11 +2,6 @@
 
 namespace kgs
 {
-	Mesh::Mesh()
-	{
-	}
 
-	Mesh::~Mesh()
-	{
-	}
+	
 }

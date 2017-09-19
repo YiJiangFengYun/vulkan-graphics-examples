@@ -121,44 +121,6 @@ namespace kgs
 			typedef Color32 base_t;
 		};
 
-		enum class UVType
-		{
-			FLOAT,
-			VECTOR_2,
-			VECTOR_3,
-			BEGIN_RANGE = FLOAT,
-			END_RANGE = VECTOR_3,
-			RANGE_SIZE = (END_RANGE - BEGIN_RANGE + 1)
-		};
-
-		template<UVType type>
-		struct UVTypeInfo
-		{
-			typedef void value_t;
-			DataType dataType;
-		};
-
-		template<>
-		struct UVTypeInfo<UVType::FLOAT>
-		{
-			typedef float value_t;
-			DataType dataType = DataType::FLOAT_ARRAY;
-		};
-
-		template<>
-		struct UVTypeInfo<UVType::VECTOR_2>
-		{
-			typedef Vector2 value_t;
-			DataType dataType = DataType::VECTOR_2_ARRAY;
-		};
-
-		template<>
-		struct UVTypeInfo<UVType::VECTOR_3>
-		{
-			typedef Vector3 value_t;
-			DataType dataType = DataType::VECTOR_3_ARRAY;
-		};
-
 		std::vector<float> arrFloats;
 		std::unordered_map<std::string, float> mapFloats;
 

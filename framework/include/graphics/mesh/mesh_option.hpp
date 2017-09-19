@@ -4,9 +4,75 @@
 #include <array>
 #include <vulkan/vulkan.hpp>
 #include "graphics/global.hpp"
+#include "graphics/mesh/mesh_data.hpp"
 
 namespace kgs
 {
+	enum class MeshType
+	{
+		SPACE_2,
+		SPACE_3
+	};
+
+	template<MeshType type>
+	struct MeshTypeInfo
+	{
+		MeshData::DataType baseType;
+		MeshData::DataType arrType;
+	};
+
+	template<>
+	struct MeshTypeInfo<MeshType::SPACE_2>
+	{
+		MeshData::DataType baseType = MeshData::DataType::VECTOR_2;
+		MeshData::DataType arrType = MeshData::DataType::VECTOR_2_ARRAY;
+	};
+
+	template<>
+	struct MeshTypeInfo<MeshType::SPACE_3>
+	{
+		MeshData::DataType baseType = MeshData::DataType::VECTOR_3;
+		MeshData::DataType arrType = MeshData::DataType::VECTOR_3_ARRAY;
+	};
+
+	enum class UVType
+	{
+		FLOAT,
+		VECTOR_2,
+		VECTOR_3,
+		BEGIN_RANGE = FLOAT,
+		END_RANGE = VECTOR_3,
+		RANGE_SIZE = (END_RANGE - BEGIN_RANGE + 1)
+	};
+
+	template<UVType type>
+	struct UVTypeInfo
+	{
+		MeshData::DataType baseType;
+		MeshData::DataType arrType;
+	};
+
+	template<>
+	struct UVTypeInfo<UVType::FLOAT>
+	{
+		MeshData::DataType baseType = MeshData::DataType::FLOAT;
+		MeshData::DataType arrType = MeshData::DataType::FLOAT_ARRAY;
+	};
+
+	template<>
+	struct UVTypeInfo<UVType::VECTOR_2>
+	{
+		MeshData::DataType baseType = MeshData::DataType::VECTOR_2;
+		MeshData::DataType arrType = MeshData::DataType::VECTOR_2_ARRAY;
+	};
+
+	template<>
+	struct UVTypeInfo<UVType::VECTOR_3>
+	{
+		MeshData::DataType baseType = MeshData::DataType::VECTOR_3;
+		MeshData::DataType arrType = MeshData::DataType::VECTOR_3_ARRAY;
+	};
+
 	enum class PrimitiveTopology
 	{
 		POINT_LIST = 0,

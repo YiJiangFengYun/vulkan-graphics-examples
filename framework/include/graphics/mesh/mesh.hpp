@@ -4,6 +4,7 @@
 #include <glm/glm.hpp>
 #include "graphics/global.hpp"
 #include "graphics/mesh/mesh_option.hpp"
+#include "graphics/mesh/mesh_data.hpp"
 
 #define KGS_VERTEX_POSTION_NAME "_Position"
 #define KGS_VERTEX_COLOR_NAME "_Color"
@@ -18,45 +19,86 @@
 
 namespace kgs
 {
-	template <typename VecType>
+	template <MeshType meshType>
 	class Mesh
 	{
 	public:
-		typedef VecType type_value;
-
+		typedef typename MeshData::DataTypeInfo<MeshTypeInfo<meshType>::baseType>::value_t base_data_t;
+		typedef typename MeshData::DataTypeInfo<MeshTypeInfo<meshType>::arrType>::value_t arr_data_t;
 		struct LayoutInfo
 		{
 			std::string name;
+			MeshData::DataType dataType;
+			uint32_t location;
+
+			LayoutInfo(std::string name,
+				MeshData::DataType dataType,
+				uint32_t location):
+				name(name), 
+				dataType(dataType), 
+				location(location)
+			{
+
+			}
+
+			Bool32 operator ==(const LayoutInfo& target) const
+			{
+				return name == target.name && dataType == target.dataType && location == target.location;
+			}
 		};
 
 
-		Mesh();
-		~Mesh();
+		Mesh()
+		{
 
-		uint32_t getVertexCount() const;
+		}
+
+		~Mesh()
+		{
+
+		}
+
+		MeshType getMeshType() const
+		{
+			return m_meshType;
+		}
+
+		uint32_t getVertexCount() const
+		{
+			return m_vertexCount;
+		}
+
+		void setVertexCount(uint32_t value)
+		{
+			m_vertexCount = value;
+		}
 
 		//vertex
-		std::vector<type_value> getVertices() const;
-		void setVertices(std::vector<type_value> vertices);
+		arr_data_t getVertices() const
+		{
+			
+		}
+
+		void setVertices(arr_data_t vertices);
 
 		//color
 		std::vector<Color32> getColors() const;
 		void setColors(std::vector<Color32> colors);
 
 		//normal
-		std::vector<type_value> getNormals() const;
-		void setNormals(std::vector<type_value> normals);
+		arr_data_t getNormals() const;
+		void setNormals(arr_data_t normals);
 
 		//tangent
-		std::vector<type_value> getTangents() const;
-		void setTangents(std::vector<type_value> tangents);
+		arr_data_t getTangents() const;
+		void setTangents(arr_data_t tangents);
 
 		//uv
-		template<typename UVVecType>
-		std::vector<UVVecType> getUVs(uint32_t uvIndex);
+		template<UVType uvType>
+		typename MeshData::DataTypeInfo<UVTypeInfo<uvType>::arrType>::value_t getUVs(uint32_t uvIndex);
 
-		template<typename UVVecType>
-		void setUVs(std::vector<UVVecType> uvs, uint32_t uvIndex);
+		template<UVType uvType>
+		void setUVs(typename MeshData::DataTypeInfo<UVTypeInfo<uvType>::arrType>::value_t uvs, uint32_t uvIndex);
 
 		//index
 		std::vector<uint32_t> getIndices(uint32_t subMeshIndex) const;
@@ -71,7 +113,7 @@ namespace kgs
 		void setSubMeshCount(uint32_t value);
 
 		/*The bounding volume of the mesh*/
-		fd::Bounds<type_value> getBounds();
+		fd::Bounds<base_data_t> getBounds();
 
 		/**Vertex colors of the Mesh multiplied to verties*/
 		Color getMultipliedColor() const;
@@ -85,7 +127,10 @@ namespace kgs
 
 
 	private:
-		fd::Bounds<type_value> m_bounds;
+		MeshType m_meshType = meshType;
+		uint32_t m_vertexCount;
+		std::shared_ptr<MeshData> m_pData;
+		fd::Bounds<base_data_t> m_bounds;
 		Color m_multipliedColor;
 		Color m_addedColor;
 	};

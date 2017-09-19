@@ -231,10 +231,10 @@ namespace kgs
 
 	//------------------this used to eliminate ide warning------------------------------
 	template <MeshData::DataType type>
-	typename MeshData::DataTypeInfo<type>::value_t MeshData::getDataValue(std::string name) { return {}; }
+	typename MeshData::DataTypeInfo<type>::ValueType MeshData::getDataValue(std::string name) { return {}; }
 
 	template <MeshData::DataType type>
-	void MeshData::setDataValue(std::string name, typename MeshData::DataTypeInfo<type>::value_t value) {}
+	void MeshData::setDataValue(std::string name, typename MeshData::DataTypeInfo<type>::ValueType value) {}
 	//-----------------this used to eliminate ide warning----------------
 
 	template<>

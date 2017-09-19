@@ -17,22 +17,22 @@ namespace kgs
 	template<MeshType type>
 	struct MeshTypeInfo
 	{
-		MeshData::DataType baseType;
-		MeshData::DataType arrType;
+		MeshData::DataType BaseType;
+		MeshData::DataType ArrayType;
 	};
 
 	template<>
 	struct MeshTypeInfo<MeshType::SPACE_2>
 	{
-		MeshData::DataType baseType = MeshData::DataType::VECTOR_2;
-		MeshData::DataType arrType = MeshData::DataType::VECTOR_2_ARRAY;
+		MeshData::DataType BaseType = MeshData::DataType::VECTOR_2;
+		MeshData::DataType ArrayType = MeshData::DataType::VECTOR_2_ARRAY;
 	};
 
 	template<>
 	struct MeshTypeInfo<MeshType::SPACE_3>
 	{
-		MeshData::DataType baseType = MeshData::DataType::VECTOR_3;
-		MeshData::DataType arrType = MeshData::DataType::VECTOR_3_ARRAY;
+		MeshData::DataType BaseType = MeshData::DataType::VECTOR_3;
+		MeshData::DataType ArrayType = MeshData::DataType::VECTOR_3_ARRAY;
 	};
 
 	enum class UVType
@@ -48,29 +48,29 @@ namespace kgs
 	template<UVType type>
 	struct UVTypeInfo
 	{
-		MeshData::DataType baseType;
-		MeshData::DataType arrType;
+		MeshData::DataType BaseType;
+		MeshData::DataType ArrayType;
 	};
 
 	template<>
 	struct UVTypeInfo<UVType::FLOAT>
 	{
-		MeshData::DataType baseType = MeshData::DataType::FLOAT;
-		MeshData::DataType arrType = MeshData::DataType::FLOAT_ARRAY;
+		MeshData::DataType BaseType = MeshData::DataType::FLOAT;
+		MeshData::DataType ArrayType = MeshData::DataType::FLOAT_ARRAY;
 	};
 
 	template<>
 	struct UVTypeInfo<UVType::VECTOR_2>
 	{
-		MeshData::DataType baseType = MeshData::DataType::VECTOR_2;
-		MeshData::DataType arrType = MeshData::DataType::VECTOR_2_ARRAY;
+		MeshData::DataType BaseType = MeshData::DataType::VECTOR_2;
+		MeshData::DataType ArrayType = MeshData::DataType::VECTOR_2_ARRAY;
 	};
 
 	template<>
 	struct UVTypeInfo<UVType::VECTOR_3>
 	{
-		MeshData::DataType baseType = MeshData::DataType::VECTOR_3;
-		MeshData::DataType arrType = MeshData::DataType::VECTOR_3_ARRAY;
+		MeshData::DataType BaseType = MeshData::DataType::VECTOR_3;
+		MeshData::DataType ArrayType = MeshData::DataType::VECTOR_3_ARRAY;
 	};
 
 	enum class PrimitiveTopology

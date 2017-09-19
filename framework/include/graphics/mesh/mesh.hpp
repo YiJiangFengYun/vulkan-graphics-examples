@@ -23,10 +23,10 @@ namespace kgs
 	class Mesh
 	{
 	public:
-		typedef typename MeshTypeInfo<meshType>::baseType BaseDataType;
-		typedef typename MeshTypeInfo<meshType>::arrType ArrayDataType;
-		typedef typename MeshData::DataTypeInfo<BaseDataType>::ValueType BaseValueType;
-		typedef typename MeshData::DataTypeInfo<ArrayDataType>::ValueType ArrayValueType;
+		const MeshData::DataType static baseDataType = MeshTypeInfo<meshType>::BaseType;
+		const MeshData::DataType static arrayDataType = MeshTypeInfo<meshType>::ArrayType ;
+		typedef typename MeshData::DataTypeInfo<baseDataType>::ValueType BaseValueType;
+		typedef typename MeshData::DataTypeInfo<arrayDataType>::ValueType ArrayValueType;
 		struct LayoutInfo
 		{
 			std::string name;
@@ -78,7 +78,7 @@ namespace kgs
 		//vertex
 		ArrayValueType getVertices() const
 		{
-			m_pData->getDataValue<
+			m_pData->getDataValue<baseDataType>(KGS_VERTEX_POSTION_NAME);
 		}
 
 		void setVertices(ArrayValueType vertices);
@@ -97,10 +97,10 @@ namespace kgs
 
 		//uv
 		template<UVType uvType>
-		typename MeshData::DataTypeInfo<UVTypeInfo<uvType>::arrType>::ValueType getUVs(uint32_t uvIndex);
+		typename MeshData::DataTypeInfo<UVTypeInfo<uvType>::ArrayType>::ValueType getUVs(uint32_t uvIndex);
 
 		template<UVType uvType>
-		void setUVs(typename MeshData::DataTypeInfo<UVTypeInfo<uvType>::arrType>::ValueType uvs, uint32_t uvIndex);
+		void setUVs(typename MeshData::DataTypeInfo<UVTypeInfo<uvType>::ArrayType>::ValueType uvs, uint32_t uvIndex);
 
 		//index
 		std::vector<uint32_t> getIndices(uint32_t subMeshIndex) const;
@@ -115,7 +115,7 @@ namespace kgs
 		void setSubMeshCount(uint32_t value);
 
 		/*The bounding volume of the mesh*/
-		fd::Bounds<BaseValueType> getBounds();
+		fd::Bounds<typename BaseValueType> getBounds();
 
 		/**Vertex colors of the Mesh multiplied to verties*/
 		Color getMultipliedColor() const;

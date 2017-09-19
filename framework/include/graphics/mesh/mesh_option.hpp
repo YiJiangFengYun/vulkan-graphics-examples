@@ -21,20 +21,6 @@ namespace kgs
 		const static MeshData::DataType ARRAY_TYPE;
 	};
 
-	template<>
-	struct MeshTypeInfo<MeshType::SPACE_2>
-	{
-		const static MeshData::DataType BASE_TYPE = MeshData::DataType::VECTOR_2;
-		const static MeshData::DataType ARRAY_TYPE = MeshData::DataType::VECTOR_2_ARRAY;
-	};
-
-	template<>
-	struct MeshTypeInfo<MeshType::SPACE_3>
-	{
-		const static MeshData::DataType BASE_TYPE = MeshData::DataType::VECTOR_3;
-		const static MeshData::DataType ARRAY_TYPE = MeshData::DataType::VECTOR_3_ARRAY;
-	};
-
 	enum class UVType
 	{
 		FLOAT,
@@ -52,25 +38,29 @@ namespace kgs
 		const static MeshData::DataType ARRAY_TYPE;
 	};
 
-	template<>
-	struct UVTypeInfo<UVType::FLOAT>
+	enum class UVIndex
 	{
-		const static MeshData::DataType BASE_TYPE = MeshData::DataType::FLOAT;
-		const static MeshData::DataType ARRAY_TYPE = MeshData::DataType::FLOAT_ARRAY;
+		UV_0,
+		UV_1,
+		UV_2,
 	};
 
-	template<>
-	struct UVTypeInfo<UVType::VECTOR_2>
-	{
-		const static MeshData::DataType BASE_TYPE = MeshData::DataType::VECTOR_2;
-		const static MeshData::DataType ARRAY_TYPE = MeshData::DataType::VECTOR_2_ARRAY;
-	};
+#define KGS_VERTEX_POSTION_NAME "_Position"
+#define KGS_VERTEX_COLOR_NAME "_Color"
+#define KGS_VERTEX_NORMAL_NAME "_Normal"
+#define KGS_VERTEX_TANGENT_NAME "_Tangent"
+	//#define KGS_VERTEX_UV
 
-	template<>
-	struct UVTypeInfo<UVType::VECTOR_3>
+#define KGS_VERTEX_POSITION_LOCATION 0u
+#define KGS_VERTEX_COLOR_LOCATION 1u
+#define KGS_VERTEX_NORMAL_LOCATION 2u
+#define KGS_VERTEX_TANGENT_LOCATION 3u
+
+	template<UVIndex index>
+	struct UVIndexInfo
 	{
-		const static MeshData::DataType BASE_TYPE = MeshData::DataType::VECTOR_3;
-		const static MeshData::DataType ARRAY_TYPE = MeshData::DataType::VECTOR_3_ARRAY;
+		static const std::string VERTEX_NAME;
+		static const std::uint32_t VERTEX_LOCATION;
 	};
 
 	enum class PrimitiveTopology

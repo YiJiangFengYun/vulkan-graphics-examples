@@ -9,10 +9,35 @@
 namespace kgs
 {
 	template <typename T>
+	inline Bool32 isHas(std::string name, std::unordered_map<std::string, T>& map)
+	{
+		auto iterator = map.find(name);
+		return iterator != map.end();
+
+	}
+	template <typename T>
 	inline Bool32 isHas(std::string name, std::unordered_map<std::string, T>& map, std::vector<T>& arr)
 	{
 		auto iterator = map.find(name);
 		return iterator != map.end();
+	}
+
+	template <typename T>
+	inline T getValue(std::string name, std::unordered_map<std::string, T>& map, Bool32 isThrowNotExist = KGS_FALSE)
+	{
+		auto iterator = map.find(name);
+		if (iterator == map.end())
+		{
+			if (isThrowNotExist == KGS_TRUE)
+			{
+				throw std::runtime_error("The Content of the specify key don't exit in map");
+			}
+			return {};
+		}
+		else
+		{
+			return iterator->second;
+		}
 	}
 
 	template <typename T>
@@ -30,6 +55,20 @@ namespace kgs
 		else
 		{
 			return iterator->second;
+		}
+	}
+
+	template <typename T>
+	inline void setValue(std::string name, T value, std::unordered_map<std::string, T>& map)
+	{
+		auto iterator = map.find(name);
+		if (iterator == map.end())
+		{
+			map.insert(std::make_pair(name, value));
+		}
+		else
+		{
+			iterator->second = value;
 		}
 	}
 

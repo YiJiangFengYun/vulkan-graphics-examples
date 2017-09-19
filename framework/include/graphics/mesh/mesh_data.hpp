@@ -121,40 +121,40 @@ namespace kgs
 			typedef Color32 BaseType;
 		};
 
-		std::vector<float> arrFloats;
+		//std::vector<float> arrFloats;
 		std::unordered_map<std::string, float> mapFloats;
 
-		std::vector<std::vector<float>> arrFloatArrays;
+		//std::vector<std::vector<float>> arrFloatArrays;
 		std::unordered_map<std::string, std::vector<float>> mapFloatArrays;
 
-		std::vector<int32_t> arrInts;
+		//std::vector<int32_t> arrInts;
 		std::unordered_map<std::string, int32_t> mapInts;
 
-		std::vector<std::vector<int32_t>> arrIntArrays;
+		//std::vector<std::vector<int32_t>> arrIntArrays;
 		std::unordered_map<std::string, std::vector<int32_t>> mapIntArrays;
 
-		std::vector<Vector2> arrVector2s;
+		//std::vector<Vector2> arrVector2s;
 		std::unordered_map <std::string, Vector2> mapVector2s;
 
-		std::vector<std::vector<Vector2>> arrVector2Arrays;
+		//std::vector<std::vector<Vector2>> arrVector2Arrays;
 		std::unordered_map <std::string, std::vector<Vector2>> mapVector2Arrays;
 
-		std::vector<Vector3> arrVector3s;
+		//std::vector<Vector3> arrVector3s;
 		std::unordered_map<std::string, Vector3> mapVector3s;
 
-		std::vector<std::vector<Vector3>> arrVector3Arrays;
+		//std::vector<std::vector<Vector3>> arrVector3Arrays;
 		std::unordered_map <std::string, std::vector<Vector3>> mapVector3Arrays;
 
-		std::vector<Vector4> arrVector4s;
+		//std::vector<Vector4> arrVector4s;
 		std::unordered_map<std::string, Vector4> mapVector4s;
 
-		std::vector<std::vector<Vector4>> arrVector4Arrays;
+		//std::vector<std::vector<Vector4>> arrVector4Arrays;
 		std::unordered_map<std::string, std::vector<Vector4>> mapVector4Arrays;
 
-		std::vector<Color32> arrColor32s;
+		//std::vector<Color32> arrColor32s;
 		std::unordered_map<std::string, Color32> mapColor32s;
 
-		std::vector<std::vector<Color32>> arrColor32Arrays;
+		//std::vector<std::vector<Color32>> arrColor32Arrays;
 		std::unordered_map<std::string, std::vector<Color32>> mapColor32Arrays;
 
 		template <DataType type>

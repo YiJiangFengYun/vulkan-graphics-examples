@@ -17,22 +17,22 @@ namespace kgs
 	template<MeshType type>
 	struct MeshTypeInfo
 	{
-		MeshData::DataType BaseType;
-		MeshData::DataType ArrayType;
+		const static MeshData::DataType BASE_TYPE;
+		const static MeshData::DataType ARRAY_TYPE;
 	};
 
 	template<>
 	struct MeshTypeInfo<MeshType::SPACE_2>
 	{
-		MeshData::DataType BaseType = MeshData::DataType::VECTOR_2;
-		MeshData::DataType ArrayType = MeshData::DataType::VECTOR_2_ARRAY;
+		const static MeshData::DataType BASE_TYPE = MeshData::DataType::VECTOR_2;
+		const static MeshData::DataType ARRAY_TYPE = MeshData::DataType::VECTOR_2_ARRAY;
 	};
 
 	template<>
 	struct MeshTypeInfo<MeshType::SPACE_3>
 	{
-		MeshData::DataType BaseType = MeshData::DataType::VECTOR_3;
-		MeshData::DataType ArrayType = MeshData::DataType::VECTOR_3_ARRAY;
+		const static MeshData::DataType BASE_TYPE = MeshData::DataType::VECTOR_3;
+		const static MeshData::DataType ARRAY_TYPE = MeshData::DataType::VECTOR_3_ARRAY;
 	};
 
 	enum class UVType
@@ -48,29 +48,29 @@ namespace kgs
 	template<UVType type>
 	struct UVTypeInfo
 	{
-		MeshData::DataType BaseType;
-		MeshData::DataType ArrayType;
+		const static MeshData::DataType BASE_TYPE;
+		const static MeshData::DataType ARRAY_TYPE;
 	};
 
 	template<>
 	struct UVTypeInfo<UVType::FLOAT>
 	{
-		MeshData::DataType BaseType = MeshData::DataType::FLOAT;
-		MeshData::DataType ArrayType = MeshData::DataType::FLOAT_ARRAY;
+		const static MeshData::DataType BASE_TYPE = MeshData::DataType::FLOAT;
+		const static MeshData::DataType ARRAY_TYPE = MeshData::DataType::FLOAT_ARRAY;
 	};
 
 	template<>
 	struct UVTypeInfo<UVType::VECTOR_2>
 	{
-		MeshData::DataType BaseType = MeshData::DataType::VECTOR_2;
-		MeshData::DataType ArrayType = MeshData::DataType::VECTOR_2_ARRAY;
+		const static MeshData::DataType BASE_TYPE = MeshData::DataType::VECTOR_2;
+		const static MeshData::DataType ARRAY_TYPE = MeshData::DataType::VECTOR_2_ARRAY;
 	};
 
 	template<>
 	struct UVTypeInfo<UVType::VECTOR_3>
 	{
-		MeshData::DataType BaseType = MeshData::DataType::VECTOR_3;
-		MeshData::DataType ArrayType = MeshData::DataType::VECTOR_3_ARRAY;
+		const static MeshData::DataType BASE_TYPE = MeshData::DataType::VECTOR_3;
+		const static MeshData::DataType ARRAY_TYPE = MeshData::DataType::VECTOR_3_ARRAY;
 	};
 
 	enum class PrimitiveTopology

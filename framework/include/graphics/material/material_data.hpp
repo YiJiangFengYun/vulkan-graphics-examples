@@ -38,7 +38,7 @@ namespace kgs
 		{
 			typedef void ValueType;
 			typedef void BaseType;
-			Bool32 isArray = KGS_FALSE;
+			static const Bool32 IS_ARRAY = KGS_FALSE;
 		};
 
 
@@ -47,7 +47,7 @@ namespace kgs
 		{
 			typedef float ValueType;
 			typedef float BaseType;
-			Bool32 isArray = KGS_FALSE;
+			const static Bool32 IS_ARRAY = KGS_FALSE;
 		};
 
 		template<>
@@ -55,7 +55,7 @@ namespace kgs
 		{
 			typedef std::vector<float> ValueType;
 			typedef float BaseType;
-			Bool32 isArray = KGS_TRUE;
+			const static Bool32 IS_ARRAY = KGS_TRUE;
 		};
 
 		template<>
@@ -63,7 +63,7 @@ namespace kgs
 		{
 			typedef int32_t ValueType;
 			typedef int32_t BaseType;
-			Bool32 isArray = KGS_FALSE;
+			const static Bool32 IS_ARRAY = KGS_FALSE;
 		};
 
 		template<>
@@ -71,7 +71,7 @@ namespace kgs
 		{
 			typedef std::vector<int32_t> ValueType;
 			typedef int32_t BaseType;
-			Bool32 isArray = KGS_TRUE;
+			const static Bool32 IS_ARRAY = KGS_TRUE;
 		};
 
 		template<>
@@ -79,7 +79,7 @@ namespace kgs
 		{
 			typedef Color ValueType;
 			typedef Color BaseType;
-			Bool32 isArray = KGS_FALSE;
+			const static Bool32 IS_ARRAY = KGS_FALSE;
 		};
 
 		template<>
@@ -87,7 +87,7 @@ namespace kgs
 		{
 			typedef std::vector<Color> ValueType;
 			typedef Color BaseType;
-			Bool32 isArray = KGS_TRUE;
+			const static Bool32 IS_ARRAY = KGS_TRUE;
 		};
 
 		template<>
@@ -95,7 +95,7 @@ namespace kgs
 		{
 			typedef Vector4 ValueType;
 			typedef Vector4 BaseType;
-			Bool32 isArray = KGS_FALSE;
+			const static Bool32 IS_ARRAY = KGS_FALSE;
 		};
 
 		template<>
@@ -103,7 +103,7 @@ namespace kgs
 		{
 			typedef std::vector<Vector4> ValueType;
 			typedef Vector4 BaseType;
-			Bool32 isArray = KGS_TRUE;
+			const static Bool32 IS_ARRAY = KGS_TRUE;
 		};
 
 		template<>
@@ -111,7 +111,7 @@ namespace kgs
 		{
 			typedef Matrix4x4 ValueType;
 			typedef Matrix4x4 BaseType;
-			Bool32 isArray = KGS_FALSE;
+			const static Bool32 IS_ARRAY = KGS_FALSE;
 		};
 
 		template<>
@@ -119,7 +119,7 @@ namespace kgs
 		{
 			typedef std::vector<Matrix4x4> ValueType;
 			typedef Matrix4x4 BaseType;
-			Bool32 isArray = KGS_TRUE;
+			const static Bool32 IS_ARRAY = KGS_TRUE;
 		};
 
 		template<>
@@ -127,7 +127,7 @@ namespace kgs
 		{
 			typedef std::shared_ptr<Texture> ValueType;
 			typedef std::shared_ptr<Texture> BaseType;
-			Bool32 isArray = KGS_FALSE;
+			const static Bool32 IS_ARRAY = KGS_FALSE;
 		};
 
 		template<>
@@ -135,7 +135,7 @@ namespace kgs
 		{
 			typedef Vector2 ValueType;
 			typedef Vector2 BaseType;
-			Bool32 isArray = KGS_FALSE;
+			const static Bool32 IS_ARRAY = KGS_FALSE;
 		};
 
 		template<>
@@ -143,7 +143,7 @@ namespace kgs
 		{
 			typedef Vector2 ValueType;
 			typedef Vector2 BaseType;
-			Bool32 isArray = KGS_FALSE;
+			const static Bool32 IS_ARRAY = KGS_FALSE;
 		};
 
 		std::vector<float> arrFloats;

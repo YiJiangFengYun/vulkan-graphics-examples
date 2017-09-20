@@ -2,6 +2,7 @@
 #define KGS_MESH_H
 
 #include <glm/glm.hpp>
+#include <foundation/foundation.hpp>
 #include "graphics/global.hpp"
 #include "graphics/mesh/mesh_option.hpp"
 #include "graphics/mesh/mesh_data.hpp"
@@ -44,10 +45,12 @@ namespace kgs
 		const MeshData::DataType static ARRAY_DATA_TYPE = MeshTypeInfo<meshType>::ARRAY_TYPE;
 		typedef typename MeshData::DataTypeInfo<BASE_DATA_TYPE>::ValueType BaseValueType;
 		typedef typename MeshData::DataTypeInfo<ARRAY_DATA_TYPE>::ValueType ArrayValueType;
-		
-		Mesh()
+
+		Mesh() :
+			m_pContext(pContext);
+			m_multipliedColor(COLOR_WHITE) //default multiplied color should be (1, 1, 1, 1)
 		{
-		
+
 		}
 
 		~Mesh()
@@ -196,18 +199,84 @@ namespace kgs
 		}
 
 		/**Vertex colors of the Mesh multiplied to verties*/
-		Color getMultipliedColor() const;
+		Color getMultipliedColor() const
+		{
+			return m_multipliedColor;
+		}
+
 		/**Vertex colors of the Mesh multiplied to verties*/
-		void setMultipliedColor(Color32 value);
+		void setMultipliedColor(Color value)
+		{
+			m_multipliedColor = value;
+		}
 
 		/**Vertex colors of the Mesh added to verties*/
-		Color getAddedColor() const;
-		/**Vertex colors of the Mesh added to verties*/
-		void setAddedColor(Color value);
+		Color getAddedColor() const
+		{
+			return m_addedColor;
+		}
 
-		void apply(Bool32 makeUnreadable);
+		/**Vertex colors of the Mesh added to verties*/
+		void setAddedColor(Color value)
+		{
+			m_addedColor = value;
+		}
+
+		void apply(Bool32 makeUnreadable)
+		{
+			//create vertex buffer
+			{
+				//get size of every vertex
+				uint32_t size = 0;
+				for (const auto& layoutInfo : m_layouts)
+				{
+					size += MeshData::getDataBaseTypeSize(layoutInfo.dataType);
+				}
+				//get vertex buffer size.
+				uint32_t vertexBufferSize = size * m_vertexCount;
+
+				//create staging buffer.
+				vk::BufferCreateInfo createInfo = {
+					vk::BufferCreateFlags(),
+					vertexBufferSize,
+					vk::BufferUsageFlagBits::eTransferSrc,
+					vk::SharingMode::eExclusive
+				};
+
+				auto pDevice = m_pContext->getPNativeDevice();
+				auto pStagingBuffer = fd::createBuffer(pDevice, createInfo);
+
+				vk::MemoryRequirements memReqs = pDevice->getBufferMemoryRequirements(*pBuffer);
+				vk::MemoryAllocateInfo allocateInfo = {
+					memReqs.size,
+					kgs::_findMemoryType(m_pContext->getPPhysicalDevice(),
+					memReqs.memoryTypeBits,
+					vk::MemoryPropertyFlagBits::eHostVisible | vk::MemoryPropertyFlagBits::eHostCoherent)
+				};
+
+				auto pStagingBufferMemory = fd::allocateMemory(pDevice, allocateInfo);
+
+				pDevice->bindBufferMemory(*pStagingBuffer, *pStagingBufferMemory, 0);
+
+				void* data;
+				pDevice->mapMemory(*pStagingBufferMemory, 0u, static_cast<vk::DeviceSize>(vertexBufferSize), vk::MemoryMapFlags(), &data);
+				uint32_t offset = 0;
+				for (const auto& layoutInfo : m_layouts)
+				{
+					m_pData->memCopyDataValue(layoutInfo.name, layoutInfo.dataType, data, offset, 0u, m_vertexCount);
+					offset += MeshData::getDataBaseTypeSize(layoutInfo.dataType) * m_vertexCount;
+				}
+				pDevice->unmapMemory(*pStagingBufferMemory);
+			}
+
+
+
+
+			//create index buffer
+		}
 
 	private:
+		std::shared_ptr<Context> m_pContext;
 		MeshType m_meshType = meshType;
 		uint32_t m_vertexCount;
 		std::shared_ptr<MeshData> m_pData;
@@ -217,6 +286,11 @@ namespace kgs
 		fd::Bounds<BaseValueType> m_bounds;
 		Color m_multipliedColor;
 		Color m_addedColor;
+
+		vk::Buffer vertexBuffer;
+		vk::DeviceMemory vertexBufferMemory;
+		vk::Buffer indexBuffer;
+		vk::DeviceMemory indexBufferMemory;
 
 #ifdef DEBUG
 		inline verifySubMeshIndex(uint32_t subMeshIndex)

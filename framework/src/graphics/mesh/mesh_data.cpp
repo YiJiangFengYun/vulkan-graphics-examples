@@ -161,8 +161,9 @@ namespace kgs
 		case DataType::FLOAT_ARRAY:
 		{
 			auto arr = getValue(name, mapFloatArrays, KGS_TRUE);
-			std::memcpy(ptr, arr.data() + elementStart, 
-				sizeof(DataTypeInfo<DataType::FLOAT_ARRAY>::BaseType) * std::min(static_cast<uint32_t>(arr.size()) - elementStart, maxElementCount));
+			uint32_t finalElementCount = std::max(0u, std::min(static_cast<uint32_t>(arr.size()) - elementStart, maxElementCount));
+			if (finalElementCount == 0) break;
+			std::memcpy(ptr, arr.data() + elementStart, sizeof(DataTypeInfo<DataType::FLOAT_ARRAY>::BaseType) * finalElementCount);
 			break;
 		}
 		case DataType::INT:
@@ -174,8 +175,9 @@ namespace kgs
 		case DataType::INT_ARRAY:
 		{
 			auto arr = getValue(name, mapIntArrays, KGS_TRUE);
-			std::memcpy(ptr, arr.data() + elementStart,
-				sizeof(DataTypeInfo<DataType::INT_ARRAY>::BaseType) * std::min(static_cast<uint32_t>(arr.size()) - elementStart, maxElementCount));
+			uint32_t finalElementCount = std::max(0u, std::min(static_cast<uint32_t>(arr.size()) - elementStart, maxElementCount));
+			if (finalElementCount == 0) break;
+			std::memcpy(ptr, arr.data() + elementStart, sizeof(DataTypeInfo<DataType::INT_ARRAY>::BaseType) * finalElementCount);
 			break;
 		}
 		case DataType::VECTOR_2:
@@ -187,8 +189,9 @@ namespace kgs
 		case DataType::VECTOR_2_ARRAY:
 		{
 			auto arr = getValue(name, mapVector2Arrays, KGS_TRUE);
-			std::memcpy(ptr, arr.data() + elementStart, 
-				sizeof(DataTypeInfo<DataType::VECTOR_2_ARRAY>::BaseType) * std::min(static_cast<uint32_t>(arr.size()) - elementStart, maxElementCount));
+			uint32_t finalElementCount = std::max(0u, std::min(static_cast<uint32_t>(arr.size()) - elementStart, maxElementCount));
+			if (finalElementCount == 0) break;
+			std::memcpy(ptr, arr.data() + elementStart, sizeof(DataTypeInfo<DataType::VECTOR_2_ARRAY>::BaseType) * finalElementCount);
 			break;
 		}
 		case DataType::VECTOR_3:
@@ -200,8 +203,9 @@ namespace kgs
 		case DataType::VECTOR_3_ARRAY:
 		{
 			auto arr = getValue(name, mapVector3Arrays, KGS_TRUE);
-			std::memcpy(ptr, arr.data() + elementStart, 
-				sizeof(DataTypeInfo<DataType::VECTOR_3_ARRAY>::BaseType) * std::min(static_cast<uint32_t>(arr.size()) - elementStart, maxElementCount));
+			uint32_t finalElementCount = std::max(0u, std::min(static_cast<uint32_t>(arr.size()) - elementStart, maxElementCount));
+			if (finalElementCount == 0) break;
+			std::memcpy(ptr, arr.data() + elementStart, sizeof(DataTypeInfo<DataType::VECTOR_3_ARRAY>::BaseType) * finalElementCount);
 			break;
 		}
 		case DataType::VECTOR_4:
@@ -213,8 +217,9 @@ namespace kgs
 		case DataType::VECTOR_4_ARRAY:
 		{
 			auto arr = getValue(name, mapVector4Arrays, KGS_TRUE);
-			std::memcpy(ptr, arr.data() + elementStart, 
-				sizeof(DataTypeInfo<DataType::VECTOR_4_ARRAY>::BaseType) * std::min(static_cast<uint32_t>(arr.size()) - elementStart, maxElementCount));
+			uint32_t finalElementCount = std::max(0u, std::min(static_cast<uint32_t>(arr.size()) - elementStart, maxElementCount));
+			if (finalElementCount == 0) break;
+			std::memcpy(ptr, arr.data() + elementStart, sizeof(DataTypeInfo<DataType::VECTOR_4_ARRAY>::BaseType) * finalElementCount);
 			break;
 		}
 		case DataType::COLOR_32:
@@ -226,8 +231,9 @@ namespace kgs
 		case DataType::COLOR_32_ARRAY:
 		{
 			auto arr = getValue(name, mapColor32Arrays, KGS_TRUE);
-			std::memcpy(ptr, arr.data() + elementStart, 
-				sizeof(DataTypeInfo<DataType::COLOR_32_ARRAY>::BaseType) * std::min(static_cast<uint32_t>(arr.size()) - elementStart, maxElementCount));
+			uint32_t finalElementCount = std::max(0u, std::min(static_cast<uint32_t>(arr.size()) - elementStart, maxElementCount));
+			if (finalElementCount == 0) break;
+			std::memcpy(ptr, arr.data() + elementStart, sizeof(DataTypeInfo<DataType::COLOR_32_ARRAY>::BaseType) * finalElementCount);
 			break;
 		}
 		default:

@@ -34,6 +34,19 @@ namespace kgs
 	typedef fd::Bounds<glm::vec2> Bound2;
 	typedef fd::Bounds<glm::vec3> Bound3;
 
+	extern const Color COLOR_ZERO;
+	extern const Color COLOR_WHITE;
+	extern const Color COLOR_BLACK;
+	extern const Color COLOR_BLUE;
+	extern const Color COLOR_GREEN;
+	extern const Color COLOR_RED;
+	extern const Color COLOR_YELLOW;
+	extern const Color COLOR_CYAN;
+	extern const Color COLOR_GRAY;
+	extern const Color COLOR_GREY;
+	extern const Color COLOR_MAGENTA;
+	
+
 	extern Bool32 isInited;
 	extern std::shared_ptr<Context> pContext;
 	extern void init(std::shared_ptr<vk::PhysicalDevice> pPhysicalDevice,

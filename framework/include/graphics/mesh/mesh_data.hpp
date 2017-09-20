@@ -167,7 +167,7 @@ namespace kgs
 
 		uint32_t getDataValueSize(std::string name, DataType dataType);
 
-		void memCopyDataValue(std::string name, DataType dataType, void* dst, uint32_t offset, uint32_t maxElementCount);
+		void memCopyDataValue(std::string name, DataType dataType, void* dst, uint32_t offset, uint32_t elementStart, uint32_t maxElementCount);
 
 	};
 }

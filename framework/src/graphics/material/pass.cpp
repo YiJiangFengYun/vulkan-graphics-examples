@@ -274,7 +274,7 @@ namespace kgs
 		pDevice->mapMemory(*m_pUniformBufferMemory, 0, static_cast<vk::DeviceSize>(totalSize), vk::MemoryMapFlags(), &data);
 		for (int32_t i = 0; i < uniformBufferCount; ++i)
 		{
-			m_pData->memCopyDataValue(names[i], types[i], data, offsets[i], descriptorCounts[i]);
+			m_pData->memCopyDataValue(names[i], types[i], data, offsets[i], 0u, descriptorCounts[i]);
 		}
 		pDevice->unmapMemory(*m_pUniformBufferMemory);
 	}

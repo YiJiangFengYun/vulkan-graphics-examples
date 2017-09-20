@@ -103,7 +103,7 @@ namespace kgs
 		}
 	}
 
-	void MaterialData::memCopyDataValue(std::string name, DataType dataType, void* dst, uint32_t offset, uint32_t maxElementCount)
+	void MaterialData::memCopyDataValue(std::string name, DataType dataType, void* dst, uint32_t offset, uint32_t elementStart, uint32_t maxElementCount)
 	{
 		char *ptr = static_cast<char *>(dst);
 		ptr += offset;
@@ -117,7 +117,8 @@ namespace kgs
 		case DataType::FLOAT_ARRAY:
 		{
 			auto arr = getValue(name, mapFloatArrays, arrFloatArrays, KGS_TRUE);
-			std::memcpy(ptr, arr.data(), sizeof(DataTypeInfo<DataType::FLOAT_ARRAY>::BaseType) * std::min(static_cast<uint32_t>(arr.size()), maxElementCount));
+			std::memcpy(ptr, arr.data() + elementStart, 
+				sizeof(DataTypeInfo<DataType::FLOAT_ARRAY>::BaseType) * std::min(static_cast<uint32_t>(arr.size()) - elementStart, maxElementCount));
 		}
 		case DataType::INT:
 		{
@@ -127,7 +128,8 @@ namespace kgs
 		case DataType::INT_ARRAY:
 		{
 			auto arr = getValue(name, mapIntArrays, arrIntArrays, KGS_TRUE);
-			std::memcpy(ptr, arr.data(), sizeof(DataTypeInfo<DataType::INT_ARRAY>::BaseType) * std::min(static_cast<uint32_t>(arr.size()), maxElementCount));
+			std::memcpy(ptr, arr.data() + elementStart, 
+				sizeof(DataTypeInfo<DataType::INT_ARRAY>::BaseType) * std::min(static_cast<uint32_t>(arr.size()) - elementStart, maxElementCount));
 		}
 		case DataType::COLOR:
 		{
@@ -137,7 +139,8 @@ namespace kgs
 		case DataType::COLOR_ARRAY:
 		{
 			auto arr = getValue(name, mapColorArrays, arrColorArrays, KGS_TRUE);
-			std::memcpy(ptr, arr.data(), sizeof(DataTypeInfo<DataType::COLOR_ARRAY>::BaseType) * std::min(static_cast<uint32_t>(arr.size()), maxElementCount));
+			std::memcpy(ptr, arr.data() + elementStart, 
+				sizeof(DataTypeInfo<DataType::COLOR_ARRAY>::BaseType) * std::min(static_cast<uint32_t>(arr.size()) - elementStart, maxElementCount));
 		}
 		case DataType::VECTOR:
 		{
@@ -147,7 +150,8 @@ namespace kgs
 		case DataType::VECTOR_ARRAY:
 		{
 			auto arr = getValue(name, mapVectorArrays, arrVectorArrays, KGS_TRUE);
-			std::memcpy(ptr, arr.data(), sizeof(DataTypeInfo<DataType::VECTOR_ARRAY>::BaseType) * std::min(static_cast<uint32_t>(arr.size()), maxElementCount));
+			std::memcpy(ptr, arr.data() + elementStart, 
+				sizeof(DataTypeInfo<DataType::VECTOR_ARRAY>::BaseType) * std::min(static_cast<uint32_t>(arr.size()) - elementStart, maxElementCount));
 		}
 		case DataType::MATRIX:
 		{
@@ -157,7 +161,8 @@ namespace kgs
 		case DataType::MATRIX_ARRAY:
 		{
 			auto arr = getValue(name, mapMatrixArrays, arrMatrixArrays, KGS_TRUE);
-			std::memcpy(ptr, arr.data(), sizeof(DataTypeInfo<DataType::MATRIX_ARRAY>::BaseType) * std::min(static_cast<uint32_t>(arr.size()), maxElementCount));
+			std::memcpy(ptr, arr.data() + elementStart, 
+				sizeof(DataTypeInfo<DataType::MATRIX_ARRAY>::BaseType) * std::min(static_cast<uint32_t>(arr.size()) - elementStart, maxElementCount));
 		}
 		case DataType::TEXTURE_OFFSET:
 		{

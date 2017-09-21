@@ -522,7 +522,7 @@ namespace kgs
 	void Texture::_applyWithGenMipMap()
 	{
 		auto pDevice = m_pContext->getPNativeDevice();
-		auto pCommandBuffer = _beginSingleTimeCommands();
+		auto pCommandBuffer = beginSingleTimeCommands();
 		//create first level image data using staging buffer.
 		if (m_arrTempColors.size() == 0)
 		{
@@ -604,7 +604,7 @@ namespace kgs
 		_tranImageLayout(pCommandBuffer, *m_pImage, vk::ImageLayout::eTransferSrcOptimal, vk::ImageLayout::eShaderReadOnlyOptimal,
 			0, m_mipMapLevels, 0, m_arrayLayer);
 
-		_endSingleTimeCommands(pCommandBuffer);
+		endSingleTimeCommands(pCommandBuffer);
 
 		m_vkImageLayout = vk::ImageLayout::eShaderReadOnlyOptimal;
 	}
@@ -621,7 +621,7 @@ namespace kgs
 		//create image data using staging buffer mipmap level by mipmap level.
 		for (uint32_t i = 0; i < m_mipMapLevels; ++i)
 		{
-			auto pCommandBuffer = _beginSingleTimeCommands();
+			auto pCommandBuffer = beginSingleTimeCommands();
 			//create staging buffer.
 			uint32_t imageSize = static_cast<uint32_t>(m_arrTempColors[i].size() * sizeof(Color32));
 			std::shared_ptr<vk::Buffer> pStagingBuffer;
@@ -648,7 +648,7 @@ namespace kgs
 			_tranImageLayout(pCommandBuffer, *m_pImage, vk::ImageLayout::eTransferDstOptimal, vk::ImageLayout::eShaderReadOnlyOptimal,
 				i, 1, 0, m_arrayLayer);
 
-			_endSingleTimeCommands(pCommandBuffer);
+			endSingleTimeCommands(pCommandBuffer);
 		}
 
 		m_vkImageLayout = vk::ImageLayout::eShaderReadOnlyOptimal;
@@ -749,35 +749,6 @@ namespace kgs
 		};
 
 		pCommandBuffer->copyBufferToImage(buffer, image, vk::ImageLayout::eTransferDstOptimal, copyInfo);
-	}
-
-	std::shared_ptr<vk::CommandBuffer> Texture::_beginSingleTimeCommands() {
-		auto pDevice = m_pContext->getPNativeDevice();
-		auto pCommandPool = m_pContext->getPCommandPool();
-		vk::CommandBufferAllocateInfo allocateInfo = {
-			*pCommandPool,
-			vk::CommandBufferLevel::ePrimary,
-			uint32_t(1)
-		};
-
-		auto pCommandBuffer = fd::allocateCommandBuffer(pDevice, pCommandPool, allocateInfo);
-
-		vk::CommandBufferBeginInfo beginInfo = {
-			vk::CommandBufferUsageFlags(vk::CommandBufferUsageFlagBits::eOneTimeSubmit)
-		};
-		pCommandBuffer->begin(beginInfo);
-
-		return pCommandBuffer;
-	}
-
-	void Texture::_endSingleTimeCommands(std::shared_ptr<vk::CommandBuffer> pCommandBuffer) {
-		auto pDevice = m_pContext->getPNativeDevice();
-		auto graphicsQueue = m_pContext->getGraphicsQueue();
-		auto commandPool = m_pContext->getPCommandPool();
-		pCommandBuffer->end();
-		vk::SubmitInfo submitInfo = { 0, nullptr, nullptr, 1, pCommandBuffer.get(), 0, nullptr };
-		graphicsQueue.submit(submitInfo, nullptr);
-		graphicsQueue.waitIdle();
 	}
 
 	inline uint32_t caculateImageSizeWithMipmapLevel(uint32_t size, uint32_t mipmapLevel)

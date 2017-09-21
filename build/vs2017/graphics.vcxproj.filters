@@ -102,6 +102,9 @@
     <ClCompile Include="..\..\framework\src\graphics\mesh\mesh_data.cpp">
       <Filter>src\graphics\mesh</Filter>
     </ClCompile>
+    <ClCompile Include="..\..\framework\src\graphics\util\single_time_command.cpp">
+      <Filter>src\graphics\util</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="..\..\framework\include\graphics\texture\texture.hpp">
@@ -169,6 +172,9 @@
     </ClInclude>
     <ClInclude Include="..\..\framework\include\graphics\mesh\mesh_data.hpp">
       <Filter>include\graphics\mesh</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\framework\include\graphics\util\single_time_command.hpp">
+      <Filter>include\graphics\util</Filter>
     </ClInclude>
   </ItemGroup>
 </Project>

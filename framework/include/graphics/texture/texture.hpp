@@ -6,6 +6,7 @@
 #include "foundation/wrapper.hpp"
 #include "graphics/util/find_memory.hpp"
 #include "graphics/global.hpp"
+#include "graphics/util/single_time_command.hpp"
 #include "graphics/texture/texture_option.hpp"
 #include "graphics/context.hpp"
 
@@ -93,10 +94,6 @@ namespace kgs
 			uint32_t width, uint32_t height, uint32_t depth, uint32_t mipLevel,
 			uint32_t baseArrayLayer, uint32_t layerCount);
 		void _resizeColorsData(uint32_t mipLevel);
-
-		//tool methods
-		std::shared_ptr<vk::CommandBuffer> _beginSingleTimeCommands();
-		void _endSingleTimeCommands(std::shared_ptr<vk::CommandBuffer> pCommandBuffer);
 	};
 }
 

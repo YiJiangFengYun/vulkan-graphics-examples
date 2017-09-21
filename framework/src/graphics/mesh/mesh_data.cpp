@@ -82,7 +82,7 @@ namespace kgs
 		}
 		case DataType::FLOAT_ARRAY:
 		{
-			auto arr = getValue(name, mapFloatArrays, KGS_TRUE);
+			auto arr = getValue(name, mapFloatArrays);
 			return static_cast<uint32_t>(sizeof(DataTypeInfo<DataType::FLOAT_ARRAY>::BaseType) * arr.size());
 			break;
 		}
@@ -93,7 +93,7 @@ namespace kgs
 		}
 		case DataType::INT_ARRAY:
 		{
-			auto arr = getValue(name, mapIntArrays, KGS_TRUE);
+			auto arr = getValue(name, mapIntArrays);
 			return static_cast<uint32_t>(sizeof(DataTypeInfo<DataType::INT_ARRAY>::BaseType) * arr.size());
 			break;
 		}
@@ -104,7 +104,7 @@ namespace kgs
 		}
 		case DataType::VECTOR_2_ARRAY:
 		{
-			auto arr = getValue(name, mapVector2Arrays, KGS_TRUE);
+			auto arr = getValue(name, mapVector2Arrays);
 			return static_cast<uint32_t>(sizeof(DataTypeInfo<DataType::VECTOR_2_ARRAY>::BaseType) * arr.size());
 			break;
 		}
@@ -115,7 +115,7 @@ namespace kgs
 		}
 		case DataType::VECTOR_3_ARRAY:
 		{
-			auto arr = getValue(name, mapVector3Arrays, KGS_TRUE);
+			auto arr = getValue(name, mapVector3Arrays);
 			return static_cast<uint32_t>(sizeof(DataTypeInfo<DataType::VECTOR_3_ARRAY>::BaseType) * arr.size());
 			break;
 		}
@@ -126,7 +126,7 @@ namespace kgs
 		}
 		case DataType::VECTOR_4_ARRAY:
 		{
-			auto arr = getValue(name, mapVector4Arrays, KGS_TRUE);
+			auto arr = getValue(name, mapVector4Arrays);
 			return static_cast<uint32_t>(sizeof(DataTypeInfo<DataType::VECTOR_4_ARRAY>::BaseType) * arr.size());
 			break;
 		}
@@ -137,7 +137,7 @@ namespace kgs
 		}
 		case DataType::COLOR_32_ARRAY:
 		{
-			auto arr = getValue(name, mapColor32Arrays, KGS_TRUE);
+			auto arr = getValue(name, mapColor32Arrays);
 			return static_cast<uint32_t>(sizeof(DataTypeInfo<DataType::COLOR_32_ARRAY>::BaseType) * arr.size());
 			break;
 		}
@@ -154,13 +154,13 @@ namespace kgs
 		{
 		case DataType::FLOAT:
 		{
-			auto value = getValue(name, mapFloats, KGS_TRUE);
+			auto value = getValue(name, mapFloats);
 			std::memcpy(ptr, &value, sizeof(DataTypeInfo<DataType::FLOAT>::BaseType));
 			break;
 		}
 		case DataType::FLOAT_ARRAY:
 		{
-			auto arr = getValue(name, mapFloatArrays, KGS_TRUE);
+			auto arr = getValue(name, mapFloatArrays);
 			uint32_t finalElementCount = std::max(0u, std::min(static_cast<uint32_t>(arr.size()) - elementStart, maxElementCount));
 			if (finalElementCount == 0) break;
 			std::memcpy(ptr, arr.data() + elementStart, sizeof(DataTypeInfo<DataType::FLOAT_ARRAY>::BaseType) * finalElementCount);
@@ -168,13 +168,13 @@ namespace kgs
 		}
 		case DataType::INT:
 		{
-			auto value = getValue(name, mapInts, KGS_TRUE);
+			auto value = getValue(name, mapInts);
 			std::memcpy(ptr, &value, sizeof(DataTypeInfo<DataType::INT>::BaseType));
 			break;
 		}
 		case DataType::INT_ARRAY:
 		{
-			auto arr = getValue(name, mapIntArrays, KGS_TRUE);
+			auto arr = getValue(name, mapIntArrays);
 			uint32_t finalElementCount = std::max(0u, std::min(static_cast<uint32_t>(arr.size()) - elementStart, maxElementCount));
 			if (finalElementCount == 0) break;
 			std::memcpy(ptr, arr.data() + elementStart, sizeof(DataTypeInfo<DataType::INT_ARRAY>::BaseType) * finalElementCount);
@@ -182,13 +182,13 @@ namespace kgs
 		}
 		case DataType::VECTOR_2:
 		{
-			auto value = getValue(name, mapVector2s, KGS_TRUE);
+			auto value = getValue(name, mapVector2s);
 			std::memcpy(ptr, &value, sizeof(DataTypeInfo<DataType::VECTOR_2>::BaseType));
 			break;
 		}
 		case DataType::VECTOR_2_ARRAY:
 		{
-			auto arr = getValue(name, mapVector2Arrays, KGS_TRUE);
+			auto arr = getValue(name, mapVector2Arrays);
 			uint32_t finalElementCount = std::max(0u, std::min(static_cast<uint32_t>(arr.size()) - elementStart, maxElementCount));
 			if (finalElementCount == 0) break;
 			std::memcpy(ptr, arr.data() + elementStart, sizeof(DataTypeInfo<DataType::VECTOR_2_ARRAY>::BaseType) * finalElementCount);
@@ -196,13 +196,13 @@ namespace kgs
 		}
 		case DataType::VECTOR_3:
 		{
-			auto value = getValue(name, mapVector3s, KGS_TRUE);
+			auto value = getValue(name, mapVector3s);
 			std::memcpy(ptr, &value, sizeof(DataTypeInfo<DataType::VECTOR_3>::BaseType));
 			break;
 		}
 		case DataType::VECTOR_3_ARRAY:
 		{
-			auto arr = getValue(name, mapVector3Arrays, KGS_TRUE);
+			auto arr = getValue(name, mapVector3Arrays);
 			uint32_t finalElementCount = std::max(0u, std::min(static_cast<uint32_t>(arr.size()) - elementStart, maxElementCount));
 			if (finalElementCount == 0) break;
 			std::memcpy(ptr, arr.data() + elementStart, sizeof(DataTypeInfo<DataType::VECTOR_3_ARRAY>::BaseType) * finalElementCount);
@@ -210,13 +210,13 @@ namespace kgs
 		}
 		case DataType::VECTOR_4:
 		{
-			auto value = getValue(name, mapVector4s, KGS_TRUE);
+			auto value = getValue(name, mapVector4s);
 			std::memcpy(ptr, &value, sizeof(DataTypeInfo<DataType::VECTOR_4>::BaseType));
 			break;
 		}
 		case DataType::VECTOR_4_ARRAY:
 		{
-			auto arr = getValue(name, mapVector4Arrays, KGS_TRUE);
+			auto arr = getValue(name, mapVector4Arrays);
 			uint32_t finalElementCount = std::max(0u, std::min(static_cast<uint32_t>(arr.size()) - elementStart, maxElementCount));
 			if (finalElementCount == 0) break;
 			std::memcpy(ptr, arr.data() + elementStart, sizeof(DataTypeInfo<DataType::VECTOR_4_ARRAY>::BaseType) * finalElementCount);
@@ -224,13 +224,13 @@ namespace kgs
 		}
 		case DataType::COLOR_32:
 		{
-			auto value = getValue(name, mapColor32s, KGS_TRUE);
+			auto value = getValue(name, mapColor32s);
 			std::memcpy(ptr, &value, sizeof(DataTypeInfo<DataType::COLOR_32>::BaseType));
 			break;
 		}
 		case DataType::COLOR_32_ARRAY:
 		{
-			auto arr = getValue(name, mapColor32Arrays, KGS_TRUE);
+			auto arr = getValue(name, mapColor32Arrays);
 			uint32_t finalElementCount = std::max(0u, std::min(static_cast<uint32_t>(arr.size()) - elementStart, maxElementCount));
 			if (finalElementCount == 0) break;
 			std::memcpy(ptr, arr.data() + elementStart, sizeof(DataTypeInfo<DataType::COLOR_32_ARRAY>::BaseType) * finalElementCount);

@@ -23,16 +23,12 @@ namespace kgs
 	}
 
 	template <typename T>
-	inline T& getValue(std::string name, std::unordered_map<std::string, T>& map, Bool32 isThrowNotExist = KGS_FALSE)
+	inline T& getValue(std::string name, std::unordered_map<std::string, T>& map)
 	{
 		auto iterator = map.find(name);
 		if (iterator == map.end())
 		{
-			if (isThrowNotExist == KGS_TRUE)
-			{
-				throw std::runtime_error("The Content of the specify key don't exit in map");
-			}
-			return {};
+			throw std::runtime_error("The Content of the specify key don't exit in map");
 		}
 		else
 		{
@@ -41,16 +37,12 @@ namespace kgs
 	}
 
 	template <typename T>
-	inline T& getValue(std::string name, std::unordered_map<std::string, T>& map, std::vector<T>& arr, Bool32 isThrowNotExist = KGS_FALSE)
+	inline T& getValue(std::string name, std::unordered_map<std::string, T>& map, std::vector<T>& arr)
 	{
 		auto iterator = map.find(name);
 		if (iterator == map.end())
 		{
-			if (isThrowNotExist == KGS_TRUE)
-			{
-				throw std::runtime_error("The Content of the specify key don't exit in map");
-			}
-			return {};
+			throw std::runtime_error("The Content of the specify key don't exit in map");
 		}
 		else
 		{

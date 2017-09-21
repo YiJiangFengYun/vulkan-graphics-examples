@@ -179,10 +179,10 @@ namespace kgs
 		std::unordered_map<std::string, Vector2> mapTextureScales;
 
 		template <DataType type>
-		typename DataTypeInfo<type>::ValueType getDataValue(std::string name);
+		typename DataTypeInfo<type>::ValueType& getDataValue(std::string name);
 
 		template<DataType type>
-		void setDataValue(std::string name, typename DataTypeInfo<type>::ValueType value);
+		void setDataValue(std::string name, typename DataTypeInfo<type>::ValueType& value);
 
 		uint32_t static getDataBaseTypeSize(DataType dataType);
 

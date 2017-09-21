@@ -186,164 +186,164 @@ namespace kgs
 
 	//-----------------this used to eliminate ide warning----------------
 	template <MaterialData::DataType type>
-	typename MaterialData::DataTypeInfo<type>::ValueType MaterialData::getDataValue(std::string name) { return {}; }
+	typename MaterialData::DataTypeInfo<type>::ValueType& MaterialData::getDataValue(std::string name) { return {}; }
 
 	template<MaterialData::DataType type>
-	void MaterialData::setDataValue(std::string name, typename MaterialData::DataTypeInfo<type>::ValueType value) {}
+	void MaterialData::setDataValue(std::string name, typename MaterialData::DataTypeInfo<type>::ValueType& value) {}
 	//-----------------this used to eliminate ide warning----------------
 
 	template<>
-	float MaterialData::getDataValue<MaterialData::DataType::FLOAT>(std::string name)
+	float& MaterialData::getDataValue<MaterialData::DataType::FLOAT>(std::string name)
 	{
 		return getValue(name, mapFloats, arrFloats);
 	}
 
 	template<>
-	void MaterialData::setDataValue<MaterialData::DataType::FLOAT>(std::string name, float value)
+	void MaterialData::setDataValue<MaterialData::DataType::FLOAT>(std::string name, float& value)
 	{
 		setValue(name, value, mapFloats, arrFloats);
 	}
 
 	template<>
-	std::vector<float> MaterialData::getDataValue<MaterialData::DataType::FLOAT_ARRAY>(std::string name)
+	std::vector<float>& MaterialData::getDataValue<MaterialData::DataType::FLOAT_ARRAY>(std::string name)
 	{
 		return getValue(name, mapFloatArrays, arrFloatArrays);
 	}
 
 	template<>
-	void MaterialData::setDataValue<MaterialData::DataType::FLOAT_ARRAY>(std::string name, std::vector<float> value)
+	void MaterialData::setDataValue<MaterialData::DataType::FLOAT_ARRAY>(std::string name, std::vector<float>& value)
 	{
 		setValue(name, value, mapFloatArrays, arrFloatArrays);
 	}
 
 	template<>
-	int32_t MaterialData::getDataValue<MaterialData::DataType::INT>(std::string name)
+	int32_t& MaterialData::getDataValue<MaterialData::DataType::INT>(std::string name)
 	{
 		return getValue(name, mapInts, arrInts);
 	}
 
 	template<>
-	void MaterialData::setDataValue<MaterialData::DataType::INT>(std::string name, int32_t value)
+	void MaterialData::setDataValue<MaterialData::DataType::INT>(std::string name, int32_t& value)
 	{
 		setValue(name, value, mapInts, arrInts);
 	}
 
 	template<>
-	std::vector<int32_t> MaterialData::getDataValue<MaterialData::DataType::INT_ARRAY>(std::string name)
+	std::vector<int32_t>& MaterialData::getDataValue<MaterialData::DataType::INT_ARRAY>(std::string name)
 	{
 		return getValue(name, mapIntArrays, arrIntArrays);
 	}
 
 	template<>
-	void MaterialData::setDataValue<MaterialData::DataType::INT_ARRAY>(std::string name, std::vector<int32_t> value)
+	void MaterialData::setDataValue<MaterialData::DataType::INT_ARRAY>(std::string name, std::vector<int32_t>& value)
 	{
 		setValue(name, value, mapIntArrays, arrIntArrays);
 	}
 
 	template<>
-	Color MaterialData::getDataValue<MaterialData::DataType::COLOR>(std::string name)
+	Color& MaterialData::getDataValue<MaterialData::DataType::COLOR>(std::string name)
 	{
 		return getValue(name, mapColors, arrColors);
 	}
 
 	template<>
-	void MaterialData::setDataValue<MaterialData::DataType::COLOR>(std::string name, Color value)
+	void MaterialData::setDataValue<MaterialData::DataType::COLOR>(std::string name, Color& value)
 	{
 		setValue(name, value, mapColors, arrColors);
 	}
 
 	template<>
-	std::vector<Color> MaterialData::getDataValue<MaterialData::DataType::COLOR_ARRAY>(std::string name)
+	std::vector<Color>& MaterialData::getDataValue<MaterialData::DataType::COLOR_ARRAY>(std::string name)
 	{
 		return getValue(name, mapColorArrays, arrColorArrays);
 	}
 
 	template<>
-	void MaterialData::setDataValue<MaterialData::DataType::COLOR_ARRAY>(std::string name, std::vector<Color> value)
+	void MaterialData::setDataValue<MaterialData::DataType::COLOR_ARRAY>(std::string name, std::vector<Color>& value)
 	{
 		setValue(name, value, mapColorArrays, arrColorArrays);
 	}
 
 	template<>
-	Vector4 MaterialData::getDataValue<MaterialData::DataType::VECTOR>(std::string name)
+	Vector4& MaterialData::getDataValue<MaterialData::DataType::VECTOR>(std::string name)
 	{
 		return getValue(name, mapVectors, arrVectors);
 	}
 
 	template<>
-	void MaterialData::setDataValue<MaterialData::DataType::VECTOR>(std::string name, Vector4 value)
+	void MaterialData::setDataValue<MaterialData::DataType::VECTOR>(std::string name, Vector4& value)
 	{
 		setValue(name, value, mapVectors, arrVectors);
 	}
 
 	template<>
-	std::vector<Vector4> MaterialData::getDataValue<MaterialData::DataType::VECTOR_ARRAY>(std::string name)
+	std::vector<Vector4>& MaterialData::getDataValue<MaterialData::DataType::VECTOR_ARRAY>(std::string name)
 	{
 		return getValue(name, mapVectorArrays, arrVectorArrays);
 	}
 
 	template<>
-	void MaterialData::setDataValue<MaterialData::DataType::VECTOR_ARRAY>(std::string name, std::vector<Vector4> value)
+	void MaterialData::setDataValue<MaterialData::DataType::VECTOR_ARRAY>(std::string name, std::vector<Vector4>& value)
 	{
 		setValue(name, value, mapVectorArrays, arrVectorArrays);
 	}
 
 	template<>
-	Matrix4x4 MaterialData::getDataValue<MaterialData::DataType::MATRIX>(std::string name)
+	Matrix4x4& MaterialData::getDataValue<MaterialData::DataType::MATRIX>(std::string name)
 	{
 		return getValue(name, mapMatrixs, arrMatrixs);
 	}
 
 	template<>
-	void MaterialData::setDataValue<MaterialData::DataType::MATRIX>(std::string name, Matrix4x4 value)
+	void MaterialData::setDataValue<MaterialData::DataType::MATRIX>(std::string name, Matrix4x4& value)
 	{
 		setValue(name, value, mapMatrixs, arrMatrixs);
 	}
 
 	template<>
-	std::vector<Matrix4x4> MaterialData::getDataValue<MaterialData::DataType::MATRIX_ARRAY>(std::string name)
+	std::vector<Matrix4x4>& MaterialData::getDataValue<MaterialData::DataType::MATRIX_ARRAY>(std::string name)
 	{
 		return getValue(name, mapMatrixArrays, arrMatrixArrays);
 	}
 
 	template<>
-	void MaterialData::setDataValue<MaterialData::DataType::MATRIX_ARRAY>(std::string name, std::vector<Matrix4x4> value)
+	void MaterialData::setDataValue<MaterialData::DataType::MATRIX_ARRAY>(std::string name, std::vector<Matrix4x4>& value)
 	{
 		setValue(name, value, mapMatrixArrays, arrMatrixArrays);
 	}
 
 	template<>
-	std::shared_ptr<Texture> MaterialData::getDataValue<MaterialData::DataType::TEXTURE>(std::string name)
+	std::shared_ptr<Texture>& MaterialData::getDataValue<MaterialData::DataType::TEXTURE>(std::string name)
 	{
 		return getValue(name, mapTextures, arrTextures);
 	}
 
 	template<>
-	void MaterialData::setDataValue<MaterialData::DataType::TEXTURE>(std::string name, std::shared_ptr<Texture> value)
+	void MaterialData::setDataValue<MaterialData::DataType::TEXTURE>(std::string name, std::shared_ptr<Texture>& value)
 	{
 		setValue(name, value, mapTextures, arrTextures);
 	}
 
 	template<>
-	Vector2 MaterialData::getDataValue<MaterialData::DataType::TEXTURE_OFFSET>(std::string name)
+	Vector2& MaterialData::getDataValue<MaterialData::DataType::TEXTURE_OFFSET>(std::string name)
 	{
 		return getValue(name, mapTextureOffsets, arrTextureOffsets);
 	}
 
 	template<>
-	void MaterialData::setDataValue<MaterialData::DataType::TEXTURE_OFFSET>(std::string name, Vector2 value)
+	void MaterialData::setDataValue<MaterialData::DataType::TEXTURE_OFFSET>(std::string name, Vector2& value)
 	{
 		setValue(name, value, mapTextureOffsets, arrTextureOffsets);
 	}
 
 	template<>
-	Vector2 MaterialData::getDataValue<MaterialData::DataType::TEXTURE_SCALE>(std::string name)
+	Vector2& MaterialData::getDataValue<MaterialData::DataType::TEXTURE_SCALE>(std::string name)
 	{
 		return getValue(name, mapTextureScales, arrTextureScales);
 	}
 
 	template<>
-	void MaterialData::setDataValue<MaterialData::DataType::TEXTURE_SCALE>(std::string name, Vector2 value)
+	void MaterialData::setDataValue<MaterialData::DataType::TEXTURE_SCALE>(std::string name, Vector2& value)
 	{
 		setValue(name, value, mapTextureScales, arrTextureScales);
 	}

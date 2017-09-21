@@ -243,152 +243,152 @@ namespace kgs
 
 	//------------------this used to eliminate ide warning------------------------------
 	template <MeshData::DataType type>
-	typename MeshData::DataTypeInfo<type>::ValueType MeshData::getDataValue(std::string name) { return {}; }
+	typename MeshData::DataTypeInfo<type>::ValueType& MeshData::getDataValue(std::string name) { return {}; }
 
 	template <MeshData::DataType type>
-	void MeshData::setDataValue(std::string name, typename MeshData::DataTypeInfo<type>::ValueType value) {}
+	void MeshData::setDataValue(std::string name, typename MeshData::DataTypeInfo<type>::ValueType& value) {}
 	//-----------------this used to eliminate ide warning----------------
 
 	template<>
-	float MeshData::getDataValue<MeshData::DataType::FLOAT>(std::string name)
+	float& MeshData::getDataValue<MeshData::DataType::FLOAT>(std::string name)
 	{
 		return getValue(name, mapFloats);
 	}
 
 	template<>
-	void MeshData::setDataValue<MeshData::DataType::FLOAT>(std::string name, float value)
+	void MeshData::setDataValue<MeshData::DataType::FLOAT>(std::string name, float& value)
 	{
 		setValue(name, value, mapFloats);
 	}
 
 	template<>
-	std::vector<float> MeshData::getDataValue<MeshData::DataType::FLOAT_ARRAY>(std::string name)
+	std::vector<float>& MeshData::getDataValue<MeshData::DataType::FLOAT_ARRAY>(std::string name)
 	{
 		return getValue(name, mapFloatArrays);
 	}
 
 	template<>
-	void MeshData::setDataValue<MeshData::DataType::FLOAT_ARRAY>(std::string name, std::vector<float> value)
+	void MeshData::setDataValue<MeshData::DataType::FLOAT_ARRAY>(std::string name, std::vector<float>& value)
 	{
 		setValue(name, value, mapFloatArrays);
 	}
 
 	template<>
-	int32_t MeshData::getDataValue<MeshData::DataType::INT>(std::string name)
+	int32_t& MeshData::getDataValue<MeshData::DataType::INT>(std::string name)
 	{
 		return getValue(name, mapInts);
 	}
 
 	template<>
-	void MeshData::setDataValue<MeshData::DataType::INT>(std::string name, int32_t value)
+	void MeshData::setDataValue<MeshData::DataType::INT>(std::string name, int32_t& value)
 	{
 		setValue(name, value, mapInts);
 	}
 
 	template<>
-	std::vector<int32_t> MeshData::getDataValue<MeshData::DataType::INT_ARRAY>(std::string name)
+	std::vector<int32_t>& MeshData::getDataValue<MeshData::DataType::INT_ARRAY>(std::string name)
 	{
 		return getValue(name, mapIntArrays);
 	}
 
 	template<>
-	void MeshData::setDataValue<MeshData::DataType::INT_ARRAY>(std::string name, std::vector<int32_t> value)
+	void MeshData::setDataValue<MeshData::DataType::INT_ARRAY>(std::string name, std::vector<int32_t>& value)
 	{
 		setValue(name, value, mapIntArrays);
 	}
 
 	template<>
-	Vector2 MeshData::getDataValue<MeshData::DataType::VECTOR_2>(std::string name)
+	Vector2& MeshData::getDataValue<MeshData::DataType::VECTOR_2>(std::string name)
 	{
 		return getValue(name, mapVector2s);
 	}
 
 	template<>
-	void MeshData::setDataValue<MeshData::DataType::VECTOR_2>(std::string name, Vector2 value)
+	void MeshData::setDataValue<MeshData::DataType::VECTOR_2>(std::string name, Vector2& value)
 	{
 		setValue(name, value, mapVector2s);
 	}
 
 	template<>
-	std::vector<Vector2> MeshData::getDataValue<MeshData::DataType::VECTOR_2_ARRAY>(std::string name)
+	std::vector<Vector2>& MeshData::getDataValue<MeshData::DataType::VECTOR_2_ARRAY>(std::string name)
 	{
 		return getValue(name, mapVector2Arrays);
 	}
 
 	template<>
-	void MeshData::setDataValue<MeshData::DataType::VECTOR_2_ARRAY>(std::string name, std::vector<Vector2> value)
+	void MeshData::setDataValue<MeshData::DataType::VECTOR_2_ARRAY>(std::string name, std::vector<Vector2>& value)
 	{
 		setValue(name, value, mapVector2Arrays);
 	}
 
 	template<>
-	Vector3 MeshData::getDataValue<MeshData::DataType::VECTOR_3>(std::string name)
+	Vector3& MeshData::getDataValue<MeshData::DataType::VECTOR_3>(std::string name)
 	{
 		return getValue(name, mapVector3s);
 	}
 
 	template<>
-	void MeshData::setDataValue<MeshData::DataType::VECTOR_3>(std::string name, Vector3 value)
+	void MeshData::setDataValue<MeshData::DataType::VECTOR_3>(std::string name, Vector3& value)
 	{
 		setValue(name, value, mapVector3s);
 	}
 
 	template<>
-	std::vector<Vector3> MeshData::getDataValue<MeshData::DataType::VECTOR_3_ARRAY>(std::string name)
+	std::vector<Vector3>& MeshData::getDataValue<MeshData::DataType::VECTOR_3_ARRAY>(std::string name)
 	{
 		return getValue(name, mapVector3Arrays);
 	}
 
 	template<>
-	void MeshData::setDataValue<MeshData::DataType::VECTOR_3_ARRAY>(std::string name, std::vector<Vector3> value)
+	void MeshData::setDataValue<MeshData::DataType::VECTOR_3_ARRAY>(std::string name, std::vector<Vector3>& value)
 	{
 		setValue(name, value, mapVector3Arrays);
 	}
 
 	template<>
-	Vector4 MeshData::getDataValue<MeshData::DataType::VECTOR_4>(std::string name)
+	Vector4& MeshData::getDataValue<MeshData::DataType::VECTOR_4>(std::string name)
 	{
 		return getValue(name, mapVector4s);
 	}
 
 	template<>
-	void MeshData::setDataValue<MeshData::DataType::VECTOR_4>(std::string name, Vector4 value)
+	void MeshData::setDataValue<MeshData::DataType::VECTOR_4>(std::string name, Vector4& value)
 	{
 		setValue(name, value, mapVector4s);
 	}
 
 	template<>
-	std::vector<Vector4> MeshData::getDataValue<MeshData::DataType::VECTOR_4_ARRAY>(std::string name)
+	std::vector<Vector4>& MeshData::getDataValue<MeshData::DataType::VECTOR_4_ARRAY>(std::string name)
 	{
 		return getValue(name, mapVector4Arrays);
 	}
 
 	template<>
-	void MeshData::setDataValue<MeshData::DataType::VECTOR_4_ARRAY>(std::string name, std::vector<Vector4> value)
+	void MeshData::setDataValue<MeshData::DataType::VECTOR_4_ARRAY>(std::string name, std::vector<Vector4>& value)
 	{
 		setValue(name, value, mapVector4Arrays);
 	}
 
 	template<>
-	Color32 MeshData::getDataValue<MeshData::DataType::COLOR_32>(std::string name)
+	Color32& MeshData::getDataValue<MeshData::DataType::COLOR_32>(std::string name)
 	{
 		return getValue(name, mapColor32s);
 	}
 
 	template<>
-	void MeshData::setDataValue<MeshData::DataType::COLOR_32>(std::string name, Color32 value)
+	void MeshData::setDataValue<MeshData::DataType::COLOR_32>(std::string name, Color32& value)
 	{
 		setValue(name, value, mapColor32s);
 	}
 
 	template<>
-	std::vector<Color32> MeshData::getDataValue<MeshData::DataType::COLOR_32_ARRAY>(std::string name)
+	std::vector<Color32>& MeshData::getDataValue<MeshData::DataType::COLOR_32_ARRAY>(std::string name)
 	{
 		return getValue(name, mapColor32Arrays);
 	}
 
 	template<>
-	void MeshData::setDataValue<MeshData::DataType::COLOR_32_ARRAY>(std::string name, std::vector<Color32> value)
+	void MeshData::setDataValue<MeshData::DataType::COLOR_32_ARRAY>(std::string name, std::vector<Color32>& value)
 	{
 		setValue(name, value, mapColor32Arrays);
 	}

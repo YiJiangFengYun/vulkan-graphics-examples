@@ -4,6 +4,8 @@
 #include <glm/glm.hpp>
 #include <foundation/foundation.hpp>
 #include "graphics/global.hpp"
+#include "graphics/util/find_memory.hpp"
+#include "graphics/util/single_time_command.hpp"
 #include "graphics/mesh/mesh_option.hpp"
 #include "graphics/mesh/mesh_data.hpp"
 
@@ -243,20 +245,19 @@ namespace kgs
 					vk::SharingMode::eExclusive
 				};
 
+				auto pPhysicalDevice = m_pContext->getPPhysicalDevice();
 				auto pDevice = m_pContext->getPNativeDevice();
 				auto pStagingBuffer = fd::createBuffer(pDevice, createInfo);
 
 				vk::MemoryRequirements memReqs = pDevice->getBufferMemoryRequirements(*pBuffer);
 				vk::MemoryAllocateInfo allocateInfo = {
 					memReqs.size,
-					kgs::_findMemoryType(m_pContext->getPPhysicalDevice(),
-					memReqs.memoryTypeBits,
-					vk::MemoryPropertyFlagBits::eHostVisible | vk::MemoryPropertyFlagBits::eHostCoherent)
+					kgs::findMemoryType(pPhysicalDevice, memReqs.memoryTypeBits, vk::MemoryPropertyFlagBits::eHostVisible | vk::MemoryPropertyFlagBits::eHostCoherent)
 				};
 
 				auto pStagingBufferMemory = fd::allocateMemory(pDevice, allocateInfo);
 
-				pDevice->bindBufferMemory(*pStagingBuffer, *pStagingBufferMemory, 0);
+				pDevice->bindBufferMemory(*pStagingBuffer, *pStagingBufferMemory, 0u);
 
 				void* data;
 				pDevice->mapMemory(*pStagingBufferMemory, 0u, static_cast<vk::DeviceSize>(vertexBufferSize), vk::MemoryMapFlags(), &data);
@@ -267,6 +268,18 @@ namespace kgs
 					offset += MeshData::getDataBaseTypeSize(layoutInfo.dataType) * m_vertexCount;
 				}
 				pDevice->unmapMemory(*pStagingBufferMemory);
+
+				//create vertex buffer
+				createInfo.usage = vk::BufferUsageFlagBits::eTransferDst | vk::BufferUsageFlagBits::eVertexBuffer;
+				m_pVertexBuffer = fd::createBuffer(pDevice, createInfo);
+				memReqs = pDevice->getBufferMemoryRequirements(*m_pVertexBuffer);
+				allocateInfo.allocationSize = memReqs.size;
+				allocateInfo.memoryTypeIndex = kgs::findMemoryType(pPhysicalDevice, memReqs.memoryTypeBits, vk::MemoryPropertyFlagBits::eDeviceLocal);
+				m_pVertexBufferMemory = fd::allocateMemory(pDevice, allocateInfo);
+				pDevice->bindBufferMemory(*m_pVertexBuffer, *m_pVertexBufferMemory, 0u);
+
+				//copy buffer from staging buffer to vertex buffer.
+				_copyBuffer(pStagingBuffer, m_pVertexBuffer, vertexBufferSize);
 			}
 
 
@@ -287,11 +300,13 @@ namespace kgs
 		Color m_multipliedColor;
 		Color m_addedColor;
 
-		vk::Buffer vertexBuffer;
-		vk::DeviceMemory vertexBufferMemory;
-		vk::Buffer indexBuffer;
-		vk::DeviceMemory indexBufferMemory;
+		std::shared_ptr<vk::Buffer> m_pVertexBuffer;
+		std::shared_ptr<vk::DeviceMemory> m_pVertexBufferMemory;
+		std::shared_ptr<vk::Buffer> m_pIndexBuffer;
+		std::shared_ptr<vk::DeviceMemory> m_pIndexBufferMemory;
 
+
+		//tool methods
 #ifdef DEBUG
 		inline verifySubMeshIndex(uint32_t subMeshIndex)
 		{
@@ -304,6 +319,19 @@ namespace kgs
 		{
 			SubMeshInfo& subMeshInfo = m_subMeshInfos[subMeshIndex];
 			return static_cast<uint32_t>(subMeshInfo.indices.size());
+		}
+
+		void _copyBuffer(std::shared_ptr<vk::Buffer>& pSrcBuffer, std::shared_ptr<vk::Buffer>& pDstBuffer, vk::DeviceSize size)
+		{
+			auto pCommandBuffer = beginSingleTimeCommands();
+
+			vk::BufferCopy copyRegin = {};
+			copyRegin.srcOffset = 0;
+			copyRegin.dstOffset = 0;
+			copyRegin.size = size;
+			pCommandBuffer->copyBuffer(*pSrcBuffer, *pDstBuffer, copyRegin);
+
+			endSingleTimeCommands(pCommandBuffer);
 		}
 	};
 }

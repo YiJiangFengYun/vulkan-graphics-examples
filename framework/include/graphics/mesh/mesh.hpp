@@ -50,7 +50,7 @@ namespace kgs
 
 		Mesh() :
 			m_pContext(pContext);
-			m_multipliedColor(COLOR_WHITE) //default multiplied color should be (1, 1, 1, 1)
+		m_multipliedColor(COLOR_WHITE) //default multiplied color should be (1, 1, 1, 1)
 		{
 
 		}
@@ -226,66 +226,16 @@ namespace kgs
 
 		void apply(Bool32 makeUnreadable)
 		{
+			//caculate bounds
+			_updateBounds();
+
 			//create vertex buffer
-			{
-				//get size of every vertex
-				uint32_t size = 0;
-				for (const auto& layoutInfo : m_layouts)
-				{
-					size += MeshData::getDataBaseTypeSize(layoutInfo.dataType);
-				}
-				//get vertex buffer size.
-				uint32_t vertexBufferSize = size * m_vertexCount;
-
-				//create staging buffer.
-				vk::BufferCreateInfo createInfo = {
-					vk::BufferCreateFlags(),
-					vertexBufferSize,
-					vk::BufferUsageFlagBits::eTransferSrc,
-					vk::SharingMode::eExclusive
-				};
-
-				auto pPhysicalDevice = m_pContext->getPPhysicalDevice();
-				auto pDevice = m_pContext->getPNativeDevice();
-				auto pStagingBuffer = fd::createBuffer(pDevice, createInfo);
-
-				vk::MemoryRequirements memReqs = pDevice->getBufferMemoryRequirements(*pBuffer);
-				vk::MemoryAllocateInfo allocateInfo = {
-					memReqs.size,
-					kgs::findMemoryType(pPhysicalDevice, memReqs.memoryTypeBits, vk::MemoryPropertyFlagBits::eHostVisible | vk::MemoryPropertyFlagBits::eHostCoherent)
-				};
-
-				auto pStagingBufferMemory = fd::allocateMemory(pDevice, allocateInfo);
-
-				pDevice->bindBufferMemory(*pStagingBuffer, *pStagingBufferMemory, 0u);
-
-				void* data;
-				pDevice->mapMemory(*pStagingBufferMemory, 0u, static_cast<vk::DeviceSize>(vertexBufferSize), vk::MemoryMapFlags(), &data);
-				uint32_t offset = 0;
-				for (const auto& layoutInfo : m_layouts)
-				{
-					m_pData->memCopyDataValue(layoutInfo.name, layoutInfo.dataType, data, offset, 0u, m_vertexCount);
-					offset += MeshData::getDataBaseTypeSize(layoutInfo.dataType) * m_vertexCount;
-				}
-				pDevice->unmapMemory(*pStagingBufferMemory);
-
-				//create vertex buffer
-				createInfo.usage = vk::BufferUsageFlagBits::eTransferDst | vk::BufferUsageFlagBits::eVertexBuffer;
-				m_pVertexBuffer = fd::createBuffer(pDevice, createInfo);
-				memReqs = pDevice->getBufferMemoryRequirements(*m_pVertexBuffer);
-				allocateInfo.allocationSize = memReqs.size;
-				allocateInfo.memoryTypeIndex = kgs::findMemoryType(pPhysicalDevice, memReqs.memoryTypeBits, vk::MemoryPropertyFlagBits::eDeviceLocal);
-				m_pVertexBufferMemory = fd::allocateMemory(pDevice, allocateInfo);
-				pDevice->bindBufferMemory(*m_pVertexBuffer, *m_pVertexBufferMemory, 0u);
-
-				//copy buffer from staging buffer to vertex buffer.
-				_copyBuffer(pStagingBuffer, m_pVertexBuffer, vertexBufferSize);
-			}
-
-
-
+			_createVertexBuffer();
 
 			//create index buffer
+			{
+
+			}
 		}
 
 	private:
@@ -294,7 +244,7 @@ namespace kgs
 		uint32_t m_vertexCount;
 		std::shared_ptr<MeshData> m_pData;
 		std::vector<LayoutInfo> m_layouts;
-		uint32_t m_busMeshCount;
+		uint32_t m_subMeshCount;
 		std::vector<SubMeshInfo> m_subMeshInfos;
 		fd::Bounds<BaseValueType> m_bounds;
 		Color m_multipliedColor;
@@ -308,9 +258,9 @@ namespace kgs
 
 		//tool methods
 #ifdef DEBUG
-		inline verifySubMeshIndex(uint32_t subMeshIndex)
+		inline void verifySubMeshIndex(uint32_t subMeshIndex)
 		{
-			if (subMeshIndex >= m_busMeshCount)
+			if (subMeshIndex >= m_subMeshCount)
 				throw std::range_error("The subMeshIndex out of range of the actual sub mesh count.");
 		}
 #endif // DEBUG
@@ -332,6 +282,89 @@ namespace kgs
 			pCommandBuffer->copyBuffer(*pSrcBuffer, *pDstBuffer, copyRegin);
 
 			endSingleTimeCommands(pCommandBuffer);
+		}
+
+		inline void _createVertexBuffer()
+		{
+			//get size of every vertex
+			uint32_t size = 0;
+			for (const auto& layoutInfo : m_layouts)
+			{
+				size += MeshData::getDataBaseTypeSize(layoutInfo.dataType);
+			}
+			//get vertex buffer size.
+			uint32_t vertexBufferSize = size * m_vertexCount;
+
+			//create staging buffer.
+			vk::BufferCreateInfo createInfo = {
+				vk::BufferCreateFlags(),
+				vertexBufferSize,
+				vk::BufferUsageFlagBits::eTransferSrc,
+				vk::SharingMode::eExclusive
+			};
+
+			auto pPhysicalDevice = m_pContext->getPPhysicalDevice();
+			auto pDevice = m_pContext->getPNativeDevice();
+			auto pStagingBuffer = fd::createBuffer(pDevice, createInfo);
+
+			vk::MemoryRequirements memReqs = pDevice->getBufferMemoryRequirements(*pBuffer);
+			vk::MemoryAllocateInfo allocateInfo = {
+				memReqs.size,
+				kgs::findMemoryType(pPhysicalDevice, memReqs.memoryTypeBits, vk::MemoryPropertyFlagBits::eHostVisible | vk::MemoryPropertyFlagBits::eHostCoherent)
+			};
+
+			auto pStagingBufferMemory = fd::allocateMemory(pDevice, allocateInfo);
+
+			pDevice->bindBufferMemory(*pStagingBuffer, *pStagingBufferMemory, 0u);
+
+			void* data;
+			pDevice->mapMemory(*pStagingBufferMemory, 0u, static_cast<vk::DeviceSize>(vertexBufferSize), vk::MemoryMapFlags(), &data);
+			uint32_t offset = 0;
+			for (const auto& layoutInfo : m_layouts)
+			{
+				m_pData->memCopyDataValue(layoutInfo.name, layoutInfo.dataType, data, offset, 0u, m_vertexCount);
+				offset += MeshData::getDataBaseTypeSize(layoutInfo.dataType) * m_vertexCount;
+			}
+			pDevice->unmapMemory(*pStagingBufferMemory);
+
+			//create vertex buffer
+			createInfo.usage = vk::BufferUsageFlagBits::eTransferDst | vk::BufferUsageFlagBits::eVertexBuffer;
+			m_pVertexBuffer = fd::createBuffer(pDevice, createInfo);
+			memReqs = pDevice->getBufferMemoryRequirements(*m_pVertexBuffer);
+			allocateInfo.allocationSize = memReqs.size;
+			allocateInfo.memoryTypeIndex = kgs::findMemoryType(pPhysicalDevice, memReqs.memoryTypeBits, vk::MemoryPropertyFlagBits::eDeviceLocal);
+			m_pVertexBufferMemory = fd::allocateMemory(pDevice, allocateInfo);
+			pDevice->bindBufferMemory(*m_pVertexBuffer, *m_pVertexBufferMemory, 0u);
+
+			//copy buffer from staging buffer to vertex buffer.
+			_copyBuffer(pStagingBuffer, m_pVertexBuffer, vertexBufferSize);
+		}
+
+		inline void _updateBounds()
+		{
+			if (m_vertexCount == 0u)
+			{
+				m_bounds = {};
+				return;
+			}
+
+			auto vertices = m_pData->getDataValue<ARRAY_DATA_TYPE>(KGS_VERTEX_POSTION_NAME);
+			BaseValueType minPos;
+			BaseValueType maxPos;
+			BaseValueType::length_type len = BaseValueType::length();
+			for (BaseValueType::length_type i = 0; i < len; ++i)
+			{
+				typename BaseValueType::value_type min = std::numeric_limits<typename BaseValueType::value_type>::max(), max = -std::numeric_limits<typename BaseValueType::value_type>::max();
+				for (uint32_t j = 0; i < m_vertexCount && j < static_cast<uint32_t>(vertices.size()); ++j)
+				{
+					if (min > vertices[j][i])min = vertices[j][i];
+					if (max < vertices[j][i])max = vertices[j][i];
+				}
+				minPos[i] = min;
+				maxPos[i] = max;
+			}
+			m_bounds.setMin(minPos);
+			m_bounds.setMax(maxPos);
 		}
 	};
 }

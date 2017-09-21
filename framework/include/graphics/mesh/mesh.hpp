@@ -233,9 +233,7 @@ namespace kgs
 			_createVertexBuffer();
 
 			//create index buffer
-			{
-
-			}
+			_createIndexBuffer();
 		}
 
 	private:
@@ -246,6 +244,7 @@ namespace kgs
 		std::vector<LayoutInfo> m_layouts;
 		uint32_t m_subMeshCount;
 		std::vector<SubMeshInfo> m_subMeshInfos;
+		std::vector<SubMeshInfo> m_usingSubMeshInfos; //save sub mesh info to render.
 		fd::Bounds<BaseValueType> m_bounds;
 		Color m_multipliedColor;
 		Color m_addedColor;
@@ -307,7 +306,7 @@ namespace kgs
 			auto pDevice = m_pContext->getPNativeDevice();
 			auto pStagingBuffer = fd::createBuffer(pDevice, createInfo);
 
-			vk::MemoryRequirements memReqs = pDevice->getBufferMemoryRequirements(*pBuffer);
+			vk::MemoryRequirements memReqs = pDevice->getBufferMemoryRequirements(*pStagingBuffer);
 			vk::MemoryAllocateInfo allocateInfo = {
 				memReqs.size,
 				kgs::findMemoryType(pPhysicalDevice, memReqs.memoryTypeBits, vk::MemoryPropertyFlagBits::eHostVisible | vk::MemoryPropertyFlagBits::eHostCoherent)
@@ -338,6 +337,65 @@ namespace kgs
 
 			//copy buffer from staging buffer to vertex buffer.
 			_copyBuffer(pStagingBuffer, m_pVertexBuffer, vertexBufferSize);
+		}
+
+		inline void _createIndexBuffer()
+		{
+			m_usingSubMeshInfos = m_subMeshInfos;
+
+			//get index buffer size
+			uint32_t indexBufferSize = 0;
+			for (const auto& item : m_usingSubMeshInfos)
+			{
+				std::vector<uint32_t>& indices = item.indices;
+				indexBufferSize += indices.size() * sizeof(uint32_t);
+			}
+
+			//create staging buffer.
+			vk::BufferCreateInfo createInfo = {
+				vk::BufferCreateFlags(),
+				indexBufferSize,
+				vk::BufferUsageFlagBits::eTransferSrc,
+				vk::SharingMode::eExclusive
+			};
+
+			auto pPhysicalDevice = m_pContext->getPPhysicalDevice();
+			auto pDevice = m_pContext->getPNativeDevice();
+			auto pStagingBuffer = fd::createBuffer(pDevice, createInfo);
+
+			vk::MemoryRequirements memReqs = pDevice->getBufferMemoryRequirements(*pStagingBuffer);
+			vk::MemoryAllocateInfo allocateInfo = {
+				memReqs.size,
+				kgs::findMemoryType(pPhysicalDevice, memReqs.memoryTypeBits, vk::MemoryPropertyFlagBits::eHostVisible | vk::MemoryPropertyFlagBits::eHostCoherent)
+			};
+
+			auto pStagingBufferMemory = fd::allocateMemory(pDevice, allocateInfo);
+
+			pDevice->bindBufferMemory(*pStagingBuffer, *pStagingBufferMemory, 0u);
+
+			void* data;
+			pDevice->mapMemory(*pStagingBufferMemory, 0u, static_cast<vk::DeviceSize>(indexBufferSize), vk::MemoryMapFlags(), &data);
+			uint32_t offset = 0;
+			for (const auto& subMeshInfo : m_usingSubMeshInfos)
+			{
+				std::vector<uint32_t>& indices = subMeshInfo.indices;
+				size_t size = indices.size() * sizeof(uint32_t);
+				memcpy(data + offset, indices.data(), size);
+				offset += size;
+			}
+			pDevice->unmapMemory(*pStagingBufferMemory);
+
+			//create index buffer
+			createInfo.usage = vk::BufferUsageFlagBits::eTransferDst | vk::BufferUsageFlagBits::eIndexBuffer;
+			m_pIndexBuffer = fd::createBuffer(pDevice, createInfo);
+			memReqs = pDevice->getBufferMemoryRequirements(*m_pIndexBuffer);
+			allocateInfo.allocationSize = memReqs.size;
+			allocateInfo.memoryTypeIndex = kgs::findMemoryType(pPhysicalDevice, memReqs.memoryTypeBits, vk::MemoryPropertyFlagBits::eDeviceLocal);
+			m_pIndexBufferMemory = fd::allocateMemory(pDevice, allocateInfo);
+			pDevice->bindBufferMemory(*m_pIndexBuffer, *m_pIndexBufferMemory, 0u);
+
+			//copy buffer from staging buffer to index buffer.
+			_copyBuffer(pStagingBuffer, m_pIndexBuffer, indexBufferSize);
 		}
 
 		inline void _updateBounds()

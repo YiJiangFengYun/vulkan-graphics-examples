@@ -294,7 +294,7 @@ namespace kgs
 		vk::MemoryRequirements memReqs = pDevice->getBufferMemoryRequirements(*pBuffer);
 		vk::MemoryAllocateInfo allocateInfo = {
 			memReqs.size,
-			kgs::_findMemoryType(m_pContext->getPPhysicalDevice(),
+			kgs::findMemoryType(m_pContext->getPPhysicalDevice(),
 			memReqs.memoryTypeBits,
 			vk::MemoryPropertyFlagBits::eHostVisible | vk::MemoryPropertyFlagBits::eHostCoherent)
 		};

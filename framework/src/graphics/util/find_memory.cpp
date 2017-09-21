@@ -2,7 +2,7 @@
 
 namespace kgs
 {
-	uint32_t _findMemoryType(std::shared_ptr<vk::PhysicalDevice> pPhysicalDevice, uint32_t typeFilter, vk::MemoryPropertyFlags properties)
+	uint32_t findMemoryType(std::shared_ptr<vk::PhysicalDevice> pPhysicalDevice, uint32_t typeFilter, vk::MemoryPropertyFlags properties)
 	{
 		vk::PhysicalDeviceMemoryProperties memProperties = pPhysicalDevice->getMemoryProperties();
 		for (uint32_t i = 0; i < memProperties.memoryTypeCount; ++i)

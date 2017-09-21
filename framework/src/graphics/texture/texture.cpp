@@ -329,7 +329,7 @@ namespace kgs
 
 		vk::MemoryAllocateInfo allocInfo = {
 			memRequirements.size,
-			kgs::_findMemoryType(m_pContext->getPPhysicalDevice(), memRequirements.memoryTypeBits, vk::MemoryPropertyFlagBits::eDeviceLocal)
+			kgs::findMemoryType(m_pContext->getPPhysicalDevice(), memRequirements.memoryTypeBits, vk::MemoryPropertyFlagBits::eDeviceLocal)
 		};
 
 		m_pMemory = fd::allocateMemory(pDevice, allocInfo);
@@ -680,7 +680,7 @@ namespace kgs
 		vk::MemoryRequirements memReqs = pDevice->getBufferMemoryRequirements(*pBuffer);
 		vk::MemoryAllocateInfo allocateInfo = {
 			memReqs.size,
-			kgs::_findMemoryType(m_pContext->getPPhysicalDevice(), memReqs.memoryTypeBits, properties)
+			kgs::findMemoryType(m_pContext->getPPhysicalDevice(), memReqs.memoryTypeBits, properties)
 		};
 
 		pBufferMemory = fd::allocateMemory(pDevice, allocateInfo);

@@ -33,22 +33,28 @@ namespace kgs
 	const MeshData::DataType UVTypeInfo<UVType::VECTOR_3>::ARRAY_TYPE = MeshData::DataType::VECTOR_3_ARRAY;
 
 	template<>
-	const std::string UVIndexInfo<UVIndex::UV_0>::VERTEX_NAME = "_UV_0";
+	const std::string UVIndexInfo<UVIndex::UV_0>::VERTEX_NAME = KGS_VERTEX_UV0_NAME;
 
 	template<>
-	const std::uint32_t UVIndexInfo<UVIndex::UV_0>::VERTEX_LOCATION = 4u;
+	const std::uint32_t UVIndexInfo<UVIndex::UV_0>::VERTEX_BINDING = KGS_VERTEX_UV0_BINDING;
 
 	template<>
-	const std::string UVIndexInfo<UVIndex::UV_1>::VERTEX_NAME = "_UV_1";
+	const std::string UVIndexInfo<UVIndex::UV_1>::VERTEX_NAME = KGS_VERTEX_UV1_NAME;
 
 	template<>
-	const std::uint32_t UVIndexInfo<UVIndex::UV_1>::VERTEX_LOCATION = 5u;
+	const std::uint32_t UVIndexInfo<UVIndex::UV_1>::VERTEX_BINDING = KGS_VERTEX_UV1_BINDING;
 
 	template<>
-	const std::string UVIndexInfo<UVIndex::UV_2>::VERTEX_NAME = "_UV_2";
+	const std::string UVIndexInfo<UVIndex::UV_2>::VERTEX_NAME = KGS_VERTEX_UV2_NAME;
 
 	template<>
-	const std::uint32_t UVIndexInfo<UVIndex::UV_2>::VERTEX_LOCATION = 6u;
+	const std::uint32_t UVIndexInfo<UVIndex::UV_2>::VERTEX_BINDING = KGS_VERTEX_UV2_BINDING;
+
+	template<>
+	const std::string UVIndexInfo<UVIndex::UV_3>::VERTEX_NAME = KGS_VERTEX_UV3_NAME;
+
+	template<>
+	const std::uint32_t UVIndexInfo<UVIndex::UV_3>::VERTEX_BINDING = KGS_VERTEX_UV3_BINDING;
 
 
 	std::array<std::pair<PrimitiveTopology, vk::PrimitiveTopology>, static_cast<size_t>(PrimitiveTopology::RANGE_SIZE)> arrPrimitiveTopologyToVK = {

@@ -15,25 +15,25 @@ namespace kgs
 	class Mesh
 	{
 	public:
-		struct LayoutInfo
+		struct LayoutBindingInfo
 		{
 			std::string name;
 			MeshData::DataType dataType;
-			uint32_t location;
+			uint32_t binding;
 
-			LayoutInfo(std::string name,
+			LayoutBindingInfo(std::string name,
 				MeshData::DataType dataType,
-				uint32_t location) :
+				uint32_t binding) :
 				name(name),
 				dataType(dataType),
-				location(location)
+				binding(binding)
 			{
 
 			}
 
-			Bool32 operator ==(const LayoutInfo& target) const
+			Bool32 operator ==(const LayoutBindingInfo& target) const
 			{
-				return name == target.name && dataType == target.dataType && location == target.location;
+				return name == target.name && dataType == target.dataType && binding == target.binding;
 			}
 		};
 
@@ -78,58 +78,78 @@ namespace kgs
 		//vertex
 		ArrayValueType getVertices() const
 		{
-			return m_pData->getDataValue<ARRAY_DATA_TYPE>(KGS_VERTEX_POSTION_NAME);
+			return getData<ARRAY_DATA_TYPE>(KGS_VERTEX_POSITION_NAME);
 		}
 
 		void setVertices(ArrayValueType vertices)
 		{
-			m_pData->setDataValue<ARRAY_DATA_TYPE>(KGS_VERTEX_POSTION_NAME, vertices);
+			setData<ARRAY_DATA_TYPE>(KGS_VERTEX_POSITION_NAME, vertices, KGS_VERTEX_POSITION_BINDING);
 		}
 
 		//color
 		std::vector<Color32> getColors() const
 		{
-			return m_pData->getDataValue<MeshData::DataType::COLOR_32_ARRAY>(KGS_VERTEX_COLOR_NAME);
+			return getData<MeshData::DataType::COLOR_32_ARRAY>(KGS_VERTEX_COLOR_NAME);
 		}
 
 		void setColors(std::vector<Color32> colors)
 		{
-			m_pData->setDataValue<MeshData::DataType::COLOR_32_ARRAY>(KGS_VERTEX_COLOR_NAME, colors);
+			setData<MeshData::DataType::COLOR_32_ARRAY>(KGS_VERTEX_COLOR_NAME, colors, KGS_VERTEX_COLOR_BINDING);
 		}
 
 		//normal
 		ArrayValueType getNormals() const
 		{
-			return m_pData->getDataValue<ARRAY_DATA_TYPE>(KGS_VERTEX_NORMAL_NAME);
+			getData<ARRAY_DATA_TYPE>(KGS_VERTEX_NORMAL_NAME);
 		}
 
 		void setNormals(ArrayValueType normals)
 		{
-			m_pData->setDataValue<ARRAY_DATA_TYPE>(KGS_VERTEX_NORMAL_NAME, normals);
+			setData<ARRAY_DATA_TYPE>(KGS_VERTEX_NORMAL_NAME, normals, KGS_VERTEX_NORMAL_BINDING);
 		}
 
 		//tangent
 		ArrayValueType getTangents() const
 		{
-			return m_pData->getDataValue<ARRAY_DATA_TYPE>(KGS_VERTEX_TANGENT_NAME);
+			getData<ARRAY_DATA_TYPE>(KGS_VERTEX_TANGENT_NAME);
 		}
 
 		void setTangents(ArrayValueType tangents)
 		{
-			m_pData->setDataValue<ARRAY_DATA_TYPE>(KGS_VERTEX_TANGENT_NAME, tangents);
+			setData<ARRAY_DATA_TYPE>(KGS_VERTEX_TANGENT_NAME, tangents, KGS_VERTEX_TANGENT_BINDING);
 		}
 
 		//uv
 		template<UVType uvType, UVIndex uvIndex>
 		typename MeshData::DataTypeInfo<UVTypeInfo<uvType>::ARRAY_TYPE>::ValueType getUVs()
 		{
-			return m_pData->getDataValue<UVTypeInfo<uvType>::ARRAY_TYPE>(UVIndexInfo<uvIndex>::VERTEX_NAME);
+			return getData<UVTypeInfo<uvType>::ARRAY_TYPE>(UVIndexInfo<uvIndex>::VERTEX_NAME);
 		}
 
 		template<UVType uvType, UVIndex uvIndex>
 		void setUVs(typename MeshData::DataTypeInfo<UVTypeInfo<uvType>::ARRAY_TYPE>::ValueType uvs, uint32_t uvIndex)
 		{
-			m_pData->setDataValue<UVTypeInfo<uvType>::ARRAY_TYPE>(UVIndexInfo<uvIndex>::VERTEX_NAME, uvs);
+			setData<UVTypeInfo<uvType>::ARRAY_TYPE>(UVIndexInfo<uvIndex>::VERTEX_NAME, uvs, UVIndexInfo<uvIndex>::VERTEX_BINDING);
+		}
+
+		template<MeshData::DataType dataType>
+		typename MeshData::DataTypeInfo<dataType>::ValueType getData(std::string name)
+		{
+			return m_pData->getDataValue<dataType>(name);
+		}
+
+
+		template <MeshData::DataType dataType>
+		void setData(std::string name, typename MeshData::DataTypeInfo<dataType>::ValueType value, uint32_t binding = KGS_VERTEX_OTHER_MIN_BINDING)
+		{
+			m_pData->setDataValue<dataType>(name, value);
+			//update layout binding info
+			LayoutBindingInfo info(
+				name,
+				dataType,
+				binding
+			);
+			setValue(name, info, m_mapLayoutBindingInfos, m_arrLayoutBindingInfos);
 		}
 
 		//index
@@ -241,7 +261,8 @@ namespace kgs
 		MeshType m_meshType = meshType;
 		uint32_t m_vertexCount;
 		std::shared_ptr<MeshData> m_pData;
-		std::vector<LayoutInfo> m_layouts;
+		std::vector<LayoutBindingInfo> m_arrLayoutBindingInfos;
+		std::unordered_map<std::string, LayoutBindingInfo> m_mapLayoutBindingInfos;
 		uint32_t m_subMeshCount;
 		std::vector<SubMeshInfo> m_subMeshInfos;
 		std::vector<SubMeshInfo> m_usingSubMeshInfos; //save sub mesh info to render.
@@ -287,7 +308,7 @@ namespace kgs
 		{
 			//get size of every vertex
 			uint32_t size = 0;
-			for (const auto& layoutInfo : m_layouts)
+			for (const auto& layoutInfo : m_arrLayoutBindingInfos)
 			{
 				size += MeshData::getDataBaseTypeSize(layoutInfo.dataType);
 			}
@@ -319,7 +340,7 @@ namespace kgs
 			void* data;
 			pDevice->mapMemory(*pStagingBufferMemory, 0u, static_cast<vk::DeviceSize>(vertexBufferSize), vk::MemoryMapFlags(), &data);
 			uint32_t offset = 0;
-			for (const auto& layoutInfo : m_layouts)
+			for (const auto& layoutInfo : m_arrLayoutBindingInfos)
 			{
 				m_pData->memCopyDataValue(layoutInfo.name, layoutInfo.dataType, data, offset, 0u, m_vertexCount);
 				offset += MeshData::getDataBaseTypeSize(layoutInfo.dataType) * m_vertexCount;
@@ -406,7 +427,7 @@ namespace kgs
 				return;
 			}
 
-			auto vertices = m_pData->getDataValue<ARRAY_DATA_TYPE>(KGS_VERTEX_POSTION_NAME);
+			auto vertices = m_pData->getDataValue<ARRAY_DATA_TYPE>(KGS_VERTEX_POSITION_NAME);
 			BaseValueType minPos;
 			BaseValueType maxPos;
 			BaseValueType::length_type len = BaseValueType::length();

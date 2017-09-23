@@ -13,19 +13,13 @@ namespace kgs
 	{
 		enum class DataType
 		{
-			FLOAT,
 			FLOAT_ARRAY,
-			INT,
 			INT_ARRAY,
-			VECTOR_2,
 			VECTOR_2_ARRAY,
-			VECTOR_3,
 			VECTOR_3_ARRAY,
-			VECTOR_4,
 			VECTOR_4_ARRAY,
-			COLOR_32,
 			COLOR_32_ARRAY,
-			BEGIN_RANGE = FLOAT,
+			BEGIN_RANGE = FLOAT_ARRAY,
 			END_RANGE = COLOR_32_ARRAY,
 			RANGE_SIZE = (END_RANGE - BEGIN_RANGE + 1)
 		};
@@ -35,13 +29,7 @@ namespace kgs
 		{
 			typedef void ValueType;
 			typedef void BaseType;
-		};
-
-		template<>
-		struct DataTypeInfo<DataType::FLOAT>
-		{
-			typedef float ValueType;
-			typedef float BaseType;
+			const vk::Format static BASE_FORMAT = vk::Format::eUndefined;
 		};
 
 		template<>
@@ -49,13 +37,7 @@ namespace kgs
 		{
 			typedef std::vector<float> ValueType;
 			typedef float BaseType;
-		};
-
-		template<>
-		struct DataTypeInfo<DataType::INT>
-		{
-			typedef int32_t ValueType;
-			typedef int32_t  BaseType;
+			const vk::Format static BASE_FORMAT = vk::Format::eR32Sfloat;
 		};
 
 		template<>
@@ -63,13 +45,7 @@ namespace kgs
 		{
 			typedef std::vector<int32_t> ValueType;
 			typedef int32_t  BaseType;
-		};
-
-		template<>
-		struct DataTypeInfo<DataType::VECTOR_2>
-		{
-			typedef Vector2 ValueType;
-			typedef Vector2 BaseType;
+			const vk::Format static BASE_FORMAT = vk::Format::eR32Sint;
 		};
 
 		template<>
@@ -77,13 +53,7 @@ namespace kgs
 		{
 			typedef std::vector<Vector2> ValueType;
 			typedef Vector2 BaseType;
-		};
-
-		template<>
-		struct DataTypeInfo<DataType::VECTOR_3>
-		{
-			typedef Vector3 ValueType;
-			typedef Vector3 BaseType;
+			const vk::Format static BASE_FORMAT = vk::Format::eR32G32Sfloat;
 		};
 
 		template<>
@@ -91,13 +61,7 @@ namespace kgs
 		{
 			typedef std::vector<Vector3> ValueType;
 			typedef Vector3 BaseType;
-		};
-
-		template<>
-		struct DataTypeInfo<DataType::VECTOR_4>
-		{
-			typedef Vector4 ValueType;
-			typedef Vector4 BaseType;
+			const vk::Format static BASE_FORMAT = vk::Format::eR32G32B32Sfloat;
 		};
 
 		template<>
@@ -105,13 +69,7 @@ namespace kgs
 		{
 			typedef std::vector<Vector4> ValueType;
 			typedef Vector4 BaseType;
-		};
-
-		template<>
-		struct DataTypeInfo<DataType::COLOR_32>
-		{
-			typedef Color32 ValueType;
-			typedef Color32 BaseType;
+			const vk::Format static BASE_FORMAT = vk::Format::eR32G32B32A32Sfloat;
 		};
 
 		template<>
@@ -119,6 +77,7 @@ namespace kgs
 		{
 			typedef std::vector<Color32> ValueType;
 			typedef Color32 BaseType;
+			const vk::Format static BASE_FORMAT = vk::Format::eR8G8B8A8Snorm;
 		};
 
 		//std::vector<float> arrFloats;

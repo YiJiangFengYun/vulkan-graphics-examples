@@ -3,31 +3,16 @@
 namespace kgs
 {
 	template<>
-	const MeshData::DataType MeshTypeInfo<MeshType::SPACE_2>::BASE_TYPE = MeshData::DataType::VECTOR_2;
-
-	template<>
 	const MeshData::DataType MeshTypeInfo<MeshType::SPACE_2>::ARRAY_TYPE = MeshData::DataType::VECTOR_2_ARRAY;
-
-	template<>
-	const MeshData::DataType MeshTypeInfo<MeshType::SPACE_3>::BASE_TYPE = MeshData::DataType::VECTOR_3;
 
 	template<>
 	const MeshData::DataType MeshTypeInfo<MeshType::SPACE_3>::ARRAY_TYPE = MeshData::DataType::VECTOR_3_ARRAY;
 
 	template<>
-	const MeshData::DataType UVTypeInfo<UVType::FLOAT>::BASE_TYPE = MeshData::DataType::FLOAT;
-
-	template<>
 	const MeshData::DataType UVTypeInfo<UVType::FLOAT>::ARRAY_TYPE = MeshData::DataType::FLOAT_ARRAY;
 
 	template<>
-	const MeshData::DataType UVTypeInfo<UVType::VECTOR_2>::BASE_TYPE = MeshData::DataType::VECTOR_2;
-
-	template<>
 	const MeshData::DataType UVTypeInfo<UVType::VECTOR_2>::ARRAY_TYPE = MeshData::DataType::VECTOR_2_ARRAY;
-
-	template<>
-	const MeshData::DataType UVTypeInfo<UVType::VECTOR_3>::BASE_TYPE = MeshData::DataType::VECTOR_3;
 
 	template<>
 	const MeshData::DataType UVTypeInfo<UVType::VECTOR_3>::ARRAY_TYPE = MeshData::DataType::VECTOR_3_ARRAY;
@@ -36,25 +21,25 @@ namespace kgs
 	const std::string UVIndexInfo<UVIndex::UV_0>::VERTEX_NAME = KGS_VERTEX_UV0_NAME;
 
 	template<>
-	const std::uint32_t UVIndexInfo<UVIndex::UV_0>::VERTEX_BINDING = KGS_VERTEX_UV0_BINDING;
+	const std::uint32_t UVIndexInfo<UVIndex::UV_0>::VERTEX_BINDING_PRIORITY = KGS_VERTEX_BINDING_PRIORITY_UV0;
 
 	template<>
 	const std::string UVIndexInfo<UVIndex::UV_1>::VERTEX_NAME = KGS_VERTEX_UV1_NAME;
 
 	template<>
-	const std::uint32_t UVIndexInfo<UVIndex::UV_1>::VERTEX_BINDING = KGS_VERTEX_UV1_BINDING;
+	const std::uint32_t UVIndexInfo<UVIndex::UV_1>::VERTEX_BINDING_PRIORITY = KGS_VERTEX_BINDING_PRIORITY_UV1;
 
 	template<>
 	const std::string UVIndexInfo<UVIndex::UV_2>::VERTEX_NAME = KGS_VERTEX_UV2_NAME;
 
 	template<>
-	const std::uint32_t UVIndexInfo<UVIndex::UV_2>::VERTEX_BINDING = KGS_VERTEX_UV2_BINDING;
+	const std::uint32_t UVIndexInfo<UVIndex::UV_2>::VERTEX_BINDING_PRIORITY = KGS_VERTEX_BINDING_PRIORITY_UV2;
 
 	template<>
 	const std::string UVIndexInfo<UVIndex::UV_3>::VERTEX_NAME = KGS_VERTEX_UV3_NAME;
 
 	template<>
-	const std::uint32_t UVIndexInfo<UVIndex::UV_3>::VERTEX_BINDING = KGS_VERTEX_UV3_BINDING;
+	const std::uint32_t UVIndexInfo<UVIndex::UV_3>::VERTEX_BINDING_PRIORITY = KGS_VERTEX_BINDING_PRIORITY_UV3;
 
 
 	std::array<std::pair<PrimitiveTopology, vk::PrimitiveTopology>, static_cast<size_t>(PrimitiveTopology::RANGE_SIZE)> arrPrimitiveTopologyToVK = {

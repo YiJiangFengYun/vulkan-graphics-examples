@@ -1,6 +1,7 @@
 #ifndef KGS_MESH_H
 #define KGS_MESH_H
 
+#include <set>;
 #include <glm/glm.hpp>
 #include <foundation/foundation.hpp>
 #include "graphics/global.hpp"
@@ -19,21 +20,21 @@ namespace kgs
 		{
 			std::string name;
 			MeshData::DataType dataType;
-			uint32_t binding;
+			uint32_t bindingPriority;
 
 			LayoutBindingInfo(std::string name,
 				MeshData::DataType dataType,
-				uint32_t binding) :
+				uint32_t bindingPriority) :
 				name(name),
 				dataType(dataType),
-				binding(binding)
+				bindingPriority(bindingPriority)
 			{
 
 			}
 
 			Bool32 operator ==(const LayoutBindingInfo& target) const
 			{
-				return name == target.name && dataType == target.dataType && binding == target.binding;
+				return name == target.name && dataType == target.dataType && bindingPriority == target.bindingPriority;
 			}
 		};
 
@@ -83,7 +84,7 @@ namespace kgs
 
 		void setVertices(ArrayValueType vertices)
 		{
-			setData<ARRAY_DATA_TYPE>(KGS_VERTEX_POSITION_NAME, vertices, KGS_VERTEX_POSITION_BINDING);
+			setData<ARRAY_DATA_TYPE>(KGS_VERTEX_POSITION_NAME, vertices, KGS_VERTEX_BINDING_PRIORITY_POSITION);
 		}
 
 		//color
@@ -94,7 +95,7 @@ namespace kgs
 
 		void setColors(std::vector<Color32> colors)
 		{
-			setData<MeshData::DataType::COLOR_32_ARRAY>(KGS_VERTEX_COLOR_NAME, colors, KGS_VERTEX_COLOR_BINDING);
+			setData<MeshData::DataType::COLOR_32_ARRAY>(KGS_VERTEX_COLOR_NAME, colors, KGS_VERTEX_BINDING_PRIORITY_COLOR);
 		}
 
 		//normal
@@ -105,7 +106,7 @@ namespace kgs
 
 		void setNormals(ArrayValueType normals)
 		{
-			setData<ARRAY_DATA_TYPE>(KGS_VERTEX_NORMAL_NAME, normals, KGS_VERTEX_NORMAL_BINDING);
+			setData<ARRAY_DATA_TYPE>(KGS_VERTEX_NORMAL_NAME, normals, KGS_VERTEX_BINDING_PRIORITY_NORMAL);
 		}
 
 		//tangent
@@ -116,7 +117,7 @@ namespace kgs
 
 		void setTangents(ArrayValueType tangents)
 		{
-			setData<ARRAY_DATA_TYPE>(KGS_VERTEX_TANGENT_NAME, tangents, KGS_VERTEX_TANGENT_BINDING);
+			setData<ARRAY_DATA_TYPE>(KGS_VERTEX_TANGENT_NAME, tangents, KGS_VERTEX_BINDING_PRIORITY_TANGENT);
 		}
 
 		//uv
@@ -129,7 +130,7 @@ namespace kgs
 		template<UVType uvType, UVIndex uvIndex>
 		void setUVs(typename MeshData::DataTypeInfo<UVTypeInfo<uvType>::ARRAY_TYPE>::ValueType uvs, uint32_t uvIndex)
 		{
-			setData<UVTypeInfo<uvType>::ARRAY_TYPE>(UVIndexInfo<uvIndex>::VERTEX_NAME, uvs, UVIndexInfo<uvIndex>::VERTEX_BINDING);
+			setData<UVTypeInfo<uvType>::ARRAY_TYPE>(UVIndexInfo<uvIndex>::VERTEX_NAME, uvs, UVIndexInfo<uvIndex>::VERTEX_BINDING_PRIORITY);
 		}
 
 		template<MeshData::DataType dataType>
@@ -140,14 +141,14 @@ namespace kgs
 
 
 		template <MeshData::DataType dataType>
-		void setData(std::string name, typename MeshData::DataTypeInfo<dataType>::ValueType value, uint32_t binding = KGS_VERTEX_OTHER_MIN_BINDING)
+		void setData(std::string name, typename MeshData::DataTypeInfo<dataType>::ValueType value, uint32_t bindingPriority = KGS_VERTEX_BINDING_PRIORITY_OTHER_MIN)
 		{
 			m_pData->setDataValue<dataType>(name, value);
 			//update layout binding info
 			LayoutBindingInfo info(
 				name,
 				dataType,
-				binding
+				bindingPriority
 			);
 			setValue(name, info, m_mapLayoutBindingInfos, m_arrLayoutBindingInfos);
 		}
@@ -246,6 +247,9 @@ namespace kgs
 
 		void apply(Bool32 makeUnreadable)
 		{
+			//sort layout binding infos
+			_sortLayoutBindingInfos();
+
 			//caculate bounds
 			_updateBounds();
 
@@ -256,6 +260,55 @@ namespace kgs
 			_createIndexBuffer();
 		}
 
+		void _fillGraphicsPipelineCreateInfoForDraw(uint32_t subMeshIndex, vk::GraphicsPipelineCreateInfo &graphicsPipelineCreateInfo)
+		{
+			std::vector<vk::VertexInputBindingDescription> bindingDescriptions = _getVertexInputBindingDescriptions();
+			std::vector<vk::VertexInputAttributeDescription> attributeDescriptions = _getVertexInputAttributeDescriptions();
+			vk::PipelineVertexInputStateCreateInfo vertexInputStateInfo = {
+				vk::PipelineVertexInputStateCreateFlags(),
+				static_cast<uint32_t>(bindingDescriptions.size()),
+				bindingDescriptions.data(),
+				static_cast<uint32_t>(attributeDescriptions.size()),
+				attributeDescriptions.data()
+			};
+
+			vk::PipelineInputAssemblyStateCreateInfo inputAssemblyStateInfo = {
+				vk::PipelineInputAssemblyStateCreateFlags(),
+				m_usingSubMeshInfos[subMeshIndex].topology,
+				VK_FALSE
+			};
+
+			graphicsPipelineCreateInfo.pVertexInputState = &vertexInputStateInfo;
+			graphicsPipelineCreateInfo.pInputAssemblyState = &inputAssemblyStateInfo;
+		}
+
+		void _fillCommandBufferForDraw(uint32_t subMeshIndex, vk::CommandBuffer &commandBuffer)
+		{
+			std::vector<vk::Buffer> vertexBuffers(m_layoutBindingInfos.size());
+			std::vector<vk::DeviceSize> offsets(m_layoutBindingInfos.size());
+			uint32_t offset = 0u;
+			uint32_t index = 0u;
+			for (const auto& layoutInfo : m_layoutBindingInfos)
+			{
+				vertexBuffers[index] = *m_pVertexBuffer;
+				offsets[index] = offset;
+				offset += MeshData::getDataBaseTypeSize(layoutInfo.dataType) * m_vertexCount;
+				++index;
+			}
+			commandBuffer.bindVertexBuffers(0u, vertexBuffers.data(), offsets.data());
+
+			uint32_t offset = 0u;
+			for (uint32_t i = 0; i < subMeshIndex; ++i)
+			{
+				std::vector<uint32_t>& indices = m_usingSubMeshInfos[i].indices;
+				size_t size = indices.size() * sizeof(uint32_t);
+				offset += static_cast<uint32_t>(size);
+			}
+			commandBuffer.bindIndexBuffer(m_pIndexBuffer, static_cast<vk:DeviceSize>(offset), vk::IndexType::eUint32);
+		}
+
+
+
 	private:
 		std::shared_ptr<Context> m_pContext;
 		MeshType m_meshType = meshType;
@@ -265,16 +318,53 @@ namespace kgs
 		std::unordered_map<std::string, LayoutBindingInfo> m_mapLayoutBindingInfos;
 		uint32_t m_subMeshCount;
 		std::vector<SubMeshInfo> m_subMeshInfos;
-		std::vector<SubMeshInfo> m_usingSubMeshInfos; //save sub mesh info to render.
 		fd::Bounds<BaseValueType> m_bounds;
 		Color m_multipliedColor;
 		Color m_addedColor;
 
+		std::set<LayoutBindingInfo> m_layoutBindingInfos;
+		std::vector<SubMeshInfo> m_usingSubMeshInfos; //save sub mesh info to render.
 		std::shared_ptr<vk::Buffer> m_pVertexBuffer;
 		std::shared_ptr<vk::DeviceMemory> m_pVertexBufferMemory;
 		std::shared_ptr<vk::Buffer> m_pIndexBuffer;
 		std::shared_ptr<vk::DeviceMemory> m_pIndexBufferMemory;
 
+		inline void _sortLayoutBindingInfos()
+		{
+			m_layoutBindingInfos = std::set<LayoutBindingInfo>(m_arrLayoutBindingInfos.cbegin(), m_arrLayoutBindingInfos.cend(),
+				[](LayoutBindingInfo lhs, LayoutBindingInfo rhs) {
+				return lhs.bindingPriority < rhs.bindingPriority;
+			});
+		}
+
+		inline std::vector<vk::VertexInputBindingDescription> _getVertexInputBindingDescriptions()
+		{
+			std::vector<vk::VertexInputBindingDescription> descriptions(m_layoutBindingInfos.size());
+			uint32_t index = 0u;
+			for (const auto& info : m_layoutBindingInfos)
+			{
+				descriptions[index].binding = index;
+				descriptions[index].stride = MeshData::getDataBaseTypeSize(info.dataType) * m_vertexCount;
+				descriptions[index].inputRate = vk::VertexInputRate::eVertex;
+				++index;
+			}
+			return descriptions;
+		}
+
+		inline std::vector<vk::VertexInputAttributeDescription> _getVertexInputAttributeDescriptions()
+		{
+			std::vector<vk::VertexInputAttributeDescription> descriptions(m_layoutBindingInfos.size());
+			uint32_t index = 0u;
+			for (const auto& info : m_layoutBindingInfos)
+			{
+				descriptions[index].binding = index;
+				descriptions[index].location = 0u;
+				descriptions[index].format = MeshData::DataTypeInfo<info.dataType>::BASE_FORMAT;
+				descriptions[index].offset = 0u;
+				++index;
+			}
+			return descriptions;
+		}
 
 		//tool methods
 #ifdef DEBUG
@@ -307,8 +397,8 @@ namespace kgs
 		inline void _createVertexBuffer()
 		{
 			//get size of every vertex
-			uint32_t size = 0;
-			for (const auto& layoutInfo : m_arrLayoutBindingInfos)
+			uint32_t size = 0u;
+			for (const auto& layoutInfo : m_layoutBindingInfos)
 			{
 				size += MeshData::getDataBaseTypeSize(layoutInfo.dataType);
 			}
@@ -339,8 +429,8 @@ namespace kgs
 
 			void* data;
 			pDevice->mapMemory(*pStagingBufferMemory, 0u, static_cast<vk::DeviceSize>(vertexBufferSize), vk::MemoryMapFlags(), &data);
-			uint32_t offset = 0;
-			for (const auto& layoutInfo : m_arrLayoutBindingInfos)
+			uint32_t offset = 0u;
+			for (const auto& layoutInfo : m_layoutBindingInfos)
 			{
 				m_pData->memCopyDataValue(layoutInfo.name, layoutInfo.dataType, data, offset, 0u, m_vertexCount);
 				offset += MeshData::getDataBaseTypeSize(layoutInfo.dataType) * m_vertexCount;
@@ -365,7 +455,7 @@ namespace kgs
 			m_usingSubMeshInfos = m_subMeshInfos;
 
 			//get index buffer size
-			uint32_t indexBufferSize = 0;
+			uint32_t indexBufferSize = 0u;
 			for (const auto& item : m_usingSubMeshInfos)
 			{
 				std::vector<uint32_t>& indices = item.indices;
@@ -396,7 +486,7 @@ namespace kgs
 
 			void* data;
 			pDevice->mapMemory(*pStagingBufferMemory, 0u, static_cast<vk::DeviceSize>(indexBufferSize), vk::MemoryMapFlags(), &data);
-			uint32_t offset = 0;
+			uint32_t offset = 0u;
 			for (const auto& subMeshInfo : m_usingSubMeshInfos)
 			{
 				std::vector<uint32_t>& indices = subMeshInfo.indices;

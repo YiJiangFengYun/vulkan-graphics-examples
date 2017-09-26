@@ -17,7 +17,6 @@ namespace kgs
 	template<MeshType type>
 	struct MeshTypeInfo
 	{
-		const static MeshData::DataType BASE_TYPE;
 		const static MeshData::DataType ARRAY_TYPE;
 	};
 

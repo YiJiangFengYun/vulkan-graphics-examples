@@ -132,6 +132,12 @@
     <ClCompile Include="..\..\framework\src\graphics\scene\object.cpp">
       <Filter>src\graphics\scene</Filter>
     </ClCompile>
+    <ClCompile Include="..\..\framework\src\graphics\scene\visual_object.cpp">
+      <Filter>src\graphics\scene</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\framework\src\graphics\scene\light.cpp">
+      <Filter>src\graphics\scene</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="..\..\framework\include\graphics\texture\texture.hpp">
@@ -216,6 +222,12 @@
       <Filter>include\graphics\renderer</Filter>
     </ClInclude>
     <ClInclude Include="..\..\framework\include\graphics\scene\object.hpp">
+      <Filter>include\graphics\scene</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\framework\include\graphics\scene\visual_object.hpp">
+      <Filter>include\graphics\scene</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\framework\include\graphics\scene\light.hpp">
       <Filter>include\graphics\scene</Filter>
     </ClInclude>
   </ItemGroup>

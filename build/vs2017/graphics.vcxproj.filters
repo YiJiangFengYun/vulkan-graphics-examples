@@ -37,6 +37,18 @@
     <Filter Include="src\graphics\mesh">
       <UniqueIdentifier>{fd50da3c-5e88-4cac-b31d-b62cc18c1a73}</UniqueIdentifier>
     </Filter>
+    <Filter Include="include\graphics\scene">
+      <UniqueIdentifier>{30b28376-058f-4645-a337-5487baae641e}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="src\graphics\scene">
+      <UniqueIdentifier>{80de8901-f91f-4ad0-b05c-d8f2ae34b3f6}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="include\graphics\renderer">
+      <UniqueIdentifier>{2f7fdcb2-b1a5-4ac7-b25f-7a881b7e4c33}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="src\graphics\renderer">
+      <UniqueIdentifier>{b71dd6a9-b375-4df8-b6e3-df5ff150c182}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="..\..\framework\src\graphics\texture\texture.cpp">
@@ -104,6 +116,21 @@
     </ClCompile>
     <ClCompile Include="..\..\framework\src\graphics\util\single_time_command.cpp">
       <Filter>src\graphics\util</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\framework\src\graphics\scene\option.cpp">
+      <Filter>src\graphics\scene</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\framework\src\graphics\scene\camera.cpp">
+      <Filter>src\graphics\scene</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\framework\src\graphics\scene\scene.cpp">
+      <Filter>src\graphics\scene</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\framework\src\graphics\renderer\renderer.cpp">
+      <Filter>src\graphics\renderer</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\framework\src\graphics\scene\object.cpp">
+      <Filter>src\graphics\scene</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
@@ -175,6 +202,21 @@
     </ClInclude>
     <ClInclude Include="..\..\framework\include\graphics\util\single_time_command.hpp">
       <Filter>include\graphics\util</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\framework\include\graphics\scene\option.hpp">
+      <Filter>include\graphics\scene</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\framework\include\graphics\scene\camera.hpp">
+      <Filter>include\graphics\scene</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\framework\include\graphics\scene\scene.hpp">
+      <Filter>include\graphics\scene</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\framework\include\graphics\renderer\renderer.hpp">
+      <Filter>include\graphics\renderer</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\framework\include\graphics\scene\object.hpp">
+      <Filter>include\graphics\scene</Filter>
     </ClInclude>
   </ItemGroup>
 </Project>

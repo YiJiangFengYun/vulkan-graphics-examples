@@ -1,12 +1,12 @@
 #ifndef KGS_CAMERA_H
 #define KGS_CAMERA_H
 
-#include "graphics/scene/option.hpp"
+#include "graphics/scene/object.hpp"
 
 namespace kgs
 {
 	template <SpaceType SPACE_TYPE>
-	class Camera
+	class Camera : Object<SPACE_TYPE>
 	{
         
 	};

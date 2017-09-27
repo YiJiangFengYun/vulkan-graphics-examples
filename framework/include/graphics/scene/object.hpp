@@ -1,8 +1,22 @@
 #ifndef KGS_OBJECT_H
 #define KGS_OBJECT_H
 
+#include "graphics/global.hpp"
+#include "graphics/scene/option.hpp"
+
 namespace kgs
 {
+	template <SpaceType SPACE_TYPE>
+	class Object
+	{
+	public:
+		typedef typename SpaceTypeInfo<SPACE_TYPE>::VecType VecType;
+		typedef typename SpaceTypeInfo<SPACE_TYPE>::MatrixType MatrixType;
+
+	protected:
+		VecType m_location;
+		VecType m_scale;
+	};
 
 } //namespace kgs
 

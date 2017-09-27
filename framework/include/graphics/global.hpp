@@ -33,6 +33,7 @@ namespace kgs
 	typedef glm::tvec4<Byte> Color32;
 	typedef fd::Bounds<glm::vec2> Bound2;
 	typedef fd::Bounds<glm::vec3> Bound3;
+	typedef glm::quat Quaternion;
 
 	extern const Color COLOR_ZERO;
 	extern const Color COLOR_WHITE;

@@ -10,12 +10,13 @@ namespace kgs
 	class Object
 	{
 	public:
-		typedef typename SpaceTypeInfo<SPACE_TYPE>::VecType VecType;
+		typedef typename SpaceTypeInfo<SPACE_TYPE>::VectorType VectorType;
+		typedef typename SpaceTypeInfo<SPACE_TYPE>::PointType PointType;
 		typedef typename SpaceTypeInfo<SPACE_TYPE>::MatrixType MatrixType;
 
 	protected:
-		VecType m_location;
-		VecType m_scale;
+		PointType m_location;
+		VectorType m_scale;
 	};
 
 } //namespace kgs

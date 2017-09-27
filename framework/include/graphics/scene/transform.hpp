@@ -3,6 +3,7 @@
 
 #include <memory>
 #include <vector>
+#include <algorithm>
 #include "graphics/global.hpp"
 #include "graphics/scene/option.hpp"
 
@@ -13,32 +14,72 @@ namespace kgs
 	{
 	public:
 		typedef Transform<SPACE_TYPE> Type;
-		typedef typename SpaceTypeInfo<SPACE_TYPE>::VecType VecType;
+		typedef typename SpaceTypeInfo<SPACE_TYPE>::VectorType VectorType;
+		typedef typename SpaceTypeInfo<SPACE_TYPE>::PointType PointType;
 		typedef typename SpaceTypeInfo<SPACE_TYPE>::MatrixType MatrixType;
 		typedef typename SpaceTypeInfo<SPACE_TYPE>::RotationType RotationType;
 
+		//------------hierarchy-----------------------
 		uint32_t getChildCount()
 		{
 			return m_pChildren.size();
 		}
 
+		void detachChildren()
+		{
+			m_pChildren.resize(0u);
+		}
+
+		std::shared_ptr<Transform> getChildWithIndex(uint32_t index)
+		{
+			return m_pChildren[index];
+		}
+
+		Bool32 isChild(std::shared_ptr<Transform> transform)
+		{
+			std::find(m_pChildren.cbegin(), m_pChildren.cend(), transform) != m_pChildren.cend();
+		}
+
+		std::shared_ptr<Type> getPParent()
+		{
+			return m_pParant;
+		}
+
+		std::shared_ptr<Type> getRoot()
+		{
+			if (m_pParant == nullptr)
+			{
+				return this;
+			}
+			else
+			{
+				auto root = m_pParant;
+				while (root.m_pParent != nullptr)
+				{
+					root = root.m_pParent
+				}
+				return root;
+			}
+		}
+
+		//------------state-----------------------
 		Bool32 getIsChanged()
 		{
 			return m_isChanged;
 		}
 
-		VecType getLocalPosition()
+		PointType getLocalPosition()
 		{
 			return m_appliedPosition;
 		}
 
-		void setLocalPosition(VecType position)
+		void setLocalPosition(PointType position)
 		{
 			m_localPosition = position;
 			m_isChanged = KGS_TRUE;
 		}
 
-		VecType getPosition()
+		PointType getPosition()
 		{
 			return _getMatrixLocalToWorld(KGS_FALSE) * m_appliedPosition;
 		}
@@ -66,20 +107,20 @@ namespace kgs
 			return rotation;
 		}
 
-		VecType getLocalScale()
+		VectorType getLocalScale()
 		{
 			return m_localScale;
 		}
 
-		void setLocalScale(VecType scale)
+		void setLocalScale(VectorType scale)
 		{
 			m_localScale = scale;
 			m_isChanged = KGS_TRUE;
 		}
 
-		VecType getScale()
+		VectorType getScale()
 		{
-			VecType scale = m_appliedScale;
+			VectorType scale = m_appliedScale;
 			auto curr = m_pParant;
 			while (curr != nullptr)
 			{
@@ -94,6 +135,28 @@ namespace kgs
 
 		}
 
+		//-------------------------transform tool-------------------------------------
+
+		VectorType transformVectorToWorld(VectorType vector)
+		{
+			return VectorType(_getMatrixLocalToWorld() * PointType(vector, 0.0f));
+		}
+
+		VectorType transformVectorToLocal(VectorType vector)
+		{
+			return VectorType(_getMatrixWorldToLocal() * PointType(vector, 0.0f));
+		}
+
+		PointType transformPointToWorld(PointType point)
+		{
+			return _getMatrixLocalToWorld() * point;
+		}
+
+		PointType transformPointToLocal(PointType point)
+		{
+			return _getMatrixWorldToLocal() * point;
+		}
+
 		MatrixType getMatrixLocalToWorld()
 		{
 			return _getMatrixLocalToWorld(KGS_TRUE);
@@ -104,42 +167,18 @@ namespace kgs
 			return _getMatrixWorldToLocal(KGS_TRUE);
 		}
 
-		std::shared_ptr<Type> getPParent()
-		{
-			return m_pParant;
-		}
-
-		std::shared_ptr<Type> getRoot()
-		{
-			if (m_pParant == nullptr)
-			{
-				return this;
-			}
-			else
-			{
-				auto root = m_pParant;
-				while (root.m_pParent != nullptr)
-				{
-					root = root.m_pParent
-				}
-				return root;
-			}
-
-		}
-
-
 	private:
 		std::shared_ptr<Type> m_pParant;
 		std::vector<std::shared_ptr<Type>> m_pChildren;
 		Bool32 m_isChanged;
 		//pre apply
-		VecType m_localPosition;
-		VecType m_localScale;
+		PointType m_localPosition;
+		VectorType m_localScale;
 		RotationType m_localRotation;
 		//post apply
 		MatrixType m_localMatrix;
-		VecType m_appliedPosition;
-		VecType m_appliedScale;
+		PointType m_appliedPosition;
+		VectorType m_appliedScale;
 		RotationType m_appliedRotation;
 
 		inline MatrixType _getMatrixLocalToWorld(Bool32 includeSelf)

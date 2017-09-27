@@ -15,7 +15,8 @@ namespace kgs
 	template<SpaceType type>
 	struct SpaceTypeInfo
 	{
-		typedef void VecType;
+		typedef void VectorType;
+		typedef void PointType;
 		typedef void MatrixType;
 		typedef void RotationType;
 		const static MeshType MeshType;
@@ -24,7 +25,8 @@ namespace kgs
 	template<>
 	struct SpaceTypeInfo<SpaceType::SPACE_2>
 	{
-		typedef Vector2 VecType;
+		typedef Vector2 VectorType;
+		typedef Vector3 PointType;
 		typedef Matrix3x3 MatrixType;
 		typedef Quaternion RotationType;
 		const static MeshType MeshType = MeshType::SPACE_2;
@@ -33,7 +35,8 @@ namespace kgs
 	template<>
 	struct SpaceTypeInfo<SpaceType::SPACE_3>
 	{
-		typedef Vector3 VecType;
+		typedef Vector3 VectorType;
+		typedef Vector4 PointType;
 		typedef Matrix4x4 MatrixType;
 		typedef float RotationType;
 		const static MeshType MeshType = MeshType::SPACE_3;

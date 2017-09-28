@@ -5,7 +5,7 @@
 #include <mutex>
 #include "framework/global.hpp"
 #include <GLFW/glfw3.h>
-#include "foundation/wrapper.hpp"
+#include <foundation/foundation.hpp>
 #include "framework/app/window.hpp"
 #include "framework/util/thread_master.hpp"
 

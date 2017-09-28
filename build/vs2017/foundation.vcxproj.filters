@@ -15,23 +15,6 @@
     </Filter>
   </ItemGroup>
   <ItemGroup>
-    <ClInclude Include="..\..\framework\include\foundation\wrapper.hpp">
-      <Filter>include\foundation</Filter>
-    </ClInclude>
-    <ClInclude Include="..\..\framework\include\foundation\util.hpp">
-      <Filter>include\foundation</Filter>
-    </ClInclude>
-    <ClInclude Include="..\..\framework\include\foundation\gemo.hpp">
-      <Filter>include\foundation</Filter>
-    </ClInclude>
-    <ClInclude Include="..\..\framework\include\foundation\global.hpp">
-      <Filter>include\foundation</Filter>
-    </ClInclude>
-    <ClInclude Include="..\..\framework\include\foundation\foundation.hpp">
-      <Filter>include\foundation</Filter>
-    </ClInclude>
-  </ItemGroup>
-  <ItemGroup>
     <ClCompile Include="..\..\framework\src\foundation\wrapper.cpp">
       <Filter>src\foundation</Filter>
     </ClCompile>
@@ -44,5 +27,22 @@
     <ClCompile Include="..\..\framework\src\foundation\global.cpp">
       <Filter>src\foundation</Filter>
     </ClCompile>
+  </ItemGroup>
+  <ItemGroup>
+    <ClInclude Include="..\..\framework\include\foundation\foundation.hpp">
+      <Filter>include\foundation</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\framework\include\foundation\gemo.hpp">
+      <Filter>include\foundation</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\framework\include\foundation\global.hpp">
+      <Filter>include\foundation</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\framework\include\foundation\util.hpp">
+      <Filter>include\foundation</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\framework\include\foundation\wrapper.hpp">
+      <Filter>include\foundation</Filter>
+    </ClInclude>
   </ItemGroup>
 </Project>

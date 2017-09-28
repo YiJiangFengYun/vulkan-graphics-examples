@@ -1,8 +1,6 @@
 #ifndef KGS_GLOBAL_H
 #define KGS_GLOBAL_H
 
-#include <glm/glm.hpp>
-
 #ifdef _DEBUG
 #define DEBUG
 #endif // _DEBUG
@@ -15,7 +13,7 @@
 #define KGS_TRUE 1
 
 #include <cstdint>
-#include <foundation/gemo.hpp>
+#include <foundation/foundation.hpp>
 #include "graphics/context.hpp"
 
 

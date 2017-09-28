@@ -135,6 +135,11 @@ namespace kgs
 
 		}
 
+		/*void lookAt(PointType target, VectorType worldUp)
+		{
+			glm::lookAt(m_appliedPosition, target, )
+		}*/
+
 		//-------------------------transform tool-------------------------------------
 
 		VectorType transformVectorToWorld(VectorType vector)

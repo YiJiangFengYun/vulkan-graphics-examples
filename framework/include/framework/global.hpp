@@ -13,6 +13,7 @@
 #define GFW_FALSE 0
 #define GFW_TRUE 1
 
+#include <foundation/foundation.hpp>
 #include <cstdint>
 
 namespace gfw

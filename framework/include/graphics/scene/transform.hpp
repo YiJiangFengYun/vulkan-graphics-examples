@@ -137,7 +137,8 @@ namespace kgs
 			m_appliedLocalScale = m_localScale;
 			m_appliedLocalRotation = m_localRotation;
 			m_appliedLocalPosition = m_localPosition;
-
+			m_localMatrix = m_appliedLocalPosition * m_appliedLocalRotation * m_appliedLocalScale;
+			m_isChanged = KGS_FALSE;
 		}
 
 		//-------------------------transform tool-------------------------------------

@@ -17,4 +17,9 @@ namespace kgs
 		m_localPosition = m_appliedLocalPosition;
 		m_isChanged = KGS_FALSE;
 	}
+
+	void Transform3::RotateAround(const PointType& point, const VectorType& axis, float angle)
+	{
+
+	}
 } //namespace kgs

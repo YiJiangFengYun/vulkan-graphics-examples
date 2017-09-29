@@ -248,5 +248,8 @@
     <ClInclude Include="..\..\framework\include\graphics\scene\transform_3.hpp">
       <Filter>include\graphics\scene</Filter>
     </ClInclude>
+    <ClInclude Include="..\..\framework\include\graphics\scene\space_transform_type_info.hpp">
+      <Filter>include\graphics\scene</Filter>
+    </ClInclude>
   </ItemGroup>
 </Project>

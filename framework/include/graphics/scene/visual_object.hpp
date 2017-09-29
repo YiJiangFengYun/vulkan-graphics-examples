@@ -1,6 +1,9 @@
 #ifndef KGS_VISUAL_OBJECT_H
 #define KGS_VISUAL_OBJECT_H
 
+#include "graphics/scene/option.hpp"
+#include "graphics/scene/object.hpp"
+
 namespace kgs
 {
 	template <SpaceType SPACE_TYPE>

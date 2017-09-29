@@ -32,30 +32,30 @@ namespace kgs
 			m_pChildren.resize(0u);
 		}
 
-		std::shared_ptr<Transform> getChildWithIndex(uint32_t index)
+		std::shared_ptr<Type> getChildWithIndex(uint32_t index)
 		{
 			return m_pChildren[index];
 		}
 
-		Bool32 isChild(std::shared_ptr<Transform> transform)
+		Bool32 isChild(std::shared_ptr<Type> transform)
 		{
 			std::find(m_pChildren.cbegin(), m_pChildren.cend(), transform) != m_pChildren.cend();
 		}
 
 		std::shared_ptr<Type> getPParent()
 		{
-			return m_pParant;
+			return m_pParent;
 		}
 
 		std::shared_ptr<Type> getRoot()
 		{
-			if (m_pParant == nullptr)
+			if (m_pParent == nullptr)
 			{
 				return this;
 			}
 			else
 			{
-				auto root = m_pParant;
+				auto root = m_pParent;
 				while (root.m_pParent != nullptr)
 				{
 					root = root.m_pParent
@@ -100,11 +100,11 @@ namespace kgs
 		RotationType getRotation()
 		{
 			RotationType rotation = m_appliedLocalRotation;
-			auto curr = m_pParant;
+			std::shared_ptr<Type> curr = m_pParent;
 			while (curr != nullptr)
 			{
 				rotation = curr->m_appliedRotation * rotation;
-				curr = curr->m_pParent;
+				curr = curr->m_pParant;
 			}
 			return rotation;
 		}
@@ -123,7 +123,7 @@ namespace kgs
 		VectorType getScale()
 		{
 			VectorType scale = m_appliedLocalScale;
-			auto curr = m_pParant;
+			auto curr = m_pParent;
 			while (curr != nullptr)
 			{
 				scale = curr->m_appliedScale * scale;
@@ -174,7 +174,7 @@ namespace kgs
 		}
 
 	protected:
-		std::shared_ptr<Type> m_pParant;
+		std::shared_ptr<Type> m_pParent;
 		std::vector<std::shared_ptr<Type>> m_pChildren;
 		Bool32 m_isChanged;
 		//pre apply
@@ -194,7 +194,7 @@ namespace kgs
 			{
 				matrix = m_localMatrix;
 			}
-			auto curr = m_pParant;
+			auto curr = m_pParent;
 			while (curr != nullptr)
 			{
 				matrix = curr->m_localMatrix * matrix;

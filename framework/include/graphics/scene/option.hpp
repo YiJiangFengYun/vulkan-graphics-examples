@@ -26,7 +26,7 @@ namespace kgs
 	struct SpaceConstInfo
 	{
 		const static MeshType MESH_TYPE;
-		const static SpaceTypeInfo<type>::VectorType UP_VECTOR;
+		const static typename SpaceTypeInfo<type>::VectorType UP_VECTOR;
 	};
 
 	template<>

@@ -70,6 +70,7 @@
     <ClInclude Include="..\..\framework\include\graphics\scene\object.hpp" />
     <ClInclude Include="..\..\framework\include\graphics\scene\option.hpp" />
     <ClInclude Include="..\..\framework\include\graphics\scene\scene.hpp" />
+    <ClInclude Include="..\..\framework\include\graphics\scene\space_transform_type_info.hpp" />
     <ClInclude Include="..\..\framework\include\graphics\scene\transform.hpp" />
     <ClInclude Include="..\..\framework\include\graphics\scene\transform_2.hpp" />
     <ClInclude Include="..\..\framework\include\graphics\scene\transform_3.hpp" />

@@ -9,6 +9,7 @@ namespace kgs
 	{
 	public:
 		void lookAt(const PointType& worldTarget, const VectorType& worldUp = SpaceConstInfo<SpaceType::SPACE_3>::UP_VECTOR);
+		void RotateAround(const PointType& point, const VectorType& axis, float angle);
 	private:
 
 	};

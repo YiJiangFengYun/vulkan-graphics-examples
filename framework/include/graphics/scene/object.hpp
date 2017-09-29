@@ -3,6 +3,7 @@
 
 #include "graphics/global.hpp"
 #include "graphics/scene/option.hpp"
+#include "graphics/scene/space_transform_type_info.hpp"
 
 namespace kgs
 {
@@ -10,13 +11,10 @@ namespace kgs
 	class Object
 	{
 	public:
-		typedef typename SpaceTypeInfo<SPACE_TYPE>::VectorType VectorType;
-		typedef typename SpaceTypeInfo<SPACE_TYPE>::PointType PointType;
-		typedef typename SpaceTypeInfo<SPACE_TYPE>::MatrixType MatrixType;
+		typedef typename SpaceTransformTypeInfo<SPACE_TYPE>::TransformType TransformType;
 
 	protected:
-		PointType m_location;
-		VectorType m_scale;
+		TransformType m_transform;
 	};
 
 } //namespace kgs

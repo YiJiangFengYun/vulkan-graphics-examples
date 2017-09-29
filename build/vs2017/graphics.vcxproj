@@ -36,6 +36,8 @@
     <ClCompile Include="..\..\framework\src\graphics\scene\option.cpp" />
     <ClCompile Include="..\..\framework\src\graphics\scene\scene.cpp" />
     <ClCompile Include="..\..\framework\src\graphics\scene\transform.cpp" />
+    <ClCompile Include="..\..\framework\src\graphics\scene\transform_2.cpp" />
+    <ClCompile Include="..\..\framework\src\graphics\scene\transform_3.cpp" />
     <ClCompile Include="..\..\framework\src\graphics\scene\visual_object.cpp" />
     <ClCompile Include="..\..\framework\src\graphics\texture\texture.cpp" />
     <ClCompile Include="..\..\framework\src\graphics\texture\texture_1d.cpp" />
@@ -69,6 +71,8 @@
     <ClInclude Include="..\..\framework\include\graphics\scene\option.hpp" />
     <ClInclude Include="..\..\framework\include\graphics\scene\scene.hpp" />
     <ClInclude Include="..\..\framework\include\graphics\scene\transform.hpp" />
+    <ClInclude Include="..\..\framework\include\graphics\scene\transform_2.hpp" />
+    <ClInclude Include="..\..\framework\include\graphics\scene\transform_3.hpp" />
     <ClInclude Include="..\..\framework\include\graphics\scene\visual_object.hpp" />
     <ClInclude Include="..\..\framework\include\graphics\texture\texture.hpp" />
     <ClInclude Include="..\..\framework\include\graphics\texture\texture_1d.hpp" />

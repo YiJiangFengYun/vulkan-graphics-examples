@@ -6,6 +6,7 @@
 #include <algorithm>
 #include "graphics/global.hpp"
 #include "graphics/scene/option.hpp"
+#include <glm/gtx/matrix_decompose.hpp>
 
 namespace kgs
 {
@@ -16,6 +17,7 @@ namespace kgs
 		typedef Transform<SPACE_TYPE> Type;
 		typedef typename SpaceTypeInfo<SPACE_TYPE>::VectorType VectorType;
 		typedef typename SpaceTypeInfo<SPACE_TYPE>::PointType PointType;
+		typedef typename SpaceTypeInfo<SPACE_TYPE>::MatrixVectorType MatrixVectorType;
 		typedef typename SpaceTypeInfo<SPACE_TYPE>::MatrixType MatrixType;
 		typedef typename SpaceTypeInfo<SPACE_TYPE>::RotationType RotationType;
 
@@ -70,7 +72,7 @@ namespace kgs
 
 		PointType getLocalPosition()
 		{
-			return m_appliedPosition;
+			return m_appliedLocalPosition;
 		}
 
 		void setLocalPosition(PointType position)
@@ -81,12 +83,12 @@ namespace kgs
 
 		PointType getPosition()
 		{
-			return _getMatrixLocalToWorld(KGS_FALSE) * m_appliedPosition;
+			return _getMatrixLocalToWorld(KGS_FALSE) * m_appliedLocalPosition;
 		}
 
 		RotationType getLocalRotation()
 		{
-			return m_localRotation;
+			return m_appliedLocalRotation;
 		}
 
 		void setLocalRotation(RotationType rotation)
@@ -97,7 +99,7 @@ namespace kgs
 
 		RotationType getRotation()
 		{
-			RotationType rotation = m_appliedRotation;
+			RotationType rotation = m_appliedLocalRotation;
 			auto curr = m_pParant;
 			while (curr != nullptr)
 			{
@@ -109,7 +111,7 @@ namespace kgs
 
 		VectorType getLocalScale()
 		{
-			return m_localScale;
+			return m_appliedLocalScale;
 		}
 
 		void setLocalScale(VectorType scale)
@@ -120,7 +122,7 @@ namespace kgs
 
 		VectorType getScale()
 		{
-			VectorType scale = m_appliedScale;
+			VectorType scale = m_appliedLocalScale;
 			auto curr = m_pParant;
 			while (curr != nullptr)
 			{
@@ -132,13 +134,11 @@ namespace kgs
 
 		void apply()
 		{
+			m_appliedLocalScale = m_localScale;
+			m_appliedLocalRotation = m_localRotation;
+			m_appliedLocalPosition = m_localPosition;
 
 		}
-
-		/*void lookAt(PointType target, VectorType worldUp)
-		{
-			glm::lookAt(m_appliedPosition, target, )
-		}*/
 
 		//-------------------------transform tool-------------------------------------
 
@@ -172,7 +172,7 @@ namespace kgs
 			return _getMatrixWorldToLocal(KGS_TRUE);
 		}
 
-	private:
+	protected:
 		std::shared_ptr<Type> m_pParant;
 		std::vector<std::shared_ptr<Type>> m_pChildren;
 		Bool32 m_isChanged;
@@ -182,9 +182,9 @@ namespace kgs
 		RotationType m_localRotation;
 		//post apply
 		MatrixType m_localMatrix;
-		PointType m_appliedPosition;
-		VectorType m_appliedScale;
-		RotationType m_appliedRotation;
+		PointType m_appliedLocalPosition;
+		VectorType m_appliedLocalScale;
+		RotationType m_appliedLocalRotation;
 
 		inline MatrixType _getMatrixLocalToWorld(Bool32 includeSelf)
 		{

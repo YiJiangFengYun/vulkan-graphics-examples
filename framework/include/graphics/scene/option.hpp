@@ -17,29 +17,36 @@ namespace kgs
 	{
 		typedef void VectorType;
 		typedef void PointType;
+		typedef void MatrixVectorType;
 		typedef void MatrixType;
 		typedef void RotationType;
-		const static MeshType MeshType;
+	};
+
+	template<SpaceType type>
+	struct SpaceConstInfo
+	{
+		const static MeshType MESH_TYPE;
+		const static SpaceTypeInfo<type>::VectorType UP_VECTOR;
 	};
 
 	template<>
 	struct SpaceTypeInfo<SpaceType::SPACE_2>
 	{
 		typedef Vector2 VectorType;
-		typedef Vector3 PointType;
+		typedef Vector2 PointType;
+		typedef Vector3 MatrixVectorType;
 		typedef Matrix3x3 MatrixType;
-		typedef Quaternion RotationType;
-		const static MeshType MeshType = MeshType::SPACE_2;
+		typedef float RotationType;
 	};
 
 	template<>
 	struct SpaceTypeInfo<SpaceType::SPACE_3>
 	{
 		typedef Vector3 VectorType;
-		typedef Vector4 PointType;
+		typedef Vector3 PointType;
+		typedef Vector4 MatrixVectorType;
 		typedef Matrix4x4 MatrixType;
-		typedef float RotationType;
-		const static MeshType MeshType = MeshType::SPACE_3;
+		typedef Quaternion RotationType;
 	};
 } //namespace kgs
 

@@ -70,17 +70,17 @@ namespace gfw {
 		_createSubWindow(width, height, title);
 	}*/
 
-	std::shared_ptr<vk::Instance> AppBase::getPVKInstance()
+	std::shared_ptr<vk::Instance> AppBase::getVKInstance()
 	{
 		return m_pInstance;
 	}
 
-	std::shared_ptr<vk::PhysicalDevice> AppBase::getPPhysicalDevice()
+	std::shared_ptr<vk::PhysicalDevice> AppBase::getPhysicalDevice()
 	{
 		return m_pPhysicalDevice;
 	}
 
-	std::shared_ptr<vk::Device> AppBase::getPDevice()
+	std::shared_ptr<vk::Device> AppBase::getDevice()
 	{
 		return m_pDevice;
 	}

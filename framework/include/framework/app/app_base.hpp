@@ -54,9 +54,9 @@ namespace gfw
 		}
 
 		//gettor methods
-		std::shared_ptr<vk::Instance> getPVKInstance();
-		std::shared_ptr<vk::PhysicalDevice> getPPhysicalDevice();
-		std::shared_ptr<vk::Device> getPDevice();
+		std::shared_ptr<vk::Instance> getVKInstance();
+		std::shared_ptr<vk::PhysicalDevice> getPhysicalDevice();
+		std::shared_ptr<vk::Device> getDevice();
 		vk::Queue getGraphicsQueue();
 		vk::Queue getPresentQueue();
 	protected:

@@ -23,8 +23,8 @@ namespace kgs
 		//void load(std::string fragShaderPath);
 		void load(std::string vertShaderPath, std::string fragShaderPath);
 
-		std::shared_ptr<vk::ShaderModule> getPVertShaderModule();
-		std::shared_ptr<vk::ShaderModule> getPFragShaderModule();
+		std::shared_ptr<vk::ShaderModule> getVertShaderModule();
+		std::shared_ptr<vk::ShaderModule> getFragShaderModule();
 
 	private:
 		//compositions

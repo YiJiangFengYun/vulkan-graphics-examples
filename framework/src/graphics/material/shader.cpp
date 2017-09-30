@@ -29,19 +29,19 @@ namespace kgs
 		m_pFragShaderModule = _createShaderModule(fragShaderCode);
 	}
 
-	std::shared_ptr<vk::ShaderModule> Shader::getPVertShaderModule()
+	std::shared_ptr<vk::ShaderModule> Shader::getVertShaderModule()
 	{
 		return m_pVertShaderModule;
 	}
 
-	std::shared_ptr<vk::ShaderModule> Shader::getPFragShaderModule()
+	std::shared_ptr<vk::ShaderModule> Shader::getFragShaderModule()
 	{
 		return m_pFragShaderModule;
 	}
 
 	std::shared_ptr<vk::ShaderModule> Shader::_createShaderModule(const std::vector<char>& code)
 	{
-		auto device = m_pContext->getPNativeDevice();
+		auto device = m_pContext->getNativeDevice();
 
 		std::vector<uint32_t> codeAligned(code.size() / sizeof(uint32_t) + 1);
 		memcpy(codeAligned.data(), code.data(), code.size());

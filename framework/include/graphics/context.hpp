@@ -13,10 +13,10 @@ namespace kgs
 			std::shared_ptr<vk::CommandPool> pCommandPool);
 		Context(const Context& device);
 		~Context();
-		std::shared_ptr<vk::PhysicalDevice> getPPhysicalDevice();
-		std::shared_ptr<vk::Device> getPNativeDevice();
+		std::shared_ptr<vk::PhysicalDevice> getPhysicalDevice();
+		std::shared_ptr<vk::Device> getNativeDevice();
 		vk::Queue getGraphicsQueue();
-		std::shared_ptr<vk::CommandPool> getPCommandPool();
+		std::shared_ptr<vk::CommandPool> getCommandPool();
 	private:
 		std::shared_ptr<vk::PhysicalDevice> m_pPhysicalDevice;
 		std::shared_ptr<vk::Device> m_pNativeDevice;

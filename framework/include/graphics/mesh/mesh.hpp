@@ -413,8 +413,8 @@ namespace kgs
 				vk::SharingMode::eExclusive
 			};
 
-			auto pPhysicalDevice = m_pContext->getPPhysicalDevice();
-			auto pDevice = m_pContext->getPNativeDevice();
+			auto pPhysicalDevice = m_pContext->getPhysicalDevice();
+			auto pDevice = m_pContext->getNativeDevice();
 			auto pStagingBuffer = fd::createBuffer(pDevice, createInfo);
 
 			vk::MemoryRequirements memReqs = pDevice->getBufferMemoryRequirements(*pStagingBuffer);
@@ -470,8 +470,8 @@ namespace kgs
 				vk::SharingMode::eExclusive
 			};
 
-			auto pPhysicalDevice = m_pContext->getPPhysicalDevice();
-			auto pDevice = m_pContext->getPNativeDevice();
+			auto pPhysicalDevice = m_pContext->getPhysicalDevice();
+			auto pDevice = m_pContext->getNativeDevice();
 			auto pStagingBuffer = fd::createBuffer(pDevice, createInfo);
 
 			vk::MemoryRequirements memReqs = pDevice->getBufferMemoryRequirements(*pStagingBuffer);

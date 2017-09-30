@@ -80,7 +80,7 @@ namespace kgs
 
 		}
 
-		auto pDevice = m_pContext->getPNativeDevice();
+		auto pDevice = m_pContext->getNativeDevice();
 
 		//create descriptor set layout.
 		{
@@ -121,7 +121,7 @@ namespace kgs
 			mapTypeCounts[vkDescriptorType] += item.descriptorCount; //??? + 1.
 		}
 
-		auto pDevice = m_pContext->getPNativeDevice();
+		auto pDevice = m_pContext->getNativeDevice();
 		//create descriptor pool.
 		{
 			std::vector<vk::DescriptorPoolSize> poolSizeInfos(mapTypeCounts.size());
@@ -185,7 +185,7 @@ namespace kgs
 			}
 		}
 
-		auto pDevice = m_pContext->getPNativeDevice();
+		auto pDevice = m_pContext->getNativeDevice();
 		pDevice->updateDescriptorSets(writes, nullptr);
 	}
 
@@ -216,8 +216,8 @@ namespace kgs
 				vk::DescriptorImageInfo imageInfo;
 				if (pTexture != nullptr)
 				{
-					imageInfo.sampler = *pTexture->_getPSampler();
-					imageInfo.imageView = *pTexture->_getPImageView();
+					imageInfo.sampler = *pTexture->_getSampler();
+					imageInfo.imageView = *pTexture->_getImageView();
 					imageInfo.imageLayout = pTexture->_getImageLayout();
 				}
 
@@ -231,7 +231,7 @@ namespace kgs
 			}
 		}
 
-		auto pDevice = m_pContext->getPNativeDevice();
+		auto pDevice = m_pContext->getNativeDevice();
 		pDevice->updateDescriptorSets(writes, nullptr);
 	}
 
@@ -270,7 +270,7 @@ namespace kgs
 		}
 		//sync buffer data.
 		void *data;
-		auto pDevice = m_pContext->getPNativeDevice();
+		auto pDevice = m_pContext->getNativeDevice();
 		pDevice->mapMemory(*m_pUniformBufferMemory, 0, static_cast<vk::DeviceSize>(totalSize), vk::MemoryMapFlags(), &data);
 		for (int32_t i = 0; i < uniformBufferCount; ++i)
 		{
@@ -288,13 +288,13 @@ namespace kgs
 			vk::SharingMode::eExclusive
 		};
 
-		auto pDevice = m_pContext->getPNativeDevice();
+		auto pDevice = m_pContext->getNativeDevice();
 		pBuffer = fd::createBuffer(pDevice, createInfo);
 
 		vk::MemoryRequirements memReqs = pDevice->getBufferMemoryRequirements(*pBuffer);
 		vk::MemoryAllocateInfo allocateInfo = {
 			memReqs.size,
-			kgs::findMemoryType(m_pContext->getPPhysicalDevice(),
+			kgs::findMemoryType(m_pContext->getPhysicalDevice(),
 			memReqs.memoryTypeBits,
 			vk::MemoryPropertyFlagBits::eHostVisible | vk::MemoryPropertyFlagBits::eHostCoherent)
 		};

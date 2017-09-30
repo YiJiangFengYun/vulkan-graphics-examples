@@ -30,10 +30,10 @@ namespace kgs
 		uint32_t getMipmapLevel();
 
 		vk::ImageLayout _getImageLayout();
-		std::shared_ptr<vk::Image> _getPImage();
-		std::shared_ptr<vk::DeviceMemory> _getPImageMemory();
-		std::shared_ptr<vk::ImageView> _getPImageView();
-		std::shared_ptr<vk::Sampler> _getPSampler();
+		std::shared_ptr<vk::Image> _getImage();
+		std::shared_ptr<vk::DeviceMemory> _getImageMemory();
+		std::shared_ptr<vk::ImageView> _getImageView();
+		std::shared_ptr<vk::Sampler> _getSampler();
 	protected:
 		//--compositions
 		uint32_t m_width;

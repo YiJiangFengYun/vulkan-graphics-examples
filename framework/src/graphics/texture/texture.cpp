@@ -82,22 +82,22 @@ namespace kgs
 		return m_vkImageLayout;
 	}
 
-	std::shared_ptr<vk::Image> Texture::_getPImage()
+	std::shared_ptr<vk::Image> Texture::_getImage()
 	{
 		return m_pImage;
 	}
 
-	std::shared_ptr<vk::DeviceMemory> Texture::_getPImageMemory()
+	std::shared_ptr<vk::DeviceMemory> Texture::_getImageMemory()
 	{
 		return m_pMemory;
 	}
 
-	std::shared_ptr<vk::ImageView> Texture::_getPImageView()
+	std::shared_ptr<vk::ImageView> Texture::_getImageView()
 	{
 		return m_pImageView;
 	}
 
-	std::shared_ptr<vk::Sampler> Texture::_getPSampler()
+	std::shared_ptr<vk::Sampler> Texture::_getSampler()
 	{
 		return m_pSampler;
 	}
@@ -322,14 +322,14 @@ namespace kgs
 			imageLayout
 		};
 
-		auto pDevice = m_pContext->getPNativeDevice();
+		auto pDevice = m_pContext->getNativeDevice();
 		m_pImage = fd::createImage(pDevice, createInfo);
 
 		auto memRequirements = pDevice->getImageMemoryRequirements(*m_pImage);
 
 		vk::MemoryAllocateInfo allocInfo = {
 			memRequirements.size,
-			kgs::findMemoryType(m_pContext->getPPhysicalDevice(), memRequirements.memoryTypeBits, vk::MemoryPropertyFlagBits::eDeviceLocal)
+			kgs::findMemoryType(m_pContext->getPhysicalDevice(), memRequirements.memoryTypeBits, vk::MemoryPropertyFlagBits::eDeviceLocal)
 		};
 
 		m_pMemory = fd::allocateMemory(pDevice, allocInfo);
@@ -404,7 +404,7 @@ namespace kgs
 			}
 		};
 
-		auto pDevice = m_pContext->getPNativeDevice();
+		auto pDevice = m_pContext->getNativeDevice();
 		m_pImageView = fd::createImageView(pDevice, createInfo);
 	}
 
@@ -430,7 +430,7 @@ namespace kgs
 			VkBool32(VK_FALSE)
 		};
 
-		auto pDevice = m_pContext->getPNativeDevice();
+		auto pDevice = m_pContext->getNativeDevice();
 		m_pSampler = fd::createSampler(pDevice, createInfo);
 	}
 
@@ -521,7 +521,7 @@ namespace kgs
 
 	void Texture::_applyWithGenMipMap()
 	{
-		auto pDevice = m_pContext->getPNativeDevice();
+		auto pDevice = m_pContext->getNativeDevice();
 		auto pCommandBuffer = beginSingleTimeCommands();
 		//create first level image data using staging buffer.
 		if (m_arrTempColors.size() == 0)
@@ -552,7 +552,7 @@ namespace kgs
 
 #ifdef DEBUG
 		//check format.
-		auto pPhysicalDevice = m_pContext->getPPhysicalDevice();
+		auto pPhysicalDevice = m_pContext->getPhysicalDevice();
 		auto formatProperties = pPhysicalDevice->getFormatProperties(m_vkFormat);
 		if ((formatProperties.optimalTilingFeatures & vk::FormatFeatureFlagBits::eBlitSrc) == vk::FormatFeatureFlags())
 		{
@@ -616,7 +616,7 @@ namespace kgs
 			throw std::runtime_error("Pixels data is not enough to create mipmap texture.");
 		}
 
-		auto pDevice = m_pContext->getPNativeDevice();
+		auto pDevice = m_pContext->getNativeDevice();
 
 		//create image data using staging buffer mipmap level by mipmap level.
 		for (uint32_t i = 0; i < m_mipMapLevels; ++i)
@@ -674,13 +674,13 @@ namespace kgs
 			vk::SharingMode::eExclusive
 		};
 
-		auto pDevice = m_pContext->getPNativeDevice();
+		auto pDevice = m_pContext->getNativeDevice();
 		pBuffer = fd::createBuffer(pDevice, createInfo);
 
 		vk::MemoryRequirements memReqs = pDevice->getBufferMemoryRequirements(*pBuffer);
 		vk::MemoryAllocateInfo allocateInfo = {
 			memReqs.size,
-			kgs::findMemoryType(m_pContext->getPPhysicalDevice(), memReqs.memoryTypeBits, properties)
+			kgs::findMemoryType(m_pContext->getPhysicalDevice(), memReqs.memoryTypeBits, properties)
 		};
 
 		pBufferMemory = fd::allocateMemory(pDevice, allocateInfo);

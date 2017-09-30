@@ -14,22 +14,22 @@ namespace kgs
 	public:
 		typedef Mesh<SpaceConstInfo<SPACE_TYPE>::MESH_TYPE> MeshType;
 
-		std::shared_ptr<MeshType> getPMesh()
+		std::shared_ptr<MeshType> getMesh()
 		{
 			return m_pMesh;
 		}
 
-		void setPMesh(std::shared_ptr<MeshType> pMesh)
+		void setMesh(std::shared_ptr<MeshType> pMesh)
 		{
 			m_pMesh = pMesh;
 		}
 
-		std::shared_ptr<Material> getPMaterial()
+		std::shared_ptr<Material> getMaterial()
 		{
 			return m_pMaterial;
 		}
 
-		void setPMaterial(std::shared_ptr<Material> pMaterial)
+		void setMaterial(std::shared_ptr<Material> pMaterial)
 		{
 			m_pMaterial = pMaterial;
 		}

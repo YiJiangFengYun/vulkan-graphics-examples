@@ -25,12 +25,12 @@ namespace kgs
 	{
 	}
 
-	std::shared_ptr<vk::PhysicalDevice> Context::getPPhysicalDevice()
+	std::shared_ptr<vk::PhysicalDevice> Context::getPhysicalDevice()
 	{
 		return m_pPhysicalDevice;
 	}
 
-	std::shared_ptr<vk::Device> Context::getPNativeDevice()
+	std::shared_ptr<vk::Device> Context::getNativeDevice()
 	{
 		return m_pNativeDevice;
 	}
@@ -40,7 +40,7 @@ namespace kgs
 		return m_graphicsQueue;
 	}
 
-	std::shared_ptr<vk::CommandPool> Context::getPCommandPool()
+	std::shared_ptr<vk::CommandPool> Context::getCommandPool()
 	{
 		return m_pCommandPool;
 	}

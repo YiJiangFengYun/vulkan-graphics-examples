@@ -42,12 +42,12 @@ namespace kgs
 			std::find(m_pChildren.cbegin(), m_pChildren.cend(), transform) != m_pChildren.cend();
 		}
 
-		std::shared_ptr<Type> getPParent()
+		std::shared_ptr<Type> getParent()
 		{
 			return m_pParent;
 		}
 
-		void setPParent(std::shared_ptr<Type> pParent)
+		void setParent(std::shared_ptr<Type> pParent)
 		{
 			m_pParent = pParent;
 		}

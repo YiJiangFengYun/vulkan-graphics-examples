@@ -1,7 +1,7 @@
 #ifndef KGS_RENDERER_H
 #define KGS_RENDERER_H
 
-#include "graphics/scene/option.hpp"
+#include "graphics/scene/space_info.hpp"
 #include "graphics/scene/scene.hpp"
 #include "graphics/scene/camera.hpp"
 
@@ -26,7 +26,7 @@ namespace kgs
 
 		}
 
-		render()
+		void render()
 		{
 
 		}

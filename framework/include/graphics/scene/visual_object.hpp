@@ -1,7 +1,7 @@
 #ifndef KGS_VISUAL_OBJECT_H
 #define KGS_VISUAL_OBJECT_H
 
-#include "graphics/scene/option.hpp"
+#include "graphics/scene/space_info.hpp"
 #include "graphics/scene/object.hpp"
 #include "graphics/mesh/mesh.hpp"
 #include "graphics/material/material.hpp"
@@ -29,7 +29,7 @@ namespace kgs
 			return m_pMaterial;
 		}
 
-		void setMaterial(std::shared_ptr<Material> pMaterial)
+		void setPMaterial(std::shared_ptr<Material> pMaterial)
 		{
 			m_pMaterial = pMaterial;
 		}

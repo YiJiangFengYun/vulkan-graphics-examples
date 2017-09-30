@@ -1,7 +1,7 @@
 #ifndef KGS_LIGHT_2_H
 #define KGS_LIGHT_2_H
 
-#include "graphics/scene/option.hpp"
+#include "graphics/scene/space_info.hpp"
 #include "graphics/scene/light.hpp"
 
 namespace kgs

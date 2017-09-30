@@ -1,7 +1,7 @@
 #ifndef KGS_CAMERA_3_H
 #define KGS_CAMERA_3_H
 
-#include "graphics/scene/option.hpp"
+#include "graphics/scene/space_info.hpp"
 #include "graphics/scene/camera.hpp"
 
 namespace kgs

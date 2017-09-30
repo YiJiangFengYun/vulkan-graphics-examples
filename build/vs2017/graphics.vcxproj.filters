@@ -117,9 +117,6 @@
     <ClCompile Include="..\..\framework\src\graphics\util\single_time_command.cpp">
       <Filter>src\graphics\util</Filter>
     </ClCompile>
-    <ClCompile Include="..\..\framework\src\graphics\scene\option.cpp">
-      <Filter>src\graphics\scene</Filter>
-    </ClCompile>
     <ClCompile Include="..\..\framework\src\graphics\scene\camera.cpp">
       <Filter>src\graphics\scene</Filter>
     </ClCompile>
@@ -169,6 +166,12 @@
       <Filter>src\graphics\scene</Filter>
     </ClCompile>
     <ClCompile Include="..\..\framework\src\graphics\scene\scene_3.cpp">
+      <Filter>src\graphics\scene</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\framework\src\graphics\scene\space_info.cpp">
+      <Filter>src\graphics\scene</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\framework\src\graphics\scene\space_info_object.cpp">
       <Filter>src\graphics\scene</Filter>
     </ClCompile>
   </ItemGroup>
@@ -242,9 +245,6 @@
     <ClInclude Include="..\..\framework\include\graphics\util\single_time_command.hpp">
       <Filter>include\graphics\util</Filter>
     </ClInclude>
-    <ClInclude Include="..\..\framework\include\graphics\scene\option.hpp">
-      <Filter>include\graphics\scene</Filter>
-    </ClInclude>
     <ClInclude Include="..\..\framework\include\graphics\scene\camera.hpp">
       <Filter>include\graphics\scene</Filter>
     </ClInclude>
@@ -272,9 +272,6 @@
     <ClInclude Include="..\..\framework\include\graphics\scene\transform_3.hpp">
       <Filter>include\graphics\scene</Filter>
     </ClInclude>
-    <ClInclude Include="..\..\framework\include\graphics\scene\space_transform_type_info.hpp">
-      <Filter>include\graphics\scene</Filter>
-    </ClInclude>
     <ClInclude Include="..\..\framework\include\graphics\scene\scene_2.hpp">
       <Filter>include\graphics\scene</Filter>
     </ClInclude>
@@ -297,6 +294,12 @@
       <Filter>include\graphics\scene</Filter>
     </ClInclude>
     <ClInclude Include="..\..\framework\include\graphics\scene\light_3.hpp">
+      <Filter>include\graphics\scene</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\framework\include\graphics\scene\space_info.hpp">
+      <Filter>include\graphics\scene</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\framework\include\graphics\scene\space_info_object.hpp">
       <Filter>include\graphics\scene</Filter>
     </ClInclude>
   </ItemGroup>

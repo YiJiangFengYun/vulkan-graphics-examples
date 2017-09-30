@@ -1,7 +1,7 @@
 #ifndef KGS_MESH_H
 #define KGS_MESH_H
 
-#include <set>;
+#include <set>
 #include <glm/glm.hpp>
 #include <foundation/foundation.hpp>
 #include "graphics/global.hpp"

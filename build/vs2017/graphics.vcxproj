@@ -37,10 +37,11 @@
     <ClCompile Include="..\..\framework\src\graphics\scene\light_2.cpp" />
     <ClCompile Include="..\..\framework\src\graphics\scene\light_3.cpp" />
     <ClCompile Include="..\..\framework\src\graphics\scene\object.cpp" />
-    <ClCompile Include="..\..\framework\src\graphics\scene\option.cpp" />
+    <ClCompile Include="..\..\framework\src\graphics\scene\space_info.cpp" />
     <ClCompile Include="..\..\framework\src\graphics\scene\scene.cpp" />
     <ClCompile Include="..\..\framework\src\graphics\scene\scene_2.cpp" />
     <ClCompile Include="..\..\framework\src\graphics\scene\scene_3.cpp" />
+    <ClCompile Include="..\..\framework\src\graphics\scene\space_info_object.cpp" />
     <ClCompile Include="..\..\framework\src\graphics\scene\transform.cpp" />
     <ClCompile Include="..\..\framework\src\graphics\scene\transform_2.cpp" />
     <ClCompile Include="..\..\framework\src\graphics\scene\transform_3.cpp" />
@@ -80,11 +81,11 @@
     <ClInclude Include="..\..\framework\include\graphics\scene\light_2.hpp" />
     <ClInclude Include="..\..\framework\include\graphics\scene\light_3.hpp" />
     <ClInclude Include="..\..\framework\include\graphics\scene\object.hpp" />
-    <ClInclude Include="..\..\framework\include\graphics\scene\option.hpp" />
+    <ClInclude Include="..\..\framework\include\graphics\scene\space_info.hpp" />
     <ClInclude Include="..\..\framework\include\graphics\scene\scene.hpp" />
     <ClInclude Include="..\..\framework\include\graphics\scene\scene_2.hpp" />
     <ClInclude Include="..\..\framework\include\graphics\scene\scene_3.hpp" />
-    <ClInclude Include="..\..\framework\include\graphics\scene\space_transform_type_info.hpp" />
+    <ClInclude Include="..\..\framework\include\graphics\scene\space_info_object.hpp" />
     <ClInclude Include="..\..\framework\include\graphics\scene\transform.hpp" />
     <ClInclude Include="..\..\framework\include\graphics\scene\transform_2.hpp" />
     <ClInclude Include="..\..\framework\include\graphics\scene\transform_3.hpp" />

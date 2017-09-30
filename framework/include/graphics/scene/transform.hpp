@@ -5,7 +5,7 @@
 #include <vector>
 #include <algorithm>
 #include "graphics/global.hpp"
-#include "graphics/scene/option.hpp"
+#include "graphics/scene/space_info.hpp"
 #include <glm/gtx/matrix_decompose.hpp>
 
 namespace kgs

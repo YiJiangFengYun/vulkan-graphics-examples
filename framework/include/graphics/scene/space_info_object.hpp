@@ -1,7 +1,7 @@
 #ifndef KGS_SPACE_TRANSFORM_TYPE_INFO_H
 #define KGS_SPACE_TRANSFORM_TYPE_INFO_H
 
-#include "graphics/scene/option.hpp"
+#include "graphics/scene/space_info.hpp"
 #include "graphics/scene/transform_2.hpp"
 #include "graphics/scene/transform_3.hpp"
 

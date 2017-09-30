@@ -1,7 +1,7 @@
 #ifndef KGS_SCENE_2_H
 #define KGS_SCENE_2_H
 
-#include "graphics/scene/option.hpp"
+#include "graphics/scene/space_info.hpp"
 #include "graphics/scene/scene.hpp"
 
 namespace kgs

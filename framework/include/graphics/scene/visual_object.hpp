@@ -14,6 +14,13 @@ namespace kgs
 	public:
 		typedef Mesh<SpaceConstInfo<SPACE_TYPE>::MESH_TYPE> MeshType;
 
+		VisualObject()
+			: Object()
+			, m_objectType(ObjectType::VISUAL_OBJECT)
+		{
+
+		}
+
 		std::shared_ptr<MeshType> getMesh()
 		{
 			return m_pMesh;

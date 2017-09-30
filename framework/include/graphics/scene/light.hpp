@@ -8,7 +8,12 @@ namespace kgs
 	template <SpaceType SPACE_TYPE>
 	class Light : Object<SPACE_TYPE>
 	{
+		Light()
+			: Object()
+			, m_objectType(ObjectType::LIGHT)
+		{
 
+		}
 	};
 } //namespace kgs
 

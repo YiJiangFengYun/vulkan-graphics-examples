@@ -7,13 +7,35 @@
 
 namespace kgs
 {
+	enum class ObjectType
+	{
+		UNDEFINED,
+		VISUAL_OBJECT,
+		CAMERA,
+		LIGHT,
+		BEGIN_RANGE = VISUAL_OBJECT,
+		END_RANGE = LIGHT,
+		RANGE_SIZE = (END_RANGE - BEGIN_RANGE + 1)
+	};
+
 	template <SpaceType SPACE_TYPE>
 	class Object
 	{
 	public:
 		typedef typename SpaceTransformTypeInfo<SPACE_TYPE>::TransformType TransformType;
 
+		Object()
+		{
+
+		}
+
+		ObjectType getObjectType()
+		{
+			return m_objectType;
+		}
+
 	protected:
+		ObjectType m_objectType;
 		TransformType m_transform;
 	};
 

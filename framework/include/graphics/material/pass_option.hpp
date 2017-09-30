@@ -32,7 +32,10 @@ namespace kgs
 		BACKGROUND,
 		OPAQUE,
 		TRANSPARENT,
-		OVERLAY
+		OVERLAY,
+		BEGIN_RANGE = BACKGROUND,
+		END_RANGE = OVERLAY,
+		RANGE_SIZE = (END_RANGE - BEGIN_RANGE + 1)
 	};
 
 	extern std::array<std::pair<DescriptorType, vk::DescriptorType>, static_cast<size_t>(DescriptorType::RANGE_SIZE)> arrDescriptorTypeToVK;

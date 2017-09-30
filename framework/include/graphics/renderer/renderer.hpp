@@ -20,7 +20,7 @@ namespace kgs
 		}
 
 		Renderer(std::shared_ptr<SceneType> pScene, std::shared_ptr<CameraType> pCamera)
-			: m_PScene(pScene)
+			: m_pScene(pScene)
 			, m_pCamera(pCamera)
 		{
 

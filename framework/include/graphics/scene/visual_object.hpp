@@ -3,13 +3,41 @@
 
 #include "graphics/scene/option.hpp"
 #include "graphics/scene/object.hpp"
+#include "graphics/mesh/mesh.hpp"
+#include "graphics/material/material.hpp"
 
 namespace kgs
 {
 	template <SpaceType SPACE_TYPE>
 	class VisualObject : Object<SPACE_TYPE>
 	{
+	public:
+		typedef Mesh<SpaceConstInfo<SPACE_TYPE>::MESH_TYPE> MeshType;
 
+		std::shared_ptr<MeshType> getPMesh()
+		{
+			return m_pMesh;
+		}
+
+		void setPMesh(std::shared_ptr<MeshType> pMesh)
+		{
+			m_pMesh = pMesh;
+		}
+
+		std::shared_ptr<Material> getPMaterial()
+		{
+			return m_pMaterial;
+		}
+
+		void setPMaterial(std::shared_ptr<Material> pMaterial)
+		{
+			m_pMaterial = pMaterial;
+		}
+
+	protected:
+		//aggregations
+		std::shared_ptr<MeshType> m_pMesh;
+		std::shared_ptr<Material> m_pMaterial;
 	};
 } //namespace kgs
 

@@ -8,7 +8,11 @@ namespace kgs
 {
 	class Renderer2 : public Renderer<SpaceType::SPACE_2>
 	{
-
+	public:
+		Renderer2();
+		Renderer2(std::shared_ptr<SceneType> pScene, std::shared_ptr<CameraType> pCamera);
+	private:
+		void _render() override;
 	};
 } //namespace kgs
 

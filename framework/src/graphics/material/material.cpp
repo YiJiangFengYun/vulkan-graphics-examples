@@ -47,4 +47,24 @@ namespace kgs
 			item->apply();
 		}
 	}
+
+	RenderQueueType Material::getRenderQueueType()
+	{
+		return m_renderQueueType;
+	}
+
+	void Material::setRenderQueueType(RenderQueueType type)
+	{
+		m_renderQueueType = type;
+	}
+
+	uint32_t Material::getRenderPriority()
+	{
+		return m_renderPriority;
+	}
+
+	void Material::setRenderPriority(uint32_t priority)
+	{
+		m_renderPriority = priority;
+	}
 }

@@ -28,13 +28,16 @@ namespace kgs
 
 		void render()
 		{
-
+			_render();
 		}
 	protected:
 		//aggregations
 		std::shared_ptr<SceneType> m_pScene;
 		std::shared_ptr<CameraType> m_pCamera;
+		virtual void _render()
+		{
 
+		}
 	};
 } //namespace kgs
 

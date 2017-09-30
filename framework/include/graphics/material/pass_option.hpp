@@ -27,6 +27,14 @@ namespace kgs
 
 	using ShaderStageFlags = fd::Flags<ShaderStageFlagBits>;
 
+	enum class RenderQueueType
+	{
+		BACKGROUND,
+		OPAQUE,
+		TRANSPARENT,
+		OVERLAY
+	};
+
 	extern std::array<std::pair<DescriptorType, vk::DescriptorType>, static_cast<size_t>(DescriptorType::RANGE_SIZE)> arrDescriptorTypeToVK;
 	extern std::array<std::pair<ShaderStageFlagBits, vk::ShaderStageFlagBits>, static_cast<size_t>(ShaderStageFlagBits::RANGE_SIZE)> arrShaderStageFlagBitsToVK;
 

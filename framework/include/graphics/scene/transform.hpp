@@ -47,6 +47,11 @@ namespace kgs
 			return m_pParent;
 		}
 
+		void setPParent(std::shared_ptr<Type> pParent)
+		{
+			m_pParent = pParent;
+		}
+
 		std::shared_ptr<Type> getRoot()
 		{
 			if (m_pParent == nullptr)
@@ -72,13 +77,14 @@ namespace kgs
 
 		PointType getLocalPosition()
 		{
-			return m_appliedLocalPosition;
+			return m_localPosition;
 		}
 
 		void setLocalPosition(PointType position)
 		{
 			m_localPosition = position;
 			m_isChanged = KGS_TRUE;
+			_reCalculateLocalMatrix();
 		}
 
 		PointType getPosition()
@@ -95,6 +101,7 @@ namespace kgs
 		{
 			m_localRotation = rotation;
 			m_isChanged = KGS_TRUE;
+			_reCalculateLocalMatrix();
 		}
 
 		RotationType getRotation()
@@ -118,6 +125,7 @@ namespace kgs
 		{
 			m_localScale = scale;
 			m_isChanged = KGS_TRUE;
+			_reCalculateLocalMatrix();
 		}
 
 		VectorType getScale()
@@ -132,14 +140,10 @@ namespace kgs
 			return scale;
 		}
 
-		void apply()
+		/*void apply()
 		{
-			m_appliedLocalScale = m_localScale;
-			m_appliedLocalRotation = m_localRotation;
-			m_appliedLocalPosition = m_localPosition;
-			m_localMatrix = m_appliedLocalPosition * m_appliedLocalRotation * m_appliedLocalScale;
 			m_isChanged = KGS_FALSE;
-		}
+		}*/
 
 		//-------------------------transform tool-------------------------------------
 
@@ -177,15 +181,10 @@ namespace kgs
 		std::shared_ptr<Type> m_pParent;
 		std::vector<std::shared_ptr<Type>> m_pChildren;
 		Bool32 m_isChanged;
-		//pre apply
 		PointType m_localPosition;
 		VectorType m_localScale;
 		RotationType m_localRotation;
-		//post apply
 		MatrixType m_localMatrix;
-		PointType m_appliedLocalPosition;
-		VectorType m_appliedLocalScale;
-		RotationType m_appliedLocalRotation;
 
 		inline MatrixType _getMatrixLocalToWorld(Bool32 includeSelf)
 		{
@@ -208,6 +207,11 @@ namespace kgs
 			MatrixType matrix = _getMatrixLocalToWorld(includeSelf);
 			glm::inverse(matrix);
 			return matrix;
+		}
+
+		inline void _reCalculateLocalMatrix()
+		{
+			m_localMatrix = m_localPosition * m_localRotation * m_localScale;
 		}
 
 	};

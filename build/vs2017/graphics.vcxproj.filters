@@ -147,6 +147,30 @@
     <ClCompile Include="..\..\framework\src\graphics\scene\transform_3.cpp">
       <Filter>src\graphics\scene</Filter>
     </ClCompile>
+    <ClCompile Include="..\..\framework\src\graphics\scene\visual_object_2.cpp">
+      <Filter>src\graphics\scene</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\framework\src\graphics\scene\visual_object_3.cpp">
+      <Filter>src\graphics\scene</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\framework\src\graphics\scene\camera_2.cpp">
+      <Filter>src\graphics\scene</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\framework\src\graphics\scene\camera_3.cpp">
+      <Filter>src\graphics\scene</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\framework\src\graphics\scene\light_2.cpp">
+      <Filter>src\graphics\scene</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\framework\src\graphics\scene\light_3.cpp">
+      <Filter>src\graphics\scene</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\framework\src\graphics\scene\scene_2.cpp">
+      <Filter>src\graphics\scene</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\framework\src\graphics\scene\scene_3.cpp">
+      <Filter>src\graphics\scene</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="..\..\framework\include\graphics\texture\texture.hpp">
@@ -249,6 +273,30 @@
       <Filter>include\graphics\scene</Filter>
     </ClInclude>
     <ClInclude Include="..\..\framework\include\graphics\scene\space_transform_type_info.hpp">
+      <Filter>include\graphics\scene</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\framework\include\graphics\scene\scene_2.hpp">
+      <Filter>include\graphics\scene</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\framework\include\graphics\scene\scene_3.hpp">
+      <Filter>include\graphics\scene</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\framework\include\graphics\scene\visual_object_2.hpp">
+      <Filter>include\graphics\scene</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\framework\include\graphics\scene\visual_object_3.hpp">
+      <Filter>include\graphics\scene</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\framework\include\graphics\scene\camera_2.hpp">
+      <Filter>include\graphics\scene</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\framework\include\graphics\scene\camera_3.hpp">
+      <Filter>include\graphics\scene</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\framework\include\graphics\scene\light_2.hpp">
+      <Filter>include\graphics\scene</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\framework\include\graphics\scene\light_3.hpp">
       <Filter>include\graphics\scene</Filter>
     </ClInclude>
   </ItemGroup>

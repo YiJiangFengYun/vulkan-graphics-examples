@@ -3,7 +3,7 @@
 
 #include "graphics/global.hpp"
 #include "graphics/scene/space_info.hpp"
-#include "graphics/scene/space_transform_type_info.hpp"
+#include "graphics/scene/space_info_object.hpp"
 
 namespace kgs
 {

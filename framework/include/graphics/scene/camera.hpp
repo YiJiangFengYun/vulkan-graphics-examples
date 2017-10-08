@@ -8,6 +8,7 @@ namespace kgs
 	template <SpaceType SPACE_TYPE>
 	class Camera : Object<SPACE_TYPE>
 	{
+	public:
 		Camera()
 			: Object()
 			, m_objectType(ObjectType::CAMERA)

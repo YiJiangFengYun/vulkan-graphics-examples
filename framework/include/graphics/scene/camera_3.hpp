@@ -25,7 +25,7 @@ namespace kgs
 		float getZFar() const;
 		void setZFar(float zFar);
 
-		TransformType::MatrixType getProjMatrix() override;
+		typename TransformType::MatrixType getProjMatrix() override;
 	private:
 		float m_fovy, m_aspect, m_zNear, m_zFar;
 		TransformType::MatrixType m_projMatrix;

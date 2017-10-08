@@ -70,7 +70,7 @@ namespace kgs
 		m_zFar = zFar;
 	}
 
-	Object<SpaceType::SPACE_3>::TransformType::MatrixType Camera3::getProjMatrix()
+	typename Camera3::TransformType::MatrixType Camera3::getProjMatrix()
 	{
 		return m_projMatrix;
 	}

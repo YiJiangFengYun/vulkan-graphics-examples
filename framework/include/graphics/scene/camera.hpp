@@ -11,12 +11,11 @@ namespace kgs
 	public:
 		Camera()
 			: Object()
-			, m_objectType(ObjectType::CAMERA)
 		{
-
+			m_objectType = ObjectType::CAMERA;
 		}
 
-		virtual TransformType::MatrixType getProjMatrix()
+		virtual typename TransformType::MatrixType getProjMatrix()
 		{
 			return TransformType::MatrixType(1.0f);
 		}

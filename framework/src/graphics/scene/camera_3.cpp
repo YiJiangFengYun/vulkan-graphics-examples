@@ -70,9 +70,16 @@ namespace kgs
 		m_zFar = zFar;
 	}
 
+	Object<SpaceType::SPACE_3>::TransformType::MatrixType Camera3::getProjMatrix()
+	{
+		return m_projMatrix;
+	}
+
 	void Camera3::_apply()
 	{
 		m_projMatrix = glm::perspective(m_fovy, m_aspect, m_zNear, m_zFar);
+		//GLM was originally designed for OpenGL, where the Y coordinate of the clip coordinates is inverted. 
+		m_projMatrix[1][1] *= -1;
 	}
 
 

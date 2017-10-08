@@ -6,7 +6,7 @@
 namespace kgs
 {
 	template <SpaceType SPACE_TYPE>
-	class Camera : Object<SPACE_TYPE>
+	class Camera : public Object<SPACE_TYPE>
 	{
 	public:
 		Camera()
@@ -14,6 +14,11 @@ namespace kgs
 			, m_objectType(ObjectType::CAMERA)
 		{
 
+		}
+
+		virtual TransformType::MatrixType getProjMatrix()
+		{
+			return TransformType::MatrixType(1.0f);
 		}
 	};
 } //namespace kgs

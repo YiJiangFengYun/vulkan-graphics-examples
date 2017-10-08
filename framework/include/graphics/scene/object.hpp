@@ -34,6 +34,11 @@ namespace kgs
 			return m_objectType;
 		}
 
+		TransformType getTransform()
+		{
+			return m_transform;
+		}
+
 	protected:
 		ObjectType m_objectType;
 		TransformType m_transform;

@@ -32,6 +32,7 @@
     <ClCompile Include="..\..\framework\src\graphics\renderer\renderer.cpp" />
     <ClCompile Include="..\..\framework\src\graphics\renderer\renderer_2.cpp" />
     <ClCompile Include="..\..\framework\src\graphics\renderer\renderer_3.cpp" />
+    <ClCompile Include="..\..\framework\src\graphics\renderer\renderer_option.cpp" />
     <ClCompile Include="..\..\framework\src\graphics\scene\camera.cpp" />
     <ClCompile Include="..\..\framework\src\graphics\scene\camera_2.cpp" />
     <ClCompile Include="..\..\framework\src\graphics\scene\camera_3.cpp" />
@@ -78,6 +79,7 @@
     <ClInclude Include="..\..\framework\include\graphics\renderer\renderer.hpp" />
     <ClInclude Include="..\..\framework\include\graphics\renderer\renderer_2.hpp" />
     <ClInclude Include="..\..\framework\include\graphics\renderer\renderer_3.hpp" />
+    <ClInclude Include="..\..\framework\include\graphics\renderer\renderer_option.hpp" />
     <ClInclude Include="..\..\framework\include\graphics\scene\camera.hpp" />
     <ClInclude Include="..\..\framework\include\graphics\scene\camera_2.hpp" />
     <ClInclude Include="..\..\framework\include\graphics\scene\camera_3.hpp" />

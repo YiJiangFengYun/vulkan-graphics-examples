@@ -10,6 +10,17 @@
 
 namespace kgs
 {
+	enum class MaterialShowType
+	{
+		BACKGROUND,
+		OPAQUE,
+		TRANSPARENT,
+		OVERLAY,
+		BEGIN_RANGE = BACKGROUND,
+		END_RANGE = OVERLAY,
+		RANGE_SIZE = (END_RANGE - BEGIN_RANGE + 1)
+	};
+
 	struct MaterialData
 	{
 		enum class DataType

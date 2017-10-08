@@ -20,8 +20,8 @@ namespace kgs
 		std::string getPassName(int32_t index);
 		std::shared_ptr<Pass> getPass(std::string name);
 		void setPass(std::string name, std::shared_ptr<Pass> pass);
-		RenderQueueType getRenderQueueType();
-		void setRenderQueueType(RenderQueueType type);
+		MaterialShowType getShowType();
+		void setRenderQueueType(MaterialShowType type);
 		uint32_t getRenderPriority();
 		void setRenderPriority(uint32_t priority);
 
@@ -29,7 +29,7 @@ namespace kgs
 		void apply();
 	private:
 		//--compositions
-		RenderQueueType m_renderQueueType;
+		MaterialShowType m_renderQueueType;
 		uint32_t m_renderPriority;
 		//--compositions
 

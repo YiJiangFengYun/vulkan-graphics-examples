@@ -9,7 +9,10 @@ namespace kgs
 	enum class SpaceType
 	{
 		SPACE_2,
-		SPACE_3
+		SPACE_3,
+		BEGIN_RANGE = SPACE_2,
+		END_RANGE = SPACE_3,
+		RANGE_SIZE = (END_RANGE - BEGIN_RANGE + 1)
 	};
 
 	template<SpaceType type>

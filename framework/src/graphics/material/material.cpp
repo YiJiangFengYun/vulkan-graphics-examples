@@ -48,12 +48,12 @@ namespace kgs
 		}
 	}
 
-	RenderQueueType Material::getRenderQueueType()
+	MaterialShowType Material::getShowType()
 	{
 		return m_renderQueueType;
 	}
 
-	void Material::setRenderQueueType(RenderQueueType type)
+	void Material::setRenderQueueType(MaterialShowType type)
 	{
 		m_renderQueueType = type;
 	}

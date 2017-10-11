@@ -279,7 +279,7 @@ namespace gfw {
 				attachments.data(),
 				m_swapchainExtent.width,
 				m_swapchainExtent.height,
-				static_cast<uint32_t>(1)
+				1u
 			};
 
 			m_pSwapchainFramebuffers[i] = fd::createFrameBuffer(m_pDevice, createInfo);

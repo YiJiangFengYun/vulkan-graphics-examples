@@ -3,9 +3,6 @@
 
 #include "graphics/texture/texture.hpp"
 
-#include <glm/glm.hpp>
-#include "graphics/global.hpp"
-
 namespace kgs
 {
 	class Texture1D : public Texture

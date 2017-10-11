@@ -1,5 +1,7 @@
 #include "graphics/renderer/renderer_3.hpp"
 
+#include <functional>
+
 namespace kgs
 {
 	Renderer3::Renderer3()
@@ -62,9 +64,7 @@ namespace kgs
 		//sort transparent queue.
 		std::sort(queues[static_cast<size_t>(RenderQueueType::TRANSPARENT)].begin(),
 			queues[static_cast<size_t>(RenderQueueType::TRANSPARENT)].end(),
-			_sortObjectsWithCameraZ);
-
-
+			std::bind(&Renderer3::_sortObjectsWithCameraZ, this, std::placeholders::_1, std::placeholders::_2));
 	}
 
 	Bool32 Renderer3::_checkVisualObjectInsideCameraView(std::shared_ptr<typename SceneType::VisualObjectType> pVisualObject)

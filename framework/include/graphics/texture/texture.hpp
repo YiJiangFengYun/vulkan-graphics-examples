@@ -95,7 +95,6 @@ namespace kgs
 		void _setPixels(std::vector<Color> colors, uint32_t layer, uint32_t mipLevel = 0);
 		void _setPixels32(std::vector<Color32> colors, uint32_t layer, uint32_t mipLevel = 0);
 		void _apply(Bool32 updateMipmaps = KGS_TRUE, Bool32 makeUnreadable = KGS_FALSE);
-	private:
 		void _applyWithGenMipMap();
 		void _applyDirect();
 

@@ -547,7 +547,7 @@ namespace kgs
 
 		//transfer image from initial current image layout to dst layout.
 		//here use undefined layout not to use curr layout of image, it can clear image old data.
-		_tranImageLayout(pCommandBuffer, *m_pImage, vk::ImageLayout::eUndefined, vk::ImageLayout::eTransferDstOptimal,
+		_tranImageLayout(pCommandBuffer, *m_pImage, m_currVkImageLayout, vk::ImageLayout::eTransferDstOptimal,
 			0, 1, 0, m_arrayLayer);
 
 		//copy the first mip of the chain.
@@ -639,7 +639,7 @@ namespace kgs
 
 			//transfer image from initial current image layout to dst layout.
 			//here use undefined layout not to use curr layout of image, it can clear image old data.
-			_tranImageLayout(pCommandBuffer, *m_pImage, vk::ImageLayout::eUndefined, vk::ImageLayout::eTransferDstOptimal,
+			_tranImageLayout(pCommandBuffer, *m_pImage, m_currVkImageLayout, vk::ImageLayout::eTransferDstOptimal,
 				i, 1, 0, m_arrayLayer);
 
 			uint32_t width = caculateImageSizeWithMipmapLevel(m_width, i);

@@ -24,7 +24,8 @@ namespace kgs
 	};
 
 	std::array<std::pair<TextureFormat, vk::Format>, static_cast<size_t>(TextureFormat::RANGE_SIZE)> arrFormatToVKFormat = {
-		std::pair<TextureFormat, vk::Format>(TextureFormat::R8G8B8A8_UNORM, vk::Format::eR8G8B8A8Unorm)
+		std::pair<TextureFormat, vk::Format>(TextureFormat::R8G8B8A8_UNORM, vk::Format::eR8G8B8A8Unorm),
+		std::pair<TextureFormat, vk::Format>(TextureFormat::D32_SFLOAT_S8_UINT, vk::Format::eD32SfloatS8Uint)
 	};
 
 	std::array<std::pair<TextureType, vk::ImageViewType>, static_cast<size_t>(TextureType::RANGE_SIZE)> arrTextureTypeToVKImageViewType = {

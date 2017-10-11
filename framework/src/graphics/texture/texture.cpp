@@ -5,13 +5,16 @@ namespace kgs
 	inline uint32_t caculateImageSizeWithMipmapLevel(uint32_t size, uint32_t mipmapLevel);
 
 	Texture::Texture(TextureFormat format, Bool32 mipMap)
-		:m_pContext(pContext),
-		m_format(format),
-		m_mipMap(mipMap),
-		m_width(1U),
-		m_height(1U),
-		m_depth(1U),
-		m_arrayLength(1U)
+		: m_pContext(pContext)
+		, m_format(format)
+		, m_mipMap(mipMap)
+		, m_width(1U)
+		, m_height(1U)
+		, m_depth(1U)
+		, m_arrayLength(1U)
+		, m_vkImageUsageFlags(vk::ImageUsageFlagBits::eTransferDst | vk::ImageUsageFlagBits::eSampled) //default image usage is for sampled texture.
+		, m_vkImageLayout(vk::ImageLayout::eShaderReadOnlyOptimal) //default image layout is for sampled texture.
+		, m_vkImageAspectFlags(vk::ImageAspectFlagBits::eColor) //default image aspect is for sampled texture.
 	{
 		
 	}
@@ -315,7 +318,7 @@ namespace kgs
 			m_arrayLayer,
 			vk::SampleCountFlagBits::e1,
 			vk::ImageTiling::eOptimal,
-			vk::ImageUsageFlagBits::eTransferDst | vk::ImageUsageFlagBits::eSampled,
+			m_vkImageUsageFlags,
 			vk::SharingMode::eExclusive,
 			0U,
 			nullptr,
@@ -336,7 +339,7 @@ namespace kgs
 
 		pDevice->bindImageMemory(*m_pImage, *m_pMemory, vk::DeviceSize(0));
 
-		m_vkImageLayout = imageLayout;
+		m_currVkImageLayout = imageLayout;
 	}
 
 	void Texture::_createImageView()
@@ -396,7 +399,7 @@ namespace kgs
 				vk::ComponentSwizzle::eIdentity
 			},
 			{
-				vk::ImageAspectFlagBits::eColor,
+				m_vkImageAspectFlags,
 				uint32_t(0),
 				m_mipMapLevels,
 				uint32_t(0),
@@ -570,11 +573,11 @@ namespace kgs
 		for (uint32_t i = 1; i < m_mipMapLevels; ++i)
 		{
 			vk::ImageBlit blit;
-			blit.srcSubresource.aspectMask = vk::ImageAspectFlagBits::eColor;
+			blit.srcSubresource.aspectMask = m_vkImageAspectFlags;
 			blit.srcSubresource.baseArrayLayer = 0;
 			blit.srcSubresource.layerCount = m_arrayLayer;
 			blit.srcSubresource.mipLevel = i - 1;
-			blit.dstSubresource.aspectMask = vk::ImageAspectFlagBits::eColor;
+			blit.dstSubresource.aspectMask = m_vkImageAspectFlags;
 			blit.dstSubresource.baseArrayLayer = 0;
 			blit.dstSubresource.layerCount = m_arrayLayer;
 			blit.dstSubresource.mipLevel = i;
@@ -601,12 +604,12 @@ namespace kgs
 		}
 
 		//transfer all level and all layer to shader read layout.
-		_tranImageLayout(pCommandBuffer, *m_pImage, vk::ImageLayout::eTransferSrcOptimal, vk::ImageLayout::eShaderReadOnlyOptimal,
+		_tranImageLayout(pCommandBuffer, *m_pImage, vk::ImageLayout::eTransferSrcOptimal, m_vkImageLayout,
 			0, m_mipMapLevels, 0, m_arrayLayer);
 
 		endSingleTimeCommands(pCommandBuffer);
 
-		m_vkImageLayout = vk::ImageLayout::eShaderReadOnlyOptimal;
+		m_currVkImageLayout = m_vkImageLayout;
 	}
 
 	void Texture::_applyDirect()
@@ -645,13 +648,13 @@ namespace kgs
 			_copyBufferToImage(pCommandBuffer, *pStagingBuffer, *m_pImage, width, height, depth, i, 0, m_arrayLayer);
 
 			//transfer all layer to shader read layout.
-			_tranImageLayout(pCommandBuffer, *m_pImage, vk::ImageLayout::eTransferDstOptimal, vk::ImageLayout::eShaderReadOnlyOptimal,
+			_tranImageLayout(pCommandBuffer, *m_pImage, vk::ImageLayout::eTransferDstOptimal, m_vkImageLayout,
 				i, 1, 0, m_arrayLayer);
 
 			endSingleTimeCommands(pCommandBuffer);
 		}
 
-		m_vkImageLayout = vk::ImageLayout::eShaderReadOnlyOptimal;
+		m_currVkImageLayout = m_vkImageLayout;
 	}
 
 	void Texture::_resizeColorsData(uint32_t mipLevel)
@@ -700,7 +703,7 @@ namespace kgs
 		barrier.dstQueueFamilyIndex = VK_QUEUE_FAMILY_IGNORED;
 		barrier.image = image;
 
-		barrier.subresourceRange.aspectMask = vk::ImageAspectFlagBits::eColor;
+		barrier.subresourceRange.aspectMask = m_vkImageAspectFlags;
 		barrier.subresourceRange.baseMipLevel = baseMipLevel;
 		barrier.subresourceRange.levelCount = levelCount;
 		barrier.subresourceRange.baseArrayLayer = baseArrayLayer;
@@ -743,7 +746,7 @@ namespace kgs
 		uint32_t baseArrayLayer, uint32_t layerCount)
 	{
 		vk::BufferImageCopy copyInfo = { 0, 0, 0, vk::ImageSubresourceLayers(
-			vk::ImageAspectFlagBits::eColor, mipLevel, baseArrayLayer, layerCount),
+			m_vkImageAspectFlags, mipLevel, baseArrayLayer, layerCount),
 			vk::Offset3D(0, 0, 0),
 			vk::Extent3D(width, height, depth)
 		};

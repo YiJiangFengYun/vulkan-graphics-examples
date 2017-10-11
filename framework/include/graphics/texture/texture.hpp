@@ -46,11 +46,14 @@ namespace kgs
 		float m_anisotropy;
 		Bool32 m_mipMap;
 		SamplerAddressMode m_samplerAddressMode;
+		vk::ImageUsageFlags m_vkImageUsageFlags;
+		vk::ImageLayout m_vkImageLayout;
+		vk::ImageAspectFlags m_vkImageAspectFlags;
 
 		uint32_t m_mipMapLevels;
 		uint32_t m_arrayLayer;
 		vk::Format m_vkFormat;
-		vk::ImageLayout m_vkImageLayout; //record texture current image layout state.
+		vk::ImageLayout m_currVkImageLayout; //record texture current image layout state.
 		vk::Filter m_vkFilter;
 		vk::SamplerMipmapMode m_vkSamplerMipmapMode;
 		vk::SamplerAddressMode m_vkSamplerAddressMode;
@@ -66,6 +69,18 @@ namespace kgs
 		std::shared_ptr<vk::ImageView> m_pImageView;
 		std::shared_ptr<vk::Sampler> m_pSampler;
 		
+		inline virtual void _init()
+		{
+			_updateMipMapLevels();
+			_updateArrayLayer();
+			_updateVkFormat();
+			_updateVkFilter();
+			_updateVkSamplerAddressMode();
+			_createImage();
+			_createImageView();
+			_createSampler();
+		}
+
 		void _updateMipMapLevels();
 		void _updateArrayLayer();
 		void _updateVkFormat();

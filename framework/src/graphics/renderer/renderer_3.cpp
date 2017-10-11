@@ -14,9 +14,9 @@ namespace kgs
 
 	}
 
-	void Renderer3::_render()
+	void Renderer3::_render(RenderInfo renderInfo)
 	{
-		Renderer::_render();
+		Renderer::_render(renderInfo);
 
 		std::shared_ptr<Scene<SpaceType::SPACE_3>> pScene;
 		//Auto pScene = m_pScene;
@@ -59,6 +59,11 @@ namespace kgs
 			queues[static_cast<size_t>(renderQueueType)][queueCounts[static_cast<size_t>(renderQueueType)]++] = pVisualObject;
 		}
 
+		//sort transparent queue.
+		std::sort(queues[static_cast<size_t>(RenderQueueType::TRANSPARENT)].begin(),
+			queues[static_cast<size_t>(RenderQueueType::TRANSPARENT)].end(),
+			_sortObjectsWithCameraZ);
+
 
 	}
 
@@ -82,7 +87,7 @@ namespace kgs
 		const uint32_t pointCount = 8;
 		PointType points[pointCount] = { p0, p1, p2, p3, p4, p5, p6, p7 };
 
-		//get mvp matrix.
+		//get MVP matrix.
 		auto mvpMatrix = _getMVPMatrix(pVisualObject);
 
 		Bool32 isInsideCameraView = KGS_FALSE;
@@ -105,5 +110,25 @@ namespace kgs
 		}
 
 		return isInsideCameraView;
+	}
+
+	Bool32 Renderer3::_sortObjectsWithCameraZ(std::shared_ptr<typename SceneType::ObjectType> pObject1, std::shared_ptr<typename SceneType::ObjectType> pObject2)
+	{
+		//get MV matrix.
+		auto mvMatrix1 = _getMVMatrix(pObject1);
+		auto mvMatrix2 = _getMVMatrix(pObject2);
+		//get position
+		auto pos1 = pObject1->getTransform().getLocalPosition();
+		auto pos2 = pObject2->getTransform().getLocalPosition();
+
+		typedef SpaceTypeInfo<SpaceType::SPACE_3>::PointType PointType;
+		typedef SpaceTypeInfo<SpaceType::SPACE_3>::MatrixVectorType MatrixVectorType;
+		//transform point from model coordinate system to camera coordinate system.
+		pos1 = mvMatrix1 * MatrixVectorType(pos1, 1.0f);
+		pos2 = mvMatrix2 * MatrixVectorType(pos2, 1.0f);
+
+		//it is smaller if its z is bigger than the other.
+		return static_cast<Bool32>(pos1.z > pos2.z);
+
 	}
 } //namespace kgs

@@ -28,8 +28,9 @@ namespace kgs
 		Renderer3();
 		Renderer3(std::shared_ptr<SceneType> pScene, std::shared_ptr<CameraType> pCamera);
 	private:
-		void _render() override;
+		void _render(RenderInfo renderInfo) override;
 		Bool32 _checkVisualObjectInsideCameraView(std::shared_ptr<typename SceneType::VisualObjectType> pVisualObject) override;
+		Bool32 _sortObjectsWithCameraZ(std::shared_ptr<typename SceneType::ObjectType> pObject1, std::shared_ptr<typename SceneType::ObjectType> pObject2);
 
 		inline SpaceTypeInfo<SpaceType::SPACE_3>::MatrixType _getMVPMatrix(std::shared_ptr<typename SceneType::ObjectType> pObject) override
 		{

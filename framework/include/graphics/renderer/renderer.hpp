@@ -27,21 +27,33 @@ namespace kgs
 
 		}
 
-		void render()
+		void render(RenderInfo renderInfo)
 		{
-			_render();
+			_render(renderInfo);
 		}
 
 	protected:
 		//compositions
+		/*vk::Extent2D m_framebufferExtent;
+		vk::Format m_colorImageFormat;
+		vk::Format m_depthImageFormat;*/
 
 		//aggregations
 		std::shared_ptr<SceneType> m_pScene;
 		std::shared_ptr<CameraType> m_pCamera;
-		virtual void _render() = 0;
+		virtual void _render(RenderInfo renderInfo) = 0;
 		virtual Bool32 _checkVisualObjectInsideCameraView(std::shared_ptr<typename SceneType::VisualObjectType> pVisualObject) = 0;
 
-		inline virtual SpaceTypeInfo<SPACE_TYPE>::MatrixType _getMVPMatrix(std::shared_ptr<typename SceneType::ObjectType> pObject) = 0;
+		inline virtual SpaceTypeInfo<SPACE_TYPE>::MatrixType _getMVPMatrix(std::shared_ptr<typename SceneType::ObjectType> pObject)
+		{
+			//return m_pCamera->getTransform().getMatrixWorldToLocal() * pObject->getTransform().getMatrixLocalToWorld();
+			return _getMVMatrix(pObject);
+		}
+
+		inline virtual SpaceTypeInfo<SPACE_TYPE>::MatrixType _getMVMatrix(std::shared_ptr<typename SceneType::ObjectType> pObject)
+		{
+			return m_pCamera->getTransform().getMatrixWorldToLocal() * pObject->getTransform().getMatrixLocalToWorld();
+		}
 	};
 } //namespace kgs
 

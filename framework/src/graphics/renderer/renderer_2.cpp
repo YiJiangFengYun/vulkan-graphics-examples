@@ -14,9 +14,9 @@ namespace kgs
 
 	}
 
-	void Renderer2::_render()
+	void Renderer2::_render(RenderInfo renderInfo)
 	{
-		Renderer::_render();
+		Renderer::_render(renderInfo);
 		LOG(plog::debug) << "test" << std::endl;
 	}
 } //namespace kgs

@@ -12,7 +12,7 @@ namespace kgs
 		Renderer2();
 		Renderer2(std::shared_ptr<SceneType> pScene, std::shared_ptr<CameraType> pCamera);
 	private:
-		void _render() override;
+		void _render(RenderInfo renderInfo) override;
 	};
 } //namespace kgs
 

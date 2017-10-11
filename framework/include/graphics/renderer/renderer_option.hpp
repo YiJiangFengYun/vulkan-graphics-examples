@@ -6,7 +6,12 @@
 
 namespace kgs
 {
-	
+	struct RenderInfo {
+		uint32_t                         waitSemaphoreCount;
+		const vk::Semaphore*             pWaitSemaphores;
+		uint32_t                         signalSemaphoreCount;
+		const vk::Semaphore*             pSignalSemaphores;
+	};
 
 } //namespace kgs
 

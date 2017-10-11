@@ -8,14 +8,7 @@ namespace kgs
 		m_type = TextureType::TEX_2D;
 		m_width = width;
 		m_height = height;
-		_updateMipMapLevels();
-		_updateArrayLayer();
-		_updateVkFormat();
-		_updateVkFilter();
-		_updateVkSamplerAddressMode();
-		_createImage();
-		_createImageView();
-		_createSampler();
+		_init();
 	}
 
 	Texture2D::~Texture2D()

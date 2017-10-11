@@ -9,14 +9,7 @@ namespace kgs
 		m_width = width;
 		m_height = height;
 		m_depth = depth;
-		_updateMipMapLevels();
-		_updateArrayLayer();
-		_updateVkFormat();
-		_updateVkFilter();
-		_updateVkSamplerAddressMode();
-		_createImage();
-		_createImageView();
-		_createSampler();
+		_init();
 	}
 
 	Texture3D::~Texture3D()

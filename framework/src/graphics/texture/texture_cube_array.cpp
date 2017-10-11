@@ -9,14 +9,7 @@ namespace kgs
 		m_width = size;
 		m_height = size;
 		m_arrayLength = arraylength;
-		_updateMipMapLevels();
-		_updateArrayLayer();
-		_updateVkFormat();
-		_updateVkFilter();
-		_updateVkSamplerAddressMode();
-		_createImage();
-		_createImageView();
-		_createSampler();
+		_init();
 	}
 
 	TextureCubeArray::~TextureCubeArray()

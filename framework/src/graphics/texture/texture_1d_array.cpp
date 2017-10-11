@@ -8,14 +8,7 @@ namespace kgs
 		m_type = TextureType::TEX_1D_ARRAY;
 		m_width = width;
 		m_arrayLength = arraylength;
-		_updateMipMapLevels();
-		_updateArrayLayer();
-		_updateVkFormat();
-		_updateVkFilter();
-		_updateVkSamplerAddressMode();
-		_createImage();
-		_createImageView();
-		_createSampler();
+		_init();
 	}
 
 	Texture1DArray::~Texture1DArray()

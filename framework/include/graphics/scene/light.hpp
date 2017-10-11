@@ -6,7 +6,7 @@
 namespace kgs
 {
 	template <SpaceType SPACE_TYPE>
-	class Light : Object<SPACE_TYPE>
+	class Light : public Object<SPACE_TYPE>
 	{
 		Light()
 			: Object()

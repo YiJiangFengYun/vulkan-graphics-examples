@@ -149,22 +149,22 @@ namespace kgs
 
 		VectorType transformVectorToWorld(VectorType vector)
 		{
-			return VectorType(_getMatrixLocalToWorld() * PointType(vector, 0.0f));
+			return VectorType(_getMatrixLocalToWorld() * MatrixVectorType(vector, 0.0f));
 		}
 
 		VectorType transformVectorToLocal(VectorType vector)
 		{
-			return VectorType(_getMatrixWorldToLocal() * PointType(vector, 0.0f));
+			return VectorType(_getMatrixWorldToLocal() * MatrixVectorType(vector, 0.0f));
 		}
 
 		PointType transformPointToWorld(PointType point)
 		{
-			return _getMatrixLocalToWorld() * point;
+			return _getMatrixLocalToWorld() * MatrixVectorType(point, 1.0f);
 		}
 
 		PointType transformPointToLocal(PointType point)
 		{
-			return _getMatrixWorldToLocal() * point;
+			return _getMatrixWorldToLocal() * MatrixVectorType(point, 1.0f);
 		}
 
 		MatrixType getMatrixLocalToWorld()

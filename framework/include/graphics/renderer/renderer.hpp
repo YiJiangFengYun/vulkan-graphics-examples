@@ -38,10 +38,10 @@ namespace kgs
 		//aggregations
 		std::shared_ptr<SceneType> m_pScene;
 		std::shared_ptr<CameraType> m_pCamera;
-		inline virtual void _render() = 0;
-		inline virtual Bool32 _checkVisualObjectInsideCameraView(typename SceneType::VisualObjectType visualObject) = 0;
+		virtual void _render() = 0;
+		virtual Bool32 _checkVisualObjectInsideCameraView(std::shared_ptr<typename SceneType::VisualObjectType> pVisualObject) = 0;
 
-
+		inline virtual SpaceTypeInfo<SPACE_TYPE>::MatrixType _getMVPMatrix(std::shared_ptr<typename SceneType::ObjectType> pObject) = 0;
 	};
 } //namespace kgs
 

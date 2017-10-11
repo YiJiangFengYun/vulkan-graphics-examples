@@ -9,7 +9,7 @@
 namespace kgs
 {
 	template <SpaceType SPACE_TYPE>
-	class VisualObject : Object<SPACE_TYPE>
+	class VisualObject : public Object<SPACE_TYPE>
 	{
 	public:
 		typedef Mesh<SpaceConstInfo<SPACE_TYPE>::MESH_TYPE> MeshType;

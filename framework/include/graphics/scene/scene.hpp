@@ -22,7 +22,7 @@ namespace kgs
 
 		uint32_t getVisualObjectCount()
 		{
-			return m_arrPVisualObjects.size();
+			return static_cast<uint32_t>(m_arrPVisualObjects.size());
 		}
 
 		std::shared_ptr<VisualObjectType> getVisualObjectWithIndex(uint32_t index)

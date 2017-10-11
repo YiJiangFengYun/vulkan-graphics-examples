@@ -4,6 +4,7 @@
 #include "graphics/scene/space_info.hpp"
 #include "graphics/scene/scene.hpp"
 #include "graphics/scene/camera.hpp"
+#include "graphics/renderer/renderer_option.hpp"
 
 namespace kgs
 {
@@ -30,14 +31,17 @@ namespace kgs
 		{
 			_render();
 		}
+
 	protected:
+		//compositions
+
 		//aggregations
 		std::shared_ptr<SceneType> m_pScene;
 		std::shared_ptr<CameraType> m_pCamera;
-		virtual void _render()
-		{
+		inline virtual void _render() = 0;
+		inline virtual Bool32 _checkVisualObjectInsideCameraView(typename SceneType::VisualObjectType visualObject) = 0;
 
-		}
+
 	};
 } //namespace kgs
 

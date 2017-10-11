@@ -16,7 +16,7 @@ namespace kgs
 	{
 	public:
 		typedef Object<SPACE_TYPE> ObjectType;
-		typedef VisualObject<SPACE_TYPE> VisualObject;
+		typedef VisualObject<SPACE_TYPE> VisualObjectType;
 		typedef Camera<SPACE_TYPE> CameraType;
 		typedef Light<SPACE_TYPE> LightType;
 
@@ -25,17 +25,17 @@ namespace kgs
 			return m_arrPVisualObjects.size();
 		}
 
-		std::shared_ptr<VisualObject> getVisualObjectWithIndex(uint32_t index)
+		std::shared_ptr<VisualObjectType> getVisualObjectWithIndex(uint32_t index)
 		{
 			return m_arrPVisualObjects[index];
 		}
 
-		std::shared_ptr<VisualObject> getVisualObjectWithName(std::string name)
+		std::shared_ptr<VisualObjectType> getVisualObjectWithName(std::string name)
 		{
 			getValue(name, m_mapPVisualObjects, m_arrPVisualObjects);
 		}
 
-		void setVisualObjectWithName(std::string name, std::shared_ptr<VisualObject> value)
+		void setVisualObjectWithName(std::string name, std::shared_ptr<VisualObjectType> value)
 		{
 			setValue(name, value, m_mapPVisualObjects, m_arrPVisualObjects);
 		}
@@ -83,8 +83,8 @@ namespace kgs
 	protected:
 
 		//aggregations
-		std::vector<std::shared_ptr<VisualObject>> m_arrPVisualObjects;
-		std::unordered_map<std::string, std::shared_ptr<VisualObject>> m_mapPVisualObjects;
+		std::vector<std::shared_ptr<VisualObjectType>> m_arrPVisualObjects;
+		std::unordered_map<std::string, std::shared_ptr<VisualObjectType>> m_mapPVisualObjects;
 		std::vector<std::shared_ptr<CameraType>> m_arrPCameras;
 		std::unordered_map<std::string, std::shared_ptr<CameraType>> m_mapPCameras;
 		std::vector<std::shared_ptr<LightType>> m_arrPLights;

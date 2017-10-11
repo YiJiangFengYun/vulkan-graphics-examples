@@ -17,7 +17,13 @@ namespace kgs
 	template<MeshType type>
 	struct MeshTypeInfo
 	{
-		const static MeshData::DataType ARRAY_TYPE;
+		typedef Vector3 PointType;
+	};
+
+	template<MeshType type>
+	struct MeshConstInfo
+	{
+		static const MeshData::DataType ARRAY_TYPE;
 	};
 
 	enum class UVType
@@ -31,10 +37,10 @@ namespace kgs
 	};
 
 	template<UVType type>
-	struct UVTypeInfo
+	struct UVConstInfo
 	{
-		const static MeshData::DataType BASE_TYPE;
-		const static MeshData::DataType ARRAY_TYPE;
+		static const MeshData::DataType BASE_TYPE;
+		static const MeshData::DataType ARRAY_TYPE;
 	};
 
 	enum class UVIndex
@@ -111,6 +117,47 @@ namespace kgs
 #endif // DEBUG
 		return vkTopology;
 	}
+
+
+	//-------specialization--------------------------------------------------------------------------
+	template<>
+	const MeshData::DataType MeshConstInfo<MeshType::SPACE_2>::ARRAY_TYPE = MeshData::DataType::VECTOR_2_ARRAY;
+
+	template<>
+	const MeshData::DataType MeshConstInfo<MeshType::SPACE_3>::ARRAY_TYPE = MeshData::DataType::VECTOR_3_ARRAY;
+
+	template<>
+	const MeshData::DataType UVConstInfo<UVType::FLOAT>::ARRAY_TYPE = MeshData::DataType::FLOAT_ARRAY;
+
+	template<>
+	const MeshData::DataType UVConstInfo<UVType::VECTOR_2>::ARRAY_TYPE = MeshData::DataType::VECTOR_2_ARRAY;
+
+	template<>
+	const MeshData::DataType UVConstInfo<UVType::VECTOR_3>::ARRAY_TYPE = MeshData::DataType::VECTOR_3_ARRAY;
+
+	template<>
+	const std::string UVIndexInfo<UVIndex::UV_0>::VERTEX_NAME = KGS_VERTEX_UV0_NAME;
+
+	template<>
+	const std::uint32_t UVIndexInfo<UVIndex::UV_0>::VERTEX_BINDING_PRIORITY = KGS_VERTEX_BINDING_PRIORITY_UV0;
+
+	template<>
+	const std::string UVIndexInfo<UVIndex::UV_1>::VERTEX_NAME = KGS_VERTEX_UV1_NAME;
+
+	template<>
+	const std::uint32_t UVIndexInfo<UVIndex::UV_1>::VERTEX_BINDING_PRIORITY = KGS_VERTEX_BINDING_PRIORITY_UV1;
+
+	template<>
+	const std::string UVIndexInfo<UVIndex::UV_2>::VERTEX_NAME = KGS_VERTEX_UV2_NAME;
+
+	template<>
+	const std::uint32_t UVIndexInfo<UVIndex::UV_2>::VERTEX_BINDING_PRIORITY = KGS_VERTEX_BINDING_PRIORITY_UV2;
+
+	template<>
+	const std::string UVIndexInfo<UVIndex::UV_3>::VERTEX_NAME = KGS_VERTEX_UV3_NAME;
+
+	template<>
+	const std::uint32_t UVIndexInfo<UVIndex::UV_3>::VERTEX_BINDING_PRIORITY = KGS_VERTEX_BINDING_PRIORITY_UV3;
 } //namespace kgs
 
 #endif // !KGS_MESH_OPTION_H

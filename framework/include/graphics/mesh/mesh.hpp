@@ -44,14 +44,14 @@ namespace kgs
 			std::vector<uint32_t> indices;
 		};
 
-		const MeshData::DataType static BASE_DATA_TYPE = MeshTypeInfo<meshType>::BASE_TYPE;
-		const MeshData::DataType static ARRAY_DATA_TYPE = MeshTypeInfo<meshType>::ARRAY_TYPE;
-		typedef typename MeshData::DataTypeInfo<BASE_DATA_TYPE>::ValueType BaseValueType;
+		static const MeshData::DataType ARRAY_DATA_TYPE = MeshConstInfo<meshType>::ARRAY_TYPE;
+		typedef typename MeshData::DataTypeInfo<ARRAY_DATA_TYPE>::BaseType BaseValueType;
 		typedef typename MeshData::DataTypeInfo<ARRAY_DATA_TYPE>::ValueType ArrayValueType;
+		typedef typename MeshTypeInfo<meshType>::PointType PointType;
 
-		Mesh() :
-			m_pContext(pContext);
-		m_multipliedColor(COLOR_WHITE) //default multiplied color should be (1, 1, 1, 1)
+		Mesh()
+			: m_pContext(pContext)
+			, m_multipliedColor(COLOR_WHITE) //default multiplied color should be (1, 1, 1, 1)
 		{
 
 		}
@@ -122,15 +122,15 @@ namespace kgs
 
 		//uv
 		template<UVType uvType, UVIndex uvIndex>
-		typename MeshData::DataTypeInfo<UVTypeInfo<uvType>::ARRAY_TYPE>::ValueType getUVs()
+		typename MeshData::DataTypeInfo<UVConstInfo<uvType>::ARRAY_TYPE>::ValueType getUVs()
 		{
-			return getData<UVTypeInfo<uvType>::ARRAY_TYPE>(UVIndexInfo<uvIndex>::VERTEX_NAME);
+			return getData<UVConstInfo<uvType>::ARRAY_TYPE>(UVIndexInfo<uvIndex>::VERTEX_NAME);
 		}
 
 		template<UVType uvType, UVIndex uvIndex>
-		void setUVs(typename MeshData::DataTypeInfo<UVTypeInfo<uvType>::ARRAY_TYPE>::ValueType uvs, uint32_t uvIndex)
+		void setUVs(typename MeshData::DataTypeInfo<UVConstInfo<uvType>::ARRAY_TYPE>::ValueType uvs, uint32_t uvIndex)
 		{
-			setData<UVTypeInfo<uvType>::ARRAY_TYPE>(UVIndexInfo<uvIndex>::VERTEX_NAME, uvs, UVIndexInfo<uvIndex>::VERTEX_BINDING_PRIORITY);
+			setData<UVConstInfo<uvType>::ARRAY_TYPE>(UVIndexInfo<uvIndex>::VERTEX_NAME, uvs, UVIndexInfo<uvIndex>::VERTEX_BINDING_PRIORITY);
 		}
 
 		template<MeshData::DataType dataType>
@@ -216,7 +216,7 @@ namespace kgs
 		}
 
 		/*The bounding volume of the mesh*/
-		fd::Bounds<typename BaseValueType> getBounds()
+		fd::Bounds<PointType> getBounds()
 		{
 			return m_bounds;
 		}
@@ -318,7 +318,7 @@ namespace kgs
 		std::unordered_map<std::string, LayoutBindingInfo> m_mapLayoutBindingInfos;
 		uint32_t m_subMeshCount;
 		std::vector<SubMeshInfo> m_subMeshInfos;
-		fd::Bounds<BaseValueType> m_bounds;
+		fd::Bounds<PointType> m_bounds;
 		Color m_multipliedColor;
 		Color m_addedColor;
 

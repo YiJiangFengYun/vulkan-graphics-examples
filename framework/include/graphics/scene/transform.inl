@@ -1,6 +1,13 @@
 namespace kgs
 {
 	template <SpaceType SPACE_TYPE>
+	Transform<SPACE_TYPE>::Transform()
+		: BaseTransform()
+	{
+
+	}
+
+	template <SpaceType SPACE_TYPE>
 	uint32_t Transform<SPACE_TYPE>::getChildCount()
 	{
 		return m_pChildren.size();

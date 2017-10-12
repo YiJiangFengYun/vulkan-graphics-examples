@@ -5,12 +5,20 @@
 
 namespace kgs
 {
+	class BaseCamera
+	{
+	public:
+
+	protected:
+
+	};
 	template <SpaceType SPACE_TYPE>
-	class Camera : public Object<SPACE_TYPE>
+	class Camera : public BaseCamera, public Object<SPACE_TYPE>
 	{
 	public:
 		Camera()
-			: Object()
+			: BaseCamera()
+			, Object<SPACE_TYPE>()
 		{
 			m_objectType = ObjectType::CAMERA;
 		}

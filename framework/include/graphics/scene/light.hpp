@@ -5,11 +5,20 @@
 
 namespace kgs
 {
+	class BaseLight
+	{
+	public:
+
+	protected:
+
+	};
+
 	template <SpaceType SPACE_TYPE>
-	class Light : public Object<SPACE_TYPE>
+	class Light : public BaseLight, public Object<SPACE_TYPE>
 	{
 		Light()
-			: Object()
+			: BaseLight()
+			, Object<SPACE_TYPE>()
 			, m_objectType(ObjectType::LIGHT)
 		{
 

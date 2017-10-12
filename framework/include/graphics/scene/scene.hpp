@@ -11,14 +11,24 @@
 
 namespace kgs
 {
+	class BaseScene
+	{
+	public:
+
+	protected:
+
+	};
+
 	template <SpaceType SPACE_TYPE>
-	class Scene
+	class Scene : public BaseScene
 	{
 	public:
 		typedef Object<SPACE_TYPE> ObjectType;
 		typedef VisualObject<SPACE_TYPE> VisualObjectType;
 		typedef Camera<SPACE_TYPE> CameraType;
 		typedef Light<SPACE_TYPE> LightType;
+
+		Scene();
 
 		uint32_t getVisualObjectCount();
 

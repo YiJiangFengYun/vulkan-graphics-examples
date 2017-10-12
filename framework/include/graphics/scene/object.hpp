@@ -18,8 +18,16 @@ namespace kgs
 		RANGE_SIZE = (END_RANGE - BEGIN_RANGE + 1)
 	};
 
+	class BaseObject
+	{
+	public:
+		ObjectType getObjectType();
+	protected:
+		ObjectType m_objectType;
+	};
+
 	template <SpaceType SPACE_TYPE>
-	class Object
+	class Object : public BaseObject
 	{
 	public:
 		typedef typename SpaceTransformTypeInfo<SPACE_TYPE>::TransformType TransformType;
@@ -29,18 +37,12 @@ namespace kgs
 
 		}
 
-		ObjectType getObjectType()
-		{
-			return m_objectType;
-		}
-
 		TransformType getTransform()
 		{
 			return m_transform;
 		}
 
 	protected:
-		ObjectType m_objectType;
 		TransformType m_transform;
 	};
 

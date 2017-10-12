@@ -10,8 +10,16 @@
 
 namespace kgs
 {
+	class BaseTransform
+	{
+	public:
+
+	protected:
+
+	};
+
 	template <SpaceType SPACE_TYPE>
-	class Transform
+	class Transform : public BaseTransform
 	{
 	public:
 		typedef Transform<SPACE_TYPE> Type;
@@ -20,6 +28,8 @@ namespace kgs
 		typedef typename SpaceTypeInfo<SPACE_TYPE>::MatrixVectorType MatrixVectorType;
 		typedef typename SpaceTypeInfo<SPACE_TYPE>::MatrixType MatrixType;
 		typedef typename SpaceTypeInfo<SPACE_TYPE>::RotationType RotationType;
+
+		Transform();
 
 		//------------hierarchy-----------------------
 		uint32_t getChildCount();

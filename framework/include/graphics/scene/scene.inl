@@ -1,6 +1,13 @@
 namespace kgs
 {
 	template <SpaceType SPACE_TYPE>
+	Scene<SPACE_TYPE>::Scene()
+		: BaseScene()
+	{
+
+	}
+
+	template <SpaceType SPACE_TYPE>
 	uint32_t Scene<SPACE_TYPE>::getVisualObjectCount()
 	{
 		return static_cast<uint32_t>(m_arrPVisualObjects.size());

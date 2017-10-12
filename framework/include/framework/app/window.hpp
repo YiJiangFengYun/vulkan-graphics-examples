@@ -50,7 +50,7 @@ namespace gfw
 		vk::Extent2D m_swapchainExtent;
 		std::vector<std::shared_ptr<vk::ImageView>> m_pSwapchainImageViews;
 		std::shared_ptr<vk::CommandPool> m_pCommandPool;
-		//std::vector<std::shared_ptr<kgs::Renderer>> m_renders;
+		std::vector<std::shared_ptr<kgs::BaseRenderer>> m_pRenderers;
 		std::shared_ptr<vk::Semaphore> m_pImageAvailableSemaphore;
 		std::shared_ptr<vk::Semaphore> m_pRenderFinishedSemaphore;
 

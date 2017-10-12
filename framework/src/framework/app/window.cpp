@@ -172,7 +172,13 @@ namespace gfw {
 
 	void Window::_createRenderers()
 	{
+		size_t num = m_swapchainImages.size();
+		m_pRenderers.resize(m_swapchainImages.size());
 
+		for (size_t i = 0; i < num; ++i)
+		{
+			//m_pRenderers[i] = new  
+		}
 	}
 
 	void Window::_createSemaphores()

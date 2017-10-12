@@ -16,6 +16,21 @@ namespace kgs
 	{
 	}
 
+	uint32_t Texture3D::getWidth()
+	{
+		return m_width;
+	}
+
+	uint32_t Texture3D::getHeight()
+	{
+		return m_height;
+	}
+
+	uint32_t Texture3D::getDepth()
+	{
+		return m_depth;
+	}
+
 	std::vector<Color> Texture3D::getPixels(uint32_t mipLevel)
 	{
 		return _getPixels(0u, mipLevel);

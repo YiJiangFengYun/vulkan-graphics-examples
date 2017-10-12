@@ -14,6 +14,11 @@ namespace kgs
 	{
 	}
 
+	uint32_t Texture1D::getWidth()
+	{
+		return m_width;
+	}
+
 	std::vector<Color> Texture1D::getPixels(uint32_t mipLevel)
 	{
 		return _getPixels(0u, mipLevel);

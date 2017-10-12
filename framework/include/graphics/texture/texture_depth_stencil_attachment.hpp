@@ -10,6 +10,8 @@ namespace kgs
 	public:
 		TextureDepthStencilAttachment(TextureFormat format, uint32_t width, uint32_t height);
 		~TextureDepthStencilAttachment();
+		uint32_t getWidth();
+		uint32_t getHeight();
 	private:
 		TextureDepthStencilAttachment() = delete;
 		inline void _init() override

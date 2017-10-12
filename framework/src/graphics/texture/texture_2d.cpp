@@ -15,6 +15,16 @@ namespace kgs
 	{
 	}
 
+	uint32_t Texture2D::getWidth()
+	{
+		return m_width;
+	}
+
+	uint32_t Texture2D::getHeight()
+	{
+		return m_height;
+	}
+
 	std::vector<Color> Texture2D::getPixels(uint32_t mipLevel)
 	{
 		return _getPixels(0u, mipLevel);

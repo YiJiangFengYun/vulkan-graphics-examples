@@ -15,6 +15,11 @@ namespace kgs
 	{
 	}
 
+	uint32_t TextureCube::getSize()
+	{
+		return m_width;
+	}
+
 	std::vector<Color> TextureCube::getPixels(CubemapFace face, uint32_t mipLevel)
 	{
 		return _getPixels(static_cast<uint32_t>(face), mipLevel);

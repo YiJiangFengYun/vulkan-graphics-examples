@@ -10,6 +10,8 @@ namespace kgs
 	public:
 		TextureCubeArray(TextureFormat format, Bool32 mipmap, uint32_t size, uint32_t arraylength);
 		~TextureCubeArray();
+		uint32_t getSize();
+		uint32_t getArrayLength();
 		std::vector<Color> getPixels(CubemapFace face, uint32_t arrayIndex, uint32_t mipLevel = 0);
 		std::vector<Color32> getPixels32(CubemapFace face, uint32_t arrayIndex, uint32_t mipLevel = 0);
 		void setPixels(std::vector<Color> colors, CubemapFace face, uint32_t arrayIndex, uint32_t mipLevel = 0);

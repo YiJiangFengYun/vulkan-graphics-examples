@@ -16,6 +16,21 @@ namespace kgs
 	{
 	}
 
+	uint32_t Texture2DArray::getWidth()
+	{
+		return m_width;
+	}
+
+	uint32_t Texture2DArray::getHeight()
+	{
+		return m_height;
+	}
+
+	uint32_t Texture2DArray::getArrayLength()
+	{
+		return m_arrayLength;
+	}
+
 	std::vector<Color> Texture2DArray::getPixels(uint32_t arrayIndex, uint32_t mipLevel)
 	{
 		return _getPixels(arrayIndex, mipLevel);

@@ -10,6 +10,9 @@ namespace kgs
 	public:
 		Texture2DArray(TextureFormat format, Bool32 mipmap, uint32_t width, uint32_t height, uint32_t arraylength);
 		~Texture2DArray();
+		uint32_t getWidth();
+		uint32_t getHeight();
+		uint32_t getArrayLength();
 		std::vector<Color> getPixels(uint32_t arrayIndex, uint32_t mipLevel = 0);
 		std::vector<Color32> getPixels32(uint32_t arrayIndex, uint32_t mipLevel = 0);
 		void setPixels(std::vector<Color> colors, uint32_t arrayIndex, uint32_t mipLevel = 0);

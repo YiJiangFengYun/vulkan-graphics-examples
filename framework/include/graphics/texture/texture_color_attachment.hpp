@@ -10,6 +10,8 @@ namespace kgs
 	public:
 		TextureColorAttachment(TextureFormat format, uint32_t width, uint32_t height);
 		~TextureColorAttachment();
+		uint32_t getWidth();
+		uint32_t getHeight();
 	private:
 		TextureColorAttachment() = delete;
 		inline void _init() override

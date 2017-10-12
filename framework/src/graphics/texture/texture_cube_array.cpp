@@ -16,6 +16,16 @@ namespace kgs
 	{
 	}
 
+	uint32_t TextureCubeArray::getSize()
+	{
+		return m_width;
+	}
+
+	uint32_t TextureCubeArray::getArrayLength()
+	{
+		return m_arrayLength;
+	}
+
 	std::vector<Color> TextureCubeArray::getPixels(CubemapFace face, uint32_t arrayIndex, uint32_t mipLevel)
 	{
 		return _getPixels(static_cast<uint32_t>(face) + arrayIndex * static_cast<uint32_t>(CubemapFace::RANGE_SIZE), mipLevel);

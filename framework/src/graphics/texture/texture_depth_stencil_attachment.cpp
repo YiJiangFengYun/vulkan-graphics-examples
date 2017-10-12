@@ -17,4 +17,14 @@ namespace kgs
 	TextureDepthStencilAttachment::~TextureDepthStencilAttachment()
 	{
 	}
+
+	uint32_t TextureDepthStencilAttachment::getWidth()
+	{
+		return m_width;
+	}
+
+	uint32_t TextureDepthStencilAttachment::getHeight()
+	{
+		return m_height;
+	}
 } //namespace kgs

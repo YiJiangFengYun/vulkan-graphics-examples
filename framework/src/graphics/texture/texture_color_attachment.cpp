@@ -17,4 +17,14 @@ namespace kgs
 	TextureColorAttachment::~TextureColorAttachment()
 	{
 	}
+
+	uint32_t TextureColorAttachment::getWidth()
+	{
+		return m_width;
+	}
+
+	uint32_t TextureColorAttachment::getHeight()
+	{
+		return m_height;
+	}
 } //namespace kgs

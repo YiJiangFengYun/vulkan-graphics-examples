@@ -10,6 +10,7 @@ namespace kgs
 	public:
 		TextureCube(TextureFormat format, Bool32 mipmap, uint32_t size);
 		~TextureCube();
+		uint32_t getSize();
 		std::vector<Color> getPixels(CubemapFace face, uint32_t mipLevel = 0);
 		std::vector<Color32> getPixels32(CubemapFace face, uint32_t mipLevel = 0);
 		void setPixels(std::vector<Color> colors, CubemapFace face, uint32_t mipLevel = 0);

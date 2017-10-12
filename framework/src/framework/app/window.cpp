@@ -6,7 +6,6 @@
 #include <set>
 
 namespace gfw {
-	vk::Format Window::DEFAULT_DEPTH_FORMAT(vk::Format::eD32SfloatS8Uint);
 
 	Window::Window(uint32_t width, uint32_t height, const char* title,
 		std::shared_ptr<vk::Instance> pInstance, std::shared_ptr<vk::PhysicalDevice> pPhysicalDevice, 
@@ -17,15 +16,12 @@ namespace gfw {
 		m_pDevice = device;
 		m_graphicsQueue = graphicsQueue;
 		m_presentQueue = presentQueue;
-		m_depthFormat = DEFAULT_DEPTH_FORMAT;
 		_createWindow(width, height, title);
 		_createSurface();
 		_createSwapchain();
 		_createSwapchainImageViews();
 		_createCommandPool();
-		_createRenderPass();
-		_createDepthResources();
-		_createFramebuffers();
+		_createRenderers();
 		_createSemaphores();
 	}
 
@@ -40,15 +36,12 @@ namespace gfw {
 		m_pDevice = device;
 		m_graphicsQueue = graphicsQueue;
 		m_presentQueue = presentQueue;
-		m_depthFormat = DEFAULT_DEPTH_FORMAT;
 		glfwSetWindowUserPointer(pWindow.get(), this);
 		glfwSetWindowSizeCallback(pWindow.get(), onWindowResized);
 		_createSwapchain();
 		_createSwapchainImageViews();
 		_createCommandPool();
-		_createRenderPass();
-		_createDepthResources();
-		_createFramebuffers();
+		_createRenderers();
 		_createSemaphores();
 	}
 
@@ -177,113 +170,9 @@ namespace gfw {
 		m_pCommandPool = fd::createCommandPool(m_pDevice, createInfo);
 	}
 
-	void Window::_createRenderPass()
+	void Window::_createRenderers()
 	{
-		vk::AttachmentDescription colorAttachment = {
-			vk::AttachmentDescriptionFlags(),
-			m_swapchainImageFormat,
-			vk::SampleCountFlagBits::e1,
-			vk::AttachmentLoadOp::eClear,
-			vk::AttachmentStoreOp::eStore,
-			vk::AttachmentLoadOp::eDontCare,
-			vk::AttachmentStoreOp::eDontCare,
-			vk::ImageLayout::eUndefined,
-			vk::ImageLayout::ePresentSrcKHR
-		};
 
-		vk::AttachmentDescription depthAttachment = {
-			vk::AttachmentDescriptionFlags(),
-			m_depthFormat,
-			vk::SampleCountFlagBits::e1,
-			vk::AttachmentLoadOp::eClear,
-			vk::AttachmentStoreOp::eDontCare,
-			vk::AttachmentLoadOp::eDontCare,
-			vk::AttachmentStoreOp::eDontCare,
-			vk::ImageLayout::eUndefined,
-			vk::ImageLayout::eDepthStencilAttachmentOptimal
-		};
-
-		vk::AttachmentReference colorAttachmentRef = {
-			uint32_t(0),
-			vk::ImageLayout::eColorAttachmentOptimal
-		};
-
-		vk::AttachmentReference depthAttachmentRef = {
-			uint32_t(1),
-			vk::ImageLayout::eDepthStencilAttachmentOptimal
-		};
-
-		vk::SubpassDescription subpass = {
-			vk::SubpassDescriptionFlags(),
-			vk::PipelineBindPoint::eGraphics,
-			0,
-			nullptr,
-			1,
-			&colorAttachmentRef,
-			nullptr,
-			&depthAttachmentRef,
-			0,
-			nullptr
-		};
-
-		vk::SubpassDependency dependency = {
-			VK_SUBPASS_EXTERNAL,
-			0,
-			vk::PipelineStageFlagBits::eColorAttachmentOutput,
-			vk::PipelineStageFlagBits::eColorAttachmentOutput,
-			vk::AccessFlags(),
-			vk::AccessFlagBits::eColorAttachmentRead | vk::AccessFlagBits::eColorAttachmentWrite,
-			vk::DependencyFlags()
-		};
-
-		std::array<vk::AttachmentDescription, 2> attachments = { colorAttachment, depthAttachment };
-		vk::RenderPassCreateInfo createInfo = {
-			vk::RenderPassCreateFlags(),
-			static_cast<uint32_t>(attachments.size()),
-			attachments.data(),
-			static_cast<uint32_t>(1),
-			&subpass,
-			static_cast<uint32_t>(1),
-			&dependency
-		};
-		m_pRenderPass = fd::createRenderPass(m_pDevice, createInfo);
-	}
-
-	void Window::_createDepthResources()
-	{
-		_checkDepthFormat();
-		_createImage(m_swapchainExtent.width,
-			m_swapchainExtent.height,
-			m_depthFormat,
-			vk::ImageTiling::eOptimal,
-			vk::ImageUsageFlagBits::eDepthStencilAttachment,
-			vk::MemoryPropertyFlagBits::eDeviceLocal,
-			m_pDepthImage,
-			m_pDepthImageMemory);
-		m_pDepthImageView = _createImageView(*m_pDepthImage, m_depthFormat, vk::ImageAspectFlagBits::eDepth);
-		_transitionImageLayout(*m_pDepthImage, m_depthFormat, vk::ImageLayout::eUndefined,
-			vk::ImageLayout::eDepthStencilAttachmentOptimal);
-	}
-
-	void Window::_createFramebuffers()
-	{
-		size_t count = m_pSwapchainImageViews.size();
-		m_pSwapchainFramebuffers.resize(count);
-		for (size_t i = 0; i < count; ++i)
-		{
-			std::array<vk::ImageView, 2> attachments = { *m_pSwapchainImageViews[i], *m_pDepthImageView };
-			vk::FramebufferCreateInfo createInfo = {
-				vk::FramebufferCreateFlags(),
-				*m_pRenderPass,
-				static_cast<uint32_t>(attachments.size()),
-				attachments.data(),
-				m_swapchainExtent.width,
-				m_swapchainExtent.height,
-				1u
-			};
-
-			m_pSwapchainFramebuffers[i] = fd::createFrameBuffer(m_pDevice, createInfo);
-		}
 	}
 
 	void Window::_createSemaphores()
@@ -302,13 +191,13 @@ namespace gfw {
 
 	void Window::_render()
 	{
-		/*_beginRender();
-		_endRender();*/
+		_beginRender();
+		_endRender();
 	}
 
 	std::shared_ptr<vk::CommandBuffer> Window::_beginRender()
 	{
-		vk::CommandBufferAllocateInfo allocateInfo = {
+		/*vk::CommandBufferAllocateInfo allocateInfo = {
 			*m_pCommandPool,
 			vk::CommandBufferLevel::ePrimary,
 			static_cast<uint32_t>(1)
@@ -340,17 +229,18 @@ namespace gfw {
 		};
 
 		m_pCurrCommandBuffer->beginRenderPass(renderPassBeginInfo, vk::SubpassContents::eInline);
-		return m_pCurrCommandBuffer;
+		return m_pCurrCommandBuffer;*/
+		return nullptr;
 	}
 
 	void Window::_endRender()
 	{
-		m_pCurrCommandBuffer->endRenderPass();
+		//m_pCurrCommandBuffer->endRenderPass();
 
-		m_pCurrCommandBuffer->end();
+		//m_pCurrCommandBuffer->end();
 
-		//free command buffer created when begin of render.
-		m_pCurrCommandBuffer = nullptr;
+		////free command buffer created when begin of render.
+		//m_pCurrCommandBuffer = nullptr;
 	}
 
 	void Window::_createImage(uint32_t width, uint32_t height, vk::Format format, vk::ImageTiling tiling,
@@ -510,16 +400,6 @@ namespace gfw {
 		pCommandBuffer = nullptr;
 	}
 
-	void Window::_checkDepthFormat()
-	{
-		auto props = m_pPhysicalDevice->getFormatProperties(m_depthFormat);
-		if ((props.optimalTilingFeatures & vk::FormatFeatureFlagBits::eDepthStencilAttachment) !=
-			vk::FormatFeatureFlagBits::eDepthStencilAttachment)
-		{
-			throw std::runtime_error("Depth format is be supported!");
-		}
-	}
-
 	void Window::_onWindowResized(int32_t width, int32_t height)
 	{
 		LOG(plog::debug) << "Context resize.";
@@ -527,8 +407,7 @@ namespace gfw {
 		//recreate.
 		_createSwapchain();
 		_createSwapchainImageViews();
-		_createDepthResources();
-		_createFramebuffers();
+		_createRenderers();
 	}
 
 	void onWindowResized(GLFWwindow* window, int32_t width, int32_t height)

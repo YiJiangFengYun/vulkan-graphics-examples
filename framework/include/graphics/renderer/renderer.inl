@@ -6,11 +6,15 @@ namespace kgs
 	template <SpaceType SPACE_TYPE>
 	Renderer<SPACE_TYPE>::Renderer(std::shared_ptr<vk::ImageView> pSwapchainImageView
 		, vk::Format swapchainImageFormat
+		, uint32_t swapchainImageWidth
+		, uint32_t swapchainImageHeight
 	)
 		: m_pSwapchainImageView(pSwapchainImageView)
 		, m_swapchainImageFormat(swapchainImageFormat)
 		, m_colorImageFormat(swapchainImageFormat)
 		, m_depthStencilImageFormat(DEFAULT_DEPTH_STENCIL_FORMAT)
+		, m_framebufferWidth(swapchainImageWidth)
+		, m_framebufferHeight(swapchainImageHeight)
 	{
 		_init();
 	}
@@ -18,6 +22,8 @@ namespace kgs
 	template <SpaceType SPACE_TYPE>
 	Renderer<SPACE_TYPE>::Renderer(std::shared_ptr<vk::ImageView> pSwapchainImageView
 		, vk::Format swapchainImageFormat
+		, uint32_t swapchainImageWidth
+		, uint32_t swapchainImageHeight
 		, std::shared_ptr<SceneType> pScene
 		, std::shared_ptr<CameraType> pCamera
 	)
@@ -25,6 +31,8 @@ namespace kgs
 		, m_swapchainImageFormat(swapchainImageFormat)
 		, m_colorImageFormat(swapchainImageFormat)
 		, m_depthStencilImageFormat(DEFAULT_DEPTH_STENCIL_FORMAT)
+		, m_framebufferWidth(swapchainImageWidth)
+		, m_framebufferHeight(swapchainImageHeight)
 		, m_pScene(pScene)
 		, m_pCamera(pCamera)
 	{
@@ -37,6 +45,8 @@ namespace kgs
 		: m_pColorTexture(pColorAttachmentTex)
 		, m_colorImageFormat(pColorAttachmentTex->_getVKFormat())
 		, m_depthStencilImageFormat(DEFAULT_DEPTH_STENCIL_FORMAT)
+		, m_framebufferWidth(pColorAttachmentTex->getWidth())
+		, m_framebufferHeight(pColorAttachmentTex->getHeight())
 	{
 		_init();
 	}
@@ -49,6 +59,8 @@ namespace kgs
 		: m_pColorTexture(pColorAttachmentTex)
 		, m_colorImageFormat(pColorAttachmentTex->_getVKFormat())
 		, m_depthStencilImageFormat(DEFAULT_DEPTH_STENCIL_FORMAT)
+		, m_framebufferWidth(pColorAttachmentTex->getWidth())
+		, m_framebufferHeight(pColorAttachmentTex->getHeight())
 		, m_pScene(pScene)
 		, m_pCamera(pCamera)
 	{
@@ -148,6 +160,33 @@ namespace kgs
 	}
 
 	template <SpaceType SPACE_TYPE>
+	void Renderer<SPACE_TYPE>::_createFramebuffer()
+	{
+		std::array<vk::ImageView, 2> attachments;
+		if (m_pColorTexture != nullptr)
+		{
+			attachments = { *m_pColorTexture->_getImageView(), *m_pDepthStencilTexture->_getImageView() };
+		}
+		else
+		{
+			attachments = { *m_pSwapchainImageView, *m_pDepthStencilTexture->_getImageView() };
+		}
+
+		vk::FramebufferCreateInfo createInfo = {
+			vk::FramebufferCreateFlags(),
+			*m_pRenderPass,
+			static_cast<uint32_t>(attachments.size()),
+			attachments.data(),
+			m_framebufferWidth,
+			m_framebufferHeight,
+			1u
+		};
+
+		auto pDevice = pContext->getNativeDevice();
+		m_pFrameBuffer = fd::createFrameBuffer(pDevice, createInfo);
+	}
+
+	template <SpaceType SPACE_TYPE>
 	void Renderer<SPACE_TYPE>::_render(RenderInfo renderInfo)
 	{
 		if (m_pScene == nullptr)
@@ -178,6 +217,7 @@ namespace kgs
 	void Renderer<SPACE_TYPE>::_init()
 	{
 		_createRenderPass();
+		_createFramebuffer();
 	}
 
 } //namespace kgs

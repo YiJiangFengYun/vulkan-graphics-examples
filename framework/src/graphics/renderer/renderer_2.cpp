@@ -4,20 +4,28 @@ namespace kgs
 {
 	Renderer2::Renderer2(std::shared_ptr<vk::ImageView> pSwapchainImageView
 		, vk::Format swapchainImageFormat
+		, uint32_t swapchainImageWidth
+		, uint32_t swapchainImageHeight
 	)
 		: Renderer(pSwapchainImageView
-			, swapchainImageFormat)
+			, swapchainImageFormat
+			, swapchainImageWidth
+			, swapchainImageHeight)
 	{
 
 	}
 
 	Renderer2::Renderer2(std::shared_ptr<vk::ImageView> pSwapchainImageView
 		, vk::Format swapchainImageFormat
+		, uint32_t swapchainImageWidth
+		, uint32_t swapchainImageHeight
 		, std::shared_ptr<SceneType> pScene
 		, std::shared_ptr<CameraType> pCamera
 	)
 		: Renderer(pSwapchainImageView
 			, swapchainImageFormat
+			, swapchainImageWidth
+			, swapchainImageHeight
 			, pScene
 			, pCamera)
 	{

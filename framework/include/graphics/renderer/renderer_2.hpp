@@ -11,10 +11,14 @@ namespace kgs
 	public:
 		Renderer2(std::shared_ptr<vk::ImageView> pSwapchainImageView
 			, vk::Format swapchainImageFormat
+			, uint32_t swapchainImageWidth
+			, uint32_t swapchainImageHeight
 		);
 
 		Renderer2(std::shared_ptr<vk::ImageView> pSwapchainImageView
 			, vk::Format swapchainImageFormat
+			, uint32_t swapchainImageWidth
+			, uint32_t swapchainImageHeight
 			, std::shared_ptr<SceneType> pScene
 			, std::shared_ptr<CameraType> pCamera
 		);

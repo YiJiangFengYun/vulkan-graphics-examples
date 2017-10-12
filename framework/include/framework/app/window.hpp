@@ -10,6 +10,7 @@
 #include <GLFW/glfw3.h>
 #include "framework/app/queue_family.hpp"
 #include "foundation/wrapper.hpp"
+#include <graphics/renderer/renderer.hpp>
 
 namespace gfw
 {
@@ -40,9 +41,6 @@ namespace gfw
 	private:
 		Window(const Window&);
 
-		//--static
-		static vk::Format DEFAULT_DEPTH_FORMAT;
-
 		//--compositions
 		std::shared_ptr<GLFWwindow> m_pWindow;
 		std::shared_ptr<vk::SurfaceKHR> m_pSurface;
@@ -52,12 +50,7 @@ namespace gfw
 		vk::Extent2D m_swapchainExtent;
 		std::vector<std::shared_ptr<vk::ImageView>> m_pSwapchainImageViews;
 		std::shared_ptr<vk::CommandPool> m_pCommandPool;
-		std::shared_ptr<vk::RenderPass> m_pRenderPass;
-		std::shared_ptr<vk::Image> m_pDepthImage;
-		std::shared_ptr<vk::ImageView> m_pDepthImageView;
-		std::shared_ptr<vk::DeviceMemory> m_pDepthImageMemory;
-		vk::Format m_depthFormat;
-		std::vector<std::shared_ptr<vk::Framebuffer>> m_pSwapchainFramebuffers;
+		//std::vector<std::shared_ptr<kgs::Renderer>> m_renders;
 		std::shared_ptr<vk::Semaphore> m_pImageAvailableSemaphore;
 		std::shared_ptr<vk::Semaphore> m_pRenderFinishedSemaphore;
 
@@ -78,10 +71,7 @@ namespace gfw
 		void _createSwapchain();
 		void _createSwapchainImageViews();
 		void _createCommandPool();
-		void _createRenderPass();
-		void _checkDepthFormat();
-		void _createDepthResources();
-		void _createFramebuffers();
+		void _createRenderers();
 		void _createSemaphores();
 
 		void _update();

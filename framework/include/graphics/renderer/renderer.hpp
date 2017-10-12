@@ -21,10 +21,14 @@ namespace kgs
 
 		Renderer(std::shared_ptr<vk::ImageView> pSwapchainImageView
 			, vk::Format swapchainImageFormat
+			, uint32_t swapchainImageWidth
+			, uint32_t swapchainImageHeight
 		);
 
 		Renderer(std::shared_ptr<vk::ImageView> pSwapchainImageView
 			, vk::Format swapchainImageFormat
+			, uint32_t swapchainImageWidth
+			, uint32_t swapchainImageHeight
 			, std::shared_ptr<SceneType> pScene
 			, std::shared_ptr<CameraType> pCamera
 		);
@@ -46,11 +50,13 @@ namespace kgs
 
 	protected:
 		//compositions
-		vk::Extent2D m_framebufferExtent;
+		uint32_t m_framebufferWidth;
+		uint32_t m_framebufferHeight;
 		vk::Format m_colorImageFormat;
 		vk::Format m_depthStencilImageFormat;
 		std::shared_ptr<vk::RenderPass> m_pRenderPass;
 		std::shared_ptr<TextureDepthStencilAttachment> m_pDepthStencilTexture;
+		std::shared_ptr<vk::Framebuffer> m_pFrameBuffer;
 
 		//aggregations
 		//Renderer will use swapchain image when color attachment texture is null.
@@ -63,6 +69,7 @@ namespace kgs
 		std::shared_ptr<CameraType> m_pCamera;
 
 		void _createRenderPass();
+		void _createFramebuffer();
 
 		virtual void _render(RenderInfo renderInfo);
 

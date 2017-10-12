@@ -22,123 +22,40 @@ namespace kgs
 		typedef typename SpaceTypeInfo<SPACE_TYPE>::RotationType RotationType;
 
 		//------------hierarchy-----------------------
-		uint32_t getChildCount()
-		{
-			return m_pChildren.size();
-		}
+		uint32_t getChildCount();
 
-		void detachChildren()
-		{
-			m_pChildren.resize(0u);
-		}
+		void detachChildren();
 
-		std::shared_ptr<Type> getChildWithIndex(uint32_t index)
-		{
-			return m_pChildren[index];
-		}
+		std::shared_ptr<Type> getChildWithIndex(uint32_t index);
 
-		Bool32 isChild(std::shared_ptr<Type> transform)
-		{
-			std::find(m_pChildren.cbegin(), m_pChildren.cend(), transform) != m_pChildren.cend();
-		}
+		Bool32 isChild(std::shared_ptr<Type> transform);
 
-		std::shared_ptr<Type> getParent()
-		{
-			return m_pParent;
-		}
+		std::shared_ptr<Type> getParent();
 
-		void setParent(std::shared_ptr<Type> pParent)
-		{
-			m_pParent = pParent;
-		}
+		void setParent(std::shared_ptr<Type> pParent);
 
-		std::shared_ptr<Type> getRoot()
-		{
-			if (m_pParent == nullptr)
-			{
-				return this;
-			}
-			else
-			{
-				auto root = m_pParent;
-				while (root.m_pParent != nullptr)
-				{
-					root = root.m_pParent
-				}
-				return root;
-			}
-		}
+		std::shared_ptr<Type> getRoot();
 
 		//------------state-----------------------
-		Bool32 getIsChanged()
-		{
-			return m_isChanged;
-		}
+		Bool32 getIsChanged();
 
-		PointType getLocalPosition()
-		{
-			return m_localPosition;
-		}
+		PointType getLocalPosition();
 
-		void setLocalPosition(PointType position)
-		{
-			m_localPosition = position;
-			m_isChanged = KGS_TRUE;
-			_reCalculateLocalMatrix();
-		}
+		void setLocalPosition(PointType position);
 
-		PointType getPosition()
-		{
-			return _getMatrixLocalToWorld(KGS_FALSE) * m_appliedLocalPosition;
-		}
+		PointType getPosition();
 
-		RotationType getLocalRotation()
-		{
-			return m_appliedLocalRotation;
-		}
+		RotationType getLocalRotation();
 
-		void setLocalRotation(RotationType rotation)
-		{
-			m_localRotation = rotation;
-			m_isChanged = KGS_TRUE;
-			_reCalculateLocalMatrix();
-		}
+		void setLocalRotation(RotationType rotation);
 
-		RotationType getRotation()
-		{
-			RotationType rotation = m_appliedLocalRotation;
-			std::shared_ptr<Type> curr = m_pParent;
-			while (curr != nullptr)
-			{
-				rotation = curr->m_appliedRotation * rotation;
-				curr = curr->m_pParant;
-			}
-			return rotation;
-		}
+		RotationType getRotation();
 
-		VectorType getLocalScale()
-		{
-			return m_appliedLocalScale;
-		}
+		VectorType getLocalScale();
 
-		void setLocalScale(VectorType scale)
-		{
-			m_localScale = scale;
-			m_isChanged = KGS_TRUE;
-			_reCalculateLocalMatrix();
-		}
+		void setLocalScale(VectorType scale);
 
-		VectorType getScale()
-		{
-			VectorType scale = m_appliedLocalScale;
-			auto curr = m_pParent;
-			while (curr != nullptr)
-			{
-				scale = curr->m_appliedScale * scale;
-				curr = curr->m_pParent;
-			}
-			return scale;
-		}
+		VectorType getScale();
 
 		/*void apply()
 		{
@@ -147,35 +64,17 @@ namespace kgs
 
 		//-------------------------transform tool-------------------------------------
 
-		VectorType transformVectorToWorld(VectorType vector)
-		{
-			return VectorType(_getMatrixLocalToWorld() * MatrixVectorType(vector, 0.0f));
-		}
+		VectorType transformVectorToWorld(VectorType vector);
 
-		VectorType transformVectorToLocal(VectorType vector)
-		{
-			return VectorType(_getMatrixWorldToLocal() * MatrixVectorType(vector, 0.0f));
-		}
+		VectorType transformVectorToLocal(VectorType vector);
 
-		PointType transformPointToWorld(PointType point)
-		{
-			return _getMatrixLocalToWorld() * MatrixVectorType(point, 1.0f);
-		}
+		PointType transformPointToWorld(PointType point);
 
-		PointType transformPointToLocal(PointType point)
-		{
-			return _getMatrixWorldToLocal() * MatrixVectorType(point, 1.0f);
-		}
+		PointType transformPointToLocal(PointType point);
 
-		MatrixType getMatrixLocalToWorld()
-		{
-			return _getMatrixLocalToWorld(KGS_TRUE);
-		}
+		MatrixType getMatrixLocalToWorld();
 
-		MatrixType getMatrixWorldToLocal()
-		{
-			return _getMatrixWorldToLocal(KGS_TRUE);
-		}
+		MatrixType getMatrixWorldToLocal();
 
 	protected:
 		std::shared_ptr<Type> m_pParent;
@@ -186,34 +85,15 @@ namespace kgs
 		RotationType m_localRotation;
 		MatrixType m_localMatrix;
 
-		inline MatrixType _getMatrixLocalToWorld(Bool32 includeSelf)
-		{
-			MatrixType matrix(1.0f); //identity matrix;
-			if (includeSelf)
-			{
-				matrix = m_localMatrix;
-			}
-			auto curr = m_pParent;
-			while (curr != nullptr)
-			{
-				matrix = curr->m_localMatrix * matrix;
-				curr = curr->m_pParent;
-			}
-			return matrix;
-		}
+		inline MatrixType _getMatrixLocalToWorld(Bool32 includeSelf);
 
-		inline MatrixType _getMatrixWorldToLocal(Bool32 includeSelf)
-		{
-			MatrixType matrix = _getMatrixLocalToWorld(includeSelf);
-			glm::inverse(matrix);
-			return matrix;
-		}
+		inline MatrixType _getMatrixWorldToLocal(Bool32 includeSelf);
 
-		inline void _reCalculateLocalMatrix()
-		{
-			m_localMatrix = m_localPosition * m_localRotation * m_localScale;
-		}
+		inline void _reCalculateLocalMatrix();
 
 	};
 } //namespace kgs
+
+#include "graphics/scene/transform.inl"
+
 #endif // !KGS_TRANSFORM_H

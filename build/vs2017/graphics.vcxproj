@@ -115,6 +115,12 @@
     <ClInclude Include="..\..\framework\include\graphics\util\single_time_command.hpp" />
     <ClInclude Include="..\..\framework\include\graphics\util\util.hpp" />
   </ItemGroup>
+  <ItemGroup>
+    <None Include="..\..\framework\include\graphics\mesh\mesh.inl" />
+    <None Include="..\..\framework\include\graphics\renderer\renderer.inl" />
+    <None Include="..\..\framework\include\graphics\scene\scene.inl" />
+    <None Include="..\..\framework\include\graphics\scene\transform.inl" />
+  </ItemGroup>
   <PropertyGroup Label="Globals">
     <VCProjectVersion>15.0</VCProjectVersion>
     <ProjectGuid>{C1225BF6-5118-407D-B349-02286D5B179C}</ProjectGuid>

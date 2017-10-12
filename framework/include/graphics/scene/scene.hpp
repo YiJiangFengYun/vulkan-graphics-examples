@@ -20,65 +20,29 @@ namespace kgs
 		typedef Camera<SPACE_TYPE> CameraType;
 		typedef Light<SPACE_TYPE> LightType;
 
-		uint32_t getVisualObjectCount()
-		{
-			return static_cast<uint32_t>(m_arrPVisualObjects.size());
-		}
+		uint32_t getVisualObjectCount();
 
-		std::shared_ptr<VisualObjectType> getVisualObjectWithIndex(uint32_t index)
-		{
-			return m_arrPVisualObjects[index];
-		}
+		std::shared_ptr<VisualObjectType> getVisualObjectWithIndex(uint32_t index);
 
-		std::shared_ptr<VisualObjectType> getVisualObjectWithName(std::string name)
-		{
-			getValue(name, m_mapPVisualObjects, m_arrPVisualObjects);
-		}
+		std::shared_ptr<VisualObjectType> getVisualObjectWithName(std::string name);
 
-		void setVisualObjectWithName(std::string name, std::shared_ptr<VisualObjectType> value)
-		{
-			setValue(name, value, m_mapPVisualObjects, m_arrPVisualObjects);
-		}
+		void setVisualObjectWithName(std::string name, std::shared_ptr<VisualObjectType> value);
 
-		uint32_t getCameraCount()
-		{
-			return m_arrPCameras.size();
-		}
+		uint32_t getCameraCount();
 
-		std::shared_ptr<CameraType> getCameraWithIndex(uint32_t index)
-		{
-			return m_arrPCameras[index];
-		}
+		std::shared_ptr<CameraType> getCameraWithIndex(uint32_t index);
 
-		std::shared_ptr<CameraType> getCameraWithName(std::string name)
-		{
-			getValue(name, m_mapPCameras, m_arrPCameras);
-		}
+		std::shared_ptr<CameraType> getCameraWithName(std::string name);
 
-		void setCameraWithName(std::string name, std::shared_ptr<CameraType> value)
-		{
-			setValue(name, value, m_mapPCameras, m_arrPCameras);
-		}
+		void setCameraWithName(std::string name, std::shared_ptr<CameraType> value);
 
-		uint32_t getLightCount()
-		{
-			return m_arrPLights.size();
-		}
+		uint32_t getLightCount();
 
-		std::shared_ptr<LightType> getLightWithIndex(uint32_t index)
-		{
-			return m_arrPLights[index];
-		}
+		std::shared_ptr<LightType> getLightWithIndex(uint32_t index);
 
-		std::shared_ptr<LightType> getLightWithName(std::string name)
-		{
-			getValue(name, m_mapPLights, m_arrPLights);
-		}
+		std::shared_ptr<LightType> getLightWithName(std::string name);
 
-		void setLightWithName(std::string name, std::shared_ptr<LightType> value)
-		{
-			setValue(name, value, m_mapPLights, m_arrPLights);
-		}
+		void setLightWithName(std::string name, std::shared_ptr<LightType> value);
 
 	protected:
 
@@ -92,5 +56,7 @@ namespace kgs
 
 	};
 } //namespace kgs
+
+#include "graphics/scene/scene.inl"
 
 #endif // !KGS_SCENE_H

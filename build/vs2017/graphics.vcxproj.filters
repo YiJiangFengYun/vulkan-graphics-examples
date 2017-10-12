@@ -333,4 +333,18 @@
       <Filter>include\graphics\texture</Filter>
     </ClInclude>
   </ItemGroup>
+  <ItemGroup>
+    <None Include="..\..\framework\include\graphics\mesh\mesh.inl">
+      <Filter>include\graphics\mesh</Filter>
+    </None>
+    <None Include="..\..\framework\include\graphics\renderer\renderer.inl">
+      <Filter>include\graphics\renderer</Filter>
+    </None>
+    <None Include="..\..\framework\include\graphics\scene\scene.inl">
+      <Filter>include\graphics\scene</Filter>
+    </None>
+    <None Include="..\..\framework\include\graphics\scene\transform.inl">
+      <Filter>include\graphics\scene</Filter>
+    </None>
+  </ItemGroup>
 </Project>

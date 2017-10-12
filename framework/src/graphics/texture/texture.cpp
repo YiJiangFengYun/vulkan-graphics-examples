@@ -80,6 +80,11 @@ namespace kgs
 		return m_mipMapLevels;
 	}
 
+	vk::Format Texture::_getVKFormat()
+	{
+		return m_vkFormat;
+	}
+
 	vk::ImageLayout Texture::_getImageLayout()
 	{
 		return m_vkImageLayout;

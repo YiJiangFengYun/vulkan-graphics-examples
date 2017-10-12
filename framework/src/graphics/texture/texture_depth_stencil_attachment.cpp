@@ -1,4 +1,4 @@
-#include "graphics/texture/texure_depth_stencil_attachment.hpp"
+#include "graphics/texture/texture_depth_stencil_attachment.hpp"
 
 namespace kgs
 {

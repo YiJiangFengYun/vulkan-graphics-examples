@@ -29,6 +29,7 @@ namespace kgs
 		Bool32 getIsMipmap();
 		uint32_t getMipmapLevel();
 
+		vk::Format _getVKFormat();
 		vk::ImageLayout _getImageLayout();
 		std::shared_ptr<vk::Image> _getImage();
 		std::shared_ptr<vk::DeviceMemory> _getImageMemory();

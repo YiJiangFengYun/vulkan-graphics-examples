@@ -61,7 +61,7 @@
     <ClCompile Include="..\..\framework\src\graphics\texture\texture_cube.cpp" />
     <ClCompile Include="..\..\framework\src\graphics\texture\texture_cube_array.cpp" />
     <ClCompile Include="..\..\framework\src\graphics\texture\texture_option.cpp" />
-    <ClCompile Include="..\..\framework\src\graphics\texture\texure_depth_stencil_attachment.cpp" />
+    <ClCompile Include="..\..\framework\src\graphics\texture\texture_depth_stencil_attachment.cpp" />
     <ClCompile Include="..\..\framework\src\graphics\util\find_memory.cpp" />
     <ClCompile Include="..\..\framework\src\graphics\util\single_time_command.cpp" />
     <ClCompile Include="..\..\framework\src\graphics\util\util.cpp" />
@@ -110,7 +110,7 @@
     <ClInclude Include="..\..\framework\include\graphics\texture\texture_cube.hpp" />
     <ClInclude Include="..\..\framework\include\graphics\texture\texture_cube_array.hpp" />
     <ClInclude Include="..\..\framework\include\graphics\texture\texture_option.hpp" />
-    <ClInclude Include="..\..\framework\include\graphics\texture\texure_depth_stencil_attachment.hpp" />
+    <ClInclude Include="..\..\framework\include\graphics\texture\texture_depth_stencil_attachment.hpp" />
     <ClInclude Include="..\..\framework\include\graphics\util\find_memory.hpp" />
     <ClInclude Include="..\..\framework\include\graphics\util\single_time_command.hpp" />
     <ClInclude Include="..\..\framework\include\graphics\util\util.hpp" />

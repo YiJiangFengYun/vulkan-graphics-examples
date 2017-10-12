@@ -4,14 +4,42 @@
 
 namespace kgs
 {
-	Renderer3::Renderer3()
-		:Renderer()
+	Renderer3::Renderer3(std::shared_ptr<vk::ImageView> pSwapchainImageView
+		, vk::Format swapchainImageFormat
+	)
+		: Renderer(pSwapchainImageView
+			, swapchainImageFormat)
 	{
 
 	}
 
-	Renderer3::Renderer3(std::shared_ptr<SceneType> pScene, std::shared_ptr<CameraType> pCamera)
-		: Renderer(pScene, pCamera)
+	Renderer3::Renderer3(std::shared_ptr<vk::ImageView> pSwapchainImageView
+		, vk::Format swapchainImageFormat
+		, std::shared_ptr<SceneType> pScene
+		, std::shared_ptr<CameraType> pCamera
+	)
+		: Renderer(pSwapchainImageView
+			, swapchainImageFormat
+			, pScene
+			, pCamera)
+	{
+
+	}
+
+	Renderer3::Renderer3(std::shared_ptr<TextureColorAttachment> pColorAttachmentTex
+	)
+		: Renderer(pColorAttachmentTex)
+	{
+
+	}
+
+	Renderer3::Renderer3(std::shared_ptr<TextureColorAttachment> pColorAttachmentTex
+		, std::shared_ptr<SceneType> pScene
+		, std::shared_ptr<CameraType> pCamera
+	)
+		: Renderer(pColorAttachmentTex
+			, pScene
+			, pCamera)
 	{
 
 	}

@@ -25,9 +25,25 @@ namespace kgs
 			return static_cast<RenderQueueType>(showType);
 		}
 
-		Renderer3();
-		Renderer3(std::shared_ptr<SceneType> pScene, std::shared_ptr<CameraType> pCamera);
+		Renderer3(std::shared_ptr<vk::ImageView> pSwapchainImageView
+			, vk::Format swapchainImageFormat
+		);
+
+		Renderer3(std::shared_ptr<vk::ImageView> pSwapchainImageView
+			, vk::Format swapchainImageFormat
+			, std::shared_ptr<SceneType> pScene
+			, std::shared_ptr<CameraType> pCamera
+		);
+
+		Renderer3(std::shared_ptr<TextureColorAttachment> pColorAttachmentTex
+		);
+
+		Renderer3(std::shared_ptr<TextureColorAttachment> pColorAttachmentTex
+			, std::shared_ptr<SceneType> pScene
+			, std::shared_ptr<CameraType> pCamera
+		);
 	private:
+		Renderer3() = delete;
 		void _render(RenderInfo renderInfo) override;
 		Bool32 _checkVisualObjectInsideCameraView(std::shared_ptr<typename SceneType::VisualObjectType> pVisualObject) override;
 		Bool32 _sortObjectsWithCameraZ(std::shared_ptr<typename SceneType::ObjectType> pObject1, std::shared_ptr<typename SceneType::ObjectType> pObject2);

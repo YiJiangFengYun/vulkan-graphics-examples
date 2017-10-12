@@ -10,40 +10,18 @@
 
 namespace kgs
 {
-	template <SpaceType SPACE_TYPE>
-	class Renderer
+	class BaseRenderer
 	{
 	public:
-		typedef Scene<SPACE_TYPE> SceneType;
-		typedef Camera<SPACE_TYPE> CameraType;
-
 		static const vk::Format DEFAULT_DEPTH_STENCIL_FORMAT;
 
-		Renderer(std::shared_ptr<vk::ImageView> pSwapchainImageView
+		BaseRenderer(std::shared_ptr<vk::ImageView> pSwapchainImageView
 			, vk::Format swapchainImageFormat
 			, uint32_t swapchainImageWidth
 			, uint32_t swapchainImageHeight
 		);
 
-		Renderer(std::shared_ptr<vk::ImageView> pSwapchainImageView
-			, vk::Format swapchainImageFormat
-			, uint32_t swapchainImageWidth
-			, uint32_t swapchainImageHeight
-			, std::shared_ptr<SceneType> pScene
-			, std::shared_ptr<CameraType> pCamera
-		);
-
-		Renderer(std::shared_ptr<TextureColorAttachment> pColorAttachmentTex
-		);
-
-		Renderer(std::shared_ptr<TextureColorAttachment> pColorAttachmentTex
-			, std::shared_ptr<SceneType> pScene
-			, std::shared_ptr<CameraType> pCamera
-		);
-
-		void render(RenderInfo renderInfo
-			, std::shared_ptr<SceneType> pScene
-			, std::shared_ptr<CameraType> pCamera
+		BaseRenderer(std::shared_ptr<TextureColorAttachment> pColorAttachmentTex
 		);
 
 		void render(RenderInfo renderInfo);
@@ -65,13 +43,58 @@ namespace kgs
 		//Renderer will render to color texture when it is not null.
 		std::shared_ptr<TextureColorAttachment> m_pColorTexture;
 
-		std::shared_ptr<SceneType> m_pScene;
-		std::shared_ptr<CameraType> m_pCamera;
+		virtual void _render(RenderInfo renderInfo);
 
 		void _createRenderPass();
 		void _createFramebuffer();
 
-		virtual void _render(RenderInfo renderInfo);
+
+	private:
+		BaseRenderer() = delete;
+		inline void _init();
+	};
+
+	template <SpaceType SPACE_TYPE>
+	class Renderer : public BaseRenderer
+	{
+	public:
+		typedef Scene<SPACE_TYPE> SceneType;
+		typedef Camera<SPACE_TYPE> CameraType;
+
+		Renderer(std::shared_ptr<vk::ImageView> pSwapchainImageView
+			, vk::Format swapchainImageFormat
+			, uint32_t swapchainImageWidth
+			, uint32_t swapchainImageHeight
+		);
+
+		Renderer(std::shared_ptr<vk::ImageView> pSwapchainImageView
+			, vk::Format swapchainImageFormat
+			, uint32_t swapchainImageWidth
+			, uint32_t swapchainImageHeight
+			, std::shared_ptr<SceneType> pScene
+			, std::shared_ptr<CameraType> pCamera
+		);
+
+		Renderer(std::shared_ptr<TextureColorAttachment> pColorAttachmentTex
+		);
+
+		Renderer(std::shared_ptr<TextureColorAttachment> pColorAttachmentTex
+			, std::shared_ptr<SceneType> pScene
+			, std::shared_ptr<CameraType> pCamera
+		);
+
+		void reset(std::shared_ptr<SceneType> pScene
+			, std::shared_ptr<CameraType> pCamera
+		);
+
+	protected:
+		//compositions
+
+		//aggregations
+		std::shared_ptr<SceneType> m_pScene;
+		std::shared_ptr<CameraType> m_pCamera;
+
+		void _render(RenderInfo renderInfo) override;
 
 		virtual Bool32 _checkVisualObjectInsideCameraView(std::shared_ptr<typename SceneType::VisualObjectType> pVisualObject) = 0;
 
@@ -81,7 +104,6 @@ namespace kgs
 
 	private:
 		Renderer() = delete;
-		inline void _init();
 	};
 } //namespace kgs
 

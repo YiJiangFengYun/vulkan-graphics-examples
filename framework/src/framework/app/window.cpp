@@ -198,6 +198,7 @@ namespace gfw {
 	void Window::_render()
 	{
 		_beginRender();
+
 		_endRender();
 	}
 

@@ -11,4 +11,14 @@ namespace kgs
 	{
 		m_pMaterial = pMaterial;
 	}
+
+	std::shared_ptr<BaseMesh> BaseVisualObject::getMesh()
+	{
+		return m_pMesh;
+	}
+
+	uint32_t BaseVisualObject::getSubMeshIndex()
+	{
+		return m_subMeshIndex;
+	}
 } //namespace kgs

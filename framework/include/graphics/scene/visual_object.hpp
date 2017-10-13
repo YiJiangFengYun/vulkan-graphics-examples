@@ -15,8 +15,14 @@ namespace kgs
 
 		void setPMaterial(std::shared_ptr<Material> pMaterial);
 
+		std::shared_ptr<BaseMesh> getMesh();
+
+		uint32_t getSubMeshIndex();
+
 	protected:
 		std::shared_ptr<Material> m_pMaterial;
+		std::shared_ptr<BaseMesh> m_pMesh;
+		uint32_t m_subMeshIndex;
 	};
 
 	template <SpaceType SPACE_TYPE>
@@ -28,24 +34,19 @@ namespace kgs
 		VisualObject()
 			: BaseVisualObject()
 			, Object<SPACE_TYPE>()
-			, m_objectType(ObjectType::VISUAL_OBJECT)
 		{
+			m_objectType = ObjectType::VISUAL_OBJECT;
 
 		}
 
-		std::shared_ptr<MeshType> getMesh()
-		{
-			return m_pMesh;
-		}
-
-		void setMesh(std::shared_ptr<MeshType> pMesh)
+		void setMesh(std::shared_ptr<MeshType> pMesh, uint32_t subMeshIndex)
 		{
 			m_pMesh = pMesh;
+			m_subMeshIndex = subMeshIndex;
 		}
-
 	protected:
 		//aggregations
-		std::shared_ptr<MeshType> m_pMesh;
+		
 	};
 } //namespace kgs
 

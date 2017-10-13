@@ -80,6 +80,46 @@ namespace kgs
 			const vk::Format static BASE_FORMAT = vk::Format::eR8G8B8A8Snorm;
 		};
 
+		inline static vk::Format getBaseFormatWithDataType(DataType dataType)
+		{
+			switch (dataType)
+			{
+			case DataType::FLOAT_ARRAY:
+			{
+				return DataTypeInfo<DataType::FLOAT_ARRAY>::BASE_FORMAT;
+				break;
+			}
+			case DataType::INT_ARRAY:
+			{
+				return DataTypeInfo<DataType::INT_ARRAY>::BASE_FORMAT;
+				break;
+			}
+			case DataType::VECTOR_2_ARRAY:
+			{
+				return DataTypeInfo<DataType::VECTOR_2_ARRAY>::BASE_FORMAT;
+				break;
+			}
+			case DataType::VECTOR_3_ARRAY:
+			{
+				return DataTypeInfo<DataType::VECTOR_3_ARRAY>::BASE_FORMAT;
+				break;
+			}
+			case DataType::VECTOR_4_ARRAY:
+			{
+				return DataTypeInfo<DataType::VECTOR_4_ARRAY>::BASE_FORMAT;
+				break;
+			}
+			case DataType::COLOR_32_ARRAY:
+			{
+				return DataTypeInfo<DataType::COLOR_32_ARRAY>::BASE_FORMAT;
+				break;
+			}
+			default:
+				throw std::runtime_error("Can't get base format with data type.");
+				break;
+			}
+		}
+
 		//std::vector<float> arrFloats;
 		std::unordered_map<std::string, float> mapFloats;
 

@@ -2,6 +2,7 @@
 #define KGS_MESH_H
 
 #include <set>
+#include <utility>
 #include <glm/glm.hpp>
 #include <foundation/foundation.hpp>
 #include "graphics/global.hpp"
@@ -12,8 +13,7 @@
 
 namespace kgs
 {
-	template <MeshType meshType>
-	class Mesh
+	class BaseMesh
 	{
 	public:
 		struct LayoutBindingInfo
@@ -32,10 +32,9 @@ namespace kgs
 
 			}
 
-			Bool32 operator ==(const LayoutBindingInfo& target) const
-			{
-				return name == target.name && dataType == target.dataType && bindingPriority == target.bindingPriority;
-			}
+			Bool32 operator ==(const LayoutBindingInfo &target) const;
+
+			Bool32 operator<(const LayoutBindingInfo &target) const;
 		};
 
 		struct SubMeshInfo
@@ -44,14 +43,9 @@ namespace kgs
 			std::vector<uint32_t> indices;
 		};
 
-		static const MeshData::DataType ARRAY_DATA_TYPE = MeshConstInfo<meshType>::ARRAY_TYPE;
-		typedef typename MeshData::DataTypeInfo<ARRAY_DATA_TYPE>::BaseType BaseValueType;
-		typedef typename MeshData::DataTypeInfo<ARRAY_DATA_TYPE>::ValueType ArrayValueType;
-		typedef typename MeshTypeInfo<meshType>::PointType PointType;
+		BaseMesh();
 
-		Mesh();
-
-		~Mesh();
+		~BaseMesh();
 
 		MeshType getMeshType() const;
 
@@ -59,39 +53,10 @@ namespace kgs
 
 		void setVertexCount(uint32_t value);
 
-		//vertex
-		ArrayValueType getVertices() const;
-
-		void setVertices(ArrayValueType vertices);
-
 		//color
 		std::vector<Color32> getColors() const;
 
 		void setColors(std::vector<Color32> colors);
-
-		//normal
-		ArrayValueType getNormals() const;
-
-		void setNormals(ArrayValueType normals);
-
-		//tangent
-		ArrayValueType getTangents() const;
-
-		void setTangents(ArrayValueType tangents);
-
-		//uv
-		template<UVType uvType, UVIndex uvIndex>
-		typename MeshData::DataTypeInfo<UVConstInfo<uvType>::ARRAY_TYPE>::ValueType getUVs();
-
-		template<UVType uvType, UVIndex uvIndex>
-		void setUVs(typename MeshData::DataTypeInfo<UVConstInfo<uvType>::ARRAY_TYPE>::ValueType uvs, uint32_t uvIndex);
-
-		template<MeshData::DataType dataType>
-		typename MeshData::DataTypeInfo<dataType>::ValueType getData(std::string name);
-
-
-		template <MeshData::DataType dataType>
-		void setData(std::string name, typename MeshData::DataTypeInfo<dataType>::ValueType value, uint32_t bindingPriority = KGS_VERTEX_BINDING_PRIORITY_OTHER_MIN);
 
 		//index
 		uint32_t getSubMeshCount() const;
@@ -108,9 +73,6 @@ namespace kgs
 
 		PrimitiveTopology getTopology(uint32_t subMeshIndex) const;
 
-		/*The bounding volume of the mesh*/
-		fd::Bounds<PointType> getBounds();
-
 		/**Vertex colors of the Mesh multiplied to verties*/
 		Color getMultipliedColor() const;
 
@@ -123,24 +85,36 @@ namespace kgs
 		/**Vertex colors of the Mesh added to verties*/
 		void setAddedColor(Color value);
 
-		void apply(Bool32 makeUnreadable);
+		virtual void apply(Bool32 makeUnreadable);
 
-		void _fillGraphicsPipelineCreateInfoForDraw(uint32_t subMeshIndex, vk::GraphicsPipelineCreateInfo &graphicsPipelineCreateInfo);
+		//uv
+		template<UVType uvType, UVIndex uvIndex>
+		typename MeshData::DataTypeInfo<UVConstInfo<uvType>::ARRAY_TYPE>::ValueType getUVs();
 
-		void _fillCommandBufferForDraw(uint32_t subMeshIndex, vk::CommandBuffer &commandBuffer);
+		template<UVType uvType, UVIndex uvIndex>
+		void setUVs(typename MeshData::DataTypeInfo<UVConstInfo<uvType>::ARRAY_TYPE>::ValueType uvs, uint32_t uvIndex);
+
+		template<MeshData::DataType dataType>
+		typename MeshData::DataTypeInfo<dataType>::ValueType getData(std::string name) const;
 
 
+		template <MeshData::DataType dataType>
+		void setData(std::string name, typename MeshData::DataTypeInfo<dataType>::ValueType value, uint32_t bindingPriority = KGS_VERTEX_BINDING_PRIORITY_OTHER_MIN);
 
-	private:
+		inline void _fillGraphicsPipelineCreateInfoForDraw(uint32_t subMeshIndex, vk::GraphicsPipelineCreateInfo &graphicsPipelineCreateInfo);
+
+		inline void _fillCommandBufferForDraw(uint32_t subMeshIndex, vk::CommandBuffer &commandBuffer);
+
+	protected:
 		std::shared_ptr<Context> m_pContext;
-		MeshType m_meshType = meshType;
+		MeshType m_meshType;
 		uint32_t m_vertexCount;
 		std::shared_ptr<MeshData> m_pData;
 		std::vector<LayoutBindingInfo> m_arrLayoutBindingInfos;
 		std::unordered_map<std::string, LayoutBindingInfo> m_mapLayoutBindingInfos;
 		uint32_t m_subMeshCount;
 		std::vector<SubMeshInfo> m_subMeshInfos;
-		fd::Bounds<PointType> m_bounds;
+
 		Color m_multipliedColor;
 		Color m_addedColor;
 
@@ -151,24 +125,66 @@ namespace kgs
 		std::shared_ptr<vk::Buffer> m_pIndexBuffer;
 		std::shared_ptr<vk::DeviceMemory> m_pIndexBufferMemory;
 
+		void _createVertexBuffer();
+
+		void _createIndexBuffer();
+
+		virtual std::vector<vk::VertexInputBindingDescription> _getVertexInputBindingDescriptions() = 0;
+
+		virtual std::vector<vk::VertexInputAttributeDescription> _getVertexInputAttributeDescriptions() = 0;
+
 		inline void _sortLayoutBindingInfos();
-
-		inline std::vector<vk::VertexInputBindingDescription> _getVertexInputBindingDescriptions();
-
-		inline std::vector<vk::VertexInputAttributeDescription> _getVertexInputAttributeDescriptions();
-
 		//tool methods
 #ifdef DEBUG
-		inline void verifySubMeshIndex(uint32_t subMeshIndex);
+		inline void verifySubMeshIndex(uint32_t subMeshIndex) const;
 #endif // DEBUG
 
 		inline uint32_t _getIndexCount(uint32_t subMeshIndex) const;
 
-		void _copyBuffer(std::shared_ptr<vk::Buffer>& pSrcBuffer, std::shared_ptr<vk::Buffer>& pDstBuffer, vk::DeviceSize size);
+		inline void _copyBuffer(std::shared_ptr<vk::Buffer>& pSrcBuffer, std::shared_ptr<vk::Buffer>& pDstBuffer, vk::DeviceSize size);
+	};
 
-		inline void _createVertexBuffer();
+	template <MeshType meshType>
+	class Mesh : public BaseMesh
+	{
+	public:
+		static const MeshData::DataType ARRAY_DATA_TYPE = MeshConstInfo<meshType>::ARRAY_TYPE;
+		typedef typename MeshData::DataTypeInfo<ARRAY_DATA_TYPE>::BaseType BaseValueType;
+		typedef typename MeshData::DataTypeInfo<ARRAY_DATA_TYPE>::ValueType ArrayValueType;
+		typedef typename MeshTypeInfo<meshType>::PointType PointType;
 
-		inline void _createIndexBuffer();
+		Mesh();
+
+		~Mesh();
+
+		//vertex
+		ArrayValueType getVertices() const;
+
+		void setVertices(ArrayValueType vertices);
+
+		//normal
+		ArrayValueType getNormals() const;
+
+		void setNormals(ArrayValueType normals);
+
+		//tangent
+		ArrayValueType getTangents() const;
+
+		void setTangents(ArrayValueType tangents);
+
+		void apply(Bool32 makeUnreadable) override;
+
+		/*The bounding volume of the mesh*/
+		fd::Bounds<PointType> getBounds();
+
+	private:
+		
+		fd::Bounds<PointType> m_bounds;
+
+		std::vector<vk::VertexInputBindingDescription> _getVertexInputBindingDescriptions() override;
+
+		std::vector<vk::VertexInputAttributeDescription> _getVertexInputAttributeDescriptions() override;
+
 
 		inline void _updateBounds();
 	};

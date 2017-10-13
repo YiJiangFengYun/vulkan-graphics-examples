@@ -91,7 +91,7 @@ namespace kgs
 
 	extern std::array<std::pair<PrimitiveTopology, vk::PrimitiveTopology>, static_cast<size_t>(PrimitiveTopology::RANGE_SIZE)> arrPrimitiveTopologyToVK;
 
-	inline vk::PrimitiveTopology tranDescriptorTypeToVK(PrimitiveTopology topology)
+	inline vk::PrimitiveTopology tranPrimitiveTopologyTypeToVK(PrimitiveTopology topology)
 	{
 		vk::PrimitiveTopology vkTopology;
 #ifdef DEBUG

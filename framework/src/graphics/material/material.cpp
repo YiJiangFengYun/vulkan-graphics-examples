@@ -20,7 +20,7 @@ namespace kgs
 
 	}
 
-	std::string Material::getPassName(int32_t index)
+	std::string Material::getPassName(uint32_t index)
 	{
 		auto pass = *(m_arrPasses.cbegin() + index);
 		//linear complexity
@@ -38,6 +38,11 @@ namespace kgs
 	void Material::setPass(std::string name, std::shared_ptr<Pass> pass)
 	{
 		setValue(name, pass, m_mapPasses, m_arrPasses);
+	}
+
+	std::shared_ptr<Pass> Material::getPassWithIndex(uint32_t index)
+	{
+		return m_arrPasses[index];
 	}
 
 	void Material::apply()

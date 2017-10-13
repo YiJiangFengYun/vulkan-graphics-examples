@@ -17,9 +17,10 @@ namespace kgs
 		~Material();
 
 		int32_t getPassIndex(std::string name);
-		std::string getPassName(int32_t index);
+		std::string getPassName(uint32_t index);
 		std::shared_ptr<Pass> getPass(std::string name);
 		void setPass(std::string name, std::shared_ptr<Pass> pass);
+		std::shared_ptr<Pass> getPassWithIndex(uint32_t index);
 		MaterialShowType getShowType();
 		void setRenderQueueType(MaterialShowType type);
 		uint32_t getRenderPriority();

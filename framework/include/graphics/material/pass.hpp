@@ -99,6 +99,8 @@ namespace kgs
 		void setMainColor(Color value);
 
 		void apply();
+
+		std::shared_ptr<Shader> _getShader();
 	private:
 		//compositons
 		std::shared_ptr<MaterialData> m_pData;

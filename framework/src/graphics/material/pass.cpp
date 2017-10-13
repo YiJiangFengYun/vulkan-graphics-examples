@@ -66,6 +66,11 @@ namespace kgs
 		_applyBufferContent();
 	}
 
+	std::shared_ptr<Shader> Pass::_getShader()
+	{
+		return m_pShader;
+	}
+
 	void Pass::_createDescriptorSetLayout()
 	{
 		std::vector<vk::DescriptorSetLayoutBinding> bindings(m_arrLayoutBinds.size());

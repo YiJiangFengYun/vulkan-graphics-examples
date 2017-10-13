@@ -48,6 +48,7 @@ namespace kgs
 		void _createRenderPass();
 		void _createFramebuffer();
 
+		void _render_createGraphicsPipeline(std::shared_ptr<BaseVisualObject> pVisualObject, uint32_t passIndex = 0u);
 
 	private:
 		BaseRenderer() = delete;

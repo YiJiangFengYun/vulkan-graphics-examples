@@ -107,7 +107,7 @@ namespace kgs
 	{
 		//get bounds and its 8 points.
 		auto pMesh = pVisualObject->getMesh();
-		auto bounds = pMesh->getBounds();
+		auto bounds = dynamic_cast<SceneType::VisualObjectType::MeshType *>(pMesh.get())->getBounds();
 		auto min = bounds.getMin();
 		auto max = bounds.getMax();
 		typedef SpaceTypeInfo<SpaceType::SPACE_3>::PointType PointType;

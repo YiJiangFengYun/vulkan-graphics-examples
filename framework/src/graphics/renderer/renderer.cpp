@@ -37,6 +37,43 @@ namespace kgs
 
 	void BaseRenderer::_render(RenderInfo renderInfo)
 	{
+		
+	}
+
+	void BaseRenderer::_render_createGraphicsPipeline(std::shared_ptr<BaseVisualObject> pVisualObject, uint32_t passIndex)
+	{
+		//Create graphics pipeline create info. 
+		vk::GraphicsPipelineCreateInfo createInfo = {};
+
+		//Coustruct shader stage create info.
+		auto pShader = pVisualObject->getMaterial()->getPassWithIndex(passIndex)->_getShader();
+		vk::PipelineShaderStageCreateInfo vertShaderStageInfo = {
+			vk::PipelineShaderStageCreateFlags(),
+			vk::ShaderStageFlagBits::eVertex,
+			*pShader->getVertShaderModule(),
+			"main"
+		};
+
+		vk::PipelineShaderStageCreateInfo fragShaderStageInfo = {
+			vk::PipelineShaderStageCreateFlags(),
+			vk::ShaderStageFlagBits::eFragment,
+			*pShader->getFragShaderModule(),
+			"main"
+		};
+
+		vk::PipelineShaderStageCreateInfo shaderStages[] = { vertShaderStageInfo, fragShaderStageInfo };
+
+		createInfo.stageCount = 2u;
+		createInfo.pStages = shaderStages;
+
+		//Fill binding description and attributeDescriptions for one sub mesh of the mesh.
+		auto subMeshIndex = pVisualObject->getSubMeshIndex();
+		pVisualObject->getMesh()->_fillGraphicsPipelineCreateInfoForDraw(subMeshIndex, createInfo);
+
+		//View port info.
+
+		
+
 	}
 
 	void BaseRenderer::_init()

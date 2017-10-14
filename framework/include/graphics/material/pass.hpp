@@ -39,23 +39,9 @@ namespace kgs
 				std::uint32_t binding,
 				DescriptorType descriptorType,
 				std::uint32_t descriptorCount,
-				ShaderStageFlags stageFlags):
-				name(name),
-				dataType(dataType),
-				binding(binding),
-				descriptorType(descriptorType),
-				descriptorCount(descriptorCount),
-				stageFlags(stageFlags)
-			{
-			
-			}
+				ShaderStageFlags stageFlags);
 
-			Bool32 operator ==(const LayoutBindingInfo& target) const
-			{
-				return name == target.name && dataType == target.dataType && binding == target.binding &&
-					descriptorType == target.descriptorType && descriptorCount == target.descriptorCount &&
-					stageFlags == target.stageFlags;
-			}
+			Bool32 operator ==(const LayoutBindingInfo& target) const;
 		};
 
 		Pass();
@@ -101,6 +87,11 @@ namespace kgs
 		void apply();
 
 		std::shared_ptr<Shader> _getShader();
+		std::shared_ptr<vk::Buffer> _getUniformBuffer();
+		std::shared_ptr<vk::DeviceMemory> _getUniformBufferMemory();
+		std::shared_ptr<vk::DescriptorSetLayout> _getDescriptorSetLayout();
+		std::shared_ptr<vk::DescriptorPool> _getDescriptorPool();
+		std::shared_ptr<vk::DescriptorSet> _getDescriptorSet();
 	private:
 		//compositons
 		std::shared_ptr<MaterialData> m_pData;

@@ -2,6 +2,29 @@
 
 namespace kgs
 {
+	Pass::LayoutBindingInfo::LayoutBindingInfo(std::string name,
+		MaterialData::DataType dataType,
+		std::uint32_t binding,
+		DescriptorType descriptorType,
+		std::uint32_t descriptorCount,
+		ShaderStageFlags stageFlags) :
+		name(name),
+		dataType(dataType),
+		binding(binding),
+		descriptorType(descriptorType),
+		descriptorCount(descriptorCount),
+		stageFlags(stageFlags)
+	{
+
+	}
+
+	Bool32 Pass::LayoutBindingInfo::operator ==(const LayoutBindingInfo& target) const
+	{
+		return name == target.name && dataType == target.dataType && binding == target.binding &&
+			descriptorType == target.descriptorType && descriptorCount == target.descriptorCount &&
+			stageFlags == target.stageFlags;
+	}
+
 	Pass::Pass() :
 		m_pContext(pContext),
 		m_pData(new MaterialData())
@@ -69,6 +92,31 @@ namespace kgs
 	std::shared_ptr<Shader> Pass::_getShader()
 	{
 		return m_pShader;
+	}
+
+	std::shared_ptr<vk::Buffer> Pass::_getUniformBuffer()
+	{
+		return m_pUniformBuffer;
+	}
+
+	std::shared_ptr<vk::DeviceMemory> Pass::_getUniformBufferMemory()
+	{
+		return m_pUniformBufferMemory;
+	}
+
+	std::shared_ptr<vk::DescriptorSetLayout> Pass::_getDescriptorSetLayout()
+	{
+		return m_pDescriptorSetLayout;
+	}
+
+	std::shared_ptr<vk::DescriptorPool> Pass::_getDescriptorPool()
+	{
+		return m_pDescriptorPool;
+	}
+
+	std::shared_ptr<vk::DescriptorSet> Pass::_getDescriptorSet()
+	{
+		return m_pDescriptorSet;
 	}
 
 	void Pass::_createDescriptorSetLayout()

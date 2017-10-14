@@ -37,7 +37,6 @@ namespace kgs
 
 	void BaseRenderer::_render(RenderInfo renderInfo)
 	{
-
 	}
 
 	void BaseRenderer::_render_createGraphicsPipeline(const RenderInfo& renderInfo, std::shared_ptr<BaseVisualObject> pVisualObject, uint32_t passIndex)

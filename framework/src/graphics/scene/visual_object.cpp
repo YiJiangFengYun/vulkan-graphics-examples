@@ -7,7 +7,7 @@ namespace kgs
 		return m_pMaterial;
 	}
 
-	void BaseVisualObject::setPMaterial(std::shared_ptr<Material> pMaterial)
+	void BaseVisualObject::setMaterial(std::shared_ptr<Material> pMaterial)
 	{
 		m_pMaterial = pMaterial;
 	}

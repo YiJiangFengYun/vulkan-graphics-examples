@@ -13,7 +13,7 @@ namespace kgs
 	public:
 		std::shared_ptr<Material> getMaterial();
 
-		void setPMaterial(std::shared_ptr<Material> pMaterial);
+		void setMaterial(std::shared_ptr<Material> pMaterial);
 
 		std::shared_ptr<BaseMesh> getMesh();
 

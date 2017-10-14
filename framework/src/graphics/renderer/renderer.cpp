@@ -46,7 +46,8 @@ namespace kgs
 		vk::GraphicsPipelineCreateInfo createInfo = {};
 
 		//Coustruct shader stage create info.
-		auto pShader = pVisualObject->getMaterial()->getPassWithIndex(passIndex)->_getShader();
+		auto pPass = pVisualObject->getMaterial()->getPassWithIndex(passIndex);
+		auto pShader = pPass->_getShader();
 		vk::PipelineShaderStageCreateInfo vertShaderStageInfo = {
 			vk::PipelineShaderStageCreateFlags(),
 			vk::ShaderStageFlagBits::eVertex,
@@ -168,7 +169,16 @@ namespace kgs
 		};
 		createInfo.pColorBlendState = &colorBlendStateCreateInfo;
 
+		//pPass->_getDescriptorSetLayout();
+		vk::PipelineLayoutCreateInfo pipelineLayoutCreateInfo = {
+			vk::PipelineLayoutCreateFlags(),     //flags
+			1u,                                  //setLayoutCount
+			pPass->_getDescriptorSetLayout().get(),      //pSetLayouts
+			0,                                   //pushConstantRangeCount
+			nullptr                              //pPushConstantRanges
+		};
 
+		//auto pipelineLayout = fd::createPipeline
 	}
 
 	void BaseRenderer::_init()

@@ -7,7 +7,7 @@
 
 namespace fd
 {
-	extern std::shared_ptr<vk::Instance> createInstance(const vk::InstanceCreateInfo & createInfo, 
+	extern std::shared_ptr<vk::Instance> createInstance(const vk::InstanceCreateInfo & createInfo,
 		vk::Optional<const vk::AllocationCallbacks> allocator = nullptr);
 
 	extern std::shared_ptr<vk::Device> createDevice(const std::shared_ptr<vk::PhysicalDevice> pPhysicalDevice,
@@ -64,6 +64,9 @@ namespace fd
 
 	extern std::shared_ptr<vk::DescriptorSet> allocateDescriptorSet(const std::shared_ptr<vk::Device> pDevice,
 		const std::shared_ptr<vk::DescriptorPool> pDescriptorPool, vk::DescriptorSetAllocateInfo & allocateInfo);
+
+	extern std::shared_ptr<vk::PipelineLayout> createPipelineLayout(const std::shared_ptr<vk::Device> pDevice,
+		const vk::PipelineLayoutCreateInfo & createInfo, vk::Optional<const vk::AllocationCallbacks> allocator = nullptr);
 }
 
 #endif // !FD_VK_WRAPPER_H

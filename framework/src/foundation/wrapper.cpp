@@ -215,4 +215,14 @@ namespace fd
 			pDevice->freeDescriptorSets(*pDescriptorPool, *p);
 		});
 	}
+
+	std::shared_ptr<vk::PipelineLayout> createPipelineLayout(const std::shared_ptr<vk::Device> pDevice,
+		const vk::PipelineLayoutCreateInfo & createInfo, vk::Optional<const vk::AllocationCallbacks> allocator)
+	{
+		auto pipelineLayout = pDevice->createPipelineLayout(createInfo, allocator);
+		return std::shared_ptr<vk::PipelineLayout>(new vk::PipelineLayout(pipelineLayout),
+			[pDevice](vk::PipelineLayout *p) {
+			pDevice->destroyPipelineLayout(*p);
+		});
+	}
 }

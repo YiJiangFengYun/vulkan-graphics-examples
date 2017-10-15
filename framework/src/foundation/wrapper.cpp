@@ -225,4 +225,15 @@ namespace fd
 			pDevice->destroyPipelineLayout(*p);
 		});
 	}
+
+	std::shared_ptr<vk::Pipeline> createGraphicsPipeline(const std::shared_ptr<vk::Device> pDevice,
+		vk::PipelineCache pipelineCache, const vk::GraphicsPipelineCreateInfo & createInfo,
+		vk::Optional<const vk::AllocationCallbacks> allocator)
+	{
+		auto pipeline = pDevice->createGraphicsPipeline(pipelineCache, createInfo, allocator);
+		return std::shared_ptr<vk::Pipeline>(new vk::Pipeline(pipeline),
+			[pDevice](vk::Pipeline *p) {
+			pDevice->destroyPipeline(*p);
+		});
+	}
 }

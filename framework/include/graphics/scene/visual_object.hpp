@@ -17,12 +17,9 @@ namespace kgs
 
 		std::shared_ptr<BaseMesh> getMesh();
 
-		uint32_t getSubMeshIndex();
-
 	protected:
 		std::shared_ptr<Material> m_pMaterial;
 		std::shared_ptr<BaseMesh> m_pMesh;
-		uint32_t m_subMeshIndex;
 	};
 
 	template <SpaceType SPACE_TYPE>
@@ -39,10 +36,9 @@ namespace kgs
 
 		}
 
-		void setMesh(std::shared_ptr<MeshType> pMesh, uint32_t subMeshIndex)
+		void setMesh(std::shared_ptr<MeshType> pMesh)
 		{
 			m_pMesh = pMesh;
-			m_subMeshIndex = subMeshIndex;
 		}
 	protected:
 		//aggregations

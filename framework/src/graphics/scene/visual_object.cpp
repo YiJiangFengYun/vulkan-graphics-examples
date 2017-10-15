@@ -16,9 +16,4 @@ namespace kgs
 	{
 		return m_pMesh;
 	}
-
-	uint32_t BaseVisualObject::getSubMeshIndex()
-	{
-		return m_subMeshIndex;
-	}
 } //namespace kgs

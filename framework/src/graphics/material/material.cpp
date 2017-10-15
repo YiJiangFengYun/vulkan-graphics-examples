@@ -45,6 +45,11 @@ namespace kgs
 		return m_arrPasses[index];
 	}
 
+	uint32_t Material::getPassCount()
+	{
+		return m_arrPasses.size();
+	}
+
 	void Material::apply()
 	{
 		for (const auto& item : m_arrPasses)

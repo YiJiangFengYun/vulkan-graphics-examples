@@ -38,6 +38,7 @@ namespace kgs
 		std::shared_ptr<vk::RenderPass> m_pRenderPass;
 		std::shared_ptr<TextureDepthStencilAttachment> m_pDepthStencilTexture;
 		std::shared_ptr<vk::Framebuffer> m_pFrameBuffer;
+		std::shared_ptr<vk::CommandBuffer> m_pCommandBuffer;
 
 		//aggregations
 		//Renderer will use swapchain image when color attachment texture is null.
@@ -50,10 +51,18 @@ namespace kgs
 
 		void _createRenderPass();
 		void _createFramebuffer();
+		void _createCommandBuffer();
 
 		void _createPipelineForRender(std::shared_ptr<vk::PipelineLayout> &pPipelineLayout, 
 			std::shared_ptr<vk::Pipeline> &pPipeline,
 			const RenderInfo& renderInfo, 
+			std::shared_ptr<BaseMesh> pMesh,
+			std::shared_ptr<Material> pMaterial,
+			uint32_t subMeshIndex = 0u,
+			uint32_t passIndex = 0u);
+		void _recordCommandBufferForRender(const RenderInfo& renderInfo, 
+			std::shared_ptr<vk::PipelineLayout> pPipelineLayout,
+			std::shared_ptr<vk::Pipeline> pPipeline,
 			std::shared_ptr<BaseMesh> pMesh,
 			std::shared_ptr<Material> pMaterial,
 			uint32_t subMeshIndex = 0u,

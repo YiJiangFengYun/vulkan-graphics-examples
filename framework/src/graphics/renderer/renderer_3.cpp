@@ -111,9 +111,9 @@ namespace kgs
 		for (uint32_t typeIndex = 0u; typeIndex < queueTypeCount; ++typeIndex)
 		{
 			auto queueLength = queueLengths[typeIndex];
-			for (uint32_t i = 0u; i < queueLength; ++i)
+			for (uint32_t objectIndex = 0u; objectIndex < queueLength; ++objectIndex)
 			{
-				auto pVisualObject = queues[typeIndex][i];
+				auto pVisualObject = queues[typeIndex][objectIndex];
 				auto pMesh = pVisualObject->getMesh();
 				auto subMeshCount = pMesh->getSubMeshCount();
 				auto pMaterial = pVisualObject->getMaterial();
@@ -124,9 +124,7 @@ namespace kgs
 					{
 						std::shared_ptr<vk::PipelineLayout> pPipelineLayout;
 						std::shared_ptr<vk::Pipeline> pPipeline;
-
 						_createPipelineForRender(pPipelineLayout, pPipeline, renderInfo, pMesh, pMaterial, subMeshIndex, passIndex);
-						
 					}
 				}
 			}

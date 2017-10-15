@@ -44,8 +44,8 @@ namespace kgs
 		const RenderInfo& renderInfo,
 		std::shared_ptr<BaseMesh> pMesh,
 		std::shared_ptr<Material> pMaterial,
-		uint32_t subMeshIndex = 0u,
-		uint32_t passIndex = 0u)
+		uint32_t subMeshIndex,
+		uint32_t passIndex)
 	{
 		//Create graphics pipeline create info. 
 		vk::GraphicsPipelineCreateInfo createInfo = {};
@@ -175,11 +175,11 @@ namespace kgs
 
 		//pPass->_getDescriptorSetLayout();
 		vk::PipelineLayoutCreateInfo pipelineLayoutCreateInfo = {
-			vk::PipelineLayoutCreateFlags(),     //flags
-			1u,                                  //setLayoutCount
+			vk::PipelineLayoutCreateFlags(),             //flags
+			1u,                                          //setLayoutCount
 			pPass->_getDescriptorSetLayout().get(),      //pSetLayouts
-			0,                                   //pushConstantRangeCount
-			nullptr                              //pPushConstantRanges
+			0,                                           //pushConstantRangeCount
+			nullptr                                      //pPushConstantRanges
 		};
 
 		auto pDevice = pContext->getNativeDevice();
@@ -193,10 +193,56 @@ namespace kgs
 		pPipeline = fd::createGraphicsPipeline(pDevice, nullptr, createInfo);
 	}
 
+	void BaseRenderer::_recordCommandBufferForRender(const RenderInfo& renderInfo, 
+		std::shared_ptr<vk::PipelineLayout> pPipelineLayout,
+		std::shared_ptr<vk::Pipeline> pPipeline,
+		std::shared_ptr<BaseMesh> pMesh,
+		std::shared_ptr<Material> pMaterial,
+		uint32_t subMeshIndex,
+		uint32_t passIndex)
+	{
+		vk::CommandBufferBeginInfo beginInfo = {
+			vk::CommandBufferUsageFlagBits::eSimultaneousUse,  //flags
+			nullptr                                            //pInheritanceInfo
+		};
+
+		m_pCommandBuffer->begin(beginInfo);
+
+		std::array<vk::ClearValue, 2> clearValues = { {
+				vk::ClearValue(vk::ClearColorValue(std::array<float, 4>{{0.0f, 0.0f, 0.0f, 0.0f}})),
+				vk::ClearValue(vk::ClearDepthStencilValue(1.0f, 0u))
+			} };
+		vk::RenderPassBeginInfo renderPassBeginInfo = {
+			*m_pRenderPass,                                   //renderPass
+			*m_pFrameBuffer,                                  //framebuffer
+			vk::Rect2D(                                     //renderArea
+				vk::Offset2D(0, 0),
+				vk::Extent2D(0u, 0u)
+			),
+			static_cast<uint32_t>(clearValues.size()),      //clearValueCount
+			clearValues.data()                              //pClearValues
+		};
+
+		m_pCommandBuffer->beginRenderPass(renderPassBeginInfo, vk::SubpassContents::eInline);
+		m_pCommandBuffer->bindPipeline(vk::PipelineBindPoint::eGraphics, *pPipeline);
+
+		auto pPass = pMaterial->getPassWithIndex(passIndex);
+		m_pCommandBuffer->bindDescriptorSets(vk::PipelineBindPoint::eGraphics, *pPipelineLayout, 0u, *pPass->_getDescriptorSet(), nullptr);
+
+		pMesh->_fillCommandBufferForDraw(subMeshIndex, *m_pCommandBuffer);
+
+		m_pCommandBuffer->drawIndexed(pMesh->getIndexCount(subMeshIndex), 1u, 0u, 0u, 0u);
+
+		m_pCommandBuffer->endRenderPass();
+
+		m_pCommandBuffer->end();
+	}
+
 	void BaseRenderer::_init()
 	{
 		_createRenderPass();
 		_createFramebuffer();
+		_createCommandBuffer();
 	}
 
 	void BaseRenderer::_createRenderPass()
@@ -297,5 +343,18 @@ namespace kgs
 
 		auto pDevice = pContext->getNativeDevice();
 		m_pFrameBuffer = fd::createFrameBuffer(pDevice, createInfo);
+	}
+
+	void BaseRenderer::_createCommandBuffer()
+	{
+		auto pCommandPool = pContext->getCommandPool();
+		vk::CommandBufferAllocateInfo allocateInfo = {
+			*pCommandPool,                //commandPool
+			vk::CommandBufferLevel::ePrimary,          //level
+			1u                                         //commandBufferCount
+		};
+
+		auto pDevice = pContext->getNativeDevice();
+		m_pCommandBuffer = fd::allocateCommandBuffer(pDevice, pCommandPool, allocateInfo);
 	}
 }

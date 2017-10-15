@@ -164,7 +164,8 @@ namespace gfw {
 		UsedQueueFamily queueFamilyIndices = UsedQueueFamily::findQueueFamilies(*m_pPhysicalDevice, *m_pSurface);
 
 		vk::CommandPoolCreateInfo createInfo = {
-			vk::CommandPoolCreateFlags(),
+			//vk::CommandPoolCreateFlags(),
+			vk::CommandPoolCreateFlagBits::eResetCommandBuffer,
 			static_cast<uint32_t>(queueFamilyIndices.graphicsFamily)
 		};
 		m_pCommandPool = fd::createCommandPool(m_pDevice, createInfo);

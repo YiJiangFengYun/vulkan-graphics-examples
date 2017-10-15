@@ -39,13 +39,19 @@ namespace kgs
 	{
 	}
 
-	void BaseRenderer::_render_createGraphicsPipeline(const RenderInfo& renderInfo, std::shared_ptr<BaseVisualObject> pVisualObject, uint32_t passIndex)
+	void BaseRenderer::_createPipelineForRender(std::shared_ptr<vk::PipelineLayout> &pPipelineLayout,
+		std::shared_ptr<vk::Pipeline> &pPipeline,
+		const RenderInfo& renderInfo,
+		std::shared_ptr<BaseMesh> pMesh,
+		std::shared_ptr<Material> pMaterial,
+		uint32_t subMeshIndex = 0u,
+		uint32_t passIndex = 0u)
 	{
 		//Create graphics pipeline create info. 
 		vk::GraphicsPipelineCreateInfo createInfo = {};
 
 		//Coustruct shader stage create info.
-		auto pPass = pVisualObject->getMaterial()->getPassWithIndex(passIndex);
+		auto pPass = pMaterial->getPassWithIndex(passIndex);
 		auto pShader = pPass->_getShader();
 		vk::PipelineShaderStageCreateInfo vertShaderStageInfo = {
 			vk::PipelineShaderStageCreateFlags(),
@@ -67,8 +73,7 @@ namespace kgs
 		createInfo.pStages = shaderStages;
 
 		//Fill binding description and attributeDescriptions for one sub mesh of the mesh.
-		auto subMeshIndex = pVisualObject->getSubMeshIndex();
-		pVisualObject->getMesh()->_fillGraphicsPipelineCreateInfoForDraw(subMeshIndex, createInfo);
+		pMesh->_fillGraphicsPipelineCreateInfoForDraw(subMeshIndex, createInfo);
 
 		//View port info.
 		vk::Viewport viewport = {
@@ -177,7 +182,15 @@ namespace kgs
 			nullptr                              //pPushConstantRanges
 		};
 
-		//auto pipelineLayout = fd::createPipeline
+		auto pDevice = pContext->getNativeDevice();
+		pPipelineLayout = fd::createPipelineLayout(pDevice, pipelineLayoutCreateInfo);
+		createInfo.layout = *pPipelineLayout;
+
+		createInfo.pDynamicState = nullptr;
+		createInfo.renderPass = *m_pRenderPass;
+		createInfo.subpass = 0;
+
+		pPipeline = fd::createGraphicsPipeline(pDevice, nullptr, createInfo);
 	}
 
 	void BaseRenderer::_init()

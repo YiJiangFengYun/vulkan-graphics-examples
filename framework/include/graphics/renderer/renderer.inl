@@ -69,6 +69,8 @@ namespace kgs
 		{
 			throw new std::runtime_error("Camera is not specified.");
 		}
+
+		BaseRenderer::_render(renderInfo);
 	}
 
 	template <SpaceType SPACE_TYPE>

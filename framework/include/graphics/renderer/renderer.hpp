@@ -8,6 +8,9 @@
 #include "graphics/texture/texture_color_attachment.hpp"
 #include "graphics/texture/texture_depth_stencil_attachment.hpp"
 
+//todo: batch mesh,
+//todo: cache graphics pipeline.
+
 namespace kgs
 {
 	class BaseRenderer
@@ -48,7 +51,13 @@ namespace kgs
 		void _createRenderPass();
 		void _createFramebuffer();
 
-		void _render_createGraphicsPipeline(const RenderInfo& renderInfo, std::shared_ptr<BaseVisualObject> pVisualObject, uint32_t passIndex = 0u);
+		void _createPipelineForRender(std::shared_ptr<vk::PipelineLayout> &pPipelineLayout, 
+			std::shared_ptr<vk::Pipeline> &pPipeline,
+			const RenderInfo& renderInfo, 
+			std::shared_ptr<BaseMesh> pMesh,
+			std::shared_ptr<Material> pMaterial,
+			uint32_t subMeshIndex = 0u,
+			uint32_t passIndex = 0u);
 
 	private:
 		BaseRenderer() = delete;

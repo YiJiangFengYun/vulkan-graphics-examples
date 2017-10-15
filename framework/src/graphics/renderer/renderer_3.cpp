@@ -54,11 +54,15 @@ namespace kgs
 
 	void Renderer3::_render(RenderInfo renderInfo)
 	{
+		auto queueTypeCount = static_cast<uint32_t>(RenderQueueType::RANGE_SIZE);
+
 		Renderer::_render(renderInfo);
 
-		std::shared_ptr<Scene<SpaceType::SPACE_3>> pScene;
-		//Auto pScene = m_pScene;
+		//std::shared_ptr<Scene<SpaceType::SPACE_3>> pScene;
+		auto pScene = m_pScene;
 		uint32_t visualObjectCount = pScene->getVisualObjectCount();
+		
+		//----------Preparing render.
 
 		//Filter visualObject is out of camera with its bounds.
 		std::vector<std::shared_ptr<SceneType::VisualObjectType>> validVisualObjects(visualObjectCount); //allocate enough space for array to storage points.
@@ -73,20 +77,20 @@ namespace kgs
 		}
 
 		//Get queue count for each queue type.
-		std::vector<uint32_t> queueCounts(static_cast<uint32_t>(RenderQueueType::RANGE_SIZE), 0u);
+		std::vector<uint32_t> queueLengths(queueTypeCount, 0u);
 		for (uint32_t i = 0; i < validVisualObjectCount; ++i)
 		{
 			auto pVisualObject = validVisualObjects[i];
 			auto renderQueueType = tranMaterialShowTypeToRenderQueueType(pVisualObject->getMaterial()->getShowType());
-			++queueCounts[static_cast<size_t>(renderQueueType)];
+			++queueLengths[static_cast<size_t>(renderQueueType)];
 		}
 
-		std::vector<std::vector<std::shared_ptr<SceneType::VisualObjectType>>> queues(static_cast<uint32_t>(RenderQueueType::RANGE_SIZE));
-		//Resize queues and reset to zero for preparing next use.
-		for (uint32_t i = 0; i < static_cast<uint32_t>(RenderQueueType::RANGE_SIZE); ++i)
+		std::vector<std::vector<std::shared_ptr<SceneType::VisualObjectType>>> queues(queueTypeCount);
+		//Resize queues and reset quue counts to zero for preparing next use.
+		for (uint32_t i = 0; i < queueTypeCount; ++i)
 		{
-			queues[i].resize(queueCounts[i], nullptr);
-			queueCounts[i] = 0u;
+			queues[i].resize(queueLengths[i], nullptr);
+			queueLengths[i] = 0u;
 		}
 
 		//Update queues to point to visual object.
@@ -94,13 +98,41 @@ namespace kgs
 		{
 			auto pVisualObject = validVisualObjects[i];
 			auto renderQueueType = tranMaterialShowTypeToRenderQueueType(pVisualObject->getMaterial()->getShowType());
-			queues[static_cast<size_t>(renderQueueType)][queueCounts[static_cast<size_t>(renderQueueType)]++] = pVisualObject;
+			queues[static_cast<size_t>(renderQueueType)][queueLengths[static_cast<size_t>(renderQueueType)]++] = pVisualObject;
 		}
 
 		//sort transparent queue.
 		std::sort(queues[static_cast<size_t>(RenderQueueType::TRANSPARENT)].begin(),
 			queues[static_cast<size_t>(RenderQueueType::TRANSPARENT)].end(),
 			std::bind(&Renderer3::_sortObjectsWithCameraZ, this, std::placeholders::_1, std::placeholders::_2));
+
+
+		//-----Doing render.
+		for (uint32_t typeIndex = 0u; typeIndex < queueTypeCount; ++typeIndex)
+		{
+			auto queueLength = queueLengths[typeIndex];
+			for (uint32_t i = 0u; i < queueLength; ++i)
+			{
+				auto pVisualObject = queues[typeIndex][i];
+				auto pMesh = pVisualObject->getMesh();
+				auto subMeshCount = pMesh->getSubMeshCount();
+				auto pMaterial = pVisualObject->getMaterial();
+				auto passCount = pMaterial->getPassCount();
+				for (uint32_t subMeshIndex = 0u; subMeshIndex < subMeshCount; ++subMeshIndex)
+				{
+					for (uint32_t passIndex = 0u; passIndex < passCount; ++passIndex)
+					{
+						std::shared_ptr<vk::PipelineLayout> pPipelineLayout;
+						std::shared_ptr<vk::Pipeline> pPipeline;
+
+						_createPipelineForRender(pPipelineLayout, pPipeline, renderInfo, pMesh, pMaterial, subMeshIndex, passIndex);
+						
+					}
+				}
+			}
+		}
+
+
 	}
 
 	Bool32 Renderer3::_checkVisualObjectInsideCameraView(std::shared_ptr<typename SceneType::VisualObjectType> pVisualObject)

@@ -347,7 +347,7 @@ namespace kgs
 
 	void BaseRenderer::_createCommandBuffer()
 	{
-		auto pCommandPool = pContext->getCommandPool();
+		auto pCommandPool = pContext->getCommandPoolForResetBuffer();
 		vk::CommandBufferAllocateInfo allocateInfo = {
 			*pCommandPool,                //commandPool
 			vk::CommandBufferLevel::ePrimary,          //level

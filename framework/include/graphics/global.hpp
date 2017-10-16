@@ -48,9 +48,11 @@ namespace kgs
 
 	extern Bool32 isInited;
 	extern std::shared_ptr<Context> pContext;
-	extern void init(std::shared_ptr<vk::PhysicalDevice> pPhysicalDevice,
-		std::shared_ptr<vk::Device> pNativeDevice, vk::Queue graphicsQueue,
-		std::shared_ptr<vk::CommandPool> pCommandPool);
+	extern void init(std::shared_ptr<vk::PhysicalDevice> pPhysicalDevice
+		, std::shared_ptr<vk::Device> pNativeDevice
+		, vk::Queue graphicsQueue
+		, uint32_t graphicsFamily
+	);
 }
 
 

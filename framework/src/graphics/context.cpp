@@ -2,21 +2,22 @@
 
 namespace kgs
 {
-	Context::Context(std::shared_ptr<vk::PhysicalDevice> pPhysicalDevice,
-		std::shared_ptr<vk::Device> pNativeDevice, vk::Queue graphicsQueue,
-		std::shared_ptr<vk::CommandPool> pCommandPool)
-		:m_pPhysicalDevice(pPhysicalDevice),
-		m_pNativeDevice(pNativeDevice),
-		m_graphicsQueue(graphicsQueue),
-		m_pCommandPool(pCommandPool)
+	Context::Context(std::shared_ptr<vk::PhysicalDevice> pPhysicalDevice
+		, std::shared_ptr<vk::Device> pNativeDevice, vk::Queue graphicsQueue
+		, uint32_t graphicsFamily
+	)
+		: m_pPhysicalDevice(pPhysicalDevice)
+		, m_pNativeDevice(pNativeDevice)
+		, m_graphicsQueue(graphicsQueue)
+		, m_graphicsFamily(graphicsFamily)
 	{
 	}
 
 	Context::Context(const Context& device)
-		:m_pPhysicalDevice(device.m_pPhysicalDevice),
-		m_pNativeDevice(device.m_pNativeDevice),
-		m_graphicsQueue(device.m_graphicsQueue),
-		m_pCommandPool(device.m_pCommandPool)
+		: m_pPhysicalDevice(device.m_pPhysicalDevice)
+		, m_pNativeDevice(device.m_pNativeDevice)
+		, m_graphicsQueue(device.m_graphicsQueue)
+		, m_graphicsFamily(device.m_graphicsFamily)
 	{
 
 	}
@@ -40,8 +41,28 @@ namespace kgs
 		return m_graphicsQueue;
 	}
 
-	std::shared_ptr<vk::CommandPool> Context::getCommandPool()
+	std::shared_ptr<vk::CommandPool> Context::getCommandPoolForTransientBuffer()
 	{
-		return m_pCommandPool;
+		return m_pCommandPoolForTransientBuffer;
+	}
+
+	std::shared_ptr<vk::CommandPool> Context::getCommandPoolForResetBuffer()
+	{
+		return m_pCommandPoolForResetBuffer;
+	}
+
+	void Context::_createCommandPool()
+	{
+		vk::CommandPoolCreateInfo createInfoForTransientBuffer = {
+			vk::CommandPoolCreateFlagBits::eTransient,
+			m_graphicsFamily
+		};
+		m_pCommandPoolForTransientBuffer = fd::createCommandPool(m_pNativeDevice, createInfoForTransientBuffer);
+
+		vk::CommandPoolCreateInfo createInfoForResetBuffer = {
+			vk::CommandPoolCreateFlagBits::eResetCommandBuffer,
+			m_graphicsFamily
+		};
+		m_pCommandPoolForResetBuffer = fd::createCommandPool(m_pNativeDevice, createInfoForResetBuffer);
 	}
 }

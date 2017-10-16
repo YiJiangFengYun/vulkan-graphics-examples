@@ -4,7 +4,7 @@ namespace kgs
 {
 	std::shared_ptr<vk::CommandBuffer> beginSingleTimeCommands() {
 		auto pDevice = pContext->getNativeDevice();
-		auto pCommandPool = pContext->getCommandPool();
+		auto pCommandPool = pContext->getCommandPoolForTransientBuffer();
 		vk::CommandBufferAllocateInfo allocateInfo = {
 			*pCommandPool,
 			vk::CommandBufferLevel::ePrimary,
@@ -24,7 +24,7 @@ namespace kgs
 	void endSingleTimeCommands(std::shared_ptr<vk::CommandBuffer> pCommandBuffer) {
 		auto pDevice = pContext->getNativeDevice();
 		auto graphicsQueue = pContext->getGraphicsQueue();
-		auto commandPool = pContext->getCommandPool();
+		auto commandPool = pContext->getCommandPoolForTransientBuffer();
 		pCommandBuffer->end();
 		vk::SubmitInfo submitInfo = { 0, nullptr, nullptr, 1, pCommandBuffer.get(), 0, nullptr };
 		graphicsQueue.submit(submitInfo, nullptr);

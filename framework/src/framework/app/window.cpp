@@ -52,8 +52,8 @@ namespace gfw {
 	void Window::run()
 	{
 		LOG(plog::debug) << "Window run" << std::endl;
-		_update();
-		_render();
+		_doUpdate();
+		_doRender();
 	}
 
 	void Window::windowSetShouldClose(Bool32 value)
@@ -192,63 +192,15 @@ namespace gfw {
 		m_pRenderFinishedSemaphore = fd::createSemaphore(m_pDevice, createInfo);
 	}
 
-	void Window::_update()
+	void Window::_doUpdate()
 	{
 	}
 
-	void Window::_render()
+	void Window::_doRender()
 	{
-		_beginRender();
+		_preRender();
 
-		_endRender();
-	}
-
-	std::shared_ptr<vk::CommandBuffer> Window::_beginRender()
-	{
-		/*vk::CommandBufferAllocateInfo allocateInfo = {
-			*m_pCommandPool,
-			vk::CommandBufferLevel::ePrimary,
-			static_cast<uint32_t>(1)
-		};
-
-		m_pCurrCommandBuffer = fd::allocateCommandBuffer(m_pDevice, m_pCommandPool, allocateInfo);
-
-		vk::CommandBufferBeginInfo beginInfo = {
-			vk::CommandBufferUsageFlags()
-		};
-
-		m_pCurrCommandBuffer->begin(beginInfo);
-
-
-		uint32_t imageIndex = m_pDevice->acquireNextImageKHR(*m_pSwapchain,
-			std::numeric_limits<uint64_t>::max(),
-			*m_pImageAvailableSemaphore, nullptr).value;
-
-		std::array<vk::ClearValue, 2> clearValues = {};
-		clearValues[0] = vk::ClearColorValue();
-		clearValues[1] = vk::ClearDepthStencilValue(1.0f, 0);
-
-		vk::RenderPassBeginInfo renderPassBeginInfo = {
-			*m_pRenderPass,
-			*m_pSwapchainFramebuffers[imageIndex],
-			vk::Rect2D({0, 0}, m_swapchainExtent),
-			static_cast<uint32_t>(clearValues.size()),
-			clearValues.data()
-		};
-
-		m_pCurrCommandBuffer->beginRenderPass(renderPassBeginInfo, vk::SubpassContents::eInline);
-		return m_pCurrCommandBuffer;*/
-		return nullptr;
-	}
-
-	void Window::_endRender()
-	{
-		//m_pCurrCommandBuffer->endRenderPass();
-
-		//m_pCurrCommandBuffer->end();
-
-		////free command buffer created when begin of render.
-		//m_pCurrCommandBuffer = nullptr;
+		_postRender();
 	}
 
 	void Window::_createImage(uint32_t width, uint32_t height, vk::Format format, vk::ImageTiling tiling,

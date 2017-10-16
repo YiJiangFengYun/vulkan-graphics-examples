@@ -40,6 +40,9 @@
     <ClInclude Include="..\..\framework\include\framework\world\entity.hpp" />
     <ClInclude Include="..\..\framework\include\framework\world\scene.hpp" />
   </ItemGroup>
+  <ItemGroup>
+    <None Include="..\..\framework\include\framework\app\window.inl" />
+  </ItemGroup>
   <PropertyGroup Label="Globals">
     <VCProjectVersion>15.0</VCProjectVersion>
     <ProjectGuid>{A756B90F-B3A9-4015-9D83-160B6AD8C99D}</ProjectGuid>

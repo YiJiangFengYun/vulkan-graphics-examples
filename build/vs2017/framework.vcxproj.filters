@@ -90,4 +90,9 @@
       <Filter>include\framework</Filter>
     </ClInclude>
   </ItemGroup>
+  <ItemGroup>
+    <None Include="..\..\framework\include\framework\app\window.inl">
+      <Filter>include\framework\app</Filter>
+    </None>
+  </ItemGroup>
 </Project>

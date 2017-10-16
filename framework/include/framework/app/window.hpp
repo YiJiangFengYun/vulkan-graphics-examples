@@ -74,11 +74,24 @@ namespace gfw
 		void _createRenderers();
 		void _createSemaphores();
 
-		void _update();
-		void _render();
+		void _doUpdate();
+		void _doRender();
 
-		std::shared_ptr<vk::CommandBuffer> _beginRender();
-		void _endRender();
+		inline void _preUpdate();
+		inline void _update();
+		inline void _postUpdate();
+
+		inline void _preRender();
+		inline void _render();
+		inline void _postRender();
+
+		virtual void _onPreUpdate() = 0;
+		virtual void _onUpdate() = 0;
+		virtual void _onPostUpdate() = 0;
+
+		virtual void _onPreRender() = 0;
+		virtual void _onRender() = 0;
+		virtual void _onPostRender() = 0;
 
 		// tool methods
 		void _createImage(uint32_t width, uint32_t height, vk::Format format, vk::ImageTiling tiling,
@@ -95,8 +108,9 @@ namespace gfw
 
 		friend void onWindowResized(GLFWwindow *window, int32_t width, int32_t height);
 	};
-}
+}  //namespace gfw
 
+#include "framework/app/window.inl"
 
 
 #endif // !GFW_CONTEXT_H

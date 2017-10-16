@@ -73,6 +73,7 @@ namespace gfw
 		bool _checkValidationLayerSupport();
 		void _pickPhysicalDevice(std::shared_ptr<vk::SurfaceKHR> psurface);
 		void _createLogicDevice(std::shared_ptr<vk::SurfaceKHR> pSurface);
+		void _initGrahpicsModule(std::shared_ptr<vk::SurfaceKHR> pSurface);
 
 		template <typename MainWindow_T>
 		void _createWindow(std::shared_ptr<GLFWwindow> pWindow, std::shared_ptr<vk::SurfaceKHR> pSurface);

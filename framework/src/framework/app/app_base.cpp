@@ -164,6 +164,7 @@ namespace gfw {
 
 		_pickPhysicalDevice(pResultSurface);
 		_createLogicDevice(pResultSurface);
+		_initGrahpicsModule(pResultSurface);
 	}
 
 	bool AppBase::_checkValidationLayerSupport()
@@ -348,6 +349,12 @@ namespace gfw {
 		m_presentQueue = m_pDevice->getQueue(usedQueueFamily.presentFamily, 0);
 
 		LOG(plog::debug) << "Create successfully logic device.";
+	}
+
+	void AppBase::_initGrahpicsModule(std::shared_ptr<vk::SurfaceKHR> pSurface)
+	{
+		UsedQueueFamily usedQueueFamily = UsedQueueFamily::findQueueFamilies(*m_pPhysicalDevice, *pSurface);
+		kgs::init(m_pPhysicalDevice, m_pDevice, m_graphicsQueue, usedQueueFamily.graphicsFamily);
 	}
 
 	std::vector<const char*> AppBase::_getRequiredExtensions()

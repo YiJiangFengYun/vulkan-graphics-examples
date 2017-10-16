@@ -7,15 +7,22 @@
 
 namespace gfw {
 
-	Window::Window(uint32_t width, uint32_t height, const char* title,
-		std::shared_ptr<vk::Instance> pInstance, std::shared_ptr<vk::PhysicalDevice> pPhysicalDevice, 
-		std::shared_ptr<vk::Device> pDevice, vk::Queue graphicsQueue, vk::Queue presentQueue)
+	Window::Window(uint32_t width
+		, uint32_t height
+		, const char* title
+		, std::shared_ptr<vk::Instance> pInstance
+		, std::shared_ptr<vk::PhysicalDevice> pPhysicalDevice
+		, std::shared_ptr<vk::Device> pDevice
+		, vk::Queue graphicsQueue
+		, vk::Queue presentQueue
+	)
+		: m_renderType(RendererType::BEGIN_RANGE)
+		, m_pVKInstance(pInstance)
+		, m_pPhysicalDevice(pPhysicalDevice)
+		, m_pDevice(pDevice)
+		, m_graphicsQueue(graphicsQueue)
+		, m_presentQueue(presentQueue)
 	{
-		m_pVKInstance = pInstance;
-		m_pPhysicalDevice = pPhysicalDevice;
-		m_pDevice = pDevice;
-		m_graphicsQueue = graphicsQueue;
-		m_presentQueue = presentQueue;
 		_createWindow(width, height, title);
 		_createSurface();
 		_createSwapchain();
@@ -24,17 +31,76 @@ namespace gfw {
 		_createSemaphores();
 	}
 
-	Window::Window(std::shared_ptr<GLFWwindow> pWindow, std::shared_ptr<vk::SurfaceKHR> pSurface,
-		std::shared_ptr<vk::Instance> pInstance, std::shared_ptr<vk::PhysicalDevice> pPhysicalDevice,
-		std::shared_ptr<vk::Device> pDevice, vk::Queue graphicsQueue, vk::Queue presentQueue)
+	Window::Window(uint32_t width
+		, uint32_t height
+		, const char* title
+		, RendererType rendererType
+		, std::shared_ptr<vk::Instance> pInstance
+		, std::shared_ptr<vk::PhysicalDevice> pPhysicalDevice
+		, std::shared_ptr<vk::Device> pDevice
+		, vk::Queue graphicsQueue
+		, vk::Queue presentQueue
+	)
+		: m_renderType(rendererType)
+		, m_pVKInstance(pInstance)
+		, m_pPhysicalDevice(pPhysicalDevice)
+		, m_pDevice(pDevice)
+		, m_graphicsQueue(graphicsQueue)
+		, m_presentQueue(presentQueue)
 	{
-		m_pWindow = pWindow;
-		m_pSurface = pSurface;
-		m_pVKInstance = pInstance;
-		m_pPhysicalDevice = pPhysicalDevice;
-		m_pDevice = pDevice;
-		m_graphicsQueue = graphicsQueue;
-		m_presentQueue = presentQueue;
+		_createWindow(width, height, title);
+		_createSurface();
+		_createSwapchain();
+		_createSwapchainImageViews();
+		_createRenderers();
+		_createSemaphores();
+	}
+
+	Window::Window(std::shared_ptr<GLFWwindow> pWindow
+		, std::shared_ptr<vk::SurfaceKHR> pSurface
+		, std::shared_ptr<vk::Instance> pInstance
+		, std::shared_ptr<vk::PhysicalDevice> pPhysicalDevice
+		, std::shared_ptr<vk::Device> pDevice
+		, vk::Queue graphicsQueue
+		, vk::Queue presentQueue
+	)
+		: m_renderType(RendererType::BEGIN_RANGE)
+		, m_pWindow(pWindow)
+		, m_pSurface(pSurface)
+		, m_pVKInstance(pInstance)
+		, m_pPhysicalDevice(pPhysicalDevice)
+		, m_pDevice(pDevice)
+		, m_graphicsQueue(graphicsQueue)
+		, m_presentQueue(presentQueue)
+	{
+
+		glfwSetWindowUserPointer(pWindow.get(), this);
+		glfwSetWindowSizeCallback(pWindow.get(), onWindowResized);
+		_createSwapchain();
+		_createSwapchainImageViews();
+		_createRenderers();
+		_createSemaphores();
+	}
+
+	Window::Window(RendererType rendererType
+		, std::shared_ptr<GLFWwindow> pWindow
+		, std::shared_ptr<vk::SurfaceKHR> pSurface
+		, std::shared_ptr<vk::Instance> pInstance
+		, std::shared_ptr<vk::PhysicalDevice> pPhysicalDevice
+		, std::shared_ptr<vk::Device> pDevice
+		, vk::Queue graphicsQueue
+		, vk::Queue presentQueue
+	)
+		: m_renderType(rendererType)
+		, m_pWindow(pWindow)
+		, m_pSurface(pSurface)
+		, m_pVKInstance(pInstance)
+		, m_pPhysicalDevice(pPhysicalDevice)
+		, m_pDevice(pDevice)
+		, m_graphicsQueue(graphicsQueue)
+		, m_presentQueue(presentQueue)
+	{
+		
 		glfwSetWindowUserPointer(pWindow.get(), this);
 		glfwSetWindowSizeCallback(pWindow.get(), onWindowResized);
 		_createSwapchain();

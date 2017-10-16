@@ -36,20 +36,53 @@ namespace gfw
 			RANGE_SIZE = (END_RANGE - BEGIN_RANGE + 1)
 		};
 
+		Window(uint32_t width
+			, uint32_t height
+			, const char* title
+			, std::shared_ptr<vk::Instance> pInstance
+			, std::shared_ptr<vk::PhysicalDevice> pPhysicalDevice
+			, std::shared_ptr<vk::Device> pDevice
+			, vk::Queue graphicsQueue
+			, vk::Queue presentQueue
+		);
 
-		Window(uint32_t width, uint32_t height, const char* title,
-			std::shared_ptr<vk::Instance> pInstance, std::shared_ptr<vk::PhysicalDevice> pPhysicalDevice,
-			std::shared_ptr<vk::Device> pDevice, vk::Queue graphicsQueue, vk::Queue presentQueue);
-		Window(std::shared_ptr<GLFWwindow> pWindow, std::shared_ptr<vk::SurfaceKHR> pSurface,
-			std::shared_ptr<vk::Instance> pInstance, std::shared_ptr<vk::PhysicalDevice> pPhysicalDevice,
-			std::shared_ptr<vk::Device> pDevice, vk::Queue graphicsQueue, vk::Queue presentQueue);
+		Window(uint32_t width
+			, uint32_t height
+			, const char* title
+			, RendererType rendererType
+			, std::shared_ptr<vk::Instance> pInstance
+			, std::shared_ptr<vk::PhysicalDevice> pPhysicalDevice
+			, std::shared_ptr<vk::Device> pDevice
+			, vk::Queue graphicsQueue
+			, vk::Queue presentQueue
+		);
+
+		Window(std::shared_ptr<GLFWwindow> pWindow
+			, std::shared_ptr<vk::SurfaceKHR> pSurface
+			, std::shared_ptr<vk::Instance> pInstance
+			, std::shared_ptr<vk::PhysicalDevice> pPhysicalDevice
+			, std::shared_ptr<vk::Device> pDevice
+			, vk::Queue graphicsQueue
+			, vk::Queue presentQueue
+		);
+
+		Window(RendererType rendererType
+			, std::shared_ptr<GLFWwindow> pWindow
+			, std::shared_ptr<vk::SurfaceKHR> pSurface
+			, std::shared_ptr<vk::Instance> pInstance
+			, std::shared_ptr<vk::PhysicalDevice> pPhysicalDevice
+			, std::shared_ptr<vk::Device> pDevice
+			, vk::Queue graphicsQueue
+			, vk::Queue presentQueue
+		);
+
 		virtual ~Window();
 		void run();
 		void Window::windowSetShouldClose(Bool32 value);
 		gfw::Bool32 windowShouldClose();
 		std::shared_ptr<GLFWwindow> getGLFWWindow() const;
 	protected:
-		Window(const Window&);
+		Window(const Window&) = delete;
 
 		//--compositions
 		RendererType m_renderType;

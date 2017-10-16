@@ -125,6 +125,23 @@ namespace kgs
 						std::shared_ptr<vk::PipelineLayout> pPipelineLayout;
 						std::shared_ptr<vk::Pipeline> pPipeline;
 						_createPipelineForRender(pPipelineLayout, pPipeline, renderInfo, pMesh, pMaterial, subMeshIndex, passIndex);
+						_recordCommandBufferForRender(renderInfo, pPipelineLayout, pPipeline, pMesh, pMaterial, subMeshIndex, passIndex);
+
+						//submit
+
+						vk::PipelineStageFlags waitStages[] = { vk::PipelineStageFlagBits::eColorAttachmentOutput };
+
+						vk::SubmitInfo submitInfo = {
+							renderInfo.waitSemaphoreCount,        //waitSemaphoreCount
+							renderInfo.pWaitSemaphores,           //pWaitSemaphores
+							waitStages,                           //pWaitDstStageMask
+							1u,                                   //commandBufferCount
+							m_pCommandBuffer.get(),               //pCommandBuffers
+							renderInfo.signalSemaphoreCount,      //signalSemaphoreCount
+							renderInfo.pSignalSemaphores          //pSignalSemaphores
+						};
+
+						pContext->getGraphicsQueue().submit(submitInfo, nullptr);
 					}
 				}
 			}

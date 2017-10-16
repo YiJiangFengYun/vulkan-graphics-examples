@@ -9,38 +9,36 @@ namespace gfw {
 
 	Window::Window(uint32_t width, uint32_t height, const char* title,
 		std::shared_ptr<vk::Instance> pInstance, std::shared_ptr<vk::PhysicalDevice> pPhysicalDevice, 
-		std::shared_ptr<vk::Device> device, vk::Queue graphicsQueue, vk::Queue presentQueue)
+		std::shared_ptr<vk::Device> pDevice, vk::Queue graphicsQueue, vk::Queue presentQueue)
 	{
 		m_pVKInstance = pInstance;
 		m_pPhysicalDevice = pPhysicalDevice;
-		m_pDevice = device;
+		m_pDevice = pDevice;
 		m_graphicsQueue = graphicsQueue;
 		m_presentQueue = presentQueue;
 		_createWindow(width, height, title);
 		_createSurface();
 		_createSwapchain();
 		_createSwapchainImageViews();
-		_createCommandPool();
 		_createRenderers();
 		_createSemaphores();
 	}
 
 	Window::Window(std::shared_ptr<GLFWwindow> pWindow, std::shared_ptr<vk::SurfaceKHR> pSurface,
 		std::shared_ptr<vk::Instance> pInstance, std::shared_ptr<vk::PhysicalDevice> pPhysicalDevice,
-		std::shared_ptr<vk::Device> device, vk::Queue graphicsQueue, vk::Queue presentQueue)
+		std::shared_ptr<vk::Device> pDevice, vk::Queue graphicsQueue, vk::Queue presentQueue)
 	{
 		m_pWindow = pWindow;
 		m_pSurface = pSurface;
 		m_pVKInstance = pInstance;
 		m_pPhysicalDevice = pPhysicalDevice;
-		m_pDevice = device;
+		m_pDevice = pDevice;
 		m_graphicsQueue = graphicsQueue;
 		m_presentQueue = presentQueue;
 		glfwSetWindowUserPointer(pWindow.get(), this);
 		glfwSetWindowSizeCallback(pWindow.get(), onWindowResized);
 		_createSwapchain();
 		_createSwapchainImageViews();
-		_createCommandPool();
 		_createRenderers();
 		_createSemaphores();
 	}
@@ -159,18 +157,6 @@ namespace gfw {
 		}
 	}
 
-	void Window::_createCommandPool()
-	{
-		UsedQueueFamily queueFamilyIndices = UsedQueueFamily::findQueueFamilies(*m_pPhysicalDevice, *m_pSurface);
-
-		vk::CommandPoolCreateInfo createInfo = {
-			//vk::CommandPoolCreateFlags(),
-			vk::CommandPoolCreateFlagBits::eResetCommandBuffer,
-			static_cast<uint32_t>(queueFamilyIndices.graphicsFamily)
-		};
-		m_pCommandPool = fd::createCommandPool(m_pDevice, createInfo);
-	}
-
 	void Window::_createRenderers()
 	{
 		size_t num = m_swapchainImages.size();
@@ -194,13 +180,15 @@ namespace gfw {
 
 	void Window::_doUpdate()
 	{
+		_onPreUpdate();
+		_onPostUpdate();
 	}
 
 	void Window::_doRender()
 	{
-		_preRender();
+		_onPreRender();
 
-		_postRender();
+		_onPostRender();
 	}
 
 	void Window::_createImage(uint32_t width, uint32_t height, vk::Format format, vk::ImageTiling tiling,
@@ -265,62 +253,6 @@ namespace gfw {
 		return fd::createImageView(m_pDevice, createInfo);
 	}
 
-	void Window::_transitionImageLayout(vk::Image image, vk::Format format,
-		vk::ImageLayout oldLayout, vk::ImageLayout newLayout) {
-		auto commandBuffer = _beginSingleTimeCommands();
-
-		vk::ImageMemoryBarrier barrier = {};
-		barrier.oldLayout = oldLayout;
-		barrier.newLayout = newLayout;
-		barrier.srcQueueFamilyIndex = VK_QUEUE_FAMILY_IGNORED;
-		barrier.dstQueueFamilyIndex = VK_QUEUE_FAMILY_IGNORED;
-		barrier.image = image;
-
-		if (newLayout == vk::ImageLayout::eDepthStencilAttachmentOptimal)
-		{
-			barrier.subresourceRange.aspectMask = vk::ImageAspectFlagBits::eDepth | vk::ImageAspectFlagBits::eStencil;
-		}
-		else
-		{
-			barrier.subresourceRange.aspectMask = vk::ImageAspectFlagBits::eColor;
-		}
-		barrier.subresourceRange.baseMipLevel = 0;
-		barrier.subresourceRange.levelCount = 1;
-		barrier.subresourceRange.baseArrayLayer = 0;
-		barrier.subresourceRange.layerCount = 1;
-
-		if (oldLayout == vk::ImageLayout::eUndefined && newLayout == vk::ImageLayout::eTransferDstOptimal)
-		{
-			barrier.srcAccessMask = vk::AccessFlags();
-			barrier.dstAccessMask = vk::AccessFlagBits::eTransferWrite;
-		}
-		else if (oldLayout == vk::ImageLayout::eTransferDstOptimal && newLayout == vk::ImageLayout::eShaderReadOnlyOptimal)
-		{
-			barrier.srcAccessMask = vk::AccessFlagBits::eTransferWrite;
-			barrier.dstAccessMask = vk::AccessFlagBits::eShaderRead;
-		}
-		else if (oldLayout == vk::ImageLayout::eUndefined && newLayout == vk::ImageLayout::eDepthStencilAttachmentOptimal)
-		{
-			barrier.srcAccessMask = vk::AccessFlags();
-			barrier.dstAccessMask = vk::AccessFlagBits::eDepthStencilAttachmentRead |
-				vk::AccessFlagBits::eDepthStencilAttachmentWrite;
-		}
-		else
-		{
-			throw std::invalid_argument("Unsupported layout transition!");
-		}
-
-		commandBuffer->pipelineBarrier(vk::PipelineStageFlagBits::eTopOfPipe,
-			vk::PipelineStageFlagBits::eTopOfPipe,
-			vk::DependencyFlags(),
-			nullptr,
-			nullptr,
-			barrier
-		);
-
-		_endSingleTimeCommands(commandBuffer);
-	}
-
 	uint32_t Window::_findMemoryType(uint32_t typeFilter, vk::MemoryPropertyFlags properties)
 	{
 		vk::PhysicalDeviceMemoryProperties memProperties = m_pPhysicalDevice->getMemoryProperties();
@@ -334,30 +266,6 @@ namespace gfw {
 
 		throw std::runtime_error("Failed to find suitable memory type!");
 
-	}
-
-	std::shared_ptr<vk::CommandBuffer> Window::_beginSingleTimeCommands() {
-		vk::CommandBufferAllocateInfo allocateInfo = {
-			*m_pCommandPool,
-			vk::CommandBufferLevel::ePrimary,
-			uint32_t(1)
-		};
-		auto pCommandBuffer = fd::allocateCommandBuffer(m_pDevice, m_pCommandPool, allocateInfo);
-
-		vk::CommandBufferBeginInfo beginInfo = {
-			vk::CommandBufferUsageFlags(vk::CommandBufferUsageFlagBits::eOneTimeSubmit)
-		};
-		pCommandBuffer->begin(beginInfo);
-
-		return pCommandBuffer;
-	}
-
-	void Window::_endSingleTimeCommands(std::shared_ptr<vk::CommandBuffer> pCommandBuffer) {
-		pCommandBuffer->end();
-		vk::SubmitInfo submitInfo = { 0, nullptr, nullptr, 1, pCommandBuffer.get(), 0, nullptr };
-		m_graphicsQueue.submit(submitInfo, nullptr);
-		m_graphicsQueue.waitIdle();
-		pCommandBuffer = nullptr;
 	}
 
 	void Window::_onWindowResized(int32_t width, int32_t height)

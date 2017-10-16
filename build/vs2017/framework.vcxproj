@@ -41,6 +41,7 @@
     <ClInclude Include="..\..\framework\include\framework\world\scene.hpp" />
   </ItemGroup>
   <ItemGroup>
+    <None Include="..\..\framework\include\framework\app\app_base.inl" />
     <None Include="..\..\framework\include\framework\app\window.inl" />
   </ItemGroup>
   <PropertyGroup Label="Globals">

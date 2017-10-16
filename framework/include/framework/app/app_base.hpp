@@ -27,31 +27,14 @@ namespace gfw
 	class AppBase
 	{
 	public:
-		AppBase(uint32_t width, uint32_t height, const char *title);
+		AppBase();
 		~AppBase();
 		void virtual run();
+		template<typename MainWindow_T>
+		void init(uint32_t width, uint32_t height, const char *title);
 
 		template<typename Window_T>
-		void createSubWindow(uint32_t width, uint32_t height, const char *title)
-		{
-			std::shared_ptr<Window_T> window(new Window_T(width, height, title, m_pInstance, m_pPhysicalDevice,
-				m_pDevice, m_graphicsQueue, m_presentQueue));
-			/*{
-				auto& subWindowsMutex = m_subWindowsMutex;
-				std::lock_guard <std::mutex> lg(subWindowsMutex);
-				std::vector<std::shared_ptr<Window>>& pSubWindows = m_pSubWindows;*/
-			m_pSubWindows.push_back(window);
-
-			//	//create new thread to run window.
-			//	m_threadMaster.appendThread([&](std::shared_ptr<Window_T> window) {
-			//		window->run();
-			//		{
-			//			std::lock_guard <std::mutex> lg(subWindowsMutex);
-			//			pSubWindows.erase(window);
-			//		}
-			//	}, window);
-			//}
-		}
+		void createSubWindow(uint32_t width, uint32_t height, const char *title);
 
 		//gettor methods
 		std::shared_ptr<vk::Instance> getVKInstance();
@@ -59,10 +42,9 @@ namespace gfw
 		std::shared_ptr<vk::Device> getDevice();
 		vk::Queue getGraphicsQueue();
 		vk::Queue getPresentQueue();
-	protected:
 
-	private:
-		AppBase(const AppBase&);
+	protected:
+		AppBase(const AppBase&) = delete;
 
 		const char* m_appName;
 		uint32_t m_appVersion;
@@ -73,8 +55,8 @@ namespace gfw
 		std::shared_ptr<vk::Device> m_pDevice;
 		vk::Queue m_graphicsQueue;
 		vk::Queue m_presentQueue;
-		int32_t m_width;
-		int32_t m_height;
+		uint32_t m_width;
+		uint32_t m_height;
 		const char *m_title;
 		std::shared_ptr<gfw::Window> m_pWindow;
 		std::vector<std::shared_ptr<gfw::Window>> m_pSubWindows;
@@ -83,10 +65,16 @@ namespace gfw
 		//ThreadMaster m_threadMaster; 
 		//std::mutex m_subWindowsMutex;
 
-		void _init();
+		void _initEnv(uint32_t width
+			, uint32_t height
+			, const char *title
+			, std::shared_ptr<GLFWwindow> &pResultGLFWWindow
+			, std::shared_ptr<vk::SurfaceKHR> &pResultSurface);
 		bool _checkValidationLayerSupport();
 		void _pickPhysicalDevice(std::shared_ptr<vk::SurfaceKHR> psurface);
 		void _createLogicDevice(std::shared_ptr<vk::SurfaceKHR> pSurface);
+
+		template <typename MainWindow_T>
 		void _createWindow(std::shared_ptr<GLFWwindow> pWindow, std::shared_ptr<vk::SurfaceKHR> pSurface);
 
 		//tool methods.
@@ -111,5 +99,7 @@ namespace gfw
 #endif // DEBUG
 	};
 }
+
+#include "framework/app/app_base.inl"
 
 #endif // !GFW_APP_BASE_H

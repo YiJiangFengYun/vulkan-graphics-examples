@@ -27,21 +27,33 @@ namespace gfw
 	class Window
 	{
 	public:
+		enum class RendererType
+		{
+			RENDERER_2,
+			RENDERER_3,
+			BEGIN_RANGE = RENDERER_2,
+			END_RANGE = RENDERER_3,
+			RANGE_SIZE = (END_RANGE - BEGIN_RANGE + 1)
+		};
+
+
 		Window(uint32_t width, uint32_t height, const char* title,
 			std::shared_ptr<vk::Instance> pInstance, std::shared_ptr<vk::PhysicalDevice> pPhysicalDevice,
-			std::shared_ptr<vk::Device> device, vk::Queue graphicsQueue, vk::Queue presentQueue);
+			std::shared_ptr<vk::Device> pDevice, vk::Queue graphicsQueue, vk::Queue presentQueue);
 		Window(std::shared_ptr<GLFWwindow> pWindow, std::shared_ptr<vk::SurfaceKHR> pSurface,
 			std::shared_ptr<vk::Instance> pInstance, std::shared_ptr<vk::PhysicalDevice> pPhysicalDevice,
-			std::shared_ptr<vk::Device> device, vk::Queue graphicsQueue, vk::Queue presentQueue);
+			std::shared_ptr<vk::Device> pDevice, vk::Queue graphicsQueue, vk::Queue presentQueue);
 		virtual ~Window();
 		void run();
 		void Window::windowSetShouldClose(Bool32 value);
 		gfw::Bool32 windowShouldClose();
 		std::shared_ptr<GLFWwindow> getGLFWWindow() const;
-	private:
+	protected:
 		Window(const Window&);
 
 		//--compositions
+		RendererType m_renderType;
+
 		std::shared_ptr<GLFWwindow> m_pWindow;
 		std::shared_ptr<vk::SurfaceKHR> m_pSurface;
 		std::shared_ptr<vk::SwapchainKHR> m_pSwapchain;
@@ -49,7 +61,6 @@ namespace gfw
 		vk::Format m_swapchainImageFormat;
 		vk::Extent2D m_swapchainExtent;
 		std::vector<std::shared_ptr<vk::ImageView>> m_pSwapchainImageViews;
-		std::shared_ptr<vk::CommandPool> m_pCommandPool;
 		std::vector<std::shared_ptr<kgs::BaseRenderer>> m_pRenderers;
 		std::shared_ptr<vk::Semaphore> m_pImageAvailableSemaphore;
 		std::shared_ptr<vk::Semaphore> m_pRenderFinishedSemaphore;
@@ -70,27 +81,16 @@ namespace gfw
 		void _createSurface();
 		void _createSwapchain();
 		void _createSwapchainImageViews();
-		void _createCommandPool();
 		void _createRenderers();
 		void _createSemaphores();
 
 		void _doUpdate();
 		void _doRender();
 
-		inline void _preUpdate();
-		inline void _update();
-		inline void _postUpdate();
-
-		inline void _preRender();
-		inline void _render();
-		inline void _postRender();
-
 		virtual void _onPreUpdate() = 0;
-		virtual void _onUpdate() = 0;
 		virtual void _onPostUpdate() = 0;
 
 		virtual void _onPreRender() = 0;
-		virtual void _onRender() = 0;
 		virtual void _onPostRender() = 0;
 
 		// tool methods
@@ -98,10 +98,7 @@ namespace gfw
 			vk::ImageUsageFlags usage, vk::MemoryPropertyFlags properties,
 			std::shared_ptr<vk::Image>& pImage, std::shared_ptr<vk::DeviceMemory>& pImageMemory);
 		std::shared_ptr<vk::ImageView> _createImageView(vk::Image image, vk::Format format, vk::ImageAspectFlags aspectFlags);
-		void _transitionImageLayout(vk::Image image, vk::Format format, vk::ImageLayout oldLayout, vk::ImageLayout newLayout);
 		uint32_t _findMemoryType(uint32_t typeFilter, vk::MemoryPropertyFlags properties);
-		std::shared_ptr<vk::CommandBuffer> _beginSingleTimeCommands();
-		void _endSingleTimeCommands(std::shared_ptr<vk::CommandBuffer> pCommandBuffer);
 
 		//event handlers
 		void _onWindowResized(int32_t width, int32_t height);

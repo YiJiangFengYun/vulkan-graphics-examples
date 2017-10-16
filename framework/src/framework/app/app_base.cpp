@@ -12,16 +12,15 @@ namespace gfw {
 		pSubWindow->run();
 	}
 
-	AppBase::AppBase(uint32_t width, uint32_t height, const char *title)
+	AppBase::AppBase()
 		:m_appName("vulkan graphics"),
 		m_appVersion(VK_MAKE_VERSION(1, 0, 0)),
 		m_engineName("No engine"),
 		m_engineVersion(VK_MAKE_VERSION(1, 0, 0)),
-		m_width(width),
-		m_height(height),
-		m_title(title)
+		m_width(0u),
+		m_height(0u),
+		m_title("")
 	{
-		_init();
 	}
 
 	AppBase::~AppBase()
@@ -95,9 +94,15 @@ namespace gfw {
 		return m_presentQueue;
 	}
 
-	void AppBase::_init()
+	void AppBase::_initEnv(uint32_t width
+		, uint32_t height
+		, const char *title
+		, std::shared_ptr<GLFWwindow> &pResultGLFWWindow
+	    , std::shared_ptr<vk::SurfaceKHR> &pResultSurface)
 	{
-		LOG(plog::debug) << "Application initialization.";
+		m_width = width;
+		m_height = height;
+		m_title = title;
 
 		glfwInit();
 
@@ -154,14 +159,11 @@ namespace gfw {
 		_setupDebugCallBack();
 #endif // DEBUG
 
-		auto pWindow = _createGLFWWindow(m_width, m_height, m_title);
-		auto pSurface = _createVKSurface(pWindow);
+		pResultGLFWWindow = _createGLFWWindow(m_width, m_height, m_title);
+		pResultSurface = _createVKSurface(pResultGLFWWindow);
 
-		_pickPhysicalDevice(pSurface);
-		_createLogicDevice(pSurface);
-		_createWindow(pWindow, pSurface);
-
-		LOG(plog::debug) << "Application initialization complete.";
+		_pickPhysicalDevice(pResultSurface);
+		_createLogicDevice(pResultSurface);
 	}
 
 	bool AppBase::_checkValidationLayerSupport()
@@ -347,21 +349,6 @@ namespace gfw {
 
 		LOG(plog::debug) << "Create successfully logic device.";
 	}
-
-	void AppBase::_createWindow(std::shared_ptr<GLFWwindow> pWindow, std::shared_ptr<vk::SurfaceKHR> pSurface)
-	{
-		m_pWindow.reset(new Window(pWindow, pSurface, m_pInstance, m_pPhysicalDevice, m_pDevice,
-			m_graphicsQueue, m_presentQueue));
-	}
-
-	/*std::shared_ptr<Window> AppBase::_createSubWindow(uint32_t width, uint32_t height, const char* title)
-	{
-		std::shared_ptr<Window> window(new Window(width, height, title, m_instance, m_physicalDevice,
-			m_device, m_graphicsQueue, m_presentQueue));
-		m_pSubWindows.push_back(window);
-		return window;
-	}*/
-
 
 	std::vector<const char*> AppBase::_getRequiredExtensions()
 	{

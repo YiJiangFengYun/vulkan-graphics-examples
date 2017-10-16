@@ -8,7 +8,7 @@ namespace app
 	class App : public gfw::AppBase
 	{
 	public:
-		App(uint32_t width, uint32_t height, const char *title);
+		App();
 
 	private:
 

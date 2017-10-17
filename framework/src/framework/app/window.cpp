@@ -306,31 +306,42 @@ namespace gfw {
 			, VK_NULL_HANDLE
 			, &imageIndex);
 
-		if (result == VK_ERROR_OUT_OF_DATE_KHR)
-		{
-			_reCreate();
-		}
-		else if (result != VK_SUCCESS && result != VK_SUBOPTIMAL_KHR)
-		{
-			throw std::runtime_error("Failed to acquire swap chain image");
-		}
-
-		kgs::RenderInfo renderInfo;
-		renderInfo.waitSemaphoreCount = 1u;
-		renderInfo.pWaitSemaphores = m_pImageAvailableSemaphore.get();
-		renderInfo.signalSemaphoreCount = 1u;
-		renderInfo.pSignalSemaphores = m_pRenderFinishedSemaphore.get();
-
-		m_pRenderers[imageIndex]->render(renderInfo);
-
 		vk::PresentInfoKHR presentInfo = {
-			1u,              //waitSemaphoreCount
-			m_pRenderFinishedSemaphore.get(),   //pWaitSemaphores
+			0u,                                 //waitSemaphoreCount
+			nullptr,                            //pWaitSemaphores
 			1u,                                 //swapchainCount
 			m_pSwapchain.get(),                 //pSwapchains
 			&imageIndex,                        //pImageIndices
 			nullptr                             //pResults
 		};
+
+		if (m_pRenderers[imageIndex]->isValidForRender())
+		{
+			if (result == VK_ERROR_OUT_OF_DATE_KHR)
+			{
+				_reCreate();
+			}
+			else if (result != VK_SUCCESS && result != VK_SUBOPTIMAL_KHR)
+			{
+				throw std::runtime_error("Failed to acquire swap chain image");
+			}
+
+			kgs::RenderInfo renderInfo;
+			renderInfo.waitSemaphoreCount = 1u;
+			renderInfo.pWaitSemaphores = m_pImageAvailableSemaphore.get();
+			renderInfo.signalSemaphoreCount = 1u;
+			renderInfo.pSignalSemaphores = m_pRenderFinishedSemaphore.get();
+
+			m_pRenderers[imageIndex]->render(renderInfo);
+
+			presentInfo.waitSemaphoreCount = 1u;
+			presentInfo.pWaitSemaphores = m_pRenderFinishedSemaphore.get();
+		}
+		else
+		{
+			presentInfo.waitSemaphoreCount = 1u;
+			presentInfo.pWaitSemaphores = m_pImageAvailableSemaphore.get();
+		}
 
 		result = vkQueuePresentKHR(m_presentQueue, &VkPresentInfoKHR(presentInfo));
 

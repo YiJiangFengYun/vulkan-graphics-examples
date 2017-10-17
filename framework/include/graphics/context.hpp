@@ -30,6 +30,11 @@ namespace kgs
 		std::shared_ptr<vk::CommandPool> m_pCommandPoolForTransientBuffer;
 		std::shared_ptr<vk::CommandPool> m_pCommandPoolForResetBuffer;
 
+		inline void _init()
+		{
+			_createCommandPool();
+		}
+
 		void _createCommandPool();
 	};
 }

@@ -30,9 +30,19 @@ namespace kgs
 		_init();
 	}
 
+	Bool32 BaseRenderer::isValidForRender()
+	{
+		return _isValidForRender();
+	}
+
 	void BaseRenderer::render(RenderInfo renderInfo)
 	{
 		_render(renderInfo);
+	}
+
+	Bool32 BaseRenderer::_isValidForRender()
+	{
+		return KGS_TRUE;
 	}
 
 	void BaseRenderer::_render(RenderInfo renderInfo)

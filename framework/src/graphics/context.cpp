@@ -11,6 +11,7 @@ namespace kgs
 		, m_graphicsQueue(graphicsQueue)
 		, m_graphicsFamily(graphicsFamily)
 	{
+		_init();
 	}
 
 	Context::Context(const Context& device)
@@ -19,7 +20,7 @@ namespace kgs
 		, m_graphicsQueue(device.m_graphicsQueue)
 		, m_graphicsFamily(device.m_graphicsFamily)
 	{
-
+		_init();
 	}
 
 	Context::~Context()

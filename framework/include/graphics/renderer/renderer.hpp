@@ -27,6 +27,8 @@ namespace kgs
 		BaseRenderer(std::shared_ptr<TextureColorAttachment> pColorAttachmentTex
 		);
 
+		Bool32 isValidForRender();
+
 		void render(RenderInfo renderInfo);
 
 	protected:
@@ -48,6 +50,7 @@ namespace kgs
 		std::shared_ptr<TextureColorAttachment> m_pColorTexture;
 
 		virtual void _render(RenderInfo renderInfo);
+		virtual Bool32 _isValidForRender();
 
 		void _createRenderPass();
 		void _createDepthStencilTex();
@@ -114,6 +117,7 @@ namespace kgs
 		std::shared_ptr<SceneType> m_pScene;
 		std::shared_ptr<CameraType> m_pCamera;
 
+		Bool32 _isValidForRender() override;
 		void _render(RenderInfo renderInfo) override;
 
 		virtual Bool32 _checkVisualObjectInsideCameraView(std::shared_ptr<typename SceneType::VisualObjectType> pVisualObject) = 0;

@@ -9,7 +9,7 @@ namespace kgs
 		:BaseRenderer(pSwapchainImageView
 			, swapchainImageFormat
 			, swapchainImageWidth
-		    , swapchainImageHeight)
+			, swapchainImageHeight)
 	{
 	}
 
@@ -42,7 +42,7 @@ namespace kgs
 		, std::shared_ptr<SceneType> pScene
 		, std::shared_ptr<CameraType> pCamera
 	)
-		:BaseRenderer(pColorAttachmentTex)
+		: BaseRenderer(pColorAttachmentTex)
 		, m_pScene(pScene)
 		, m_pCamera(pCamera)
 	{
@@ -55,6 +55,27 @@ namespace kgs
 	{
 		m_pScene = pScene;
 		m_pCamera = pCamera;
+	}
+
+	template <SpaceType SPACE_TYPE>
+	Bool32 Renderer<SPACE_TYPE>::_isValidForRender()
+	{
+		if (m_pScene == nullptr || m_pCamera == nullptr)
+		{
+			if (m_pScene == nullptr)
+			{
+				//throw new std::runtime_error("Scene is not specified.");
+				LOG(plog::warning) << "Scene is not specified." << std::endl;
+			}
+
+			if (m_pCamera == nullptr)
+			{
+				//throw new std::runtime_error("Camera is not specified.");
+				LOG(plog::warning) << "Camera is not specified." << std::endl;
+			}
+			return KGS_FALSE;
+		}
+		return BaseRenderer::_isValidForRender();
 	}
 
 	template <SpaceType SPACE_TYPE>

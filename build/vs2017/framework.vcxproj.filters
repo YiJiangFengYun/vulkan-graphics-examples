@@ -10,9 +10,6 @@
     <Filter Include="include\framework">
       <UniqueIdentifier>{dbc93ddc-2dd4-470a-8bbb-90168f50fac8}</UniqueIdentifier>
     </Filter>
-    <Filter Include="include\framework\app">
-      <UniqueIdentifier>{5a7ad6bb-4076-456f-9f67-b45500aeb2bf}</UniqueIdentifier>
-    </Filter>
     <Filter Include="include\framework\util">
       <UniqueIdentifier>{cc1c0b45-3f2d-421a-b22b-920a17a4fbd2}</UniqueIdentifier>
     </Filter>
@@ -31,11 +28,14 @@
     <Filter Include="src\framework\world">
       <UniqueIdentifier>{fb6f33a7-d86c-4e22-b41d-e8041af0c377}</UniqueIdentifier>
     </Filter>
+    <Filter Include="include\framework\app1">
+      <UniqueIdentifier>{8108ccc1-ef20-4a65-a232-68539d968fa0}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="include\framework\app">
+      <UniqueIdentifier>{e9e482ca-da74-4d1f-9fb8-6c101815aea4}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
-    <ClCompile Include="..\..\framework\src\framework\app\app_base.cpp">
-      <Filter>src\framework\app</Filter>
-    </ClCompile>
     <ClCompile Include="..\..\framework\src\framework\app\queue_family.cpp">
       <Filter>src\framework\app</Filter>
     </ClCompile>
@@ -57,20 +57,11 @@
     <ClCompile Include="..\..\framework\src\framework\global.cpp">
       <Filter>src\framework</Filter>
     </ClCompile>
+    <ClCompile Include="..\..\framework\src\framework\app\app.cpp">
+      <Filter>src\framework\app</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
-    <ClInclude Include="..\..\framework\include\framework\app\app_base.hpp">
-      <Filter>include\framework\app</Filter>
-    </ClInclude>
-    <ClInclude Include="..\..\framework\include\framework\app\queue_family.hpp">
-      <Filter>include\framework\app</Filter>
-    </ClInclude>
-    <ClInclude Include="..\..\framework\include\framework\app\vulkan_ext.hpp">
-      <Filter>include\framework\app</Filter>
-    </ClInclude>
-    <ClInclude Include="..\..\framework\include\framework\app\window.hpp">
-      <Filter>include\framework\app</Filter>
-    </ClInclude>
     <ClInclude Include="..\..\framework\include\framework\world\scene.hpp">
       <Filter>include\framework\world</Filter>
     </ClInclude>
@@ -89,12 +80,24 @@
     <ClInclude Include="..\..\framework\include\framework\framework.hpp">
       <Filter>include\framework</Filter>
     </ClInclude>
+    <ClInclude Include="..\..\framework\include\framework\app\queue_family.hpp">
+      <Filter>include\framework\app</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\framework\include\framework\app\vulkan_ext.hpp">
+      <Filter>include\framework\app</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\framework\include\framework\app\window.hpp">
+      <Filter>include\framework\app</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\framework\include\framework\app\app.hpp">
+      <Filter>include\framework\app</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
-    <None Include="..\..\framework\include\framework\app\window.inl">
+    <None Include="..\..\framework\include\framework\app\app.inl">
       <Filter>include\framework\app</Filter>
     </None>
-    <None Include="..\..\framework\include\framework\app\app_base.inl">
+    <None Include="..\..\framework\include\framework\app\window.inl">
       <Filter>include\framework\app</Filter>
     </None>
   </ItemGroup>

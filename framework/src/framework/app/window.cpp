@@ -306,15 +306,6 @@ namespace gfw {
 			, VK_NULL_HANDLE
 			, &imageIndex);
 
-		vk::PresentInfoKHR presentInfo = {
-			0u,                                 //waitSemaphoreCount
-			nullptr,                            //pWaitSemaphores
-			1u,                                 //swapchainCount
-			m_pSwapchain.get(),                 //pSwapchains
-			&imageIndex,                        //pImageIndices
-			nullptr                             //pResults
-		};
-
 		if (m_pRenderers[imageIndex]->isValidForRender())
 		{
 			if (result == VK_ERROR_OUT_OF_DATE_KHR)
@@ -334,35 +325,41 @@ namespace gfw {
 
 			m_pRenderers[imageIndex]->render(renderInfo);
 
-			presentInfo.waitSemaphoreCount = 1u;
-			presentInfo.pWaitSemaphores = m_pRenderFinishedSemaphore.get();
+			vk::PresentInfoKHR presentInfo = {
+				1u,                                 //waitSemaphoreCount
+				m_pRenderFinishedSemaphore.get(),   //pWaitSemaphores
+				1u,                                 //swapchainCount
+				m_pSwapchain.get(),                 //pSwapchains
+				&imageIndex,                        //pImageIndices
+				nullptr                             //pResults
+			};
+
+
+			result = vkQueuePresentKHR(m_presentQueue, &VkPresentInfoKHR(presentInfo));
+
+			if (result == VK_ERROR_OUT_OF_DATE_KHR || result == VK_SUBOPTIMAL_KHR)
+			{
+				_reCreate();
+			}
+			else if (result != VK_SUCCESS)
+			{
+				throw std::runtime_error("Failed to present swap chain image!");
+			}
+
+			/**
+			If you run your application with validation layers enabled and you monitor the memory usage of your application,
+			you may notice that it is slowly growing. The reason for this is that the validation layer implementation expects
+			the application to explicitly synchronize with the GPU. Although this is technically not required, doing so once a
+			frame will not noticeably affect performance.
+			**/
+#ifdef ENABLE_VALIDATION_LAYERS
+			vkQueueWaitIdle(m_presentQueue);
+#endif //ENABLE_VALIDATION_LAYERS
 		}
 		else
 		{
-			presentInfo.waitSemaphoreCount = 1u;
-			presentInfo.pWaitSemaphores = m_pImageAvailableSemaphore.get();
+			throw std::runtime_error("Renderer is invalid for render.");
 		}
-
-		result = vkQueuePresentKHR(m_presentQueue, &VkPresentInfoKHR(presentInfo));
-
-		if (result == VK_ERROR_OUT_OF_DATE_KHR || result == VK_SUBOPTIMAL_KHR)
-		{
-			_reCreate();
-		}
-		else if (result != VK_SUCCESS)
-		{
-			throw std::runtime_error("Failed to present swap chain image!");
-		}
-
-		/**
-		If you run your application with validation layers enabled and you monitor the memory usage of your application,
-		you may notice that it is slowly growing. The reason for this is that the validation layer implementation expects
-		the application to explicitly synchronize with the GPU. Although this is technically not required, doing so once a
-		frame will not noticeably affect performance.
-		**/
-#ifdef ENABLE_VALIDATION_LAYERS
-		vkQueueWaitIdle(m_presentQueue);
-#endif //ENABLE_VALIDATION_LAYERS
 	}
 
 	void Window::_createImage(uint32_t width, uint32_t height, vk::Format format, vk::ImageTiling tiling,

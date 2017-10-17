@@ -241,6 +241,7 @@ namespace kgs
 	void BaseRenderer::_init()
 	{
 		_createRenderPass();
+		_createDepthStencilTex();
 		_createFramebuffer();
 		_createCommandBuffer();
 	}
@@ -317,6 +318,13 @@ namespace kgs
 
 		auto pDevice = pContext->getNativeDevice();
 		m_pRenderPass = fd::createRenderPass(pDevice, createInfo);
+	}
+
+	void BaseRenderer::_createDepthStencilTex()
+	{
+		m_pDepthStencilTexture = std::shared_ptr<TextureDepthStencilAttachment>(
+			new TextureDepthStencilAttachment(TextureFormat::D32_SFLOAT_S8_UINT, m_framebufferWidth, m_framebufferHeight)
+			);
 	}
 
 	void BaseRenderer::_createFramebuffer()

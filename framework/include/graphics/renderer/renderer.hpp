@@ -50,6 +50,7 @@ namespace kgs
 		virtual void _render(RenderInfo renderInfo);
 
 		void _createRenderPass();
+		void _createDepthStencilTex();
 		void _createFramebuffer();
 		void _createCommandBuffer();
 

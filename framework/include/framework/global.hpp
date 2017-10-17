@@ -16,6 +16,10 @@
 #include <foundation/foundation.hpp>
 #include <cstdint>
 
+#ifdef DEBUG
+#define ENABLE_VALIDATION_LAYERS
+#endif // DEBUG
+
 namespace gfw
 { 
 	typedef uint32_t Bool32;

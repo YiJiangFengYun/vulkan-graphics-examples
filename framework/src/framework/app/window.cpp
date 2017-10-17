@@ -275,17 +275,83 @@ namespace gfw {
 		m_pRenderFinishedSemaphore = fd::createSemaphore(m_pDevice, createInfo);
 	}
 
+	void Window::_reCreate()
+	{
+		_createSwapchain();
+		_createSwapchainImageViews();
+		_createRenderers();
+	}
+
 	void Window::_doUpdate()
 	{
 		_onPreUpdate();
+		_update();
 		_onPostUpdate();
 	}
 
 	void Window::_doRender()
 	{
 		_onPreRender();
-
+		_render();
 		_onPostRender();
+	}
+
+	void Window::_render()
+	{
+		uint32_t imageIndex;
+		VkResult result = vkAcquireNextImageKHR(*m_pDevice
+			, *m_pSwapchain
+			, std::numeric_limits<uint64_t>::max()
+			, *m_pImageAvailableSemaphore
+			, VK_NULL_HANDLE
+			, &imageIndex);
+
+		if (result == VK_ERROR_OUT_OF_DATE_KHR)
+		{
+			_reCreate();
+		}
+		else if (result != VK_SUCCESS && result != VK_SUBOPTIMAL_KHR)
+		{
+			throw std::runtime_error("Failed to acquire swap chain image");
+		}
+
+		kgs::RenderInfo renderInfo;
+		renderInfo.waitSemaphoreCount = 1u;
+		renderInfo.pWaitSemaphores = m_pImageAvailableSemaphore.get();
+		renderInfo.signalSemaphoreCount = 1u;
+		renderInfo.pSignalSemaphores = m_pRenderFinishedSemaphore.get();
+
+		m_pRenderers[imageIndex]->render(renderInfo);
+
+		vk::PresentInfoKHR presentInfo = {
+			1u,              //waitSemaphoreCount
+			m_pRenderFinishedSemaphore.get(),   //pWaitSemaphores
+			1u,                                 //swapchainCount
+			m_pSwapchain.get(),                 //pSwapchains
+			&imageIndex,                        //pImageIndices
+			nullptr                             //pResults
+		};
+
+		result = vkQueuePresentKHR(m_presentQueue, &VkPresentInfoKHR(presentInfo));
+
+		if (result == VK_ERROR_OUT_OF_DATE_KHR || result == VK_SUBOPTIMAL_KHR)
+		{
+			_reCreate();
+		}
+		else if (result != VK_SUCCESS)
+		{
+			throw std::runtime_error("Failed to present swap chain image!");
+		}
+
+		/**
+		If you run your application with validation layers enabled and you monitor the memory usage of your application,
+		you may notice that it is slowly growing. The reason for this is that the validation layer implementation expects
+		the application to explicitly synchronize with the GPU. Although this is technically not required, doing so once a
+		frame will not noticeably affect performance.
+		**/
+#ifdef ENABLE_VALIDATION_LAYERS
+		vkQueueWaitIdle(m_presentQueue);
+#endif //ENABLE_VALIDATION_LAYERS
 	}
 
 	void Window::_createImage(uint32_t width, uint32_t height, vk::Format format, vk::ImageTiling tiling,
@@ -370,9 +436,7 @@ namespace gfw {
 		LOG(plog::debug) << "Context resize.";
 
 		//recreate.
-		_createSwapchain();
-		_createSwapchainImageViews();
-		_createRenderers();
+		_reCreate();
 	}
 
 	void onWindowResized(GLFWwindow* window, int32_t width, int32_t height)

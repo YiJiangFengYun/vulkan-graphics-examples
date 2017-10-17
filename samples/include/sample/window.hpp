@@ -19,6 +19,7 @@ namespace app
 
 	private:
 		void _onPreUpdate() override;
+		void _update() override;
 		void _onPostUpdate() override;
 
 		void _onPreRender() override;

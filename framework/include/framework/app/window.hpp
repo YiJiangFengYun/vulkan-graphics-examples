@@ -135,13 +135,17 @@ namespace gfw
 		void _createRenderers();
 		void _createSemaphores();
 
+		void _reCreate();
+
 		void _doUpdate();
 		void _doRender();
 
 		virtual void _onPreUpdate() = 0;
+		virtual void _update() = 0;
 		virtual void _onPostUpdate() = 0;
 
 		virtual void _onPreRender() = 0;
+		virtual void _render();
 		virtual void _onPostRender() = 0;
 
 		// tool methods

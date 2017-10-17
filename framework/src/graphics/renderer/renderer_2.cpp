@@ -58,6 +58,6 @@ namespace kgs
 
 	Bool32 Renderer2::_checkVisualObjectInsideCameraView(std::shared_ptr<typename SceneType::VisualObjectType> pVisualObject)
 	{
-
+		return KGS_TRUE;
 	}
 } //namespace kgs

@@ -11,12 +11,11 @@
 
 namespace gfw
 {
-#ifdef DEBUG
-#define ENABLE_VALIDATION_LAYERS
+#ifdef ENABLE_VALIDATION_LAYERS
 	const std::vector<const char*> validationlayers = {
 		"VK_LAYER_LUNARG_standard_validation"
 	};
-#endif // DEBUG
+#endif // ENABLE_VALIDATION_LAYERS
 
 	const std::vector<const char*> deviceExtensionNames = {
 		VK_KHR_SWAPCHAIN_EXTENSION_NAME

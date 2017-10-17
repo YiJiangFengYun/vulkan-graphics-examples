@@ -23,6 +23,11 @@ namespace app
 
 	}
 
+	void Window::_update()
+	{
+
+	}
+
 	void Window::_onPostUpdate()
 	{
 

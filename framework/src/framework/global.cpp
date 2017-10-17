@@ -10,7 +10,6 @@ namespace gfw
 	{
 		if (isInited == GFW_TRUE) return;
 		fd::init();
-		//kgs::init();
 		isInited = GFW_TRUE;
 	}
 }

@@ -6,10 +6,14 @@
 
 const uint32_t WINDOW_WIDTH = 800;
 const uint32_t WINDOW_HEIGHT = 600;
+std::vector<char> readFile(const std::string& filename);
 int main() {
 
 	//kgs::initGraphics();
 	gfw::init();
+
+	auto vertShaderCode = readFile("shaders/vert.spv");
+	auto fragShaderCode = readFile("shaders/frag.spv");
 
 	app::App app;
 	app.init<app::Window>(WINDOW_WIDTH, WINDOW_HEIGHT, "sample");
@@ -18,4 +22,23 @@ int main() {
 	app.run();
 
 	return 0;
+}
+
+std::vector<char> readFile(const std::string& filename)
+{
+	std::ifstream file(filename, std::ios::ate | std::ios::binary);
+
+	if (!file.is_open()) {
+		throw std::runtime_error("failed to open file!");
+	}
+
+	size_t fileSize = (size_t)file.tellg();
+	std::vector<char> buffer(fileSize);
+
+	file.seekg(0);
+	file.read(buffer.data(), fileSize);
+
+	file.close();
+
+	return buffer;
 }

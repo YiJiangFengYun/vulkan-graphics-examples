@@ -82,19 +82,27 @@
   <PropertyGroup Label="UserMacros" />
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
     <LinkIncremental>true</LinkIncremental>
-    <IntDir>$(ProjectName)\$(Configuration)\</IntDir>
-    <OutDir>$(GS_PROJECT_ROOT)\bin\Win32\</OutDir>
+    <IntDir>$(ProjectName)\$(Platform)\$(Configuration)\</IntDir>
+    <OutDir>$(GS_PROJECT_ROOT)\bin\$(Platform)\$(Configuration)\</OutDir>
+    <SourcePath>$(GS_PROJECT_ROOT)\samples\resources\;$(SourcePath)</SourcePath>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
     <LinkIncremental>true</LinkIncremental>
     <IntDir>$(ProjectName)\$(Platform)\$(Configuration)\</IntDir>
-    <OutDir>$(GS_PROJECT_ROOT)\bin\X64\</OutDir>
+    <OutDir>$(GS_PROJECT_ROOT)\bin\$(Platform)\$(Configuration)\</OutDir>
+    <SourcePath>$(GS_PROJECT_ROOT)\samples\resources\;$(SourcePath)</SourcePath>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
     <LinkIncremental>false</LinkIncremental>
+    <SourcePath>$(GS_PROJECT_ROOT)\samples\resources\;$(SourcePath)</SourcePath>
+    <OutDir>$(GS_PROJECT_ROOT)\bin\$(Platform)\$(Configuration)\</OutDir>
+    <IntDir>$(ProjectName)\$(Platform)\$(Configuration)\</IntDir>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
     <LinkIncremental>false</LinkIncremental>
+    <OutDir>$(GS_PROJECT_ROOT)\bin\$(Platform)\$(Configuration)\</OutDir>
+    <SourcePath>$(GS_PROJECT_ROOT)\samples\resources\;$(SourcePath)</SourcePath>
+    <IntDir>$(ProjectName)\$(Platform)\$(Configuration)\</IntDir>
   </PropertyGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
     <ClCompile>

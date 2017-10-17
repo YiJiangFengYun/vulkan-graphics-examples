@@ -23,6 +23,7 @@
     <ProjectGuid>{4F3426AE-EA32-4391-AE63-18F1FE9155FB}</ProjectGuid>
     <RootNamespace>graphicsframework</RootNamespace>
     <WindowsTargetPlatformVersion>10.0.14393.0</WindowsTargetPlatformVersion>
+    <ProjectName>testlib</ProjectName>
   </PropertyGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.Default.props" />
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'" Label="Configuration">

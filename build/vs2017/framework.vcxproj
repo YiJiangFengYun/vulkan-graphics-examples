@@ -19,7 +19,7 @@
     </ProjectConfiguration>
   </ItemGroup>
   <ItemGroup>
-    <ClCompile Include="..\..\framework\src\framework\app\app_base.cpp" />
+    <ClCompile Include="..\..\framework\src\framework\app\app.cpp" />
     <ClCompile Include="..\..\framework\src\framework\app\queue_family.cpp" />
     <ClCompile Include="..\..\framework\src\framework\app\vulkan_ext.cpp" />
     <ClCompile Include="..\..\framework\src\framework\app\window.cpp" />
@@ -29,7 +29,7 @@
     <ClCompile Include="..\..\framework\src\framework\world\scene.cpp" />
   </ItemGroup>
   <ItemGroup>
-    <ClInclude Include="..\..\framework\include\framework\app\app_base.hpp" />
+    <ClInclude Include="..\..\framework\include\framework\app\app.hpp" />
     <ClInclude Include="..\..\framework\include\framework\app\queue_family.hpp" />
     <ClInclude Include="..\..\framework\include\framework\app\vulkan_ext.hpp" />
     <ClInclude Include="..\..\framework\include\framework\app\window.hpp" />
@@ -41,7 +41,7 @@
     <ClInclude Include="..\..\framework\include\framework\world\scene.hpp" />
   </ItemGroup>
   <ItemGroup>
-    <None Include="..\..\framework\include\framework\app\app_base.inl" />
+    <None Include="..\..\framework\include\framework\app\app.inl" />
     <None Include="..\..\framework\include\framework\app\window.inl" />
   </ItemGroup>
   <PropertyGroup Label="Globals">

@@ -23,11 +23,11 @@ namespace gfw
 
 	bool checkDeviceExtensionSupport(const vk::PhysicalDevice& physicalDevice, std::vector<const char*> deviceExtensionNames);
 
-	class AppBase
+	class App
 	{
 	public:
-		AppBase();
-		~AppBase();
+		App();
+		~App();
 		void virtual run();
 		template<typename MainWindow_T>
 		void init(uint32_t width, uint32_t height, const char *title);
@@ -43,7 +43,7 @@ namespace gfw
 		vk::Queue getPresentQueue();
 
 	protected:
-		AppBase(const AppBase&) = delete;
+		App(const App&) = delete;
 
 		const char* m_appName;
 		uint32_t m_appVersion;
@@ -78,8 +78,8 @@ namespace gfw
 		void _createWindow(std::shared_ptr<GLFWwindow> pWindow, std::shared_ptr<vk::SurfaceKHR> pSurface);
 
 		//tool methods.
-		std::shared_ptr<GLFWwindow> AppBase::_createGLFWWindow(uint32_t width, uint32_t height, const char* title);
-		std::shared_ptr<vk::SurfaceKHR> AppBase::_createVKSurface(std::shared_ptr<GLFWwindow> pWindow);
+		std::shared_ptr<GLFWwindow> _createGLFWWindow(uint32_t width, uint32_t height, const char* title);
+		std::shared_ptr<vk::SurfaceKHR> _createVKSurface(std::shared_ptr<GLFWwindow> pWindow);
 		std::vector<const char*> _getRequiredExtensions();
 #ifdef DEBUG
 		vk::DebugReportCallbackEXT m_debugReportCallBack;
@@ -100,6 +100,6 @@ namespace gfw
 	};
 }
 
-#include "framework/app/app_base.inl"
+#include "framework/app/app.inl"
 
 #endif // !GFW_APP_BASE_H

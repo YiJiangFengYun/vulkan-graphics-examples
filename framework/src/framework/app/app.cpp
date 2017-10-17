@@ -1,4 +1,4 @@
-#include "framework/app/app_base.hpp"
+#include "framework/app/app.hpp"
 
 #include <plog/Log.h>
 #include <plog/Appenders/DebugOutputAppender.h>
@@ -12,7 +12,7 @@ namespace gfw {
 		pSubWindow->run();
 	}
 
-	AppBase::AppBase()
+	App::App()
 		:m_appName("vulkan graphics"),
 		m_appVersion(VK_MAKE_VERSION(1, 0, 0)),
 		m_engineName("No engine"),
@@ -23,7 +23,7 @@ namespace gfw {
 	{
 	}
 
-	AppBase::~AppBase()
+	App::~App()
 	{
 		m_pWindow = nullptr;
 		m_pSubWindows.resize(0);
@@ -38,7 +38,7 @@ namespace gfw {
 		glfwTerminate();
 	}
 
-	void AppBase::run()
+	void App::run()
 	{
 		//std::thread thread_test;
 
@@ -69,32 +69,32 @@ namespace gfw {
 		_createSubWindow(width, height, title);
 	}*/
 
-	std::shared_ptr<vk::Instance> AppBase::getVKInstance()
+	std::shared_ptr<vk::Instance> App::getVKInstance()
 	{
 		return m_pInstance;
 	}
 
-	std::shared_ptr<vk::PhysicalDevice> AppBase::getPhysicalDevice()
+	std::shared_ptr<vk::PhysicalDevice> App::getPhysicalDevice()
 	{
 		return m_pPhysicalDevice;
 	}
 
-	std::shared_ptr<vk::Device> AppBase::getDevice()
+	std::shared_ptr<vk::Device> App::getDevice()
 	{
 		return m_pDevice;
 	}
 
-	vk::Queue AppBase::getGraphicsQueue()
+	vk::Queue App::getGraphicsQueue()
 	{
 		return m_graphicsQueue;
 	}
 
-	vk::Queue AppBase::getPresentQueue()
+	vk::Queue App::getPresentQueue()
 	{
 		return m_presentQueue;
 	}
 
-	void AppBase::_initEnv(uint32_t width
+	void App::_initEnv(uint32_t width
 		, uint32_t height
 		, const char *title
 		, std::shared_ptr<GLFWwindow> &pResultGLFWWindow
@@ -167,7 +167,7 @@ namespace gfw {
 		_initGrahpicsModule(pResultSurface);
 	}
 
-	bool AppBase::_checkValidationLayerSupport()
+	bool App::_checkValidationLayerSupport()
 	{
 		//query available layers.
 		auto avaibleLayers = vk::enumerateInstanceLayerProperties();
@@ -200,17 +200,17 @@ namespace gfw {
 		return true;
 	}
 
-	std::shared_ptr<GLFWwindow> AppBase::_createGLFWWindow(uint32_t width, uint32_t height, const char* title)
+	std::shared_ptr<GLFWwindow> App::_createGLFWWindow(uint32_t width, uint32_t height, const char* title)
 	{
 		return fd::createGLFWWindow(width, height, title);
 	}
 
-	std::shared_ptr<vk::SurfaceKHR> AppBase::_createVKSurface(std::shared_ptr<GLFWwindow> pWindow)
+	std::shared_ptr<vk::SurfaceKHR> App::_createVKSurface(std::shared_ptr<GLFWwindow> pWindow)
 	{
 		return fd::createSurface(m_pInstance, pWindow);
 	}
 
-	void AppBase::_pickPhysicalDevice(std::shared_ptr<vk::SurfaceKHR> pSurface)
+	void App::_pickPhysicalDevice(std::shared_ptr<vk::SurfaceKHR> pSurface)
 	{
 		auto physicalDevices = m_pInstance->enumeratePhysicalDevices();
 
@@ -303,7 +303,7 @@ namespace gfw {
 		LOG(plog::debug) << "Pick successfully physical device.";
 	}
 
-	void AppBase::_createLogicDevice(std::shared_ptr<vk::SurfaceKHR> pSurface)
+	void App::_createLogicDevice(std::shared_ptr<vk::SurfaceKHR> pSurface)
 	{
 		UsedQueueFamily usedQueueFamily = UsedQueueFamily::findQueueFamilies(*m_pPhysicalDevice, *pSurface);
 		std::vector<vk::DeviceQueueCreateInfo> queueCreateInfos;
@@ -351,13 +351,13 @@ namespace gfw {
 		LOG(plog::debug) << "Create successfully logic device.";
 	}
 
-	void AppBase::_initGrahpicsModule(std::shared_ptr<vk::SurfaceKHR> pSurface)
+	void App::_initGrahpicsModule(std::shared_ptr<vk::SurfaceKHR> pSurface)
 	{
 		UsedQueueFamily usedQueueFamily = UsedQueueFamily::findQueueFamilies(*m_pPhysicalDevice, *pSurface);
 		kgs::init(m_pPhysicalDevice, m_pDevice, m_graphicsQueue, usedQueueFamily.graphicsFamily);
 	}
 
-	std::vector<const char*> AppBase::_getRequiredExtensions()
+	std::vector<const char*> App::_getRequiredExtensions()
 	{
 		std::vector<const char*> requiredExtensions;
 
@@ -387,7 +387,7 @@ namespace gfw {
 	}
 
 #ifdef DEBUG
-	void AppBase::_setupDebugCallBack()
+	void App::_setupDebugCallBack()
 	{
 		vk::DebugReportCallbackCreateInfoEXT createInfo = {
 			vk::DebugReportFlagBitsEXT::eDebug |
@@ -405,7 +405,7 @@ namespace gfw {
 		m_debugReportCallBack = callback;
 	}
 
-	void AppBase::_onDebugCallBack(vk::DebugReportFlagsEXT flags, vk::DebugReportObjectTypeEXT objType,
+	void App::_onDebugCallBack(vk::DebugReportFlagsEXT flags, vk::DebugReportObjectTypeEXT objType,
 		uint64_t obj, size_t location, int32_t code, const char* layerPrefix,
 		const char* msg)
 	{
@@ -447,7 +447,7 @@ namespace gfw {
 		const char* msg,
 		void * userData)
 	{
-		AppBase* context = (AppBase *)userData;
+		App* context = (App *)userData;
 		context->_onDebugCallBack(vk::DebugReportFlagsEXT(vk::DebugReportFlagBitsEXT(flags)),
 			vk::DebugReportObjectTypeEXT(objType),
 			obj, location,

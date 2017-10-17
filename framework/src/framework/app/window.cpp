@@ -16,7 +16,7 @@ namespace gfw {
 		, vk::Queue graphicsQueue
 		, vk::Queue presentQueue
 	)
-		: m_renderType(RendererType::BEGIN_RANGE)
+		: m_renderType(RenderType::BEGIN_RANGE)
 		, m_pVKInstance(pInstance)
 		, m_pPhysicalDevice(pPhysicalDevice)
 		, m_pDevice(pDevice)
@@ -34,14 +34,14 @@ namespace gfw {
 	Window::Window(uint32_t width
 		, uint32_t height
 		, const char* title
-		, RendererType rendererType
+		, RenderType renderType
 		, std::shared_ptr<vk::Instance> pInstance
 		, std::shared_ptr<vk::PhysicalDevice> pPhysicalDevice
 		, std::shared_ptr<vk::Device> pDevice
 		, vk::Queue graphicsQueue
 		, vk::Queue presentQueue
 	)
-		: m_renderType(rendererType)
+		: m_renderType(renderType)
 		, m_pVKInstance(pInstance)
 		, m_pPhysicalDevice(pPhysicalDevice)
 		, m_pDevice(pDevice)
@@ -64,7 +64,7 @@ namespace gfw {
 		, vk::Queue graphicsQueue
 		, vk::Queue presentQueue
 	)
-		: m_renderType(RendererType::BEGIN_RANGE)
+		: m_renderType(RenderType::BEGIN_RANGE)
 		, m_pWindow(pWindow)
 		, m_pSurface(pSurface)
 		, m_pVKInstance(pInstance)
@@ -82,7 +82,7 @@ namespace gfw {
 		_createSemaphores();
 	}
 
-	Window::Window(RendererType rendererType
+	Window::Window(RenderType renderType
 		, std::shared_ptr<GLFWwindow> pWindow
 		, std::shared_ptr<vk::SurfaceKHR> pSurface
 		, std::shared_ptr<vk::Instance> pInstance
@@ -91,7 +91,7 @@ namespace gfw {
 		, vk::Queue graphicsQueue
 		, vk::Queue presentQueue
 	)
-		: m_renderType(rendererType)
+		: m_renderType(renderType)
 		, m_pWindow(pWindow)
 		, m_pSurface(pSurface)
 		, m_pVKInstance(pInstance)
@@ -100,7 +100,7 @@ namespace gfw {
 		, m_graphicsQueue(graphicsQueue)
 		, m_presentQueue(presentQueue)
 	{
-		
+
 		glfwSetWindowUserPointer(pWindow.get(), this);
 		glfwSetWindowSizeCallback(pWindow.get(), onWindowResized);
 		_createSwapchain();
@@ -125,7 +125,7 @@ namespace gfw {
 		//{
 		//	//synchronization
 		//	std::lock_guard<std::mutex> lg(m_windowMutex);
-			glfwSetWindowShouldClose(m_pWindow.get(), value);
+		glfwSetWindowShouldClose(m_pWindow.get(), value);
 		//}
 	}
 
@@ -134,7 +134,7 @@ namespace gfw {
 		//{
 		//	//synchronization
 		//	std::lock_guard<std::mutex> lg(m_windowMutex);
-			return glfwWindowShouldClose(m_pWindow.get());
+		return glfwWindowShouldClose(m_pWindow.get());
 		//}
 	}
 
@@ -226,11 +226,42 @@ namespace gfw {
 	void Window::_createRenderers()
 	{
 		size_t num = m_swapchainImages.size();
-		m_pRenderers.resize(m_swapchainImages.size());
 
+		//Clear references in m_pRenderers.
+		m_pRenderers.resize(0u);
+		m_pRenderers.resize(m_swapchainImages.size(), nullptr);
+
+		//Create the renders of the specified type.
 		for (size_t i = 0; i < num; ++i)
 		{
-			//m_pRenderers[i] = new  
+			switch (m_renderType)
+			{
+			case RenderType::RENDERER_2:
+			{
+				m_pRenderers[i] = std::shared_ptr<kgs::BaseRenderer>(
+					new RenderTypeInfo<RenderType::RENDERER_2>::RendererType(m_pSwapchainImageViews[i]
+						, m_swapchainImageFormat
+					    , m_swapchainExtent.width
+					    , m_swapchainExtent.height
+					)
+				);
+				break;
+			}
+			case RenderType::RENDERER_3:
+			{
+				m_pRenderers[i] = std::shared_ptr<kgs::BaseRenderer>(
+					new RenderTypeInfo<RenderType::RENDERER_3>::RendererType(m_pSwapchainImageViews[i]
+						, m_swapchainImageFormat
+					    , m_swapchainExtent.width
+					    , m_swapchainExtent.height
+					)
+				);
+				break;
+			}
+			default:
+				throw std::runtime_error("Render type of window is invalid.");
+				break;
+			}
 		}
 	}
 
@@ -258,7 +289,7 @@ namespace gfw {
 	}
 
 	void Window::_createImage(uint32_t width, uint32_t height, vk::Format format, vk::ImageTiling tiling,
-		vk::ImageUsageFlags usage, vk::MemoryPropertyFlags properties, 
+		vk::ImageUsageFlags usage, vk::MemoryPropertyFlags properties,
 		std::shared_ptr<vk::Image>& pImage, std::shared_ptr<vk::DeviceMemory>& pImageMemory)
 	{
 		vk::ImageCreateInfo createInfo = {

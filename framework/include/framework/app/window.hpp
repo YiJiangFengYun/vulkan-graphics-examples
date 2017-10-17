@@ -10,7 +10,7 @@
 #include <GLFW/glfw3.h>
 #include "framework/app/queue_family.hpp"
 #include "foundation/wrapper.hpp"
-#include <graphics/renderer/renderer.hpp>
+#include <graphics/graphics.hpp>
 
 namespace gfw
 {
@@ -27,13 +27,31 @@ namespace gfw
 	class Window
 	{
 	public:
-		enum class RendererType
+		enum class RenderType
 		{
 			RENDERER_2,
 			RENDERER_3,
 			BEGIN_RANGE = RENDERER_2,
 			END_RANGE = RENDERER_3,
 			RANGE_SIZE = (END_RANGE - BEGIN_RANGE + 1)
+		};
+
+		template<RenderType type>
+		struct RenderTypeInfo
+		{
+			typedef kgs::BaseRenderer RendererType;
+		};
+
+		template<>
+		struct RenderTypeInfo<RenderType::RENDERER_2>
+		{
+			typedef kgs::Renderer2 RendererType;
+		};
+
+		template<>
+		struct RenderTypeInfo<RenderType::RENDERER_3>
+		{
+			typedef kgs::Renderer3 RendererType;
 		};
 
 		Window(uint32_t width
@@ -49,7 +67,7 @@ namespace gfw
 		Window(uint32_t width
 			, uint32_t height
 			, const char* title
-			, RendererType rendererType
+			, RenderType renderType
 			, std::shared_ptr<vk::Instance> pInstance
 			, std::shared_ptr<vk::PhysicalDevice> pPhysicalDevice
 			, std::shared_ptr<vk::Device> pDevice
@@ -66,7 +84,7 @@ namespace gfw
 			, vk::Queue presentQueue
 		);
 
-		Window(RendererType rendererType
+		Window(RenderType renderType
 			, std::shared_ptr<GLFWwindow> pWindow
 			, std::shared_ptr<vk::SurfaceKHR> pSurface
 			, std::shared_ptr<vk::Instance> pInstance
@@ -85,7 +103,7 @@ namespace gfw
 		Window(const Window&) = delete;
 
 		//--compositions
-		RendererType m_renderType;
+		RenderType m_renderType;
 
 		std::shared_ptr<GLFWwindow> m_pWindow;
 		std::shared_ptr<vk::SurfaceKHR> m_pSurface;

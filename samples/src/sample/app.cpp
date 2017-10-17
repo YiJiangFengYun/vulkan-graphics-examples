@@ -3,7 +3,7 @@
 namespace app
 {
 	App::App():
-		AppBase()
+		gfw::App()
 	{
 	}
 }

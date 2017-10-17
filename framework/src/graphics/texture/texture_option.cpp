@@ -10,7 +10,10 @@ namespace kgs
 		{TextureType::TEX_2D_ARRAY, "Texture 2D Array"},
 		{TextureType::TEX_3D, "Texture 3D"},
 		{TextureType::CUBE, "Texture Cube"},
-		{TextureType::CUBE_ARRARY, "Texture Cube Array"}
+		{TextureType::CUBE_ARRARY, "Texture Cube Array"},
+		{TextureType::COLOR_ATTACHMENT, "Texture Color Attachment"},
+		{TextureType::DEPTH_STENCIL_ATTACHMENT, "Texture Depth Stencil Attachment"}
+
 	};
 
 	std::array<std::pair<TextureType, vk::ImageType>, static_cast<size_t>(TextureType::RANGE_SIZE)> arrTextureTypeToVKImageType = {
@@ -20,7 +23,9 @@ namespace kgs
 		std::pair<TextureType, vk::ImageType>(TextureType::TEX_2D_ARRAY, vk::ImageType::e2D),
 		std::pair<TextureType, vk::ImageType>(TextureType::TEX_3D, vk::ImageType::e3D),
 		std::pair<TextureType, vk::ImageType>(TextureType::CUBE, vk::ImageType::e2D),
-		std::pair<TextureType, vk::ImageType>(TextureType::CUBE_ARRARY, vk::ImageType::e2D)
+		std::pair<TextureType, vk::ImageType>(TextureType::CUBE_ARRARY, vk::ImageType::e2D),
+		std::pair<TextureType, vk::ImageType>(TextureType::COLOR_ATTACHMENT, vk::ImageType::e2D),
+		std::pair<TextureType, vk::ImageType>(TextureType::DEPTH_STENCIL_ATTACHMENT, vk::ImageType::e2D)
 	};
 
 	std::array<std::pair<TextureFormat, vk::Format>, static_cast<size_t>(TextureFormat::RANGE_SIZE)> arrFormatToVKFormat = {
@@ -35,7 +40,9 @@ namespace kgs
 		std::pair<TextureType, vk::ImageViewType>(TextureType::TEX_2D_ARRAY, vk::ImageViewType::e2DArray),
 		std::pair<TextureType, vk::ImageViewType>(TextureType::TEX_3D, vk::ImageViewType::e3D),
 		std::pair<TextureType, vk::ImageViewType>(TextureType::CUBE, vk::ImageViewType::eCube),
-		std::pair<TextureType, vk::ImageViewType>(TextureType::CUBE_ARRARY, vk::ImageViewType::eCubeArray)
+		std::pair<TextureType, vk::ImageViewType>(TextureType::CUBE_ARRARY, vk::ImageViewType::eCubeArray),
+		std::pair<TextureType, vk::ImageViewType>(TextureType::COLOR_ATTACHMENT, vk::ImageViewType::e2D),
+		std::pair<TextureType, vk::ImageViewType>(TextureType::DEPTH_STENCIL_ATTACHMENT, vk::ImageViewType::e2D)
 	};
 
 	std::array<std::tuple<FilterMode, vk::Filter, vk::SamplerMipmapMode>, static_cast<size_t>(FilterMode::RANGE_SIZE)> arrFilerModeToVK =

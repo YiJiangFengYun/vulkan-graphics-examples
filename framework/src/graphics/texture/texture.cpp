@@ -132,6 +132,8 @@ namespace kgs
 		case TextureType::TEX_1D:
 		case TextureType::TEX_2D:
 		case TextureType::TEX_3D:
+		case TextureType::COLOR_ATTACHMENT:
+		case TextureType::DEPTH_STENCIL_ATTACHMENT:
 		{
 			arraylayer = 1U;
 			break;
@@ -231,7 +233,7 @@ namespace kgs
 #ifdef DEBUG
 		if (isFind == KGS_FALSE)
 		{
-			throw std::invalid_argument("Invalid type argument at creating image for texture.");
+			throw std::logic_error("Invalid texture type at creating image for texture.");
 		}
 #endif // DEBUG
 
@@ -250,6 +252,8 @@ namespace kgs
 		}
 		case TextureType::TEX_2D:
 		case TextureType::TEX_2D_ARRAY:
+		case TextureType::COLOR_ATTACHMENT:
+		case TextureType::DEPTH_STENCIL_ATTACHMENT:
 		{
 			if (m_width == 0) throw std::invalid_argument("Invalid width argument at creating image for texture.");
 			if (m_height == 0) throw std::invalid_argument("Invalid height argument at creating image for texture.");
@@ -290,6 +294,11 @@ namespace kgs
 		}
 		case TextureType::TEX_1D_ARRAY:
 		case TextureType::TEX_2D_ARRAY:
+		{
+			break;
+		}
+		case TextureType::COLOR_ATTACHMENT:
+		case TextureType::DEPTH_STENCIL_ATTACHMENT:
 		{
 			break;
 		}

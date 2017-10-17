@@ -47,7 +47,7 @@ namespace kgs
 
 	uint32_t Material::getPassCount()
 	{
-		return m_arrPasses.size();
+		return static_cast<uint32_t>(m_arrPasses.size());
 	}
 
 	void Material::apply()

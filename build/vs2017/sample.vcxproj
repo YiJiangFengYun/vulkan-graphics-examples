@@ -119,8 +119,7 @@
       <AdditionalDependencies>framework.lib;graphics.lib;foundation.lib;vulkan-1.lib;glfw3.lib;%(AdditionalDependencies)</AdditionalDependencies>
     </Link>
     <PostBuildEvent>
-      <Command>
-      </Command>
+      <Command>xcopy /y /v /f /i /e /k /q /d "$(GS_PROJECT_ROOT)\samples\resources\*.*" "$(OutDir)\"</Command>
       <Message>copy resource files to output directory.</Message>
     </PostBuildEvent>
   </ItemDefinitionGroup>
@@ -139,8 +138,7 @@
       <AdditionalDependencies>framework.lib;graphics.lib;foundation.lib;vulkan-1.lib;glfw3.lib;%(AdditionalDependencies)</AdditionalDependencies>
     </Link>
     <PostBuildEvent>
-      <Command>
-      </Command>
+      <Command>xcopy /y /v /f /i /e /k /q /d "$(GS_PROJECT_ROOT)\samples\resources\*.*" "$(OutDir)\"</Command>
       <Message>copy resource files to output directory.</Message>
     </PostBuildEvent>
   </ItemDefinitionGroup>
@@ -163,8 +161,7 @@
       <AdditionalDependencies>framework.lib;graphics.lib;foundation.lib;vulkan-1.lib;glfw3.lib;%(AdditionalDependencies)</AdditionalDependencies>
     </Link>
     <PostBuildEvent>
-      <Command>
-      </Command>
+      <Command>xcopy /y /v /f /i /e /k /q /d "$(GS_PROJECT_ROOT)\samples\resources\*.*" "$(OutDir)\"</Command>
       <Message>copy resource files to output directory.</Message>
     </PostBuildEvent>
   </ItemDefinitionGroup>
@@ -187,8 +184,7 @@
       <AdditionalDependencies>framework.lib;graphics.lib;foundation.lib;vulkan-1.lib;glfw3.lib;%(AdditionalDependencies)</AdditionalDependencies>
     </Link>
     <PostBuildEvent>
-      <Command>
-      </Command>
+      <Command>xcopy /y /v /f /i /e /k /q /d "$(GS_PROJECT_ROOT)\samples\resources\*.*" "$(OutDir)\"</Command>
       <Message>copy resource files to output directory.</Message>
     </PostBuildEvent>
   </ItemDefinitionGroup>

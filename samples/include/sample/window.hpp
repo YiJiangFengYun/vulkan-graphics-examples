@@ -18,6 +18,18 @@ namespace app
 			std::shared_ptr<vk::Device> pDevice, vk::Queue graphicsQueue, vk::Queue presentQueue);
 
 	private:
+		kgs::Scene3 m_scene;
+		kgs::Camera3 m_camera;
+		kgs::VisualObject3 m_model;
+		kgs::Mesh3 m_mesh;
+		kgs::Material m_material;
+		kgs::Pass m_pass;
+		kgs::Shader m_shader;
+		kgs::Texture2D m_texture;
+
+
+		void _loadModel();
+
 		void _onPreUpdate() override;
 		void _update() override;
 		void _onPostUpdate() override;

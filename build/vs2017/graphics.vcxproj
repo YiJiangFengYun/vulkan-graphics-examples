@@ -27,6 +27,8 @@
     <ClCompile Include="..\..\framework\src\graphics\material\pass_option.cpp" />
     <ClCompile Include="..\..\framework\src\graphics\material\shader.cpp" />
     <ClCompile Include="..\..\framework\src\graphics\mesh\mesh.cpp" />
+    <ClCompile Include="..\..\framework\src\graphics\mesh\mesh_2.cpp" />
+    <ClCompile Include="..\..\framework\src\graphics\mesh\mesh_3.cpp" />
     <ClCompile Include="..\..\framework\src\graphics\mesh\mesh_data.cpp" />
     <ClCompile Include="..\..\framework\src\graphics\mesh\mesh_option.cpp" />
     <ClCompile Include="..\..\framework\src\graphics\renderer\renderer.cpp" />
@@ -76,6 +78,8 @@
     <ClInclude Include="..\..\framework\include\graphics\material\pass_option.hpp" />
     <ClInclude Include="..\..\framework\include\graphics\material\shader.hpp" />
     <ClInclude Include="..\..\framework\include\graphics\mesh\mesh.hpp" />
+    <ClInclude Include="..\..\framework\include\graphics\mesh\mesh_2.hpp" />
+    <ClInclude Include="..\..\framework\include\graphics\mesh\mesh_3.hpp" />
     <ClInclude Include="..\..\framework\include\graphics\mesh\mesh_data.hpp" />
     <ClInclude Include="..\..\framework\include\graphics\mesh\mesh_option.hpp" />
     <ClInclude Include="..\..\framework\include\graphics\renderer\renderer.hpp" />

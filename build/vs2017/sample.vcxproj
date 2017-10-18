@@ -25,6 +25,8 @@
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="..\..\samples\include\sample\app.hpp" />
+    <ClInclude Include="..\..\samples\include\sample\stb_image.h" />
+    <ClInclude Include="..\..\samples\include\sample\tiny_obj_loader.h" />
     <ClInclude Include="..\..\samples\include\sample\window.hpp" />
   </ItemGroup>
   <PropertyGroup Label="Globals">

@@ -32,5 +32,11 @@
     <ClInclude Include="..\..\samples\include\sample\window.hpp">
       <Filter>include\sample</Filter>
     </ClInclude>
+    <ClInclude Include="..\..\samples\include\sample\tiny_obj_loader.h">
+      <Filter>include\sample</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\samples\include\sample\stb_image.h">
+      <Filter>include\sample</Filter>
+    </ClInclude>
   </ItemGroup>
 </Project>

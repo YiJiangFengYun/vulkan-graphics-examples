@@ -189,6 +189,12 @@
     <ClCompile Include="..\..\framework\src\graphics\texture\texture_depth_stencil_attachment.cpp">
       <Filter>src\graphics\texture</Filter>
     </ClCompile>
+    <ClCompile Include="..\..\framework\src\graphics\mesh\mesh_3.cpp">
+      <Filter>src\graphics\mesh</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\framework\src\graphics\mesh\mesh_2.cpp">
+      <Filter>src\graphics\mesh</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="..\..\framework\include\graphics\texture\texture.hpp">
@@ -331,6 +337,12 @@
     </ClInclude>
     <ClInclude Include="..\..\framework\include\graphics\texture\texture_depth_stencil_attachment.hpp">
       <Filter>include\graphics\texture</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\framework\include\graphics\mesh\mesh_3.hpp">
+      <Filter>include\graphics\mesh</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\framework\include\graphics\mesh\mesh_2.hpp">
+      <Filter>include\graphics\mesh</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>

@@ -167,6 +167,7 @@ namespace gfw {
 		_initGrahpicsModule(pResultSurface);
 	}
 
+#ifdef ENABLE_VALIDATION_LAYERS
 	bool App::_checkValidationLayerSupport()
 	{
 		//query available layers.
@@ -199,6 +200,7 @@ namespace gfw {
 
 		return true;
 	}
+#endif // ENABLE_VALIDATION_LAYERS
 
 	std::shared_ptr<GLFWwindow> App::_createGLFWWindow(uint32_t width, uint32_t height, const char* title)
 	{

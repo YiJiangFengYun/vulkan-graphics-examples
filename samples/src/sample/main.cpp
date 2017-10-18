@@ -1,4 +1,5 @@
 #include <exception>
+#include <iostream>
 #include "vulkan/vulkan.h"
 #include "sample/window.hpp"
 #include "sample/app.hpp"
@@ -28,7 +29,9 @@ std::vector<char> readFile(const std::string& filename)
 {
 	std::ifstream file(filename, std::ios::ate | std::ios::binary);
 
-	if (!file.is_open()) {
+	if (!file.is_open())
+	{
+		std::cout << "Failed to open file!" << std::endl;
 		throw std::runtime_error("failed to open file!");
 	}
 

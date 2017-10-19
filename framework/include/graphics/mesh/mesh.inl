@@ -83,8 +83,6 @@ namespace kgs
 	template <MeshType meshType>
 	Mesh<meshType>::Mesh() 
 		: BaseMesh()
-		, m_pContext(pContext)
-		, m_multipliedColor(COLOR_WHITE) //default multiplied color should be (1, 1, 1, 1)
 	{
 		m_meshType = meshType;
 	}

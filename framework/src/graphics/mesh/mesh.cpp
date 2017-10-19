@@ -18,6 +18,8 @@ namespace kgs
 	}
 
 	BaseMesh::BaseMesh()
+		: m_pContext(pContext)
+		, m_multipliedColor(COLOR_WHITE) //default multiplied color should be (1, 1, 1, 1)
 	{
 
 	}

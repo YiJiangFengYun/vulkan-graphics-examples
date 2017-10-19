@@ -20,7 +20,7 @@ namespace kgs
 	template<MeshType type>
 	struct MeshTypeInfo
 	{
-		typedef Vector3 PointType;
+		typedef void PointType;
 	};
 
 	template<MeshType type>
@@ -123,7 +123,52 @@ namespace kgs
 
 
 	//-------specialization--------------------------------------------------------------------------
+
 	template<>
+	struct MeshTypeInfo<MeshType::SPACE_2>
+	{
+		typedef Vector2 PointType;
+	};
+
+	template<>
+	struct MeshTypeInfo<MeshType::SPACE_3>
+	{
+		typedef Vector3 PointType;
+	};
+
+	// Using struct declaration type specialization, so these members can't be used to indicate innter type of class when declarated.
+	// Otherwise, these member value will not be definited when class declaration.
+	template<>
+	struct MeshConstInfo<MeshType::SPACE_2>
+	{
+		static const MeshData::DataType ARRAY_TYPE = MeshData::DataType::VECTOR_2_ARRAY;
+	};
+
+	template<>
+	struct MeshConstInfo<MeshType::SPACE_3>
+	{
+		static const MeshData::DataType ARRAY_TYPE = MeshData::DataType::VECTOR_3_ARRAY;
+	};
+
+	template<>
+	struct UVConstInfo<UVType::FLOAT>
+	{
+		static const MeshData::DataType ARRAY_TYPE = MeshData::DataType::FLOAT_ARRAY;
+	};
+
+	template<>
+	struct UVConstInfo<UVType::VECTOR_2>
+	{
+		static const MeshData::DataType ARRAY_TYPE = MeshData::DataType::VECTOR_2_ARRAY;
+	};
+
+	template<>
+	struct UVConstInfo<UVType::VECTOR_3>
+	{
+		static const MeshData::DataType ARRAY_TYPE = MeshData::DataType::VECTOR_3_ARRAY;
+	};
+
+	/*template<>
 	const MeshData::DataType MeshConstInfo<MeshType::SPACE_2>::ARRAY_TYPE = MeshData::DataType::VECTOR_2_ARRAY;
 
 	template<>
@@ -136,7 +181,7 @@ namespace kgs
 	const MeshData::DataType UVConstInfo<UVType::VECTOR_2>::ARRAY_TYPE = MeshData::DataType::VECTOR_2_ARRAY;
 
 	template<>
-	const MeshData::DataType UVConstInfo<UVType::VECTOR_3>::ARRAY_TYPE = MeshData::DataType::VECTOR_3_ARRAY;
+	const MeshData::DataType UVConstInfo<UVType::VECTOR_3>::ARRAY_TYPE = MeshData::DataType::VECTOR_3_ARRAY;*/
 
 	template<>
 	const std::string UVIndexInfo<UVIndex::UV_0>::VERTEX_NAME = KGS_VERTEX_UV0_NAME;

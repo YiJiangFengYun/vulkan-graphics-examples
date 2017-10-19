@@ -142,37 +142,6 @@ namespace kgs
 		_createIndexBuffer();
 	}
 
-	template<UVType uvType, UVIndex uvIndex>
-	typename MeshData::DataTypeInfo<UVConstInfo<uvType>::ARRAY_TYPE>::ValueType  BaseMesh::getUVs()
-	{
-		return getData<UVConstInfo<uvType>::ARRAY_TYPE>(UVIndexInfo<uvIndex>::VERTEX_NAME);
-	}
-
-	template<UVType uvType, UVIndex uvIndex>
-	void BaseMesh::setUVs(typename MeshData::DataTypeInfo<UVConstInfo<uvType>::ARRAY_TYPE>::ValueType uvs, uint32_t uvIndex)
-	{
-		setData<UVConstInfo<uvType>::ARRAY_TYPE>(UVIndexInfo<uvIndex>::VERTEX_NAME, uvs, UVIndexInfo<uvIndex>::VERTEX_BINDING_PRIORITY);
-	}
-
-	template<MeshData::DataType dataType>
-	typename MeshData::DataTypeInfo<dataType>::ValueType BaseMesh::getData(std::string name) const
-	{
-		return m_pData->getDataValue<dataType>(name);
-	}
-
-	template <MeshData::DataType dataType>
-	void BaseMesh::setData(std::string name, typename MeshData::DataTypeInfo<dataType>::ValueType value, uint32_t bindingPriority)
-	{
-		m_pData->setDataValue<dataType>(name, value);
-		//update layout binding info
-		LayoutBindingInfo info(
-			name,
-			dataType,
-			bindingPriority
-		);
-		setValue(name, info, m_mapLayoutBindingInfos, m_arrLayoutBindingInfos);
-	}
-
 	inline void BaseMesh::_createVertexBuffer()
 	{
 		//get size of every vertex

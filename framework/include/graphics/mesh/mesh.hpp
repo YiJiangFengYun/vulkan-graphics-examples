@@ -92,7 +92,7 @@ namespace kgs
 		typename MeshData::DataTypeInfo<UVConstInfo<uvType>::ARRAY_TYPE>::ValueType getUVs();
 
 		template<UVType uvType, UVIndex uvIndex>
-		void setUVs(typename MeshData::DataTypeInfo<UVConstInfo<uvType>::ARRAY_TYPE>::ValueType uvs, uint32_t uvIndex);
+		void setUVs(typename MeshData::DataTypeInfo<UVConstInfo<uvType>::ARRAY_TYPE>::ValueType uvs);
 
 		template<MeshData::DataType dataType>
 		typename MeshData::DataTypeInfo<dataType>::ValueType getData(std::string name) const;

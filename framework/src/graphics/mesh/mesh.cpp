@@ -21,7 +21,7 @@ namespace kgs
 		: m_pContext(pContext)
 		, m_multipliedColor(COLOR_WHITE) //default multiplied color should be (1, 1, 1, 1)
 	{
-
+		setSubMeshCount(1u);
 	}
 
 	BaseMesh::~BaseMesh()
@@ -66,7 +66,7 @@ namespace kgs
 	std::vector<uint32_t> BaseMesh::getIndices(uint32_t subMeshIndex) const
 	{
 #ifdef DEBUG
-		verifySubMeshIndex(subMeshIndex);
+		_verifySubMeshIndex(subMeshIndex);
 #endif // DEBUG
 		return m_subMeshInfos[subMeshIndex].indices;
 	}
@@ -74,7 +74,7 @@ namespace kgs
 	void BaseMesh::setIndices(std::vector<uint32_t> indices, PrimitiveTopology topology, uint32_t subMeshIndex)
 	{
 #ifdef DEBUG
-		verifySubMeshIndex(subMeshIndex);
+		_verifySubMeshIndex(subMeshIndex);
 #endif // DEBUG
 		SubMeshInfo& subMeshInfo = m_subMeshInfos[subMeshIndex];
 		subMeshInfo.topology = topology;
@@ -84,7 +84,7 @@ namespace kgs
 	uint32_t BaseMesh::getIndexCount(uint32_t subMeshIndex) const
 	{
 #ifdef DEBUG
-		verifySubMeshIndex(subMeshIndex);
+		_verifySubMeshIndex(subMeshIndex);
 #endif // DEBUG
 		return _getIndexCount(subMeshIndex);
 	}
@@ -92,7 +92,7 @@ namespace kgs
 	uint32_t BaseMesh::getIndexStart(uint32_t subMeshIndex) const
 	{
 #ifdef DEBUG
-		verifySubMeshIndex(subMeshIndex);
+		_verifySubMeshIndex(subMeshIndex);
 #endif // DEBUG
 		uint32_t start = 0;
 		for (uint32_t i = 0; i < subMeshIndex; ++i)
@@ -105,7 +105,7 @@ namespace kgs
 	PrimitiveTopology BaseMesh::getTopology(uint32_t subMeshIndex) const
 	{
 #ifdef DEBUG
-		verifySubMeshIndex(subMeshIndex);
+		_verifySubMeshIndex(subMeshIndex);
 #endif // DEBUG
 		return m_subMeshInfos[subMeshIndex].topology;
 	}
@@ -140,6 +140,22 @@ namespace kgs
 
 		//create index buffer
 		_createIndexBuffer();
+
+		if (makeUnreadable)
+		{
+			m_vertexCount = 0u;
+
+			//clear data with asign nullptr
+			m_pData = nullptr;
+			//clear layout binding info array with reallocate.
+			std::vector<LayoutBindingInfo>().swap(m_arrLayoutBindingInfos);
+			//clear layout binding info map with reallocate.
+			std::unordered_map<std::string, LayoutBindingInfo>().swap(m_mapLayoutBindingInfos);
+			//clear sub mesh info with reallocate.
+			std::vector<SubMeshInfo>().swap(m_subMeshInfos);
+			//reset sub mesh count to 1.
+			setSubMeshCount(1u);
+		}
 	}
 
 	inline void BaseMesh::_createVertexBuffer()

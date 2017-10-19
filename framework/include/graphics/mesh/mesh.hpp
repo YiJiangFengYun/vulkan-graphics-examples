@@ -65,7 +65,7 @@ namespace kgs
 
 		std::vector<uint32_t> getIndices(uint32_t subMeshIndex) const;
 
-		void setIndices(std::vector<uint32_t> indices, PrimitiveTopology topology, uint32_t subMeshIndex);
+		void setIndices(std::vector<uint32_t> indices, PrimitiveTopology topology, uint32_t subMeshIndex = 0u);
 
 		uint32_t getIndexCount(uint32_t subMeshIndex) const;
 
@@ -136,7 +136,7 @@ namespace kgs
 		inline void _sortLayoutBindingInfos();
 		//tool methods
 #ifdef DEBUG
-		inline void verifySubMeshIndex(uint32_t subMeshIndex) const;
+		inline void _verifySubMeshIndex(uint32_t subMeshIndex) const;
 #endif // DEBUG
 
 		inline uint32_t _getIndexCount(uint32_t subMeshIndex) const;

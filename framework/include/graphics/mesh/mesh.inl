@@ -85,7 +85,7 @@ namespace kgs
 	}
 
 #ifdef DEBUG
-	void BaseMesh::verifySubMeshIndex(uint32_t subMeshIndex) const
+	void BaseMesh::_verifySubMeshIndex(uint32_t subMeshIndex) const
 	{
 		if (subMeshIndex >= m_subMeshCount)
 			throw std::range_error("The subMeshIndex out of range of the actual sub mesh count.");

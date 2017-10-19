@@ -112,6 +112,7 @@
     </ClCompile>
     <Lib>
       <AdditionalLibraryDirectories>$(GS_PROJECT_ROOT)\lib\Win32;$(GS_PROJECT_ROOT)\libs\VulkanSDK\1.0.49.0\Lib32;$(GS_PROJECT_ROOT)\libs\glfw\lib-win32;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
+      <IgnoreAllDefaultLibraries>true</IgnoreAllDefaultLibraries>
     </Lib>
     <BuildLog />
   </ItemDefinitionGroup>
@@ -129,6 +130,7 @@
     </Link>
     <Lib>
       <AdditionalLibraryDirectories>$(GS_PROJECT_ROOT)\lib\Win32;$(GS_PROJECT_ROOT)\libs\VulkanSDK\1.0.49.0\Lib32;$(GS_PROJECT_ROOT)\libs\glfw\lib-win32;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
+      <IgnoreAllDefaultLibraries>true</IgnoreAllDefaultLibraries>
     </Lib>
     <BuildLog />
   </ItemDefinitionGroup>

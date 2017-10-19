@@ -157,10 +157,10 @@ namespace kgs
 
 		~Mesh();
 
-		//vertex
-		ArrayValueType getVertices() const;
+		//position
+		ArrayValueType getPositions() const;
 
-		void setVertices(ArrayValueType vertices);
+		void setPositions(ArrayValueType vertices);
 
 		//normal
 		ArrayValueType getNormals() const;

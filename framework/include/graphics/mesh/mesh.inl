@@ -94,13 +94,13 @@ namespace kgs
 	}
 
 	template <MeshType meshType>
-	typename Mesh<meshType>::ArrayValueType Mesh<meshType>::getVertices() const
+	typename Mesh<meshType>::ArrayValueType Mesh<meshType>::getPositions() const
 	{
 		return getData<Mesh<meshType>::ARRAY_DATA_TYPE>(KGS_VERTEX_POSITION_NAME);
 	}
 
 	template <MeshType meshType>
-	void Mesh<meshType>::setVertices(ArrayValueType vertices)
+	void Mesh<meshType>::setPositions(ArrayValueType vertices)
 	{
 		setData<Mesh<meshType>::ARRAY_DATA_TYPE>(KGS_VERTEX_POSITION_NAME, vertices, KGS_VERTEX_BINDING_PRIORITY_POSITION);
 	}

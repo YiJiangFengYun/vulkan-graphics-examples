@@ -34,6 +34,8 @@ namespace kgs
 			std::uint32_t descriptorCount;
 			ShaderStageFlags stageFlags;
 
+			LayoutBindingInfo();
+
 			LayoutBindingInfo(std::string name,
 				MaterialData::DataType dataType,
 				std::uint32_t binding,
@@ -48,14 +50,14 @@ namespace kgs
 		~Pass();
 
 		template <MaterialData::DataType dataType>
-		typename MaterialData::DataTypeInfo<dataType>::ValueType getData(std::string name)
+		const typename MaterialData::DataTypeInfo<dataType>::ValueType getData(std::string name) const
 		{
 			return m_pData->getDataValue<dataType>(name);
 		}
 
 		template <MaterialData::DataType dataType>
 		void setData(std::string name, 
-			typename MaterialData::DataTypeInfo<dataType>::ValueType value, 
+			const typename MaterialData::DataTypeInfo<dataType>::ValueType value, 
 			uint32_t binding = KGS_M_OTHER_MIN_BINDING, 
 			DescriptorType descriptorType = DescriptorType::UNIFORM_BUFFER, 
 			ShaderStageFlags stageFlags = ShaderStageFlagBits::VERTEX)
@@ -71,18 +73,18 @@ namespace kgs
 				descriptorCount,
 				stageFlags
 			);
-			setValue(name, info, m_mapLayoutBinds, m_arrLayoutBinds);
+			setValue(name, info, m_mapLayoutBinds, m_arrLayoutBindNames);
 		}
 
-		std::shared_ptr<Texture> getMainTexture();
-		void setMainTexture(std::shared_ptr<Texture> value);
-		Vector2 getMainTextureOffset();
-		void setMainTextureOffset(Vector2 value);
-		Vector2 getMainTextureScale();
-		void setMainTextureScale(Vector2 value);
+		const std::shared_ptr<Texture> getMainTexture() const;
+		void setMainTexture(const std::shared_ptr<Texture> value);
+		const Vector2 getMainTextureOffset() const;
+		void setMainTextureOffset(const Vector2 value);
+		const Vector2 getMainTextureScale() const;
+		void setMainTextureScale(const Vector2 value);
 
-		Color getMainColor();
-		void setMainColor(Color value);
+		const Color getMainColor() const;
+		void setMainColor(const Color value);
 
 		void apply();
 
@@ -95,7 +97,7 @@ namespace kgs
 	private:
 		//compositons
 		std::shared_ptr<MaterialData> m_pData;
-		std::vector<LayoutBindingInfo> m_arrLayoutBinds;
+		std::vector<std::string> m_arrLayoutBindNames;
 		std::unordered_map<std::string, LayoutBindingInfo> m_mapLayoutBinds;
 		std::shared_ptr<vk::Buffer> m_pUniformBuffer;
 		std::shared_ptr<vk::DeviceMemory> m_pUniformBufferMemory;

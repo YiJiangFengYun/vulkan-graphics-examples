@@ -2,6 +2,21 @@
 
 namespace kgs
 {
+	BaseMesh::LayoutBindingInfo::LayoutBindingInfo()
+	{
+
+	}
+
+	BaseMesh::LayoutBindingInfo::LayoutBindingInfo(std::string name,
+		MeshData::DataType dataType,
+		uint32_t bindingPriority) :
+		name(name),
+		dataType(dataType),
+		bindingPriority(bindingPriority)
+	{
+
+	}
+
 	Bool32 BaseMesh::LayoutBindingInfo::operator ==(const LayoutBindingInfo &target) const
 	{
 		return name == target.name && dataType == target.dataType && bindingPriority == target.bindingPriority;
@@ -39,14 +54,14 @@ namespace kgs
 		m_vertexCount = value;
 	}
 
-	std::vector<Color32> BaseMesh::getColors() const
+	const std::vector<Color32> &BaseMesh::getColors() const
 	{
-		return getData<MeshData::DataType::COLOR_32_ARRAY>(KGS_VERTEX_COLOR_NAME);
+		return _getData<MeshData::DataType::COLOR_32_ARRAY>(KGS_VERTEX_COLOR_NAME);
 	}
 
-	void BaseMesh::setColors(std::vector<Color32> colors)
+	void BaseMesh::setColors(const std::vector<Color32> &colors)
 	{
-		setData<MeshData::DataType::COLOR_32_ARRAY>(KGS_VERTEX_COLOR_NAME, colors, KGS_VERTEX_BINDING_PRIORITY_COLOR);
+		_setData<MeshData::DataType::COLOR_32_ARRAY>(KGS_VERTEX_COLOR_NAME, colors, KGS_VERTEX_BINDING_PRIORITY_COLOR);
 	}
 
 	uint32_t BaseMesh::getSubMeshCount() const
@@ -63,7 +78,7 @@ namespace kgs
 		}
 	}
 
-	std::vector<uint32_t> BaseMesh::getIndices(uint32_t subMeshIndex) const
+	const std::vector<uint32_t> &BaseMesh::getIndices(uint32_t subMeshIndex) const
 	{
 #ifdef DEBUG
 		_verifySubMeshIndex(subMeshIndex);
@@ -71,7 +86,7 @@ namespace kgs
 		return m_subMeshInfos[subMeshIndex].indices;
 	}
 
-	void BaseMesh::setIndices(std::vector<uint32_t> indices, PrimitiveTopology topology, uint32_t subMeshIndex)
+	void BaseMesh::setIndices(const std::vector<uint32_t> &indices, PrimitiveTopology topology, uint32_t subMeshIndex)
 	{
 #ifdef DEBUG
 		_verifySubMeshIndex(subMeshIndex);
@@ -148,7 +163,7 @@ namespace kgs
 			//clear data with asign nullptr
 			m_pData = nullptr;
 			//clear layout binding info array with reallocate.
-			std::vector<LayoutBindingInfo>().swap(m_arrLayoutBindingInfos);
+			std::vector<std::string>().swap(m_arrLayoutBindingInfoNames);
 			//clear layout binding info map with reallocate.
 			std::unordered_map<std::string, LayoutBindingInfo>().swap(m_mapLayoutBindingInfos);
 			//clear sub mesh info with reallocate.

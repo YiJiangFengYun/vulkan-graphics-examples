@@ -1,6 +1,8 @@
 #ifndef WINDOW_H
 #define WINDOW_H
 
+#include "sample/stb_image.h"
+#include "sample/tiny_obj_loader.h"
 #include "framework/app/window.hpp"
 
 namespace app
@@ -8,6 +10,14 @@ namespace app
 	class Window : public gfw::Window
 	{
 	public:
+		struct Vertex
+		{
+			glm::vec3 pos;
+			glm::vec3 color;
+			glm::vec2 texCoord;
+
+			bool operator==(const Vertex& other) const;
+		};
 
 		Window(uint32_t width, uint32_t height, const char* title,
 			std::shared_ptr<vk::Instance> pInstance, std::shared_ptr<vk::PhysicalDevice> pPhysicalDevice,
@@ -18,17 +28,29 @@ namespace app
 			std::shared_ptr<vk::Device> pDevice, vk::Queue graphicsQueue, vk::Queue presentQueue);
 
 	private:
-		kgs::Scene3 m_scene;
-		kgs::Camera3 m_camera;
-		kgs::VisualObject3 m_model;
-		kgs::Mesh3 m_mesh;
-		kgs::Material m_material;
-		kgs::Pass m_pass;
-		kgs::Shader m_shader;
-		kgs::Texture2D m_texture;
+		std::vector<kgs::Vector3> m_tempPositions;
+		std::vector<kgs::Vector2> m_tempTexCoords;
+		std::vector<kgs::Color> m_tempColors;
+		std::vector<uint32_t> m_tempIndices;
+
+
+		std::shared_ptr<kgs::Scene3> m_pScene;
+		std::shared_ptr<kgs::Camera3> m_pCamera;
+		std::shared_ptr<kgs::VisualObject3> m_pModel;
+		std::shared_ptr<kgs::Mesh3> m_pMesh;
+		std::shared_ptr<kgs::Material> m_pMaterial;
+		std::shared_ptr<kgs::Pass> m_pPass;
+		std::shared_ptr<kgs::Shader> m_pShader;
+		std::shared_ptr<kgs::Texture2D> m_pTexture;
 
 
 		void _loadModel();
+		void _createMesh();
+		void _createTexture();
+		void _createMaterial();
+		void _createModel();
+		void _createCamera();
+		void _createScene();
 
 		void _onPreUpdate() override;
 		void _update() override;
@@ -38,6 +60,17 @@ namespace app
 	    void _onPostRender() override;
 	};
 
+}
+
+namespace std {
+	template<> 
+	struct hash<app::Window::Vertex> {
+		size_t operator()(const app::Window::Vertex& vertex) const {
+			return ((hash<glm::vec3>()(vertex.pos) ^
+				(hash<glm::vec3>()(vertex.color) << 1)) >> 1) ^
+				(hash<glm::vec2>()(vertex.texCoord) << 1);
+		}
+	};
 }
 
 #endif // !WINDOW_H

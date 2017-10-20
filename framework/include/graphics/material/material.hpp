@@ -18,9 +18,9 @@ namespace kgs
 
 		int32_t getPassIndex(std::string name);
 		std::string getPassName(uint32_t index);
-		std::shared_ptr<Pass> getPass(std::string name);
-		void setPass(std::string name, std::shared_ptr<Pass> pass);
-		std::shared_ptr<Pass> getPassWithIndex(uint32_t index);
+		const std::shared_ptr<Pass>& getPass(std::string name) const;
+		void setPass(std::string name, const std::shared_ptr<Pass>& pass);
+		const std::shared_ptr<Pass>& getPassWithIndex(uint32_t index) const;
 		uint32_t getPassCount();
 		MaterialShowType getShowType();
 		void setRenderQueueType(MaterialShowType type);
@@ -36,7 +36,7 @@ namespace kgs
 		//--compositions
 
 		//--aggregations
-		std::vector<std::shared_ptr<Pass>> m_arrPasses;
+		std::vector<std::string> m_arrPasseNames;
 		std::unordered_map<std::string, std::shared_ptr<Pass>> m_mapPasses;
 		//--aggregations
 

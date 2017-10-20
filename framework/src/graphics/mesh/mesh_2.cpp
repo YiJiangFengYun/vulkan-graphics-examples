@@ -2,5 +2,8 @@
 
 namespace kgs
 {
-
+	Mesh2::Mesh2()
+		: Mesh<MeshType::SPACE_2>()
+	{
+	}
 } //namespace kgs

@@ -358,5 +358,8 @@
     <None Include="..\..\framework\include\graphics\scene\transform.inl">
       <Filter>include\graphics\scene</Filter>
     </None>
+    <None Include="..\..\framework\include\graphics\mesh\mesh_data.inl">
+      <Filter>include\graphics\mesh</Filter>
+    </None>
   </ItemGroup>
 </Project>

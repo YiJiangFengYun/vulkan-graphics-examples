@@ -147,80 +147,80 @@ namespace kgs
 
 	//------------------this used to eliminate ide warning------------------------------
 	template <MeshData::DataType type>
-	typename MeshData::DataTypeInfo<type>::ValueType& MeshData::getDataValue(std::string name) { return {}; }
+	const typename MeshData::DataTypeInfo<type>::ValueType& MeshData::getDataValue(std::string name) const { return {}; }
 
 	template <MeshData::DataType type>
-	void MeshData::setDataValue(std::string name, typename MeshData::DataTypeInfo<type>::ValueType& value) {}
+	void MeshData::setDataValue(std::string name, const typename MeshData::DataTypeInfo<type>::ValueType& value) {}
 	//-----------------this used to eliminate ide warning----------------
 
 	template<>
-	std::vector<float>& MeshData::getDataValue<MeshData::DataType::FLOAT_ARRAY>(std::string name)
+	const std::vector<float>& MeshData::getDataValue<MeshData::DataType::FLOAT_ARRAY>(std::string name) const
 	{
 		return getValue(name, mapFloatArrays);
 	}
 
 	template<>
-	void MeshData::setDataValue<MeshData::DataType::FLOAT_ARRAY>(std::string name, std::vector<float>& value)
+	void MeshData::setDataValue<MeshData::DataType::FLOAT_ARRAY>(std::string name, const std::vector<float>& value)
 	{
 		setValue(name, value, mapFloatArrays);
 	}
 
 	template<>
-	std::vector<int32_t>& MeshData::getDataValue<MeshData::DataType::INT_ARRAY>(std::string name)
+	const std::vector<int32_t>& MeshData::getDataValue<MeshData::DataType::INT_ARRAY>(std::string name) const
 	{
 		return getValue(name, mapIntArrays);
 	}
 
 	template<>
-	void MeshData::setDataValue<MeshData::DataType::INT_ARRAY>(std::string name, std::vector<int32_t>& value)
+	void MeshData::setDataValue<MeshData::DataType::INT_ARRAY>(std::string name, const std::vector<int32_t>& value)
 	{
 		setValue(name, value, mapIntArrays);
 	}
 
 	template<>
-	std::vector<Vector2>& MeshData::getDataValue<MeshData::DataType::VECTOR_2_ARRAY>(std::string name)
+	const std::vector<Vector2>& MeshData::getDataValue<MeshData::DataType::VECTOR_2_ARRAY>(std::string name) const
 	{
 		return getValue(name, mapVector2Arrays);
 	}
 
 	template<>
-	void MeshData::setDataValue<MeshData::DataType::VECTOR_2_ARRAY>(std::string name, std::vector<Vector2>& value)
+	void MeshData::setDataValue<MeshData::DataType::VECTOR_2_ARRAY>(std::string name, const std::vector<Vector2>& value)
 	{
 		setValue(name, value, mapVector2Arrays);
 	}
 
 	template<>
-	std::vector<Vector3>& MeshData::getDataValue<MeshData::DataType::VECTOR_3_ARRAY>(std::string name)
+	const std::vector<Vector3>& MeshData::getDataValue<MeshData::DataType::VECTOR_3_ARRAY>(std::string name) const
 	{
 		return getValue(name, mapVector3Arrays);
 	}
 
 	template<>
-	void MeshData::setDataValue<MeshData::DataType::VECTOR_3_ARRAY>(std::string name, std::vector<Vector3>& value)
+	void MeshData::setDataValue<MeshData::DataType::VECTOR_3_ARRAY>(std::string name, const std::vector<Vector3>& value)
 	{
 		setValue(name, value, mapVector3Arrays);
 	}
 
 	template<>
-	std::vector<Vector4>& MeshData::getDataValue<MeshData::DataType::VECTOR_4_ARRAY>(std::string name)
+	const std::vector<Vector4>& MeshData::getDataValue<MeshData::DataType::VECTOR_4_ARRAY>(std::string name) const
 	{
 		return getValue(name, mapVector4Arrays);
 	}
 
 	template<>
-	void MeshData::setDataValue<MeshData::DataType::VECTOR_4_ARRAY>(std::string name, std::vector<Vector4>& value)
+	void MeshData::setDataValue<MeshData::DataType::VECTOR_4_ARRAY>(std::string name, const std::vector<Vector4>& value)
 	{
 		setValue(name, value, mapVector4Arrays);
 	}
 
 	template<>
-	std::vector<Color32>& MeshData::getDataValue<MeshData::DataType::COLOR_32_ARRAY>(std::string name)
+	const std::vector<Color32>& MeshData::getDataValue<MeshData::DataType::COLOR_32_ARRAY>(std::string name) const
 	{
 		return getValue(name, mapColor32Arrays);
 	}
 
 	template<>
-	void MeshData::setDataValue<MeshData::DataType::COLOR_32_ARRAY>(std::string name, std::vector<Color32>& value)
+	void MeshData::setDataValue<MeshData::DataType::COLOR_32_ARRAY>(std::string name, const std::vector<Color32>& value)
 	{
 		setValue(name, value, mapColor32Arrays);
 	}

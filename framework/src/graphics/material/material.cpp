@@ -15,46 +15,42 @@ namespace kgs
 		auto iterator = m_mapPasses.find(name);
 		if (iterator == m_mapPasses.end()) return -1;
 		//linear complexity
-		auto iterator2 = std::find(m_arrPasses.cbegin(), m_arrPasses.cend(), iterator->second);
-		return static_cast<int32_t>(iterator2 - m_arrPasses.cbegin());
+		auto iterator2 = std::find(m_arrPasseNames.cbegin(), m_arrPasseNames.cend(), iterator->first);
+		return static_cast<int32_t>(iterator2 - m_arrPasseNames.cbegin());
 
 	}
 
 	std::string Material::getPassName(uint32_t index)
 	{
-		auto pass = *(m_arrPasses.cbegin() + index);
-		//linear complexity
-		auto pos = std::find_if(m_mapPasses.cbegin(), m_mapPasses.cend(), [pass](const std::pair<std::string, std::shared_ptr<Pass>>& elem) {
-			return elem.second == pass;
-		});
-		return pos->first;
+		return  m_arrPasseNames[index];
 	}
 
-	std::shared_ptr<Pass> Material::getPass(std::string name)
+	const std::shared_ptr<Pass>& Material::getPass(std::string name) const
 	{
-		return getValue(name, m_mapPasses, m_arrPasses);
+		return getValue(name, m_mapPasses);
 	}
 
-	void Material::setPass(std::string name, std::shared_ptr<Pass> pass)
+	void Material::setPass(std::string name, const std::shared_ptr<Pass> &pass)
 	{
-		setValue(name, pass, m_mapPasses, m_arrPasses);
+		setValue(name, pass, m_mapPasses, m_arrPasseNames);
 	}
 
-	std::shared_ptr<Pass> Material::getPassWithIndex(uint32_t index)
+	const std::shared_ptr<Pass>& Material::getPassWithIndex(uint32_t index) const
 	{
-		return m_arrPasses[index];
+		auto name = m_arrPasseNames[index];
+		return getValue(name, m_mapPasses);
 	}
 
 	uint32_t Material::getPassCount()
 	{
-		return static_cast<uint32_t>(m_arrPasses.size());
+		return static_cast<uint32_t>(m_arrPasseNames.size());
 	}
 
 	void Material::apply()
 	{
-		for (const auto& item : m_arrPasses)
+		for (const auto& item : m_mapPasses)
 		{
-			item->apply();
+			item.second->apply();
 		}
 	}
 

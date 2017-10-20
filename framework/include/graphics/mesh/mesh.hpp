@@ -22,15 +22,11 @@ namespace kgs
 			MeshData::DataType dataType;
 			uint32_t bindingPriority;
 
+			LayoutBindingInfo();
+
 			LayoutBindingInfo(std::string name,
 				MeshData::DataType dataType,
-				uint32_t bindingPriority) :
-				name(name),
-				dataType(dataType),
-				bindingPriority(bindingPriority)
-			{
-
-			}
+				uint32_t bindingPriority);
 
 			Bool32 operator ==(const LayoutBindingInfo &target) const;
 
@@ -54,18 +50,18 @@ namespace kgs
 		void setVertexCount(uint32_t value);
 
 		//color
-		std::vector<Color32> getColors() const;
+		const std::vector<Color32> &getColors() const;
 
-		void setColors(std::vector<Color32> colors);
+		void setColors(const std::vector<Color32> &colors);
 
 		//index
 		uint32_t getSubMeshCount() const;
 
 		void setSubMeshCount(uint32_t value);
 
-		std::vector<uint32_t> getIndices(uint32_t subMeshIndex) const;
+		const std::vector<uint32_t> &getIndices(uint32_t subMeshIndex) const;
 
-		void setIndices(std::vector<uint32_t> indices, PrimitiveTopology topology, uint32_t subMeshIndex = 0u);
+		void setIndices(const std::vector<uint32_t> &indices, PrimitiveTopology topology, uint32_t subMeshIndex = 0u);
 
 		uint32_t getIndexCount(uint32_t subMeshIndex) const;
 
@@ -89,17 +85,16 @@ namespace kgs
 
 		//uv
 		template<UVType uvType, UVIndex uvIndex>
-		typename MeshData::DataTypeInfo<UVConstInfo<uvType>::ARRAY_TYPE>::ValueType getUVs();
+		const typename MeshData::DataTypeInfo<UVConstInfo<uvType>::ARRAY_TYPE>::ValueType &getUVs() const;
 
 		template<UVType uvType, UVIndex uvIndex>
-		void setUVs(typename MeshData::DataTypeInfo<UVConstInfo<uvType>::ARRAY_TYPE>::ValueType uvs);
+		void setUVs(const typename MeshData::DataTypeInfo<UVConstInfo<uvType>::ARRAY_TYPE>::ValueType &uvs);
 
 		template<MeshData::DataType dataType>
-		typename MeshData::DataTypeInfo<dataType>::ValueType getData(std::string name) const;
-
+		const typename MeshData::DataTypeInfo<dataType>::ValueType &getData(std::string name) const;
 
 		template <MeshData::DataType dataType>
-		void setData(std::string name, typename MeshData::DataTypeInfo<dataType>::ValueType value, uint32_t bindingPriority = KGS_VERTEX_BINDING_PRIORITY_OTHER_MIN);
+		void setData(const std::string name, const typename MeshData::DataTypeInfo<dataType>::ValueType &value, uint32_t bindingPriority = KGS_VERTEX_BINDING_PRIORITY_OTHER_MIN);
 
 		inline void _fillGraphicsPipelineCreateInfoForDraw(uint32_t subMeshIndex, vk::GraphicsPipelineCreateInfo &graphicsPipelineCreateInfo);
 
@@ -110,7 +105,7 @@ namespace kgs
 		MeshType m_meshType;
 		uint32_t m_vertexCount;
 		std::shared_ptr<MeshData> m_pData;
-		std::vector<LayoutBindingInfo> m_arrLayoutBindingInfos;
+		std::vector<std::string> m_arrLayoutBindingInfoNames;
 		std::unordered_map<std::string, LayoutBindingInfo> m_mapLayoutBindingInfos;
 		uint32_t m_subMeshCount;
 		std::vector<SubMeshInfo> m_subMeshInfos;
@@ -132,6 +127,13 @@ namespace kgs
 		virtual std::vector<vk::VertexInputBindingDescription> _getVertexInputBindingDescriptions() = 0;
 
 		virtual std::vector<vk::VertexInputAttributeDescription> _getVertexInputAttributeDescriptions() = 0;
+
+		template<MeshData::DataType dataType>
+		inline const typename MeshData::DataTypeInfo<dataType>::ValueType &_getData(std::string name) const;
+
+		template <MeshData::DataType dataType>
+		inline void _setData(std::string name, const typename MeshData::DataTypeInfo<dataType>::ValueType &value, uint32_t bindingPriority = KGS_VERTEX_BINDING_PRIORITY_OTHER_MIN);
+
 
 		inline void _sortLayoutBindingInfos();
 		//tool methods
@@ -158,19 +160,19 @@ namespace kgs
 		~Mesh();
 
 		//position
-		ArrayValueType getPositions() const;
+		const ArrayValueType &getPositions() const;
 
-		void setPositions(ArrayValueType vertices);
+		void setPositions(const ArrayValueType &vertices);
 
 		//normal
-		ArrayValueType getNormals() const;
+		const ArrayValueType &getNormals() const;
 
-		void setNormals(ArrayValueType normals);
+		void setNormals(const ArrayValueType &normals);
 
 		//tangent
-		ArrayValueType getTangents() const;
+		const ArrayValueType &getTangents() const;
 
-		void setTangents(ArrayValueType tangents);
+		void setTangents(const ArrayValueType &tangents);
 
 		void apply(Bool32 makeUnreadable) override;
 

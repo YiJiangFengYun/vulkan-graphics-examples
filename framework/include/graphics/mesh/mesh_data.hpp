@@ -142,7 +142,7 @@ namespace kgs
 		std::unordered_map<std::string, Vector3> mapVector3s;
 
 		//std::vector<std::vector<Vector3>> arrVector3Arrays;
-		std::unordered_map <std::string, std::vector<Vector3>> mapVector3Arrays;
+		std::unordered_map<std::string, std::vector<Vector3>> mapVector3Arrays;
 
 		//std::vector<Vector4> arrVector4s;
 		std::unordered_map<std::string, Vector4> mapVector4s;
@@ -157,10 +157,10 @@ namespace kgs
 		std::unordered_map<std::string, std::vector<Color32>> mapColor32Arrays;
 
 		template <DataType type>
-		typename DataTypeInfo<type>::ValueType& getDataValue(std::string name);
+		const typename DataTypeInfo<type>::ValueType& getDataValue(std::string name) const;
 
 		template <DataType type>
-		void setDataValue(std::string name, typename DataTypeInfo<type>::ValueType& value);
+		void setDataValue(std::string name, const typename DataTypeInfo<type>::ValueType& value);
 
 		uint32_t static getDataBaseTypeSize(DataType dataType);
 
@@ -170,5 +170,7 @@ namespace kgs
 
 	};
 }
+
+#include "graphics/mesh/mesh_data.inl"
 
 #endif // !KGS_MESH_DATA_H

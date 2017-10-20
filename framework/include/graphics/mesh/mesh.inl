@@ -1,34 +1,27 @@
 namespace kgs
 {
 	template<UVType uvType, UVIndex uvIndex>
-	typename MeshData::DataTypeInfo<UVConstInfo<uvType>::ARRAY_TYPE>::ValueType  BaseMesh::getUVs()
+	const typename MeshData::DataTypeInfo<UVConstInfo<uvType>::ARRAY_TYPE>::ValueType &BaseMesh::getUVs() const
 	{
-		return getData<UVConstInfo<uvType>::ARRAY_TYPE>(UVIndexInfo<uvIndex>::VERTEX_NAME);
+		return _getData<UVConstInfo<uvType>::ARRAY_TYPE>(UVIndexInfo<uvIndex>::VERTEX_NAME);
 	}
 
 	template<UVType uvType, UVIndex uvIndex>
-	void BaseMesh::setUVs(typename MeshData::DataTypeInfo<UVConstInfo<uvType>::ARRAY_TYPE>::ValueType uvs)
+	void BaseMesh::setUVs(const typename MeshData::DataTypeInfo<UVConstInfo<uvType>::ARRAY_TYPE>::ValueType &uvs)
 	{
-		setData<UVConstInfo<uvType>::ARRAY_TYPE>(UVIndexInfo<uvIndex>::VERTEX_NAME, uvs, UVIndexInfo<uvIndex>::VERTEX_BINDING_PRIORITY);
+		_setData<UVConstInfo<uvType>::ARRAY_TYPE>(UVIndexInfo<uvIndex>::VERTEX_NAME, uvs, UVIndexInfo<uvIndex>::VERTEX_BINDING_PRIORITY);
 	}
 
 	template<MeshData::DataType dataType>
-	typename MeshData::DataTypeInfo<dataType>::ValueType BaseMesh::getData(std::string name) const
+	const typename MeshData::DataTypeInfo<dataType>::ValueType &BaseMesh::getData(std::string name) const
 	{
-		return m_pData->getDataValue<dataType>(name);
+		return _getData<dataType>(name);
 	}
 
 	template <MeshData::DataType dataType>
-	void BaseMesh::setData(std::string name, typename MeshData::DataTypeInfo<dataType>::ValueType value, uint32_t bindingPriority)
+	void BaseMesh::setData(std::string name, const typename MeshData::DataTypeInfo<dataType>::ValueType &value, uint32_t bindingPriority)
 	{
-		m_pData->setDataValue<dataType>(name, value);
-		//update layout binding info
-		LayoutBindingInfo info(
-			name,
-			dataType,
-			bindingPriority
-		);
-		setValue(name, info, m_mapLayoutBindingInfos, m_arrLayoutBindingInfos);
+		_setData<dataType>(name, value, bindingPriority);
 	}
 
 	void BaseMesh::_fillGraphicsPipelineCreateInfoForDraw(uint32_t subMeshIndex, vk::GraphicsPipelineCreateInfo &graphicsPipelineCreateInfo)
@@ -79,9 +72,33 @@ namespace kgs
 		commandBuffer.bindIndexBuffer(*m_pIndexBuffer, static_cast<vk::DeviceSize>(offset), vk::IndexType::eUint32);
 	}
 
+	template<MeshData::DataType dataType>
+	const typename MeshData::DataTypeInfo<dataType>::ValueType &BaseMesh::_getData(std::string name) const
+	{
+		return m_pData->getDataValue<dataType>(name);
+	}
+
+	template <MeshData::DataType dataType>
+	void BaseMesh::_setData(std::string name, const typename MeshData::DataTypeInfo<dataType>::ValueType &value, uint32_t bindingPriority)
+	{
+		m_pData->setDataValue<dataType>(name, value);
+		//update layout binding info
+		LayoutBindingInfo info(
+			name,
+			dataType,
+			bindingPriority
+		);
+		setValue(name, info, m_mapLayoutBindingInfos, m_arrLayoutBindingInfoNames);
+	}
+
 	void BaseMesh::_sortLayoutBindingInfos()
 	{
-		m_layoutBindingInfos = { m_arrLayoutBindingInfos.cbegin(), m_arrLayoutBindingInfos.cend() };
+		m_layoutBindingInfos.clear();
+		for (const auto& name : m_arrLayoutBindingInfoNames)
+		{
+			const auto& item = m_mapLayoutBindingInfos[name];
+			m_layoutBindingInfos.insert(item);
+		}
 	}
 
 #ifdef DEBUG
@@ -125,39 +142,39 @@ namespace kgs
 	}
 
 	template <MeshType meshType>
-	typename Mesh<meshType>::ArrayValueType Mesh<meshType>::getPositions() const
+	const typename Mesh<meshType>::ArrayValueType &Mesh<meshType>::getPositions() const
 	{
-		return getData<Mesh<meshType>::ARRAY_DATA_TYPE>(KGS_VERTEX_POSITION_NAME);
+		return _getData<Mesh<meshType>::ARRAY_DATA_TYPE>(KGS_VERTEX_POSITION_NAME);
 	}
 
 	template <MeshType meshType>
-	void Mesh<meshType>::setPositions(ArrayValueType vertices)
+	void Mesh<meshType>::setPositions(const ArrayValueType &vertices)
 	{
-		setData<Mesh<meshType>::ARRAY_DATA_TYPE>(KGS_VERTEX_POSITION_NAME, vertices, KGS_VERTEX_BINDING_PRIORITY_POSITION);
+		_setData<Mesh<meshType>::ARRAY_DATA_TYPE>(KGS_VERTEX_POSITION_NAME, vertices, KGS_VERTEX_BINDING_PRIORITY_POSITION);
 	}
 
 	template <MeshType meshType>
-	typename Mesh<meshType>::ArrayValueType Mesh<meshType>::getNormals() const
+	const typename Mesh<meshType>::ArrayValueType &Mesh<meshType>::getNormals() const
 	{
-		getData<Mesh<meshType>::ARRAY_DATA_TYPE>(KGS_VERTEX_NORMAL_NAME);
+		_getData<Mesh<meshType>::ARRAY_DATA_TYPE>(KGS_VERTEX_NORMAL_NAME);
 	}
 
 	template <MeshType meshType>
-	void Mesh<meshType>::setNormals(ArrayValueType normals)
+	void Mesh<meshType>::setNormals(const ArrayValueType &normals)
 	{
-		setData<Mesh<meshType>::ARRAY_DATA_TYPE>(KGS_VERTEX_NORMAL_NAME, normals, KGS_VERTEX_BINDING_PRIORITY_NORMAL);
+		_setData<Mesh<meshType>::ARRAY_DATA_TYPE>(KGS_VERTEX_NORMAL_NAME, normals, KGS_VERTEX_BINDING_PRIORITY_NORMAL);
 	}
 
 	template <MeshType meshType>
-	typename Mesh<meshType>::ArrayValueType Mesh<meshType>::getTangents() const
+	const typename Mesh<meshType>::ArrayValueType &Mesh<meshType>::getTangents() const
 	{
-		getData<Mesh<meshType>::ARRAY_DATA_TYPE>(KGS_VERTEX_TANGENT_NAME);
+		_getData<Mesh<meshType>::ARRAY_DATA_TYPE>(KGS_VERTEX_TANGENT_NAME);
 	}
 
 	template <MeshType meshType>
-	void Mesh<meshType>::setTangents(ArrayValueType tangents)
+	void Mesh<meshType>::setTangents(const ArrayValueType &tangents)
 	{
-		setData<Mesh<meshType>::ARRAY_DATA_TYPE>(KGS_VERTEX_TANGENT_NAME, tangents, KGS_VERTEX_BINDING_PRIORITY_TANGENT);
+		_setData<Mesh<meshType>::ARRAY_DATA_TYPE>(KGS_VERTEX_TANGENT_NAME, tangents, KGS_VERTEX_BINDING_PRIORITY_TANGENT);
 	}
 
 	template <MeshType meshType>

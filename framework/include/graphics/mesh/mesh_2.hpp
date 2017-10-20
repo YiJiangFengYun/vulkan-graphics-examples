@@ -6,6 +6,7 @@ namespace kgs
 	class Mesh2 : public Mesh<MeshType::SPACE_2>
 	{
 	public:
+		Mesh2();
 
 	private:
 

@@ -51,7 +51,7 @@ namespace kgs
 		}
 		case DataType::FLOAT_ARRAY:
 		{
-			auto arr = getValue(name, mapFloatArrays, arrFloatArrays);
+			auto arr = getValue(name, mapFloatArrays);
 			return static_cast<uint32_t>(sizeof(DataTypeInfo<DataType::FLOAT_ARRAY>::BaseType) * arr.size());
 		}
 		case DataType::INT:
@@ -60,7 +60,7 @@ namespace kgs
 		}
 		case DataType::INT_ARRAY:
 		{
-			auto arr = getValue(name, mapIntArrays, arrIntArrays);
+			auto arr = getValue(name, mapIntArrays);
 			return static_cast<uint32_t>(sizeof(DataTypeInfo<DataType::INT_ARRAY>::BaseType) * arr.size());
 		}
 		case DataType::COLOR:
@@ -69,7 +69,7 @@ namespace kgs
 		}
 		case DataType::COLOR_ARRAY:
 		{
-			auto arr = getValue(name, mapColorArrays, arrColorArrays);
+			auto arr = getValue(name, mapColorArrays);
 			return static_cast<uint32_t>(sizeof(DataTypeInfo<DataType::COLOR_ARRAY>::BaseType) * arr.size());
 		}
 		case DataType::VECTOR:
@@ -78,7 +78,7 @@ namespace kgs
 		}
 		case DataType::VECTOR_ARRAY:
 		{
-			auto arr = getValue(name, mapVectorArrays, arrVectorArrays);
+			auto arr = getValue(name, mapVectorArrays);
 			return static_cast<uint32_t>(sizeof(DataTypeInfo<DataType::VECTOR_ARRAY>::BaseType) * arr.size());
 		}
 		case DataType::MATRIX:
@@ -87,7 +87,7 @@ namespace kgs
 		}
 		case DataType::MATRIX_ARRAY:
 		{
-			auto arr = getValue(name, mapMatrixArrays, arrMatrixArrays);
+			auto arr = getValue(name, mapMatrixArrays);
 			return static_cast<uint32_t>(sizeof(DataTypeInfo<DataType::MATRIX_ARRAY>::BaseType) * arr.size());
 		}
 		case DataType::TEXTURE_OFFSET:
@@ -111,72 +111,72 @@ namespace kgs
 		{
 		case DataType::FLOAT:
 		{
-			auto value = getValue(name, mapFloats, arrFloats);
+			auto value = getValue(name, mapFloats);
 			std::memcpy(ptr, &value, sizeof(DataTypeInfo<DataType::FLOAT>::BaseType));
 		}
 		case DataType::FLOAT_ARRAY:
 		{
-			auto arr = getValue(name, mapFloatArrays, arrFloatArrays);
+			auto arr = getValue(name, mapFloatArrays);
 			uint32_t finalElementCount = std::max(0u, std::min(static_cast<uint32_t>(arr.size()) - elementStart, maxElementCount));
 			if (finalElementCount == 0) break;
 			std::memcpy(ptr, arr.data() + elementStart, sizeof(DataTypeInfo<DataType::FLOAT_ARRAY>::BaseType) * finalElementCount);
 		}
 		case DataType::INT:
 		{
-			auto value = getValue(name, mapInts, arrInts);
+			auto value = getValue(name, mapInts);
 			std::memcpy(ptr, &value, sizeof(DataTypeInfo<DataType::INT>::BaseType));
 		}
 		case DataType::INT_ARRAY:
 		{
-			auto arr = getValue(name, mapIntArrays, arrIntArrays);
+			auto arr = getValue(name, mapIntArrays);
 			uint32_t finalElementCount = std::max(0u, std::min(static_cast<uint32_t>(arr.size()) - elementStart, maxElementCount));
 			if (finalElementCount == 0) break;
 			std::memcpy(ptr, arr.data() + elementStart, sizeof(DataTypeInfo<DataType::INT_ARRAY>::BaseType) * finalElementCount);
 		}
 		case DataType::COLOR:
 		{
-			auto value = getValue(name, mapColors, arrColors);
+			auto value = getValue(name, mapColors);
 			std::memcpy(ptr, &value, sizeof(DataTypeInfo<DataType::COLOR>::BaseType));
 		}
 		case DataType::COLOR_ARRAY:
 		{
-			auto arr = getValue(name, mapColorArrays, arrColorArrays);
+			auto arr = getValue(name, mapColorArrays);
 			uint32_t finalElementCount = std::max(0u, std::min(static_cast<uint32_t>(arr.size()) - elementStart, maxElementCount));
 			if (finalElementCount == 0) break;
 			std::memcpy(ptr, arr.data() + elementStart, sizeof(DataTypeInfo<DataType::COLOR_ARRAY>::BaseType) * finalElementCount);
 		}
 		case DataType::VECTOR:
 		{
-			auto value = getValue(name, mapVectors, arrVectors);
+			auto value = getValue(name, mapVectors);
 			std::memcpy(ptr, &value, sizeof(DataTypeInfo<DataType::VECTOR>::BaseType));
 		}
 		case DataType::VECTOR_ARRAY:
 		{
-			auto arr = getValue(name, mapVectorArrays, arrVectorArrays);
+			auto arr = getValue(name, mapVectorArrays);
 			uint32_t finalElementCount = std::max(0u, std::min(static_cast<uint32_t>(arr.size()) - elementStart, maxElementCount));
 			if (finalElementCount == 0) break;
 			std::memcpy(ptr, arr.data() + elementStart, sizeof(DataTypeInfo<DataType::VECTOR_ARRAY>::BaseType) * finalElementCount);
 		}
 		case DataType::MATRIX:
 		{
-			auto value = getValue(name, mapMatrixs, arrMatrixs);
+			auto value = getValue(name, mapMatrixs);
 			std::memcpy(ptr, &value, sizeof(DataTypeInfo<DataType::MATRIX>::BaseType));
 		}
 		case DataType::MATRIX_ARRAY:
 		{
-			auto arr = getValue(name, mapMatrixArrays, arrMatrixArrays);
+			auto arr = getValue(name, mapMatrixArrays);
 			uint32_t finalElementCount = std::max(0u, std::min(static_cast<uint32_t>(arr.size()) - elementStart, maxElementCount));
 			if (finalElementCount == 0) break;
 			std::memcpy(ptr, arr.data() + elementStart, sizeof(DataTypeInfo<DataType::MATRIX_ARRAY>::BaseType) * finalElementCount);
 		}
 		case DataType::TEXTURE_OFFSET:
 		{
-			auto value = getValue(name, mapTextureOffsets, arrTextureOffsets);
+			auto value = getValue(name, mapTextureOffsets);
 			std::memcpy(ptr, &value, sizeof(DataTypeInfo<DataType::TEXTURE_OFFSET>::BaseType));
 		}
 		case DataType::TEXTURE_SCALE:
 		{
-			auto value = getValue(name, mapTextureScales, arrTextureScales);
+			auto value = getValue(name, mapTextureScales);
 			std::memcpy(ptr, &value, sizeof(DataTypeInfo<DataType::TEXTURE_SCALE>::BaseType));
 		}
 		default:
@@ -186,164 +186,164 @@ namespace kgs
 
 	//-----------------this used to eliminate ide warning----------------
 	template <MaterialData::DataType type>
-	typename MaterialData::DataTypeInfo<type>::ValueType& MaterialData::getDataValue(std::string name) { return {}; }
+	const typename MaterialData::DataTypeInfo<type>::ValueType& MaterialData::getDataValue(std::string name) const { return {}; }
 
 	template<MaterialData::DataType type>
-	void MaterialData::setDataValue(std::string name, typename MaterialData::DataTypeInfo<type>::ValueType& value) {}
+	void MaterialData::setDataValue(std::string name, const typename MaterialData::DataTypeInfo<type>::ValueType& value) {}
 	//-----------------this used to eliminate ide warning----------------
 
 	template<>
-	float& MaterialData::getDataValue<MaterialData::DataType::FLOAT>(std::string name)
+	const float &MaterialData::getDataValue<MaterialData::DataType::FLOAT>(std::string name) const
 	{
-		return getValue(name, mapFloats, arrFloats);
+		return getValue(name, mapFloats);
 	}
 
 	template<>
-	void MaterialData::setDataValue<MaterialData::DataType::FLOAT>(std::string name, float& value)
+	void MaterialData::setDataValue<MaterialData::DataType::FLOAT>(std::string name, const float& value)
 	{
 		setValue(name, value, mapFloats, arrFloats);
 	}
 
 	template<>
-	std::vector<float>& MaterialData::getDataValue<MaterialData::DataType::FLOAT_ARRAY>(std::string name)
+	const std::vector<float>& MaterialData::getDataValue<MaterialData::DataType::FLOAT_ARRAY>(std::string name) const
 	{
-		return getValue(name, mapFloatArrays, arrFloatArrays);
+		return getValue(name, mapFloatArrays);
 	}
 
 	template<>
-	void MaterialData::setDataValue<MaterialData::DataType::FLOAT_ARRAY>(std::string name, std::vector<float>& value)
+	void MaterialData::setDataValue<MaterialData::DataType::FLOAT_ARRAY>(std::string name, const std::vector<float>& value)
 	{
 		setValue(name, value, mapFloatArrays, arrFloatArrays);
 	}
 
 	template<>
-	int32_t& MaterialData::getDataValue<MaterialData::DataType::INT>(std::string name)
+	const int32_t& MaterialData::getDataValue<MaterialData::DataType::INT>(std::string name) const
 	{
-		return getValue(name, mapInts, arrInts);
+		return getValue(name, mapInts);
 	}
 
 	template<>
-	void MaterialData::setDataValue<MaterialData::DataType::INT>(std::string name, int32_t& value)
+	void MaterialData::setDataValue<MaterialData::DataType::INT>(std::string name, const int32_t& value)
 	{
 		setValue(name, value, mapInts, arrInts);
 	}
 
 	template<>
-	std::vector<int32_t>& MaterialData::getDataValue<MaterialData::DataType::INT_ARRAY>(std::string name)
+	const std::vector<int32_t>& MaterialData::getDataValue<MaterialData::DataType::INT_ARRAY>(std::string name) const
 	{
-		return getValue(name, mapIntArrays, arrIntArrays);
+		return getValue(name, mapIntArrays);
 	}
 
 	template<>
-	void MaterialData::setDataValue<MaterialData::DataType::INT_ARRAY>(std::string name, std::vector<int32_t>& value)
+	void MaterialData::setDataValue<MaterialData::DataType::INT_ARRAY>(std::string name, const std::vector<int32_t>& value)
 	{
 		setValue(name, value, mapIntArrays, arrIntArrays);
 	}
 
 	template<>
-	Color& MaterialData::getDataValue<MaterialData::DataType::COLOR>(std::string name)
+	const Color& MaterialData::getDataValue<MaterialData::DataType::COLOR>(std::string name) const
 	{
-		return getValue(name, mapColors, arrColors);
+		return getValue(name, mapColors);
 	}
 
 	template<>
-	void MaterialData::setDataValue<MaterialData::DataType::COLOR>(std::string name, Color& value)
+	void MaterialData::setDataValue<MaterialData::DataType::COLOR>(std::string name, const Color& value)
 	{
 		setValue(name, value, mapColors, arrColors);
 	}
 
 	template<>
-	std::vector<Color>& MaterialData::getDataValue<MaterialData::DataType::COLOR_ARRAY>(std::string name)
+	const std::vector<Color>& MaterialData::getDataValue<MaterialData::DataType::COLOR_ARRAY>(std::string name) const
 	{
-		return getValue(name, mapColorArrays, arrColorArrays);
+		return getValue(name, mapColorArrays);
 	}
 
 	template<>
-	void MaterialData::setDataValue<MaterialData::DataType::COLOR_ARRAY>(std::string name, std::vector<Color>& value)
+	void MaterialData::setDataValue<MaterialData::DataType::COLOR_ARRAY>(std::string name, const std::vector<Color>& value)
 	{
 		setValue(name, value, mapColorArrays, arrColorArrays);
 	}
 
 	template<>
-	Vector4& MaterialData::getDataValue<MaterialData::DataType::VECTOR>(std::string name)
+	const Vector4& MaterialData::getDataValue<MaterialData::DataType::VECTOR>(std::string name) const
 	{
-		return getValue(name, mapVectors, arrVectors);
+		return getValue(name, mapVectors);
 	}
 
 	template<>
-	void MaterialData::setDataValue<MaterialData::DataType::VECTOR>(std::string name, Vector4& value)
+	void MaterialData::setDataValue<MaterialData::DataType::VECTOR>(std::string name, const Vector4& value)
 	{
 		setValue(name, value, mapVectors, arrVectors);
 	}
 
 	template<>
-	std::vector<Vector4>& MaterialData::getDataValue<MaterialData::DataType::VECTOR_ARRAY>(std::string name)
+	const std::vector<Vector4>& MaterialData::getDataValue<MaterialData::DataType::VECTOR_ARRAY>(std::string name) const
 	{
-		return getValue(name, mapVectorArrays, arrVectorArrays);
+		return getValue(name, mapVectorArrays);
 	}
 
 	template<>
-	void MaterialData::setDataValue<MaterialData::DataType::VECTOR_ARRAY>(std::string name, std::vector<Vector4>& value)
+	void MaterialData::setDataValue<MaterialData::DataType::VECTOR_ARRAY>(std::string name, const std::vector<Vector4>& value)
 	{
 		setValue(name, value, mapVectorArrays, arrVectorArrays);
 	}
 
 	template<>
-	Matrix4x4& MaterialData::getDataValue<MaterialData::DataType::MATRIX>(std::string name)
+	const Matrix4x4& MaterialData::getDataValue<MaterialData::DataType::MATRIX>(std::string name) const
 	{
-		return getValue(name, mapMatrixs, arrMatrixs);
+		return getValue(name, mapMatrixs);
 	}
 
 	template<>
-	void MaterialData::setDataValue<MaterialData::DataType::MATRIX>(std::string name, Matrix4x4& value)
+	void MaterialData::setDataValue<MaterialData::DataType::MATRIX>(std::string name, const Matrix4x4& value)
 	{
 		setValue(name, value, mapMatrixs, arrMatrixs);
 	}
 
 	template<>
-	std::vector<Matrix4x4>& MaterialData::getDataValue<MaterialData::DataType::MATRIX_ARRAY>(std::string name)
+	const std::vector<Matrix4x4>& MaterialData::getDataValue<MaterialData::DataType::MATRIX_ARRAY>(std::string name) const
 	{
-		return getValue(name, mapMatrixArrays, arrMatrixArrays);
+		return getValue(name, mapMatrixArrays);
 	}
 
 	template<>
-	void MaterialData::setDataValue<MaterialData::DataType::MATRIX_ARRAY>(std::string name, std::vector<Matrix4x4>& value)
+	void MaterialData::setDataValue<MaterialData::DataType::MATRIX_ARRAY>(std::string name, const std::vector<Matrix4x4>& value)
 	{
 		setValue(name, value, mapMatrixArrays, arrMatrixArrays);
 	}
 
 	template<>
-	std::shared_ptr<Texture>& MaterialData::getDataValue<MaterialData::DataType::TEXTURE>(std::string name)
+	const std::shared_ptr<Texture>& MaterialData::getDataValue<MaterialData::DataType::TEXTURE>(std::string name) const
 	{
-		return getValue(name, mapTextures, arrTextures);
+		return getValue(name, mapTextures);
 	}
 
 	template<>
-	void MaterialData::setDataValue<MaterialData::DataType::TEXTURE>(std::string name, std::shared_ptr<Texture>& value)
+	void MaterialData::setDataValue<MaterialData::DataType::TEXTURE>(std::string name, const std::shared_ptr<Texture>& value)
 	{
 		setValue(name, value, mapTextures, arrTextures);
 	}
 
 	template<>
-	Vector2& MaterialData::getDataValue<MaterialData::DataType::TEXTURE_OFFSET>(std::string name)
+	const Vector2& MaterialData::getDataValue<MaterialData::DataType::TEXTURE_OFFSET>(std::string name) const
 	{
-		return getValue(name, mapTextureOffsets, arrTextureOffsets);
+		return getValue(name, mapTextureOffsets);
 	}
 
 	template<>
-	void MaterialData::setDataValue<MaterialData::DataType::TEXTURE_OFFSET>(std::string name, Vector2& value)
+	void MaterialData::setDataValue<MaterialData::DataType::TEXTURE_OFFSET>(std::string name, const Vector2& value)
 	{
 		setValue(name, value, mapTextureOffsets, arrTextureOffsets);
 	}
 
 	template<>
-	Vector2& MaterialData::getDataValue<MaterialData::DataType::TEXTURE_SCALE>(std::string name)
+	const Vector2& MaterialData::getDataValue<MaterialData::DataType::TEXTURE_SCALE>(std::string name) const
 	{
-		return getValue(name, mapTextureScales, arrTextureScales);
+		return getValue(name, mapTextureScales);
 	}
 
 	template<>
-	void MaterialData::setDataValue<MaterialData::DataType::TEXTURE_SCALE>(std::string name, Vector2& value)
+	void MaterialData::setDataValue<MaterialData::DataType::TEXTURE_SCALE>(std::string name, const Vector2& value)
 	{
 		setValue(name, value, mapTextureScales, arrTextureScales);
 	}

@@ -22,15 +22,11 @@ namespace kgs
 			MeshData::DataType dataType;
 			uint32_t bindingPriority;
 
+			LayoutBindingInfo();
+
 			LayoutBindingInfo(std::string name,
 				MeshData::DataType dataType,
-				uint32_t bindingPriority) :
-				name(name),
-				dataType(dataType),
-				bindingPriority(bindingPriority)
-			{
-
-			}
+				uint32_t bindingPriority);
 
 			Bool32 operator ==(const LayoutBindingInfo &target) const;
 
@@ -97,7 +93,6 @@ namespace kgs
 		template<MeshData::DataType dataType>
 		typename MeshData::DataTypeInfo<dataType>::ValueType getData(std::string name) const;
 
-
 		template <MeshData::DataType dataType>
 		void setData(std::string name, typename MeshData::DataTypeInfo<dataType>::ValueType value, uint32_t bindingPriority = KGS_VERTEX_BINDING_PRIORITY_OTHER_MIN);
 
@@ -110,7 +105,7 @@ namespace kgs
 		MeshType m_meshType;
 		uint32_t m_vertexCount;
 		std::shared_ptr<MeshData> m_pData;
-		std::vector<LayoutBindingInfo> m_arrLayoutBindingInfos;
+		std::vector<std::string> m_arrLayoutBindingInfoNames;
 		std::unordered_map<std::string, LayoutBindingInfo> m_mapLayoutBindingInfos;
 		uint32_t m_subMeshCount;
 		std::vector<SubMeshInfo> m_subMeshInfos;
@@ -132,6 +127,13 @@ namespace kgs
 		virtual std::vector<vk::VertexInputBindingDescription> _getVertexInputBindingDescriptions() = 0;
 
 		virtual std::vector<vk::VertexInputAttributeDescription> _getVertexInputAttributeDescriptions() = 0;
+
+		template<MeshData::DataType dataType>
+		inline const typename MeshData::DataTypeInfo<dataType>::ValueType & _getData(std::string name) const;
+
+		template <MeshData::DataType dataType>
+		inline void _setData(std::string name, const typename MeshData::DataTypeInfo<dataType>::ValueType &value, uint32_t bindingPriority = KGS_VERTEX_BINDING_PRIORITY_OTHER_MIN);
+
 
 		inline void _sortLayoutBindingInfos();
 		//tool methods

@@ -2,6 +2,11 @@
 
 namespace kgs
 {
+	Pass::LayoutBindingInfo::LayoutBindingInfo()
+	{
+
+	}
+
 	Pass::LayoutBindingInfo::LayoutBindingInfo(std::string name,
 		MaterialData::DataType dataType,
 		std::uint32_t binding,
@@ -35,18 +40,18 @@ namespace kgs
 	{
 	}
 
-	std::shared_ptr<Texture> Pass::getMainTexture()
+	const std::shared_ptr<Texture> Pass::getMainTexture() const
 	{
 		return getData<MaterialData::DataType::TEXTURE>(KGS_M_MAIN_TEXTURE_NAME);
 	}
 
-	void Pass::setMainTexture(std::shared_ptr<Texture> value)
+	void Pass::setMainTexture(const std::shared_ptr<Texture> value)
 	{
 		setData<MaterialData::DataType::TEXTURE>(KGS_M_MAIN_TEXTURE_NAME, value, KGS_M_MAIN_TEXTURE_BINDING, 
 			DescriptorType::COMBINED_IMAGE_SAMPLER, ShaderStageFlagBits::FRAGMENT);
 	}
 
-	Vector2 Pass::getMainTextureOffset()
+	const Vector2 Pass::getMainTextureOffset() const
 	{
 		return getData<MaterialData::DataType::TEXTURE_OFFSET>(KGS_M_MAIN_TEXTURE_NAME);
 	}
@@ -57,23 +62,23 @@ namespace kgs
 			DescriptorType::UNIFORM_BUFFER, ShaderStageFlagBits::FRAGMENT);
 	}
 
-	Vector2 Pass::getMainTextureScale()
+	const Vector2 Pass::getMainTextureScale() const 
 	{
 		return getData<MaterialData::DataType::TEXTURE_SCALE>(KGS_M_MAIN_TEXTURE_NAME);
 	}
 
-	void Pass::setMainTextureScale(Vector2 value)
+	void Pass::setMainTextureScale(const Vector2 value)
 	{
 		setData<MaterialData::DataType::TEXTURE_SCALE>(KGS_M_MAIN_TEXTURE_NAME, value, KGS_M_MAIN_TEXTURE_SCALE_BINDING,
 			DescriptorType::UNIFORM_BUFFER, ShaderStageFlagBits::FRAGMENT);
 	}
 
-	Color Pass::getMainColor()
+	const Color Pass::getMainColor() const
 	{
 		return getData<MaterialData::DataType::COLOR>(KGS_M_MAIN_COLOR_NAME);
 	}
 
-	void Pass::setMainColor(Color value)
+	void Pass::setMainColor(const Color value)
 	{
 		setData<MaterialData::DataType::COLOR>(KGS_M_MAIN_COLOR_NAME, value,
 			KGS_M_MAIN_COLOR_BINDING, DescriptorType::UNIFORM_BUFFER, ShaderStageFlagBits::VERTEX);
@@ -121,10 +126,11 @@ namespace kgs
 
 	void Pass::_createDescriptorSetLayout()
 	{
-		std::vector<vk::DescriptorSetLayoutBinding> bindings(m_arrLayoutBinds.size());
+		std::vector<vk::DescriptorSetLayoutBinding> bindings(m_arrLayoutBindNames.size());
 		size_t index = 0;
-		for (const auto& item : m_arrLayoutBinds)
+		for (const auto& name : m_arrLayoutBindNames)
 		{
+			const auto& item = m_mapLayoutBinds[name];
 			bindings[index].binding = item.binding;
 			bindings[index].descriptorCount = item.descriptorCount;
 			bindings[index].descriptorType = tranDescriptorTypeToVK(item.descriptorType);
@@ -153,8 +159,9 @@ namespace kgs
 		//get total size of uniform buffer datas and their offsets and sizes for each one.
 		uint32_t totalSize = 0u;
 		uint32_t size = 0u;
-		for (const auto& item : m_arrLayoutBinds)
+		for (const auto& name : m_arrLayoutBindNames)
 		{
+			const auto& item = m_mapLayoutBinds[name];
 			if (item.descriptorType == DescriptorType::UNIFORM_BUFFER)
 			{
 				size = sizeof(MaterialData::getDataBaseTypeSize(item.dataType)) * item.descriptorCount;
@@ -168,8 +175,9 @@ namespace kgs
 	{
 		std::unordered_map<vk::DescriptorType, uint32_t> mapTypeCounts;
 		size_t index = 0;
-		for (const auto& item : m_arrLayoutBinds)
+		for (const auto& name : m_arrLayoutBindNames)
 		{
+			const auto& item = m_mapLayoutBinds[name];
 			vk::DescriptorType vkDescriptorType = tranDescriptorTypeToVK(item.descriptorType);
 			mapTypeCounts[vkDescriptorType] += item.descriptorCount; //??? + 1.
 		}
@@ -204,8 +212,9 @@ namespace kgs
 	{
 		//get total number of unimform buffer variables.
 		int32_t count = 0u;
-		for (const auto& item : m_arrLayoutBinds)
+		for (const auto& name : m_arrLayoutBindNames)
 		{
+			const auto& item = m_mapLayoutBinds[name];
 			if (item.descriptorType == DescriptorType::UNIFORM_BUFFER)
 				++count;
 		}
@@ -215,8 +224,9 @@ namespace kgs
 		uint32_t offset = 0u;
 		uint32_t index = 0u;
 		uint32_t size = 0u;
-		for (const auto& item : m_arrLayoutBinds)
+		for (const auto& name : m_arrLayoutBindNames)
 		{
+			const auto& item = m_mapLayoutBinds[name];
 			if (item.descriptorType == DescriptorType::UNIFORM_BUFFER)
 			{
 				std::vector<vk::DescriptorBufferInfo> bufferInfos(item.descriptorCount);
@@ -246,8 +256,9 @@ namespace kgs
 	{
 		//get total number of unimform buffer variables.
 		int32_t count = 0u;
-		for (const auto& item : m_arrLayoutBinds)
+		for (const auto& name : m_arrLayoutBindNames)
 		{
+			const auto& item = m_mapLayoutBinds[name];
 			if (item.descriptorType == DescriptorType::COMBINED_IMAGE_SAMPLER)
 				++count;
 		}
@@ -255,8 +266,9 @@ namespace kgs
 		std::vector<vk::WriteDescriptorSet> writes(count);
 
 		uint32_t index = 0u;
-		for (const auto& item : m_arrLayoutBinds)
+		for (const auto& name : m_arrLayoutBindNames)
 		{
+			const auto& item = m_mapLayoutBinds[name];
 			if (item.descriptorType == DescriptorType::COMBINED_IMAGE_SAMPLER)
 			{
 #ifdef DEBUG
@@ -292,8 +304,9 @@ namespace kgs
 	{
 		//get total number of unimform buffer variables.
 		int32_t uniformBufferCount = 0u;
-		for (const auto& item : m_arrLayoutBinds)
+		for (const auto& name : m_arrLayoutBindNames)
 		{
+			const auto& item = m_mapLayoutBinds[name];
 			if (item.descriptorType == DescriptorType::UNIFORM_BUFFER)
 				++uniformBufferCount;
 		}
@@ -307,8 +320,9 @@ namespace kgs
 		std::vector<uint32_t> descriptorCounts(uniformBufferCount);
 		uint32_t index = 0u;
 		uint32_t size = 0u;
-		for (const auto& item : m_arrLayoutBinds)
+		for (const auto& name : m_arrLayoutBindNames)
 		{
+			const auto& item = m_mapLayoutBinds[name];
 			if (item.descriptorType == DescriptorType::UNIFORM_BUFFER)
 			{
 				offsets[index] = offset;

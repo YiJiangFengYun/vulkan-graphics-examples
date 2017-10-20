@@ -11,21 +11,18 @@ namespace kgs
 	template <typename T>
 	inline Bool32 isHas(std::string name, std::unordered_map<std::string, T>& map)
 	{
-		auto iterator = map.find(name);
-		return iterator != map.end();
+		return map.count(name) != 0;
+		/*auto iterator = map.find(name);
+		return iterator != map.end();*/
 
 	}
-	template <typename T>
-	inline Bool32 isHas(std::string name, std::unordered_map<std::string, T>& map, std::vector<T>& arr)
-	{
-		auto iterator = map.find(name);
-		return iterator != map.end();
-	}
+
 
 	template <typename T>
-	inline T& getValue(std::string name, std::unordered_map<std::string, T>& map)
+	inline const T& getValue(std::string name, std::unordered_map<std::string, T>& map)
 	{
-		auto iterator = map.find(name);
+		return map[name];
+		/*auto iterator = map.find(name);
 		if (iterator == map.end())
 		{
 			throw std::runtime_error("The Content of the specify key don't exit in map");
@@ -33,27 +30,14 @@ namespace kgs
 		else
 		{
 			return iterator->second;
-		}
+		}*/
 	}
 
 	template <typename T>
-	inline T& getValue(std::string name, std::unordered_map<std::string, T>& map, std::vector<T>& arr)
+	inline void setValue(std::string name, const T& value, std::unordered_map<std::string, T>& map)
 	{
-		auto iterator = map.find(name);
-		if (iterator == map.end())
-		{
-			throw std::runtime_error("The Content of the specify key don't exit in map");
-		}
-		else
-		{
-			return iterator->second;
-		}
-	}
-
-	template <typename T>
-	inline void setValue(std::string name, T& value, std::unordered_map<std::string, T>& map)
-	{
-		auto iterator = map.find(name);
+		map[name] = value;
+		/*auto iterator = map.find(name);
 		if (iterator == map.end())
 		{
 			map.insert(std::make_pair(name, value));
@@ -61,13 +45,19 @@ namespace kgs
 		else
 		{
 			iterator->second = value;
-		}
+		}*/
 	}
 
 	template <typename T>
-	inline void setValue(std::string name, T& value, std::unordered_map<std::string, T>& map, std::vector<T>& arr)
+	inline void setValue(std::string name, const T& value, std::unordered_map<std::string, T>& map, std::vector<std::string>& arr)
 	{
-		auto iterator = map.find(name);
+		map[name] = value;
+		auto iterator = std::find(arr.begin(), arr.end(), name);
+		if (iterator == arr.end())
+		{
+			arr.push_back(name);
+		}
+		/*auto iterator = map.find(name);
 		if (iterator == map.end())
 		{
 			map.insert(std::make_pair(name, value));
@@ -78,7 +68,7 @@ namespace kgs
 			iterator->second = value;
 			auto iterator2 = std::find(arr.begin(), arr.end(), iterator->second);
 			*iterator2 = value;
-		}
+		}*/
 	}
 } //namespace kgs
 #endif // !KGS_UTIL_H

@@ -32,27 +32,27 @@ namespace kgs
 
 		uint32_t getVisualObjectCount();
 
-		std::shared_ptr<VisualObjectType> getVisualObjectWithIndex(uint32_t index);
+		const std::shared_ptr<VisualObjectType> &getVisualObjectWithIndex(uint32_t index) const;
 
-		std::shared_ptr<VisualObjectType> getVisualObjectWithName(std::string name);
+		const std::shared_ptr<VisualObjectType> &getVisualObjectWithName(std::string name) const;
 
-		void setVisualObjectWithName(std::string name, std::shared_ptr<VisualObjectType> value);
+		void setVisualObjectWithName(std::string name, const std::shared_ptr<VisualObjectType> &value);
 
 		uint32_t getCameraCount();
 
-		std::shared_ptr<CameraType> getCameraWithIndex(uint32_t index);
+		const std::shared_ptr<CameraType> &getCameraWithIndex(uint32_t index) const;
 
-		std::shared_ptr<CameraType> getCameraWithName(std::string name);
+		const std::shared_ptr<CameraType> &getCameraWithName(std::string name) const;
 
-		void setCameraWithName(std::string name, std::shared_ptr<CameraType> value);
+		void setCameraWithName(std::string name, const std::shared_ptr<CameraType> &value);
 
 		uint32_t getLightCount();
 
-		std::shared_ptr<LightType> getLightWithIndex(uint32_t index);
+		const std::shared_ptr<LightType> &getLightWithIndex(uint32_t index) const;
 
-		std::shared_ptr<LightType> getLightWithName(std::string name);
+		const std::shared_ptr<LightType> &getLightWithName(std::string name) const;
 
-		void setLightWithName(std::string name, std::shared_ptr<LightType> value);
+		void setLightWithName(std::string name, const std::shared_ptr<LightType> &value);
 
 	protected:
 

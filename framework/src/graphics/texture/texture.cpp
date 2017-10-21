@@ -12,6 +12,9 @@ namespace kgs
 		, m_height(1U)
 		, m_depth(1U)
 		, m_arrayLength(1U)
+		, m_filterMode(FilterMode::LINEAR)
+		, m_samplerAddressMode(SamplerAddressMode::CLAMP_TO_BORDER)
+		, m_anisotropy(0.0f)
 		, m_vkImageUsageFlags(vk::ImageUsageFlagBits::eTransferDst | vk::ImageUsageFlagBits::eSampled) //default image usage is for sampled texture.
 		, m_vkImageLayout(vk::ImageLayout::eShaderReadOnlyOptimal) //default image layout is for sampled texture.
 		, m_vkImageAspectFlags(vk::ImageAspectFlagBits::eColor) //default image aspect is for sampled texture.
@@ -185,14 +188,13 @@ namespace kgs
 
 	void Texture::_updateVkFilter()
 	{
-		vk::Filter vkFiler;
-		//vk::SamplerMipmapMode vkSamplerMipmapMode;
 		for (const auto& item : arrFilerModeToVK)
 		{
 			if (std::get<0>(item) == m_filterMode)
 			{
-				vkFiler = std::get<1>(item);
+				m_vkFilter = std::get<1>(item);
 				m_vkSamplerMipmapMode = std::get<2>(item);
+				break;
 			}
 		}
 	}

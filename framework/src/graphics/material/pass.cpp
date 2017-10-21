@@ -53,23 +53,23 @@ namespace kgs
 
 	const Vector2 Pass::getMainTextureOffset() const
 	{
-		return getData<MaterialData::DataType::TEXTURE_OFFSET>(KGS_M_MAIN_TEXTURE_NAME);
+		return getData<MaterialData::DataType::TEXTURE_OFFSET>(KGS_M_MAIN_TEXTURE_OFFSET_NAME);
 	}
 
 	void Pass::setMainTextureOffset(Vector2 value)
 	{
-		setData<MaterialData::DataType::TEXTURE_OFFSET>(KGS_M_MAIN_TEXTURE_NAME, value, KGS_M_MAIN_TEXTURE_OFFSET_BINDING, 
+		setData<MaterialData::DataType::TEXTURE_OFFSET>(KGS_M_MAIN_TEXTURE_OFFSET_NAME, value, KGS_M_MAIN_TEXTURE_OFFSET_BINDING,
 			DescriptorType::UNIFORM_BUFFER, ShaderStageFlagBits::FRAGMENT);
 	}
 
 	const Vector2 Pass::getMainTextureScale() const 
 	{
-		return getData<MaterialData::DataType::TEXTURE_SCALE>(KGS_M_MAIN_TEXTURE_NAME);
+		return getData<MaterialData::DataType::TEXTURE_SCALE>(KGS_M_MAIN_TEXTURE_SCALE_NAME);
 	}
 
 	void Pass::setMainTextureScale(const Vector2 value)
 	{
-		setData<MaterialData::DataType::TEXTURE_SCALE>(KGS_M_MAIN_TEXTURE_NAME, value, KGS_M_MAIN_TEXTURE_SCALE_BINDING,
+		setData<MaterialData::DataType::TEXTURE_SCALE>(KGS_M_MAIN_TEXTURE_SCALE_NAME, value, KGS_M_MAIN_TEXTURE_SCALE_BINDING,
 			DescriptorType::UNIFORM_BUFFER, ShaderStageFlagBits::FRAGMENT);
 	}
 

@@ -29,17 +29,6 @@
     <ClInclude Include="..\..\samples\include\sample\tiny_obj_loader.h" />
     <ClInclude Include="..\..\samples\include\sample\window.hpp" />
   </ItemGroup>
-  <ItemGroup>
-    <Object Include="..\..\samples\resources\models\chalet.obj" />
-  </ItemGroup>
-  <ItemGroup>
-    <None Include="..\..\samples\resources\shaders\compile.bat" />
-    <None Include="..\..\samples\resources\shaders\shader.frag" />
-    <None Include="..\..\samples\resources\shaders\shader.vert" />
-  </ItemGroup>
-  <ItemGroup>
-    <Image Include="..\..\samples\resources\textures\chalet.jpg" />
-  </ItemGroup>
   <PropertyGroup Label="Globals">
     <VCProjectVersion>15.0</VCProjectVersion>
     <ProjectGuid>{f8172acd-126e-4b67-bcf4-d9e277fc3e3b}</ProjectGuid>

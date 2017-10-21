@@ -13,6 +13,9 @@
     <Filter Include="src\sample">
       <UniqueIdentifier>{4ed98e2c-7cb6-4472-9d0e-8a309d034e93}</UniqueIdentifier>
     </Filter>
+    <Filter Include="resources">
+      <UniqueIdentifier>{5f8db274-635f-4536-8936-ff0fe690d6d3}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="..\..\samples\src\sample\app.cpp">
@@ -38,5 +41,26 @@
     <ClInclude Include="..\..\samples\include\sample\stb_image.h">
       <Filter>include\sample</Filter>
     </ClInclude>
+  </ItemGroup>
+  <ItemGroup>
+    <Object Include="..\..\samples\resources\models\chalet.obj">
+      <Filter>resources</Filter>
+    </Object>
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="..\..\samples\resources\shaders\shader.vert">
+      <Filter>resources</Filter>
+    </None>
+    <None Include="..\..\samples\resources\shaders\compile.bat">
+      <Filter>resources</Filter>
+    </None>
+    <None Include="..\..\samples\resources\shaders\shader.frag">
+      <Filter>resources</Filter>
+    </None>
+  </ItemGroup>
+  <ItemGroup>
+    <Image Include="..\..\samples\resources\textures\chalet.jpg">
+      <Filter>resources</Filter>
+    </Image>
   </ItemGroup>
 </Project>

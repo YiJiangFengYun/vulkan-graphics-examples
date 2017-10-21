@@ -120,6 +120,8 @@ namespace kgs
 		std::shared_ptr<vk::Buffer> m_pIndexBuffer;
 		std::shared_ptr<vk::DeviceMemory> m_pIndexBufferMemory;
 
+		void _createMeshData();
+
 		void _createVertexBuffer();
 
 		void _createIndexBuffer();

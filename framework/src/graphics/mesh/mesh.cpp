@@ -36,6 +36,7 @@ namespace kgs
 		: m_pContext(pContext)
 		, m_multipliedColor(COLOR_WHITE) //default multiplied color should be (1, 1, 1, 1)
 	{
+		_createMeshData();
 		setSubMeshCount(1u);
 	}
 
@@ -160,8 +161,8 @@ namespace kgs
 		{
 			m_vertexCount = 0u;
 
-			//clear data with asign nullptr
-			m_pData = nullptr;
+			//clear data with new mesh data.
+			_createMeshData();
 			//clear layout binding info array with reallocate.
 			std::vector<std::string>().swap(m_arrLayoutBindingInfoNames);
 			//clear layout binding info map with reallocate.
@@ -173,7 +174,12 @@ namespace kgs
 		}
 	}
 
-	inline void BaseMesh::_createVertexBuffer()
+	void BaseMesh::_createMeshData()
+	{
+		m_pData = std::shared_ptr<MeshData>(new MeshData());
+	}
+
+	void BaseMesh::_createVertexBuffer()
 	{
 		//get size of every vertex
 		uint32_t size = 0u;

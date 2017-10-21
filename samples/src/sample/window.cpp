@@ -4,6 +4,45 @@
 
 namespace app
 {
+	SubWindow::SubWindow(uint32_t width, uint32_t height, const char* title,
+		std::shared_ptr<vk::Instance> pInstance, std::shared_ptr<vk::PhysicalDevice> pPhysicalDevice,
+		std::shared_ptr<vk::Device> device, vk::Queue graphicsQueue, vk::Queue presentQueue)
+		: gfw::Window(width, height, title, pInstance, pPhysicalDevice, device, graphicsQueue, presentQueue)
+	{
+	}
+
+	SubWindow::SubWindow(std::shared_ptr<GLFWwindow> pWindow, std::shared_ptr<vk::SurfaceKHR> pSurface,
+		std::shared_ptr<vk::Instance> pInstance, std::shared_ptr<vk::PhysicalDevice> pPhysicalDevice,
+		std::shared_ptr<vk::Device> pDevice, vk::Queue graphicsQueue, vk::Queue presentQueue)
+		: gfw::Window(pWindow, pSurface, pInstance, pPhysicalDevice, pDevice, graphicsQueue, presentQueue)
+	{
+	}
+
+	void SubWindow::_onPreUpdate()
+	{
+
+	}
+
+	void SubWindow::_update()
+	{
+
+	}
+
+	void SubWindow::_onPostUpdate()
+	{
+
+	}
+
+	void SubWindow::_onPreRender()
+	{
+
+	}
+
+	void SubWindow::_onPostRender()
+	{
+
+	}
+
 	bool Window::Vertex::operator==(const Vertex& other) const {
 		return pos == other.pos && color == other.color && texCoord == other.texCoord;
 	}
@@ -74,6 +113,9 @@ namespace app
 
 	void Window::_createMesh()
 	{
+		/*std::unordered_map<std::string, std::vector<kgs::Vector3>> testMap;
+		testMap["_Position"] = m_tempPositions;*/
+
 		m_pMesh = static_cast<std::shared_ptr<kgs::Mesh3>>(new kgs::Mesh3());
 		m_pMesh->setVertexCount(static_cast<uint32_t>(m_tempPositions.size()));
 		m_pMesh->setPositions(m_tempPositions);

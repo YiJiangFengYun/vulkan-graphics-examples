@@ -20,8 +20,8 @@ int main() {
 
 	app::App app;
 	app.init<app::Window>(WINDOW_WIDTH, WINDOW_HEIGHT, "sample");
-	app.createSubWindow<app::Window>(200, 200, "sub window");
-	app.createSubWindow<app::Window>(200, 400, "sub window2");
+	app.createSubWindow<app::SubWindow>(200, 200, "sub window");
+	app.createSubWindow<app::SubWindow>(200, 400, "sub window2");
 	app.run();
 
 	return 0;

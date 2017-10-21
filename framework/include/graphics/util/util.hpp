@@ -14,13 +14,6 @@ namespace kgs
 		return map.count(name) != 0;
 	}
 
-
-	template <typename T>
-	inline const T& getValue(std::string name, std::unordered_map<std::string, T>& map)
-	{
-		return map[name];
-	}
-
 	template <typename T>
 	inline const T& getValue(std::string name, const std::unordered_map<std::string, T>& map)
 	{
@@ -45,6 +38,7 @@ namespace kgs
 	inline void setValue(std::string name, const T& value, std::unordered_map<std::string, T>& map, std::vector<std::string>& arr)
 	{
 		map[name] = value;
+
 		auto iterator = std::find(arr.begin(), arr.end(), name);
 		if (iterator == arr.end())
 		{

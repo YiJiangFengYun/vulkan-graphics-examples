@@ -12,15 +12,65 @@ namespace kgs
 		std::uint32_t binding,
 		DescriptorType descriptorType,
 		std::uint32_t descriptorCount,
-		ShaderStageFlags stageFlags) :
-		name(name),
-		dataType(dataType),
-		binding(binding),
-		descriptorType(descriptorType),
-		descriptorCount(descriptorCount),
-		stageFlags(stageFlags)
+		ShaderStageFlags stageFlags) 
+		: name(name)
+		, dataType(dataType)
+		, binding(binding)
+		, descriptorType(descriptorType)
+		, descriptorCount(descriptorCount)
+		, stageFlags(stageFlags)
+	{
+		updateSize();
+	}
+
+	Pass::LayoutBindingInfo::LayoutBindingInfo(const LayoutBindingInfo & target)
+		: name(target.name)
+		, dataType(target.dataType)
+		, binding(target.binding)
+		, descriptorType(target.descriptorType)
+		, descriptorCount(target.descriptorCount)
+		, stageFlags(target.stageFlags)
+		, size(target.size)
+		, bufferSize(target.bufferSize)
 	{
 
+	}
+
+	Pass::LayoutBindingInfo& Pass::LayoutBindingInfo::operator=(const LayoutBindingInfo &target)
+	{
+		name = target.name;
+		dataType = target.dataType;
+		binding = target.binding;
+		descriptorType = target.descriptorType;
+		descriptorCount = target.descriptorCount;
+		stageFlags = target.stageFlags;
+		size = target.size;
+		bufferSize = target.bufferSize;
+
+		return *this;
+	}
+
+	Pass::LayoutBindingInfo::LayoutBindingInfo(const LayoutBindingInfo &&target)
+		: name(target.name)
+		, dataType(target.dataType)
+		, binding(target.binding)
+		, descriptorType(target.descriptorType)
+		, descriptorCount(target.descriptorCount)
+		, stageFlags(target.stageFlags)
+		, size(target.size)
+		, bufferSize(target.bufferSize)
+	{
+
+	}
+
+	void Pass::LayoutBindingInfo::updateSize()
+	{
+		auto pPhysicalDevice = pContext->getPhysicalDevice();
+		auto properties = pPhysicalDevice->getProperties();
+		auto minOffsetAlignment = static_cast<float>(properties.limits.minUniformBufferOffsetAlignment);
+		//uint32_t minUniformBufferOffsetAlignment = pPhysicalDevice->min
+		size = sizeof(MaterialData::getDataBaseTypeSize(dataType)) * descriptorCount;
+		bufferSize = static_cast<uint32_t>(std::ceil(size / minOffsetAlignment) * minOffsetAlignment);
 	}
 
 	Bool32 Pass::LayoutBindingInfo::operator ==(const LayoutBindingInfo& target) const
@@ -158,14 +208,12 @@ namespace kgs
 	{
 		//get total size of uniform buffer datas and their offsets and sizes for each one.
 		uint32_t totalSize = 0u;
-		uint32_t size = 0u;
 		for (const auto& name : m_arrLayoutBindNames)
 		{
 			const auto& item = m_mapLayoutBinds[name];
 			if (item.descriptorType == DescriptorType::UNIFORM_BUFFER)
 			{
-				size = sizeof(MaterialData::getDataBaseTypeSize(item.dataType)) * item.descriptorCount;
-				totalSize += size;
+				totalSize += item.bufferSize;
 			}
 		}
 		createBuffer(static_cast<vk::DeviceSize>(totalSize), m_pUniformBuffer, m_pUniformBufferMemory);
@@ -220,30 +268,28 @@ namespace kgs
 		}
 
 		std::vector<vk::WriteDescriptorSet> writes(count);
-
+		std::vector<std::vector<vk::DescriptorBufferInfo>> bufferInfoss(count);
 		uint32_t offset = 0u;
 		uint32_t index = 0u;
-		uint32_t size = 0u;
 		for (const auto& name : m_arrLayoutBindNames)
 		{
 			const auto& item = m_mapLayoutBinds[name];
 			if (item.descriptorType == DescriptorType::UNIFORM_BUFFER)
 			{
-				std::vector<vk::DescriptorBufferInfo> bufferInfos(item.descriptorCount);
+				bufferInfoss[index].resize(item.descriptorCount);
 				for (uint32_t i = 0; i < item.descriptorCount; ++i)
 				{
-					size = sizeof(MaterialData::getDataBaseTypeSize(item.dataType));
-					bufferInfos[i].buffer = *m_pUniformBuffer;
-					bufferInfos[i].offset = offset;
-					bufferInfos[i].range = size;
-					offset += size;
+					bufferInfoss[index][i].buffer = *m_pUniformBuffer;
+					bufferInfoss[index][i].offset = offset;
+					bufferInfoss[index][i].range = item.size;
+					offset += item.bufferSize;
 				}
 				writes[index].dstSet = *m_pDescriptorSet;
 				writes[index].dstBinding = item.binding;
 				writes[index].descriptorType = tranDescriptorTypeToVK(item.descriptorType);
 				writes[index].dstArrayElement = 0;
 				writes[index].descriptorCount = item.descriptorCount;
-				writes[index].pBufferInfo = bufferInfos.data();
+				writes[index].pBufferInfo = bufferInfoss[index].data();
 				++index;
 			}
 		}
@@ -319,7 +365,6 @@ namespace kgs
 		std::vector<MaterialData::DataType> types(uniformBufferCount);
 		std::vector<uint32_t> descriptorCounts(uniformBufferCount);
 		uint32_t index = 0u;
-		uint32_t size = 0u;
 		for (const auto& name : m_arrLayoutBindNames)
 		{
 			const auto& item = m_mapLayoutBinds[name];
@@ -329,9 +374,8 @@ namespace kgs
 				types[index] = item.dataType;
 				names[index] = item.name;
 				descriptorCounts[index] = item.descriptorCount;
-				size = sizeof(MaterialData::getDataBaseTypeSize(item.dataType)) * item.descriptorCount;
-				totalSize += size;
-				offset += size;
+				totalSize += item.size;
+				offset += item.bufferSize;
 				++index;
 			}
 		}

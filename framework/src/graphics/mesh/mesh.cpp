@@ -9,10 +9,35 @@ namespace kgs
 
 	BaseMesh::LayoutBindingInfo::LayoutBindingInfo(std::string name,
 		MeshData::DataType dataType,
-		uint32_t bindingPriority) :
-		name(name),
-		dataType(dataType),
-		bindingPriority(bindingPriority)
+		uint32_t bindingPriority)
+		: name(name)
+		, dataType(dataType)
+		, bindingPriority(bindingPriority)
+	{
+
+	}
+
+	BaseMesh::LayoutBindingInfo::LayoutBindingInfo(const LayoutBindingInfo &target)
+		: name(target.name)
+		, dataType(target.dataType)
+		, bindingPriority(target.bindingPriority)
+	{
+
+	}
+
+	BaseMesh::LayoutBindingInfo &BaseMesh::LayoutBindingInfo::operator=(const LayoutBindingInfo &target)
+	{
+		name = target.name;
+		dataType = target.dataType;
+		bindingPriority = target.bindingPriority;
+		return *this;
+	}
+
+
+	BaseMesh::LayoutBindingInfo::LayoutBindingInfo(const LayoutBindingInfo &&target)
+		: name(target.name)
+		, dataType(target.dataType)
+		, bindingPriority(target.bindingPriority)
 	{
 
 	}

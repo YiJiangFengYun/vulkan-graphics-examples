@@ -34,6 +34,9 @@ namespace kgs
 			std::uint32_t descriptorCount;
 			ShaderStageFlags stageFlags;
 
+			std::uint32_t size;
+			std::uint32_t bufferSize;
+
 			LayoutBindingInfo();
 
 			LayoutBindingInfo(std::string name,
@@ -43,7 +46,15 @@ namespace kgs
 				std::uint32_t descriptorCount,
 				ShaderStageFlags stageFlags);
 
+			LayoutBindingInfo(const LayoutBindingInfo &);
+
+			LayoutBindingInfo(const LayoutBindingInfo &&);
+
+			LayoutBindingInfo& operator=(const LayoutBindingInfo &);
+
 			Bool32 operator ==(const LayoutBindingInfo& target) const;
+
+			void updateSize();
 		};
 
 		Pass();

@@ -28,6 +28,12 @@ namespace kgs
 				MeshData::DataType dataType,
 				uint32_t bindingPriority);
 
+			LayoutBindingInfo(const LayoutBindingInfo &);
+
+			LayoutBindingInfo(const LayoutBindingInfo &&);
+
+			LayoutBindingInfo &operator=(const LayoutBindingInfo &);
+
 			Bool32 operator ==(const LayoutBindingInfo &target) const;
 
 			Bool32 operator<(const LayoutBindingInfo &target) const;

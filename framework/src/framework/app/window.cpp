@@ -317,7 +317,7 @@ namespace gfw {
 				throw std::runtime_error("Failed to acquire swap chain image");
 			}
 
-			kgs::RenderInfo renderInfo;
+			kgs::BaseRenderer::RenderInfo renderInfo;
 			renderInfo.waitSemaphoreCount = 1u;
 			renderInfo.pWaitSemaphores = m_pImageAvailableSemaphore.get();
 			renderInfo.signalSemaphoreCount = 1u;

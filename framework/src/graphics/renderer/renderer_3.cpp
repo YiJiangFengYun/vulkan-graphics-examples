@@ -52,6 +52,12 @@ namespace kgs
 
 	}
 
+	void Renderer3::_update(UpdateInfo updateInfo)
+	{
+		Renderer::_update(updateInfo);
+
+	}
+
 	void Renderer3::_render(RenderInfo renderInfo)
 	{
 		auto queueTypeCount = static_cast<uint32_t>(RenderQueueType::RANGE_SIZE);

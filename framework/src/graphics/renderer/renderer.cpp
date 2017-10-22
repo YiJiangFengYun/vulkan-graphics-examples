@@ -35,6 +35,11 @@ namespace kgs
 		return _isValidForRender();
 	}
 
+	void BaseRenderer::update(UpdateInfo updateInfo)
+	{
+		_update(updateInfo);
+	}
+
 	void BaseRenderer::render(RenderInfo renderInfo)
 	{
 		_render(renderInfo);
@@ -43,6 +48,11 @@ namespace kgs
 	Bool32 BaseRenderer::_isValidForRender()
 	{
 		return KGS_TRUE;
+	}
+
+	void BaseRenderer::_update(UpdateInfo updateInfo)
+	{
+
 	}
 
 	void BaseRenderer::_render(RenderInfo renderInfo)

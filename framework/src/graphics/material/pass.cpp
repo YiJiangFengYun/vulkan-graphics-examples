@@ -390,7 +390,7 @@ namespace kgs
 		pDevice->unmapMemory(*m_pUniformBufferMemory);
 	}
 
-	void Pass::createBuffer(vk::DeviceSize size, std::shared_ptr<vk::Buffer>& pBuffer, std::shared_ptr<vk::DeviceMemory> pBufferMemory)
+	void Pass::createBuffer(vk::DeviceSize size, std::shared_ptr<vk::Buffer>& pBuffer, std::shared_ptr<vk::DeviceMemory> &pBufferMemory)
 	{
 		vk::BufferCreateInfo createInfo = {
 			vk::BufferCreateFlags(),

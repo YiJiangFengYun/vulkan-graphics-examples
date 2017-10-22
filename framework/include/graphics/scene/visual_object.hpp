@@ -26,7 +26,7 @@ namespace kgs
 	class VisualObject : public BaseVisualObject, public Object<SPACE_TYPE>
 	{
 	public:
-		typedef Mesh<SpaceConstInfo<SPACE_TYPE>::MESH_TYPE> MeshType;
+		typedef Mesh<SpaceTypeInfo<SPACE_TYPE>::MESH_TYPE> MeshType;
 
 		VisualObject()
 			: BaseVisualObject()

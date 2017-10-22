@@ -18,6 +18,7 @@ namespace kgs
 	template<SpaceType type>
 	struct SpaceTypeInfo
 	{
+		static const MeshType MESH_TYPE;
 		typedef void VectorType;
 		typedef void PointType;
 		typedef void MatrixVectorType;
@@ -28,13 +29,13 @@ namespace kgs
 	template<SpaceType type>
 	struct SpaceConstInfo
 	{
-		static const MeshType MESH_TYPE;
 		static const typename SpaceTypeInfo<type>::VectorType UP_VECTOR;
 	};
 
 	template<>
 	struct SpaceTypeInfo<SpaceType::SPACE_2>
 	{
+		static const MeshType MESH_TYPE = MeshType::SPACE_2;
 		typedef Vector2 VectorType;
 		typedef Vector2 PointType;
 		typedef Vector3 MatrixVectorType;
@@ -45,6 +46,7 @@ namespace kgs
 	template<>
 	struct SpaceTypeInfo<SpaceType::SPACE_3>
 	{
+		static const MeshType MESH_TYPE = MeshType::SPACE_3;
 		typedef Vector3 VectorType;
 		typedef Vector3 PointType;
 		typedef Vector4 MatrixVectorType;
@@ -53,13 +55,7 @@ namespace kgs
 	};
 
 	template<>
-	const MeshType SpaceConstInfo<SpaceType::SPACE_2>::MESH_TYPE = MeshType::SPACE_2;
-
-	template<>
     const SpaceTypeInfo<SpaceType::SPACE_2>::VectorType SpaceConstInfo<SpaceType::SPACE_2>::UP_VECTOR = { 0.0f, 1.0f };
-
-	template<>
-	const MeshType SpaceConstInfo<SpaceType::SPACE_3>::MESH_TYPE = MeshType::SPACE_3;
 
 	template<>
 	const SpaceTypeInfo<SpaceType::SPACE_3>::VectorType SpaceConstInfo<SpaceType::SPACE_3>::UP_VECTOR = { 0.0f, 1.0f, 0.0f };

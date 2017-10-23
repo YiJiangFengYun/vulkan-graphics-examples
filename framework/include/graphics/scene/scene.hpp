@@ -57,11 +57,11 @@ namespace kgs
 	protected:
 
 		//aggregations
-		std::vector<std::shared_ptr<VisualObjectType>> m_arrPVisualObjects;
+		std::vector<std::string> m_arrVisualObjectNames;
 		std::unordered_map<std::string, std::shared_ptr<VisualObjectType>> m_mapPVisualObjects;
-		std::vector<std::shared_ptr<CameraType>> m_arrPCameras;
+		std::vector<std::string> m_arrCameraNames;
 		std::unordered_map<std::string, std::shared_ptr<CameraType>> m_mapPCameras;
-		std::vector<std::shared_ptr<LightType>> m_arrPLights;
+		std::vector<std::string> m_arrLightNames;
 		std::unordered_map<std::string, std::shared_ptr<LightType>> m_mapPLights;
 
 	};

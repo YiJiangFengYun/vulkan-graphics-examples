@@ -26,5 +26,6 @@ namespace kgs
 			stageFlags
 		);
 		setValue(name, info, m_mapLayoutBinds, m_arrLayoutBindNames);
+		m_applied = KGS_FALSE;
 	}
 } //namespace kgs

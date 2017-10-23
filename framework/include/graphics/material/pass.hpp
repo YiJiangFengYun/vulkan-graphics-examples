@@ -106,9 +106,9 @@ namespace kgs
 		std::shared_ptr<vk::DescriptorSetLayout> m_pDescriptorSetLayout;
 		std::shared_ptr<vk::DescriptorPool> m_pDescriptorPool;
 		std::shared_ptr<vk::DescriptorSet> m_pDescriptorSet;
+		Bool32 m_applied;
 
 		//aggregations
-		std::shared_ptr<Context> m_pContext;
 		std::shared_ptr<Shader> m_pShader;
 		void _createDescriptorSetLayout();
 		void _createUniformBuffer();

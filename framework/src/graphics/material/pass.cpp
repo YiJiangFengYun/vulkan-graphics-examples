@@ -80,9 +80,9 @@ namespace kgs
 			stageFlags == target.stageFlags;
 	}
 
-	Pass::Pass() :
-		m_pContext(pContext),
-		m_pData(new MaterialData())
+	Pass::Pass() 
+		: m_pData(new MaterialData())
+		, m_applied(KGS_FALSE)
 	{
 	}
 
@@ -136,12 +136,16 @@ namespace kgs
 
 	void Pass::apply()
 	{
-		_createDescriptorSetLayout();
-		_createUniformBuffer();
-		_createDescriptorSet();
-		_updateDescriptorBufferInfo();
-		_updateDescriptorImageInfo();
-		_applyBufferContent();
+		if (m_applied == KGS_FALSE)
+		{
+			_createDescriptorSetLayout();
+			_createUniformBuffer();
+			_createDescriptorSet();
+			_updateDescriptorBufferInfo();
+			_updateDescriptorImageInfo();
+			_applyBufferContent();
+			m_applied = KGS_TRUE;
+		}
 	}
 
 	std::shared_ptr<Shader> Pass::_getShader()
@@ -189,7 +193,7 @@ namespace kgs
 
 		}
 
-		auto pDevice = m_pContext->getNativeDevice();
+		auto pDevice = pContext->getNativeDevice();
 
 		//create descriptor set layout.
 		{
@@ -230,7 +234,7 @@ namespace kgs
 			mapTypeCounts[vkDescriptorType] += item.descriptorCount; //??? + 1.
 		}
 
-		auto pDevice = m_pContext->getNativeDevice();
+		auto pDevice = pContext->getNativeDevice();
 		//create descriptor pool.
 		{
 			std::vector<vk::DescriptorPoolSize> poolSizeInfos(mapTypeCounts.size());
@@ -294,7 +298,7 @@ namespace kgs
 			}
 		}
 
-		auto pDevice = m_pContext->getNativeDevice();
+		auto pDevice = pContext->getNativeDevice();
 		pDevice->updateDescriptorSets(writes, nullptr);
 	}
 
@@ -342,7 +346,7 @@ namespace kgs
 			}
 		}
 
-		auto pDevice = m_pContext->getNativeDevice();
+		auto pDevice = pContext->getNativeDevice();
 		pDevice->updateDescriptorSets(writes, nullptr);
 	}
 
@@ -381,7 +385,7 @@ namespace kgs
 		}
 		//sync buffer data.
 		void *data;
-		auto pDevice = m_pContext->getNativeDevice();
+		auto pDevice = pContext->getNativeDevice();
 		pDevice->mapMemory(*m_pUniformBufferMemory, 0, static_cast<vk::DeviceSize>(totalSize), vk::MemoryMapFlags(), &data);
 		for (int32_t i = 0; i < uniformBufferCount; ++i)
 		{
@@ -399,13 +403,13 @@ namespace kgs
 			vk::SharingMode::eExclusive
 		};
 
-		auto pDevice = m_pContext->getNativeDevice();
+		auto pDevice = pContext->getNativeDevice();
 		pBuffer = fd::createBuffer(pDevice, createInfo);
 
 		vk::MemoryRequirements memReqs = pDevice->getBufferMemoryRequirements(*pBuffer);
 		vk::MemoryAllocateInfo allocateInfo = {
 			memReqs.size,
-			kgs::findMemoryType(m_pContext->getPhysicalDevice(),
+			kgs::findMemoryType(pContext->getPhysicalDevice(),
 			memReqs.memoryTypeBits,
 			vk::MemoryPropertyFlagBits::eHostVisible | vk::MemoryPropertyFlagBits::eHostCoherent)
 		};

@@ -89,6 +89,7 @@ namespace kgs
 			bindingPriority
 		);
 		setValue(name, info, m_mapLayoutBindingInfos, m_arrLayoutBindingInfoNames);
+		m_applied = KGS_FALSE;
 	}
 
 	void BaseMesh::_sortLayoutBindingInfos()

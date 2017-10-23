@@ -119,6 +119,8 @@ namespace kgs
 		Color m_multipliedColor;
 		Color m_addedColor;
 
+		Bool32 m_applied;
+
 		std::set<LayoutBindingInfo> m_layoutBindingInfos;
 		std::vector<SubMeshInfo> m_usingSubMeshInfos; //save sub mesh info to render.
 		std::shared_ptr<vk::Buffer> m_pVertexBuffer;

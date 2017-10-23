@@ -60,6 +60,7 @@ namespace kgs
 	BaseMesh::BaseMesh()
 		: m_pContext(pContext)
 		, m_multipliedColor(COLOR_WHITE) //default multiplied color should be (1, 1, 1, 1)
+		, m_applied(KGS_FALSE)
 	{
 		_createMeshData();
 		setSubMeshCount(1u);
@@ -78,6 +79,7 @@ namespace kgs
 	void BaseMesh::setVertexCount(uint32_t value)
 	{
 		m_vertexCount = value;
+		m_applied = KGS_FALSE;
 	}
 
 	const std::vector<Color32> &BaseMesh::getColors() const
@@ -102,6 +104,7 @@ namespace kgs
 		{
 			m_subMeshInfos.resize(value);
 		}
+		m_applied = KGS_FALSE;
 	}
 
 	const std::vector<uint32_t> &BaseMesh::getIndices(uint32_t subMeshIndex) const
@@ -120,6 +123,7 @@ namespace kgs
 		SubMeshInfo& subMeshInfo = m_subMeshInfos[subMeshIndex];
 		subMeshInfo.topology = topology;
 		subMeshInfo.indices = indices;
+		m_applied = KGS_FALSE;
 	}
 
 	uint32_t BaseMesh::getIndexCount(uint32_t subMeshIndex) const
@@ -159,6 +163,7 @@ namespace kgs
 	void BaseMesh::setMultipliedColor(Color value)
 	{
 		m_multipliedColor = value;
+		m_applied = KGS_FALSE;
 	}
 
 	Color BaseMesh::getAddedColor() const
@@ -169,18 +174,24 @@ namespace kgs
 	void BaseMesh::setAddedColor(Color value)
 	{
 		m_addedColor = value;
+		m_applied = KGS_FALSE;
 	}
 
 	void BaseMesh::apply(Bool32 makeUnreadable)
 	{
-		//sort layout binding infos
-		_sortLayoutBindingInfos();
+		if (m_applied == KGS_FALSE)
+		{
+			//sort layout binding infos
+			_sortLayoutBindingInfos();
 
-		//create vertex buffer
-		_createVertexBuffer();
+			//create vertex buffer
+			_createVertexBuffer();
 
-		//create index buffer
-		_createIndexBuffer();
+			//create index buffer
+			_createIndexBuffer();
+
+			m_applied = KGS_TRUE;
+		}
 
 		if (makeUnreadable)
 		{

@@ -206,9 +206,6 @@
     <ClInclude Include="..\..\framework\include\graphics\texture\texture_1d.hpp">
       <Filter>include\graphics\texture</Filter>
     </ClInclude>
-    <ClInclude Include="..\..\framework\include\graphics\global.hpp">
-      <Filter>include\graphics</Filter>
-    </ClInclude>
     <ClInclude Include="..\..\framework\include\graphics\texture\texture_cube.hpp">
       <Filter>include\graphics\texture</Filter>
     </ClInclude>
@@ -343,6 +340,9 @@
     </ClInclude>
     <ClInclude Include="..\..\framework\include\graphics\mesh\mesh_2.hpp">
       <Filter>include\graphics\mesh</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\framework\include\graphics\global.hpp">
+      <Filter>include\graphics</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>

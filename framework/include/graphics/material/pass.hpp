@@ -45,12 +45,13 @@ namespace kgs
 
 			LayoutBindingInfo();
 
-			LayoutBindingInfo(std::string name,
-				MaterialData::DataType dataType,
-				std::uint32_t binding,
-				DescriptorType descriptorType,
-				std::uint32_t descriptorCount,
-				ShaderStageFlags stageFlags);
+			LayoutBindingInfo(std::string name
+				, MaterialData::DataType dataType
+				, std::uint32_t binding
+				, DescriptorType descriptorType
+				, std::uint32_t descriptorCount
+				, ShaderStageFlags stageFlags
+			);
 
 			LayoutBindingInfo(const LayoutBindingInfo &);
 
@@ -67,31 +68,15 @@ namespace kgs
 		~Pass();
 
 		template <MaterialData::DataType dataType>
-		const typename MaterialData::DataTypeInfo<dataType>::ValueType getData(std::string name) const
-		{
-			return m_pData->getDataValue<dataType>(name);
-		}
+		const typename MaterialData::DataTypeInfo<dataType>::ValueType getData(std::string name) const;
 
 		template <MaterialData::DataType dataType>
-		void setData(std::string name, 
-			const typename MaterialData::DataTypeInfo<dataType>::ValueType value, 
-			uint32_t binding = KGS_M_OTHER_MIN_BINDING, 
-			DescriptorType descriptorType = DescriptorType::UNIFORM_BUFFER, 
-			ShaderStageFlags stageFlags = ShaderStageFlagBits::VERTEX)
-		{
-			m_pData->setDataValue<dataType>(name, value);
-			//update layout binding information.
-			uint32_t descriptorCount = static_cast<uint32_t>(sizeof(value) / sizeof(typename MaterialData::DataTypeInfo<dataType>::BaseType));
-			LayoutBindingInfo info(
-				name,
-				dataType,
-				binding,
-				descriptorType,
-				descriptorCount,
-				stageFlags
-			);
-			setValue(name, info, m_mapLayoutBinds, m_arrLayoutBindNames);
-		}
+		void setData(std::string name
+			, const typename MaterialData::DataTypeInfo<dataType>::ValueType value
+			, uint32_t binding = KGS_M_OTHER_MIN_BINDING
+			, DescriptorType descriptorType = DescriptorType::UNIFORM_BUFFER
+			, ShaderStageFlags stageFlags = ShaderStageFlagBits::VERTEX
+		);
 
 		const std::shared_ptr<Texture> getMainTexture() const;
 		void setMainTexture(const std::shared_ptr<Texture> value);
@@ -136,5 +121,7 @@ namespace kgs
 		void createBuffer(vk::DeviceSize size, std::shared_ptr<vk::Buffer> &pBuffer, std::shared_ptr<vk::DeviceMemory> &pBufferMemory);
 	};
 }
+
+#include "graphics/material/pass.inl"
 
 #endif // !KGS_PASS_H

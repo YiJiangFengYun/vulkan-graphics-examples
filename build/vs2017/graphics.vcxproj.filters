@@ -361,5 +361,8 @@
     <None Include="..\..\framework\include\graphics\mesh\mesh_data.inl">
       <Filter>include\graphics\mesh</Filter>
     </None>
+    <None Include="..\..\framework\include\graphics\material\pass.inl">
+      <Filter>include\graphics\material</Filter>
+    </None>
   </ItemGroup>
 </Project>

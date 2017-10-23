@@ -70,7 +70,7 @@ namespace kgs
 		//Create graphics pipeline create info. 
 		vk::GraphicsPipelineCreateInfo createInfo = {};
 
-		//Coustruct shader stage create info.
+		//Construct shader stage create info.
 		auto pPass = pMaterial->getPassWithIndex(passIndex);
 		auto pShader = pPass->_getShader();
 		vk::PipelineShaderStageCreateInfo vertShaderStageInfo = {

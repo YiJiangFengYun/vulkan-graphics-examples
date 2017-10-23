@@ -728,8 +728,9 @@ namespace kgs
 		std::vector<std::pair<vk::ImageLayout, vk::AccessFlags>> arrLayoutToAccess = {
 			std::pair<vk::ImageLayout, vk::AccessFlags>(vk::ImageLayout::eUndefined, vk::AccessFlags()),
 			std::pair<vk::ImageLayout, vk::AccessFlags>(vk::ImageLayout::eTransferDstOptimal, vk::AccessFlagBits::eTransferWrite),
-			std::pair<vk::ImageLayout, vk::AccessFlags>(vk::ImageLayout::eTransferSrcOptimal, vk::AccessFlagBits::eTransferWrite),
+			std::pair<vk::ImageLayout, vk::AccessFlags>(vk::ImageLayout::eTransferSrcOptimal, vk::AccessFlagBits::eTransferRead),
 			std::pair<vk::ImageLayout, vk::AccessFlags>(vk::ImageLayout::eShaderReadOnlyOptimal, vk::AccessFlagBits::eShaderRead),
+			std::pair<vk::ImageLayout, vk::AccessFlags>(vk::ImageLayout::eDepthStencilAttachmentOptimal, vk::AccessFlagBits::eDepthStencilAttachmentWrite)
 		};
 
 		for (const auto& item : arrLayoutToAccess)

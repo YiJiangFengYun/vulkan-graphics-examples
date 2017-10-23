@@ -78,7 +78,7 @@ namespace kgs
 		return BaseRenderer::_isValidForRender();
 	}
 
-	template <SpaceType SPACE_TYPE>
+	/*template <SpaceType SPACE_TYPE>
 	void Renderer<SPACE_TYPE>::_update(UpdateInfo updateInfo)
 	{
 		if (m_pScene == nullptr)
@@ -92,7 +92,7 @@ namespace kgs
 		}
 
 		BaseRenderer::_update(updateInfo);
-	}
+	}*/
 
 	template <SpaceType SPACE_TYPE>
 	void Renderer<SPACE_TYPE>::_render(RenderInfo renderInfo)
@@ -120,7 +120,7 @@ namespace kgs
 	template <SpaceType SPACE_TYPE>
 	typename SpaceTypeInfo<SPACE_TYPE>::MatrixType Renderer<SPACE_TYPE>::_getMVMatrix(std::shared_ptr<typename SceneType::ObjectType> pObject)
 	{
-		return m_pCamera->getTransform().getMatrixWorldToLocal() * pObject->getTransform().getMatrixLocalToWorld();
+		return m_pCamera->getTransform()->getMatrixWorldToLocal() * pObject->getTransform()->getMatrixLocalToWorld();
 	}
 
 } //namespace kgs

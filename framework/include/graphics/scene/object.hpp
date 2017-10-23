@@ -37,13 +37,13 @@ namespace kgs
 
 		}
 
-		TransformType getTransform()
+		const std::shared_ptr<TransformType> getTransform() const
 		{
-			return m_transform;
+			return m_pTransform;
 		}
 
 	protected:
-		TransformType m_transform;
+		std::shared_ptr<TransformType> m_pTransform;
 	};
 
 } //namespace kgs

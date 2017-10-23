@@ -18,9 +18,9 @@ namespace kgs
 	public:
 		static const vk::Format DEFAULT_DEPTH_STENCIL_FORMAT;
 
-		struct UpdateInfo {
+		/*struct UpdateInfo {
 
-		};
+		};*/
 
 		struct RenderInfo {
 			uint32_t                         waitSemaphoreCount;
@@ -40,7 +40,7 @@ namespace kgs
 
 		Bool32 isValidForRender();
 
-		void update(UpdateInfo updateInfo);
+		//void update(UpdateInfo updateInfo);
 
 		void render(RenderInfo renderInfo);
 
@@ -62,7 +62,7 @@ namespace kgs
 		//Renderer will render to color texture when it is not null.
 		std::shared_ptr<TextureColorAttachment> m_pColorTexture;
 
-		virtual void _update(UpdateInfo updateInfo);
+		//virtual void _update(UpdateInfo updateInfo);
 		virtual void _render(RenderInfo renderInfo);
 		virtual Bool32 _isValidForRender();
 
@@ -132,7 +132,7 @@ namespace kgs
 		std::shared_ptr<CameraType> m_pCamera;
 
 		Bool32 _isValidForRender() override;
-		void _update(UpdateInfo renderInfo) override;
+		//void _update(UpdateInfo renderInfo) override;
 		void _render(RenderInfo renderInfo) override;
 
 		virtual Bool32 _checkVisualObjectInsideCameraView(std::shared_ptr<typename SceneType::VisualObjectType> pVisualObject) = 0;

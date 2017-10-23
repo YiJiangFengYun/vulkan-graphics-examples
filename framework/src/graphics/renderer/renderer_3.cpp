@@ -52,11 +52,11 @@ namespace kgs
 
 	}
 
-	void Renderer3::_update(UpdateInfo updateInfo)
-	{
-		Renderer::_update(updateInfo);
+	//void Renderer3::_update(UpdateInfo updateInfo)
+	//{
+	//	Renderer::_update(updateInfo);
 
-	}
+	//}
 
 	void Renderer3::_render(RenderInfo renderInfo)
 	{
@@ -124,6 +124,14 @@ namespace kgs
 				auto subMeshCount = pMesh->getSubMeshCount();
 				auto pMaterial = pVisualObject->getMaterial();
 				auto passCount = pMaterial->getPassCount();
+
+				/*for (uint32_t passIndex = 0u; passIndex < passCount; ++passIndex)
+				{
+					auto pPass = pMaterial->getPassWithIndex(passIndex);
+					auto pTransform = pVisualObject->getTransform();
+					pPass->setData(KGS_M_MATRIX_OBJECT_TO_NDC_NAME, )
+				}*/
+
 				for (uint32_t subMeshIndex = 0u; subMeshIndex < subMeshCount; ++subMeshIndex)
 				{
 					for (uint32_t passIndex = 0u; passIndex < passCount; ++passIndex)
@@ -207,8 +215,8 @@ namespace kgs
 		auto mvMatrix1 = _getMVMatrix(pObject1);
 		auto mvMatrix2 = _getMVMatrix(pObject2);
 		//get position
-		auto pos1 = pObject1->getTransform().getLocalPosition();
-		auto pos2 = pObject2->getTransform().getLocalPosition();
+		auto pos1 = pObject1->getTransform()->getLocalPosition();
+		auto pos2 = pObject2->getTransform()->getLocalPosition();
 
 		typedef SpaceTypeInfo<SpaceType::SPACE_3>::PointType PointType;
 		typedef SpaceTypeInfo<SpaceType::SPACE_3>::MatrixVectorType MatrixVectorType;

@@ -50,10 +50,10 @@ namespace kgs
 
 	}
 
-	void Renderer2::_update(UpdateInfo updateInfo)
+	/*void Renderer2::_update(UpdateInfo updateInfo)
 	{
 		Renderer::_update(updateInfo);
-	}
+	}*/
 
 	void Renderer2::_render(RenderInfo renderInfo)
 	{

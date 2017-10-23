@@ -29,9 +29,6 @@
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
-    <ClInclude Include="..\..\framework\include\foundation\foundation.hpp">
-      <Filter>include\foundation</Filter>
-    </ClInclude>
     <ClInclude Include="..\..\framework\include\foundation\gemo.hpp">
       <Filter>include\foundation</Filter>
     </ClInclude>
@@ -42,6 +39,9 @@
       <Filter>include\foundation</Filter>
     </ClInclude>
     <ClInclude Include="..\..\framework\include\foundation\wrapper.hpp">
+      <Filter>include\foundation</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\framework\include\foundation\foundation.hpp">
       <Filter>include\foundation</Filter>
     </ClInclude>
   </ItemGroup>

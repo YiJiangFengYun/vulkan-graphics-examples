@@ -60,6 +60,7 @@ namespace app
 		_createModel();
 		_createCamera();
 		_createScene();
+		_updateRenderer();
 	}
 
 	Window::Window(std::shared_ptr<GLFWwindow> pWindow, std::shared_ptr<vk::SurfaceKHR> pSurface,
@@ -74,6 +75,7 @@ namespace app
 		_createModel();
 		_createCamera();
 		_createScene();
+		_updateRenderer();
 	}
 
 	void Window::_loadModel()
@@ -193,6 +195,26 @@ namespace app
 		m_pScene->setVisualObjectWithName("Object1", m_pModel);
 	}
 
+	void Window::_updateRenderer()
+	{
+		for (auto& pRenderer : m_pRenderers)
+		{
+			switch (m_renderType)
+			{
+			case RenderType::RENDERER_2:
+			{
+				//dynamic_cast<kgs::Renderer2 *>(pRenderer.get())->reset(m_pScene, m_pCamera);
+				break;
+			}
+			case RenderType::RENDERER_3:
+			{
+				dynamic_cast<kgs::Renderer3 *>(pRenderer.get())->reset(m_pScene, m_pCamera);
+				break;
+			}
+			}
+		}
+	}
+
 	void Window::_onPreUpdate()
 	{
 
@@ -206,27 +228,13 @@ namespace app
 		auto duration = currentTime - startTime;
 		float time = std::chrono::duration_cast<std::chrono::milliseconds>(currentTime - startTime).count() / 1000.0f;
 
-		m_pPass->setData<kgs::MaterialData::DataType::MATRIX>("model"
-			, glm::rotate(glm::mat4(), time * glm::radians(90.0f), glm::vec3(0.0f, 0.0f, 1.0f))
-			, 4u
-			, kgs::DescriptorType::UNIFORM_BUFFER
-			, kgs::ShaderStageFlagBits::VERTEX
-			);
+		auto pTransform = m_pModel->getTransform();
+		//pTransform->rotateAround(kgs::Vector3(0.0f), kgs::Vector3(0.0f, 0.0f, 1.0f), glm::radians(90.0f) * time, kgs::Vector3(1.0f));
+		pTransform->setLocalRotation(kgs::Quaternion(glm::radians(90.0f) * time, kgs::Vector3(0.0f, 0.0f, 1.0f)));
 
-		m_pPass->setData<kgs::MaterialData::DataType::MATRIX>("view"
-			, glm::lookAt(glm::vec3(2.0f, 2.0f, 2.0f), glm::vec3(0.0, 0.0f, 0.0f), glm::vec3(0.0, 0.0f, 1.0f))
-			, 5u
-			, kgs::DescriptorType::UNIFORM_BUFFER
-			, kgs::ShaderStageFlagBits::VERTEX
-			);
-
-		/*m_pPass->setData<kgs::MaterialData::DataType::MATRIX>("proj"
-		, glm::perspective(glm::radians(45.0f),  / (float)(swapChainExtent.height), 0.1f, 10.0f)
-		, 6u
-		, kgs::DescriptorType::UNIFORM_BUFFER
-		, kgs::ShaderStageFlagBits::VERTEX
-		);*/
-		m_pPass->apply();
+		pTransform = m_pCamera->getTransform();
+		pTransform->setLocalPosition(kgs::Vector3(2.0f, 2.0f, 2.0f));
+		pTransform->lookAt(kgs::Vector3(0.0f, 0.0f, 0.0f), kgs::Vector3(0.0f, 0.0f, 1.0f));
 	}
 
 	void Window::_onPostUpdate()

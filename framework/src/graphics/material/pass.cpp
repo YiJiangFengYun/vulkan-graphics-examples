@@ -86,8 +86,27 @@ namespace kgs
 	{
 	}
 
+	Pass::Pass(std::shared_ptr<Shader> pShader)
+		: m_pData(new MaterialData())
+		, m_applied(KGS_FALSE)
+		, m_pShader(pShader)
+	{
+
+	}
+
+
 	Pass::~Pass()
 	{
+	}
+
+	std::shared_ptr<Shader> Pass::getShader()
+	{
+		return m_pShader;
+	}
+
+	void Pass::setShader(std::shared_ptr<Shader> pShader)
+	{
+		m_pShader = pShader;
 	}
 
 	const std::shared_ptr<Texture> Pass::getMainTexture() const

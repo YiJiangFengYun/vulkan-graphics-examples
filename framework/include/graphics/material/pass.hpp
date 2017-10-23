@@ -65,7 +65,11 @@ namespace kgs
 		};
 
 		Pass();
+		Pass(std::shared_ptr<Shader> pShader);
 		~Pass();
+
+		std::shared_ptr<Shader> getShader();
+		void setShader(std::shared_ptr<Shader> pShader);
 
 		template <MaterialData::DataType dataType>
 		const typename MaterialData::DataTypeInfo<dataType>::ValueType getData(std::string name) const;

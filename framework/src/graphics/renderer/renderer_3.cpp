@@ -121,16 +121,42 @@ namespace kgs
 			{
 				auto pVisualObject = queues[typeIndex][objectIndex];
 				auto pMesh = pVisualObject->getMesh();
+
 				auto subMeshCount = pMesh->getSubMeshCount();
 				auto pMaterial = pVisualObject->getMaterial();
 				auto passCount = pMaterial->getPassCount();
 
-				/*for (uint32_t passIndex = 0u; passIndex < passCount; ++passIndex)
+				for (uint32_t passIndex = 0u; passIndex < passCount; ++passIndex)
 				{
+					//update building in matrix variable.
 					auto pPass = pMaterial->getPassWithIndex(passIndex);
-					auto pTransform = pVisualObject->getTransform();
-					pPass->setData(KGS_M_MATRIX_OBJECT_TO_NDC_NAME, )
-				}*/
+					auto projMatrix = m_pCamera->getProjMatrix();
+					auto viewMatrix = m_pCamera->getTransform()->getMatrixWorldToLocal();
+					auto modelMatrix = pVisualObject->getTransform()->getMatrixLocalToWorld();
+					auto mvMatrix = viewMatrix * modelMatrix;
+					pPass->setData<MaterialData::DataType::MATRIX>(KGS_M_MATRIX_OBJECT_TO_NDC_NAME
+						, projMatrix * mvMatrix
+						, KGS_M_MATRIX_OBJECT_TO_NDC_BINDING
+						, DescriptorType::UNIFORM_BUFFER
+					    , ShaderStageFlagBits::VERTEX
+						);
+
+					pPass->setData<MaterialData::DataType::MATRIX>(KGS_M_MATRIX_OBJECT_TO_VIEW_NAME
+						, mvMatrix
+						, KGS_M_MATRIX_OBJECT_TO_VIEW_BINDING
+						, DescriptorType::UNIFORM_BUFFER
+						, ShaderStageFlagBits::VERTEX
+						);
+
+					pPass->setData<MaterialData::DataType::MATRIX>(KGS_M_MATRIX_OBJECT_TO_WORLD_NAME
+						, modelMatrix
+						, KGS_M_MATRIX_OBJECT_TO_WORLD_BINDING
+						, DescriptorType::UNIFORM_BUFFER
+						, ShaderStageFlagBits::VERTEX
+						);
+
+					pPass->apply();
+				}
 
 				for (uint32_t subMeshIndex = 0u; subMeshIndex < subMeshCount; ++subMeshIndex)
 				{

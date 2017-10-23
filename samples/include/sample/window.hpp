@@ -72,8 +72,6 @@ namespace app
 		void _createCamera();
 		void _createScene();
 
-		void _updateUniform();
-
 		void _onPreUpdate() override;
 		void _update() override;
 		void _onPostUpdate() override;

@@ -159,32 +159,46 @@ namespace app
 
 	void Window::_createMaterial()
 	{
-		m_pPass = std::shared_ptr<kgs::Pass>(new kgs::Pass());
+		m_pShader = std::shared_ptr<kgs::Shader>(new kgs::Shader("shaders/vert.spv", "shaders/frag.spv"));
+		m_pPass = std::shared_ptr<kgs::Pass>(new kgs::Pass(m_pShader));
 		m_pMaterial = std::shared_ptr<kgs::Material>(new kgs::Material());
 		m_pMaterial->setPass("pass0", m_pPass);
 		m_pMaterial->setRenderPriority(0u);
 		m_pMaterial->setRenderQueueType(kgs::MaterialShowType::OPAQUE);
 		m_pPass->setMainTexture(m_pTexture);
-		_updateUniform();
 
 	}
 
 	void Window::_createModel()
 	{
-
+		m_pModel = std::shared_ptr<kgs::VisualObject3>(new kgs::VisualObject3());
+		m_pModel->setMesh(m_pMesh);
+		m_pModel->setMaterial(m_pMaterial);
 	}
 
 	void Window::_createCamera()
 	{
-
+		m_pCamera = std::shared_ptr<kgs::Camera3>(new kgs::Camera3());
+		m_pCamera->setAspect(m_swapchainExtent.width / (float)(m_swapchainExtent.height));
+		m_pCamera->setFovY(glm::radians(45.0f));
+		m_pCamera->setZNear(0.1f);
+		m_pCamera->setZFar(10.0f);
+		m_pCamera->apply();
 	}
 
 	void Window::_createScene()
 	{
+		m_pScene = std::shared_ptr<kgs::Scene3>(new kgs::Scene3());
+		m_pScene->setCameraWithName("MainCamera", m_pCamera);
+		m_pScene->setVisualObjectWithName("Object1", m_pModel);
+	}
+
+	void Window::_onPreUpdate()
+	{
 
 	}
 
-	void Window::_updateUniform()
+	void Window::_update()
 	{
 		static auto startTime = std::chrono::high_resolution_clock::now();
 
@@ -207,22 +221,12 @@ namespace app
 			);
 
 		/*m_pPass->setData<kgs::MaterialData::DataType::MATRIX>("proj"
-			, glm::perspective(glm::radians(45.0f),  / (float)(swapChainExtent.height), 0.1f, 10.0f)
-			, 6u
-			, kgs::DescriptorType::UNIFORM_BUFFER
-			, kgs::ShaderStageFlagBits::VERTEX
-			);*/
+		, glm::perspective(glm::radians(45.0f),  / (float)(swapChainExtent.height), 0.1f, 10.0f)
+		, 6u
+		, kgs::DescriptorType::UNIFORM_BUFFER
+		, kgs::ShaderStageFlagBits::VERTEX
+		);*/
 		m_pPass->apply();
-	}
-
-	void Window::_onPreUpdate()
-	{
-
-	}
-
-	void Window::_update()
-	{
-
 	}
 
 	void Window::_onPostUpdate()

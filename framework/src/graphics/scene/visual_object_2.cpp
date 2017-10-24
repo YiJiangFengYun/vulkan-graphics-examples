@@ -2,5 +2,10 @@
 
 namespace kgs
 {
+	VisualObject2::VisualObject2()
+		: VisualObject<SpaceType::SPACE_2>()
+	{
+
+	}
 
 } //namespace kgs

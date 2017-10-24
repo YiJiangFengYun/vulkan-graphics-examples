@@ -16,12 +16,12 @@ namespace kgs
 	template <SpaceType SPACE_TYPE>
 	class Light : public BaseLight, public Object<SPACE_TYPE>
 	{
+	public:
 		Light()
 			: BaseLight()
 			, Object<SPACE_TYPE>()
-			, m_objectType(ObjectType::LIGHT)
 		{
-
+			m_objectType = ObjectType::LIGHT;
 		}
 	};
 } //namespace kgs

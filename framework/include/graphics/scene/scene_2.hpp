@@ -8,7 +8,8 @@ namespace kgs
 {
 	class Scene2 : public Scene<SpaceType::SPACE_2>
 	{
-
+	public:
+		Scene2();
 	};
 
 } //namespace kgs

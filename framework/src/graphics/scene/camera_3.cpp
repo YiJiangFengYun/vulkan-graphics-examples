@@ -7,7 +7,7 @@ namespace kgs
 	const float Camera3::DEFAULT_Z_NEAR = 0.1f;
 	const float Camera3::DEFAULT_Z_FAR = 10.0f;
 	Camera3::Camera3()
-		:Camera<SpaceType::SPACE_3>()
+		: Camera<SpaceType::SPACE_3>()
 		, m_fovy(DEFAULT_FOVY)
 		, m_aspect(DEFAULT_ASPECT)
 		, m_zNear(DEFAULT_Z_NEAR)

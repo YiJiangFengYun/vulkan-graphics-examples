@@ -8,7 +8,8 @@ namespace kgs
 {
 	class VisualObject3 : public VisualObject<SpaceType::SPACE_3>
 	{
-
+	public:
+		VisualObject3();
 	};
 
 } //namespace kgs

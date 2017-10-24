@@ -8,7 +8,8 @@ namespace kgs
 {
 	class Camera2 : public Camera<SpaceType::SPACE_2>
 	{
-
+	public:
+		Camera2();
 	};
 
 } //namespace kgs

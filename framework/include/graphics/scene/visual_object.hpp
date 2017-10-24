@@ -11,6 +11,8 @@ namespace kgs
 	class BaseVisualObject
 	{
 	public:
+		BaseVisualObject();
+
 		std::shared_ptr<Material> getMaterial();
 
 		void setMaterial(std::shared_ptr<Material> pMaterial);

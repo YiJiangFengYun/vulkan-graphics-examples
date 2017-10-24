@@ -10,13 +10,45 @@ namespace app
 	class SubWindow : public gfw::Window
 	{
 	public:
-		SubWindow(uint32_t width, uint32_t height, const char* title,
-			std::shared_ptr<vk::Instance> pInstance, std::shared_ptr<vk::PhysicalDevice> pPhysicalDevice,
-			std::shared_ptr<vk::Device> pDevice, vk::Queue graphicsQueue, vk::Queue presentQueue);
+		SubWindow(uint32_t width
+			, uint32_t height
+			, const char* title
+			, std::shared_ptr<vk::Instance> pInstance
+			, std::shared_ptr<vk::PhysicalDevice> pPhysicalDevice
+			, std::shared_ptr<vk::Device> pDevice
+			, vk::Queue graphicsQueue
+			, vk::Queue presentQueue
+		);
 
-		SubWindow(std::shared_ptr<GLFWwindow> pWindow, std::shared_ptr<vk::SurfaceKHR> pSurface,
-			std::shared_ptr<vk::Instance> pInstance, std::shared_ptr<vk::PhysicalDevice> pPhysicalDevice,
-			std::shared_ptr<vk::Device> pDevice, vk::Queue graphicsQueue, vk::Queue presentQueue);
+		SubWindow(uint32_t width
+			, uint32_t height
+			, const char* title
+			, RenderType renderType
+			, std::shared_ptr<vk::Instance> pInstance
+			, std::shared_ptr<vk::PhysicalDevice> pPhysicalDevice
+			, std::shared_ptr<vk::Device> pDevice
+			, vk::Queue graphicsQueue
+			, vk::Queue presentQueue
+		);
+
+		SubWindow(std::shared_ptr<GLFWwindow> pWindow
+			, std::shared_ptr<vk::SurfaceKHR> pSurface
+			, std::shared_ptr<vk::Instance> pInstance
+			, std::shared_ptr<vk::PhysicalDevice> pPhysicalDevice
+			, std::shared_ptr<vk::Device> pDevice
+			, vk::Queue graphicsQueue
+			, vk::Queue presentQueue
+		);
+
+		SubWindow(RenderType renderType
+			, std::shared_ptr<GLFWwindow> pWindow
+			, std::shared_ptr<vk::SurfaceKHR> pSurface
+			, std::shared_ptr<vk::Instance> pInstance
+			, std::shared_ptr<vk::PhysicalDevice> pPhysicalDevice
+			, std::shared_ptr<vk::Device> pDevice
+			, vk::Queue graphicsQueue
+			, vk::Queue presentQueue
+		);
 
 	private:
 		void _onPreUpdate() override;
@@ -39,13 +71,45 @@ namespace app
 			bool operator==(const Vertex& other) const;
 		};
 
-		Window(uint32_t width, uint32_t height, const char* title,
-			std::shared_ptr<vk::Instance> pInstance, std::shared_ptr<vk::PhysicalDevice> pPhysicalDevice,
-			std::shared_ptr<vk::Device> pDevice, vk::Queue graphicsQueue, vk::Queue presentQueue);
+		Window(uint32_t width
+			, uint32_t height
+			, const char* title
+			, std::shared_ptr<vk::Instance> pInstance
+			, std::shared_ptr<vk::PhysicalDevice> pPhysicalDevice
+			, std::shared_ptr<vk::Device> pDevice
+			, vk::Queue graphicsQueue
+			, vk::Queue presentQueue
+		);
 
-		Window(std::shared_ptr<GLFWwindow> pWindow, std::shared_ptr<vk::SurfaceKHR> pSurface,
-			std::shared_ptr<vk::Instance> pInstance, std::shared_ptr<vk::PhysicalDevice> pPhysicalDevice,
-			std::shared_ptr<vk::Device> pDevice, vk::Queue graphicsQueue, vk::Queue presentQueue);
+		Window(uint32_t width
+			, uint32_t height
+			, const char* title
+			, RenderType renderType
+			, std::shared_ptr<vk::Instance> pInstance
+			, std::shared_ptr<vk::PhysicalDevice> pPhysicalDevice
+			, std::shared_ptr<vk::Device> pDevice
+			, vk::Queue graphicsQueue
+			, vk::Queue presentQueue
+		);
+
+		Window(std::shared_ptr<GLFWwindow> pWindow
+			, std::shared_ptr<vk::SurfaceKHR> pSurface
+			, std::shared_ptr<vk::Instance> pInstance
+			, std::shared_ptr<vk::PhysicalDevice> pPhysicalDevice
+			, std::shared_ptr<vk::Device> pDevice
+			, vk::Queue graphicsQueue
+			, vk::Queue presentQueue
+		);
+
+		Window(RenderType renderType
+			, std::shared_ptr<GLFWwindow> pWindow
+			, std::shared_ptr<vk::SurfaceKHR> pSurface
+			, std::shared_ptr<vk::Instance> pInstance
+			, std::shared_ptr<vk::PhysicalDevice> pPhysicalDevice
+			, std::shared_ptr<vk::Device> pDevice
+			, vk::Queue graphicsQueue
+			, vk::Queue presentQueue
+		);
 
 	private:
 		std::vector<kgs::Vector3> m_tempPositions;
@@ -71,7 +135,7 @@ namespace app
 		void _createModel();
 		void _createCamera();
 		void _createScene();
-		void _updateRenderer();
+		void _fillRenderer();
 
 		void _onPreUpdate() override;
 		void _update() override;

@@ -2,6 +2,11 @@
 
 namespace kgs
 {
+	BaseVisualObject::BaseVisualObject()
+	{
+
+	}
+
 	std::shared_ptr<Material> BaseVisualObject::getMaterial()
 	{
 		return m_pMaterial;

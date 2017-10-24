@@ -19,9 +19,9 @@ int main() {
 	gfw::init();
 
 	app::App app;
-	app.init<app::Window>(WINDOW_WIDTH, WINDOW_HEIGHT, "sample");
-	app.createSubWindow<app::SubWindow>(200, 200, "sub window");
-	app.createSubWindow<app::SubWindow>(200, 400, "sub window2");
+	app.init<app::Window>(WINDOW_WIDTH, WINDOW_HEIGHT, "sample", gfw::Window::RenderType::RENDERER_3);
+	app.createSubWindow<app::SubWindow>(200, 200, "sub window", gfw::Window::RenderType::RENDERER_3);
+	app.createSubWindow<app::SubWindow>(200, 400, "sub window2", gfw::Window::RenderType::RENDERER_3);
 	app.run();
 
 	return 0;

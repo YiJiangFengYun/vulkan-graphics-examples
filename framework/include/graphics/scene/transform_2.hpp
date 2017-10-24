@@ -8,7 +8,7 @@ namespace kgs
 	class Transform2 : public Transform<SpaceType::SPACE_2>
 	{
 	public:
-
+		Transform2();
 	private:
 
 	};

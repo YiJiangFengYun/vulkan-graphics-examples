@@ -1,20 +1,20 @@
 namespace gfw
 {
 	template<typename MainWindow_T>
-	void App::init(uint32_t width, uint32_t height, const char *title)
+	void App::init(uint32_t width, uint32_t height, const char *title, Window::RenderType renderType)
 	{
 		LOG(plog::debug) << "Application initialization.";
 		std::shared_ptr<GLFWwindow> pResultGLFWWindow;
 		std::shared_ptr<vk::SurfaceKHR> pResultSurface;
 		_initEnv(width, height, title, pResultGLFWWindow, pResultSurface);
-		_createWindow<MainWindow_T>(pResultGLFWWindow, pResultSurface);
+		_createWindow<MainWindow_T>(pResultGLFWWindow, pResultSurface, renderType);
 		LOG(plog::debug) << "Application initialization complete.";
 	}
 
 	template<typename Window_T>
-	void App::createSubWindow(uint32_t width, uint32_t height, const char *title)
+	void App::createSubWindow(uint32_t width, uint32_t height, const char *title, Window::RenderType renderType)
 	{
-		std::shared_ptr<Window_T> window(new Window_T(width, height, title, m_pInstance, m_pPhysicalDevice,
+		std::shared_ptr<Window_T> window(new Window_T(width, height, title, renderType, m_pInstance, m_pPhysicalDevice,
 			m_pDevice, m_graphicsQueue, m_presentQueue));
 		/*{
 		auto& subWindowsMutex = m_subWindowsMutex;
@@ -34,9 +34,9 @@ namespace gfw
 	}
 
 	template <typename MainWindow_T>
-	void App::_createWindow(std::shared_ptr<GLFWwindow> pWindow, std::shared_ptr<vk::SurfaceKHR> pSurface)
+	void App::_createWindow(std::shared_ptr<GLFWwindow> pWindow, std::shared_ptr<vk::SurfaceKHR> pSurface, Window::RenderType renderType)
 	{
-		m_pWindow.reset(new MainWindow_T(pWindow, pSurface, m_pInstance, m_pPhysicalDevice, m_pDevice,
+		m_pWindow.reset(new MainWindow_T(renderType, pWindow, pSurface, m_pInstance, m_pPhysicalDevice, m_pDevice,
 			m_graphicsQueue, m_presentQueue));
 	}
 

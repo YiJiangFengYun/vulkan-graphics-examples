@@ -5,18 +5,87 @@
 
 namespace app
 {
-	SubWindow::SubWindow(uint32_t width, uint32_t height, const char* title,
-		std::shared_ptr<vk::Instance> pInstance, std::shared_ptr<vk::PhysicalDevice> pPhysicalDevice,
-		std::shared_ptr<vk::Device> device, vk::Queue graphicsQueue, vk::Queue presentQueue)
-		: gfw::Window(width, height, title, pInstance, pPhysicalDevice, device, graphicsQueue, presentQueue)
+	SubWindow::SubWindow(uint32_t width
+		, uint32_t height
+		, const char* title
+		, std::shared_ptr<vk::Instance> pInstance
+		, std::shared_ptr<vk::PhysicalDevice> pPhysicalDevice
+		, std::shared_ptr<vk::Device> device, vk::Queue graphicsQueue
+		, vk::Queue presentQueue
+	)
+		: gfw::Window(width
+			, height
+			, title
+			, pInstance
+			, pPhysicalDevice
+			, device
+			, graphicsQueue
+			, presentQueue
+		)
 	{
 	}
 
-	SubWindow::SubWindow(std::shared_ptr<GLFWwindow> pWindow, std::shared_ptr<vk::SurfaceKHR> pSurface,
-		std::shared_ptr<vk::Instance> pInstance, std::shared_ptr<vk::PhysicalDevice> pPhysicalDevice,
-		std::shared_ptr<vk::Device> pDevice, vk::Queue graphicsQueue, vk::Queue presentQueue)
-		: gfw::Window(pWindow, pSurface, pInstance, pPhysicalDevice, pDevice, graphicsQueue, presentQueue)
+	SubWindow::SubWindow(uint32_t width
+		, uint32_t height
+		, const char* title
+		, RenderType renderType
+		, std::shared_ptr<vk::Instance> pInstance
+		, std::shared_ptr<vk::PhysicalDevice> pPhysicalDevice
+		, std::shared_ptr<vk::Device> device, vk::Queue graphicsQueue
+		, vk::Queue presentQueue
+	)
+		: gfw::Window(width
+			, height
+			, title
+			, renderType
+			, pInstance
+			, pPhysicalDevice
+			, device
+			, graphicsQueue
+			, presentQueue
+		)
 	{
+	}
+
+	SubWindow::SubWindow(std::shared_ptr<GLFWwindow> pWindow
+		, std::shared_ptr<vk::SurfaceKHR> pSurface
+		, std::shared_ptr<vk::Instance> pInstance
+		, std::shared_ptr<vk::PhysicalDevice> pPhysicalDevice
+		, std::shared_ptr<vk::Device> pDevice
+		, vk::Queue graphicsQueue
+		, vk::Queue presentQueue
+	)
+		: gfw::Window(pWindow
+			, pSurface
+			, pInstance
+			, pPhysicalDevice
+			, pDevice
+			, graphicsQueue
+			, presentQueue
+		)
+	{
+	}
+
+	SubWindow::SubWindow(RenderType renderType
+		, std::shared_ptr<GLFWwindow> pWindow
+		, std::shared_ptr<vk::SurfaceKHR> pSurface
+		, std::shared_ptr<vk::Instance> pInstance
+		, std::shared_ptr<vk::PhysicalDevice> pPhysicalDevice
+		, std::shared_ptr<vk::Device> pDevice
+		, vk::Queue graphicsQueue
+		, vk::Queue presentQueue
+	)
+		: gfw::Window(renderType
+			, pWindow
+			, pSurface
+			, pInstance
+			, pPhysicalDevice
+			, pDevice
+			, graphicsQueue
+			, presentQueue
+		)
+	{
+
 	}
 
 	void SubWindow::_onPreUpdate()
@@ -48,10 +117,24 @@ namespace app
 		return pos == other.pos && color == other.color && texCoord == other.texCoord;
 	}
 
-	Window::Window(uint32_t width, uint32_t height, const char* title,
-		std::shared_ptr<vk::Instance> pInstance, std::shared_ptr<vk::PhysicalDevice> pPhysicalDevice,
-		std::shared_ptr<vk::Device> device, vk::Queue graphicsQueue, vk::Queue presentQueue)
-		: gfw::Window(width, height, title, pInstance, pPhysicalDevice, device, graphicsQueue, presentQueue)
+	Window::Window(uint32_t width
+		, uint32_t height
+		, const char* title
+		, std::shared_ptr<vk::Instance> pInstance
+		, std::shared_ptr<vk::PhysicalDevice> pPhysicalDevice
+		, std::shared_ptr<vk::Device> device
+		, vk::Queue graphicsQueue
+		, vk::Queue presentQueue
+	)
+		: gfw::Window(width
+			, height
+			, title
+			, pInstance
+			, pPhysicalDevice
+			, device
+			, graphicsQueue
+			, presentQueue
+		)
 	{
 		_loadModel();
 		_createMesh();
@@ -60,13 +143,29 @@ namespace app
 		_createModel();
 		_createCamera();
 		_createScene();
-		_updateRenderer();
+		_fillRenderer();
 	}
 
-	Window::Window(std::shared_ptr<GLFWwindow> pWindow, std::shared_ptr<vk::SurfaceKHR> pSurface,
-		std::shared_ptr<vk::Instance> pInstance, std::shared_ptr<vk::PhysicalDevice> pPhysicalDevice,
-		std::shared_ptr<vk::Device> pDevice, vk::Queue graphicsQueue, vk::Queue presentQueue)
-		: gfw::Window(pWindow, pSurface, pInstance, pPhysicalDevice, pDevice, graphicsQueue, presentQueue)
+	Window::Window(uint32_t width
+		, uint32_t height
+		, const char* title
+		, RenderType renderType
+		, std::shared_ptr<vk::Instance> pInstance
+		, std::shared_ptr<vk::PhysicalDevice> pPhysicalDevice
+		, std::shared_ptr<vk::Device> pDevice
+		, vk::Queue graphicsQueue
+		, vk::Queue presentQueue
+	)
+		: gfw::Window(width
+			, height
+			, title
+			, renderType
+			, pInstance
+			, pPhysicalDevice
+			, pDevice
+			, graphicsQueue
+			, presentQueue
+		)
 	{
 		_loadModel();
 		_createMesh();
@@ -75,7 +174,63 @@ namespace app
 		_createModel();
 		_createCamera();
 		_createScene();
-		_updateRenderer();
+		_fillRenderer();
+	}
+
+	Window::Window(std::shared_ptr<GLFWwindow> pWindow
+		, std::shared_ptr<vk::SurfaceKHR> pSurface
+		, std::shared_ptr<vk::Instance> pInstance
+		, std::shared_ptr<vk::PhysicalDevice> pPhysicalDevice
+		, std::shared_ptr<vk::Device> pDevice
+		, vk::Queue graphicsQueue
+		, vk::Queue presentQueue
+	)
+		: gfw::Window(pWindow
+			, pSurface
+			, pInstance
+			, pPhysicalDevice
+			, pDevice
+			, graphicsQueue
+			, presentQueue
+		)
+	{
+		_loadModel();
+		_createMesh();
+		_createTexture();
+		_createMaterial();
+		_createModel();
+		_createCamera();
+		_createScene();
+		_fillRenderer();
+	}
+
+	Window::Window(RenderType renderType
+		, std::shared_ptr<GLFWwindow> pWindow
+		, std::shared_ptr<vk::SurfaceKHR> pSurface
+		, std::shared_ptr<vk::Instance> pInstance
+		, std::shared_ptr<vk::PhysicalDevice> pPhysicalDevice
+		, std::shared_ptr<vk::Device> pDevice
+		, vk::Queue graphicsQueue
+		, vk::Queue presentQueue
+	)
+		: gfw::Window(renderType
+			, pWindow
+			, pSurface
+			, pInstance
+			, pPhysicalDevice
+			, pDevice
+			, graphicsQueue
+			, presentQueue
+		)
+	{
+		_loadModel();
+		_createMesh();
+		_createTexture();
+		_createMaterial();
+		_createModel();
+		_createCamera();
+		_createScene();
+		_fillRenderer();
 	}
 
 	void Window::_loadModel()
@@ -195,7 +350,7 @@ namespace app
 		m_pScene->setVisualObjectWithName("Object1", m_pModel);
 	}
 
-	void Window::_updateRenderer()
+	void Window::_fillRenderer()
 	{
 		for (auto& pRenderer : m_pRenderers)
 		{

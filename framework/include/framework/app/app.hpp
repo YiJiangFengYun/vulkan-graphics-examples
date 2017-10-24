@@ -30,10 +30,10 @@ namespace gfw
 		~App();
 		void virtual run();
 		template<typename MainWindow_T>
-		void init(uint32_t width, uint32_t height, const char *title);
+		void init(uint32_t width, uint32_t height, const char *title, Window::RenderType renderType);
 
 		template<typename Window_T>
-		void createSubWindow(uint32_t width, uint32_t height, const char *title);
+		void createSubWindow(uint32_t width, uint32_t height, const char *title, Window::RenderType renderType);
 
 		//gettor methods
 		std::shared_ptr<vk::Instance> getVKInstance();
@@ -77,7 +77,7 @@ namespace gfw
 		void _initGrahpicsModule(std::shared_ptr<vk::SurfaceKHR> pSurface);
 
 		template <typename MainWindow_T>
-		void _createWindow(std::shared_ptr<GLFWwindow> pWindow, std::shared_ptr<vk::SurfaceKHR> pSurface);
+		void _createWindow(std::shared_ptr<GLFWwindow> pWindow, std::shared_ptr<vk::SurfaceKHR> pSurface, Window::RenderType renderType);
 
 		//tool methods.
 		std::shared_ptr<GLFWwindow> _createGLFWWindow(uint32_t width, uint32_t height, const char* title);

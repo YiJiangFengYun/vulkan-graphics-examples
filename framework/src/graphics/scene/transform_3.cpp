@@ -2,6 +2,12 @@
 
 namespace kgs
 {
+	Transform3::Transform3()
+		: Transform<SpaceType::SPACE_3>()
+	{
+
+	}
+
 	void Transform3::lookAt(const PointType& worldTarget, const VectorType& worldUp)
 	{
 		MatrixType matrix = _getMatrixWorldToLocal(KGS_TRUE);

@@ -8,7 +8,8 @@ namespace kgs
 {
 	class Light3 : public Light<SpaceType::SPACE_3>
 	{
-
+	public:
+		Light3();
 	};
 
 } //namespace kgs

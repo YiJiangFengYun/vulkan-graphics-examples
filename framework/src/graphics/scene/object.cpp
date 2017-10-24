@@ -2,6 +2,11 @@
 
 namespace kgs
 {
+	BaseObject::BaseObject()
+	{
+
+	}
+
 	ObjectType BaseObject::getObjectType()
 	{
 		return m_objectType;

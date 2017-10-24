@@ -91,8 +91,11 @@ namespace kgs
 		std::vector<std::shared_ptr<Type>> m_pChildren;
 		Bool32 m_isChanged;
 		PointType m_localPosition;
+		MatrixType m_localPosMatrix;
 		VectorType m_localScale;
+		MatrixType m_localScaleMatrix;
 		RotationType m_localRotation;
+		MatrixType m_localRotationMatrix;
 		MatrixType m_localMatrix;
 
 		inline MatrixType _getMatrixLocalToWorld(Bool32 includeSelf);

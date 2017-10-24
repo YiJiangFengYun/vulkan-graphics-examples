@@ -21,6 +21,7 @@ namespace kgs
 	class BaseObject
 	{
 	public:
+		BaseObject();
 		ObjectType getObjectType();
 	protected:
 		ObjectType m_objectType;
@@ -33,6 +34,8 @@ namespace kgs
 		typedef typename SpaceTransformTypeInfo<SPACE_TYPE>::TransformType TransformType;
 
 		Object()
+			: BaseObject()
+			, m_pTransform(new TransformType())
 		{
 
 		}

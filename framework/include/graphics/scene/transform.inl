@@ -3,6 +3,16 @@ namespace kgs
 	template <SpaceType SPACE_TYPE>
 	Transform<SPACE_TYPE>::Transform()
 		: BaseTransform()
+		, m_pParent(nullptr)
+		, m_pChildren()
+		, m_isChanged(KGS_FALSE)
+		, m_localPosition(0.0f)
+		, m_localPosMatrix(1.0f)
+		, m_localScale(1.0f)
+		, m_localScaleMatrix(1.0f)
+		, m_localRotation()
+		, m_localRotationMatrix(1.0f)
+		, m_localMatrix(1.0f)
 	{
 
 	}
@@ -77,6 +87,16 @@ namespace kgs
 	void Transform<SPACE_TYPE>::setLocalPosition(PointType position)
 	{
 		m_localPosition = position;
+		typename VectorType::length_type i;
+		typename VectorType::length_type length = VectorType::length();
+		MatrixType normalMatrix(1.0f);
+		m_localPosMatrix = normalMatrix;
+		for (i = 0; i < length - 1; ++i)
+		{
+			m_localPosMatrix[length - 1] += normalMatrix[i] * position[i];
+		}
+		m_localPosMatrix[length - 1] += normalMatrix[i];
+		//Result[3] = m[0] * v[0] + m[1] * v[1] + m[2] * v[2] + m[3];
 		m_isChanged = KGS_TRUE;
 		_reCalculateLocalMatrix();
 	}
@@ -91,14 +111,6 @@ namespace kgs
 	typename Transform<SPACE_TYPE>::RotationType Transform<SPACE_TYPE>::getLocalRotation()
 	{
 		return m_appliedLocalRotation;
-	}
-
-	template <SpaceType SPACE_TYPE>
-	void Transform<SPACE_TYPE>::setLocalRotation(RotationType rotation)
-	{
-		m_localRotation = rotation;
-		m_isChanged = KGS_TRUE;
-		_reCalculateLocalMatrix();
 	}
 
 	template <SpaceType SPACE_TYPE>
@@ -124,6 +136,22 @@ namespace kgs
 	void Transform<SPACE_TYPE>::setLocalScale(VectorType scale)
 	{
 		m_localScale = scale;
+		typename VectorType::length_type i;
+		typename VectorType::length_type length = VectorType::length();
+		MatrixType normalMatrix(1.0f);
+		MatrixType result(uninitialize);
+		for (i = 0; i < length - 1; ++i)
+		{
+			result[i] = normalMatrix[i] * scale[i];
+		}
+		result[i] = normalMatrix[i];
+		m_localScaleMatrix = result;
+		/*tmat4x4<T, P> Result(uninitialize);
+		Result[0] = m[0] * v[0];
+		Result[1] = m[1] * v[1];
+		Result[2] = m[2] * v[2];
+		Result[3] = m[3];
+		return Result;*/
 		m_isChanged = KGS_TRUE;
 		_reCalculateLocalMatrix();
 	}
@@ -205,6 +233,6 @@ namespace kgs
 	template <SpaceType SPACE_TYPE>
 	void Transform<SPACE_TYPE>::_reCalculateLocalMatrix()
 	{
-		m_localMatrix = m_localPosition * m_localRotation * m_localScale;
+		m_localMatrix = m_localPosMatrix * m_localRotationMatrix * m_localScaleMatrix;
 	}
 } //namespace kgs

@@ -154,18 +154,18 @@ namespace fd
 		}
 
 		ValueType getMin() { return m_min; }
-		void setMin(ValueType value)
+		/*void setMin(ValueType value)
 		{
 			m_min = value;
 			_updateSize();
-		}
+		}*/
 
 		ValueType getMax() { return m_max; }
-		void setMax(ValueType value)
+		/*void setMax(ValueType value)
 		{
 			m_max = value;
 			_updateSize();
-		}
+		}*/
 
 		/* Sets the bounds to the min and max value of the box.
            Using this function is faster than assigning min and max separately.*/
@@ -327,8 +327,8 @@ namespace fd
 		/*Does another bounding box intersect with this bounding box?*/
 		Bool32 isIntersects(Bounds<ValueType> bounds)
 		{
-			vec_value_type length = ValueType::length();
-			for (vec_value_type i = 0; i < length; ++i)
+			typename ValueType::length_type length = ValueType::length();
+			for (typename ValueType::length_type i = 0; i < length; ++i)
 			{
 				if (m_min[i] > bounds.m_max[i] || m_max[i] < bounds.m_min[i])
 					return false;

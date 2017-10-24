@@ -93,7 +93,24 @@ namespace kgs
 		createInfo.pStages = shaderStages;
 
 		//Fill binding description and attributeDescriptions for one sub mesh of the mesh.
-		pMesh->_fillGraphicsPipelineCreateInfoForDraw(subMeshIndex, createInfo);
+		std::vector<vk::VertexInputBindingDescription> bindingDescriptions = pMesh->_getVertexInputBindingDescriptions();
+		std::vector<vk::VertexInputAttributeDescription> attributeDescriptions = pMesh->_getVertexInputAttributeDescriptions();
+		vk::PipelineVertexInputStateCreateInfo vertexInputStateInfo = {
+			vk::PipelineVertexInputStateCreateFlags(),
+			static_cast<uint32_t>(bindingDescriptions.size()),
+			bindingDescriptions.data(),
+			static_cast<uint32_t>(attributeDescriptions.size()),
+			attributeDescriptions.data()
+		};
+
+		vk::PipelineInputAssemblyStateCreateInfo inputAssemblyStateInfo = {
+			vk::PipelineInputAssemblyStateCreateFlags(),
+			pMesh->_getVKTopology(subMeshIndex),
+			VK_FALSE
+		};
+
+		createInfo.pVertexInputState = &vertexInputStateInfo;
+		createInfo.pInputAssemblyState = &inputAssemblyStateInfo;
 
 		//View port info.
 		vk::Viewport viewport = {

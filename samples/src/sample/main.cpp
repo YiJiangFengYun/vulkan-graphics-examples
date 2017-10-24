@@ -20,8 +20,12 @@ int main() {
 
 	app::App app;
 	app.init<app::Window>(WINDOW_WIDTH, WINDOW_HEIGHT, "sample", gfw::Window::RenderType::RENDERER_3);
-	app.createSubWindow<app::SubWindow>(200, 200, "sub window", gfw::Window::RenderType::RENDERER_3);
-	app.createSubWindow<app::SubWindow>(200, 400, "sub window2", gfw::Window::RenderType::RENDERER_3);
+	//app.createSubWindow<app::SubWindow>(200, 200, "sub window", gfw::Window::RenderType::RENDERER_3);
+	//app.createSubWindow<app::SubWindow>(200, 400, "sub window2", gfw::Window::RenderType::RENDERER_3);
+
+	LOG(plog::debug) << "Initialization completed." << std::endl;
+
+	LOG(plog::debug) << "Start to app run loop." << std::endl;
 	app.run();
 
 	return 0;

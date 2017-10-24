@@ -24,54 +24,6 @@ namespace kgs
 		_setData<dataType>(name, value, bindingPriority);
 	}
 
-	void BaseMesh::_fillGraphicsPipelineCreateInfoForDraw(uint32_t subMeshIndex, vk::GraphicsPipelineCreateInfo &graphicsPipelineCreateInfo)
-	{
-		std::vector<vk::VertexInputBindingDescription> bindingDescriptions = _getVertexInputBindingDescriptions();
-		std::vector<vk::VertexInputAttributeDescription> attributeDescriptions = _getVertexInputAttributeDescriptions();
-		vk::PipelineVertexInputStateCreateInfo vertexInputStateInfo = {
-			vk::PipelineVertexInputStateCreateFlags(),
-			static_cast<uint32_t>(bindingDescriptions.size()),
-			bindingDescriptions.data(),
-			static_cast<uint32_t>(attributeDescriptions.size()),
-			attributeDescriptions.data()
-		};
-
-		vk::PipelineInputAssemblyStateCreateInfo inputAssemblyStateInfo = {
-			vk::PipelineInputAssemblyStateCreateFlags(),
-			tranPrimitiveTopologyTypeToVK(m_usingSubMeshInfos[subMeshIndex].topology),
-			VK_FALSE
-		};
-
-		graphicsPipelineCreateInfo.pVertexInputState = &vertexInputStateInfo;
-		graphicsPipelineCreateInfo.pInputAssemblyState = &inputAssemblyStateInfo;
-	}
-
-	void BaseMesh::_fillCommandBufferForDraw(uint32_t subMeshIndex, vk::CommandBuffer &commandBuffer)
-	{
-		std::vector<vk::Buffer> vertexBuffers(m_layoutBindingInfos.size());
-		std::vector<vk::DeviceSize> offsets(m_layoutBindingInfos.size());
-		uint32_t offset = 0u;
-		uint32_t index = 0u;
-		for (const auto& layoutInfo : m_layoutBindingInfos)
-		{
-			vertexBuffers[index] = *m_pVertexBuffer;
-			offsets[index] = offset;
-			offset += MeshData::getDataBaseTypeSize(layoutInfo.dataType) * m_vertexCount;
-			++index;
-		}
-
-		commandBuffer.bindVertexBuffers(0u, vertexBuffers, offsets);
-
-		offset = 0u;
-		for (uint32_t i = 0; i < subMeshIndex; ++i)
-		{
-			std::vector<uint32_t>& indices = m_usingSubMeshInfos[i].indices;
-			size_t size = indices.size() * sizeof(uint32_t);
-			offset += static_cast<uint32_t>(size);
-		}
-		commandBuffer.bindIndexBuffer(*m_pIndexBuffer, static_cast<vk::DeviceSize>(offset), vk::IndexType::eUint32);
-	}
-
 	template<MeshData::DataType dataType>
 	const typename MeshData::DataTypeInfo<dataType>::ValueType &BaseMesh::_getData(std::string name) const
 	{
@@ -187,10 +139,10 @@ namespace kgs
 	template <MeshType meshType>
 	void Mesh<meshType>::apply(Bool32 makeUnreadable)
 	{
-		BaseMesh::apply(makeUnreadable);
-
 		//caculate bounds
 		_updateBounds();
+
+		BaseMesh::apply(makeUnreadable);
 	}
 
 	template <MeshType meshType>
@@ -248,7 +200,6 @@ namespace kgs
 			minPos[i] = min;
 			maxPos[i] = max;
 		}
-		m_bounds.setMin(minPos);
-		m_bounds.setMax(maxPos);
+		m_bounds.setMinMax(minPos, maxPos);
 	}
 } //namespace kgs

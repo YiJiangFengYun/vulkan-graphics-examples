@@ -15,9 +15,16 @@ namespace kgs
 		PointType localTarget = matrix * MatrixVectorType(worldTarget, 1.0f);
 		VectorType localUp = matrix * MatrixVectorType(worldUp, 0.0f);
 		m_localMatrix *= glm::lookAt(m_localPosition, localTarget, localUp);
-		PointType skew;
-		MatrixVectorType perspective;
-		glm::decompose(m_localMatrix, m_localScale, m_localRotation, m_localPosition, skew, perspective);
+
+		VectorType tempScale;
+		RotationType tempRotation;
+		PointType tempTranslate;
+		PointType tempSkew;
+		MatrixVectorType tempPerspective;
+		glm::decompose(m_localMatrix, tempScale, tempRotation, tempTranslate, tempSkew, tempPerspective);
+		setLocalScale(tempScale);
+		setLocalRotation(tempRotation);
+		setLocalPosition(tempTranslate);
 		m_isChanged = KGS_FALSE;
 	}
 
@@ -28,9 +35,15 @@ namespace kgs
 		m_localMatrix = glm::scale(m_localMatrix, scale);
 		m_localMatrix = glm::translate(m_localMatrix, -point);
 
-		PointType skew;
-		MatrixVectorType perspective;
-		glm::decompose(m_localMatrix, m_localScale, m_localRotation, m_localPosition, skew, perspective);
+		VectorType tempScale;
+		RotationType tempRotation;
+		PointType tempTranslate;
+		PointType tempSkew;
+		MatrixVectorType tempPerspective;
+		glm::decompose(m_localMatrix, tempScale, tempRotation, tempTranslate, tempSkew, tempPerspective);
+		setLocalScale(tempScale);
+		setLocalRotation(tempRotation);
+		setLocalPosition(tempTranslate);
 		m_isChanged = KGS_FALSE;
 
 	}

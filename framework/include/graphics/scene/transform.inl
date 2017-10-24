@@ -87,8 +87,8 @@ namespace kgs
 	void Transform<SPACE_TYPE>::setLocalPosition(PointType position)
 	{
 		m_localPosition = position;
-		typename VectorType::length_type i;
-		typename VectorType::length_type length = VectorType::length();
+		typename MatrixVectorType::length_type i;
+		typename MatrixVectorType::length_type length = MatrixVectorType::length();
 		MatrixType normalMatrix(1.0f);
 		m_localPosMatrix = normalMatrix;
 		for (i = 0; i < length - 1; ++i)
@@ -136,10 +136,10 @@ namespace kgs
 	void Transform<SPACE_TYPE>::setLocalScale(VectorType scale)
 	{
 		m_localScale = scale;
-		typename VectorType::length_type i;
-		typename VectorType::length_type length = VectorType::length();
+		typename MatrixVectorType::length_type i;
+		typename MatrixVectorType::length_type length = MatrixVectorType::length();
 		MatrixType normalMatrix(1.0f);
-		MatrixType result(uninitialize);
+		MatrixType result;
 		for (i = 0; i < length - 1; ++i)
 		{
 			result[i] = normalMatrix[i] * scale[i];
@@ -226,7 +226,7 @@ namespace kgs
 	typename Transform<SPACE_TYPE>::MatrixType Transform<SPACE_TYPE>::_getMatrixWorldToLocal(Bool32 includeSelf)
 	{
 		MatrixType matrix = _getMatrixLocalToWorld(includeSelf);
-		glm::inverse(matrix);
+		matrix = glm::inverse(matrix);
 		return matrix;
 	}
 

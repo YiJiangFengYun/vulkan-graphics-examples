@@ -102,9 +102,13 @@ namespace kgs
 		template <MeshData::DataType dataType>
 		void setData(const std::string name, const typename MeshData::DataTypeInfo<dataType>::ValueType &value, uint32_t bindingPriority = KGS_VERTEX_BINDING_PRIORITY_OTHER_MIN);
 
-		inline void _fillGraphicsPipelineCreateInfoForDraw(uint32_t subMeshIndex, vk::GraphicsPipelineCreateInfo &graphicsPipelineCreateInfo);
+		virtual std::vector<vk::VertexInputBindingDescription> _getVertexInputBindingDescriptions() = 0;
 
-		inline void _fillCommandBufferForDraw(uint32_t subMeshIndex, vk::CommandBuffer &commandBuffer);
+		virtual std::vector<vk::VertexInputAttributeDescription> _getVertexInputAttributeDescriptions() = 0;
+
+		vk::PrimitiveTopology _getVKTopology(uint32_t subMeshIndex);
+
+		void _fillCommandBufferForDraw(uint32_t subMeshIndex, vk::CommandBuffer &commandBuffer);
 
 	protected:
 		std::shared_ptr<Context> m_pContext;
@@ -133,10 +137,6 @@ namespace kgs
 		void _createVertexBuffer();
 
 		void _createIndexBuffer();
-
-		virtual std::vector<vk::VertexInputBindingDescription> _getVertexInputBindingDescriptions() = 0;
-
-		virtual std::vector<vk::VertexInputAttributeDescription> _getVertexInputAttributeDescriptions() = 0;
 
 		template<MeshData::DataType dataType>
 		inline const typename MeshData::DataTypeInfo<dataType>::ValueType &_getData(std::string name) const;

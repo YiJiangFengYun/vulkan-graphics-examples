@@ -207,29 +207,42 @@ namespace kgs
 		PointType p5(max.x, min.y, max.z);
 		PointType p6(min.x, max.y, max.z);
 		PointType p7(max);
-		const uint32_t pointCount = 8;
+		const uint8_t pointCount = 8;
 		PointType points[pointCount] = { p0, p1, p2, p3, p4, p5, p6, p7 };
 
 		//get MVP matrix.
 		auto mvpMatrix = _getMVPMatrix(pVisualObject);
 
-		Bool32 isInsideCameraView = KGS_FALSE;
-		for (uint32_t i = 0; i < pointCount; ++i)
+		//transform point from model coordinate system to normalize device coordinate system.
+		for (uint8_t i = 0; i < pointCount; ++i)
 		{
-			PointType p = points[i];
-			//transform point from model coordinate system to normalize device coordinate system.
-			p = mvpMatrix * MatrixVectorType(p, 1.0f);
+			points[i] = mvpMatrix * MatrixVectorType(points[i], 1.0f);
+		}
 
-			//check if point is inside camera view.
-			if ((p.x > -1 && p.x < 1)
-				&& (p.y > -1 && p.y < 1)
-				&& (p.z > 0 && p.z < 1)
-				)
+		PointType minInView;
+		PointType maxInView;
+
+		typename PointType::length_type len = PointType::length();
+		for (typename PointType::length_type i = 0; i < len; ++i)
+		{
+			typename PointType::value_type min = std::numeric_limits<typename PointType::value_type>::max(), max = -std::numeric_limits<typename PointType::value_type>::max();
+			for (uint8_t j = 0; j < pointCount; ++j)
 			{
-				isInsideCameraView = KGS_TRUE;
-				//Bounds is inside camera view as long as one of Points is inside camera view.
-				break;
+				if (min > points[j][i])min = points[j][i];
+				if (max < points[j][i])max = points[j][i];
 			}
+			minInView[i] = min;
+			maxInView[i] = max;
+		}
+
+		fd::Bounds<PointType> boundsInView(minInView, maxInView);
+		fd::Bounds<PointType> boundsOfView(PointType(-1.0f, -1.0f, 0.0f), PointType(1.0f, 1.0f, 1.0f));
+
+		Bool32 isInsideCameraView = KGS_FALSE;
+		////check if it is inside camera view.
+		if (boundsOfView.isIntersects(boundsInView))
+		{
+			isInsideCameraView = KGS_TRUE;
 		}
 
 		return isInsideCameraView;

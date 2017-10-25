@@ -296,7 +296,7 @@ namespace app
 		VkDeviceSize imageSize = texWidth * texHeight * 4;
 
 		if (!pixels) {
-			throw std::runtime_error("failed to load texture image!");
+			throw std::runtime_error("Failed to load texture image!");
 		}
 
 		uint32_t colorCount = texWidth * texHeight;
@@ -385,7 +385,7 @@ namespace app
 
 		auto pTransform = m_pModel->getTransform();
 		//pTransform->rotateAround(kgs::Vector3(0.0f), kgs::Vector3(0.0f, 0.0f, 1.0f), glm::radians(90.0f) * time, kgs::Vector3(1.0f));
-		pTransform->setLocalRotation(kgs::Quaternion(glm::radians(90.0f) * time, kgs::Vector3(0.0f, 0.0f, 1.0f)));
+		pTransform->setLocalRotation(glm::angleAxis(glm::radians(90.0f) * time, kgs::Vector3(0.0f, 0.0f, 1.0f)));
 
 		pTransform = m_pCamera->getTransform();
 		pTransform->setLocalPosition(kgs::Vector3(2.0f, 2.0f, 2.0f));

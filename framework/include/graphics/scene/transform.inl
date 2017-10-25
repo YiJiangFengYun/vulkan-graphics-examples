@@ -104,23 +104,23 @@ namespace kgs
 	template <SpaceType SPACE_TYPE>
 	typename Transform<SPACE_TYPE>::PointType Transform<SPACE_TYPE>::getPosition()
 	{
-		return _getMatrixLocalToWorld(KGS_FALSE) * m_appliedLocalPosition;
+		return _getMatrixLocalToWorld(KGS_FALSE) * MatrixVectorType(m_localPosition, 0.0);
 	}
 
 	template <SpaceType SPACE_TYPE>
 	typename Transform<SPACE_TYPE>::RotationType Transform<SPACE_TYPE>::getLocalRotation()
 	{
-		return m_appliedLocalRotation;
+		return m_localPosition;
 	}
 
 	template <SpaceType SPACE_TYPE>
 	typename Transform<SPACE_TYPE>::RotationType Transform<SPACE_TYPE>::getRotation()
 	{
-		RotationType rotation = m_appliedLocalRotation;
+		RotationType rotation = m_localRotation;
 		std::shared_ptr<Type> curr = m_pParent;
 		while (curr != nullptr)
 		{
-			rotation = curr->m_appliedRotation * rotation;
+			rotation = curr->m_localRotation * rotation;
 			curr = curr->m_pParant;
 		}
 		return rotation;
@@ -129,7 +129,7 @@ namespace kgs
 	template <SpaceType SPACE_TYPE>
 	typename Transform<SPACE_TYPE>::VectorType Transform<SPACE_TYPE>::getLocalScale()
 	{
-		return m_appliedLocalScale;
+		return m_localScale;
 	}
 
 	template <SpaceType SPACE_TYPE>
@@ -159,11 +159,11 @@ namespace kgs
 	template <SpaceType SPACE_TYPE>
 	typename Transform<SPACE_TYPE>::VectorType Transform<SPACE_TYPE>::getScale()
 	{
-		VectorType scale = m_appliedLocalScale;
+		VectorType scale = m_localScale;
 		auto curr = m_pParent;
 		while (curr != nullptr)
 		{
-			scale = curr->m_appliedScale * scale;
+			scale = curr->m_localScale * scale;
 			curr = curr->m_pParent;
 		}
 		return scale;

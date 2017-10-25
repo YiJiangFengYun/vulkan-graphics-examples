@@ -29,7 +29,7 @@ namespace kgs
 	void Transform<SpaceType::SPACE_3>::setLocalRotation(Quaternion rotation)
 	{
 		m_localRotation = rotation;
-		m_localRotationMatrix = glm::mat4_cast(rotation);
+		m_localRotationMatrix = glm::toMat4(rotation);
 		_reCalculateLocalMatrix();
 	}
 } //namespace kgs

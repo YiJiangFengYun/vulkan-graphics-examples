@@ -10,18 +10,16 @@ namespace kgs
 
 	void Transform3::lookAt(const PointType& worldTarget, const VectorType& worldUp)
 	{
-		MatrixType matrix = _getMatrixWorldToLocal(KGS_TRUE);
-		//transform target to local
-		PointType localTarget = matrix * MatrixVectorType(worldTarget, 1.0f);
-		VectorType localUp = matrix * MatrixVectorType(worldUp, 0.0f);
-		m_localMatrix *= glm::lookAt(m_localPosition, localTarget, localUp);
+		auto matrix = glm::lookAt(getPosition(), worldTarget, worldUp);
+        //todo
+		if (m_pParent != nullptr)throw std::runtime_error("Parent should be null.");
 
 		VectorType tempScale;
 		RotationType tempRotation;
 		PointType tempTranslate;
 		PointType tempSkew;
 		MatrixVectorType tempPerspective;
-		glm::decompose(m_localMatrix, tempScale, tempRotation, tempTranslate, tempSkew, tempPerspective);
+		glm::decompose(matrix, tempScale, tempRotation, tempTranslate, tempSkew, tempPerspective);
 		setLocalScale(tempScale);
 		setLocalRotation(tempRotation);
 		setLocalPosition(tempTranslate);

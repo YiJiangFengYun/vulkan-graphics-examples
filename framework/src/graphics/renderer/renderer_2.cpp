@@ -55,9 +55,9 @@ namespace kgs
 		Renderer::_update(updateInfo);
 	}*/
 
-	void Renderer2::_render(RenderInfo renderInfo)
+	void Renderer2::_render(const RenderInfo &info, RenderResultInfo &resultInfo)
 	{
-		Renderer::_render(renderInfo);
+		Renderer::_render(info, resultInfo);
 	}
 
 	Bool32 Renderer2::_checkVisualObjectInsideCameraView(std::shared_ptr<typename SceneType::VisualObjectType> pVisualObject)

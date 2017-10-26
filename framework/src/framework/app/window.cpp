@@ -272,7 +272,7 @@ namespace gfw {
 		};
 
 		m_pImageAvailableSemaphore = fd::createSemaphore(m_pDevice, createInfo);
-		m_pRenderFinishedSemaphore = fd::createSemaphore(m_pDevice, createInfo);
+		//m_pRenderFinishedSemaphore = fd::createSemaphore(m_pDevice, createInfo);
 	}
 
 	void Window::_reCreate()
@@ -317,17 +317,17 @@ namespace gfw {
 				throw std::runtime_error("Failed to acquire swap chain image");
 			}
 
-			kgs::BaseRenderer::RenderInfo renderInfo;
-			renderInfo.waitSemaphoreCount = 1u;
-			renderInfo.pWaitSemaphores = m_pImageAvailableSemaphore.get();
-			renderInfo.signalSemaphoreCount = 1u;
-			renderInfo.pSignalSemaphores = m_pRenderFinishedSemaphore.get();
+			kgs::BaseRenderer::RenderInfo info;
+			info.waitSemaphoreCount = 1u;
+			info.pWaitSemaphores = m_pImageAvailableSemaphore.get();
 
-			m_pRenderers[imageIndex]->render(renderInfo);
+			kgs::BaseRenderer::RenderResultInfo resultInfo;
+
+			m_pRenderers[imageIndex]->render(info, resultInfo);
 
 			vk::PresentInfoKHR presentInfo = {
-				1u,                                 //waitSemaphoreCount
-				m_pRenderFinishedSemaphore.get(),   //pWaitSemaphores
+				resultInfo.signalSemaphoreCount,                                 //waitSemaphoreCount
+			    resultInfo.pSignalSemaphores,   //pWaitSemaphores
 				1u,                                 //swapchainCount
 				m_pSwapchain.get(),                 //pSwapchains
 				&imageIndex,                        //pImageIndices

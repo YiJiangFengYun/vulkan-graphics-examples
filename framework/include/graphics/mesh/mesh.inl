@@ -168,7 +168,7 @@ namespace kgs
 		for (const auto& info : m_layoutBindingInfos)
 		{
 			descriptions[index].binding = index;
-			descriptions[index].location = 0u;
+			descriptions[index].location = index;
 			descriptions[index].format = MeshData::getBaseFormatWithDataType(info.dataType);
 			descriptions[index].offset = 0u;
 			++index;

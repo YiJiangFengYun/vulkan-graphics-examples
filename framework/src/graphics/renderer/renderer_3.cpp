@@ -58,11 +58,13 @@ namespace kgs
 
 	//}
 
-	void Renderer3::_render(RenderInfo renderInfo)
+	void Renderer3::_render(const RenderInfo &info, RenderResultInfo &resultInfo)
 	{
 		auto queueTypeCount = static_cast<uint32_t>(RenderQueueType::RANGE_SIZE);
 
-		Renderer::_render(renderInfo);
+		Renderer::_render(info, resultInfo);
+
+		auto pDevice = pContext->getNativeDevice();
 
 		//std::shared_ptr<Scene<SpaceType::SPACE_3>> pScene;
 		auto pScene = m_pScene;
@@ -114,6 +116,28 @@ namespace kgs
 
 
 		//-----Doing render.
+		//caculate total draw count.
+		uint32_t drawCount = 0;
+		for (uint32_t typeIndex = 0u; typeIndex < queueTypeCount; ++typeIndex)
+		{
+			auto queueLength = queueLengths[typeIndex];
+			for (uint32_t objectIndex = 0u; objectIndex < queueLength; ++objectIndex)
+			{
+				auto pVisualObject = queues[typeIndex][objectIndex];
+				auto pMesh = pVisualObject->getMesh();
+				auto subMeshCount = pMesh->getSubMeshCount();
+				auto pMaterial = pVisualObject->getMaterial();
+				auto passCount = pMaterial->getPassCount();
+				drawCount += subMeshCount * passCount;
+			}
+		}
+
+		std::vector<vk::SubmitInfo> submitInfos(drawCount);
+		m_arrPLastPipelineLayouts.resize(drawCount);
+		m_arrPLastPipelines.resize(drawCount);
+		m_arrPLastSemaphores.resize(drawCount);
+		m_arrSemaphores.resize(drawCount);
+		uint32_t drawIndex = 0;
 		for (uint32_t typeIndex = 0u; typeIndex < queueTypeCount; ++typeIndex)
 		{
 			auto queueLength = queueLengths[typeIndex];
@@ -164,30 +188,43 @@ namespace kgs
 					{
 						std::shared_ptr<vk::PipelineLayout> pPipelineLayout;
 						std::shared_ptr<vk::Pipeline> pPipeline;
-						_createPipelineForRender(pPipelineLayout, pPipeline, renderInfo, pMesh, pMaterial, subMeshIndex, passIndex);
-						_recordCommandBufferForRender(renderInfo, pPipelineLayout, pPipeline, pMesh, pMaterial, subMeshIndex, passIndex);
+						_createPipelineForRender(pPipelineLayout, pPipeline, pMesh, pMaterial, subMeshIndex, passIndex);
+						_recordCommandBufferForRender(pPipelineLayout, pPipeline, pMesh, pMaterial, subMeshIndex, passIndex);
 
 						//submit
-
 						vk::PipelineStageFlags waitStages[] = { vk::PipelineStageFlagBits::eColorAttachmentOutput };
 
+						vk::SemaphoreCreateInfo createInfo = {
+							vk::SemaphoreCreateFlags()
+						};
+
+						std::shared_ptr<vk::Semaphore> pSemaphore = fd::createSemaphore(pDevice, createInfo);
+
 						vk::SubmitInfo submitInfo = {
-							renderInfo.waitSemaphoreCount,        //waitSemaphoreCount
-							renderInfo.pWaitSemaphores,           //pWaitSemaphores
+							info.waitSemaphoreCount,        //waitSemaphoreCount
+							info.pWaitSemaphores,           //pWaitSemaphores
 							waitStages,                           //pWaitDstStageMask
 							1u,                                   //commandBufferCount
 							m_pCommandBuffer.get(),               //pCommandBuffers
-							renderInfo.signalSemaphoreCount,      //signalSemaphoreCount
-							renderInfo.pSignalSemaphores          //pSignalSemaphores
+							1u,                                   //signalSemaphoreCount
+							pSemaphore.get()          //pSignalSemaphores
 						};
 
-						pContext->getGraphicsQueue().submit(submitInfo, nullptr);
+						submitInfos[drawIndex] = submitInfo;
+						m_arrPLastPipelineLayouts[drawIndex] = pPipelineLayout;
+						m_arrPLastPipelines[drawIndex] = pPipeline;
+						m_arrPLastSemaphores[drawIndex] = pSemaphore;
+						m_arrSemaphores[drawIndex] = *pSemaphore;
+						++drawIndex;
 					}
 				}
 			}
 		}
 
+		pContext->getGraphicsQueue().submit(submitInfos, nullptr);
 
+		resultInfo.signalSemaphoreCount = static_cast<uint32_t>(m_arrSemaphores.size());
+		resultInfo.pSignalSemaphores = m_arrSemaphores.data();
 	}
 
 	Bool32 Renderer3::_checkVisualObjectInsideCameraView(std::shared_ptr<typename SceneType::VisualObjectType> pVisualObject)

@@ -95,7 +95,7 @@ namespace kgs
 	}*/
 
 	template <SpaceType SPACE_TYPE>
-	void Renderer<SPACE_TYPE>::_render(RenderInfo renderInfo)
+	void Renderer<SPACE_TYPE>::_render(const RenderInfo &info, RenderResultInfo &resultInfo)
 	{
 		if (m_pScene == nullptr)
 		{
@@ -107,7 +107,7 @@ namespace kgs
 			throw new std::runtime_error("Camera is not specified.");
 		}
 
-		BaseRenderer::_render(renderInfo);
+		BaseRenderer::_render(info, resultInfo);
 	}
 
 	template <SpaceType SPACE_TYPE>

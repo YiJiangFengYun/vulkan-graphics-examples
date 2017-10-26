@@ -265,7 +265,11 @@ namespace kgs
 				++index;
 			}
 
-			vk::DescriptorPoolCreateInfo createInfo = { vk::DescriptorPoolCreateFlags(), 1u, static_cast<uint32_t>(poolSizeInfos.size()), poolSizeInfos.data() };
+			vk::DescriptorPoolCreateInfo createInfo = { vk::DescriptorPoolCreateFlagBits::eFreeDescriptorSet
+				, 1u
+				, static_cast<uint32_t>(poolSizeInfos.size())
+				, poolSizeInfos.data() 
+			};
 			m_pDescriptorPool = fd::createDescriptorPool(pDevice, createInfo);
 		}
 
@@ -333,6 +337,7 @@ namespace kgs
 		}
 
 		std::vector<vk::WriteDescriptorSet> writes(count);
+		std::vector<vk::DescriptorImageInfo> imageInfos(count);
 
 		uint32_t index = 0u;
 		for (const auto& name : m_arrLayoutBindNames)
@@ -347,12 +352,11 @@ namespace kgs
 					throw std::runtime_error("The descriptor count of binding shoubld be 1 when its type is COMBINED_IMAGE_SAMPLER");
 #endif // DEBUG
 				std::shared_ptr<Texture> pTexture = m_pData->getDataValue<MaterialData::DataType::TEXTURE>(item.name);
-				vk::DescriptorImageInfo imageInfo;
 				if (pTexture != nullptr)
 				{
-					imageInfo.sampler = *pTexture->_getSampler();
-					imageInfo.imageView = *pTexture->_getImageView();
-					imageInfo.imageLayout = pTexture->_getImageLayout();
+					imageInfos[index].sampler = *pTexture->_getSampler();
+					imageInfos[index].imageView = *pTexture->_getImageView();
+					imageInfos[index].imageLayout = pTexture->_getImageLayout();
 				}
 
 				writes[index].dstSet = *m_pDescriptorSet;
@@ -360,7 +364,7 @@ namespace kgs
 				writes[index].descriptorType = tranDescriptorTypeToVK(item.descriptorType);
 				writes[index].dstArrayElement = 0u;
 				writes[index].descriptorCount = item.descriptorCount;
-				writes[index].pImageInfo = &imageInfo;
+				writes[index].pImageInfo = &imageInfos[index];
 				++index;
 			}
 		}

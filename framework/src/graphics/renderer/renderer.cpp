@@ -40,9 +40,9 @@ namespace kgs
 		_update(updateInfo);
 	}*/
 
-	void BaseRenderer::render(RenderInfo renderInfo)
+	void BaseRenderer::render(const RenderInfo &info, RenderResultInfo &resultInfo)
 	{
-		_render(renderInfo);
+		_render(info, resultInfo);
 	}
 
 	Bool32 BaseRenderer::_isValidForRender()
@@ -55,13 +55,12 @@ namespace kgs
 
 	}*/
 
-	void BaseRenderer::_render(RenderInfo renderInfo)
+	void BaseRenderer::_render(const RenderInfo &info, RenderResultInfo &resultInfo)
 	{
 	}
 
 	void BaseRenderer::_createPipelineForRender(std::shared_ptr<vk::PipelineLayout> &pPipelineLayout,
 		std::shared_ptr<vk::Pipeline> &pPipeline,
-		const RenderInfo& renderInfo,
 		std::shared_ptr<BaseMesh> pMesh,
 		std::shared_ptr<Material> pMaterial,
 		uint32_t subMeshIndex,
@@ -230,8 +229,7 @@ namespace kgs
 		pPipeline = fd::createGraphicsPipeline(pDevice, nullptr, createInfo);
 	}
 
-	void BaseRenderer::_recordCommandBufferForRender(const RenderInfo& renderInfo, 
-		std::shared_ptr<vk::PipelineLayout> pPipelineLayout,
+	void BaseRenderer::_recordCommandBufferForRender(std::shared_ptr<vk::PipelineLayout> pPipelineLayout,
 		std::shared_ptr<vk::Pipeline> pPipeline,
 		std::shared_ptr<BaseMesh> pMesh,
 		std::shared_ptr<Material> pMaterial,

@@ -25,6 +25,9 @@ namespace kgs
 		struct RenderInfo {
 			uint32_t                         waitSemaphoreCount;
 			const vk::Semaphore*             pWaitSemaphores;
+		};
+
+		struct RenderResultInfo {
 			uint32_t                         signalSemaphoreCount;
 			const vk::Semaphore*             pSignalSemaphores;
 		};
@@ -42,7 +45,7 @@ namespace kgs
 
 		//void update(UpdateInfo updateInfo);
 
-		void render(RenderInfo renderInfo);
+		void render(const RenderInfo &info, RenderResultInfo &resultInfo);
 
 	protected:
 		//compositions
@@ -55,6 +58,10 @@ namespace kgs
 		std::shared_ptr<vk::Framebuffer> m_pFrameBuffer;
 		std::shared_ptr<vk::CommandBuffer> m_pCommandBuffer;
 
+		std::vector<std::shared_ptr<vk::PipelineLayout>> m_arrPLastPipelineLayouts;
+		std::vector<std::shared_ptr<vk::Pipeline>> m_arrPLastPipelines;
+		std::vector<std::shared_ptr<vk::Semaphore>> m_arrPLastSemaphores;
+		std::vector<vk::Semaphore> m_arrSemaphores;
 		//aggregations
 		//Renderer will use swapchain image when color attachment texture is null.
 		std::shared_ptr<vk::ImageView> m_pSwapchainImageView;
@@ -63,7 +70,7 @@ namespace kgs
 		std::shared_ptr<TextureColorAttachment> m_pColorTexture;
 
 		//virtual void _update(UpdateInfo updateInfo);
-		virtual void _render(RenderInfo renderInfo);
+		virtual void _render(const RenderInfo &info, RenderResultInfo &resultInfo);
 		virtual Bool32 _isValidForRender();
 
 		void _createRenderPass();
@@ -73,13 +80,11 @@ namespace kgs
 
 		void _createPipelineForRender(std::shared_ptr<vk::PipelineLayout> &pPipelineLayout, 
 			std::shared_ptr<vk::Pipeline> &pPipeline,
-			const RenderInfo& renderInfo, 
 			std::shared_ptr<BaseMesh> pMesh,
 			std::shared_ptr<Material> pMaterial,
 			uint32_t subMeshIndex = 0u,
 			uint32_t passIndex = 0u);
-		void _recordCommandBufferForRender(const RenderInfo& renderInfo, 
-			std::shared_ptr<vk::PipelineLayout> pPipelineLayout,
+		void _recordCommandBufferForRender(std::shared_ptr<vk::PipelineLayout> pPipelineLayout,
 			std::shared_ptr<vk::Pipeline> pPipeline,
 			std::shared_ptr<BaseMesh> pMesh,
 			std::shared_ptr<Material> pMaterial,
@@ -133,7 +138,7 @@ namespace kgs
 
 		Bool32 _isValidForRender() override;
 		//void _update(UpdateInfo renderInfo) override;
-		void _render(RenderInfo renderInfo) override;
+		void _render(const RenderInfo &info, RenderResultInfo &resultInfo) override;
 
 		virtual Bool32 _checkVisualObjectInsideCameraView(std::shared_ptr<typename SceneType::VisualObjectType> pVisualObject) = 0;
 

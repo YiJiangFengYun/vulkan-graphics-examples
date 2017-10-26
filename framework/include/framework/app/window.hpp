@@ -114,7 +114,7 @@ namespace gfw
 		std::vector<std::shared_ptr<vk::ImageView>> m_pSwapchainImageViews;
 		std::vector<std::shared_ptr<kgs::BaseRenderer>> m_pRenderers;
 		std::shared_ptr<vk::Semaphore> m_pImageAvailableSemaphore;
-		std::shared_ptr<vk::Semaphore> m_pRenderFinishedSemaphore;
+		//std::shared_ptr<vk::Semaphore> m_pRenderFinishedSemaphore;
 
 		//std::mutex m_windowMutex;
 

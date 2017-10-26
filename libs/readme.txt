@@ -1,0 +1,1 @@
+Vulkan SDK version: 1.0.49.0

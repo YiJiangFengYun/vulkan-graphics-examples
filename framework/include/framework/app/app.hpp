@@ -3,6 +3,7 @@
 
 #include <memory>
 #include <mutex>
+#include <string>
 #include "framework/global.hpp"
 #include <GLFW/glfw3.h>
 #include <foundation/foundation.hpp>

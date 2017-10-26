@@ -11,8 +11,11 @@ namespace kgs
 	void Transform3::lookAt(const PointType& worldTarget, const VectorType& worldUp)
 	{
 		auto matrix = glm::lookAt(getPosition(), worldTarget, worldUp);
-        //todo
-		if (m_pParent != nullptr)throw std::runtime_error("Parent should be null.");
+		if (m_pParent != nullptr)
+		{
+			auto m = _getMatrixLocalToWorld(KGS_FALSE);
+			matrix = glm::inverse(m) * matrix;
+		}
 
 		VectorType tempScale;
 		RotationType tempRotation;

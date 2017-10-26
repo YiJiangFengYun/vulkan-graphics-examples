@@ -96,7 +96,6 @@ namespace kgs
 			m_localPosMatrix[length - 1] += normalMatrix[i] * position[i];
 		}
 		m_localPosMatrix[length - 1] += normalMatrix[i];
-		//Result[3] = m[0] * v[0] + m[1] * v[1] + m[2] * v[2] + m[3];
 		m_isChanged = KGS_TRUE;
 		_reCalculateLocalMatrix();
 	}
@@ -146,12 +145,6 @@ namespace kgs
 		}
 		result[i] = normalMatrix[i];
 		m_localScaleMatrix = result;
-		/*tmat4x4<T, P> Result(uninitialize);
-		Result[0] = m[0] * v[0];
-		Result[1] = m[1] * v[1];
-		Result[2] = m[2] * v[2];
-		Result[3] = m[3];
-		return Result;*/
 		m_isChanged = KGS_TRUE;
 		_reCalculateLocalMatrix();
 	}

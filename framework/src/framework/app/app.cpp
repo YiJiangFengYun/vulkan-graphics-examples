@@ -430,6 +430,7 @@ namespace gfw {
 		else if (flags & vk::DebugReportFlagBitsEXT::eError)
 		{
 			LOG(plog::error) << code << " : " << msg << " at " << layerPrefix << std::endl;
+			throw std::runtime_error(std::to_string(code) + " : " + std::string(msg) + " at " + std::string(layerPrefix));
 		}
 		else
 		{

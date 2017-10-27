@@ -19,6 +19,13 @@
     </ProjectConfiguration>
   </ItemGroup>
   <ItemGroup>
+    <ClCompile Include="..\..\test\src\test-triangle\app.cpp" />
+    <ClCompile Include="..\..\test\src\test-triangle\main.cpp" />
+    <ClCompile Include="..\..\test\src\test-triangle\window.cpp" />
+  </ItemGroup>
+  <ItemGroup>
+    <ClInclude Include="..\..\test\include\test-triangle\app.hpp" />
+    <ClInclude Include="..\..\test\include\test-triangle\window.hpp" />
   </ItemGroup>
   <PropertyGroup Label="Globals">
     <VCProjectVersion>15.0</VCProjectVersion>

@@ -132,6 +132,7 @@ namespace kgs
 			}
 		}
 
+		vk::PipelineStageFlags waitStages[] = { vk::PipelineStageFlagBits::eColorAttachmentOutput };
 		std::vector<vk::SubmitInfo> submitInfos(drawCount);
 		m_arrPLastPipelineLayouts.resize(drawCount);
 		m_arrPLastPipelines.resize(drawCount);
@@ -192,7 +193,6 @@ namespace kgs
 						_recordCommandBufferForRender(pPipelineLayout, pPipeline, pMesh, pMaterial, subMeshIndex, passIndex);
 
 						//submit
-						vk::PipelineStageFlags waitStages[] = { vk::PipelineStageFlagBits::eColorAttachmentOutput };
 
 						vk::SemaphoreCreateInfo createInfo = {
 							vk::SemaphoreCreateFlags()

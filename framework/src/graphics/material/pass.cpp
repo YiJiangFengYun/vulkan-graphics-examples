@@ -65,11 +65,17 @@ namespace kgs
 
 	void Pass::LayoutBindingInfo::updateSize()
 	{
+		if (dataType == MaterialData::DataType::TEXTURE)
+		{
+			size = 0u;
+			bufferSize = 0u;
+			return;
+		}
 		auto pPhysicalDevice = pContext->getPhysicalDevice();
 		auto properties = pPhysicalDevice->getProperties();
 		auto minOffsetAlignment = static_cast<float>(properties.limits.minUniformBufferOffsetAlignment);
 		//uint32_t minUniformBufferOffsetAlignment = pPhysicalDevice->min
-		size = sizeof(MaterialData::getDataBaseTypeSize(dataType)) * descriptorCount;
+		size = MaterialData::getDataBaseTypeSize(dataType) * descriptorCount;
 		bufferSize = static_cast<uint32_t>(std::ceil(size / minOffsetAlignment) * minOffsetAlignment);
 	}
 

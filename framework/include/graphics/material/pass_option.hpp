@@ -18,29 +18,30 @@ namespace kgs
 
 	enum class ShaderStageFlagBits
 	{
-		VERTEX,
-		FRAGMENT,
-		BEGIN_RANGE = VERTEX,
-		END_RANGE = FRAGMENT,
-		RANGE_SIZE = (END_RANGE - BEGIN_RANGE + 1)
+		VERTEX = 1u,
+		FRAGMENT = 2u
 	};
+
+	const uint32_t ShaderStageFlagCount = 2u;
 
 	using ShaderStageFlags = fd::Flags<ShaderStageFlagBits>;
 
 	extern std::array<std::pair<DescriptorType, vk::DescriptorType>, static_cast<size_t>(DescriptorType::RANGE_SIZE)> arrDescriptorTypeToVK;
-	extern std::array<std::pair<ShaderStageFlagBits, vk::ShaderStageFlagBits>, static_cast<size_t>(ShaderStageFlagBits::RANGE_SIZE)> arrShaderStageFlagBitsToVK;
+	extern std::array<std::pair<ShaderStageFlagBits, vk::ShaderStageFlagBits>, static_cast<size_t>(ShaderStageFlagCount)> arrShaderStageFlagBitsToVK;
 
 	inline vk::ShaderStageFlags tranShaderStageFlagsToVK(ShaderStageFlags flags)
 	{
 		size_t size = arrShaderStageFlagBitsToVK.size();
 		vk::ShaderStageFlags result;
-		for (uint32_t i = 0; i < static_cast<uint32_t>(ShaderStageFlagBits::RANGE_SIZE); ++i)
+
+		for (uint32_t i = 0; i < static_cast<uint32_t>(ShaderStageFlagCount); ++i)
 		{
-			if (flags & static_cast<ShaderStageFlagBits>(i))
+			uint32_t flag = 1 << i;
+			if (flags & static_cast<ShaderStageFlagBits>(flag))
 			{
 				for (uint32_t j = 0; j < size; ++j)
 				{
-					if (arrShaderStageFlagBitsToVK[j].first == static_cast<ShaderStageFlagBits>(i))
+					if (arrShaderStageFlagBitsToVK[j].first == static_cast<ShaderStageFlagBits>(flag))
 					{
 						result |= arrShaderStageFlagBitsToVK[j].second;
 						break;

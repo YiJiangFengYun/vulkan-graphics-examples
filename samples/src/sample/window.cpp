@@ -3,7 +3,7 @@
 #define MODEL_PATH "models/chalet.obj"
 #define TEXTURE_PATH "textures/chalet.jpg"
 
-namespace app
+namespace sample
 {
 	SubWindow::SubWindow(uint32_t width
 		, uint32_t height

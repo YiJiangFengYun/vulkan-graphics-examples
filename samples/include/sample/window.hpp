@@ -5,7 +5,7 @@
 #include "sample/tiny_obj_loader.h"
 #include "framework/app/window.hpp"
 
-namespace app
+namespace sample
 {
 	class SubWindow : public gfw::Window
 	{
@@ -149,8 +149,8 @@ namespace app
 
 namespace std {
 	template<> 
-	struct hash<app::Window::Vertex> {
-		size_t operator()(const app::Window::Vertex& vertex) const {
+	struct hash<sample::Window::Vertex> {
+		size_t operator()(const sample::Window::Vertex& vertex) const {
 			return ((hash<glm::vec3>()(vertex.pos) ^
 				(hash<glm::vec3>()(vertex.color) << 1)) >> 1) ^
 				(hash<glm::vec2>()(vertex.texCoord) << 1);

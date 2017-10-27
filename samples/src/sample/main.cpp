@@ -18,8 +18,8 @@ int main() {
 	//kgs::initGraphics();
 	gfw::init();
 
-	app::App app;
-	app.init<app::Window>(WINDOW_WIDTH, WINDOW_HEIGHT, "sample", gfw::Window::RenderType::RENDERER_3);
+	sample::App app;
+	app.init<sample::Window>(WINDOW_WIDTH, WINDOW_HEIGHT, "sample", gfw::Window::RenderType::RENDERER_3);
 	//app.createSubWindow<app::SubWindow>(200, 200, "sub window", gfw::Window::RenderType::RENDERER_3);
 	//app.createSubWindow<app::SubWindow>(200, 400, "sub window2", gfw::Window::RenderType::RENDERER_3);
 

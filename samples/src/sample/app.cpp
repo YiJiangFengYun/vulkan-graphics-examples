@@ -1,6 +1,6 @@
 #include "sample/app.hpp"
 
-namespace app
+namespace sample
 {
 	App::App():
 		gfw::App()

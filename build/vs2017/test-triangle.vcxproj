@@ -19,6 +19,13 @@
     </ProjectConfiguration>
   </ItemGroup>
   <ItemGroup>
+    <ClCompile Include="..\..\test\src\test-triangle\app.cpp" />
+    <ClCompile Include="..\..\test\src\test-triangle\main.cpp" />
+    <ClCompile Include="..\..\test\src\test-triangle\window.cpp" />
+  </ItemGroup>
+  <ItemGroup>
+    <ClInclude Include="..\..\test\include\test-triangle\app.hpp" />
+    <ClInclude Include="..\..\test\include\test-triangle\window.hpp" />
   </ItemGroup>
   <PropertyGroup Label="Globals">
     <VCProjectVersion>15.0</VCProjectVersion>
@@ -76,21 +83,21 @@
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
     <LinkIncremental>true</LinkIncremental>
     <IntDir>$(ProjectName)\$(Platform)\$(Configuration)\</IntDir>
-    <OutDir>$(GS_PROJECT_ROOT)\bin\$(Platform)\$(Configuration)\</OutDir>
+    <OutDir>$(GS_PROJECT_ROOT)\bin\$(ProjectName)\$(Platform)\$(Configuration)\</OutDir>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
     <LinkIncremental>true</LinkIncremental>
     <IntDir>$(ProjectName)\$(Platform)\$(Configuration)\</IntDir>
-    <OutDir>$(GS_PROJECT_ROOT)\bin\$(Platform)\$(Configuration)\</OutDir>
+    <OutDir>$(GS_PROJECT_ROOT)\bin\$(ProjectName)\$(Platform)\$(Configuration)\</OutDir>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
     <LinkIncremental>false</LinkIncremental>
-    <OutDir>$(GS_PROJECT_ROOT)\bin\$(Platform)\$(Configuration)\</OutDir>
+    <OutDir>$(GS_PROJECT_ROOT)\bin\$(ProjectName)\$(Platform)\$(Configuration)\</OutDir>
     <IntDir>$(ProjectName)\$(Platform)\$(Configuration)\</IntDir>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
     <LinkIncremental>false</LinkIncremental>
-    <OutDir>$(GS_PROJECT_ROOT)\bin\$(Platform)\$(Configuration)\</OutDir>
+    <OutDir>$(GS_PROJECT_ROOT)\bin\$(ProjectName)\$(Platform)\$(Configuration)\</OutDir>
     <IntDir>$(ProjectName)\$(Platform)\$(Configuration)\</IntDir>
   </PropertyGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">

@@ -7,7 +7,30 @@
     <Filter Include="src">
       <UniqueIdentifier>{60c5cfcf-4bea-4bd6-8fd2-43d67b31f7cc}</UniqueIdentifier>
     </Filter>
+    <Filter Include="include\test-triangle">
+      <UniqueIdentifier>{afb479f2-114c-4f0b-affe-e47165ef2207}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="src\test-triangle">
+      <UniqueIdentifier>{cac45fc4-f841-48b4-9d47-590ece9ca715}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
+    <ClCompile Include="..\..\test\src\test-triangle\main.cpp">
+      <Filter>src\test-triangle</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\test\src\test-triangle\window.cpp">
+      <Filter>src\test-triangle</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\test\src\test-triangle\app.cpp">
+      <Filter>src\test-triangle</Filter>
+    </ClCompile>
+  </ItemGroup>
+  <ItemGroup>
+    <ClInclude Include="..\..\test\include\test-triangle\window.hpp">
+      <Filter>include\test-triangle</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\test\include\test-triangle\app.hpp">
+      <Filter>include\test-triangle</Filter>
+    </ClInclude>
   </ItemGroup>
 </Project>

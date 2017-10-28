@@ -326,7 +326,7 @@ namespace gfw {
 			m_pRenderers[imageIndex]->render(info, resultInfo);
 
 			vk::PresentInfoKHR presentInfo = {
-				resultInfo.signalSemaphoreCount,                                 //waitSemaphoreCount
+				resultInfo.signalSemaphoreCount, //waitSemaphoreCount
 			    resultInfo.pSignalSemaphores,   //pWaitSemaphores
 				1u,                                 //swapchainCount
 				m_pSwapchain.get(),                 //pSwapchains
@@ -335,7 +335,7 @@ namespace gfw {
 			};
 
 
-			result = vkQueuePresentKHR(m_presentQueue, &VkPresentInfoKHR(presentInfo));
+			result = vkQueuePresentKHR(m_presentQueue, reinterpret_cast<VkPresentInfoKHR *>(&presentInfo));
 
 			if (result == VK_ERROR_OUT_OF_DATE_KHR || result == VK_SUBOPTIMAL_KHR)
 			{

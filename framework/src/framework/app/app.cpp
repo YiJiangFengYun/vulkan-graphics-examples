@@ -61,7 +61,7 @@ namespace gfw {
 			glfwPollEvents();
 		}
 
-		//vkDeviceWaitIdle(device);
+		m_pDevice->waitIdle();
 	}
 
 	/*void AppBase::createSubWindow(uint32_t width, uint32_t height, const char *title)

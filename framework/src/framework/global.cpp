@@ -6,10 +6,16 @@
 namespace gfw
 {
 	Bool32 isInited = GFW_FALSE;
-	void init()
+	void moduleCreate()
 	{
 		if (isInited == GFW_TRUE) return;
-		fd::init();
+		fd::moduleCreate();
 		isInited = GFW_TRUE;
+	}
+
+	void moduleDestroy()
+	{
+		fd::moduleDestroy();
+		isInited = GFW_FALSE;
 	}
 }

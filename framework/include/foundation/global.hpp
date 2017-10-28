@@ -23,7 +23,8 @@ namespace fd
 	typedef uint32_t Bool32;
 
 	extern Bool32 isInited;
-	extern void init();
+	extern void moduleCreate();
+	extern void moduleDestroy();
 }
 
 #endif // !FD_GLOBAL_H

@@ -5,7 +5,7 @@
 namespace fd
 {
 	Bool32 isInited = FD_FALSE;
-	void init()
+	void moduleCreate()
 	{
 		if (isInited == FD_TRUE) return;
 		//init default log to write to the windows debug output
@@ -13,5 +13,10 @@ namespace fd
 		plog::init(plog::verbose, &debugOutputAppender);
 
 		isInited = FD_TRUE;
+	}
+
+	void moduleDestroy()
+	{
+		isInited = FD_FALSE;
 	}
 }

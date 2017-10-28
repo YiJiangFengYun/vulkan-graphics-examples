@@ -35,6 +35,8 @@ namespace gfw {
 		}
 #endif // DEBUG
 
+		_destroyGrahpicsModule();
+
 		glfwTerminate();
 	}
 
@@ -164,7 +166,7 @@ namespace gfw {
 
 		_pickPhysicalDevice(pResultSurface);
 		_createLogicDevice(pResultSurface);
-		_initGrahpicsModule(pResultSurface);
+		_createGrahpicsModule(pResultSurface);
 	}
 
 #ifdef ENABLE_VALIDATION_LAYERS
@@ -353,10 +355,15 @@ namespace gfw {
 		LOG(plog::debug) << "Create successfully logic device.";
 	}
 
-	void App::_initGrahpicsModule(std::shared_ptr<vk::SurfaceKHR> pSurface)
+	void App::_createGrahpicsModule(std::shared_ptr<vk::SurfaceKHR> pSurface)
 	{
 		UsedQueueFamily usedQueueFamily = UsedQueueFamily::findQueueFamilies(*m_pPhysicalDevice, *pSurface);
-		kgs::init(m_pPhysicalDevice, m_pDevice, m_graphicsQueue, usedQueueFamily.graphicsFamily);
+		kgs::moduleCreate(m_pPhysicalDevice, m_pDevice, m_graphicsQueue, usedQueueFamily.graphicsFamily);
+	}
+
+	void App::_destroyGrahpicsModule()
+	{
+		kgs::moduleDestory();
 	}
 
 	std::vector<const char*> App::_getRequiredExtensions()

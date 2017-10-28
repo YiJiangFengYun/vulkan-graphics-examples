@@ -24,7 +24,8 @@ namespace gfw
 { 
 	typedef uint32_t Bool32;
 	extern Bool32 isInited;
-	extern void init();
+	extern void moduleCreate();
+	extern void moduleDestroy();
 }
 
 #endif // !GFW_GLOBAL_H

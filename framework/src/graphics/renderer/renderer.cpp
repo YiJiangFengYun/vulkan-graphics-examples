@@ -92,8 +92,8 @@ namespace kgs
 		createInfo.pStages = shaderStages;
 
 		//Fill binding description and attributeDescriptions for one sub mesh of the mesh.
-		std::vector<vk::VertexInputBindingDescription> bindingDescriptions = pMesh->_getVertexInputBindingDescriptions();
-		std::vector<vk::VertexInputAttributeDescription> attributeDescriptions = pMesh->_getVertexInputAttributeDescriptions();
+		std::vector<vk::VertexInputBindingDescription> bindingDescriptions = pMesh->_getVertexInputBindingDescriptionsForRender();
+		std::vector<vk::VertexInputAttributeDescription> attributeDescriptions = pMesh->_getVertexInputAttributeDescriptionsForRender();
 		vk::PipelineVertexInputStateCreateInfo vertexInputStateInfo = {
 			vk::PipelineVertexInputStateCreateFlags(),
 			static_cast<uint32_t>(bindingDescriptions.size()),
@@ -104,7 +104,7 @@ namespace kgs
 
 		vk::PipelineInputAssemblyStateCreateInfo inputAssemblyStateInfo = {
 			vk::PipelineInputAssemblyStateCreateFlags(),
-			pMesh->_getVKTopology(subMeshIndex),
+			pMesh->_getVKTopologyForRender(subMeshIndex),
 			VK_FALSE
 		};
 
@@ -244,7 +244,7 @@ namespace kgs
 		m_pCommandBuffer->begin(beginInfo);
 
 		std::array<vk::ClearValue, 2> clearValues = { {
-				vk::ClearValue(vk::ClearColorValue(std::array<float, 4>{{0.0f, 0.0f, 0.0f, 0.0f}})),
+				vk::ClearValue(vk::ClearColorValue(std::array<float, 4>{{0.1f, 0.0f, 0.0f, 0.0f}})),
 				vk::ClearValue(vk::ClearDepthStencilValue(1.0f, 0u))
 			} };
 		vk::RenderPassBeginInfo renderPassBeginInfo = {
@@ -252,7 +252,7 @@ namespace kgs
 			*m_pFrameBuffer,                                  //framebuffer
 			vk::Rect2D(                                     //renderArea
 				vk::Offset2D(0, 0),
-				vk::Extent2D(0u, 0u)
+				vk::Extent2D(m_framebufferWidth, m_framebufferHeight)
 			),
 			static_cast<uint32_t>(clearValues.size()),      //clearValueCount
 			clearValues.data()                              //pClearValues
@@ -264,9 +264,9 @@ namespace kgs
 		auto pPass = pMaterial->getPassWithIndex(passIndex);
 		m_pCommandBuffer->bindDescriptorSets(vk::PipelineBindPoint::eGraphics, *pPipelineLayout, 0u, *pPass->_getDescriptorSet(), nullptr);
 
-		pMesh->_fillCommandBufferForDraw(subMeshIndex, *m_pCommandBuffer);
+		pMesh->_fillCommandBufferForRender(subMeshIndex, *m_pCommandBuffer);
 
-		m_pCommandBuffer->drawIndexed(pMesh->getIndexCount(subMeshIndex), 1u, 0u, 0u, 0u);
+		m_pCommandBuffer->drawIndexed(pMesh->_getIndexCountForRender(subMeshIndex), 1u, 0u, 0u, 0u);
 
 		m_pCommandBuffer->endRenderPass();
 

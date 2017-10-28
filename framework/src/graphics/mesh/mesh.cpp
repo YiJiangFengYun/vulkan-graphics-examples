@@ -181,6 +181,11 @@ namespace kgs
 	{
 		if (m_applied == KGS_FALSE)
 		{
+			m_appliedVertexCount = m_vertexCount;
+
+			m_usingSubMeshInfos = m_subMeshInfos;
+			m_appliedSubMeshCount = m_subMeshCount;
+
 			//sort layout binding infos
 			_sortLayoutBindingInfos();
 
@@ -197,6 +202,8 @@ namespace kgs
 		{
 			m_vertexCount = 0u;
 
+			m_subMeshCount = 0u;
+
 			//clear data with new mesh data.
 			_createMeshData();
 			//clear layout binding info array with reallocate.
@@ -210,12 +217,26 @@ namespace kgs
 		}
 	}
 
-	vk::PrimitiveTopology BaseMesh::_getVKTopology(uint32_t subMeshIndex)
+	uint32_t BaseMesh::_getSubMeshCountForRender() const
+	{
+		return m_appliedSubMeshCount;
+	}
+
+	vk::PrimitiveTopology BaseMesh::_getVKTopologyForRender(uint32_t subMeshIndex)
 	{
 		return tranPrimitiveTopologyTypeToVK(m_usingSubMeshInfos[subMeshIndex].topology);
 	}
 
-	void BaseMesh::_fillCommandBufferForDraw(uint32_t subMeshIndex, vk::CommandBuffer &commandBuffer)
+	uint32_t BaseMesh::_getIndexCountForRender(uint32_t subMeshIndex) const
+	{
+#ifdef DEBUG
+		if (subMeshIndex >= m_appliedSubMeshCount)
+			throw std::range_error("The subMeshIndex out of range of the actual sub mesh count.");
+#endif // DEBUG
+		return static_cast<uint32_t>(m_usingSubMeshInfos[subMeshIndex].indices.size());
+	}
+
+	void BaseMesh::_fillCommandBufferForRender(uint32_t subMeshIndex, vk::CommandBuffer &commandBuffer)
 	{
 		std::vector<vk::Buffer> vertexBuffers(m_layoutBindingInfos.size());
 		std::vector<vk::DeviceSize> offsets(m_layoutBindingInfos.size());
@@ -225,7 +246,7 @@ namespace kgs
 		{
 			vertexBuffers[index] = *m_pVertexBuffer;
 			offsets[index] = offset;
-			offset += MeshData::getDataBaseTypeSize(layoutInfo.dataType) * m_vertexCount;
+			offset += MeshData::getDataBaseTypeSize(layoutInfo.dataType) * m_appliedVertexCount;
 			++index;
 		}
 
@@ -304,8 +325,6 @@ namespace kgs
 
 	void BaseMesh::_createIndexBuffer()
 	{
-		m_usingSubMeshInfos = m_subMeshInfos;
-
 		//get index buffer size
 		uint32_t indexBufferSize = 0u;
 		for (const auto& item : m_usingSubMeshInfos)

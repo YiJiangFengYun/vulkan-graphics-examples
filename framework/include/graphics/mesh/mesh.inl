@@ -146,14 +146,14 @@ namespace kgs
 	}
 
 	template <MeshType meshType>
-	std::vector<vk::VertexInputBindingDescription> Mesh<meshType>::_getVertexInputBindingDescriptions()
+	std::vector<vk::VertexInputBindingDescription> Mesh<meshType>::_getVertexInputBindingDescriptionsForRender()
 	{
 		std::vector<vk::VertexInputBindingDescription> descriptions(m_layoutBindingInfos.size());
 		uint32_t index = 0u;
 		for (const auto& info : m_layoutBindingInfos)
 		{
 			descriptions[index].binding = index;
-			descriptions[index].stride = MeshData::getDataBaseTypeSize(info.dataType) * m_vertexCount;
+			descriptions[index].stride = MeshData::getDataBaseTypeSize(info.dataType) * m_appliedVertexCount;
 			descriptions[index].inputRate = vk::VertexInputRate::eVertex;
 			++index;
 		}
@@ -161,7 +161,7 @@ namespace kgs
 	}
 
 	template <MeshType meshType>
-	std::vector<vk::VertexInputAttributeDescription> Mesh<meshType>::_getVertexInputAttributeDescriptions()
+	std::vector<vk::VertexInputAttributeDescription> Mesh<meshType>::_getVertexInputAttributeDescriptionsForRender()
 	{
 		std::vector<vk::VertexInputAttributeDescription> descriptions(m_layoutBindingInfos.size());
 		uint32_t index = 0u;

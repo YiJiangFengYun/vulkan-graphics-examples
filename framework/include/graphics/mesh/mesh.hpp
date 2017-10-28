@@ -102,13 +102,19 @@ namespace kgs
 		template <MeshData::DataType dataType>
 		void setData(const std::string name, const typename MeshData::DataTypeInfo<dataType>::ValueType &value, uint32_t bindingPriority = KGS_VERTEX_BINDING_PRIORITY_OTHER_MIN);
 
-		virtual std::vector<vk::VertexInputBindingDescription> _getVertexInputBindingDescriptions() = 0;
 
-		virtual std::vector<vk::VertexInputAttributeDescription> _getVertexInputAttributeDescriptions() = 0;
+		//----------------------For render---------------------------------------
+		uint32_t _getSubMeshCountForRender() const;
 
-		vk::PrimitiveTopology _getVKTopology(uint32_t subMeshIndex);
+		virtual std::vector<vk::VertexInputBindingDescription> _getVertexInputBindingDescriptionsForRender() = 0;
 
-		void _fillCommandBufferForDraw(uint32_t subMeshIndex, vk::CommandBuffer &commandBuffer);
+		virtual std::vector<vk::VertexInputAttributeDescription> _getVertexInputAttributeDescriptionsForRender() = 0;
+
+		vk::PrimitiveTopology _getVKTopologyForRender(uint32_t subMeshIndex);
+
+		uint32_t _getIndexCountForRender(uint32_t subMeshIndex) const;
+
+		void _fillCommandBufferForRender(uint32_t subMeshIndex, vk::CommandBuffer &commandBuffer);
 
 	protected:
 		std::shared_ptr<Context> m_pContext;
@@ -124,7 +130,8 @@ namespace kgs
 		Color m_addedColor;
 
 		Bool32 m_applied;
-
+		uint32_t m_appliedVertexCount; //save vertex count to render.
+		uint32_t m_appliedSubMeshCount;
 		std::set<LayoutBindingInfo> m_layoutBindingInfos;
 		std::vector<SubMeshInfo> m_usingSubMeshInfos; //save sub mesh info to render.
 		std::shared_ptr<vk::Buffer> m_pVertexBuffer;
@@ -193,9 +200,9 @@ namespace kgs
 		
 		fd::Bounds<PointType> m_bounds;
 
-		std::vector<vk::VertexInputBindingDescription> _getVertexInputBindingDescriptions() override;
+		std::vector<vk::VertexInputBindingDescription> _getVertexInputBindingDescriptionsForRender() override;
 
-		std::vector<vk::VertexInputAttributeDescription> _getVertexInputAttributeDescriptions() override;
+		std::vector<vk::VertexInputAttributeDescription> _getVertexInputAttributeDescriptionsForRender() override;
 
 
 		inline void _updateBounds();

@@ -14,9 +14,4 @@
       <UniqueIdentifier>{ee786f7f-b541-4c40-9d05-bd818ee0feac}</UniqueIdentifier>
     </Filter>
   </ItemGroup>
-  <ItemGroup>
-    <ClCompile Include="..\..\test\src\gemo-test\main.cpp">
-      <Filter>src\test-gemo</Filter>
-    </ClCompile>
-  </ItemGroup>
 </Project>

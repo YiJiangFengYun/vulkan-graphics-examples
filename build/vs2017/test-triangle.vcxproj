@@ -115,7 +115,15 @@
       <AdditionalDependencies>framework.lib;graphics.lib;foundation.lib;vulkan-1.lib;glfw3.lib;%(AdditionalDependencies)</AdditionalDependencies>
     </Link>
     <PostBuildEvent>
-      <Command>xcopy /y /v /f /i /e /k /q /d "$(GS_PROJECT_ROOT)\samples\resources\*.*" "$(OutDir)\"</Command>
+      <Command>set resources_path=$(GS_PROJECT_ROOT)\test\resources
+set shaders_path=%resources_path%\shaders
+set shaders_common_name=triangle
+echo "resources path: %resources_path%"
+echo "shaders path: %shaders_path%"
+echo "shaders common name: %shaders_common_name%"
+"$(VK_SDK_PATH)\Bin\glslangValidator.exe" -V "%shaders_path%\%shaders_common_name%.vert" -o "%shaders_path%\%shaders_common_name%.vert.spv"
+"$(VK_SDK_PATH)\Bin\glslangValidator.exe" -V "%shaders_path%\%shaders_common_name%.frag" -o "%shaders_path%\%shaders_common_name%.frag.spv"
+xcopy /y /v /f /i /e /k /q /d "%resources_path%\*.*" "$(OutDir)\"</Command>
       <Message>copy resource files to output directory.</Message>
     </PostBuildEvent>
   </ItemDefinitionGroup>
@@ -134,7 +142,15 @@
       <AdditionalDependencies>framework.lib;graphics.lib;foundation.lib;vulkan-1.lib;glfw3.lib;%(AdditionalDependencies)</AdditionalDependencies>
     </Link>
     <PostBuildEvent>
-      <Command>xcopy /y /v /f /i /e /k /q /d "$(GS_PROJECT_ROOT)\samples\resources\*.*" "$(OutDir)\"</Command>
+      <Command>set resources_path=$(GS_PROJECT_ROOT)\test\resources
+set shaders_path=%resources_path%\shaders
+set shaders_common_name=triangle
+echo "resources path: %resources_path%"
+echo "shaders path: %shaders_path%"
+echo "shaders common name: %shaders_common_name%"
+"$(VK_SDK_PATH)\Bin\glslangValidator.exe" -V "%shaders_path%\%shaders_common_name%.vert" -o "%shaders_path%\%shaders_common_name%.vert.spv"
+"$(VK_SDK_PATH)\Bin\glslangValidator.exe" -V "%shaders_path%\%shaders_common_name%.frag" -o "%shaders_path%\%shaders_common_name%.frag.spv"
+xcopy /y /v /f /i /e /k /q /d "%resources_path%\*.*" "$(OutDir)\"</Command>
       <Message>copy resource files to output directory.</Message>
     </PostBuildEvent>
   </ItemDefinitionGroup>
@@ -157,7 +173,15 @@
       <AdditionalDependencies>framework.lib;graphics.lib;foundation.lib;vulkan-1.lib;glfw3.lib;%(AdditionalDependencies)</AdditionalDependencies>
     </Link>
     <PostBuildEvent>
-      <Command>xcopy /y /v /f /i /e /k /q /d "$(GS_PROJECT_ROOT)\samples\resources\*.*" "$(OutDir)\"</Command>
+      <Command>set resources_path=$(GS_PROJECT_ROOT)\test\resources
+set shaders_path=%resources_path%\shaders
+set shaders_common_name=triangle
+echo "resources path: %resources_path%"
+echo "shaders path: %shaders_path%"
+echo "shaders common name: %shaders_common_name%"
+"$(VK_SDK_PATH)\Bin\glslangValidator.exe" -V "%shaders_path%\%shaders_common_name%.vert" -o "%shaders_path%\%shaders_common_name%.vert.spv"
+"$(VK_SDK_PATH)\Bin\glslangValidator.exe" -V "%shaders_path%\%shaders_common_name%.frag" -o "%shaders_path%\%shaders_common_name%.frag.spv"
+xcopy /y /v /f /i /e /k /q /d "%resources_path%\*.*" "$(OutDir)\"</Command>
       <Message>copy resource files to output directory.</Message>
     </PostBuildEvent>
   </ItemDefinitionGroup>
@@ -180,7 +204,15 @@
       <AdditionalDependencies>framework.lib;graphics.lib;foundation.lib;vulkan-1.lib;glfw3.lib;%(AdditionalDependencies)</AdditionalDependencies>
     </Link>
     <PostBuildEvent>
-      <Command>xcopy /y /v /f /i /e /k /q /d "$(GS_PROJECT_ROOT)\samples\resources\*.*" "$(OutDir)\"</Command>
+      <Command>set resources_path=$(GS_PROJECT_ROOT)\test\resources
+set shaders_path=%resources_path%\shaders
+set shaders_common_name=triangle
+echo "resources path: %resources_path%"
+echo "shaders path: %shaders_path%"
+echo "shaders common name: %shaders_common_name%"
+"$(VK_SDK_PATH)\Bin\glslangValidator.exe" -V "%shaders_path%\%shaders_common_name%.vert" -o "%shaders_path%\%shaders_common_name%.vert.spv"
+"$(VK_SDK_PATH)\Bin\glslangValidator.exe" -V "%shaders_path%\%shaders_common_name%.frag" -o "%shaders_path%\%shaders_common_name%.frag.spv"
+xcopy /y /v /f /i /e /k /q /d "%resources_path%\*.*" "$(OutDir)\"</Command>
       <Message>copy resource files to output directory.</Message>
     </PostBuildEvent>
   </ItemDefinitionGroup>

@@ -267,7 +267,7 @@ namespace gfw {
 				return GFW_TRUE;
 			}(*it);
 
-			if (isSuitable == false)
+			if (isSuitable == GFW_FALSE)
 			{
 				physicalDevices.erase(it);
 			}
@@ -333,14 +333,14 @@ namespace gfw {
 		deviceFeatures.samplerAnisotropy = VK_TRUE;
 
 		vk::DeviceCreateInfo createInfo = {
-			vk::DeviceCreateFlags(),
-			static_cast<uint32_t>(queueCreateInfos.size()),
-			queueCreateInfos.data(),
-			0,
-			nullptr,
-			static_cast<uint32_t>(deviceExtensionNames.size()),
-			deviceExtensionNames.data(),
-			&deviceFeatures
+			vk::DeviceCreateFlags(),                         //flags
+			static_cast<uint32_t>(queueCreateInfos.size()),  //queueCreateInfoCount
+			queueCreateInfos.data(),                         //pQueueCreateInfos
+			0,                                               //enabledLayerCount
+			nullptr,                                         //ppEnabledLayerNames
+			static_cast<uint32_t>(deviceExtensionNames.size()),  //enabledExtensionCount
+			deviceExtensionNames.data(),                         //ppEnabledExtensionNames
+			&deviceFeatures                                      //pEnabledFeatures
 		};
 
 #ifdef ENABLE_VALIDATION_LAYERS

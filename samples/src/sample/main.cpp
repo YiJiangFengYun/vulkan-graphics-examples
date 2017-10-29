@@ -16,7 +16,7 @@ const uint32_t WINDOW_HEIGHT = 600;
 int main() {
 
 	//kgs::initGraphics();
-	gfw::init();
+	gfw::moduleCreate();
 
 	sample::App app;
 	app.init<sample::Window>(WINDOW_WIDTH, WINDOW_HEIGHT, "sample", gfw::Window::RenderType::RENDERER_3);

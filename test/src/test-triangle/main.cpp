@@ -16,10 +16,10 @@ const uint32_t WINDOW_HEIGHT = 600;
 int main() {
 
 	//kgs::initGraphics();
-	gfw::init();
+	gfw::moduleCreate();
 
 	testTriangle::App testTriangle;
-	testTriangle.init<testTriangle::Window>(WINDOW_WIDTH, WINDOW_HEIGHT, "sample", gfw::Window::RenderType::RENDERER_3);
+	testTriangle.init<testTriangle::Window>(WINDOW_WIDTH, WINDOW_HEIGHT, "test-triangle", gfw::Window::RenderType::RENDERER_3);
 	//app.createSubWindow<app::SubWindow>(200, 200, "sub window", gfw::Window::RenderType::RENDERER_3);
 	//app.createSubWindow<app::SubWindow>(200, 400, "sub window2", gfw::Window::RenderType::RENDERER_3);
 

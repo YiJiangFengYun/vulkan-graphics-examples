@@ -193,12 +193,13 @@ namespace gfw {
 		};
 
 		UsedQueueFamily usedQueueFamily = UsedQueueFamily::findQueueFamilies(*m_pPhysicalDevice, *m_pSurface);
+		std::vector<uint32_t> queueFamilyIndices = {
+			(uint32_t)usedQueueFamily.graphicsFamily,
+			(uint32_t)usedQueueFamily.presentFamily
+		};
+
 		if (usedQueueFamily.graphicsFamily != usedQueueFamily.presentFamily)
 		{
-			std::vector<uint32_t> queueFamilyIndices = {
-				(uint32_t)usedQueueFamily.graphicsFamily,
-				(uint32_t)usedQueueFamily.presentFamily
-			};
 			createInfo.imageSharingMode = vk::SharingMode::eConcurrent;
 			createInfo.queueFamilyIndexCount = static_cast<uint32_t>(queueFamilyIndices.size());
 			createInfo.pQueueFamilyIndices = queueFamilyIndices.data();
@@ -215,7 +216,7 @@ namespace gfw {
 	void Window::_createSwapchainImageViews()
 	{
 		size_t num = m_swapchainImages.size();
-		m_pSwapchainImageViews.resize(m_swapchainImages.size());
+		m_pSwapchainImageViews.resize(num);
 
 		for (size_t i = 0; i < num; ++i)
 		{
@@ -229,7 +230,7 @@ namespace gfw {
 
 		//Clear references in m_pRenderers.
 		m_pRenderers.resize(0u);
-		m_pRenderers.resize(m_swapchainImages.size(), nullptr);
+		m_pRenderers.resize(num, nullptr);
 
 		//Create the renders of the specified type.
 		for (size_t i = 0; i < num; ++i)
@@ -414,10 +415,10 @@ namespace gfw {
 			},
 			{
 				aspectFlags,
-				uint32_t(0),
-				uint32_t(1),
-				uint32_t(0),
-				uint32_t(1)
+				0u,
+				1u,
+				0u,
+				1u
 			}
 		};
 

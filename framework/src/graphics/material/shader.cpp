@@ -43,13 +43,13 @@ namespace kgs
 	{
 		auto device = m_pContext->getNativeDevice();
 
-		std::vector<uint32_t> codeAligned(code.size() / sizeof(uint32_t) + 1);
-		memcpy(codeAligned.data(), code.data(), code.size());
+		/*std::vector<uint32_t> codeAligned(code.size() / sizeof(uint32_t) + 1);
+		memcpy(codeAligned.data(), code.data(), code.size());*/
 
 		vk::ShaderModuleCreateInfo createInfo = {
 			vk::ShaderModuleCreateFlags(),
 			code.size(),
-			codeAligned.data()
+			/*codeAligned.data()*/reinterpret_cast<const uint32_t*>(code.data())
 		};
 
 		return fd::createShaderModule(device, createInfo);

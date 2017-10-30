@@ -35,11 +35,6 @@ namespace kgs
 		return _isValidForRender();
 	}
 
-	/*void BaseRenderer::update(UpdateInfo updateInfo)
-	{
-		_update(updateInfo);
-	}*/
-
 	void BaseRenderer::render(const RenderInfo &info, RenderResultInfo &resultInfo)
 	{
 		_render(info, resultInfo);
@@ -49,11 +44,6 @@ namespace kgs
 	{
 		return KGS_TRUE;
 	}
-
-	/*void BaseRenderer::_update(UpdateInfo updateInfo)
-	{
-
-	}*/
 
 	void BaseRenderer::_render(const RenderInfo &info, RenderResultInfo &resultInfo)
 	{
@@ -115,8 +105,8 @@ namespace kgs
 		vk::Viewport viewport = {
 			0.0f,                                     //x
 			0.0f,                                     //y
-			static_cast<float>(m_framebufferWidth),   //width
-			static_cast<float>(m_framebufferHeight),  //height
+			(float)m_framebufferWidth,   //width
+			(float)m_framebufferHeight,  //height
 			0.0f,                                     //minDepth
 			1.0f                                      //maxDepth
 		};
@@ -180,17 +170,17 @@ namespace kgs
 			{},                                                   //front
 			{},                                                   //back
 			0.0f,                                                 //minDepthBounds
-			0.0f                                                  //maxDepthBounds
+			1.0f                                                  //maxDepthBounds
 		};
 		createInfo.pDepthStencilState = &depthStencilStateCreateInfo;
 
 		//color blend info
 		vk::PipelineColorBlendAttachmentState colorBlendAttachmentState = {
 			VK_FALSE,                                //blendEnable
-			vk::BlendFactor::eZero,                  //srcColorBlendFactor
+			vk::BlendFactor::eOne,                  //srcColorBlendFactor
 			vk::BlendFactor::eZero,                  //dstColorBlendFactor
 			vk::BlendOp::eAdd,                       //colorBlendOp
-			vk::BlendFactor::eZero,                  //srcAlphaBlendFactor
+			vk::BlendFactor::eOne,                  //srcAlphaBlendFactor
 			vk::BlendFactor::eZero,                  //desAlphaBlendFactor
 			vk::BlendOp::eAdd,                       //alphaBlendOp
 			vk::ColorComponentFlagBits::eR
@@ -202,14 +192,13 @@ namespace kgs
 		vk::PipelineColorBlendStateCreateInfo colorBlendStateCreateInfo = {
 			vk::PipelineColorBlendStateCreateFlags(),              //flags
 			VK_FALSE,                                              //logicOpEnable
-			vk::LogicOp::eClear,                                   //logicOp
+			vk::LogicOp::eCopy,                                   //logicOp
 			1u,                                                    //attachmentCount
 			&colorBlendAttachmentState,                            //pAttachments
 			{ 0.0f, 0.0f, 0.0f, 0.0f }                             //blendConstants
 		};
 		createInfo.pColorBlendState = &colorBlendStateCreateInfo;
 
-		//pPass->_getDescriptorSetLayout();
 		vk::PipelineLayoutCreateInfo pipelineLayoutCreateInfo = {
 			vk::PipelineLayoutCreateFlags(),             //flags
 			1u,                                          //setLayoutCount
@@ -225,6 +214,8 @@ namespace kgs
 		createInfo.pDynamicState = nullptr;
 		createInfo.renderPass = *m_pRenderPass;
 		createInfo.subpass = 0;
+		createInfo.basePipelineHandle = nullptr;
+		createInfo.basePipelineIndex = -1;
 
 		pPipeline = fd::createGraphicsPipeline(pDevice, nullptr, createInfo);
 	}
@@ -244,7 +235,7 @@ namespace kgs
 		m_pCommandBuffer->begin(beginInfo);
 
 		std::array<vk::ClearValue, 2> clearValues = { {
-				vk::ClearValue(vk::ClearColorValue(std::array<float, 4>{{0.1f, 0.0f, 0.0f, 0.0f}})),
+				vk::ClearValue(vk::ClearColorValue(std::array<float, 4>{{0.0f, 0.0f, 0.0f, 0.0f}})),
 				vk::ClearValue(vk::ClearDepthStencilValue(1.0f, 0u))
 			} };
 		vk::RenderPassBeginInfo renderPassBeginInfo = {
@@ -284,15 +275,15 @@ namespace kgs
 	void BaseRenderer::_createRenderPass()
 	{
 		vk::AttachmentDescription colorAttachment = {
-			vk::AttachmentDescriptionFlags(),
-			m_colorImageFormat,
-			vk::SampleCountFlagBits::e1,
-			vk::AttachmentLoadOp::eClear,
-			vk::AttachmentStoreOp::eStore,
-			vk::AttachmentLoadOp::eDontCare,
-			vk::AttachmentStoreOp::eDontCare,
-			vk::ImageLayout::eUndefined,
-			m_pColorTexture == nullptr ? vk::ImageLayout::ePresentSrcKHR : vk::ImageLayout::eShaderReadOnlyOptimal
+			vk::AttachmentDescriptionFlags(),     //flags
+			m_colorImageFormat,                   //format
+			vk::SampleCountFlagBits::e1,          //samples
+			vk::AttachmentLoadOp::eClear,         //loadOp
+			vk::AttachmentStoreOp::eStore,        //storeOp
+			vk::AttachmentLoadOp::eDontCare,      //stencilLoadOp
+			vk::AttachmentStoreOp::eDontCare,     //stencilStoreOp
+			vk::ImageLayout::eUndefined,          //initialLayout
+			m_pColorTexture == nullptr ? vk::ImageLayout::ePresentSrcKHR : vk::ImageLayout::eShaderReadOnlyOptimal     //finalLayout
 		};
 
 		vk::AttachmentDescription depthAttachment = {
@@ -318,16 +309,16 @@ namespace kgs
 		};
 
 		vk::SubpassDescription subpass = {
-			vk::SubpassDescriptionFlags(),
-			vk::PipelineBindPoint::eGraphics,
-			0,
-			nullptr,
-			1,
-			&colorAttachmentRef,
-			nullptr,
-			&depthAttachmentRef,
-			0,
-			nullptr
+			vk::SubpassDescriptionFlags(),       //flags
+			vk::PipelineBindPoint::eGraphics,    //pipelineBindPoint
+			0,                                   //inputAttachmentCount
+			nullptr,                             //pInputAttachments
+			1,                                   //colorAttachmentCount
+			&colorAttachmentRef,                 //pColorAttachments
+			nullptr,                             //pResolveAttachments
+			&depthAttachmentRef,                 //pDepthStencilAttachment
+			0,                                   //preserveAttachmentCount
+			nullptr                              //pPreserveAttachments
 		};
 
 		vk::SubpassDependency dependency = {
@@ -345,9 +336,9 @@ namespace kgs
 			vk::RenderPassCreateFlags(),
 			static_cast<uint32_t>(attachments.size()),
 			attachments.data(),
-			static_cast<uint32_t>(1),
+			1u,
 			&subpass,
-			static_cast<uint32_t>(1),
+			1u,
 			&dependency
 		};
 
@@ -375,13 +366,13 @@ namespace kgs
 		}
 
 		vk::FramebufferCreateInfo createInfo = {
-			vk::FramebufferCreateFlags(),
-			*m_pRenderPass,
-			static_cast<uint32_t>(attachments.size()),
-			attachments.data(),
-			m_framebufferWidth,
-			m_framebufferHeight,
-			1u
+			vk::FramebufferCreateFlags(),                   //flags
+			*m_pRenderPass,                                 //renderPass
+			static_cast<uint32_t>(attachments.size()),      //attachmentCount
+			attachments.data(),                             //pAttachments
+			m_framebufferWidth,                             //width
+			m_framebufferHeight,                            //height
+			1u                                              //layers
 		};
 
 		auto pDevice = pContext->getNativeDevice();
@@ -392,7 +383,7 @@ namespace kgs
 	{
 		auto pCommandPool = pContext->getCommandPoolForResetBuffer();
 		vk::CommandBufferAllocateInfo allocateInfo = {
-			*pCommandPool,                //commandPool
+			*pCommandPool,                             //commandPool
 			vk::CommandBufferLevel::ePrimary,          //level
 			1u                                         //commandBufferCount
 		};

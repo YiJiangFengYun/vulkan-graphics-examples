@@ -174,22 +174,22 @@ namespace gfw {
 
 
 		vk::SwapchainCreateInfoKHR createInfo = {
-			vk::SwapchainCreateFlagsKHR(),
-			*m_pSurface,
-			minImageCount,
-			surfaceFormat.format,
-			surfaceFormat.colorSpace,
-			extent,
-			uint32_t(1),
-			vk::ImageUsageFlagBits::eColorAttachment,
-			vk::SharingMode::eExclusive,
-			uint32_t(0),
-			nullptr,
-			details.capabilities.currentTransform,
-			vk::CompositeAlphaFlagBitsKHR::eOpaque,
-			presentMode,
-			VkBool32(VK_TRUE),
-			vk::SwapchainKHR(nullptr)
+			vk::SwapchainCreateFlagsKHR(),            //flags
+			*m_pSurface,                              //surface
+			minImageCount,                            //minImageCount
+			surfaceFormat.format,                     //imageFormat
+			surfaceFormat.colorSpace,                 //imageColorSpace
+			extent,                                   //imageExtent
+			1u,                                       //imageArrayLayers
+			vk::ImageUsageFlagBits::eColorAttachment, //imageUsage
+			vk::SharingMode::eExclusive,              //imageSharingMode
+			0u,                                       //queueFamilyIndexCount
+			nullptr,                                  //pQueueFamilyIndices
+			details.capabilities.currentTransform,    //preTransform
+			vk::CompositeAlphaFlagBitsKHR::eOpaque,   //compositeAlpha
+			presentMode,                              //presentMode
+			VK_TRUE,                                  //clipped
+			vk::SwapchainKHR(nullptr)                 //oldSwapchain
 		};
 
 		UsedQueueFamily usedQueueFamily = UsedQueueFamily::findQueueFamilies(*m_pPhysicalDevice, *m_pSurface);
@@ -264,6 +264,7 @@ namespace gfw {
 				break;
 			}
 		}
+
 	}
 
 	void Window::_createSemaphores()

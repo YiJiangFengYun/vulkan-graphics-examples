@@ -431,22 +431,22 @@ namespace kgs
 	{
 
 		vk::SamplerCreateInfo createInfo = {
-			vk::SamplerCreateFlags(),
-			m_vkFilter,
-			m_vkFilter,
-			m_vkSamplerMipmapMode,
-			m_vkSamplerAddressMode,
-			m_vkSamplerAddressMode,
-			m_vkSamplerAddressMode,
-			0.0f,
-			m_anisotropy == 0.0f ? VkBool32(VK_FALSE) : VkBool32(VK_TRUE),
-			m_anisotropy,
-			VkBool32(VK_FALSE),
-			vk::CompareOp::eNever,
-			0.0f,
-			0.0f,
-			vk::BorderColor::eFloatTransparentBlack,
-			VkBool32(VK_FALSE)
+			vk::SamplerCreateFlags(),                //flags
+			m_vkFilter,                              //magFilter
+			m_vkFilter,                              //minFilter
+			m_vkSamplerMipmapMode,                   //mipmapMode
+			m_vkSamplerAddressMode,                  //addressModeU
+			m_vkSamplerAddressMode,                  //addressModeV
+			m_vkSamplerAddressMode,                  //addressModeW
+			0.0f,                                    //mipLodBias
+			m_anisotropy == 0.0f ? VkBool32(VK_FALSE) : VkBool32(VK_TRUE),      //anisotropyEnable
+			m_anisotropy,                            //maxAnisotropy
+			VkBool32(VK_FALSE),                      //compareEnable
+			vk::CompareOp::eNever,                   //compareOp
+			0.0f,                                    //minLod
+			0.0f,                                    //maxLod
+			vk::BorderColor::eFloatTransparentBlack, //borderColor
+			VkBool32(VK_FALSE)                       //unnormalizedCoordinates
 		};
 
 		auto pDevice = m_pContext->getNativeDevice();

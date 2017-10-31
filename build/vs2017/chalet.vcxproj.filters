@@ -1,0 +1,42 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <ItemGroup>
+    <Filter Include="include">
+      <UniqueIdentifier>{91b4d046-4469-4b1a-abfe-3c373385f27a}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="src">
+      <UniqueIdentifier>{60c5cfcf-4bea-4bd6-8fd2-43d67b31f7cc}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="include\chalet">
+      <UniqueIdentifier>{4c7e3db6-b161-4c45-9655-bfcca9926d5c}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="src\chalet">
+      <UniqueIdentifier>{6390dfac-041b-411a-9344-83aeb0bb0773}</UniqueIdentifier>
+    </Filter>
+  </ItemGroup>
+  <ItemGroup>
+    <ClInclude Include="..\..\samples\include\chalet\stb_image.h">
+      <Filter>include\chalet</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\samples\include\chalet\tiny_obj_loader.h">
+      <Filter>include\chalet</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\samples\include\chalet\window.hpp">
+      <Filter>include\chalet</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\samples\include\chalet\app.hpp">
+      <Filter>include\chalet</Filter>
+    </ClInclude>
+  </ItemGroup>
+  <ItemGroup>
+    <ClCompile Include="..\..\samples\src\chalet\app.cpp">
+      <Filter>src\chalet</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\samples\src\chalet\main.cpp">
+      <Filter>src\chalet</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\samples\src\chalet\window.cpp">
+      <Filter>src\chalet</Filter>
+    </ClCompile>
+  </ItemGroup>
+</Project>

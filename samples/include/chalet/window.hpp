@@ -1,11 +1,11 @@
 #ifndef WINDOW_H
 #define WINDOW_H
 
-#include "sample/stb_image.h"
-#include "sample/tiny_obj_loader.h"
-#include "framework/app/window.hpp"
+#include <framework/framework.hpp>
+#include "chalet/stb_image.h"
+#include "chalet/tiny_obj_loader.h"
 
-namespace sample
+namespace chalet
 {
 	class SubWindow : public gfw::Window
 	{
@@ -149,8 +149,8 @@ namespace sample
 
 namespace std {
 	template<> 
-	struct hash<sample::Window::Vertex> {
-		size_t operator()(const sample::Window::Vertex& vertex) const {
+	struct hash<chalet::Window::Vertex> {
+		size_t operator()(const chalet::Window::Vertex& vertex) const {
 			return ((hash<glm::vec3>()(vertex.pos) ^
 				(hash<glm::vec3>()(vertex.color) << 1)) >> 1) ^
 				(hash<glm::vec2>()(vertex.texCoord) << 1);

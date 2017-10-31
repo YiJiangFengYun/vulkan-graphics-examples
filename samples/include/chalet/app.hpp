@@ -3,7 +3,7 @@
 
 #include "framework/app/app.hpp"
 
-namespace sample
+namespace chalet
 {
 	class App : public gfw::App
 	{

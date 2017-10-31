@@ -1,9 +1,9 @@
-#include "sample/window.hpp"
+#include "chalet/window.hpp"
 
 #define MODEL_PATH "models/chalet.obj"
 #define TEXTURE_PATH "textures/chalet.jpg"
 
-namespace sample
+namespace chalet
 {
 	SubWindow::SubWindow(uint32_t width
 		, uint32_t height
@@ -316,7 +316,7 @@ namespace sample
 
 	void Window::_createMaterial()
 	{
-		m_pShader = std::shared_ptr<kgs::Shader>(new kgs::Shader("shaders/vert.spv", "shaders/frag.spv"));
+		m_pShader = std::shared_ptr<kgs::Shader>(new kgs::Shader("shaders/chalet.vert.spv", "shaders/chalet.frag.spv"));
 		m_pPass = std::shared_ptr<kgs::Pass>(new kgs::Pass(m_pShader));
 		m_pMaterial = std::shared_ptr<kgs::Material>(new kgs::Material());
 		m_pMaterial->setPass("pass0", m_pPass);

@@ -19,7 +19,7 @@ namespace kgs
 		, m_vkImageLayout(vk::ImageLayout::eShaderReadOnlyOptimal) //default image layout is for sampled texture.
 		, m_vkImageAspectFlags(vk::ImageAspectFlagBits::eColor) //default image aspect is for sampled texture.
 	{
-		
+
 	}
 
 	Texture::~Texture()
@@ -725,34 +725,54 @@ namespace kgs
 		barrier.subresourceRange.baseArrayLayer = baseArrayLayer;
 		barrier.subresourceRange.layerCount = layerCount;
 
-		std::vector<std::pair<vk::ImageLayout, vk::AccessFlags>> arrLayoutToAccess = {
-			std::pair<vk::ImageLayout, vk::AccessFlags>(vk::ImageLayout::eUndefined, vk::AccessFlags()),
-			std::pair<vk::ImageLayout, vk::AccessFlags>(vk::ImageLayout::eTransferDstOptimal, vk::AccessFlagBits::eTransferWrite),
-			std::pair<vk::ImageLayout, vk::AccessFlags>(vk::ImageLayout::eTransferSrcOptimal, vk::AccessFlagBits::eTransferRead),
-			std::pair<vk::ImageLayout, vk::AccessFlags>(vk::ImageLayout::eShaderReadOnlyOptimal, vk::AccessFlagBits::eShaderRead),
-			std::pair<vk::ImageLayout, vk::AccessFlags>(vk::ImageLayout::eDepthStencilAttachmentOptimal, vk::AccessFlagBits::eDepthStencilAttachmentWrite)
+		std::vector<std::tuple<vk::ImageLayout, vk::AccessFlags, vk::PipelineStageFlags>> arrLayoutToAccess = {
+			std::tuple<vk::ImageLayout, vk::AccessFlags, vk::PipelineStageFlags>(vk::ImageLayout::eUndefined
+				, vk::AccessFlags()
+				, vk::PipelineStageFlagBits::eTopOfPipe
+				)
+			, std::tuple<vk::ImageLayout, vk::AccessFlags, vk::PipelineStageFlags>(vk::ImageLayout::eTransferDstOptimal
+				, vk::AccessFlagBits::eTransferWrite
+				, vk::PipelineStageFlagBits::eTransfer
+				)
+			, std::tuple<vk::ImageLayout, vk::AccessFlags, vk::PipelineStageFlags>(vk::ImageLayout::eTransferSrcOptimal
+				, vk::AccessFlagBits::eTransferRead
+				, vk::PipelineStageFlagBits::eTransfer
+				)
+			, std::tuple<vk::ImageLayout, vk::AccessFlags, vk::PipelineStageFlags>(vk::ImageLayout::eShaderReadOnlyOptimal
+				, vk::AccessFlagBits::eShaderRead
+				, vk::PipelineStageFlagBits::eFragmentShader
+				)
+			, std::tuple<vk::ImageLayout, vk::AccessFlags, vk::PipelineStageFlags>(vk::ImageLayout::eDepthStencilAttachmentOptimal
+				, vk::AccessFlagBits::eDepthStencilAttachmentRead | vk::AccessFlagBits::eDepthStencilAttachmentWrite
+				, vk::PipelineStageFlagBits::eEarlyFragmentTests
+				)
 		};
-
+		vk::PipelineStageFlags srcStageMask;
+		vk::PipelineStageFlags dstStageMask;
+		Bool32 isFindSrc = KGS_FALSE;
+		Bool32 isFindDst = KGS_FALSE;
 		for (const auto& item : arrLayoutToAccess)
 		{
-			if (oldLayout == item.first)
+			if (oldLayout == std::get<0>(item))
 			{
-				barrier.srcAccessMask = item.second;
+				barrier.srcAccessMask = std::get<1>(item);
+				srcStageMask = std::get<2>(item);
+				isFindSrc = KGS_TRUE;
+			}
+			if (newLayout == std::get<0>(item))
+			{
+				barrier.dstAccessMask = std::get<1>(item);
+				dstStageMask = std::get<2>(item);
+				isFindDst = KGS_TRUE;
+			}
+			if (isFindSrc && isFindDst)
+			{
 				break;
 			}
 		}
 
-		for (const auto& item : arrLayoutToAccess)
-		{
-			if (newLayout == item.first)
-			{
-				barrier.dstAccessMask = item.second;
-				break;
-			}
-		}
-
-		pCommandBuffer->pipelineBarrier(vk::PipelineStageFlagBits::eTopOfPipe,
-			vk::PipelineStageFlagBits::eTopOfPipe,
+		pCommandBuffer->pipelineBarrier(srcStageMask,
+			dstStageMask,
 			vk::DependencyFlags(),
 			nullptr, nullptr,
 			barrier);

@@ -172,6 +172,11 @@ namespace gfw {
 			minImageCount = details.capabilities.maxImageCount;
 		}
 
+		vk::SwapchainKHR oldSwapchain;
+		if (m_pSwapchain != nullptr)
+		{
+			oldSwapchain = *m_pSwapchain;
+		}
 
 		vk::SwapchainCreateInfoKHR createInfo = {
 			vk::SwapchainCreateFlagsKHR(),            //flags
@@ -189,7 +194,7 @@ namespace gfw {
 			vk::CompositeAlphaFlagBitsKHR::eOpaque,   //compositeAlpha
 			presentMode,                              //presentMode
 			VK_TRUE,                                  //clipped
-			vk::SwapchainKHR(nullptr)                 //oldSwapchain
+			oldSwapchain                              //oldSwapchain
 		};
 
 		UsedQueueFamily usedQueueFamily = UsedQueueFamily::findQueueFamilies(*m_pPhysicalDevice, *m_pSurface);

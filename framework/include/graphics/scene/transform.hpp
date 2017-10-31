@@ -98,6 +98,11 @@ namespace kgs
 		MatrixType m_localRotationMatrix;
 		MatrixType m_localMatrix;
 
+
+		void _setLocalPositionOnly(PointType position);
+		void _setLocalScaleOnly(VectorType scale);
+		void _setLocalRotationOnly(RotationType rotation);
+
 		inline MatrixType _getMatrixLocalToWorld(Bool32 includeSelf);
 
 		inline MatrixType _getMatrixWorldToLocal(Bool32 includeSelf);

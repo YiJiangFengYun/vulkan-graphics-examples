@@ -86,17 +86,7 @@ namespace kgs
 	template <SpaceType SPACE_TYPE>
 	void Transform<SPACE_TYPE>::setLocalPosition(PointType position)
 	{
-		m_localPosition = position;
-		typename MatrixVectorType::length_type i;
-		typename MatrixVectorType::length_type length = MatrixVectorType::length();
-		MatrixType normalMatrix(1.0f);
-		m_localPosMatrix = normalMatrix;
-		for (i = 0; i < length - 1; ++i)
-		{
-			m_localPosMatrix[length - 1] += normalMatrix[i] * position[i];
-		}
-		m_localPosMatrix[length - 1] += normalMatrix[i];
-		m_isChanged = KGS_TRUE;
+		_setLocalPositionOnly(position);
 		_reCalculateLocalMatrix();
 	}
 
@@ -110,6 +100,13 @@ namespace kgs
 	typename Transform<SPACE_TYPE>::RotationType Transform<SPACE_TYPE>::getLocalRotation()
 	{
 		return m_localPosition;
+	}
+
+	template <SpaceType SPACE_TYPE>
+	typename void Transform<SPACE_TYPE>::setLocalRotation(RotationType rotation)
+	{
+		_setLocalRotationOnly(rotation);
+		_reCalculateLocalMatrix();
 	}
 
 	template <SpaceType SPACE_TYPE>
@@ -134,18 +131,7 @@ namespace kgs
 	template <SpaceType SPACE_TYPE>
 	void Transform<SPACE_TYPE>::setLocalScale(VectorType scale)
 	{
-		m_localScale = scale;
-		typename MatrixVectorType::length_type i;
-		typename MatrixVectorType::length_type length = MatrixVectorType::length();
-		MatrixType normalMatrix(1.0f);
-		MatrixType result;
-		for (i = 0; i < length - 1; ++i)
-		{
-			result[i] = normalMatrix[i] * scale[i];
-		}
-		result[i] = normalMatrix[i];
-		m_localScaleMatrix = result;
-		m_isChanged = KGS_TRUE;
+		_setLocalScaleOnly(scale);
 		_reCalculateLocalMatrix();
 	}
 
@@ -199,6 +185,45 @@ namespace kgs
 	}
 
 	template <SpaceType SPACE_TYPE>
+	typename void Transform<SPACE_TYPE>::_setLocalPositionOnly(PointType position)
+	{
+		m_localPosition = position;
+		typename MatrixVectorType::length_type i;
+		typename MatrixVectorType::length_type length = MatrixVectorType::length();
+		MatrixType normalMatrix(1.0f);
+		m_localPosMatrix = normalMatrix;
+		for (i = 0; i < length - 1; ++i)
+		{
+			m_localPosMatrix[length - 1] += normalMatrix[i] * position[i];
+		}
+		m_localPosMatrix[length - 1] += normalMatrix[i];
+		m_isChanged = KGS_TRUE;
+	}
+
+	template <SpaceType SPACE_TYPE>
+	typename void Transform<SPACE_TYPE>::_setLocalScaleOnly(VectorType scale)
+	{
+		m_localScale = scale;
+		typename MatrixVectorType::length_type i;
+		typename MatrixVectorType::length_type length = MatrixVectorType::length();
+		MatrixType normalMatrix(1.0f);
+		MatrixType result;
+		for (i = 0; i < length - 1; ++i)
+		{
+			result[i] = normalMatrix[i] * scale[i];
+		}
+		result[i] = normalMatrix[i];
+		m_localScaleMatrix = result;
+		m_isChanged = KGS_TRUE;
+	}
+
+	/*template <SpaceType SPACE_TYPE>
+	typename void Transform<SPACE_TYPE>::_setLocalRotationOnly(RotationType rotation)
+	{
+
+	}*/
+
+	template <SpaceType SPACE_TYPE>
 	typename Transform<SPACE_TYPE>::MatrixType Transform<SPACE_TYPE>::_getMatrixLocalToWorld(Bool32 includeSelf)
 	{
 		MatrixType matrix(1.0f); //identity matrix;
@@ -226,6 +251,8 @@ namespace kgs
 	template <SpaceType SPACE_TYPE>
 	void Transform<SPACE_TYPE>::_reCalculateLocalMatrix()
 	{
+		if (m_isChanged == KGS_FALSE) return;
 		m_localMatrix = m_localPosMatrix * m_localRotationMatrix * m_localScaleMatrix;
+		m_isChanged = KGS_FALSE;
 	}
 } //namespace kgs

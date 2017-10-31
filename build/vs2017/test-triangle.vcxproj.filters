@@ -32,5 +32,9 @@
     <ClInclude Include="..\..\test\include\test-triangle\app.hpp">
       <Filter>include\test-triangle</Filter>
     </ClInclude>
+    <ClInclude Include="resource.h" />
+  </ItemGroup>
+  <ItemGroup>
+    <ResourceCompile Include="test-triangle.rc" />
   </ItemGroup>
 </Project>

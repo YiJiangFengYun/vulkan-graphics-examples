@@ -26,6 +26,10 @@
   <ItemGroup>
     <ClInclude Include="..\..\test\include\test-triangle\app.hpp" />
     <ClInclude Include="..\..\test\include\test-triangle\window.hpp" />
+    <ClInclude Include="resource.h" />
+  </ItemGroup>
+  <ItemGroup>
+    <ResourceCompile Include="test-triangle.rc" />
   </ItemGroup>
   <PropertyGroup Label="Globals">
     <VCProjectVersion>15.0</VCProjectVersion>

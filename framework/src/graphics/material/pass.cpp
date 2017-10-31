@@ -221,6 +221,7 @@ namespace kgs
 		auto pDevice = pContext->getNativeDevice();
 
 		//create descriptor set layout.
+	    if(bindings.size())
 		{
 			vk::DescriptorSetLayoutCreateInfo createInfo =
 			{
@@ -230,6 +231,10 @@ namespace kgs
 			};
 
 			m_pDescriptorSetLayout = fd::createDescriptorSetLayout(pDevice, createInfo);
+		}
+		else
+		{
+			m_pDescriptorSetLayout = nullptr;
 		}
 	}
 
@@ -245,7 +250,15 @@ namespace kgs
 				totalSize += item.bufferSize;
 			}
 		}
-		createBuffer(static_cast<vk::DeviceSize>(totalSize), m_pUniformBuffer, m_pUniformBufferMemory);
+		if (totalSize)
+		{
+			createBuffer(static_cast<vk::DeviceSize>(totalSize), m_pUniformBuffer, m_pUniformBufferMemory);
+		}
+		else
+		{
+			m_pUniformBuffer = nullptr;
+			m_pUniformBufferMemory = nullptr;
+		}
 	}
 
 	void Pass::_createDescriptorSet()
@@ -271,22 +284,36 @@ namespace kgs
 				++index;
 			}
 
-			vk::DescriptorPoolCreateInfo createInfo = { vk::DescriptorPoolCreateFlagBits::eFreeDescriptorSet
-				, 1u
-				, static_cast<uint32_t>(poolSizeInfos.size())
-				, poolSizeInfos.data() 
-			};
-			m_pDescriptorPool = fd::createDescriptorPool(pDevice, createInfo);
+			if (poolSizeInfos.size())
+			{
+				vk::DescriptorPoolCreateInfo createInfo = { vk::DescriptorPoolCreateFlagBits::eFreeDescriptorSet
+					, 1u
+					, static_cast<uint32_t>(poolSizeInfos.size())
+					, poolSizeInfos.data()
+				};
+				m_pDescriptorPool = fd::createDescriptorPool(pDevice, createInfo);
+			}
+			else
+			{
+				m_pDescriptorPool = nullptr;
+			}
 		}
 
 		//create descriptor set.
-		vk::DescriptorSetLayout layouts[] = { *m_pDescriptorSetLayout };
-		vk::DescriptorSetAllocateInfo allocateInfo = {
-			*m_pDescriptorPool,
-			1u,
-			layouts
-		};
-		m_pDescriptorSet = fd::allocateDescriptorSet(pDevice, m_pDescriptorPool, allocateInfo);
+		if (m_pDescriptorSetLayout != nullptr)
+		{
+			vk::DescriptorSetLayout layouts[] = { *m_pDescriptorSetLayout };
+			vk::DescriptorSetAllocateInfo allocateInfo = {
+				*m_pDescriptorPool,
+				1u,
+				layouts
+			};
+			m_pDescriptorSet = fd::allocateDescriptorSet(pDevice, m_pDescriptorPool, allocateInfo);
+		}
+		else
+		{
+			m_pDescriptorSet = nullptr;
+		}
 	}
 
 	void Pass::_updateDescriptorBufferInfo()
@@ -327,8 +354,11 @@ namespace kgs
 			}
 		}
 
-		auto pDevice = pContext->getNativeDevice();
-		pDevice->updateDescriptorSets(writes, nullptr);
+		if (writes.size())
+		{
+			auto pDevice = pContext->getNativeDevice();
+			pDevice->updateDescriptorSets(writes, nullptr);
+		}
 	}
 
 	void Pass::_updateDescriptorImageInfo()
@@ -381,46 +411,49 @@ namespace kgs
 
 	void Pass::_applyBufferContent()
 	{
-		//get total number of unimform buffer variables.
-		int32_t uniformBufferCount = 0u;
-		for (const auto& name : m_arrLayoutBindNames)
+		if (m_pUniformBufferMemory != nullptr)
 		{
-			const auto& item = m_mapLayoutBinds[name];
-			if (item.descriptorType == DescriptorType::UNIFORM_BUFFER)
-				++uniformBufferCount;
-		}
-
-		//get total size of uniform buffer datas and their offsets and sizes for each one.
-		uint32_t totalSize = 0u;
-		uint32_t offset = 0u;
-		std::vector<uint32_t> offsets(uniformBufferCount);
-		std::vector<std::string> names(uniformBufferCount);
-		std::vector<MaterialData::DataType> types(uniformBufferCount);
-		std::vector<uint32_t> descriptorCounts(uniformBufferCount);
-		uint32_t index = 0u;
-		for (const auto& name : m_arrLayoutBindNames)
-		{
-			const auto& item = m_mapLayoutBinds[name];
-			if (item.descriptorType == DescriptorType::UNIFORM_BUFFER)
+			//get total number of unimform buffer variables.
+			int32_t uniformBufferCount = 0u;
+			for (const auto& name : m_arrLayoutBindNames)
 			{
-				offsets[index] = offset;
-				types[index] = item.dataType;
-				names[index] = item.name;
-				descriptorCounts[index] = item.descriptorCount;
-				totalSize += item.size;
-				offset += item.bufferSize;
-				++index;
+				const auto& item = m_mapLayoutBinds[name];
+				if (item.descriptorType == DescriptorType::UNIFORM_BUFFER)
+					++uniformBufferCount;
 			}
+
+			//get total size of uniform buffer datas and their offsets and sizes for each one.
+			uint32_t totalSize = 0u;
+			uint32_t offset = 0u;
+			std::vector<uint32_t> offsets(uniformBufferCount);
+			std::vector<std::string> names(uniformBufferCount);
+			std::vector<MaterialData::DataType> types(uniformBufferCount);
+			std::vector<uint32_t> descriptorCounts(uniformBufferCount);
+			uint32_t index = 0u;
+			for (const auto& name : m_arrLayoutBindNames)
+			{
+				const auto& item = m_mapLayoutBinds[name];
+				if (item.descriptorType == DescriptorType::UNIFORM_BUFFER)
+				{
+					offsets[index] = offset;
+					types[index] = item.dataType;
+					names[index] = item.name;
+					descriptorCounts[index] = item.descriptorCount;
+					totalSize += item.size;
+					offset += item.bufferSize;
+					++index;
+				}
+			}
+			//sync buffer data.
+			void *data;
+			auto pDevice = pContext->getNativeDevice();
+			pDevice->mapMemory(*m_pUniformBufferMemory, 0, static_cast<vk::DeviceSize>(totalSize), vk::MemoryMapFlags(), &data);
+			for (int32_t i = 0; i < uniformBufferCount; ++i)
+			{
+				m_pData->memCopyDataValue(names[i], types[i], data, offsets[i], 0u, descriptorCounts[i]);
+			}
+			pDevice->unmapMemory(*m_pUniformBufferMemory);
 		}
-		//sync buffer data.
-		void *data;
-		auto pDevice = pContext->getNativeDevice();
-		pDevice->mapMemory(*m_pUniformBufferMemory, 0, static_cast<vk::DeviceSize>(totalSize), vk::MemoryMapFlags(), &data);
-		for (int32_t i = 0; i < uniformBufferCount; ++i)
-		{
-			m_pData->memCopyDataValue(names[i], types[i], data, offsets[i], 0u, descriptorCounts[i]);
-		}
-		pDevice->unmapMemory(*m_pUniformBufferMemory);
 	}
 
 	void Pass::createBuffer(vk::DeviceSize size, std::shared_ptr<vk::Buffer>& pBuffer, std::shared_ptr<vk::DeviceMemory> &pBufferMemory)

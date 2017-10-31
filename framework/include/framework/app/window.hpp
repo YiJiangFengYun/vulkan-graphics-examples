@@ -1,16 +1,16 @@
-#ifndef GFW_CONTEXT_H
-#define GFW_CONTEXT_H
+#ifndef GFW_WINDOW_H
+#define GFW_WINDOW_H
 
 #include <memory>
 #include <vector>
 #include <mutex>
+#include <foundation/foundation.hpp>
+#include <GLFW/glfw3.h>
 #include <vulkan/vulkan.hpp>
+#include <graphics/graphics.hpp>
 #include "framework/global.hpp"
 #include "framework/app/vulkan_ext.hpp"
-#include <GLFW/glfw3.h>
 #include "framework/app/queue_family.hpp"
-#include "foundation/wrapper.hpp"
-#include <graphics/graphics.hpp>
 
 namespace gfw
 {
@@ -165,5 +165,5 @@ namespace gfw
 #include "framework/app/window.inl"
 
 
-#endif // !GFW_CONTEXT_H
+#endif // !GFW_WINDOW_H
 

@@ -153,7 +153,7 @@ namespace kgs
 		for (const auto& info : m_layoutBindingInfos)
 		{
 			descriptions[index].binding = index;
-			descriptions[index].stride = MeshData::getDataBaseTypeSize(info.dataType) * m_appliedVertexCount;
+			descriptions[index].stride = MeshData::getDataBaseTypeSize(info.dataType);
 			descriptions[index].inputRate = vk::VertexInputRate::eVertex;
 			++index;
 		}

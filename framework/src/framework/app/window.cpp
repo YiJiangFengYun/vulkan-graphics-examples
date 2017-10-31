@@ -514,7 +514,8 @@ namespace gfw {
 
 	vk::Extent2D SwapChainSupportDetails::chooseExtent(GLFWwindow* window)
 	{
-		if (capabilities.currentExtent.width != std::numeric_limits<uint32_t>::max())
+		if (capabilities.currentExtent.width != std::numeric_limits<uint32_t>::max()
+			&& capabilities.currentExtent.height != 0u)
 		{
 			return capabilities.currentExtent;
 		}

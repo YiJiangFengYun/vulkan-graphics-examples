@@ -21,6 +21,8 @@
 #define ENABLE_VALIDATION_LAYERS
 #endif // DEBUG
 
+#include <graphics/graphics.hpp>
+
 namespace gfw
 { 
 	typedef uint32_t Bool32;

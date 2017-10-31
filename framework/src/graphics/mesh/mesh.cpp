@@ -269,6 +269,7 @@ namespace kgs
 
 	void BaseMesh::_createVertexBuffer()
 	{
+		auto vertexCount = m_appliedVertexCount;
 		//get size of every vertex
 		uint32_t size = 0u;
 		for (const auto& layoutInfo : m_layoutBindingInfos)
@@ -276,7 +277,7 @@ namespace kgs
 			size += MeshData::getDataBaseTypeSize(layoutInfo.dataType);
 		}
 		//get vertex buffer size.
-		uint32_t vertexBufferSize = size * m_vertexCount;
+		uint32_t vertexBufferSize = size * vertexCount;
 
 		//create staging buffer.
 		vk::BufferCreateInfo createInfo = {
@@ -305,8 +306,8 @@ namespace kgs
 		uint32_t offset = 0u;
 		for (const auto& layoutInfo : m_layoutBindingInfos)
 		{
-			m_pData->memCopyDataValue(layoutInfo.name, layoutInfo.dataType, data, offset, 0u, m_vertexCount);
-			offset += MeshData::getDataBaseTypeSize(layoutInfo.dataType) * m_vertexCount;
+			m_pData->memCopyDataValue(layoutInfo.name, layoutInfo.dataType, data, offset, 0u, vertexCount);
+			offset += MeshData::getDataBaseTypeSize(layoutInfo.dataType) * vertexCount;
 		}
 		pDevice->unmapMemory(*pStagingBufferMemory);
 

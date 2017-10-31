@@ -77,7 +77,7 @@ namespace kgs
 		{
 			typedef std::vector<Color32> ValueType;
 			typedef Color32 BaseType;
-			const vk::Format static BASE_FORMAT = vk::Format::eR8G8B8A8Snorm;
+			const vk::Format static BASE_FORMAT = vk::Format::eR8G8B8A8Unorm;
 		};
 
 		inline static vk::Format getBaseFormatWithDataType(DataType dataType)

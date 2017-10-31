@@ -3,7 +3,7 @@
 
 #include "testlib/stb_image.h"
 #include "testlib/tiny_obj_loader.h"
-#include "framework/app/window.hpp"
+#include "framework/framework.hpp"
 
 namespace testTriangle
 {
@@ -113,8 +113,7 @@ namespace testTriangle
 
 	private:
 		std::vector<kgs::Vector3> m_tempPositions;
-		std::vector<kgs::Vector2> m_tempTexCoords;
-		std::vector<kgs::Color> m_tempColors;
+		std::vector<kgs::Color32> m_tempColors;
 		std::vector<uint32_t> m_tempIndices;
 
 
@@ -125,12 +124,10 @@ namespace testTriangle
 		std::shared_ptr<kgs::Material> m_pMaterial;
 		std::shared_ptr<kgs::Pass> m_pPass;
 		std::shared_ptr<kgs::Shader> m_pShader;
-		std::shared_ptr<kgs::Texture2D> m_pTexture;
 
 
 		void _loadModel();
 		void _createMesh();
-		void _createTexture();
 		void _createMaterial();
 		void _createModel();
 		void _createCamera();

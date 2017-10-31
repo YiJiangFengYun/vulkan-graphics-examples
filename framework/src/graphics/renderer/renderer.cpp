@@ -199,10 +199,13 @@ namespace kgs
 		};
 		createInfo.pColorBlendState = &colorBlendStateCreateInfo;
 
+		auto pLayout = pPass->_getDescriptorSetLayout();
+		uint32_t layoutCount = pLayout != nullptr ? 1 : 0;
+		auto pSetLayouts = pLayout != nullptr ? pLayout.get() : nullptr;
 		vk::PipelineLayoutCreateInfo pipelineLayoutCreateInfo = {
 			vk::PipelineLayoutCreateFlags(),             //flags
-			1u,                                          //setLayoutCount
-			pPass->_getDescriptorSetLayout().get(),      //pSetLayouts
+			layoutCount,                                          //setLayoutCount
+			pSetLayouts,      //pSetLayouts
 			0,                                           //pushConstantRangeCount
 			nullptr                                      //pPushConstantRanges
 		};
@@ -253,11 +256,18 @@ namespace kgs
 		m_pCommandBuffer->bindPipeline(vk::PipelineBindPoint::eGraphics, *pPipeline);
 
 		auto pPass = pMaterial->getPassWithIndex(passIndex);
-		m_pCommandBuffer->bindDescriptorSets(vk::PipelineBindPoint::eGraphics, *pPipelineLayout, 0u, *pPass->_getDescriptorSet(), nullptr);
+		uint32_t descriptSetCount = pPass->_getDescriptorSet() != nullptr ? 1 : 0;
+		std::vector<vk::DescriptorSet> descriptorSets(descriptSetCount);
+		if (pPass->_getDescriptorSet() != nullptr)
+		{
+			descriptorSets[0] = *pPass->_getDescriptorSet();
+		}
+		m_pCommandBuffer->bindDescriptorSets(vk::PipelineBindPoint::eGraphics, *pPipelineLayout, 0u, descriptorSets, nullptr);
 
 		pMesh->_fillCommandBufferForRender(subMeshIndex, *m_pCommandBuffer);
 
 		m_pCommandBuffer->drawIndexed(pMesh->_getIndexCountForRender(subMeshIndex), 1u, 0u, 0u, 0u);
+		//m_pCommandBuffer->draw(3, 1, 0, 0);
 
 		m_pCommandBuffer->endRenderPass();
 

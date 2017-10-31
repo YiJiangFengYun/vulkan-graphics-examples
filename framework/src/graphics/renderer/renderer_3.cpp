@@ -52,12 +52,6 @@ namespace kgs
 
 	}
 
-	//void Renderer3::_update(UpdateInfo updateInfo)
-	//{
-	//	Renderer::_update(updateInfo);
-
-	//}
-
 	void Renderer3::_render(const RenderInfo &info, RenderResultInfo &resultInfo)
 	{
 		auto queueTypeCount = static_cast<uint32_t>(RenderQueueType::RANGE_SIZE);
@@ -190,31 +184,37 @@ namespace kgs
 						std::shared_ptr<vk::PipelineLayout> pPipelineLayout;
 						std::shared_ptr<vk::Pipeline> pPipeline;
 						_createPipelineForRender(pPipelineLayout, pPipeline, pMesh, pMaterial, subMeshIndex, passIndex);
+						m_arrPLastPipelineLayouts[drawIndex] = pPipelineLayout;
+						m_arrPLastPipelines[drawIndex] = pPipeline;
 						_recordCommandBufferForRender(pPipelineLayout, pPipeline, pMesh, pMaterial, subMeshIndex, passIndex);
 
 						//submit
-
-						vk::SemaphoreCreateInfo createInfo = {
-							vk::SemaphoreCreateFlags()
-						};
-
-						std::shared_ptr<vk::Semaphore> pSemaphore = fd::createSemaphore(pDevice, createInfo);
+						std::shared_ptr<vk::Semaphore> pSemaphore = nullptr;
+						if (m_arrPLastSemaphores[drawIndex] != nullptr)
+						{
+							pSemaphore = m_arrPLastSemaphores[drawIndex];
+						}
+						else
+						{
+							vk::SemaphoreCreateInfo createInfo = {
+								vk::SemaphoreCreateFlags()
+							};
+							pSemaphore = fd::createSemaphore(pDevice, createInfo);
+							m_arrPLastSemaphores[drawIndex] = pSemaphore;
+						}
+						m_arrSemaphores[drawIndex] = *pSemaphore;
 
 						vk::SubmitInfo submitInfo = {
-							info.waitSemaphoreCount,        //waitSemaphoreCount
-							info.pWaitSemaphores,           //pWaitSemaphores
+							info.waitSemaphoreCount,              //waitSemaphoreCount
+							info.pWaitSemaphores,                 //pWaitSemaphores
 							waitStages,                           //pWaitDstStageMask
 							1u,                                   //commandBufferCount
 							m_pCommandBuffer.get(),               //pCommandBuffers
 							1u,                                   //signalSemaphoreCount
-							pSemaphore.get()          //pSignalSemaphores
+							pSemaphore.get()                      //pSignalSemaphores
 						};
 
 						submitInfos[drawIndex] = submitInfo;
-						m_arrPLastPipelineLayouts[drawIndex] = pPipelineLayout;
-						m_arrPLastPipelines[drawIndex] = pPipeline;
-						m_arrPLastSemaphores[drawIndex] = pSemaphore;
-						m_arrSemaphores[drawIndex] = *pSemaphore;
 						++drawIndex;
 					}
 				}

@@ -9,23 +9,6 @@
 #include "graphics/material/material_data.hpp"
 #include "graphics/util/util.hpp"
 
-#define KGS_M_MAIN_TEXTURE_NAME "_MainTex"
-#define KGS_M_MAIN_COLOR_NAME "_Color"
-#define KGS_M_MATRIX_OBJECT_TO_NDC_NAME "_MatrixObjectToNDC"
-#define KGS_M_MATRIX_OBJECT_TO_WORLD_NAME "_MatrixObjectToWorld"
-#define KGS_M_MATRIX_OBJECT_TO_VIEW_NAME "_MatrixObjectToView"
-#define KGS_M_MAIN_TEXTURE_OFFSET_NAME "_MainTexOffset"
-#define KGS_M_MAIN_TEXTURE_SCALE_NAME "_MainTexScale"
-
-#define KGS_M_MAIN_TEXTURE_BINDING 0
-#define KGS_M_MAIN_COLOR_BINDING 1
-#define KGS_M_MATRIX_OBJECT_TO_NDC_BINDING 2
-#define KGS_M_MATRIX_OBJECT_TO_WORLD_BINDING 3
-#define KGS_M_MATRIX_OBJECT_TO_VIEW_BINDING 4
-#define KGS_M_MAIN_TEXTURE_OFFSET_BINDING 5
-#define KGS_M_MAIN_TEXTURE_SCALE_BINDING 6
-#define KGS_M_OTHER_MIN_BINDING 7
-
 namespace kgs
 {
 	class Pass
@@ -34,7 +17,7 @@ namespace kgs
 		struct LayoutBindingInfo
 		{
 			std::string name;
-			MaterialData::DataType dataType;
+			Bool32 isTexture;
 			std::uint32_t binding;
 			DescriptorType descriptorType;
 			std::uint32_t descriptorCount;
@@ -46,7 +29,7 @@ namespace kgs
 			LayoutBindingInfo();
 
 			LayoutBindingInfo(std::string name
-				, MaterialData::DataType dataType
+				, Bool32 isTexture
 				, std::uint32_t binding
 				, DescriptorType descriptorType
 				, std::uint32_t descriptorCount
@@ -61,7 +44,7 @@ namespace kgs
 
 			Bool32 operator ==(const LayoutBindingInfo& target) const;
 
-			void updateSize();
+			void updateSize(const std::shared_ptr<MaterialData> &pMaterialData);
 		};
 
 		Pass();
@@ -71,26 +54,42 @@ namespace kgs
 		std::shared_ptr<Shader> getShader();
 		void setShader(std::shared_ptr<Shader> pShader);
 
-		template <MaterialData::DataType dataType>
-		const typename MaterialData::DataTypeInfo<dataType>::ValueType getData(std::string name) const;
+		const std::shared_ptr<Texture> &getTexture(std::string name) const;
 
-		template <MaterialData::DataType dataType>
-		void setData(std::string name
-			, const typename MaterialData::DataTypeInfo<dataType>::ValueType value
+		void setTexture(std::string name
+			, const std::shared_ptr<Texture> &pTex
 			, uint32_t binding = KGS_M_OTHER_MIN_BINDING
 			, DescriptorType descriptorType = DescriptorType::UNIFORM_BUFFER
 			, ShaderStageFlags stageFlags = ShaderStageFlagBits::VERTEX
 		);
 
-		const std::shared_ptr<Texture> getMainTexture() const;
-		void setMainTexture(const std::shared_ptr<Texture> value);
-		const Vector2 getMainTextureOffset() const;
-		void setMainTextureOffset(const Vector2 value);
-		const Vector2 getMainTextureScale() const;
-		void setMainTextureScale(const Vector2 value);
+		template <typename T>
+		T getDataValue(std::string name) const;
 
-		const Color getMainColor() const;
-		void setMainColor(const Color value);
+		template <typename T>
+		std::vector<T> getDataValue(std::string name, uint32_t count) const;
+
+		template<typename T>
+		void setDataValue(std::string name
+			, const T &value
+			, uint32_t binding = KGS_M_OTHER_MIN_BINDING
+			, DescriptorType descriptorType = DescriptorType::UNIFORM_BUFFER
+			, ShaderStageFlags stageFlags = ShaderStageFlagBits::VERTEX
+		);
+
+		template<typename T>
+		void setDataValue(std::string name
+			, const std::vector<T> &values
+			, uint32_t binding = KGS_M_OTHER_MIN_BINDING
+			, DescriptorType descriptorType = DescriptorType::UNIFORM_BUFFER
+			, ShaderStageFlags stageFlags = ShaderStageFlagBits::VERTEX
+		);
+
+		const std::shared_ptr<Texture> &getMainTexture() const;
+		void setMainTexture(const std::shared_ptr<Texture> value);
+
+		MaterialData::BuildInData getBuildInData() const;
+		void setBuildInData(MaterialData::BuildInData buildInData);
 
 		void apply();
 

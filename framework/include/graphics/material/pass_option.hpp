@@ -5,6 +5,7 @@
 #include <array>
 #include <vulkan/vulkan.hpp>
 #include <foundation/util.hpp>
+
 namespace kgs
 {
 	enum class DescriptorType

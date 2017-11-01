@@ -8,6 +8,13 @@
 #include "graphics/util/util.hpp"
 #include "graphics/texture/texture.hpp"
 
+#define KGS_M_MAIN_TEXTURE_NAME "_MainTex"
+#define KGS_M_BUILDIN_NAME "_BuildIn"
+
+#define KGS_M_BUILDIN_BINDING 0
+#define KGS_M_MAIN_TEXTURE_BINDING 1
+#define KGS_M_OTHER_MIN_BINDING 2
+
 namespace kgs
 {
 	enum class MaterialShowType
@@ -23,184 +30,57 @@ namespace kgs
 
 	struct MaterialData
 	{
-		enum class DataType
+		struct BuildInData
 		{
-			FLOAT,
-			FLOAT_ARRAY,
-			INT,
-			INT_ARRAY,
-			COLOR,
-			COLOR_ARRAY,
-			VECTOR,
-			VECTOR_ARRAY,
-			MATRIX,
-			MATRIX_ARRAY,
-			TEXTURE,
-			TEXTURE_OFFSET,
-			TEXTURE_SCALE,
-			BEGIN_RANGE = FLOAT,
-			END_RANGE = TEXTURE_SCALE,
-			RANGE_SIZE = (END_RANGE - BEGIN_RANGE + 1)
+			Matrix4x4 matrixObjectToNDC;
+			Color32   mainColor;
+			Matrix4x4 matrixObjectToView;
+			Matrix4x4 matrixObjectToWorld;
+
+			BuildInData();
+
+			BuildInData(Matrix4x4 matrixObjectToNDC
+				, Color32 mainColor
+				, Matrix4x4 matrixObjectToView
+				, Matrix4x4 matrixObjectToWorld);
+
+			BuildInData(const BuildInData &target);
+			BuildInData(const BuildInData &&target);
 		};
 
-		//type enum to value type
-		template <DataType type>
-		struct DataTypeInfo
-		{
-			typedef void ValueType;
-			typedef void BaseType;
-			static const Bool32 IS_ARRAY = KGS_FALSE;
-		};
-
-
-		template<>
-		struct DataTypeInfo<DataType::FLOAT>
-		{
-			typedef float ValueType;
-			typedef float BaseType;
-			const static Bool32 IS_ARRAY = KGS_FALSE;
-		};
-
-		template<>
-		struct DataTypeInfo<DataType::FLOAT_ARRAY>
-		{
-			typedef std::vector<float> ValueType;
-			typedef float BaseType;
-			const static Bool32 IS_ARRAY = KGS_TRUE;
-		};
-
-		template<>
-		struct DataTypeInfo<DataType::INT>
-		{
-			typedef int32_t ValueType;
-			typedef int32_t BaseType;
-			const static Bool32 IS_ARRAY = KGS_FALSE;
-		};
-
-		template<>
-		struct DataTypeInfo<DataType::INT_ARRAY>
-		{
-			typedef std::vector<int32_t> ValueType;
-			typedef int32_t BaseType;
-			const static Bool32 IS_ARRAY = KGS_TRUE;
-		};
-
-		template<>
-		struct DataTypeInfo<DataType::COLOR>
-		{
-			typedef Color ValueType;
-			typedef Color BaseType;
-			const static Bool32 IS_ARRAY = KGS_FALSE;
-		};
-
-		template<>
-		struct DataTypeInfo<DataType::COLOR_ARRAY>
-		{
-			typedef std::vector<Color> ValueType;
-			typedef Color BaseType;
-			const static Bool32 IS_ARRAY = KGS_TRUE;
-		};
-
-		template<>
-		struct DataTypeInfo<DataType::VECTOR>
-		{
-			typedef Vector4 ValueType;
-			typedef Vector4 BaseType;
-			const static Bool32 IS_ARRAY = KGS_FALSE;
-		};
-
-		template<>
-		struct DataTypeInfo<DataType::VECTOR_ARRAY>
-		{
-			typedef std::vector<Vector4> ValueType;
-			typedef Vector4 BaseType;
-			const static Bool32 IS_ARRAY = KGS_TRUE;
-		};
-
-		template<>
-		struct DataTypeInfo<DataType::MATRIX>
-		{
-			typedef Matrix4x4 ValueType;
-			typedef Matrix4x4 BaseType;
-			const static Bool32 IS_ARRAY = KGS_FALSE;
-		};
-
-		template<>
-		struct DataTypeInfo<DataType::MATRIX_ARRAY>
-		{
-			typedef std::vector<Matrix4x4> ValueType;
-			typedef Matrix4x4 BaseType;
-			const static Bool32 IS_ARRAY = KGS_TRUE;
-		};
-
-		template<>
-		struct DataTypeInfo<DataType::TEXTURE>
-		{
-			typedef std::shared_ptr<Texture> ValueType;
-			typedef std::shared_ptr<Texture> BaseType;
-			const static Bool32 IS_ARRAY = KGS_FALSE;
-		};
-
-		template<>
-		struct DataTypeInfo<DataType::TEXTURE_OFFSET>
-		{
-			typedef Vector2 ValueType;
-			typedef Vector2 BaseType;
-			const static Bool32 IS_ARRAY = KGS_FALSE;
-		};
-
-		template<>
-		struct DataTypeInfo<DataType::TEXTURE_SCALE>
-		{
-			typedef Vector2 ValueType;
-			typedef Vector2 BaseType;
-			const static Bool32 IS_ARRAY = KGS_FALSE;
-		};
-
-		std::vector<std::string> arrFloats;
-		std::unordered_map<std::string, float> mapFloats;
-		std::vector<std::string> arrFloatArrays;
-		std::unordered_map<std::string, std::vector<float>> mapFloatArrays;
-
-		std::vector<std::string> arrInts;
-		std::unordered_map<std::string, int32_t> mapInts;
-		std::vector<std::string> arrIntArrays;
-		std::unordered_map<std::string, std::vector<int32_t>> mapIntArrays;
-
-		std::vector<std::string> arrColors;
-		std::unordered_map<std::string, Color> mapColors;
-		std::vector<std::string> arrColorArrays;
-		std::unordered_map<std::string, std::vector<Color>> mapColorArrays;
-
-		std::vector<std::string> arrVectors;
-		std::unordered_map<std::string, Vector4> mapVectors;
-		std::vector<std::string> arrVectorArrays;
-		std::unordered_map<std::string, std::vector<Vector4>> mapVectorArrays;
-
-		std::vector<std::string> arrMatrixs;
-		std::unordered_map<std::string, Matrix4x4> mapMatrixs;
-		std::vector<std::string> arrMatrixArrays;
-		std::unordered_map<std::string, std::vector<Matrix4x4>> mapMatrixArrays;
-
-		std::vector<std::string> arrTextures;
+		std::vector<std::string> arrDataNames;
+		std::unordered_map<std::string, std::vector<Byte>> mapDatas;
+		std::unordered_map<std::string, uint32_t> mapDataCounts;
+		std::vector<std::string> arrTexNames;
 		std::unordered_map<std::string, std::shared_ptr<Texture>> mapTextures;
-		std::vector<std::string> arrTextureOffsets;
-		std::unordered_map<std::string, Vector2> mapTextureOffsets;
-		std::vector<std::string> arrTextureScales;
-		std::unordered_map<std::string, Vector2> mapTextureScales;
 
-		template <DataType type>
-		const typename DataTypeInfo<type>::ValueType &getDataValue(std::string name) const;
+		const std::shared_ptr<Texture> &getTexture(std::string name) const;
+		void setTexture(std::string name, const std::shared_ptr<Texture> &pTex);
 
-		template<DataType type>
-		void setDataValue(std::string name, const typename DataTypeInfo<type>::ValueType& value);
+		template <typename T>
+		T getDataValue(std::string name) const;
 
-		uint32_t static getDataBaseTypeSize(DataType dataType);
+		template <typename T>
+		std::vector<T> getDataValue(std::string name, uint32_t count) const;
 
-		uint32_t getDataValueSize(std::string name, DataType dataType);
+		template<typename T>
+		void setDataValue(std::string name, const T &value);
 
-		void memCopyDataValue(std::string name, DataType dataType, void* dst, uint32_t offset, uint32_t elementStart, uint32_t maxElementCount);
+		template<typename T>
+		void setDataValue(std::string name, const std::vector<T> &values);
+
+		uint32_t getDataBaseSize(std::string name) const;
+
+		uint32_t getDataSize(std::string name) const;
+
+		void memoryCopyData(std::string name
+			, void* dst
+			, uint32_t offset
+			, uint32_t elementStart
+			, uint32_t maxElementCount) const;
 	};
 } //namespace kgs
+
+#include "graphics/material/material_data.inl"
 
 #endif // !KGS_MATERIAL_DATA_H

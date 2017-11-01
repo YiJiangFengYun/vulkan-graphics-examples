@@ -1,30 +1,61 @@
 namespace kgs
 {
-	template <MaterialData::DataType dataType>
-	const typename MaterialData::DataTypeInfo<dataType>::ValueType Pass::getData(std::string name) const
+	template <typename T>
+	T Pass::getDataValue(std::string name) const
 	{
-		return m_pData->getDataValue<dataType>(name);
+		return m_pData->getDataValue<T>(name);
 	}
 
-	template <MaterialData::DataType dataType>
-	void Pass::setData(std::string name
-		, const typename MaterialData::DataTypeInfo<dataType>::ValueType value
+	template <typename T>
+	std::vector<T> Pass::getDataValue(std::string name, uint32_t count) const
+	{
+		return m_pData->getDataValue(name);
+	}
+
+	template<typename T>
+	void Pass::setDataValue(std::string name
+		, const T &value
 		, uint32_t binding
 		, DescriptorType descriptorType
 		, ShaderStageFlags stageFlags
 	)
 	{
-		m_pData->setDataValue<dataType>(name, value);
+		m_pData->setDataValue(name, value);
 		//update layout binding information.
-		uint32_t descriptorCount = static_cast<uint32_t>(sizeof(value) / sizeof(typename MaterialData::DataTypeInfo<dataType>::BaseType));
+		uint32_t descriptorCount = 1u;
 		LayoutBindingInfo info(
 			name,
-			dataType,
+			KGS_FALSE,
 			binding,
 			descriptorType,
 			descriptorCount,
 			stageFlags
 		);
+		info.updateSize(m_pData);
+		setValue(name, info, m_mapLayoutBinds, m_arrLayoutBindNames);
+		m_applied = KGS_FALSE;
+	}
+
+	template<typename T>
+	void Pass::setDataValue(std::string name
+		, const std::vector<T> &values
+		, uint32_t binding
+		, DescriptorType descriptorType
+		, ShaderStageFlags stageFlags
+	)
+	{
+		m_pData->setDataValue(name, values);
+		//update layout binding information.
+		uint32_t descriptorCount = values.size();
+		LayoutBindingInfo info(
+			name,
+			KGS_FALSE,
+			binding,
+			descriptorType,
+			descriptorCount,
+			stageFlags
+		);
+		info.updateSize(m_pData);
 		setValue(name, info, m_mapLayoutBinds, m_arrLayoutBindNames);
 		m_applied = KGS_FALSE;
 	}

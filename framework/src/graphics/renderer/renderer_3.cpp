@@ -153,26 +153,14 @@ namespace kgs
 					auto viewMatrix = m_pCamera->getTransform()->getMatrixWorldToLocal();
 					auto modelMatrix = pVisualObject->getTransform()->getMatrixLocalToWorld();
 					auto mvMatrix = viewMatrix * modelMatrix;
-					pPass->setData<MaterialData::DataType::MATRIX>(KGS_M_MATRIX_OBJECT_TO_NDC_NAME
-						, projMatrix * mvMatrix
-						, KGS_M_MATRIX_OBJECT_TO_NDC_BINDING
-						, DescriptorType::UNIFORM_BUFFER
-					    , ShaderStageFlagBits::VERTEX
-						);
+					MaterialData::BuildInData buildInData = {
+						projMatrix * mvMatrix,
+						Color32(255, 255, 255, 255),
+						mvMatrix,
+						modelMatrix
+					};
 
-					pPass->setData<MaterialData::DataType::MATRIX>(KGS_M_MATRIX_OBJECT_TO_VIEW_NAME
-						, mvMatrix
-						, KGS_M_MATRIX_OBJECT_TO_VIEW_BINDING
-						, DescriptorType::UNIFORM_BUFFER
-						, ShaderStageFlagBits::VERTEX
-						);
-
-					pPass->setData<MaterialData::DataType::MATRIX>(KGS_M_MATRIX_OBJECT_TO_WORLD_NAME
-						, modelMatrix
-						, KGS_M_MATRIX_OBJECT_TO_WORLD_BINDING
-						, DescriptorType::UNIFORM_BUFFER
-						, ShaderStageFlagBits::VERTEX
-						);
+					pPass->setBuildInData(buildInData);
 
 					pPass->apply();
 				}

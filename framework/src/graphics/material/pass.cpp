@@ -7,25 +7,25 @@ namespace kgs
 
 	}
 
-	Pass::LayoutBindingInfo::LayoutBindingInfo(std::string name,
-		MaterialData::DataType dataType,
-		std::uint32_t binding,
-		DescriptorType descriptorType,
-		std::uint32_t descriptorCount,
-		ShaderStageFlags stageFlags) 
+	Pass::LayoutBindingInfo::LayoutBindingInfo(std::string name
+		, Bool32 isTexture
+		, std::uint32_t binding
+		, DescriptorType descriptorType
+		, std::uint32_t descriptorCount
+		, ShaderStageFlags stageFlags
+	) 
 		: name(name)
-		, dataType(dataType)
+		, isTexture(isTexture)
 		, binding(binding)
 		, descriptorType(descriptorType)
 		, descriptorCount(descriptorCount)
 		, stageFlags(stageFlags)
 	{
-		updateSize();
 	}
 
 	Pass::LayoutBindingInfo::LayoutBindingInfo(const LayoutBindingInfo & target)
 		: name(target.name)
-		, dataType(target.dataType)
+		, isTexture(target.isTexture)
 		, binding(target.binding)
 		, descriptorType(target.descriptorType)
 		, descriptorCount(target.descriptorCount)
@@ -39,7 +39,7 @@ namespace kgs
 	Pass::LayoutBindingInfo& Pass::LayoutBindingInfo::operator=(const LayoutBindingInfo &target)
 	{
 		name = target.name;
-		dataType = target.dataType;
+		isTexture = target.isTexture;
 		binding = target.binding;
 		descriptorType = target.descriptorType;
 		descriptorCount = target.descriptorCount;
@@ -52,7 +52,7 @@ namespace kgs
 
 	Pass::LayoutBindingInfo::LayoutBindingInfo(const LayoutBindingInfo &&target)
 		: name(target.name)
-		, dataType(target.dataType)
+		, isTexture(target.isTexture)
 		, binding(target.binding)
 		, descriptorType(target.descriptorType)
 		, descriptorCount(target.descriptorCount)
@@ -63,9 +63,9 @@ namespace kgs
 
 	}
 
-	void Pass::LayoutBindingInfo::updateSize()
+	void Pass::LayoutBindingInfo::updateSize(const std::shared_ptr<MaterialData> &pMaterialData)
 	{
-		if (dataType == MaterialData::DataType::TEXTURE)
+		if (isTexture)
 		{
 			size = 0u;
 			bufferSize = 0u;
@@ -74,16 +74,18 @@ namespace kgs
 		auto pPhysicalDevice = pContext->getPhysicalDevice();
 		auto properties = pPhysicalDevice->getProperties();
 		auto minOffsetAlignment = static_cast<float>(properties.limits.minUniformBufferOffsetAlignment);
-		//uint32_t minUniformBufferOffsetAlignment = pPhysicalDevice->min
-		size = MaterialData::getDataBaseTypeSize(dataType) * descriptorCount;
+		size = pMaterialData->getDataBaseSize(name) * descriptorCount;
 		bufferSize = static_cast<uint32_t>(std::ceil(size / minOffsetAlignment) * minOffsetAlignment);
 	}
 
 	Bool32 Pass::LayoutBindingInfo::operator ==(const LayoutBindingInfo& target) const
 	{
-		return name == target.name && dataType == target.dataType && binding == target.binding &&
-			descriptorType == target.descriptorType && descriptorCount == target.descriptorCount &&
-			stageFlags == target.stageFlags;
+		return name == target.name 
+			&& isTexture == target.isTexture 
+			&& binding == target.binding 
+			&& descriptorType == target.descriptorType 
+			&& descriptorCount == target.descriptorCount 
+			&& stageFlags == target.stageFlags;
 	}
 
 	Pass::Pass() 
@@ -119,48 +121,57 @@ namespace kgs
 		m_pShader = pShader;
 	}
 
-	const std::shared_ptr<Texture> Pass::getMainTexture() const
+	const std::shared_ptr<Texture> &Pass::getTexture(std::string name) const
 	{
-		return getData<MaterialData::DataType::TEXTURE>(KGS_M_MAIN_TEXTURE_NAME);
+		return m_pData->getTexture(name);
+	}
+	void Pass::setTexture(std::string name
+		, const std::shared_ptr<Texture> &pTex
+		, uint32_t binding
+		, DescriptorType descriptorType
+		, ShaderStageFlags stageFlags
+	)
+	{
+		m_pData->setTexture(name, pTex);
+		//update layout binding information.
+		uint32_t descriptorCount = 1u;
+		LayoutBindingInfo info(
+			name,
+			KGS_TRUE,
+			binding,
+			descriptorType,
+			descriptorCount,
+			stageFlags
+		);
+		info.updateSize(m_pData);
+		setValue(name, info, m_mapLayoutBinds, m_arrLayoutBindNames);
+		m_applied = KGS_FALSE;
+	}
+
+	const std::shared_ptr<Texture> &Pass::getMainTexture() const
+	{
+		return getTexture(KGS_M_MAIN_TEXTURE_NAME);
 	}
 
 	void Pass::setMainTexture(const std::shared_ptr<Texture> value)
 	{
-		setData<MaterialData::DataType::TEXTURE>(KGS_M_MAIN_TEXTURE_NAME, value, KGS_M_MAIN_TEXTURE_BINDING, 
+		setTexture(KGS_M_MAIN_TEXTURE_NAME, value, KGS_M_MAIN_TEXTURE_BINDING,
 			DescriptorType::COMBINED_IMAGE_SAMPLER, ShaderStageFlagBits::FRAGMENT);
 	}
 
-	const Vector2 Pass::getMainTextureOffset() const
+	MaterialData::BuildInData Pass::getBuildInData() const
 	{
-		return getData<MaterialData::DataType::TEXTURE_OFFSET>(KGS_M_MAIN_TEXTURE_OFFSET_NAME);
+		return getDataValue<MaterialData::BuildInData>(KGS_M_BUILDIN_NAME);
 	}
 
-	void Pass::setMainTextureOffset(Vector2 value)
+	void Pass::setBuildInData(MaterialData::BuildInData buildInData)
 	{
-		setData<MaterialData::DataType::TEXTURE_OFFSET>(KGS_M_MAIN_TEXTURE_OFFSET_NAME, value, KGS_M_MAIN_TEXTURE_OFFSET_BINDING,
-			DescriptorType::UNIFORM_BUFFER, ShaderStageFlagBits::FRAGMENT);
-	}
-
-	const Vector2 Pass::getMainTextureScale() const 
-	{
-		return getData<MaterialData::DataType::TEXTURE_SCALE>(KGS_M_MAIN_TEXTURE_SCALE_NAME);
-	}
-
-	void Pass::setMainTextureScale(const Vector2 value)
-	{
-		setData<MaterialData::DataType::TEXTURE_SCALE>(KGS_M_MAIN_TEXTURE_SCALE_NAME, value, KGS_M_MAIN_TEXTURE_SCALE_BINDING,
-			DescriptorType::UNIFORM_BUFFER, ShaderStageFlagBits::FRAGMENT);
-	}
-
-	const Color Pass::getMainColor() const
-	{
-		return getData<MaterialData::DataType::COLOR>(KGS_M_MAIN_COLOR_NAME);
-	}
-
-	void Pass::setMainColor(const Color value)
-	{
-		setData<MaterialData::DataType::COLOR>(KGS_M_MAIN_COLOR_NAME, value,
-			KGS_M_MAIN_COLOR_BINDING, DescriptorType::UNIFORM_BUFFER, ShaderStageFlagBits::VERTEX);
+		setDataValue(KGS_M_BUILDIN_NAME
+			, buildInData
+			, KGS_M_BUILDIN_BINDING
+			, DescriptorType::UNIFORM_BUFFER
+			, ShaderStageFlagBits::VERTEX
+		);
 	}
 
 	void Pass::apply()
@@ -406,12 +417,12 @@ namespace kgs
 			if (item.descriptorType == DescriptorType::COMBINED_IMAGE_SAMPLER)
 			{
 #ifdef DEBUG
-				if (item.dataType != MaterialData::DataType::TEXTURE)
+				if (item.isTexture == KGS_FALSE)
 					throw std::runtime_error("The data type of binding should be is TEXTURE when its type is COMBINED_IMAGE_SAMPLER");
-				if (item.descriptorCount != 1)
+				if (item.descriptorCount != 1u)
 					throw std::runtime_error("The descriptor count of binding shoubld be 1 when its type is COMBINED_IMAGE_SAMPLER");
 #endif // DEBUG
-				std::shared_ptr<Texture> pTexture = m_pData->getDataValue<MaterialData::DataType::TEXTURE>(item.name);
+				std::shared_ptr<Texture> pTexture = getTexture(item.name);
 				if (pTexture != nullptr)
 				{
 					imageInfos[index].sampler = *pTexture->_getSampler();
@@ -451,7 +462,6 @@ namespace kgs
 			uint32_t offset = 0u;
 			std::vector<uint32_t> offsets(uniformBufferCount);
 			std::vector<std::string> names(uniformBufferCount);
-			std::vector<MaterialData::DataType> types(uniformBufferCount);
 			std::vector<uint32_t> descriptorCounts(uniformBufferCount);
 			uint32_t index = 0u;
 			for (const auto& name : m_arrLayoutBindNames)
@@ -460,7 +470,6 @@ namespace kgs
 				if (item.descriptorType == DescriptorType::UNIFORM_BUFFER)
 				{
 					offsets[index] = offset;
-					types[index] = item.dataType;
 					names[index] = item.name;
 					descriptorCounts[index] = item.descriptorCount;
 					totalSize += item.size;
@@ -474,7 +483,7 @@ namespace kgs
 			pDevice->mapMemory(*m_pUniformBufferMemory, 0, static_cast<vk::DeviceSize>(totalSize), vk::MemoryMapFlags(), &data);
 			for (int32_t i = 0; i < uniformBufferCount; ++i)
 			{
-				m_pData->memCopyDataValue(names[i], types[i], data, offsets[i], 0u, descriptorCounts[i]);
+				m_pData->memoryCopyData(names[i], data, offsets[i], 0u, descriptorCounts[i]);
 			}
 			pDevice->unmapMemory(*m_pUniformBufferMemory);
 		}

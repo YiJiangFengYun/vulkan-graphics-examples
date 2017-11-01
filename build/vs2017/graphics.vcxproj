@@ -120,6 +120,7 @@
     <ClInclude Include="..\..\framework\include\graphics\util\util.hpp" />
   </ItemGroup>
   <ItemGroup>
+    <None Include="..\..\framework\include\graphics\material\material_data.inl" />
     <None Include="..\..\framework\include\graphics\material\pass.inl" />
     <None Include="..\..\framework\include\graphics\mesh\mesh.inl" />
     <None Include="..\..\framework\include\graphics\mesh\mesh_data.inl" />

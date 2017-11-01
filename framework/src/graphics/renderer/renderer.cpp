@@ -131,14 +131,17 @@ namespace kgs
 		};
 		createInfo.pViewportState = &viewportStateCreateInfo;
 
+		auto cullMode = tranCullModeFlagsToVK(pPass->getCullMode());
+		auto frontFace = tranFrontFaceTypeToVK(pPass->getFrontFace());
+
 		//Rasterization info.
 		vk::PipelineRasterizationStateCreateInfo rasterizationStateCreateInfo = {
 			vk::PipelineRasterizationStateCreateFlags(),  //flags
 			VK_FALSE,                                     //depthClampEnable
 			VK_FALSE,                                     //rasterizerDiscardEnable
 			vk::PolygonMode::eFill,                       //polygonMode
-			vk::CullModeFlagBits::eBack,                  //cullMode
-			vk::FrontFace::eCounterClockwise,             //frontFace
+			cullMode,                                     //cullMode
+			frontFace,                                    //frontFace
 			VK_FALSE,                                     //depthBiasEnable
 			0.0f,                                         //depthBiasConstantFactor
 			0.0f,                                         //depthBiasClamp

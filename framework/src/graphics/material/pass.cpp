@@ -89,6 +89,8 @@ namespace kgs
 	Pass::Pass() 
 		: m_pData(new MaterialData())
 		, m_applied(KGS_FALSE)
+		, m_cullMode(CullModeFlagBits::eBack)
+		, m_frontFace(FrontFaceType::eCounterClockwise)
 	{
 	}
 
@@ -96,6 +98,8 @@ namespace kgs
 		: m_pData(new MaterialData())
 		, m_applied(KGS_FALSE)
 		, m_pShader(pShader)
+		, m_cullMode(CullModeFlagBits::eBack)
+		, m_frontFace(FrontFaceType::eCounterClockwise)
 	{
 
 	}
@@ -171,6 +175,26 @@ namespace kgs
 			_applyBufferContent();
 			m_applied = KGS_TRUE;
 		}
+	}
+
+	CullModeFlags Pass::getCullMode() const
+	{
+		return m_cullMode;
+	}
+
+	void Pass::setCullMode(CullModeFlags cullMode)
+	{
+		m_cullMode = cullMode;
+	}
+
+	FrontFaceType Pass::getFrontFace() const
+	{
+		return m_frontFace;
+	}
+
+	void Pass::setFrontFace(FrontFaceType frontFace)
+	{
+		m_frontFace = frontFace;
 	}
 
 	std::shared_ptr<Shader> Pass::_getShader()

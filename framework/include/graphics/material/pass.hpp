@@ -94,6 +94,12 @@ namespace kgs
 
 		void apply();
 
+		CullModeFlags getCullMode() const;
+		void setCullMode(CullModeFlags cullMode);
+
+		FrontFaceType getFrontFace() const;
+		void setFrontFace(FrontFaceType frontFace);
+
 		std::shared_ptr<Shader> _getShader();
 		std::shared_ptr<vk::Buffer> _getUniformBuffer();
 		std::shared_ptr<vk::DeviceMemory> _getUniformBufferMemory();
@@ -111,6 +117,9 @@ namespace kgs
 		std::shared_ptr<vk::DescriptorPool> m_pDescriptorPool;
 		std::shared_ptr<vk::DescriptorSet> m_pDescriptorSet;
 		Bool32 m_applied;
+
+		CullModeFlags m_cullMode;
+		FrontFaceType m_frontFace;
 
 		//aggregations
 		std::shared_ptr<Shader> m_pShader;

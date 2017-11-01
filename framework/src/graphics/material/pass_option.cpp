@@ -11,4 +11,16 @@ namespace kgs
 		std::pair<ShaderStageFlagBits, vk::ShaderStageFlagBits>(ShaderStageFlagBits::VERTEX, vk::ShaderStageFlagBits::eVertex),
 		std::pair<ShaderStageFlagBits, vk::ShaderStageFlagBits>(ShaderStageFlagBits::FRAGMENT, vk::ShaderStageFlagBits::eFragment)
 	};
+
+	std::array<std::pair<CullModeFlagBits, vk::CullModeFlagBits>, static_cast<size_t>(CullModeFlagCount)> arrCullModeFlagBitsToVK = {
+		std::pair<CullModeFlagBits, vk::CullModeFlagBits>(CullModeFlagBits::eNone, vk::CullModeFlagBits::eNone),
+		std::pair<CullModeFlagBits, vk::CullModeFlagBits>(CullModeFlagBits::eFront, vk::CullModeFlagBits::eFront),
+		std::pair<CullModeFlagBits, vk::CullModeFlagBits>(CullModeFlagBits::eBack, vk::CullModeFlagBits::eBack),
+		std::pair<CullModeFlagBits, vk::CullModeFlagBits>(CullModeFlagBits::eFrontAndBack, vk::CullModeFlagBits::eFrontAndBack)
+	};
+
+	std::array<std::pair<FrontFaceType, vk::FrontFace>, static_cast<size_t>(FrontFaceType::RANGE_SIZE)> arrFrontFaceTypeToVK = {
+		std::pair<FrontFaceType, vk::FrontFace>(FrontFaceType::eCounterClockwise, vk::FrontFace::eCounterClockwise),
+		std::pair<FrontFaceType, vk::FrontFace>(FrontFaceType::eClockwise, vk::FrontFace::eClockwise)
+	};
 }

@@ -5,8 +5,19 @@ namespace kgs
 	template <SpaceType SPACE_TYPE>
 	void Transform<SPACE_TYPE>::_setLocalRotationOnly(RotationType rotation)
 	{
-		m_localRotation = rotation;
-		m_isChanged = KGS_TRUE;
+		throw std::runtime_error("Method cann't be called.");
+	}
+
+	template <SpaceType SPACE_TYPE>
+	void  Transform<SPACE_TYPE>::setLocalMatrix(MatrixType matrix)
+	{
+		throw std::runtime_error("Method cann't be called.");
+	}
+
+	template <SpaceType SPACE_TYPE>
+	void  Transform<SPACE_TYPE>::setLocalMatrixInverse(MatrixType matrix)
+	{
+		throw std::runtime_error("Method cann't be called.");
 	}
 
 	template<>
@@ -29,4 +40,41 @@ namespace kgs
 		m_localRotationMatrix = glm::toMat4(rotation);
 		m_isChanged = KGS_TRUE;
 	}
+
+	template <>
+	void  Transform<SpaceType::SPACE_3>::setLocalMatrix(MatrixType matrix)
+	{
+		_setLocalMatrixOnly(matrix);
+		VectorType tempScale;
+		RotationType tempRotation;
+		PointType tempTranslate;
+		PointType tempSkew;
+		MatrixVectorType tempPerspective;
+		glm::decompose(m_localMatrix, tempScale, tempRotation, tempTranslate, tempSkew, tempPerspective);
+		_setLocalScaleOnly(tempScale);
+		_setLocalRotationOnly(tempRotation);
+		_setLocalPositionOnly(tempTranslate);
+		m_isChanged = KGS_FALSE;
+	}
+
+
+	template <>
+	void  Transform<SpaceType::SPACE_3>::setLocalMatrixInverse(MatrixType matrix)
+	{
+		_setLocalMatrixInverseOnly(matrix);
+		VectorType tempScale;
+		RotationType tempRotation;
+		PointType tempTranslate;
+		PointType tempSkew;
+		MatrixVectorType tempPerspective;
+		glm::decompose(m_localMatrix, tempScale, tempRotation, tempTranslate, tempSkew, tempPerspective);
+		_setLocalScaleOnly(tempScale);
+		_setLocalRotationOnly(tempRotation);
+		_setLocalPositionOnly(tempTranslate);
+		m_isChanged = KGS_FALSE;
+	}
+	
+
+
+	
 } //namespace kgs

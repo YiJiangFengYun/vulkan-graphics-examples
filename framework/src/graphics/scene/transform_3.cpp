@@ -16,20 +16,7 @@ namespace kgs
 			auto m = _getMatrixLocalToWorld(KGS_FALSE);
 			matrix = glm::inverse(m) * matrix;
 		}
-
-		VectorType tempScale;
-		RotationType tempRotation;
-		PointType tempTranslate;
-		PointType tempSkew;
-		MatrixVectorType tempPerspective;
-		glm::decompose(matrix, tempScale, tempRotation, tempTranslate, tempSkew, tempPerspective);
-		_setLocalScaleOnly(tempScale);
-		_setLocalRotationOnly(tempRotation);
-		_setLocalPositionOnly(tempTranslate);
-		m_isChanged = KGS_FALSE;
-
-		m_localMatrix = matrix;
-		//_reCalculateLocalMatrix();
+		setLocalMatrixInverse(matrix);
 	}
 
 	void Transform3::lookAt2(const PointType& worldEye, const PointType& worldTarget, const VectorType& worldUp)
@@ -40,20 +27,7 @@ namespace kgs
 			auto m = _getMatrixLocalToWorld(KGS_FALSE);
 			matrix = glm::inverse(m) * matrix;
 		}
-
-		VectorType tempScale;
-		RotationType tempRotation;
-		PointType tempTranslate;
-		PointType tempSkew;
-		MatrixVectorType tempPerspective;
-		glm::decompose(matrix, tempScale, tempRotation, tempTranslate, tempSkew, tempPerspective);
-		_setLocalScaleOnly(tempScale);
-		_setLocalRotationOnly(tempRotation);
-		_setLocalPositionOnly(tempTranslate);
-		m_isChanged = KGS_FALSE;
-
-		m_localMatrix = matrix;
-		//_reCalculateLocalMatrix();
+		setLocalMatrixInverse(matrix);
 	}
 
 	void Transform3::rotateAround(const PointType& point, const VectorType& axis, const float& angle, const VectorType& scale)

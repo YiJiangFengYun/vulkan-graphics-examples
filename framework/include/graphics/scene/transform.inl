@@ -13,6 +13,7 @@ namespace kgs
 		, m_localRotation()
 		, m_localRotationMatrix(1.0f)
 		, m_localMatrix(1.0f)
+		, m_localMatrixInverse(1.0f)
 	{
 
 	}
@@ -252,7 +253,7 @@ namespace kgs
 	void Transform<SPACE_TYPE>::_reCalculateLocalMatrix()
 	{
 		if (m_isChanged == KGS_FALSE) return;
-		m_localMatrix = m_localPosMatrix * m_localRotationMatrix * m_localScaleMatrix;
+		_setLocalMatrixOnly(m_localPosMatrix * m_localRotationMatrix * m_localScaleMatrix);
 		m_isChanged = KGS_FALSE;
 	}
 } //namespace kgs

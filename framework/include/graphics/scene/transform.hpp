@@ -67,6 +67,9 @@ namespace kgs
 
 		VectorType getScale();
 
+		void setLocalMatrix(MatrixType matrix);
+		void setLocalMatrixInverse(MatrixType matrix);
+
 		/*void apply()
 		{
 			m_isChanged = KGS_FALSE;
@@ -97,11 +100,23 @@ namespace kgs
 		RotationType m_localRotation;
 		MatrixType m_localRotationMatrix;
 		MatrixType m_localMatrix;
+		MatrixType m_localMatrixInverse;
 
 
 		void _setLocalPositionOnly(PointType position);
 		void _setLocalScaleOnly(VectorType scale);
 		void _setLocalRotationOnly(RotationType rotation);
+		void _setLocalMatrixOnly(MatrixType matrix)
+		{
+			m_localMatrix = matrix;
+			m_localMatrixInverse = glm::inverse(m_localMatrix);
+		}
+
+		void _setLocalMatrixInverseOnly(MatrixType matrix)
+		{
+			m_localMatrixInverse = matrix;
+			m_localMatrix = glm::inverse(m_localMatrixInverse);
+		}
 
 		inline MatrixType _getMatrixLocalToWorld(Bool32 includeSelf);
 

@@ -15,12 +15,6 @@
     </Filter>
   </ItemGroup>
   <ItemGroup>
-    <ClInclude Include="..\..\samples\include\chalet\stb_image.h">
-      <Filter>include\chalet</Filter>
-    </ClInclude>
-    <ClInclude Include="..\..\samples\include\chalet\tiny_obj_loader.h">
-      <Filter>include\chalet</Filter>
-    </ClInclude>
     <ClInclude Include="..\..\samples\include\chalet\window.hpp">
       <Filter>include\chalet</Filter>
     </ClInclude>

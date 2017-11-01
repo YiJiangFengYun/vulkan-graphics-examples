@@ -229,61 +229,61 @@ namespace kgs
 
 	Bool32 Renderer3::_checkVisualObjectInsideCameraView(std::shared_ptr<typename SceneType::VisualObjectType> pVisualObject)
 	{
-		////get bounds and its 8 points.
-		//auto pMesh = pVisualObject->getMesh();
-		//auto bounds = dynamic_cast<SceneType::VisualObjectType::MeshType *>(pMesh.get())->getBounds();
-		//auto min = bounds.getMin();
-		//auto max = bounds.getMax();
-		//typedef SpaceTypeInfo<SpaceType::SPACE_3>::PointType PointType;
-		//typedef SpaceTypeInfo<SpaceType::SPACE_3>::MatrixVectorType MatrixVectorType;
-		//PointType p0(min);
-		//PointType p1(max.x, min.y, min.z);
-		//PointType p2(min.x, max.y, min.z);
-		//PointType p3(min.x, min.y, max.z);
-		//PointType p4(max.x, max.y, min.z);
-		//PointType p5(max.x, min.y, max.z);
-		//PointType p6(min.x, max.y, max.z);
-		//PointType p7(max);
-		//const uint8_t pointCount = 8;
-		//PointType points[pointCount] = { p0, p1, p2, p3, p4, p5, p6, p7 };
+		//get bounds and its 8 points.
+		auto pMesh = pVisualObject->getMesh();
+		auto bounds = dynamic_cast<SceneType::VisualObjectType::MeshType *>(pMesh.get())->getBounds();
+		auto min = bounds.getMin();
+		auto max = bounds.getMax();
+		typedef SpaceTypeInfo<SpaceType::SPACE_3>::PointType PointType;
+		typedef SpaceTypeInfo<SpaceType::SPACE_3>::MatrixVectorType MatrixVectorType;
+		MatrixVectorType p0(min, 1.0f);
+		MatrixVectorType p1(max.x, min.y, min.z, 1.0f);
+		MatrixVectorType p2(min.x, max.y, min.z, 1.0f);
+		MatrixVectorType p3(min.x, min.y, max.z, 1.0f);
+		MatrixVectorType p4(max.x, max.y, min.z, 1.0f);
+		MatrixVectorType p5(max.x, min.y, max.z, 1.0f);
+		MatrixVectorType p6(min.x, max.y, max.z, 1.0f);
+		MatrixVectorType p7(max, 1.0f);
+		const uint8_t pointCount = 8;
+		MatrixVectorType points[pointCount] = { p0, p1, p2, p3, p4, p5, p6, p7 };
 
-		////get MVP matrix.
-		//auto mvpMatrix = _getMVPMatrix(pVisualObject);
+		//get MVP matrix.
+		auto mvpMatrix = _getMVPMatrix(pVisualObject);
 
-		////transform point from model coordinate system to normalize device coordinate system.
-		//for (uint8_t i = 0; i < pointCount; ++i)
-		//{
-		//	points[i] = mvpMatrix * MatrixVectorType(points[i], 1.0f);
-		//}
+		//transform point from model coordinate system to normalize device coordinate system.
+		for (uint8_t i = 0; i < pointCount; ++i)
+		{
+			points[i] = mvpMatrix * points[i];
+			points[i] = points[i] / points[i].w;
+		}
 
-		//PointType minInView;
-		//PointType maxInView;
+		PointType minInView;
+		PointType maxInView;
 
-		//typename PointType::length_type len = PointType::length();
-		//for (typename PointType::length_type i = 0; i < len; ++i)
-		//{
-		//	typename PointType::value_type min = std::numeric_limits<typename PointType::value_type>::max(), max = -std::numeric_limits<typename PointType::value_type>::max();
-		//	for (uint8_t j = 0; j < pointCount; ++j)
-		//	{
-		//		if (min > points[j][i])min = points[j][i];
-		//		if (max < points[j][i])max = points[j][i];
-		//	}
-		//	minInView[i] = min;
-		//	maxInView[i] = max;
-		//}
+		typename PointType::length_type len = PointType::length();
+		for (typename PointType::length_type i = 0; i < len; ++i)
+		{
+			typename PointType::value_type min = std::numeric_limits<typename PointType::value_type>::max(), max = -std::numeric_limits<typename PointType::value_type>::max();
+			for (uint8_t j = 0; j < pointCount; ++j)
+			{
+				if (min > points[j][i])min = points[j][i];
+				if (max < points[j][i])max = points[j][i];
+			}
+			minInView[i] = min;
+			maxInView[i] = max;
+		}
 
-		//fd::Bounds<PointType> boundsInView(minInView, maxInView);
-		//fd::Bounds<PointType> boundsOfView(PointType(-1.0f, -1.0f, 0.0f), PointType(1.0f, 1.0f, 1.0f));
+		fd::Bounds<PointType> boundsInView(minInView, maxInView);
+		fd::Bounds<PointType> boundsOfView(PointType(-1.0f, -1.0f, 0.0f), PointType(1.0f, 1.0f, 1.0f));
 
-		//Bool32 isInsideCameraView = KGS_FALSE;
-		//////check if it is inside camera view.
-		//if (boundsOfView.isIntersects(boundsInView))
-		//{
-		//	isInsideCameraView = KGS_TRUE;
-		//}
+		Bool32 isInsideCameraView = KGS_FALSE;
+		////check if it is inside camera view.
+		if (boundsOfView.isIntersects(boundsInView))
+		{
+			isInsideCameraView = KGS_TRUE;
+		}
 
-		//return isInsideCameraView;
-		return KGS_TRUE;
+		return isInsideCameraView;
 	}
 
 	Bool32 Renderer3::_sortObjectsWithCameraZ(std::shared_ptr<typename SceneType::ObjectType> pObject1, std::shared_ptr<typename SceneType::ObjectType> pObject2)

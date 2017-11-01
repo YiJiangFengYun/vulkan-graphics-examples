@@ -7,19 +7,19 @@
     <Filter Include="src">
       <UniqueIdentifier>{92326229-821d-4df5-865a-eeb0b098d0e0}</UniqueIdentifier>
     </Filter>
-    <Filter Include="include\testlib">
-      <UniqueIdentifier>{dbc93ddc-2dd4-470a-8bbb-90168f50fac8}</UniqueIdentifier>
+    <Filter Include="include\sampleslib">
+      <UniqueIdentifier>{089aa54d-a15b-45e7-97d9-9af5f4c71944}</UniqueIdentifier>
     </Filter>
-    <Filter Include="src\testlib">
-      <UniqueIdentifier>{84646f6f-be73-47b0-8834-cfb9516a77c9}</UniqueIdentifier>
+    <Filter Include="src\sampleslib">
+      <UniqueIdentifier>{795b17fc-d686-4896-844f-92b4898963ea}</UniqueIdentifier>
     </Filter>
   </ItemGroup>
   <ItemGroup>
-    <ClInclude Include="..\..\test\include\testlib\stb_image.h">
-      <Filter>include\testlib</Filter>
+    <ClInclude Include="..\..\samples\include\sampleslib\tiny_obj_loader.h">
+      <Filter>include\sampleslib</Filter>
     </ClInclude>
-    <ClInclude Include="..\..\test\include\testlib\tiny_obj_loader.h">
-      <Filter>include\testlib</Filter>
+    <ClInclude Include="..\..\samples\include\sampleslib\stb_image.h">
+      <Filter>include\sampleslib</Filter>
     </ClInclude>
   </ItemGroup>
 </Project>

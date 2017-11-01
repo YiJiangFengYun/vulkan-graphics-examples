@@ -20,8 +20,6 @@
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="..\..\samples\include\chalet\app.hpp" />
-    <ClInclude Include="..\..\samples\include\chalet\stb_image.h" />
-    <ClInclude Include="..\..\samples\include\chalet\tiny_obj_loader.h" />
     <ClInclude Include="..\..\samples\include\chalet\window.hpp" />
   </ItemGroup>
   <ItemGroup>

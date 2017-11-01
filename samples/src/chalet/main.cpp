@@ -7,9 +7,9 @@
 
 //Main.obj will contain implementions of stb_image and tiny_obj_loader.
 #define STB_IMAGE_IMPLEMENTATION
-#include "chalet/stb_image.h"
+#include "sampleslib/stb_image.h"
 #define TINYOBJLOADER_IMPLEMENTATION
-#include "chalet/tiny_obj_loader.h"
+#include "sampleslib/tiny_obj_loader.h"
 
 const uint32_t WINDOW_WIDTH = 800;
 const uint32_t WINDOW_HEIGHT = 600;

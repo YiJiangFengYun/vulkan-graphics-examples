@@ -2,8 +2,8 @@
 #define WINDOW_H
 
 #include <framework/framework.hpp>
-#include "chalet/stb_image.h"
-#include "chalet/tiny_obj_loader.h"
+#include "sampleslib/stb_image.h"
+#include "sampleslib/tiny_obj_loader.h"
 
 namespace chalet
 {

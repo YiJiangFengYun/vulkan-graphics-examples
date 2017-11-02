@@ -228,9 +228,9 @@ namespace testTriangle
 
 	void Window::_loadModel()
 	{
-		m_tempPositions = { kgs::Vector3(0.0f, -0.5f, 0.0f)
-		, kgs::Vector3(-0.5f, 0.5f, 0.0f)
-		, kgs::Vector3(0.5f, 0.5f, 0.0f)
+		m_tempPositions = { kgs::Vector3(0.0f, -0.5f, 0.5f)
+		, kgs::Vector3(-0.5f, 0.5f, 0.5f)
+		, kgs::Vector3(0.5f, 0.5f, 0.5f)
 		};
 
 		m_tempColors = { kgs::Color32(255, 0, 0, 255)
@@ -276,7 +276,7 @@ namespace testTriangle
 		m_pCamera = std::shared_ptr<kgs::Camera3>(new kgs::Camera3());
 		m_pCamera->setAspect(m_swapchainExtent.width / (float)(m_swapchainExtent.height));
 		m_pCamera->setFovY(glm::radians(45.0f));
-		m_pCamera->setZNear(0.0f);
+		m_pCamera->setZNear(0.1f);
 		m_pCamera->setZFar(10.0f);
 		m_pCamera->apply();
 	}

@@ -93,6 +93,7 @@ namespace kgs
 		, m_applied(KGS_FALSE)
 		, m_cullMode(CullModeFlagBits::eBack)
 		, m_frontFace(FrontFaceType::eCounterClockwise)
+		, m_buildInData()
 	{
 	}
 
@@ -159,15 +160,32 @@ namespace kgs
 			DescriptorType::COMBINED_IMAGE_SAMPLER, ShaderStageFlagBits::FRAGMENT);
 	}
 
-	MaterialData::BuildInData Pass::getBuildInData() const
+	Color Pass::getMainColor() const
 	{
-		return getDataValue<MaterialData::BuildInData>(KGS_M_BUILDIN_NAME);
+		return m_buildInData.mainColor;
 	}
 
-	void Pass::setBuildInData(MaterialData::BuildInData buildInData)
+	void Pass::setMainColor(Color color)
 	{
+		m_buildInData.mainColor = color;
 		setDataValue(KGS_M_BUILDIN_NAME
-			, buildInData
+			, m_buildInData
+			, KGS_M_BUILDIN_BINDING
+			, DescriptorType::UNIFORM_BUFFER
+			, ShaderStageFlagBits::VERTEX
+		);
+	}
+
+	void Pass::_setBuildInMatrixData(Matrix4x4 matrixObjectToNDC
+		, Matrix4x4 matrixObjectToView
+		, Matrix4x4 matrixObjectToWorld
+	)
+	{
+		m_buildInData.matrixObjectToNDC = matrixObjectToNDC;
+		m_buildInData.matrixObjectToView = matrixObjectToView;
+		m_buildInData.matrixObjectToWorld = matrixObjectToWorld;
+		setDataValue(KGS_M_BUILDIN_NAME
+			, m_buildInData
 			, KGS_M_BUILDIN_BINDING
 			, DescriptorType::UNIFORM_BUFFER
 			, ShaderStageFlagBits::VERTEX

@@ -153,14 +153,11 @@ namespace kgs
 					auto viewMatrix = m_pCamera->getTransform()->getMatrixWorldToLocal();
 					auto modelMatrix = pVisualObject->getTransform()->getMatrixLocalToWorld();
 					auto mvMatrix = viewMatrix * modelMatrix;
-					MaterialData::BuildInData buildInData = {
-						projMatrix * mvMatrix,
-						Color(1.0f, 1.0f, 1.0f, 1.0f),
-						mvMatrix,
-						modelMatrix
-					};
 
-					pPass->setBuildInData(buildInData);
+					pPass->_setBuildInMatrixData(projMatrix * mvMatrix
+						, mvMatrix
+						, modelMatrix
+					);
 
 					pPass->apply();
 				}

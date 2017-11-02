@@ -315,6 +315,13 @@ namespace testTriangle
 
 	void Window::_update()
 	{
+		static auto startTime = std::chrono::high_resolution_clock::now();
+
+		auto currentTime = std::chrono::high_resolution_clock::now();
+		auto duration = currentTime - startTime;
+		float time = std::chrono::duration_cast<std::chrono::milliseconds>(currentTime - startTime).count() / 1000.0f;
+		float strength = remainder(time, 1.0f) / 1.0f;
+		m_pPass->setMainColor(kgs::Color(strength, strength, strength, 1.0f));
 	}
 
 	void Window::_onPostUpdate()

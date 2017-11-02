@@ -88,8 +88,14 @@ namespace kgs
 		const std::shared_ptr<Texture> &getMainTexture() const;
 		void setMainTexture(const std::shared_ptr<Texture> value);
 
-		MaterialData::BuildInData getBuildInData() const;
-		void setBuildInData(MaterialData::BuildInData buildInData);
+		Color getMainColor() const;
+		void setMainColor(Color color);
+
+
+		void _setBuildInMatrixData(Matrix4x4 matrixObjectToNDC
+			, Matrix4x4 matrixObjectToView
+			, Matrix4x4 matrixObjectToWorld
+		);
 
 		void apply();
 
@@ -119,6 +125,8 @@ namespace kgs
 
 		CullModeFlags m_cullMode;
 		FrontFaceType m_frontFace;
+
+		MaterialData::BuildInData m_buildInData;
 
 		//aggregations
 		std::shared_ptr<Shader> m_pShader;

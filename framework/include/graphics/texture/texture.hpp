@@ -6,6 +6,7 @@
 #include "foundation/wrapper.hpp"
 #include "graphics/util/find_memory.hpp"
 #include "graphics/global.hpp"
+#include "graphics/module.hpp"
 #include "graphics/util/single_time_command.hpp"
 #include "graphics/texture/texture_option.hpp"
 #include "graphics/context.hpp"

@@ -2,7 +2,6 @@
 #define GFW_FRAMEWORK_H
 
 #include "framework/global.hpp"
-#include "framework/app/vulkan_ext.hpp"
 #include "framework/app/app.hpp"
 #include "framework/app/window.hpp"
 

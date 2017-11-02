@@ -1,4 +1,5 @@
 #include "graphics/util/single_time_command.hpp"
+#include "graphics/module.hpp"
 
 namespace kgs
 {

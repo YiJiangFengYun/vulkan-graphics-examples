@@ -5,16 +5,16 @@
 #define DEBUG
 #endif // _DEBUG
 
-#ifndef GLFW_INCLUDE_VULKAN
-#define GLFW_INCLUDE_VULKAN
-#endif // !GLFW_INCLUDE_VULKAN
-
 #define KGS_FALSE 0
 #define KGS_TRUE 1
 
+#ifdef DEBUG
+#define ENABLE_VALIDATION_LAYERS
+#endif // DEBUG
+
 #include <cstdint>
 #include <foundation/foundation.hpp>
-#include "graphics/context.hpp"
+
 
 
 namespace kgs
@@ -44,16 +44,6 @@ namespace kgs
 	extern const Color COLOR_GRAY;
 	extern const Color COLOR_GREY;
 	extern const Color COLOR_MAGENTA;
-	
-
-	extern Bool32 isInited;
-	extern std::shared_ptr<Context> pContext;
-	extern void moduleCreate(std::shared_ptr<vk::PhysicalDevice> pPhysicalDevice
-		, std::shared_ptr<vk::Device> pNativeDevice
-		, vk::Queue graphicsQueue
-		, uint32_t graphicsFamily
-	);
-	extern void moduleDestory();
 }
 
 

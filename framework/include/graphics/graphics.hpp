@@ -2,6 +2,8 @@
 #define KGS_GRAPHICS_H
 
 #include <graphics/global.hpp>
+#include <graphics/module.hpp>
+#include <graphics/app/app.hpp>
 #include <graphics/mesh/mesh.hpp>
 #include <graphics/mesh/mesh_2.hpp>
 #include <graphics/mesh/mesh_3.hpp>
@@ -26,6 +28,9 @@
 #include <graphics/scene/camera_3.hpp>
 #include <graphics/scene/visual_object_2.hpp>
 #include <graphics/scene/visual_object_3.hpp>
+
+#include <graphics/util/queue_family.hpp>
+#include <graphics/util/swapchain_info.hpp>
 
 
 namespace kgs

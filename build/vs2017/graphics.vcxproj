@@ -19,6 +19,7 @@
     </ProjectConfiguration>
   </ItemGroup>
   <ItemGroup>
+    <ClCompile Include="..\..\framework\src\graphics\app\app.cpp" />
     <ClCompile Include="..\..\framework\src\graphics\context.cpp" />
     <ClCompile Include="..\..\framework\src\graphics\global.cpp" />
     <ClCompile Include="..\..\framework\src\graphics\material\material.cpp" />
@@ -31,6 +32,7 @@
     <ClCompile Include="..\..\framework\src\graphics\mesh\mesh_3.cpp" />
     <ClCompile Include="..\..\framework\src\graphics\mesh\mesh_data.cpp" />
     <ClCompile Include="..\..\framework\src\graphics\mesh\mesh_option.cpp" />
+    <ClCompile Include="..\..\framework\src\graphics\module.cpp" />
     <ClCompile Include="..\..\framework\src\graphics\renderer\renderer.cpp" />
     <ClCompile Include="..\..\framework\src\graphics\renderer\renderer_2.cpp" />
     <ClCompile Include="..\..\framework\src\graphics\renderer\renderer_3.cpp" />
@@ -65,10 +67,14 @@
     <ClCompile Include="..\..\framework\src\graphics\texture\texture_option.cpp" />
     <ClCompile Include="..\..\framework\src\graphics\texture\texture_depth_stencil_attachment.cpp" />
     <ClCompile Include="..\..\framework\src\graphics\util\find_memory.cpp" />
+    <ClCompile Include="..\..\framework\src\graphics\util\queue_family.cpp" />
     <ClCompile Include="..\..\framework\src\graphics\util\single_time_command.cpp" />
+    <ClCompile Include="..\..\framework\src\graphics\util\swapchain_info.cpp" />
     <ClCompile Include="..\..\framework\src\graphics\util\util.cpp" />
+    <ClCompile Include="..\..\framework\src\graphics\util\vulkan_ext.cpp" />
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="..\..\framework\include\graphics\app\app.hpp" />
     <ClInclude Include="..\..\framework\include\graphics\context.hpp" />
     <ClInclude Include="..\..\framework\include\graphics\global.hpp" />
     <ClInclude Include="..\..\framework\include\graphics\graphics.hpp" />
@@ -82,6 +88,7 @@
     <ClInclude Include="..\..\framework\include\graphics\mesh\mesh_3.hpp" />
     <ClInclude Include="..\..\framework\include\graphics\mesh\mesh_data.hpp" />
     <ClInclude Include="..\..\framework\include\graphics\mesh\mesh_option.hpp" />
+    <ClInclude Include="..\..\framework\include\graphics\module.hpp" />
     <ClInclude Include="..\..\framework\include\graphics\renderer\renderer.hpp" />
     <ClInclude Include="..\..\framework\include\graphics\renderer\renderer_2.hpp" />
     <ClInclude Include="..\..\framework\include\graphics\renderer\renderer_3.hpp" />
@@ -116,8 +123,11 @@
     <ClInclude Include="..\..\framework\include\graphics\texture\texture_option.hpp" />
     <ClInclude Include="..\..\framework\include\graphics\texture\texture_depth_stencil_attachment.hpp" />
     <ClInclude Include="..\..\framework\include\graphics\util\find_memory.hpp" />
+    <ClInclude Include="..\..\framework\include\graphics\util\queue_family.hpp" />
     <ClInclude Include="..\..\framework\include\graphics\util\single_time_command.hpp" />
+    <ClInclude Include="..\..\framework\include\graphics\util\swapchain_info.hpp" />
     <ClInclude Include="..\..\framework\include\graphics\util\util.hpp" />
+    <ClInclude Include="..\..\framework\include\graphics\util\vulkan_ext.hpp" />
   </ItemGroup>
   <ItemGroup>
     <None Include="..\..\framework\include\graphics\material\material_data.inl" />

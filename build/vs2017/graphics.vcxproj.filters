@@ -49,6 +49,12 @@
     <Filter Include="src\graphics\renderer">
       <UniqueIdentifier>{b71dd6a9-b375-4df8-b6e3-df5ff150c182}</UniqueIdentifier>
     </Filter>
+    <Filter Include="include\graphics\app">
+      <UniqueIdentifier>{b73a36a6-5994-4f4e-a1e9-e827f9e7fb68}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="src\graphics\app">
+      <UniqueIdentifier>{d32ab61e-a74f-4a9e-9c01-89e8b933232c}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="..\..\framework\src\graphics\texture\texture.cpp">
@@ -194,6 +200,21 @@
     </ClCompile>
     <ClCompile Include="..\..\framework\src\graphics\mesh\mesh_2.cpp">
       <Filter>src\graphics\mesh</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\framework\src\graphics\app\app.cpp">
+      <Filter>src\graphics\app</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\framework\src\graphics\util\vulkan_ext.cpp">
+      <Filter>src\graphics\util</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\framework\src\graphics\util\queue_family.cpp">
+      <Filter>src\graphics\util</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\framework\src\graphics\util\swapchain_info.cpp">
+      <Filter>src\graphics\util</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\framework\src\graphics\module.cpp">
+      <Filter>src\graphics</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
@@ -342,6 +363,21 @@
       <Filter>include\graphics\mesh</Filter>
     </ClInclude>
     <ClInclude Include="..\..\framework\include\graphics\global.hpp">
+      <Filter>include\graphics</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\framework\include\graphics\app\app.hpp">
+      <Filter>include\graphics\app</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\framework\include\graphics\util\vulkan_ext.hpp">
+      <Filter>include\graphics\util</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\framework\include\graphics\util\queue_family.hpp">
+      <Filter>include\graphics\util</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\framework\include\graphics\util\swapchain_info.hpp">
+      <Filter>include\graphics\util</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\framework\include\graphics\module.hpp">
       <Filter>include\graphics</Filter>
     </ClInclude>
   </ItemGroup>

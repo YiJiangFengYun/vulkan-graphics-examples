@@ -9,21 +9,9 @@
 #include <vulkan/vulkan.hpp>
 #include <graphics/graphics.hpp>
 #include "framework/global.hpp"
-#include "framework/app/vulkan_ext.hpp"
-#include "framework/app/queue_family.hpp"
 
 namespace gfw
 {
-	struct SwapChainSupportDetails {
-		vk::SurfaceCapabilitiesKHR capabilities;
-		std::vector<vk::SurfaceFormatKHR> formats;
-		std::vector<vk::PresentModeKHR> presentModes;
-		SwapChainSupportDetails static querySwapChainSupport(const vk::PhysicalDevice& physicalDevice, const vk::SurfaceKHR& surface);
-	    vk::SurfaceFormatKHR chooseSurfaceFormat();
-		vk::PresentModeKHR choosePresentMode();
-		vk::Extent2D chooseExtent(GLFWwindow* window);
-	};
-
 	class Window
 	{
 	public:

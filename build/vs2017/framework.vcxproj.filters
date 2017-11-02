@@ -33,12 +33,6 @@
     </Filter>
   </ItemGroup>
   <ItemGroup>
-    <ClCompile Include="..\..\framework\src\framework\app\queue_family.cpp">
-      <Filter>src\framework\app</Filter>
-    </ClCompile>
-    <ClCompile Include="..\..\framework\src\framework\app\vulkan_ext.cpp">
-      <Filter>src\framework\app</Filter>
-    </ClCompile>
     <ClCompile Include="..\..\framework\src\framework\app\window.cpp">
       <Filter>src\framework\app</Filter>
     </ClCompile>
@@ -76,12 +70,6 @@
     </ClInclude>
     <ClInclude Include="..\..\framework\include\framework\framework.hpp">
       <Filter>include\framework</Filter>
-    </ClInclude>
-    <ClInclude Include="..\..\framework\include\framework\app\queue_family.hpp">
-      <Filter>include\framework\app</Filter>
-    </ClInclude>
-    <ClInclude Include="..\..\framework\include\framework\app\vulkan_ext.hpp">
-      <Filter>include\framework\app</Filter>
     </ClInclude>
     <ClInclude Include="..\..\framework\include\framework\app\window.hpp">
       <Filter>include\framework\app</Filter>

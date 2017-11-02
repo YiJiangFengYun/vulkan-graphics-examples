@@ -20,8 +20,6 @@
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="..\..\framework\src\framework\app\app.cpp" />
-    <ClCompile Include="..\..\framework\src\framework\app\queue_family.cpp" />
-    <ClCompile Include="..\..\framework\src\framework\app\vulkan_ext.cpp" />
     <ClCompile Include="..\..\framework\src\framework\app\window.cpp" />
     <ClCompile Include="..\..\framework\src\framework\global.cpp" />
     <ClCompile Include="..\..\framework\src\framework\util\thread_master.cpp" />
@@ -30,8 +28,6 @@
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="..\..\framework\include\framework\app\app.hpp" />
-    <ClInclude Include="..\..\framework\include\framework\app\queue_family.hpp" />
-    <ClInclude Include="..\..\framework\include\framework\app\vulkan_ext.hpp" />
     <ClInclude Include="..\..\framework\include\framework\app\window.hpp" />
     <ClInclude Include="..\..\framework\include\framework\framework.hpp" />
     <ClInclude Include="..\..\framework\include\framework\global.hpp" />

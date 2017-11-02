@@ -42,6 +42,11 @@ namespace kgs
 		return m_graphicsQueue;
 	}
 
+	uint32_t Context::getGraphicsFamily()
+	{
+		return m_graphicsFamily;
+	}
+
 	std::shared_ptr<vk::CommandPool> Context::getCommandPoolForTransientBuffer()
 	{
 		return m_pCommandPoolForTransientBuffer;

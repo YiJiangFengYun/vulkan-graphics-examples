@@ -49,6 +49,8 @@ namespace kgs
 		std::shared_ptr<vk::RenderPass> m_pRenderPass;
 		std::shared_ptr<TextureDepthStencilAttachment> m_pDepthStencilTexture;
 		std::shared_ptr<vk::Framebuffer> m_pFrameBuffer;
+		//Command pool for render safe in multiply threads.
+		std::shared_ptr<vk::CommandPool> m_pCommandPool;
 		std::shared_ptr<vk::CommandBuffer> m_pCommandBuffer;
 
 		std::vector<std::shared_ptr<vk::PipelineLayout>> m_arrPLastPipelineLayouts;
@@ -68,6 +70,7 @@ namespace kgs
 		void _createRenderPass();
 		void _createDepthStencilTex();
 		void _createFramebuffer();
+		void _createCommandPool();
 		void _createCommandBuffer();
 
 		void _createPipelineForRender(std::shared_ptr<vk::PipelineLayout> &pPipelineLayout, 
@@ -129,6 +132,7 @@ namespace kgs
 		std::shared_ptr<CameraType> m_pCamera;
 
 		Bool32 _isValidForRender() override;
+
 		void _render(const RenderInfo &info, RenderResultInfo &resultInfo) override;
 
 		virtual Bool32 _checkVisualObjectInsideCameraView(std::shared_ptr<typename SceneType::VisualObjectType> pVisualObject) = 0;

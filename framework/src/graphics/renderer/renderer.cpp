@@ -233,12 +233,14 @@ namespace kgs
 		uint32_t subMeshIndex,
 		uint32_t passIndex)
 	{
+		LOG(plog::debug) << "Pre begin command buffer for render." << std::endl;
 		vk::CommandBufferBeginInfo beginInfo = {
 			vk::CommandBufferUsageFlagBits::eSimultaneousUse,  //flags
 			nullptr                                            //pInheritanceInfo
 		};
 
 		m_pCommandBuffer->begin(beginInfo);
+		LOG(plog::debug) << "Post begin command buffer for render." << std::endl;
 
 		std::array<vk::ClearValue, 2> clearValues = { {
 				vk::ClearValue(vk::ClearColorValue(std::array<float, 4>{{0.0f, 0.0f, 0.0f, 0.0f}})),
@@ -274,7 +276,9 @@ namespace kgs
 
 		m_pCommandBuffer->endRenderPass();
 
+		LOG(plog::debug) << "Pre end command buffer." << std::endl;
 		m_pCommandBuffer->end();
+		LOG(plog::debug) << "Post end command buffer." << std::endl;
 	}
 
 	void BaseRenderer::_init()
@@ -282,6 +286,7 @@ namespace kgs
 		_createRenderPass();
 		_createDepthStencilTex();
 		_createFramebuffer();
+		_createCommandPool();
 		_createCommandBuffer();
 	}
 
@@ -392,9 +397,20 @@ namespace kgs
 		m_pFrameBuffer = fd::createFrameBuffer(pDevice, createInfo);
 	}
 
+	void BaseRenderer::_createCommandPool()
+	{
+		auto pDevice = pContext->getNativeDevice();
+		auto graphicsFamily = pContext->getGraphicsFamily();
+		vk::CommandPoolCreateInfo createInfo = {
+			vk::CommandPoolCreateFlagBits::eResetCommandBuffer,
+			graphicsFamily
+		};
+		m_pCommandPool = fd::createCommandPool(pDevice, createInfo);
+	}
+
 	void BaseRenderer::_createCommandBuffer()
 	{
-		auto pCommandPool = pContext->getCommandPoolForResetBuffer();
+		auto pCommandPool = m_pCommandPool;
 		vk::CommandBufferAllocateInfo allocateInfo = {
 			*pCommandPool,                             //commandPool
 			vk::CommandBufferLevel::ePrimary,          //level
@@ -402,6 +418,9 @@ namespace kgs
 		};
 
 		auto pDevice = pContext->getNativeDevice();
+
+		LOG(plog::debug) << "Pre allocate command buffer from pool." << std::endl;
 		m_pCommandBuffer = fd::allocateCommandBuffer(pDevice, pCommandPool, allocateInfo);
+		LOG(plog::debug) << "Post allocate command buffer from pool." << std::endl;
 	}
 }

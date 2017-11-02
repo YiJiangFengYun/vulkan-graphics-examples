@@ -206,7 +206,9 @@ namespace kgs
 			}
 		}
 
+		LOG(plog::debug) << "Pre submit to grahics queue." << std::endl;
 		pContext->getGraphicsQueue().submit(submitInfos, nullptr);
+		LOG(plog::debug) << "Post submit to grahics queue." << std::endl;
 
 		resultInfo.signalSemaphoreCount = static_cast<uint32_t>(m_arrSemaphores.size());
 		resultInfo.pSignalSemaphores = m_arrSemaphores.data();

@@ -363,10 +363,10 @@ namespace kgs
 		for (int32_t queueFamilyIndex : uniqueFamilyIndices)
 		{
 			vk::DeviceQueueCreateInfo queueCreateInfo = {
-				vk::DeviceQueueCreateFlags(),
-				static_cast<uint32_t>(queueFamilyIndex),
-				uint32_t(1),
-				&queuePriority
+				vk::DeviceQueueCreateFlags(),                 //flags
+				static_cast<uint32_t>(queueFamilyIndex),      //queueFamilyIndex
+				uint32_t(1),                                  //queueCount
+				&queuePriority                                //pQueuePriorities
 			};
 			queueCreateInfos[index] = queueCreateInfo;
 			++index;

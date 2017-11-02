@@ -1,4 +1,5 @@
 Graphics:
+.Device queue management.
 .Problem of multiply thread of the main window and sub windows.
 .orthographic for camera3 and its volume.
 .orthographic for camera2 and its volume.

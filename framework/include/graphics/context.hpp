@@ -21,6 +21,7 @@ namespace kgs
 		vk::Queue getGraphicsQueue();
 		std::shared_ptr<vk::CommandPool> getCommandPoolForTransientBuffer();
 		std::shared_ptr<vk::CommandPool> getCommandPoolForResetBuffer();
+		uint32_t getGraphicsFamily();
 	private:
 		std::shared_ptr<vk::PhysicalDevice> m_pPhysicalDevice;
 		std::shared_ptr<vk::Device> m_pNativeDevice;

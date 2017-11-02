@@ -9,7 +9,6 @@
 #include "graphics/module.hpp"
 #include "graphics/util/single_time_command.hpp"
 #include "graphics/texture/texture_option.hpp"
-#include "graphics/context.hpp"
 
 namespace kgs
 {
@@ -64,7 +63,6 @@ namespace kgs
 	    std::vector<std::vector<Color32>> m_arrTempColors;
 
 		//--aggregations
-		std::shared_ptr<Context> m_pContext;
 
 		std::shared_ptr<vk::Image> m_pImage;
 		std::shared_ptr<vk::DeviceMemory> m_pMemory;

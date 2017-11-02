@@ -26,6 +26,7 @@ namespace kgs
 			if (queueFamilyProperty.queueCount > 0 && queueFamilyProperty.queueFlags & vk::QueueFlagBits::eGraphics)
 			{
 				data.graphicsFamily = i;
+				data.graphicsMaxQueueCount = queueFamilyProperty.queueCount;
 			}
 
 			vk::Bool32 presentSupport = VK_FALSE;
@@ -33,6 +34,7 @@ namespace kgs
 			if (queueFamilyProperty.queueCount > 0 && presentSupport)
 			{
 				data.presentFamily = i;
+				data.presentMaxQueueCount = queueFamilyProperty.queueCount;
 			}
 
 			if (data.isComplete()) {

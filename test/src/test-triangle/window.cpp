@@ -9,20 +9,10 @@ namespace testTriangle
 	Window::Window(uint32_t width
 		, uint32_t height
 		, const char* title
-		, std::shared_ptr<vk::Instance> pInstance
-		, std::shared_ptr<vk::PhysicalDevice> pPhysicalDevice
-		, std::shared_ptr<vk::Device> device
-		, vk::Queue graphicsQueue
-		, vk::Queue presentQueue
 	)
 		: gfw::Window(width
 			, height
 			, title
-			, pInstance
-			, pPhysicalDevice
-			, device
-			, graphicsQueue
-			, presentQueue
 		)
 	{
 		_loadModel();
@@ -38,21 +28,11 @@ namespace testTriangle
 		, uint32_t height
 		, const char* title
 		, RenderType renderType
-		, std::shared_ptr<vk::Instance> pInstance
-		, std::shared_ptr<vk::PhysicalDevice> pPhysicalDevice
-		, std::shared_ptr<vk::Device> pDevice
-		, vk::Queue graphicsQueue
-		, vk::Queue presentQueue
 	)
 		: gfw::Window(width
 			, height
 			, title
 			, renderType
-			, pInstance
-			, pPhysicalDevice
-			, pDevice
-			, graphicsQueue
-			, presentQueue
 		)
 	{
 		_loadModel();
@@ -66,19 +46,9 @@ namespace testTriangle
 
 	Window::Window(std::shared_ptr<GLFWwindow> pWindow
 		, std::shared_ptr<vk::SurfaceKHR> pSurface
-		, std::shared_ptr<vk::Instance> pInstance
-		, std::shared_ptr<vk::PhysicalDevice> pPhysicalDevice
-		, std::shared_ptr<vk::Device> pDevice
-		, vk::Queue graphicsQueue
-		, vk::Queue presentQueue
 	)
 		: gfw::Window(pWindow
 			, pSurface
-			, pInstance
-			, pPhysicalDevice
-			, pDevice
-			, graphicsQueue
-			, presentQueue
 		)
 	{
 		_loadModel();
@@ -93,20 +63,10 @@ namespace testTriangle
 	Window::Window(RenderType renderType
 		, std::shared_ptr<GLFWwindow> pWindow
 		, std::shared_ptr<vk::SurfaceKHR> pSurface
-		, std::shared_ptr<vk::Instance> pInstance
-		, std::shared_ptr<vk::PhysicalDevice> pPhysicalDevice
-		, std::shared_ptr<vk::Device> pDevice
-		, vk::Queue graphicsQueue
-		, vk::Queue presentQueue
 	)
 		: gfw::Window(renderType
 			, pWindow
 			, pSurface
-			, pInstance
-			, pPhysicalDevice
-			, pDevice
-			, graphicsQueue
-			, presentQueue
 		)
 	{
 		_loadModel();

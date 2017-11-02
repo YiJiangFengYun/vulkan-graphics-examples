@@ -9,6 +9,9 @@
 #include "framework/app/window.hpp"
 #include "framework/util/thread_master.hpp"
 
+#define DEFAULT_GRAPHICS_QUEUE_COUNT 10
+#define DEFAULT_PRESENT_QUEUE_COUNT 5
+
 namespace gfw
 {
 
@@ -30,6 +33,8 @@ namespace gfw
 		uint32_t m_width;
 		uint32_t m_height;
 		const char *m_title;
+		uint32_t m_graphicsQueueCount;
+		uint32_t m_presentQueuecount;
 		std::shared_ptr<gfw::Window> m_pWindow;
 		std::vector<std::shared_ptr<gfw::Window>> m_pSubWindows;
 

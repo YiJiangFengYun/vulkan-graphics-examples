@@ -2,16 +2,16 @@
 #define KGS_MODULE_H
 
 #include "graphics/global.hpp"
-#include "graphics/context.hpp"
 #include "graphics/app/app.hpp"
 
 namespace kgs
 {
 	extern Bool32 isInited;
 	extern std::shared_ptr<Application> pApp;
-	extern std::shared_ptr<Context> pContext;
 	extern void moduleCreateVkinstance(std::string name, uint32_t version);
-	extern void moduleCreateOther(std::shared_ptr<vk::SurfaceKHR> pSurface);
+	extern void moduleCreateOther(std::shared_ptr<vk::SurfaceKHR> pSurface
+		, uint32_t graphicsQueueCount
+		, uint32_t presentQueueCount);
 	extern void moduleDestory();
 } //namespace kgs
 

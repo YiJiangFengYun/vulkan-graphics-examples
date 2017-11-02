@@ -34,7 +34,6 @@ namespace kgs
 		std::shared_ptr<vk::ShaderModule> m_pFragShaderModule;
 
 		//aggregations.
-		std::shared_ptr<Context> m_pContext;
 
 		//tool methods
 		std::shared_ptr<vk::ShaderModule> _createShaderModule(const std::vector<char>& code);

@@ -118,7 +118,6 @@ namespace kgs
 		void _fillCommandBufferForRender(uint32_t subMeshIndex, vk::CommandBuffer &commandBuffer);
 
 	protected:
-		std::shared_ptr<Context> m_pContext;
 		MeshType m_meshType;
 		uint32_t m_vertexCount;
 		std::shared_ptr<MeshData> m_pData;

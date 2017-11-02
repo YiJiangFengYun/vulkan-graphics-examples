@@ -45,41 +45,21 @@ namespace gfw
 		Window(uint32_t width
 			, uint32_t height
 			, const char* title
-			, std::shared_ptr<vk::Instance> pInstance
-			, std::shared_ptr<vk::PhysicalDevice> pPhysicalDevice
-			, std::shared_ptr<vk::Device> pDevice
-			, vk::Queue graphicsQueue
-			, vk::Queue presentQueue
 		);
 
 		Window(uint32_t width
 			, uint32_t height
 			, const char* title
 			, RenderType renderType
-			, std::shared_ptr<vk::Instance> pInstance
-			, std::shared_ptr<vk::PhysicalDevice> pPhysicalDevice
-			, std::shared_ptr<vk::Device> pDevice
-			, vk::Queue graphicsQueue
-			, vk::Queue presentQueue
 		);
 
 		Window(std::shared_ptr<GLFWwindow> pWindow
 			, std::shared_ptr<vk::SurfaceKHR> pSurface
-			, std::shared_ptr<vk::Instance> pInstance
-			, std::shared_ptr<vk::PhysicalDevice> pPhysicalDevice
-			, std::shared_ptr<vk::Device> pDevice
-			, vk::Queue graphicsQueue
-			, vk::Queue presentQueue
 		);
 
 		Window(RenderType renderType
 			, std::shared_ptr<GLFWwindow> pWindow
 			, std::shared_ptr<vk::SurfaceKHR> pSurface
-			, std::shared_ptr<vk::Instance> pInstance
-			, std::shared_ptr<vk::PhysicalDevice> pPhysicalDevice
-			, std::shared_ptr<vk::Device> pDevice
-			, vk::Queue graphicsQueue
-			, vk::Queue presentQueue
 		);
 
 		virtual ~Window();
@@ -100,9 +80,10 @@ namespace gfw
 		vk::Format m_swapchainImageFormat;
 		vk::Extent2D m_swapchainExtent;
 		std::vector<std::shared_ptr<vk::ImageView>> m_pSwapchainImageViews;
+		vk::Queue m_presentQueue;
+		uint32_t m_presentQueueIndex;
 		std::vector<std::shared_ptr<kgs::BaseRenderer>> m_pRenderers;
 		std::shared_ptr<vk::Semaphore> m_pImageAvailableSemaphore;
-		//std::shared_ptr<vk::Semaphore> m_pRenderFinishedSemaphore;
 
 		//std::mutex m_windowMutex;
 
@@ -110,18 +91,16 @@ namespace gfw
 		std::shared_ptr<vk::CommandBuffer> m_pCurrCommandBuffer;
 
 		//--aggregations
-		std::shared_ptr<vk::Instance> m_pVKInstance;
-		std::shared_ptr<vk::PhysicalDevice> m_pPhysicalDevice;
-		std::shared_ptr<vk::Device> m_pDevice;
-		vk::Queue m_graphicsQueue;
-		vk::Queue m_presentQueue;
 
 		void _createWindow(uint32_t width, uint32_t height, const char* title);
 		void _createSurface();
+		void _allocatePresentQueue();
 		void _createSwapchain();
 		void _createSwapchainImageViews();
 		void _createRenderers();
 		void _createSemaphores();
+
+		void _freePresentQueue();
 
 		void _reCreate();
 

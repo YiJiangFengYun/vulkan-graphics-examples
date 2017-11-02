@@ -3,7 +3,6 @@
 namespace kgs
 {
 	std::shared_ptr<Application> pApp;
-	std::shared_ptr<Context> pContext;
 	Bool32 isInited = KGS_FALSE;
 	void moduleCreateVkinstance(std::string name, uint32_t version)
 	{
@@ -13,21 +12,17 @@ namespace kgs
 		pApp->initCreateVkInstance();
 	}
 
-	void moduleCreateOther(std::shared_ptr<vk::SurfaceKHR> pSurface)
+	void moduleCreateOther(std::shared_ptr<vk::SurfaceKHR> pSurface
+		, uint32_t graphicsQueueCount
+		, uint32_t presentQueueCount
+	)
 	{
-		pApp->initOther(pSurface);
-		auto pPhysicalDevice = pApp->getPhysicalDevice();
-		auto pNativeDevice = pApp->getDevice();
-		auto graphicsQueue = pApp->getGraphicsQueue();
-		UsedQueueFamily usedQueueFamily = UsedQueueFamily::findQueueFamilies(*pPhysicalDevice, *pSurface);
-		auto graphicsFamily = usedQueueFamily.graphicsFamily;
-		pContext = std::shared_ptr<Context>(new Context(pPhysicalDevice, pNativeDevice, graphicsQueue, graphicsFamily));
+		pApp->initOther(pSurface, graphicsQueueCount, presentQueueCount);
 		isInited = KGS_TRUE;
 	}
 
 	void moduleDestory()
 	{
-		pContext = nullptr;
 		pApp = nullptr;
 		//fd::moduleDestroy();
 		isInited = KGS_FALSE;

@@ -29,7 +29,7 @@ namespace kgs
 		inline void _checkDepthFormat()
 		{
 			_updateVkFormat();
-			auto pPhysicalDevice = pContext->getPhysicalDevice();
+			auto pPhysicalDevice = pApp->getPhysicalDevice();
 			auto props = pPhysicalDevice->getFormatProperties(m_vkFormat);
 			if ((props.optimalTilingFeatures & vk::FormatFeatureFlagBits::eDepthStencilAttachment) !=
 				vk::FormatFeatureFlagBits::eDepthStencilAttachment)

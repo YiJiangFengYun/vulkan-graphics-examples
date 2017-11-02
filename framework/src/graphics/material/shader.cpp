@@ -3,16 +3,14 @@
 namespace kgs
 {
 
-	Shader::Shader() :
-		m_pContext(pContext),
-		m_pVertShaderModule(),
-		m_pFragShaderModule()
+	Shader::Shader() 
+		: m_pVertShaderModule()
+		, m_pFragShaderModule()
 	{
 
 	}
 
-	Shader::Shader(std::string vertShaderPath, std::string fragShaderPath) :
-		m_pContext(pContext)
+	Shader::Shader(std::string vertShaderPath, std::string fragShaderPath)
 	{
 		load(vertShaderPath, fragShaderPath);
 	}
@@ -41,7 +39,7 @@ namespace kgs
 
 	std::shared_ptr<vk::ShaderModule> Shader::_createShaderModule(const std::vector<char>& code)
 	{
-		auto device = m_pContext->getNativeDevice();
+		auto device = pApp->getDevice();
 
 		/*std::vector<uint32_t> codeAligned(code.size() / sizeof(uint32_t) + 1);
 		memcpy(codeAligned.data(), code.data(), code.size());*/

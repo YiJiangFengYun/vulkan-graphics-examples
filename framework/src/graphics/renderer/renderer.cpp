@@ -30,6 +30,11 @@ namespace kgs
 		_init();
 	}
 
+	BaseRenderer::~BaseRenderer()
+	{
+		_freeGraphicsQueue();
+	}
+
 	Bool32 BaseRenderer::isValidForRender()
 	{
 		return _isValidForRender();
@@ -213,7 +218,7 @@ namespace kgs
 			nullptr                                      //pPushConstantRanges
 		};
 
-		auto pDevice = pContext->getNativeDevice();
+		auto pDevice = pApp->getDevice();
 		pPipelineLayout = fd::createPipelineLayout(pDevice, pipelineLayoutCreateInfo);
 		createInfo.layout = *pPipelineLayout;
 
@@ -288,6 +293,7 @@ namespace kgs
 		_createFramebuffer();
 		_createCommandPool();
 		_createCommandBuffer();
+		_allocateGraphicsQueue();
 	}
 
 	void BaseRenderer::_createRenderPass()
@@ -360,7 +366,7 @@ namespace kgs
 			&dependency
 		};
 
-		auto pDevice = pContext->getNativeDevice();
+		auto pDevice = pApp->getDevice();
 		m_pRenderPass = fd::createRenderPass(pDevice, createInfo);
 	}
 
@@ -393,14 +399,14 @@ namespace kgs
 			1u                                              //layers
 		};
 
-		auto pDevice = pContext->getNativeDevice();
+		auto pDevice = pApp->getDevice();
 		m_pFrameBuffer = fd::createFrameBuffer(pDevice, createInfo);
 	}
 
 	void BaseRenderer::_createCommandPool()
 	{
-		auto pDevice = pContext->getNativeDevice();
-		auto graphicsFamily = pContext->getGraphicsFamily();
+		auto pDevice = pApp->getDevice();
+		auto graphicsFamily = pApp->getGraphicsFamily();
 		vk::CommandPoolCreateInfo createInfo = {
 			vk::CommandPoolCreateFlagBits::eResetCommandBuffer,
 			graphicsFamily
@@ -417,10 +423,20 @@ namespace kgs
 			1u                                         //commandBufferCount
 		};
 
-		auto pDevice = pContext->getNativeDevice();
+		auto pDevice = pApp->getDevice();
 
 		LOG(plog::debug) << "Pre allocate command buffer from pool." << std::endl;
 		m_pCommandBuffer = fd::allocateCommandBuffer(pDevice, pCommandPool, allocateInfo);
 		LOG(plog::debug) << "Post allocate command buffer from pool." << std::endl;
+	}
+
+	void BaseRenderer::_allocateGraphicsQueue()
+	{
+		pApp->allocateGaphicsQueue(m_graphicsQueueIndex, m_graphicsQueue);
+	}
+
+	void BaseRenderer::_freeGraphicsQueue()
+	{
+		pApp->freeGraphicsQueue(m_graphicsQueueIndex);
 	}
 }

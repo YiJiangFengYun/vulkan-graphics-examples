@@ -58,7 +58,7 @@ namespace kgs
 
 		Renderer::_render(info, resultInfo);
 
-		auto pDevice = pContext->getNativeDevice();
+		auto pDevice = pApp->getDevice();
 
 		//std::shared_ptr<Scene<SpaceType::SPACE_3>> pScene;
 		auto pScene = m_pScene;
@@ -207,7 +207,7 @@ namespace kgs
 		}
 
 		LOG(plog::debug) << "Pre submit to grahics queue." << std::endl;
-		pContext->getGraphicsQueue().submit(submitInfos, nullptr);
+		m_graphicsQueue.submit(submitInfos, nullptr);
 		LOG(plog::debug) << "Post submit to grahics queue." << std::endl;
 
 		resultInfo.signalSemaphoreCount = static_cast<uint32_t>(m_arrSemaphores.size());

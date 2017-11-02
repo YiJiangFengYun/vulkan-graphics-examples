@@ -10,21 +10,12 @@ namespace gfw {
 	Window::Window(uint32_t width
 		, uint32_t height
 		, const char* title
-		, std::shared_ptr<vk::Instance> pInstance
-		, std::shared_ptr<vk::PhysicalDevice> pPhysicalDevice
-		, std::shared_ptr<vk::Device> pDevice
-		, vk::Queue graphicsQueue
-		, vk::Queue presentQueue
 	)
 		: m_renderType(RenderType::BEGIN_RANGE)
-		, m_pVKInstance(pInstance)
-		, m_pPhysicalDevice(pPhysicalDevice)
-		, m_pDevice(pDevice)
-		, m_graphicsQueue(graphicsQueue)
-		, m_presentQueue(presentQueue)
 	{
 		_createWindow(width, height, title);
 		_createSurface();
+		_allocatePresentQueue();
 		_createSwapchain();
 		_createSwapchainImageViews();
 		_createRenderers();
@@ -35,21 +26,12 @@ namespace gfw {
 		, uint32_t height
 		, const char* title
 		, RenderType renderType
-		, std::shared_ptr<vk::Instance> pInstance
-		, std::shared_ptr<vk::PhysicalDevice> pPhysicalDevice
-		, std::shared_ptr<vk::Device> pDevice
-		, vk::Queue graphicsQueue
-		, vk::Queue presentQueue
 	)
 		: m_renderType(renderType)
-		, m_pVKInstance(pInstance)
-		, m_pPhysicalDevice(pPhysicalDevice)
-		, m_pDevice(pDevice)
-		, m_graphicsQueue(graphicsQueue)
-		, m_presentQueue(presentQueue)
 	{
 		_createWindow(width, height, title);
 		_createSurface();
+		_allocatePresentQueue();
 		_createSwapchain();
 		_createSwapchainImageViews();
 		_createRenderers();
@@ -58,24 +40,15 @@ namespace gfw {
 
 	Window::Window(std::shared_ptr<GLFWwindow> pWindow
 		, std::shared_ptr<vk::SurfaceKHR> pSurface
-		, std::shared_ptr<vk::Instance> pInstance
-		, std::shared_ptr<vk::PhysicalDevice> pPhysicalDevice
-		, std::shared_ptr<vk::Device> pDevice
-		, vk::Queue graphicsQueue
-		, vk::Queue presentQueue
 	)
 		: m_renderType(RenderType::BEGIN_RANGE)
 		, m_pWindow(pWindow)
 		, m_pSurface(pSurface)
-		, m_pVKInstance(pInstance)
-		, m_pPhysicalDevice(pPhysicalDevice)
-		, m_pDevice(pDevice)
-		, m_graphicsQueue(graphicsQueue)
-		, m_presentQueue(presentQueue)
 	{
 
 		glfwSetWindowUserPointer(pWindow.get(), this);
 		glfwSetWindowSizeCallback(pWindow.get(), onWindowResized);
+		_allocatePresentQueue();
 		_createSwapchain();
 		_createSwapchainImageViews();
 		_createRenderers();
@@ -85,24 +58,15 @@ namespace gfw {
 	Window::Window(RenderType renderType
 		, std::shared_ptr<GLFWwindow> pWindow
 		, std::shared_ptr<vk::SurfaceKHR> pSurface
-		, std::shared_ptr<vk::Instance> pInstance
-		, std::shared_ptr<vk::PhysicalDevice> pPhysicalDevice
-		, std::shared_ptr<vk::Device> pDevice
-		, vk::Queue graphicsQueue
-		, vk::Queue presentQueue
 	)
 		: m_renderType(renderType)
 		, m_pWindow(pWindow)
 		, m_pSurface(pSurface)
-		, m_pVKInstance(pInstance)
-		, m_pPhysicalDevice(pPhysicalDevice)
-		, m_pDevice(pDevice)
-		, m_graphicsQueue(graphicsQueue)
-		, m_presentQueue(presentQueue)
 	{
 
 		glfwSetWindowUserPointer(pWindow.get(), this);
 		glfwSetWindowSizeCallback(pWindow.get(), onWindowResized);
+		_allocatePresentQueue();
 		_createSwapchain();
 		_createSwapchainImageViews();
 		_createRenderers();
@@ -111,6 +75,7 @@ namespace gfw {
 
 	Window::~Window()
 	{
+		_freePresentQueue();
 	}
 
 	void Window::run()
@@ -153,13 +118,25 @@ namespace gfw {
 
 	void Window::_createSurface()
 	{
-		m_pSurface = fd::createSurface(m_pVKInstance, m_pWindow);
+		auto pInstance = kgs::pApp->getVKInstance();
+		m_pSurface = fd::createSurface(pInstance, m_pWindow);
 		LOG(plog::debug) << "Create successfully surface.";
+	}
+
+	void Window::_allocatePresentQueue()
+	{
+		kgs::pApp->allocatePresentQueue(m_presentQueueIndex, m_presentQueue);
+	}
+
+	void Window::_freePresentQueue()
+	{
+		kgs::pApp->freePresentQueue(m_presentQueueIndex);
 	}
 
 	void Window::_createSwapchain()
 	{
-		kgs::SwapChainSupportDetails details = kgs::SwapChainSupportDetails::querySwapChainSupport(*m_pPhysicalDevice, *m_pSurface);
+		auto pPhysicalDevice = kgs::pApp->getPhysicalDevice();
+		kgs::SwapChainSupportDetails details = kgs::SwapChainSupportDetails::querySwapChainSupport(*pPhysicalDevice, *m_pSurface);
 		vk::SurfaceFormatKHR surfaceFormat = details.chooseSurfaceFormat();
 		vk::PresentModeKHR presentMode = details.choosePresentMode();
 		vk::Extent2D extent = details.chooseExtent(m_pWindow.get());
@@ -197,7 +174,7 @@ namespace gfw {
 			oldSwapchain                              //oldSwapchain
 		};
 
-		kgs::UsedQueueFamily usedQueueFamily = kgs::UsedQueueFamily::findQueueFamilies(*m_pPhysicalDevice, *m_pSurface);
+		kgs::UsedQueueFamily usedQueueFamily = kgs::UsedQueueFamily::findQueueFamilies(*pPhysicalDevice, *m_pSurface);
 		std::vector<uint32_t> queueFamilyIndices = {
 			(uint32_t)usedQueueFamily.graphicsFamily,
 			(uint32_t)usedQueueFamily.presentFamily
@@ -210,10 +187,11 @@ namespace gfw {
 			createInfo.pQueueFamilyIndices = queueFamilyIndices.data();
 		}
 
-		m_pSwapchain = fd::createSwapchainKHR(m_pDevice, createInfo);
+		auto pDevice = kgs::pApp->getDevice();
+		m_pSwapchain = fd::createSwapchainKHR(pDevice, createInfo);
 		LOG(plog::debug) << "Create successfully swapchain.";
 
-		m_swapchainImages = m_pDevice->getSwapchainImagesKHR(*m_pSwapchain);
+		m_swapchainImages = pDevice->getSwapchainImagesKHR(*m_pSwapchain);
 		m_swapchainImageFormat = surfaceFormat.format;
 		m_swapchainExtent = extent;
 	}
@@ -277,8 +255,8 @@ namespace gfw {
 		vk::SemaphoreCreateInfo createInfo = {
 			vk::SemaphoreCreateFlags()
 		};
-
-		m_pImageAvailableSemaphore = fd::createSemaphore(m_pDevice, createInfo);
+		auto pDevice = kgs::pApp->getDevice();
+		m_pImageAvailableSemaphore = fd::createSemaphore(pDevice, createInfo);
 		//m_pRenderFinishedSemaphore = fd::createSemaphore(m_pDevice, createInfo);
 	}
 
@@ -305,8 +283,9 @@ namespace gfw {
 
 	void Window::_render()
 	{
+		auto pDevice = kgs::pApp->getDevice();
 		uint32_t imageIndex;
-		VkResult result = vkAcquireNextImageKHR(*m_pDevice
+		VkResult result = vkAcquireNextImageKHR(*pDevice
 			, *m_pSwapchain
 			, std::numeric_limits<uint64_t>::max()
 			, *m_pImageAvailableSemaphore
@@ -393,17 +372,18 @@ namespace gfw {
 			vk::ImageLayout::eUndefined
 		};
 
-		pImage = fd::createImage(m_pDevice, createInfo);
+		auto pDevice = kgs::pApp->getDevice();
+		pImage = fd::createImage(pDevice, createInfo);
 
-		auto memRequirements = m_pDevice->getImageMemoryRequirements(*pImage);
+		auto memRequirements = pDevice->getImageMemoryRequirements(*pImage);
 
 		vk::MemoryAllocateInfo allocInfo = {
 			memRequirements.size,
 			_findMemoryType(memRequirements.memoryTypeBits, properties)
 		};
 
-		pImageMemory = fd::allocateMemory(m_pDevice, allocInfo);
-		m_pDevice->bindImageMemory(*pImage, *pImageMemory, vk::DeviceSize(0));
+		pImageMemory = fd::allocateMemory(pDevice, allocInfo);
+		pDevice->bindImageMemory(*pImage, *pImageMemory, vk::DeviceSize(0));
 	}
 
 	std::shared_ptr<vk::ImageView> Window::_createImageView(vk::Image image, vk::Format format, vk::ImageAspectFlags aspectFlags)
@@ -427,13 +407,14 @@ namespace gfw {
 				1u
 			}
 		};
-
-		return fd::createImageView(m_pDevice, createInfo);
+		auto pDevice = kgs::pApp->getDevice();
+		return fd::createImageView(pDevice, createInfo);
 	}
 
 	uint32_t Window::_findMemoryType(uint32_t typeFilter, vk::MemoryPropertyFlags properties)
 	{
-		vk::PhysicalDeviceMemoryProperties memProperties = m_pPhysicalDevice->getMemoryProperties();
+		auto pPhysicalDevice = kgs::pApp->getPhysicalDevice();
+		vk::PhysicalDeviceMemoryProperties memProperties = pPhysicalDevice->getMemoryProperties();
 		for (uint32_t i = 0; i < memProperties.memoryTypeCount; ++i)
 		{
 			if (typeFilter & (1 << i) && (memProperties.memoryTypes[i].propertyFlags & properties) == properties)

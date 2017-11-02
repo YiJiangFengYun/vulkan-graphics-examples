@@ -9,6 +9,8 @@ namespace kgs
 	{
 		int32_t graphicsFamily;
 		int32_t presentFamily;
+		uint32_t graphicsMaxQueueCount;
+		uint32_t presentMaxQueueCount;
 
 		UsedQueueFamily();
 

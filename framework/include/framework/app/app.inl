@@ -14,39 +14,19 @@ namespace gfw
 	template<typename Window_T>
 	void App::createSubWindow(uint32_t width, uint32_t height, const char *title, Window::RenderType renderType)
 	{
-		auto pInstance = kgs::pApp->getVKInstance();
-		auto pPhysicalDevice = kgs::pApp->getPhysicalDevice();
-		auto pDevice = kgs::pApp->getDevice();
-		auto graphicsQueue = kgs::pApp->getGraphicsQueue();
-		auto presentQueue = kgs::pApp->getPresentQueue();
 		std::shared_ptr<Window_T> window(new Window_T(width
 			, height
 			, title
-			, renderType
-			, pInstance
-			, pPhysicalDevice
-			, pDevice
-			, graphicsQueue
-			, presentQueue));
+			, renderType));
 		m_pSubWindows.push_back(window);
 	}
 
 	template <typename MainWindow_T>
 	void App::_createWindow(std::shared_ptr<GLFWwindow> pWindow, std::shared_ptr<vk::SurfaceKHR> pSurface, Window::RenderType renderType)
 	{
-		auto pInstance = kgs::pApp->getVKInstance();
-		auto pPhysicalDevice = kgs::pApp->getPhysicalDevice();
-		auto pDevice = kgs::pApp->getDevice();
-		auto graphicsQueue = kgs::pApp->getGraphicsQueue();
-		auto presentQueue = kgs::pApp->getPresentQueue();
 		m_pWindow.reset(new MainWindow_T(renderType
 			, pWindow
-			, pSurface
-			, pInstance
-			, pPhysicalDevice
-			, pDevice
-			, graphicsQueue
-			, presentQueue));
+			, pSurface));
 	}
 
 } //namespace gfw

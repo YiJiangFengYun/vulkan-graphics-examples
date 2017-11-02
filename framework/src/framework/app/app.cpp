@@ -16,6 +16,8 @@ namespace gfw {
 		: m_width(0u)
 		, m_height(0u)
 		, m_title("")
+		, m_graphicsQueueCount(DEFAULT_GRAPHICS_QUEUE_COUNT)
+		, m_presentQueuecount(DEFAULT_PRESENT_QUEUE_COUNT)
 	{
 
 	}
@@ -54,7 +56,7 @@ namespace gfw {
 			glfwPollEvents();
 		}
 
-		kgs::pContext->getNativeDevice()->waitIdle();
+		kgs::pApp->getDevice()->waitIdle();
 	}
 
 	/*void AppBase::createSubWindow(uint32_t width, uint32_t height, const char *title)
@@ -82,7 +84,7 @@ namespace gfw {
 		pResultGLFWWindow = _createGLFWWindow(m_width, m_height, m_title);
 		pResultSurface = _createVKSurface(pResultGLFWWindow);
 
-		kgs::moduleCreateOther(pResultSurface);
+		kgs::moduleCreateOther(pResultSurface, m_graphicsQueueCount, m_presentQueuecount);
 	}
 
 	std::shared_ptr<GLFWwindow> App::_createGLFWWindow(uint32_t width, uint32_t height, const char* title)

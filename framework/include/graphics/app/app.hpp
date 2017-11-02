@@ -6,6 +6,7 @@
 #include "graphics/util/vulkan_ext.hpp"
 #include "graphics/util/queue_family.hpp"
 #include "graphics/util/swapchain_info.hpp"
+#include "graphics/util/queue_master.hpp"
 
 namespace kgs
 {
@@ -28,14 +29,25 @@ namespace kgs
 		~Application();
 
 		void initCreateVkInstance();
-		void initOther(std::shared_ptr<vk::SurfaceKHR> pSurface);
+		void initOther(std::shared_ptr<vk::SurfaceKHR> pSurface
+			, uint32_t graphicsQueueCount
+			, uint32_t presentQueueCount
+			);
 
 		//gettor methods
 		std::shared_ptr<vk::Instance> getVKInstance();
 		std::shared_ptr<vk::PhysicalDevice> getPhysicalDevice();
 		std::shared_ptr<vk::Device> getDevice();
-		vk::Queue getGraphicsQueue();
-		vk::Queue getPresentQueue();
+		uint32_t getGraphicsFamily();
+		uint32_t getPresentFamily();
+		std::shared_ptr<QueueMaster> getQueueMaster();
+		std::shared_ptr<vk::CommandPool> getCommandPoolForTransientBuffer();
+		std::shared_ptr<vk::CommandPool> getCommandPoolForResetBuffer();
+
+		void allocateGaphicsQueue(uint32_t &queueIndex, vk::Queue &queue);
+		void allocatePresentQueue(uint32_t &queueIndex, vk::Queue &queue);
+		void freeGraphicsQueue(uint32_t queueIndex);
+		void freePresentQueue(uint32_t queueIndex);
 	private:
 
 		Application() = delete;
@@ -47,8 +59,12 @@ namespace kgs
 		std::shared_ptr<vk::Instance> m_pInstance;
 		std::shared_ptr<vk::PhysicalDevice> m_pPhysicalDevice;
 		std::shared_ptr<vk::Device> m_pDevice;
-		vk::Queue m_graphicsQueue;
-		vk::Queue m_presentQueue;
+		uint32_t m_graphicsFamily;
+		uint32_t m_presentFamily;
+		std::shared_ptr<QueueMaster> m_pQueueMaster;
+		std::shared_ptr<vk::CommandPool> m_pCommandPoolForTransientBuffer;
+		std::shared_ptr<vk::CommandPool> m_pCommandPoolForResetBuffer;
+
 
 #ifdef ENABLE_VALIDATION_LAYERS
 		bool _checkValidationLayerSupport();
@@ -72,7 +88,11 @@ namespace kgs
 #endif // DEBUG
 		std::vector<const char*> _getRequiredExtensions();
 		void _pickPhysicalDevice(std::shared_ptr<vk::SurfaceKHR> psurface);
-		void _createLogicDevice(std::shared_ptr<vk::SurfaceKHR> pSurface);
+		void _createLogicDevice(std::shared_ptr<vk::SurfaceKHR> pSurface
+			, uint32_t graphicsQueueCount
+			, uint32_t presentQueueCount
+		);
+		void _createCommandPool();
 	};
 
 } //namespace kgs

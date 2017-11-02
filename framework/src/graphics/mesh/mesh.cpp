@@ -58,8 +58,7 @@ namespace kgs
 	}
 
 	BaseMesh::BaseMesh()
-		: m_pContext(pContext)
-		, m_multipliedColor(COLOR_WHITE) //default multiplied color should be (1, 1, 1, 1)
+		: m_multipliedColor(COLOR_WHITE) //default multiplied color should be (1, 1, 1, 1)
 		, m_applied(KGS_FALSE)
 	{
 		_createMeshData();
@@ -287,8 +286,8 @@ namespace kgs
 			vk::SharingMode::eExclusive
 		};
 
-		auto pPhysicalDevice = m_pContext->getPhysicalDevice();
-		auto pDevice = m_pContext->getNativeDevice();
+		auto pPhysicalDevice = pApp->getPhysicalDevice();
+		auto pDevice = pApp->getDevice();
 		auto pStagingBuffer = fd::createBuffer(pDevice, createInfo);
 
 		vk::MemoryRequirements memReqs = pDevice->getBufferMemoryRequirements(*pStagingBuffer);
@@ -342,8 +341,8 @@ namespace kgs
 			vk::SharingMode::eExclusive
 		};
 
-		auto pPhysicalDevice = m_pContext->getPhysicalDevice();
-		auto pDevice = m_pContext->getNativeDevice();
+		auto pPhysicalDevice = pApp->getPhysicalDevice();
+		auto pDevice = pApp->getDevice();
 		auto pStagingBuffer = fd::createBuffer(pDevice, createInfo);
 
 		vk::MemoryRequirements memReqs = pDevice->getBufferMemoryRequirements(*pStagingBuffer);

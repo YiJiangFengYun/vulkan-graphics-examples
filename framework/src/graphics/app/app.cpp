@@ -88,10 +88,14 @@ namespace kgs
 #endif // DEBUG
 	}
 
-	void Application::initOther(std::shared_ptr<vk::SurfaceKHR> pSurface)
+	void Application::initOther(std::shared_ptr<vk::SurfaceKHR> pSurface
+		, uint32_t graphicsQueueCount
+		, uint32_t presentQueueCount
+	)
 	{
 		_pickPhysicalDevice(pSurface);
-		_createLogicDevice(pSurface);
+		_createLogicDevice(pSurface, graphicsQueueCount, presentQueueCount);
+		_createCommandPool();
 	}
 
 	std::shared_ptr<vk::Instance> Application::getVKInstance()
@@ -109,14 +113,48 @@ namespace kgs
 		return m_pDevice;
 	}
 
-	vk::Queue Application::getGraphicsQueue()
+	uint32_t Application::getGraphicsFamily()
 	{
-		return m_graphicsQueue;
+		return m_graphicsFamily;
 	}
 
-	vk::Queue Application::getPresentQueue()
+	uint32_t Application::getPresentFamily()
 	{
-		return m_presentQueue;
+		return m_presentFamily;
+	}
+
+	std::shared_ptr<QueueMaster> Application::getQueueMaster()
+	{
+		return m_pQueueMaster;
+	}
+
+	std::shared_ptr<vk::CommandPool> Application::getCommandPoolForTransientBuffer()
+	{
+		return m_pCommandPoolForTransientBuffer;
+	}
+
+	std::shared_ptr<vk::CommandPool> Application::getCommandPoolForResetBuffer()
+	{
+		return m_pCommandPoolForResetBuffer;
+	}
+
+	void Application::allocateGaphicsQueue(uint32_t &queueIndex, vk::Queue &queue)
+	{
+		m_pQueueMaster->allocateQueue(m_graphicsFamily, queueIndex, queue);
+	}
+
+	void Application::allocatePresentQueue(uint32_t &queueIndex, vk::Queue &queue)
+	{
+		m_pQueueMaster->allocateQueue(m_presentFamily, queueIndex, queue);
+	}
+
+	void Application::freeGraphicsQueue(uint32_t queueIndex)
+	{
+		m_pQueueMaster->freeQueue(m_graphicsFamily, queueIndex);
+	}
+	void Application::freePresentQueue(uint32_t queueIndex)
+	{
+		m_pQueueMaster->freeQueue(m_presentFamily, queueIndex);
 	}
 
 #ifdef ENABLE_VALIDATION_LAYERS
@@ -350,22 +388,40 @@ namespace kgs
 		LOG(plog::debug) << "Pick successfully physical device.";
 	}
 
-	void Application::_createLogicDevice(std::shared_ptr<vk::SurfaceKHR> pSurface)
+	void Application::_createLogicDevice(std::shared_ptr<vk::SurfaceKHR> pSurface
+		, uint32_t graphicsQueueCount
+		, uint32_t presentQueueCount
+	)
 	{
 		UsedQueueFamily usedQueueFamily = UsedQueueFamily::findQueueFamilies(*m_pPhysicalDevice, *pSurface);
-		std::vector<vk::DeviceQueueCreateInfo> queueCreateInfos;
-		std::set<int32_t> uniqueFamilyIndices = { usedQueueFamily.graphicsFamily, usedQueueFamily.presentFamily };
+		m_graphicsFamily = usedQueueFamily.graphicsFamily;
+		m_presentFamily = usedQueueFamily.presentFamily;
 
-		queueCreateInfos.resize(uniqueFamilyIndices.size());
+		std::vector<vk::DeviceQueueCreateInfo> queueCreateInfos;
+		std::unordered_map<uint32_t, uint32_t> mapFamilyAndQueueCounts;
+
+		graphicsQueueCount = std::min(graphicsQueueCount, usedQueueFamily.graphicsMaxQueueCount);
+		presentQueueCount = std::min(presentQueueCount, usedQueueFamily.presentMaxQueueCount);
+
+		mapFamilyAndQueueCounts[usedQueueFamily.graphicsFamily] += graphicsQueueCount;
+		mapFamilyAndQueueCounts[usedQueueFamily.presentFamily] += presentQueueCount;
+
+		mapFamilyAndQueueCounts[usedQueueFamily.graphicsFamily] = 
+			std::min(mapFamilyAndQueueCounts[usedQueueFamily.graphicsFamily], usedQueueFamily.graphicsMaxQueueCount);
+
+		mapFamilyAndQueueCounts[usedQueueFamily.presentFamily] =
+			std::min(mapFamilyAndQueueCounts[usedQueueFamily.presentFamily], usedQueueFamily.presentMaxQueueCount);
+
+		queueCreateInfos.resize(mapFamilyAndQueueCounts.size());
 		float queuePriority = 1.0f;
 
 		size_t index = 0;
-		for (int32_t queueFamilyIndex : uniqueFamilyIndices)
+		for (const auto& item : mapFamilyAndQueueCounts)
 		{
 			vk::DeviceQueueCreateInfo queueCreateInfo = {
 				vk::DeviceQueueCreateFlags(),                 //flags
-				static_cast<uint32_t>(queueFamilyIndex),      //queueFamilyIndex
-				uint32_t(1),                                  //queueCount
+				static_cast<uint32_t>(item.first),            //queueFamilyIndex
+				uint32_t(item.second),                        //queueCount
 				&queuePriority                                //pQueuePriorities
 			};
 			queueCreateInfos[index] = queueCreateInfo;
@@ -392,9 +448,27 @@ namespace kgs
 #endif // ENABLE_VALIDATION_LAYERS
 
 		m_pDevice = fd::createDevice(m_pPhysicalDevice, createInfo);
-		m_graphicsQueue = m_pDevice->getQueue(usedQueueFamily.graphicsFamily, 0);
-		m_presentQueue = m_pDevice->getQueue(usedQueueFamily.presentFamily, 0);
+		m_pQueueMaster = std::shared_ptr<QueueMaster>(new QueueMaster(m_pDevice
+			, usedQueueFamily.graphicsFamily
+			, graphicsQueueCount
+			, usedQueueFamily.presentFamily
+			, presentQueueCount));
 
 		LOG(plog::debug) << "Create successfully logic device.";
+	}
+
+	void Application::_createCommandPool()
+	{
+		vk::CommandPoolCreateInfo createInfoForTransientBuffer = {
+			vk::CommandPoolCreateFlagBits::eTransient,
+			m_graphicsFamily
+		};
+		m_pCommandPoolForTransientBuffer = fd::createCommandPool(m_pDevice, createInfoForTransientBuffer);
+
+		vk::CommandPoolCreateInfo createInfoForResetBuffer = {
+			vk::CommandPoolCreateFlagBits::eResetCommandBuffer,
+			m_graphicsFamily
+		};
+		m_pCommandPoolForResetBuffer = fd::createCommandPool(m_pDevice, createInfoForResetBuffer);
 	}
 } //namespace kgs

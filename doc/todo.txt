@@ -1,0 +1,10 @@
+Graphics:
+.Problem of multiply thread of the main window and sub windows.
+.orthographic for camera3 and its volume.
+.orthographic for camera2 and its volume.
+.Background color of renderer.
+.Depth and stencil clear value of renderer.
+.Base render logic for renderer2.
+.Viewport and scissor of pass.
+.Setting of depth and stencil for passs as DepthStencilStateCreateInfo.
+.RenderArea of renderer to be rendered.

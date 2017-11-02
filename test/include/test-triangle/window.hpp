@@ -7,58 +7,6 @@
 
 namespace testTriangle
 {
-	class SubWindow : public gfw::Window
-	{
-	public:
-		SubWindow(uint32_t width
-			, uint32_t height
-			, const char* title
-			, std::shared_ptr<vk::Instance> pInstance
-			, std::shared_ptr<vk::PhysicalDevice> pPhysicalDevice
-			, std::shared_ptr<vk::Device> pDevice
-			, vk::Queue graphicsQueue
-			, vk::Queue presentQueue
-		);
-
-		SubWindow(uint32_t width
-			, uint32_t height
-			, const char* title
-			, RenderType renderType
-			, std::shared_ptr<vk::Instance> pInstance
-			, std::shared_ptr<vk::PhysicalDevice> pPhysicalDevice
-			, std::shared_ptr<vk::Device> pDevice
-			, vk::Queue graphicsQueue
-			, vk::Queue presentQueue
-		);
-
-		SubWindow(std::shared_ptr<GLFWwindow> pWindow
-			, std::shared_ptr<vk::SurfaceKHR> pSurface
-			, std::shared_ptr<vk::Instance> pInstance
-			, std::shared_ptr<vk::PhysicalDevice> pPhysicalDevice
-			, std::shared_ptr<vk::Device> pDevice
-			, vk::Queue graphicsQueue
-			, vk::Queue presentQueue
-		);
-
-		SubWindow(RenderType renderType
-			, std::shared_ptr<GLFWwindow> pWindow
-			, std::shared_ptr<vk::SurfaceKHR> pSurface
-			, std::shared_ptr<vk::Instance> pInstance
-			, std::shared_ptr<vk::PhysicalDevice> pPhysicalDevice
-			, std::shared_ptr<vk::Device> pDevice
-			, vk::Queue graphicsQueue
-			, vk::Queue presentQueue
-		);
-
-	private:
-		void _onPreUpdate() override;
-		void _update() override;
-		void _onPostUpdate() override;
-
-		void _onPreRender() override;
-		void _onPostRender() override;
-	};
-
 	class Window : public gfw::Window
 	{
 	public:

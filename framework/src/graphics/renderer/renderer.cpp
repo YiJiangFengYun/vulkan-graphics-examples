@@ -247,7 +247,7 @@ namespace kgs
 		vk::RenderPassBeginInfo renderPassBeginInfo = {
 			*m_pRenderPass,                                   //renderPass
 			*m_pFrameBuffer,                                  //framebuffer
-			vk::Rect2D(                                     //renderArea
+			vk::Rect2D(                                       //renderArea
 				vk::Offset2D(0, 0),
 				vk::Extent2D(m_framebufferWidth, m_framebufferHeight)
 			),

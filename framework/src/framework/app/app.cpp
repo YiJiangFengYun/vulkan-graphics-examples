@@ -41,8 +41,9 @@ namespace gfw {
 				return item->windowShouldClose();
 			}), m_pSubWindows.end());
 
-			m_pWindow->run();
+			//m_pWindow->run();
 			ThreadMaster threadMaster;
+			threadMaster.appendThread(std::shared_ptr<std::thread>(new std::thread(runWindow, m_pWindow)));
 			for (const auto& pSubWindow : m_pSubWindows)
 			{
 				threadMaster.appendThread(std::shared_ptr<std::thread>(new std::thread(runWindow, pSubWindow)));

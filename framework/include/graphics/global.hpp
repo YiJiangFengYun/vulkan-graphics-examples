@@ -27,7 +27,7 @@ namespace kgs
 	typedef glm::mat2x2 Matrix2x2;
 	typedef glm::mat3x3 Matrix3x3;
 	typedef glm::mat4x4 Matrix4x4;
-	typedef glm::tvec4<uint32_t> Color;
+	typedef glm::tvec4<float> Color;
 	typedef glm::tvec4<Byte> Color32;
 	typedef fd::Bounds<glm::vec2> Bound2;
 	typedef fd::Bounds<glm::vec3> Bound3;

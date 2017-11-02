@@ -33,14 +33,14 @@ namespace kgs
 		struct BuildInData
 		{
 			Matrix4x4 matrixObjectToNDC;
-			Color32   mainColor;
+			Color     mainColor;
 			Matrix4x4 matrixObjectToView;
 			Matrix4x4 matrixObjectToWorld;
 
 			BuildInData();
 
 			BuildInData(Matrix4x4 matrixObjectToNDC
-				, Color32 mainColor
+				, Color mainColor
 				, Matrix4x4 matrixObjectToView
 				, Matrix4x4 matrixObjectToWorld);
 

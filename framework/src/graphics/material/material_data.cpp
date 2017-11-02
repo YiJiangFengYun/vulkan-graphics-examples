@@ -4,7 +4,7 @@ namespace kgs
 {
 	MaterialData::BuildInData::BuildInData()
 		: matrixObjectToNDC(1.0f)
-		, mainColor()
+		, mainColor(1.0f, 1.0f, 1.0f, 1.0f)
 		, matrixObjectToView(1.0f)
 		, matrixObjectToWorld(1.0f)
 	{
@@ -12,7 +12,7 @@ namespace kgs
 	}
 
 	MaterialData::BuildInData::BuildInData(Matrix4x4 matrixObjectToNDC
-		, Color32 mainColor
+		, Color mainColor
 		, Matrix4x4 matrixObjectToView
 		, Matrix4x4 matrixObjectToWorld)
 		: matrixObjectToNDC(matrixObjectToNDC)

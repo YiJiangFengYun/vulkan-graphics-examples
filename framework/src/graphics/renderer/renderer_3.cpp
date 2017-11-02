@@ -155,7 +155,7 @@ namespace kgs
 					auto mvMatrix = viewMatrix * modelMatrix;
 					MaterialData::BuildInData buildInData = {
 						projMatrix * mvMatrix,
-						Color32(255, 255, 255, 255),
+						Color(1.0f, 1.0f, 1.0f, 1.0f),
 						mvMatrix,
 						modelMatrix
 					};

@@ -5,6 +5,8 @@ namespace kgs
 	UsedQueueFamily::UsedQueueFamily()
 		: graphicsFamily(-1)
 	    , presentFamily(-1)
+		, graphicsMaxQueueCount(0)
+		, presentMaxQueueCount(0)
 	{
 
 	}
@@ -23,7 +25,9 @@ namespace kgs
 		int i = 0;
 		for (const auto& queueFamilyProperty : queueFamilyProperties)
 		{
-			if (queueFamilyProperty.queueCount > 0 && queueFamilyProperty.queueFlags & vk::QueueFlagBits::eGraphics)
+			if (queueFamilyProperty.queueCount > data.graphicsMaxQueueCount
+				&& queueFamilyProperty.queueCount > 0 
+				&& queueFamilyProperty.queueFlags & vk::QueueFlagBits::eGraphics)
 			{
 				data.graphicsFamily = i;
 				data.graphicsMaxQueueCount = queueFamilyProperty.queueCount;
@@ -31,14 +35,12 @@ namespace kgs
 
 			vk::Bool32 presentSupport = VK_FALSE;
 			physicalDevice.getSurfaceSupportKHR(i, surface, &presentSupport);
-			if (queueFamilyProperty.queueCount > 0 && presentSupport)
+			if (queueFamilyProperty.queueCount > data.presentMaxQueueCount 
+				&& queueFamilyProperty.queueCount > 0 
+				&& presentSupport)
 			{
 				data.presentFamily = i;
 				data.presentMaxQueueCount = queueFamilyProperty.queueCount;
-			}
-
-			if (data.isComplete()) {
-				break;
 			}
 
 			++i;

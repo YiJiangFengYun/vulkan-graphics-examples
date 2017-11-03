@@ -43,20 +43,24 @@ namespace gfw {
 				return item->windowShouldClose();
 			}), m_pSubWindows.end());
 
-			//m_pWindow->run();
-			ThreadMaster threadMaster;
-			threadMaster.appendThread(std::shared_ptr<std::thread>(new std::thread(runWindow, m_pWindow)));
+			////multiply threads.
+			//ThreadMaster threadMaster;
+			//threadMaster.appendThread(std::shared_ptr<std::thread>(new std::thread(runWindow, m_pWindow)));
+			//for (const auto& pSubWindow : m_pSubWindows)
+			//{
+			//	threadMaster.appendThread(std::shared_ptr<std::thread>(new std::thread(runWindow, pSubWindow)));
+			//};
+			//threadMaster.join();
+
+			//single thread.
+			m_pWindow->run();
 			for (const auto& pSubWindow : m_pSubWindows)
 			{
-				threadMaster.appendThread(std::shared_ptr<std::thread>(new std::thread(runWindow, pSubWindow)));
+				pSubWindow->run();
 			};
-
-			threadMaster.join();
-
+			kgs::pApp->getDevice()->waitIdle();
 			glfwPollEvents();
 		}
-
-		kgs::pApp->getDevice()->waitIdle();
 	}
 
 	/*void AppBase::createSubWindow(uint32_t width, uint32_t height, const char *title)

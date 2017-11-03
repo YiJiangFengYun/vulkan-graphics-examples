@@ -5,114 +5,6 @@
 
 namespace chalet
 {
-	SubWindow::SubWindow(uint32_t width
-		, uint32_t height
-		, const char* title
-		, std::shared_ptr<vk::Instance> pInstance
-		, std::shared_ptr<vk::PhysicalDevice> pPhysicalDevice
-		, std::shared_ptr<vk::Device> device, vk::Queue graphicsQueue
-		, vk::Queue presentQueue
-	)
-		: gfw::Window(width
-			, height
-			, title
-			, pInstance
-			, pPhysicalDevice
-			, device
-			, graphicsQueue
-			, presentQueue
-		)
-	{
-	}
-
-	SubWindow::SubWindow(uint32_t width
-		, uint32_t height
-		, const char* title
-		, RenderType renderType
-		, std::shared_ptr<vk::Instance> pInstance
-		, std::shared_ptr<vk::PhysicalDevice> pPhysicalDevice
-		, std::shared_ptr<vk::Device> device, vk::Queue graphicsQueue
-		, vk::Queue presentQueue
-	)
-		: gfw::Window(width
-			, height
-			, title
-			, renderType
-			, pInstance
-			, pPhysicalDevice
-			, device
-			, graphicsQueue
-			, presentQueue
-		)
-	{
-	}
-
-	SubWindow::SubWindow(std::shared_ptr<GLFWwindow> pWindow
-		, std::shared_ptr<vk::SurfaceKHR> pSurface
-		, std::shared_ptr<vk::Instance> pInstance
-		, std::shared_ptr<vk::PhysicalDevice> pPhysicalDevice
-		, std::shared_ptr<vk::Device> pDevice
-		, vk::Queue graphicsQueue
-		, vk::Queue presentQueue
-	)
-		: gfw::Window(pWindow
-			, pSurface
-			, pInstance
-			, pPhysicalDevice
-			, pDevice
-			, graphicsQueue
-			, presentQueue
-		)
-	{
-	}
-
-	SubWindow::SubWindow(RenderType renderType
-		, std::shared_ptr<GLFWwindow> pWindow
-		, std::shared_ptr<vk::SurfaceKHR> pSurface
-		, std::shared_ptr<vk::Instance> pInstance
-		, std::shared_ptr<vk::PhysicalDevice> pPhysicalDevice
-		, std::shared_ptr<vk::Device> pDevice
-		, vk::Queue graphicsQueue
-		, vk::Queue presentQueue
-	)
-		: gfw::Window(renderType
-			, pWindow
-			, pSurface
-			, pInstance
-			, pPhysicalDevice
-			, pDevice
-			, graphicsQueue
-			, presentQueue
-		)
-	{
-
-	}
-
-	void SubWindow::_onPreUpdate()
-	{
-
-	}
-
-	void SubWindow::_update()
-	{
-
-	}
-
-	void SubWindow::_onPostUpdate()
-	{
-
-	}
-
-	void SubWindow::_onPreRender()
-	{
-
-	}
-
-	void SubWindow::_onPostRender()
-	{
-
-	}
-
 	bool Window::Vertex::operator==(const Vertex& other) const {
 		return pos == other.pos && color == other.color && texCoord == other.texCoord;
 	}
@@ -120,20 +12,10 @@ namespace chalet
 	Window::Window(uint32_t width
 		, uint32_t height
 		, const char* title
-		, std::shared_ptr<vk::Instance> pInstance
-		, std::shared_ptr<vk::PhysicalDevice> pPhysicalDevice
-		, std::shared_ptr<vk::Device> device
-		, vk::Queue graphicsQueue
-		, vk::Queue presentQueue
 	)
 		: gfw::Window(width
 			, height
 			, title
-			, pInstance
-			, pPhysicalDevice
-			, device
-			, graphicsQueue
-			, presentQueue
 		)
 	{
 		_loadModel();
@@ -150,21 +32,11 @@ namespace chalet
 		, uint32_t height
 		, const char* title
 		, RenderType renderType
-		, std::shared_ptr<vk::Instance> pInstance
-		, std::shared_ptr<vk::PhysicalDevice> pPhysicalDevice
-		, std::shared_ptr<vk::Device> pDevice
-		, vk::Queue graphicsQueue
-		, vk::Queue presentQueue
 	)
 		: gfw::Window(width
 			, height
 			, title
 			, renderType
-			, pInstance
-			, pPhysicalDevice
-			, pDevice
-			, graphicsQueue
-			, presentQueue
 		)
 	{
 		_loadModel();
@@ -179,19 +51,9 @@ namespace chalet
 
 	Window::Window(std::shared_ptr<GLFWwindow> pWindow
 		, std::shared_ptr<vk::SurfaceKHR> pSurface
-		, std::shared_ptr<vk::Instance> pInstance
-		, std::shared_ptr<vk::PhysicalDevice> pPhysicalDevice
-		, std::shared_ptr<vk::Device> pDevice
-		, vk::Queue graphicsQueue
-		, vk::Queue presentQueue
 	)
 		: gfw::Window(pWindow
 			, pSurface
-			, pInstance
-			, pPhysicalDevice
-			, pDevice
-			, graphicsQueue
-			, presentQueue
 		)
 	{
 		_loadModel();
@@ -207,20 +69,10 @@ namespace chalet
 	Window::Window(RenderType renderType
 		, std::shared_ptr<GLFWwindow> pWindow
 		, std::shared_ptr<vk::SurfaceKHR> pSurface
-		, std::shared_ptr<vk::Instance> pInstance
-		, std::shared_ptr<vk::PhysicalDevice> pPhysicalDevice
-		, std::shared_ptr<vk::Device> pDevice
-		, vk::Queue graphicsQueue
-		, vk::Queue presentQueue
 	)
 		: gfw::Window(renderType
 			, pWindow
 			, pSurface
-			, pInstance
-			, pPhysicalDevice
-			, pDevice
-			, graphicsQueue
-			, presentQueue
 		)
 	{
 		_loadModel();

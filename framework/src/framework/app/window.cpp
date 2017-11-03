@@ -15,7 +15,7 @@ namespace gfw {
 	{
 		_createWindow(width, height, title);
 		_createSurface();
-		_allocatePresentQueue();
+		//_allocatePresentQueue();
 		_createSwapchain();
 		_createSwapchainImageViews();
 		_createRenderers();
@@ -31,7 +31,7 @@ namespace gfw {
 	{
 		_createWindow(width, height, title);
 		_createSurface();
-		_allocatePresentQueue();
+		//_allocatePresentQueue();
 		_createSwapchain();
 		_createSwapchainImageViews();
 		_createRenderers();
@@ -48,7 +48,7 @@ namespace gfw {
 
 		glfwSetWindowUserPointer(pWindow.get(), this);
 		glfwSetWindowSizeCallback(pWindow.get(), onWindowResized);
-		_allocatePresentQueue();
+		//_allocatePresentQueue();
 		_createSwapchain();
 		_createSwapchainImageViews();
 		_createRenderers();
@@ -66,7 +66,7 @@ namespace gfw {
 
 		glfwSetWindowUserPointer(pWindow.get(), this);
 		glfwSetWindowSizeCallback(pWindow.get(), onWindowResized);
-		_allocatePresentQueue();
+		//_allocatePresentQueue();
 		_createSwapchain();
 		_createSwapchainImageViews();
 		_createRenderers();
@@ -75,7 +75,7 @@ namespace gfw {
 
 	Window::~Window()
 	{
-		_freePresentQueue();
+		//_freePresentQueue();
 	}
 
 	void Window::run()
@@ -123,7 +123,7 @@ namespace gfw {
 		LOG(plog::debug) << "Create successfully surface.";
 	}
 
-	void Window::_allocatePresentQueue()
+	/*void Window::_allocatePresentQueue()
 	{
 		kgs::pApp->allocatePresentQueue(m_presentQueueIndex, m_presentQueue);
 	}
@@ -131,7 +131,7 @@ namespace gfw {
 	void Window::_freePresentQueue()
 	{
 		kgs::pApp->freePresentQueue(m_presentQueueIndex);
-	}
+	}*/
 
 	void Window::_createSwapchain()
 	{
@@ -320,9 +320,10 @@ namespace gfw {
 				nullptr                             //pResults
 			};
 
-
-			result = vkQueuePresentKHR(m_presentQueue, reinterpret_cast<VkPresentInfoKHR *>(&presentInfo));
-
+			vk::Queue queue;
+			uint32_t queueIndex;
+			kgs::pApp->allocatePresentQueue(queueIndex, queue);
+			result = vkQueuePresentKHR(queue, reinterpret_cast<VkPresentInfoKHR *>(&presentInfo));
 			if (result == VK_ERROR_OUT_OF_DATE_KHR || result == VK_SUBOPTIMAL_KHR)
 			{
 				_reCreate();
@@ -339,8 +340,9 @@ namespace gfw {
 			frame will not noticeably affect performance.
 			**/
 #ifdef ENABLE_VALIDATION_LAYERS
-			vkQueueWaitIdle(m_presentQueue);
+			vkQueueWaitIdle(queue);
 #endif //ENABLE_VALIDATION_LAYERS
+			kgs::pApp->freePresentQueue(queueIndex);
 		}
 		else
 		{

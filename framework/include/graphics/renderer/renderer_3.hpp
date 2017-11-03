@@ -48,15 +48,8 @@ namespace kgs
 		);
 	private:
 		Renderer3() = delete;
-		//void _update(UpdateInfo updateInfo) override;
 		void _render(const RenderInfo &info, RenderResultInfo &resultInfo) override;
-		Bool32 _checkVisualObjectInsideCameraView(std::shared_ptr<typename SceneType::VisualObjectType> pVisualObject) override;
 		Bool32 _sortObjectsWithCameraZ(std::shared_ptr<typename SceneType::ObjectType> pObject1, std::shared_ptr<typename SceneType::ObjectType> pObject2);
-
-		inline SpaceTypeInfo<SpaceType::SPACE_3>::MatrixType _getMVPMatrix(std::shared_ptr<typename SceneType::ObjectType> pObject) override
-		{
-			return m_pCamera->getProjMatrix() * m_pCamera->getTransform()->getMatrixWorldToLocal() * pObject->getTransform()->getMatrixLocalToWorld();
-		}
 	};
 } //namespace kgs
 

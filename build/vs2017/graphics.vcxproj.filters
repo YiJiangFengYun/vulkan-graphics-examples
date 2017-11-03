@@ -415,5 +415,8 @@
     <None Include="..\..\framework\include\graphics\material\material_data.inl">
       <Filter>include\graphics\material</Filter>
     </None>
+    <None Include="..\..\framework\include\graphics\scene\camera_op.inl">
+      <Filter>include\graphics\scene</Filter>
+    </None>
   </ItemGroup>
 </Project>

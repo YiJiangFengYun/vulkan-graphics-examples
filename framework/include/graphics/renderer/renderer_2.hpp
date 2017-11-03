@@ -33,9 +33,7 @@ namespace kgs
 
 	private:
 		Renderer2() = delete;
-		//void _update(UpdateInfo updateInfo) override;
 		void _render(const RenderInfo &info, RenderResultInfo &resultInfo) override;
-		Bool32 _checkVisualObjectInsideCameraView(std::shared_ptr<typename SceneType::VisualObjectType> pVisualObject) override;
 	};
 } //namespace kgs
 

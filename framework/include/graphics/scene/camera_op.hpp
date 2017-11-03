@@ -9,38 +9,20 @@ namespace kgs
 	class CameraOP : public Camera<SPACE_TYPE>
 	{
 	public:
-		typedef fd::Bounds<typename SpaceTypeInfo<SPACE_TYPE>::PointType> BoundsType;
-		CameraOP()
-			: Camera<SPACE_TYPE>()
-			, m_viewBounds(BoundsType::ValueType(-1.0f), BoundsType::ValueType(1.0f))
-		{
-			apply();
-		}
-
-		void updateProj(BoundsType viewBounds)
-		{
-			m_viewBounds = viewBounds;
-			apply();
-		}
-
-		virtual void apply()
-		{
-
-		}
-
-		typename TransformType::MatrixType getProjMatrix() override
-		{
-			return m_projMatrix;
-		}
-
-		BoundsType getViewBounds()
-		{
-			return m_viewBounds;
-		}
+		CameraOP();
+		void updateProj(BoundsType viewBounds);
+		virtual void apply() = 0;
 	protected:
 		BoundsType m_viewBounds;
 		typename TransformType::MatrixType m_projMatrix;
+
+	private:
+		typename TransformType::MatrixType getProjMatrix() override;
+		BoundsType getViewBounds();
+		Bool32 isInView(std::shared_ptr<TransformType> pTransform, BoundsType bounds) override;
 	};
 } //namespace kgs
+
+#include "graphics/scene/camera_op.inl"
 
 #endif // !KGS_CAMERA_OP_H

@@ -102,10 +102,15 @@ namespace gfw
 
 		//void _freePresentQueue();
 
-		void _reCreate();
 
 		void _doUpdate();
 		void _doRender();
+
+		void _doReCreateSwapchain();
+
+		virtual void _onPreReCreateSwapchain() = 0;
+		virtual void _reCreateSwapchain();
+		virtual void _onPostReCreateSwapchain() = 0;
 
 		virtual void _onPreUpdate() = 0;
 		virtual void _update() = 0;

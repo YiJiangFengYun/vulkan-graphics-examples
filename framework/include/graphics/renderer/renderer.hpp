@@ -43,6 +43,11 @@ namespace kgs
 
 		void render(const RenderInfo &info, RenderResultInfo &resultInfo);
 
+		uint32_t getFramebufferWidth();
+		uint32_t getFramebufferHeight();
+		vk::Format getColorImageFormat();
+		vk::Format getDepthStencilImageFormat();
+
 		Color getClearValueColor();
 		void setClearValueColor(Color color);
 		float getClearValueDepth();

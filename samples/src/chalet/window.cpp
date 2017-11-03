@@ -224,6 +224,16 @@ namespace chalet
 		}
 	}
 
+	void Window::_onPreReCreateSwapchain()
+	{
+
+	}
+
+	void Window::_onPostReCreateSwapchain()
+	{
+		_fillRenderer();
+	}
+
 	void Window::_onPreUpdate()
 	{
 

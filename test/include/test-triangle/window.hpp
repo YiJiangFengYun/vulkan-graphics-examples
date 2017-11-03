@@ -62,6 +62,9 @@ namespace testTriangle
 		void _createScene();
 		void _fillRenderer();
 
+		void _onPreReCreateSwapchain() override;
+		void _onPostReCreateSwapchain() override;
+
 		void _onPreUpdate() override;
 		void _update() override;
 		void _onPostUpdate() override;

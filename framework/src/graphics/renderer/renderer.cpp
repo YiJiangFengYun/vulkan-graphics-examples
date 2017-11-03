@@ -51,6 +51,26 @@ namespace kgs
 		_render(info, resultInfo);
 	}
 
+	uint32_t BaseRenderer::getFramebufferWidth()
+	{
+		return m_framebufferWidth;
+	}
+
+	uint32_t BaseRenderer::getFramebufferHeight()
+	{
+		return m_framebufferHeight;
+	}
+
+	vk::Format BaseRenderer::getColorImageFormat()
+	{
+		return m_colorImageFormat;
+	}
+
+	vk::Format BaseRenderer::getDepthStencilImageFormat()
+	{
+		return m_depthStencilImageFormat;
+	}
+
 	Color BaseRenderer::getClearValueColor()
 	{
 		return m_clearValueColor;
@@ -421,7 +441,11 @@ namespace kgs
 	void BaseRenderer::_createDepthStencilTex()
 	{
 		m_pDepthStencilTexture = std::shared_ptr<TextureDepthStencilAttachment>(
-			new TextureDepthStencilAttachment(TextureFormat::D32_SFLOAT_S8_UINT, m_framebufferWidth, m_framebufferHeight)
+			new TextureDepthStencilAttachment(
+				TextureFormat::D32_SFLOAT_S8_UINT,
+				m_framebufferWidth,
+				m_framebufferHeight
+			)
 			);
 	}
 

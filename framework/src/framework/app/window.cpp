@@ -260,7 +260,7 @@ namespace gfw {
 		//m_pRenderFinishedSemaphore = fd::createSemaphore(m_pDevice, createInfo);
 	}
 
-	void Window::_reCreate()
+	void Window::_reCreateSwapchain()
 	{
 		_createSwapchain();
 		_createSwapchainImageViews();
@@ -281,6 +281,13 @@ namespace gfw {
 		_onPostRender();
 	}
 
+	void Window::_doReCreateSwapchain()
+	{
+		_onPreReCreateSwapchain();
+		_reCreateSwapchain();
+		_onPostReCreateSwapchain();
+	}
+
 	void Window::_render()
 	{
 		auto pDevice = kgs::pApp->getDevice();
@@ -296,7 +303,7 @@ namespace gfw {
 		{
 			if (result == VK_ERROR_OUT_OF_DATE_KHR)
 			{
-				_reCreate();
+				_doReCreateSwapchain();
 			}
 			else if (result != VK_SUCCESS && result != VK_SUBOPTIMAL_KHR)
 			{
@@ -326,7 +333,7 @@ namespace gfw {
 			result = vkQueuePresentKHR(queue, reinterpret_cast<VkPresentInfoKHR *>(&presentInfo));
 			if (result == VK_ERROR_OUT_OF_DATE_KHR || result == VK_SUBOPTIMAL_KHR)
 			{
-				_reCreate();
+				_doReCreateSwapchain();
 			}
 			else if (result != VK_SUCCESS)
 			{
@@ -431,10 +438,11 @@ namespace gfw {
 
 	void Window::_onWindowResized(int32_t width, int32_t height)
 	{
+		if (width == 0 || height == 0) return;
 		LOG(plog::debug) << "Context resize.";
 
 		//recreate.
-		_reCreate();
+		_doReCreateSwapchain();
 	}
 
 	void onWindowResized(GLFWwindow* window, int32_t width, int32_t height)

@@ -29,7 +29,6 @@ namespace kgs
 	private:
 		float m_fovy, m_aspect, m_zNear, m_zFar;
 		TransformType::MatrixType m_projMatrix;
-		inline void _apply();
 	};
 
 } //namespace kgs

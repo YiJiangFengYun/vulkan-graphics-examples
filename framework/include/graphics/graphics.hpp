@@ -24,8 +24,9 @@
 #include <graphics/renderer/renderer_3.hpp>
 #include <graphics/scene/scene_2.hpp>
 #include <graphics/scene/scene_3.hpp>
-#include <graphics/scene/camera_2.hpp>
 #include <graphics/scene/camera_3.hpp>
+#include <graphics/scene/camera_op_2.hpp>
+#include <graphics/scene/camera_op_3.hpp>
 #include <graphics/scene/visual_object_2.hpp>
 #include <graphics/scene/visual_object_3.hpp>
 

@@ -1,6 +1,4 @@
 Graphics:
-.orthographic for camera3 and its volume.
-.orthographic for camera2 and its volume.
 .Background color of renderer.
 .Depth and stencil clear value of renderer.
 .Base render logic for renderer2.

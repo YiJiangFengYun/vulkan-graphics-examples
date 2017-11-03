@@ -14,8 +14,6 @@
 const uint32_t WINDOW_WIDTH = 800;
 const uint32_t WINDOW_HEIGHT = 600;
 int main() {
-
-	//kgs::initGraphics();
 	gfw::moduleCreate();
 
 	testTriangle::App testTriangle;

@@ -77,4 +77,78 @@ namespace kgs
 		return m_projMatrix;
 	}
 
+	Bool32 Camera3::isInView(std::shared_ptr<TransformType> pTransform, BoundsType bounds)
+	{
+		auto min = bounds.getMin();
+		auto max = bounds.getMax();
+		typedef typename SpaceTypeInfo<SpaceType::SPACE_3>::PointType PointType;
+		typedef typename SpaceTypeInfo<SpaceType::SPACE_3>::MatrixVectorType MatrixVectorType;
+		typename PointType::length_type len = PointType::length();
+
+		//use permutation combination algorithm to get all points of bounds.
+		uint32_t pointCount = static_cast<uint32_t>(std::pow(2u, len));
+		std::vector<MatrixVectorType> points(pointCount);
+		uint32_t pointIndex = 0u;
+		std::vector<Bool32> places(len);
+		for (typename PointType::length_type i = 0; i <= len; ++i)
+		{
+			std::fill(places.begin(), places.end(), KGS_FALSE);
+			std::fill(places.begin(), places.begin() + i, KGS_TRUE);
+			do
+			{
+				typename PointType::length_type j;
+				for (j = 0; j < len; ++j)
+				{
+					if (places[j] == KGS_TRUE)
+					{
+						points[pointIndex][j] = min[j];
+					}
+					else
+					{
+						points[pointIndex][j] = max[j];
+					}
+				}
+				points[pointIndex][j] = 1.0f; //final number is 1.0 for point.
+				++pointIndex;
+			} while (std::prev_permutation(places.begin(), places.end()));
+		}
+
+		//get MVP matrix.
+		auto mvpMatrix = m_projMatrix * m_pTransform->getMatrixWorldToLocal() * pTransform->getMatrixLocalToWorld();
+
+		//transform point from model coordinate system to normalize device coordinate system.
+		for (uint8_t i = 0; i < pointCount; ++i)
+		{
+			points[i] = mvpMatrix * points[i];
+			points[i] = points[i] / points[i].w;
+		}
+
+		PointType minInView;
+		PointType maxInView;
+
+		for (typename PointType::length_type i = 0; i < len; ++i)
+		{
+			typename PointType::value_type min = std::numeric_limits<typename PointType::value_type>::max(), max = -std::numeric_limits<typename PointType::value_type>::max();
+			for (uint8_t j = 0; j < pointCount; ++j)
+			{
+				if (min > points[j][i])min = points[j][i];
+				if (max < points[j][i])max = points[j][i];
+			}
+			minInView[i] = min;
+			maxInView[i] = max;
+		}
+
+		fd::Bounds<PointType> boundsInView(minInView, maxInView);
+		fd::Bounds<PointType> boundsOfView(PointType(-1.0f, -1.0f, 0.0f), PointType(1.0f, 1.0f, 1.0f));
+
+		Bool32 isInsideCameraView = KGS_FALSE;
+		////check if it is inside camera view.
+		if (boundsOfView.isIntersects(boundsInView))
+		{
+			isInsideCameraView = KGS_TRUE;
+		}
+
+		return isInsideCameraView;
+	}
+
 } //namespace kgs

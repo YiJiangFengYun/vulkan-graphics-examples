@@ -139,6 +139,7 @@
     <None Include="..\..\framework\include\graphics\mesh\mesh.inl" />
     <None Include="..\..\framework\include\graphics\mesh\mesh_data.inl" />
     <None Include="..\..\framework\include\graphics\renderer\renderer.inl" />
+    <None Include="..\..\framework\include\graphics\scene\camera_op.inl" />
     <None Include="..\..\framework\include\graphics\scene\scene.inl" />
     <None Include="..\..\framework\include\graphics\scene\transform.inl" />
   </ItemGroup>

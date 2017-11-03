@@ -50,18 +50,8 @@ namespace kgs
 
 	}
 
-	/*void Renderer2::_update(UpdateInfo updateInfo)
-	{
-		Renderer::_update(updateInfo);
-	}*/
-
 	void Renderer2::_render(const RenderInfo &info, RenderResultInfo &resultInfo)
 	{
 		Renderer::_render(info, resultInfo);
-	}
-
-	Bool32 Renderer2::_checkVisualObjectInsideCameraView(std::shared_ptr<typename SceneType::VisualObjectType> pVisualObject)
-	{
-		return KGS_TRUE;
 	}
 } //namespace kgs

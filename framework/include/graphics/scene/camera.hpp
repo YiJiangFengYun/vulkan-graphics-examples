@@ -16,6 +16,7 @@ namespace kgs
 	class Camera : public BaseCamera, public Object<SPACE_TYPE>
 	{
 	public:
+		typedef fd::Bounds<typename SpaceTypeInfo<SPACE_TYPE>::PointType> BoundsType;
 		Camera()
 			: BaseCamera()
 			, Object<SPACE_TYPE>()
@@ -23,10 +24,9 @@ namespace kgs
 			m_objectType = ObjectType::CAMERA;
 		}
 
-		virtual typename TransformType::MatrixType getProjMatrix()
-		{
-			return TransformType::MatrixType(1.0f);
-		}
+		virtual typename TransformType::MatrixType getProjMatrix() = 0;
+
+		virtual Bool32 isInView(std::shared_ptr<TransformType> pTransform, BoundsType bounds) = 0;
 	};
 } //namespace kgs
 

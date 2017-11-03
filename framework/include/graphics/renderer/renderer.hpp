@@ -42,12 +42,22 @@ namespace kgs
 		Bool32 isValidForRender();
 
 		void render(const RenderInfo &info, RenderResultInfo &resultInfo);
+
+		Color getClearValueColor();
+		void setClearValueColor(Color color);
+		float getClearValueDepth();
+		void setClearValueDepth(float value);
+		uint32_t getClearValueStencil();
+		void setClearValueStencil(uint32_t value);
 	protected:
 		//compositions
 		uint32_t m_framebufferWidth;
 		uint32_t m_framebufferHeight;
 		vk::Format m_colorImageFormat;
 		vk::Format m_depthStencilImageFormat;
+		Color m_clearValueColor;
+		float m_clearValueDepth;
+		uint32_t m_clearValueStencil;
 		std::shared_ptr<vk::RenderPass> m_pRenderPass;
 		std::shared_ptr<TextureDepthStencilAttachment> m_pDepthStencilTexture;
 		std::shared_ptr<vk::Framebuffer> m_pFrameBuffer;

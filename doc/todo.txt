@@ -1,6 +1,5 @@
 Graphics:
-.Background color of renderer.
-.Depth and stencil clear value of renderer.
+.To recreate swapchain when resize window.
 .Base render logic for renderer2.
 .Viewport and scissor of pass.
 .Setting of depth and stencil for passs as DepthStencilStateCreateInfo.

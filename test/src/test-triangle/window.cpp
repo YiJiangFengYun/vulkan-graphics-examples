@@ -174,6 +174,11 @@ namespace testTriangle
 		float time = std::chrono::duration_cast<std::chrono::milliseconds>(currentTime - startTime).count() / 1000.0f;
 		float strength = remainder(time, 1.0f) / 1.0f;
 		m_pPass->setMainColor(kgs::Color(strength, strength, strength, 1.0f));
+
+		for (const auto& pRenderer : m_pRenderers)
+		{
+			pRenderer->setClearValueColor(kgs::Color(strength, 0.0f, 0.0f, 0.0f));
+		}
 	}
 
 	void Window::_onPostUpdate()

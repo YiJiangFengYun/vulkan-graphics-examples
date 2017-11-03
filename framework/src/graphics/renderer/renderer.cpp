@@ -15,6 +15,9 @@ namespace kgs
 		, m_depthStencilImageFormat(DEFAULT_DEPTH_STENCIL_FORMAT)
 		, m_framebufferWidth(swapchainImageWidth)
 		, m_framebufferHeight(swapchainImageHeight)
+		, m_clearValueColor(0.0f)
+		, m_clearValueDepth(1.0f)
+		, m_clearValueStencil(0u)
 	{
 		_init();
 	}
@@ -26,6 +29,9 @@ namespace kgs
 		, m_depthStencilImageFormat(DEFAULT_DEPTH_STENCIL_FORMAT)
 		, m_framebufferWidth(pColorAttachmentTex->getWidth())
 		, m_framebufferHeight(pColorAttachmentTex->getHeight())
+		, m_clearValueColor(0.0f)
+		, m_clearValueDepth(1.0f)
+		, m_clearValueStencil(0u)
 	{
 		_init();
 	}
@@ -43,6 +49,36 @@ namespace kgs
 	void BaseRenderer::render(const RenderInfo &info, RenderResultInfo &resultInfo)
 	{
 		_render(info, resultInfo);
+	}
+
+	Color BaseRenderer::getClearValueColor()
+	{
+		return m_clearValueColor;
+	}
+
+	void BaseRenderer::setClearValueColor(Color color)
+	{
+		m_clearValueColor = color;
+	}
+
+	float BaseRenderer::getClearValueDepth()
+	{
+		return m_clearValueDepth;
+	}
+
+	void BaseRenderer::setClearValueDepth(float value)
+	{
+		m_clearValueDepth = value;
+	}
+
+	uint32_t BaseRenderer::getClearValueStencil()
+	{
+		return m_clearValueStencil;
+	}
+
+	void BaseRenderer::setClearValueStencil(uint32_t value)
+	{
+		m_clearValueStencil = value;
 	}
 
 	Bool32 BaseRenderer::_isValidForRender()
@@ -120,11 +156,11 @@ namespace kgs
 			{                               //offset
 				0,                             //x
 				0                              //y
-			}, 
+			},
 			{                               //extent
 				m_framebufferWidth,            //width
 				m_framebufferHeight            //height
-			} 
+			}
 		};
 
 		vk::PipelineViewportStateCreateInfo viewportStateCreateInfo = {
@@ -196,7 +232,7 @@ namespace kgs
 			| vk::ColorComponentFlagBits::eB
 			| vk::ColorComponentFlagBits::eA  //colorWriteMask
 		};
-		
+
 		vk::PipelineColorBlendStateCreateInfo colorBlendStateCreateInfo = {
 			vk::PipelineColorBlendStateCreateFlags(),              //flags
 			VK_FALSE,                                              //logicOpEnable
@@ -247,10 +283,22 @@ namespace kgs
 		m_pCommandBuffer->begin(beginInfo);
 		LOG(plog::debug) << "Post begin command buffer for render." << std::endl;
 
-		std::array<vk::ClearValue, 2> clearValues = { {
-				vk::ClearValue(vk::ClearColorValue(std::array<float, 4>{{0.0f, 0.0f, 0.0f, 0.0f}})),
-				vk::ClearValue(vk::ClearDepthStencilValue(1.0f, 0u))
-			} };
+		vk::ClearValue clearValueColor = {
+			std::array<float, 4>{m_clearValueColor[0]
+					, m_clearValueColor[1]
+					, m_clearValueColor[2]
+					, m_clearValueColor[3]
+			}
+		};
+		vk::ClearValue clearValueDepthStencil = {
+			vk::ClearDepthStencilValue(m_clearValueDepth
+				, m_clearValueStencil
+			)
+		};
+		std::array<vk::ClearValue, 2> clearValues = { clearValueColor
+			, clearValueDepthStencil
+		};
+
 		vk::RenderPassBeginInfo renderPassBeginInfo = {
 			*m_pRenderPass,                                   //renderPass
 			*m_pFrameBuffer,                                  //framebuffer

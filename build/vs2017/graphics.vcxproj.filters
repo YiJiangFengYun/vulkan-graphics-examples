@@ -153,9 +153,6 @@
     <ClCompile Include="..\..\framework\src\graphics\scene\visual_object_3.cpp">
       <Filter>src\graphics\scene</Filter>
     </ClCompile>
-    <ClCompile Include="..\..\framework\src\graphics\scene\camera_2.cpp">
-      <Filter>src\graphics\scene</Filter>
-    </ClCompile>
     <ClCompile Include="..\..\framework\src\graphics\scene\camera_3.cpp">
       <Filter>src\graphics\scene</Filter>
     </ClCompile>
@@ -215,6 +212,15 @@
     </ClCompile>
     <ClCompile Include="..\..\framework\src\graphics\util\queue_master.cpp">
       <Filter>src\graphics\util</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\framework\src\graphics\scene\camera_op_2.cpp">
+      <Filter>src\graphics\scene</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\framework\src\graphics\scene\camera_op_3.cpp">
+      <Filter>src\graphics\scene</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\framework\src\graphics\scene\camera_op.cpp">
+      <Filter>src\graphics\scene</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
@@ -320,9 +326,6 @@
     <ClInclude Include="..\..\framework\include\graphics\scene\visual_object_3.hpp">
       <Filter>include\graphics\scene</Filter>
     </ClInclude>
-    <ClInclude Include="..\..\framework\include\graphics\scene\camera_2.hpp">
-      <Filter>include\graphics\scene</Filter>
-    </ClInclude>
     <ClInclude Include="..\..\framework\include\graphics\scene\camera_3.hpp">
       <Filter>include\graphics\scene</Filter>
     </ClInclude>
@@ -379,6 +382,15 @@
     </ClInclude>
     <ClInclude Include="..\..\framework\include\graphics\util\queue_master.hpp">
       <Filter>include\graphics\util</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\framework\include\graphics\scene\camera_op.hpp">
+      <Filter>include\graphics\scene</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\framework\include\graphics\scene\camera_op_2.hpp">
+      <Filter>include\graphics\scene</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\framework\include\graphics\scene\camera_op_3.hpp">
+      <Filter>include\graphics\scene</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>

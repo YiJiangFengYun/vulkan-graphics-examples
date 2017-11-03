@@ -207,7 +207,11 @@ namespace kgs
 		}
 
 		LOG(plog::debug) << "Pre submit to grahics queue." << std::endl;
-		m_graphicsQueue.submit(submitInfos, nullptr);
+		vk::Queue queue;
+		uint32_t queueIndex;
+		pApp->allocateGaphicsQueue(queueIndex, queue);
+		queue.submit(submitInfos, nullptr);
+		pApp->freeGraphicsQueue(queueIndex);
 		LOG(plog::debug) << "Post submit to grahics queue." << std::endl;
 
 		resultInfo.signalSemaphoreCount = static_cast<uint32_t>(m_arrSemaphores.size());

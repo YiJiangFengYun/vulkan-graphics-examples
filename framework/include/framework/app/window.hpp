@@ -80,8 +80,8 @@ namespace gfw
 		vk::Format m_swapchainImageFormat;
 		vk::Extent2D m_swapchainExtent;
 		std::vector<std::shared_ptr<vk::ImageView>> m_pSwapchainImageViews;
-		vk::Queue m_presentQueue;
-		uint32_t m_presentQueueIndex;
+		//vk::Queue m_presentQueue;
+		//uint32_t m_presentQueueIndex;
 		std::vector<std::shared_ptr<kgs::BaseRenderer>> m_pRenderers;
 		std::shared_ptr<vk::Semaphore> m_pImageAvailableSemaphore;
 
@@ -94,13 +94,13 @@ namespace gfw
 
 		void _createWindow(uint32_t width, uint32_t height, const char* title);
 		void _createSurface();
-		void _allocatePresentQueue();
+		//void _allocatePresentQueue();
 		void _createSwapchain();
 		void _createSwapchainImageViews();
 		void _createRenderers();
 		void _createSemaphores();
 
-		void _freePresentQueue();
+		//void _freePresentQueue();
 
 		void _reCreate();
 

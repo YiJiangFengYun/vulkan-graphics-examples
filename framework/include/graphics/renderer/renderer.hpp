@@ -56,8 +56,8 @@ namespace kgs
 		std::shared_ptr<vk::CommandBuffer> m_pCommandBuffer;
 
 		//Grahics queue for render safe in multiply threads.
-		vk::Queue m_graphicsQueue;
-		uint32_t m_graphicsQueueIndex;
+		//vk::Queue m_graphicsQueue;
+		//uint32_t m_graphicsQueueIndex;
 
 		std::vector<std::shared_ptr<vk::PipelineLayout>> m_arrPLastPipelineLayouts;
 		std::vector<std::shared_ptr<vk::Pipeline>> m_arrPLastPipelines;
@@ -78,10 +78,10 @@ namespace kgs
 		void _createFramebuffer();
 		void _createCommandPool();
 		void _createCommandBuffer();
-		void _allocateGraphicsQueue();
+		//void _allocateGraphicsQueue();
 
 
-		void _freeGraphicsQueue();
+		//void _freeGraphicsQueue();
 
 		void _createPipelineForRender(std::shared_ptr<vk::PipelineLayout> &pPipelineLayout, 
 			std::shared_ptr<vk::Pipeline> &pPipeline,

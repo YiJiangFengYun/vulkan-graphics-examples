@@ -3,18 +3,19 @@
 namespace kgs
 {
 	QueueMaster::QueueMaster(std::shared_ptr<vk::Device> pDevice
-		, uint32_t graphicsFamily
-		, uint32_t graphicsQueueCount
-		, uint32_t presentFamily
-		, uint32_t presentQueueCount
+		, std::vector<std::pair<uint32_t, uint32_t>> familiesAndCounts
 	)
 		: m_pDevice(pDevice)
-		, m_graphicsFamily(graphicsFamily)
-		, m_graphicsQueueCount(graphicsQueueCount)
-		, m_presentFamily(presentFamily)
-		, m_presentQueueCount(presentQueueCount)
 	{
-		_createQueueIndexs();
+		_createQueueIndexs(familiesAndCounts);
+	}
+
+	QueueMaster::QueueMaster(std::shared_ptr<vk::Device> pDevice
+		, std::unordered_map<uint32_t, uint32_t> familiesAndCounts
+	)
+		: m_pDevice(pDevice)
+	{
+		_createQueueIndexs(familiesAndCounts);
 	}
 
 	uint32_t  QueueMaster::getQueueCount(uint32_t family)
@@ -36,13 +37,21 @@ namespace kgs
 		m_mapQueueIndexs[family].push(queueIndex);
 	}
 
-	void QueueMaster::_createQueueIndexs()
+	void QueueMaster::_createQueueIndexs(std::vector<std::pair<uint32_t, uint32_t>> familiesAndCounts)
 	{
-		std::unordered_map<uint32_t, uint32_t> mapCounts;
-		mapCounts[m_graphicsFamily] += m_graphicsQueueCount;
-		mapCounts[m_presentFamily] += m_presentQueueCount;
+		for (const auto& item : familiesAndCounts)
+		{
+			uint32_t count = item.second;
+			for (uint32_t i = 0; i < count; ++i)
+			{
+				m_mapQueueIndexs[item.first].push(i);
+			}
+		}
+	}
 
-		for (const auto& item : mapCounts)
+	void QueueMaster::_createQueueIndexs(std::unordered_map<uint32_t, uint32_t> familiesAndCounts)
+	{
+		for (const auto& item : familiesAndCounts)
 		{
 			uint32_t count = item.second;
 			for (uint32_t i = 0; i < count; ++i)

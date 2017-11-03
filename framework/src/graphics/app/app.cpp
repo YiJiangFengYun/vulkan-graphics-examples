@@ -406,14 +406,20 @@ namespace kgs
 		mapFamilyAndQueueCounts[usedQueueFamily.graphicsFamily] += graphicsQueueCount;
 		mapFamilyAndQueueCounts[usedQueueFamily.presentFamily] += presentQueueCount;
 
-		mapFamilyAndQueueCounts[usedQueueFamily.graphicsFamily] = 
+		mapFamilyAndQueueCounts[usedQueueFamily.graphicsFamily] =
 			std::min(mapFamilyAndQueueCounts[usedQueueFamily.graphicsFamily], usedQueueFamily.graphicsMaxQueueCount);
 
 		mapFamilyAndQueueCounts[usedQueueFamily.presentFamily] =
 			std::min(mapFamilyAndQueueCounts[usedQueueFamily.presentFamily], usedQueueFamily.presentMaxQueueCount);
 
 		queueCreateInfos.resize(mapFamilyAndQueueCounts.size());
-		float queuePriority = 1.0f;
+
+		graphicsQueueCount = mapFamilyAndQueueCounts[usedQueueFamily.graphicsFamily];
+		presentQueueCount = mapFamilyAndQueueCounts[usedQueueFamily.presentFamily];
+		
+		std::unordered_map<uint32_t, std::vector<float>> familiyPriorites;
+		familiyPriorites[usedQueueFamily.graphicsFamily] = std::vector<float>(graphicsQueueCount, 0.0f);
+		familiyPriorites[usedQueueFamily.presentFamily] = std::vector<float>(presentQueueCount, 0.0f);
 
 		size_t index = 0;
 		for (const auto& item : mapFamilyAndQueueCounts)
@@ -422,7 +428,7 @@ namespace kgs
 				vk::DeviceQueueCreateFlags(),                 //flags
 				static_cast<uint32_t>(item.first),            //queueFamilyIndex
 				uint32_t(item.second),                        //queueCount
-				&queuePriority                                //pQueuePriorities
+				familiyPriorites[item.first].data()           //pQueuePriorities
 			};
 			queueCreateInfos[index] = queueCreateInfo;
 			++index;
@@ -449,10 +455,8 @@ namespace kgs
 
 		m_pDevice = fd::createDevice(m_pPhysicalDevice, createInfo);
 		m_pQueueMaster = std::shared_ptr<QueueMaster>(new QueueMaster(m_pDevice
-			, usedQueueFamily.graphicsFamily
-			, graphicsQueueCount
-			, usedQueueFamily.presentFamily
-			, presentQueueCount));
+			, mapFamilyAndQueueCounts
+		));
 
 		LOG(plog::debug) << "Create successfully logic device.";
 	}

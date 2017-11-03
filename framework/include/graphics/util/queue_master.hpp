@@ -11,10 +11,11 @@ namespace kgs
 	{
 	public:
 		QueueMaster(std::shared_ptr<vk::Device> pDevice
-			, uint32_t graphicsFamily
-			, uint32_t graphicsQueueCount
-		    , uint32_t presentFamily
-	        , uint32_t presentQueueCount
+			, std::vector<std::pair<uint32_t, uint32_t>> familiesAndCounts
+		);
+
+		QueueMaster(std::shared_ptr<vk::Device> pDevice
+			, std::unordered_map<uint32_t, uint32_t> familiesAndCounts
 		);
 
 		uint32_t getQueueCount(uint32_t family);
@@ -24,13 +25,10 @@ namespace kgs
 	private:
 		QueueMaster() = delete;
 		std::shared_ptr<vk::Device> m_pDevice;
-		uint32_t m_graphicsFamily;
-		uint32_t m_graphicsQueueCount;
-		uint32_t m_presentFamily;
-		uint32_t m_presentQueueCount;
 		std::unordered_map<uint32_t, std::queue<uint32_t>> m_mapQueueIndexs;
 
-		void _createQueueIndexs();
+		void _createQueueIndexs(std::vector<std::pair<uint32_t, uint32_t>> familiesAndCounts);
+		void _createQueueIndexs(std::unordered_map<uint32_t, uint32_t> familiesAndCounts);
 	};
 } //namespace kgs
 

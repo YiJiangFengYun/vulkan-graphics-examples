@@ -32,7 +32,7 @@ namespace kgs
 
 	BaseRenderer::~BaseRenderer()
 	{
-		_freeGraphicsQueue();
+		//_freeGraphicsQueue();
 	}
 
 	Bool32 BaseRenderer::isValidForRender()
@@ -293,7 +293,7 @@ namespace kgs
 		_createFramebuffer();
 		_createCommandPool();
 		_createCommandBuffer();
-		_allocateGraphicsQueue();
+		//_allocateGraphicsQueue();
 	}
 
 	void BaseRenderer::_createRenderPass()
@@ -430,7 +430,7 @@ namespace kgs
 		LOG(plog::debug) << "Post allocate command buffer from pool." << std::endl;
 	}
 
-	void BaseRenderer::_allocateGraphicsQueue()
+	/*void BaseRenderer::_allocateGraphicsQueue()
 	{
 		pApp->allocateGaphicsQueue(m_graphicsQueueIndex, m_graphicsQueue);
 	}
@@ -438,5 +438,5 @@ namespace kgs
 	void BaseRenderer::_freeGraphicsQueue()
 	{
 		pApp->freeGraphicsQueue(m_graphicsQueueIndex);
-	}
+	}*/
 }

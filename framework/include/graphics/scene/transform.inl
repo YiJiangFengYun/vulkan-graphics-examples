@@ -43,6 +43,21 @@ namespace kgs
 	}
 
 	template <SpaceType SPACE_TYPE>
+	std::vector<Type *>::const_iterator Transform<SPACE_TYPE>::getChildPos(Type *child)
+	{
+#ifdef DEBUG
+		if (isChild(child)) throw std::invalid_argument("The target is not a child of the tranform.");
+#endif // DEBUG
+		return std::find(m_arrPChildren.cbegin(), m_arrPChildren.cend(), child);
+	}
+
+	template <SpaceType SPACE_TYPE>
+	const Transform<SPACE_TYPE>::std::vector<Type *> &Transform<SPACE_TYPE>::getChildren()
+	{
+		return m_arrPChildren;
+	}
+
+	template <SpaceType SPACE_TYPE>
 	Bool32 Transform<SPACE_TYPE>::isChild(Type *pTransform)
 	{
 		return _isChild(pTransform);
@@ -54,7 +69,14 @@ namespace kgs
 		if (_isChild(pNewChild)) return;
 
 		_addChildOnly(pNewChild);
-		pNewChild->_setParentOnly(this);
+		pNewChild->setParent(this);
+	}
+
+	template <SpaceType SPACE_TYPE>
+	void Transform<SPACE_TYPE>::addChild(Type *pNewChild, std::vector<Type *>::const_iterator pos)
+	{
+		_addChildOnly(pNewChild, pos);
+		pNewChild->setParent(this);
 	}
 
 	template <SpaceType SPACE_TYPE>
@@ -235,6 +257,20 @@ namespace kgs
 	{
 		m_arrPChildren.push_back(pNewChild);
 		m_mapPChildren[pNewChild->getID()] = pNewChild;
+	}
+
+	template <SpaceType SPACE_TYPE>
+	void Transform<SPACE_TYPE>::_addChildOnly(Type *pNewChild, std::vector<Type *>::const_iterator pos)
+	{
+		if (_isChild(pNewChild))
+		{
+			m_arrPChildren.insert(pNewChild, pos);
+		}
+		else
+		{
+			m_arrPChildren.insert(pNewChild, pos);
+			m_mapPChildren[pNewChild->getID()] = pNewChild;
+		}
 	}
 
 	template <SpaceType SPACE_TYPE>

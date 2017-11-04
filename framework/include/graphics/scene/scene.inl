@@ -29,13 +29,13 @@ namespace kgs
 	void Scene<SPACE_TYPE>::addVisualObject(const std::shared_ptr<VisualObjectType> pTarget
 		, const std::shared_ptr<VisualObjectType> pParent)
 	{
-		_addObject(pTarget, m_arrPVisualObjects, m_mapPVisualObjects, pParent);
+		_addVisualObject(pTarget, pParent);
 	}
 
 	template <SpaceType SPACE_TYPE>
 	void Scene<SPACE_TYPE>::removeVisualObject(const std::shared_ptr<VisualObjectType> pTarget)
 	{
-		_removeObject(pTarget, m_arrPVisualObjects, m_mapPVisualObjects);
+		_removeVisualObject(pTarget);
 	}
 
 	template <SpaceType SPACE_TYPE>
@@ -98,6 +98,19 @@ namespace kgs
 	void Scene<SPACE_TYPE>::removeLight(const std::shared_ptr<LightType> pTarget)
 	{
 		_removeObject(pTarget, m_arrPLights, m_mapPLights);
+	}
+
+	template <SpaceType SPACE_TYPE>
+	void Scene<SPACE_TYPE>::_addVisualObject(const std::shared_ptr<VisualObjectType> pTarget
+		, const std::shared_ptr<VisualObjectType> pParent)
+	{
+		_addObject(pTarget, m_arrPVisualObjects, m_mapPVisualObjects, pParent);
+	}
+
+	template <SpaceType SPACE_TYPE>
+	void Scene<SPACE_TYPE>::_removeVisualObject(const std::shared_ptr<VisualObjectType> pTarget)
+	{
+		_removeObject(pTarget, m_arrPVisualObjects, m_mapPVisualObjects);
 	}
 
 	template <SpaceType SPACE_TYPE>

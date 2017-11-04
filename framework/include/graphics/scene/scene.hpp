@@ -63,6 +63,10 @@ namespace kgs
 		std::vector<std::shared_ptr<LightType>> m_arrPLights;
 		std::unordered_map<InstanceID, std::shared_ptr<LightType>> m_mapPLights;
 
+		virtual void _addVisualObject(const std::shared_ptr<VisualObjectType> pTarget
+			, const std::shared_ptr<VisualObjectType> pParent);
+		virtual void _removeVisualObject(const std::shared_ptr<VisualObjectType> pTarget);
+	private:
 		template <typename T>
 		inline Bool32 _isHasObject(const std::shared_ptr<T> &pTarget
 			, const std::vector<std::shared_ptr<T>> &arr

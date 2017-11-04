@@ -173,7 +173,7 @@ namespace chalet
 		m_pPass->setCullMode(kgs::CullModeFlagBits::eBack);
 		m_pPass->setFrontFace(kgs::FrontFaceType::eClockwise);
 		m_pMaterial = std::shared_ptr<kgs::Material>(new kgs::Material());
-		m_pMaterial->setPass("pass0", m_pPass);
+		m_pMaterial->addPass(m_pPass);
 		m_pMaterial->setRenderPriority(0u);
 		m_pMaterial->setRenderQueueType(kgs::MaterialShowType::OPAQUE);
 		m_pPass->setMainTexture(m_pTexture);
@@ -200,8 +200,8 @@ namespace chalet
 	void Window::_createScene()
 	{
 		m_pScene = std::shared_ptr<kgs::Scene3>(new kgs::Scene3());
-		m_pScene->setCameraWithName("MainCamera", m_pCamera);
-		m_pScene->setVisualObjectWithName("Object1", m_pModel);
+		m_pScene->addCamera(m_pCamera);
+		m_pScene->addVisualObject(m_pModel);
 	}
 
 	void Window::_fillRenderer()

@@ -227,7 +227,7 @@ namespace kgs
 	template <SpaceType SPACE_TYPE>
 	void Transform<SPACE_TYPE>::_setParentOnly(Type *pNewParent)
 	{
-		m_pParent = pParent;
+		m_pParent = pNewParent;
 	}
 
 	template <SpaceType SPACE_TYPE>

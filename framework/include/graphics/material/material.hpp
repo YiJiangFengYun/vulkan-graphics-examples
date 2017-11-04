@@ -18,7 +18,7 @@ namespace kgs
 
 		uint32_t getPassCount();
 		const std::shared_ptr<Pass>& getPassWithIndex(uint32_t index) const;
-		Bool32 isHas(const std::shared_ptr<Pass>& pPass);
+		Bool32 isHas(const std::shared_ptr<Pass>& pPass) const;
 		void addPass(const std::shared_ptr<Pass>& pPass);
 		void removePass(const std::shared_ptr<Pass>& pPass);
 		MaterialShowType getShowType();

@@ -136,8 +136,8 @@ namespace testTriangle
 	void Window::_createScene()
 	{
 		m_pScene = std::shared_ptr<kgs::Scene3>(new kgs::Scene3());
-		m_pScene->setCameraWithName("MainCamera", m_pCamera);
-		m_pScene->setVisualObjectWithName("Object1", m_pModel);
+		m_pScene->addCamera(m_pCamera);
+		m_pScene->addVisualObject(m_pModel);
 	}
 
 	void Window::_fillRenderer()

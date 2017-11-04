@@ -27,43 +27,60 @@ namespace kgs
 		typedef VisualObject<SPACE_TYPE> VisualObjectType;
 		typedef Camera<SPACE_TYPE> CameraType;
 		typedef Light<SPACE_TYPE> LightType;
+		typedef Transform<SPACE_TYPE> TransformType;
 
 		Scene();
 
 		uint32_t getVisualObjectCount();
-
-		const std::shared_ptr<VisualObjectType> &getVisualObjectWithIndex(uint32_t index) const;
-
-		const std::shared_ptr<VisualObjectType> &getVisualObjectWithName(std::string name) const;
-
-		void setVisualObjectWithName(std::string name, const std::shared_ptr<VisualObjectType> &value);
+		const std::shared_ptr<VisualObjectType> getVisualObjectWithIndex(uint32_t index) const;
+		Bool32 isHasVisualObject(const std::shared_ptr<VisualObjectType> pTarget) const;
+		void addVisualObject(const std::shared_ptr<VisualObjectType> pTarget
+			, const std::shared_ptr<VisualObjectType> pParent = nullptr);
+		void removeVisualObject(const std::shared_ptr<VisualObjectType> pTarget);
 
 		uint32_t getCameraCount();
-
-		const std::shared_ptr<CameraType> &getCameraWithIndex(uint32_t index) const;
-
-		const std::shared_ptr<CameraType> &getCameraWithName(std::string name) const;
-
-		void setCameraWithName(std::string name, const std::shared_ptr<CameraType> &value);
+		const std::shared_ptr<CameraType> getCameraWithIndex(uint32_t index) const;
+		Bool32 isHasCamera(const std::shared_ptr<CameraType> pTarget) const;
+		void addCamera(const std::shared_ptr<CameraType> pTarget
+			, const std::shared_ptr<CameraType> pParent = nullptr);
+		void removeCamera(const std::shared_ptr<CameraType> pTarget);
 
 		uint32_t getLightCount();
+		const std::shared_ptr<LightType> getLightWithIndex(uint32_t index) const;
+		Bool32 isHasLight(const std::shared_ptr<LightType> pTarget) const;
+		void addLight(const std::shared_ptr<LightType> pTarget
+			, const std::shared_ptr<LightType> pParent = nullptr);
+		void removeLight(const std::shared_ptr<LightType> pTarget);
 
-		const std::shared_ptr<LightType> &getLightWithIndex(uint32_t index) const;
-
-		const std::shared_ptr<LightType> &getLightWithName(std::string name) const;
-
-		void setLightWithName(std::string name, const std::shared_ptr<LightType> &value);
 
 	protected:
 
 		//aggregations
-		std::vector<std::string> m_arrVisualObjectNames;
-		std::unordered_map<std::string, std::shared_ptr<VisualObjectType>> m_mapPVisualObjects;
-		std::vector<std::string> m_arrCameraNames;
-		std::unordered_map<std::string, std::shared_ptr<CameraType>> m_mapPCameras;
-		std::vector<std::string> m_arrLightNames;
-		std::unordered_map<std::string, std::shared_ptr<LightType>> m_mapPLights;
+		std::vector<std::shared_ptr<VisualObjectType>> m_arrPVisualObjects;
+		std::unordered_map<InstanceID, std::shared_ptr<VisualObjectType>> m_mapPVisualObjects;
+		std::vector<std::shared_ptr<CameraType>> m_arrPCameras;
+		std::unordered_map<InstanceID, std::shared_ptr<CameraType>> m_mapPCameras;
+		std::vector<std::shared_ptr<LightType>> m_arrPLights;
+		std::unordered_map<InstanceID, std::shared_ptr<LightType>> m_mapPLights;
 
+		template <typename T>
+		inline Bool32 _isHasObject(const std::shared_ptr<T> &pTarget
+			, const std::vector<std::shared_ptr<T>> &arr
+			, const std::unordered_map<InstanceID, std::shared_ptr<T>> &map
+		) const;
+
+		template <typename T>
+		inline void _addObject(const std::shared_ptr<T> &pTarget
+			, std::vector<std::shared_ptr<T>> &arr
+			, std::unordered_map<InstanceID, std::shared_ptr<T>> &map
+			, const std::shared_ptr<T> &pParent = nullptr
+		);
+
+		template <typename T>
+		inline void _removeObject(const std::shared_ptr<T> &pTarget
+			, std::vector<std::shared_ptr<T>> &arr
+			, std::unordered_map<InstanceID, std::shared_ptr<T>> &map
+		);
 	};
 } //namespace kgs
 

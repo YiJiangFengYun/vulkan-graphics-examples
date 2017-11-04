@@ -1,5 +1,4 @@
 Graphics:
-.Change container interface.
 .Scene construction.
 .Base render logic for renderer2.
 .Viewport and scissor of pass.

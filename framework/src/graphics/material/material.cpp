@@ -21,7 +21,7 @@ namespace kgs
 		return m_arrPasses[index];
 	}
 
-	Bool32 Material::isHas(const std::shared_ptr<Pass>& pass)
+	Bool32 Material::isHas(const std::shared_ptr<Pass>& pass) const
 	{
 		return m_mapPasses.find(pass->getID()) != m_mapPasses.cend();
 	}
@@ -35,6 +35,7 @@ namespace kgs
 
 	void Material::removePass(const std::shared_ptr<Pass>& pPass)
 	{
+		if (isHas(pPass) == KGS_FALSE) return;
 		std::remove(m_arrPasses.begin(), m_arrPasses.end(), pPass);
 		m_mapPasses.erase(pPass->getID());
 	}

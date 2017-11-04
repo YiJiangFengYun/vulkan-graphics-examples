@@ -58,7 +58,8 @@ namespace kgs
 	}
 
 	BaseMesh::BaseMesh()
-		: m_multipliedColor(COLOR_WHITE) //default multiplied color should be (1, 1, 1, 1)
+		: Base(BaseType::MESH)
+		, m_multipliedColor(COLOR_WHITE) //default multiplied color should be (1, 1, 1, 1)
 		, m_applied(KGS_FALSE)
 	{
 		_createMeshData();

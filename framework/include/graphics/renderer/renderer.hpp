@@ -13,7 +13,7 @@
 
 namespace kgs
 {
-	class BaseRenderer
+	class BaseRenderer : public Base
 	{
 	public:
 		static const vk::Format DEFAULT_DEPTH_STENCIL_FORMAT;

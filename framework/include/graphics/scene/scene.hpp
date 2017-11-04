@@ -11,10 +11,10 @@
 
 namespace kgs
 {
-	class BaseScene
+	class BaseScene : public Base
 	{
 	public:
-
+		BaseScene();
 	protected:
 
 	};

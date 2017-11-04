@@ -14,7 +14,7 @@
 
 namespace kgs
 {
-	class BaseMesh
+	class BaseMesh : public Base
 	{
 	public:
 		struct LayoutBindingInfo

@@ -4,13 +4,15 @@ namespace kgs
 {
 
 	Shader::Shader() 
-		: m_pVertShaderModule()
+		: Base(BaseType::SHADER)
+		, m_pVertShaderModule()
 		, m_pFragShaderModule()
 	{
 
 	}
 
 	Shader::Shader(std::string vertShaderPath, std::string fragShaderPath)
+		: Base(BaseType::SHADER)
 	{
 		load(vertShaderPath, fragShaderPath);
 	}

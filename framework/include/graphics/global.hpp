@@ -14,7 +14,7 @@
 
 #include <cstdint>
 #include <foundation/foundation.hpp>
-
+#include "graphics/base.hpp"
 
 
 namespace kgs

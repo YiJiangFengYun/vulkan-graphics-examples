@@ -3,6 +3,7 @@
 namespace kgs
 {
 	Material::Material()
+		: Base(BaseType::MATERIAL)
 	{
 	}
 

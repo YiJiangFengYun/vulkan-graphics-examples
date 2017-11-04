@@ -10,10 +10,10 @@
 
 namespace kgs
 {
-	class BaseTransform
+	class BaseTransform : public Base
 	{
 	public:
-
+		BaseTransform();
 	protected:
 
 	};
@@ -38,7 +38,7 @@ namespace kgs
 
 		std::shared_ptr<Type> getChildWithIndex(uint32_t index);
 
-		Bool32 isChild(std::shared_ptr<Type> transform);
+		Bool32 isChild(std::shared_ptr<Type> pTransform);
 
 		std::shared_ptr<Type> getParent();
 
@@ -102,17 +102,19 @@ namespace kgs
 		MatrixType m_localMatrix;
 		MatrixType m_localMatrixInverse;
 
+		inline void _setParentOnly(std::shared_ptr<Type> pNewParent);
+		inline void _setChildOnly(std::shared_ptr<Type> pNewChild);
 
-		void _setLocalPositionOnly(PointType position);
-		void _setLocalScaleOnly(VectorType scale);
-		void _setLocalRotationOnly(RotationType rotation);
-		void _setLocalMatrixOnly(MatrixType matrix)
+		inline void _setLocalPositionOnly(PointType position);
+		inline void _setLocalScaleOnly(VectorType scale);
+		inline void _setLocalRotationOnly(RotationType rotation);
+		inline void _setLocalMatrixOnly(MatrixType matrix)
 		{
 			m_localMatrix = matrix;
 			m_localMatrixInverse = glm::inverse(m_localMatrix);
 		}
 
-		void _setLocalMatrixInverseOnly(MatrixType matrix)
+		inline void _setLocalMatrixInverseOnly(MatrixType matrix)
 		{
 			m_localMatrixInverse = matrix;
 			m_localMatrix = glm::inverse(m_localMatrixInverse);

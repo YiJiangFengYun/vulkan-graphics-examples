@@ -12,7 +12,7 @@
 
 namespace kgs
 {
-	class Texture
+	class Texture : public Base
 	{
 	public:
 		Texture(TextureFormat format, Bool32 mipMap);

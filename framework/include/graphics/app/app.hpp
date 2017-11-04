@@ -22,7 +22,7 @@ namespace kgs
 
 	bool checkDeviceExtensionSupport(const vk::PhysicalDevice& physicalDevice, std::vector<const char*> deviceExtensionNames);
 
-	class Application
+	class Application : public Base
 	{
 	public:
 		Application(std::string name, uint32_t version);

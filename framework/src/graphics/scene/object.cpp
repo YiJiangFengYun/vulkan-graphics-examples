@@ -3,6 +3,7 @@
 namespace kgs
 {
 	BaseObject::BaseObject()
+		: Base(BaseType::SCENE_OBJECT)
 	{
 
 	}

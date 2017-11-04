@@ -9,7 +9,8 @@ namespace kgs
 		, uint32_t swapchainImageWidth
 		, uint32_t swapchainImageHeight
 	)
-		: m_pSwapchainImageView(pSwapchainImageView)
+		: Base(BaseType::RENDERER)
+		, m_pSwapchainImageView(pSwapchainImageView)
 		, m_swapchainImageFormat(swapchainImageFormat)
 		, m_colorImageFormat(swapchainImageFormat)
 		, m_depthStencilImageFormat(DEFAULT_DEPTH_STENCIL_FORMAT)
@@ -24,7 +25,8 @@ namespace kgs
 
 	BaseRenderer::BaseRenderer(std::shared_ptr<TextureColorAttachment> pColorAttachmentTex
 	)
-		: m_pColorTexture(pColorAttachmentTex)
+		: Base(BaseType::RENDERER)
+		, m_pColorTexture(pColorAttachmentTex)
 		, m_colorImageFormat(pColorAttachmentTex->_getVKFormat())
 		, m_depthStencilImageFormat(DEFAULT_DEPTH_STENCIL_FORMAT)
 		, m_framebufferWidth(pColorAttachmentTex->getWidth())

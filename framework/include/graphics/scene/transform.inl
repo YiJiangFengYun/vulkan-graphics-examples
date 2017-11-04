@@ -37,9 +37,9 @@ namespace kgs
 	}
 
 	template <SpaceType SPACE_TYPE>
-	Bool32 Transform<SPACE_TYPE>::isChild(std::shared_ptr<Type> transform)
+	Bool32 Transform<SPACE_TYPE>::isChild(std::shared_ptr<Type> pTransform)
 	{
-		std::find(m_pChildren.cbegin(), m_pChildren.cend(), transform) != m_pChildren.cend();
+		std::find(m_pChildren.cbegin(), m_pChildren.cend(), pTransform) != m_pChildren.cend();
 	}
 
 	template <SpaceType SPACE_TYPE>
@@ -51,7 +51,7 @@ namespace kgs
 	template <SpaceType SPACE_TYPE>
 	void Transform<SPACE_TYPE>::setParent(std::shared_ptr<Type> pParent)
 	{
-		m_pParent = pParent;
+		
 	}
 
 	template <SpaceType SPACE_TYPE>
@@ -186,6 +186,18 @@ namespace kgs
 	}
 
 	template <SpaceType SPACE_TYPE>
+	void Transform<SPACE_TYPE>::_setParentOnly(std::shared_ptr<Type> pNewParent)
+	{
+		m_pParent = pParent;
+	}
+
+	template <SpaceType SPACE_TYPE>
+	void Transform<SPACE_TYPE>::_setChildOnly(std::shared_ptr<Type> pNewChild)
+	{
+
+	}
+
+	template <SpaceType SPACE_TYPE>
 	typename void Transform<SPACE_TYPE>::_setLocalPositionOnly(PointType position)
 	{
 		m_localPosition = position;
@@ -217,12 +229,6 @@ namespace kgs
 		m_localScaleMatrix = result;
 		m_isChanged = KGS_TRUE;
 	}
-
-	/*template <SpaceType SPACE_TYPE>
-	typename void Transform<SPACE_TYPE>::_setLocalRotationOnly(RotationType rotation)
-	{
-
-	}*/
 
 	template <SpaceType SPACE_TYPE>
 	typename Transform<SPACE_TYPE>::MatrixType Transform<SPACE_TYPE>::_getMatrixLocalToWorld(Bool32 includeSelf)

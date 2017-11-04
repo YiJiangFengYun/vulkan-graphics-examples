@@ -5,7 +5,8 @@ namespace kgs
 	inline uint32_t caculateImageSizeWithMipmapLevel(uint32_t size, uint32_t mipmapLevel);
 
 	Texture::Texture(TextureFormat format, Bool32 mipMap)
-		: m_format(format)
+		: Base(BaseType::TEXTURE)
+		, m_format(format)
 		, m_mipMap(mipMap)
 		, m_width(1U)
 		, m_height(1U)

@@ -20,6 +20,7 @@
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="..\..\framework\src\graphics\app\app.cpp" />
+    <ClCompile Include="..\..\framework\src\graphics\base.cpp" />
     <ClCompile Include="..\..\framework\src\graphics\global.cpp" />
     <ClCompile Include="..\..\framework\src\graphics\material\material.cpp" />
     <ClCompile Include="..\..\framework\src\graphics\material\material_data.cpp" />
@@ -77,6 +78,7 @@
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="..\..\framework\include\graphics\app\app.hpp" />
+    <ClInclude Include="..\..\framework\include\graphics\base.hpp" />
     <ClInclude Include="..\..\framework\include\graphics\global.hpp" />
     <ClInclude Include="..\..\framework\include\graphics\graphics.hpp" />
     <ClInclude Include="..\..\framework\include\graphics\material\material.hpp" />

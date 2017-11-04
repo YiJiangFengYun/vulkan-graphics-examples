@@ -222,6 +222,9 @@
     <ClCompile Include="..\..\framework\src\graphics\scene\camera_op.cpp">
       <Filter>src\graphics\scene</Filter>
     </ClCompile>
+    <ClCompile Include="..\..\framework\src\graphics\base.cpp">
+      <Filter>src\graphics</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="..\..\framework\include\graphics\texture\texture.hpp">
@@ -391,6 +394,9 @@
     </ClInclude>
     <ClInclude Include="..\..\framework\include\graphics\scene\camera_op_3.hpp">
       <Filter>include\graphics\scene</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\framework\include\graphics\base.hpp">
+      <Filter>include\graphics</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>

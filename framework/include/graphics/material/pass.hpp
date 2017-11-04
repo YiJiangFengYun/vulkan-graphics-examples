@@ -11,7 +11,7 @@
 
 namespace kgs
 {
-	class Pass
+	class Pass : public Base
 	{
 	public:
 		struct LayoutBindingInfo

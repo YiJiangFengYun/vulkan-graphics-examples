@@ -17,7 +17,8 @@ namespace kgs
 	}
 
 	Application::Application(std::string name, uint32_t version)
-		: m_appName(name)
+		: Base(BaseType::APP)
+		, m_appName(name)
 		, m_appVersion(version)
 		, m_engineName("No engine")
 		, m_engineVersion(VK_MAKE_VERSION(1, 0, 0))

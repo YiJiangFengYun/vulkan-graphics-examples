@@ -89,7 +89,8 @@ namespace kgs
 	}
 
 	Pass::Pass() 
-		: m_pData(new MaterialData())
+		: Base(BaseType::PASS)
+		, m_pData(new MaterialData())
 		, m_applied(KGS_FALSE)
 		, m_cullMode(CullModeFlagBits::eBack)
 		, m_frontFace(FrontFaceType::eCounterClockwise)
@@ -98,7 +99,8 @@ namespace kgs
 	}
 
 	Pass::Pass(std::shared_ptr<Shader> pShader)
-		: m_pData(new MaterialData())
+		: Base(BaseType::PASS)
+		, m_pData(new MaterialData())
 		, m_applied(KGS_FALSE)
 		, m_pShader(pShader)
 		, m_cullMode(CullModeFlagBits::eBack)

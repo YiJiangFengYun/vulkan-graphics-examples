@@ -11,7 +11,7 @@
 
 namespace kgs
 {
-	class Shader
+	class Shader : public Base
 	{
 	public:
 		Shader();

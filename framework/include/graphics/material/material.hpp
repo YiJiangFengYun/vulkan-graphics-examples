@@ -10,7 +10,7 @@
 
 namespace kgs
 {
-	class Material
+	class Material : public Base
 	{
 	public:
 		Material();

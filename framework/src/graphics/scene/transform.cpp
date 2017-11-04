@@ -2,6 +2,12 @@
 
 namespace kgs
 {	
+	BaseTransform::BaseTransform()
+		: Base(BaseType::TRANSFORM)
+	{
+
+	}
+
 	template <SpaceType SPACE_TYPE>
 	void Transform<SPACE_TYPE>::_setLocalRotationOnly(RotationType rotation)
 	{

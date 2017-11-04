@@ -18,7 +18,7 @@ namespace kgs
 		RANGE_SIZE = (END_RANGE - BEGIN_RANGE + 1)
 	};
 
-	class BaseObject
+	class BaseObject : public Base
 	{
 	public:
 		BaseObject();

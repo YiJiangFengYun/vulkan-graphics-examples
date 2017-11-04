@@ -2,5 +2,9 @@
 
 namespace kgs
 {
+	BaseScene::BaseScene()
+		: Base(BaseType::SCENE)
+	{
 
+	}
 } //namespace kgs

@@ -10,14 +10,7 @@ namespace kgs
 	{
 	public:
 		Scene2();
-		void setRoot(const std::shared_ptr<VisualObjectType> pTarget);
-		std::shared_ptr<VisualObjectType> getRoot();
 	private:
-		std::shared_ptr<VisualObjectType> m_pRoot;
-
-		void _addVisualObject(const std::shared_ptr<VisualObjectType> pTarget
-			, const std::shared_ptr<VisualObjectType> pParent) override;
-		void _removeVisualObject(const std::shared_ptr<VisualObjectType> pTarget) override;
 	};
 
 } //namespace kgs

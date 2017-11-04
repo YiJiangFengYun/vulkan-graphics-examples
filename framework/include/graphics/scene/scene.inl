@@ -3,6 +3,9 @@ namespace kgs
 	template <SpaceType SPACE_TYPE>
 	Scene<SPACE_TYPE>::Scene()
 		: BaseScene()
+		, pRootTransformForVisualObject(new TransformType())
+		, pRootTransformForCamera(new TransformType())
+		, pRootTransformForLight(new TransformType())
 	{
 
 	}
@@ -14,7 +17,7 @@ namespace kgs
 	}
 
 	template <SpaceType SPACE_TYPE>
-	const std::shared_ptr<typename Scene<SPACE_TYPE>::VisualObjectType> Scene<SPACE_TYPE>::getVisualObjectWithIndex(uint32_t index) const
+	const std::shared_ptr<typename Scene<SPACE_TYPE>::VisualObjectType> &Scene<SPACE_TYPE>::getVisualObjectWithIndex(uint32_t index) const
 	{
 		return m_arrPVisualObjects[index];
 	}
@@ -45,7 +48,7 @@ namespace kgs
 	}
 
 	template <SpaceType SPACE_TYPE>
-	const std::shared_ptr<typename Scene<SPACE_TYPE>::CameraType> Scene<SPACE_TYPE>::getCameraWithIndex(uint32_t index) const
+	const std::shared_ptr<typename Scene<SPACE_TYPE>::CameraType> &Scene<SPACE_TYPE>::getCameraWithIndex(uint32_t index) const
 	{
 		return m_arrPCameras[index];
 	}
@@ -60,7 +63,7 @@ namespace kgs
 	void Scene<SPACE_TYPE>::addCamera(const std::shared_ptr<CameraType> pTarget
 		, const std::shared_ptr<CameraType> pParent)
 	{
-		_addObject(pTarget, m_arrPCameras, m_mapPCameras, pParent);
+		_addObject(pTarget, m_arrPCameras, m_mapPCameras, pRootTransformForCamera, pParent);
 	}
 
 	template <SpaceType SPACE_TYPE>
@@ -76,7 +79,7 @@ namespace kgs
 	}
 
 	template <SpaceType SPACE_TYPE>
-	const std::shared_ptr<typename Scene<SPACE_TYPE>::LightType> Scene<SPACE_TYPE>::getLightWithIndex(uint32_t index) const
+	const std::shared_ptr<typename Scene<SPACE_TYPE>::LightType> &Scene<SPACE_TYPE>::getLightWithIndex(uint32_t index) const
 	{
 		return m_arrPLights[index];
 	}
@@ -91,7 +94,7 @@ namespace kgs
 	void Scene<SPACE_TYPE>::addLight(const std::shared_ptr<LightType> pTarget
 		, const std::shared_ptr<LightType> pParent)
 	{
-		_addObject(pTarget, m_arrPLights, m_mapPLights, pParent);
+		_addObject(pTarget, m_arrPLights, m_mapPLights, pRootTransformForLight, pParent);
 	}
 
 	template <SpaceType SPACE_TYPE>
@@ -104,7 +107,11 @@ namespace kgs
 	void Scene<SPACE_TYPE>::_addVisualObject(const std::shared_ptr<VisualObjectType> pTarget
 		, const std::shared_ptr<VisualObjectType> pParent)
 	{
-		_addObject(pTarget, m_arrPVisualObjects, m_mapPVisualObjects, pParent);
+		_addObject(pTarget
+			, m_arrPVisualObjects
+			, m_mapPVisualObjects
+			, pRootTransformForVisualObject
+			, pParent);
 	}
 
 	template <SpaceType SPACE_TYPE>
@@ -127,9 +134,17 @@ namespace kgs
 	void Scene<SPACE_TYPE>::_addObject(const std::shared_ptr<T> &pTarget
 		, std::vector<std::shared_ptr<T>> &arr
 		, std::unordered_map<InstanceID, std::shared_ptr<T>> &map
+		, const std::shared_ptr<TransformType> &root
 		, const std::shared_ptr<T> &pParent
 	)
 	{
+
+#ifdef DEBUG
+		//chilren of target
+		if (pTarget->getTransform()->getChildCount())
+			throw std::invalid_argument("Target should not own chilren.");
+#endif // DEBUG
+
 		if (_isHasObject(pTarget, arr, map)) return;
 		arr.push_back(pTarget);
 		map[pTarget->getID()] = pTarget;
@@ -141,8 +156,9 @@ namespace kgs
 		}
 		else
 		{
-			pTarget->getTransform()->setParent(nullptr);
+			pTarget->getTransform()->setParent(root.get());
 		}
+
 	}
 
 	template <SpaceType SPACE_TYPE>
@@ -154,8 +170,23 @@ namespace kgs
 		if (_isHasObject(pTarget, arr, map) == KGS_FALSE) return;
 		std::remove(arr.begin(), arr.end(), pTarget);
 		map.erase(pTarget->getID());
-		//clear hierarchy data.
-		pTarget->getTransform()->setParent(nullptr);
-		pTarget->getTransform()->detachChildren();
+		////clear hierarchy data.
+		//pTarget->getTransform()->setParent(nullptr);
+		//pTarget->getTransform()->detachChildren();
+
+		//reconstruct hierarchy.
+		//connect between children and parent of target.
+		auto pTranform = pTarget->getTransform();
+		auto pParent = pTranform->getParent();
+		auto pos = pParent->getChildPos(pTranform.get());
+		//copy chilren refs;
+		auto children = pTranform->getChildren();
+		//first remove all chilren of target.
+		pTranform->detachChildren();
+		//insert to pos of parent before target
+		for (const auto& child : children)
+		{
+			pParent->addChild(child, pos);
+		}
 	}
 } //namespace kgs

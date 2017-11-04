@@ -110,7 +110,7 @@ namespace testTriangle
 		m_pShader = std::shared_ptr<kgs::Shader>(new kgs::Shader("shaders/triangle.vert.spv", "shaders/triangle.frag.spv"));
 		m_pPass = std::shared_ptr<kgs::Pass>(new kgs::Pass(m_pShader));
 		m_pMaterial = std::shared_ptr<kgs::Material>(new kgs::Material());
-		m_pMaterial->setPass("pass0", m_pPass);
+		m_pMaterial->addPass(m_pPass);
 		m_pMaterial->setRenderPriority(0u);
 		m_pMaterial->setRenderQueueType(kgs::MaterialShowType::OPAQUE);
 		m_pMaterial->apply();

@@ -37,7 +37,7 @@ namespace kgs
 	}
 
 	template <SpaceType SPACE_TYPE>
-	std::shared_ptr<typename Transform<SPACE_TYPE>::Type> Transform<SPACE_TYPE>::getChildWithIndex(uint32_t index)
+	typename Transform<SPACE_TYPE>::Type *Transform<SPACE_TYPE>::getChildWithIndex(uint32_t index)
 	{
 		return m_arrPChildren[index];
 	}
@@ -94,7 +94,7 @@ namespace kgs
 	}
 
 	template <SpaceType SPACE_TYPE>
-	std::shared_ptr<typename Transform<SPACE_TYPE>::Type> Transform<SPACE_TYPE>::getRoot()
+	typename Transform<SPACE_TYPE>::Type *Transform<SPACE_TYPE>::getRoot()
 	{
 		if (m_pParent == nullptr)
 		{

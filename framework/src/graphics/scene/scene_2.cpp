@@ -8,6 +8,16 @@ namespace kgs
 
 	}
 
+	void Scene2::setRoot(const std::shared_ptr<VisualObjectType> pTarget)
+	{
+		_addVisualObject(pTarget, nullptr);
+	}
+
+	std::shared_ptr<Scene2::VisualObjectType> Scene2::getRoot()
+	{
+		return m_pRoot;
+	}
+
 	void Scene2::_addVisualObject(const std::shared_ptr<VisualObjectType> pTarget
 		, const std::shared_ptr<VisualObjectType> pParent)
 	{
@@ -16,8 +26,16 @@ namespace kgs
 		//root 
 		if (pParent == nullptr)
 		{
-			if (m_pRoot != nullptr) throw std::runtime_error("Can't assign new root when the root of scene has existed.");
-			m_pRoot = pParent;
+			if (m_pRoot != nullptr)
+			{
+				//The origin root becomes to child of new root.
+				pTarget->getTransform()->addChild(m_pRoot->getTransform().get());
+				m_pRoot = pTarget;
+			}
+			else
+			{
+				m_pRoot = pParent;
+			}
 		}
 	}
 

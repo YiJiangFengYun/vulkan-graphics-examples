@@ -35,7 +35,7 @@ namespace kgs
 
 		Type *getChildWithIndex(uint32_t index);
 
-		std::vector<Type *>::const_iterator getChildPos(Type *child);
+		typename std::vector<Type *>::const_iterator getChildPos(Type *child);
 
 		const std::vector<Type *> &getChildren();
 
@@ -44,7 +44,7 @@ namespace kgs
 		Bool32 isChild(Type *pTransform);
 
 		void addChild(Type *pNewChild);
-		void addChild(Type *pNewChild, std::vector<Type *>::const_iterator pos);
+		void addChild(Type *pNewChild, typename std::vector<Type *>::const_iterator pos);
 		void removeChild(Type *pChild);
 
 		Type *getParent();
@@ -112,7 +112,8 @@ namespace kgs
 
 		inline void _setParentOnly(Type *pNewParent);
 		inline void _addChildOnly(Type *pNewChild);
-		inline void _addChildOnly(Type *pNewChild, std::vector<Type *>::const_iterator pos);
+		inline void _addChildOnly(Type *pNewChild, 
+			typename std::vector<Type *>::const_iterator pos);
 		inline void _removeChildOnly(Type *pChild);
 		inline Bool32 _isChild(Type *pTransform);
 

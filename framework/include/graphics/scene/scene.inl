@@ -151,7 +151,7 @@ namespace kgs
 		, std::vector<std::shared_ptr<T>> &arr
 		, std::unordered_map<InstanceID, std::shared_ptr<T>> &map)
 	{
-		if (_isHasObject(pTarget) == KGS_FALSE) return;
+		if (_isHasObject(pTarget, arr, map) == KGS_FALSE) return;
 		std::remove(arr.begin(), arr.end(), pTarget);
 		map.erase(pTarget->getID());
 		//clear hierarchy data.

@@ -2,7 +2,6 @@
 #define KGS_TRANSFORM_H
 
 #include <memory>
-#include <vector>
 #include <algorithm>
 #include "graphics/global.hpp"
 #include "graphics/scene/space_info.hpp"
@@ -34,17 +33,20 @@ namespace kgs
 		//------------hierarchy-----------------------
 		uint32_t getChildCount();
 
+		Type *getChildWithIndex(uint32_t index);
+
 		void detachChildren();
 
-		std::shared_ptr<Type> getChildWithIndex(uint32_t index);
+		Bool32 isChild(Type *pTransform);
 
-		Bool32 isChild(std::shared_ptr<Type> pTransform);
+		void addChild(Type *pNewChild);
+		void removeChild(Type *pChild);
 
-		std::shared_ptr<Type> getParent();
+		Type *getParent();
 
-		void setParent(std::shared_ptr<Type> pParent);
+		void setParent(Type *pParent);
 
-		std::shared_ptr<Type> getRoot();
+		Type *getRoot();
 
 		//------------state-----------------------
 		Bool32 getIsChanged();
@@ -90,8 +92,9 @@ namespace kgs
 		MatrixType getMatrixWorldToLocal();
 
 	protected:
-		std::shared_ptr<Type> m_pParent;
-		std::vector<std::shared_ptr<Type>> m_pChildren;
+		Type *m_pParent;
+		std::unordered_map<InstanceID, Type *> m_mapPChildren;
+		std::vector<Type *> m_arrPChildren;
 		Bool32 m_isChanged;
 		PointType m_localPosition;
 		MatrixType m_localPosMatrix;
@@ -102,8 +105,10 @@ namespace kgs
 		MatrixType m_localMatrix;
 		MatrixType m_localMatrixInverse;
 
-		inline void _setParentOnly(std::shared_ptr<Type> pNewParent);
-		inline void _setChildOnly(std::shared_ptr<Type> pNewChild);
+		inline void _setParentOnly(Type *pNewParent);
+		inline void _addChildOnly(Type *pNewChild);
+		inline void _removeChildOnly(Type *pChild);
+		inline Bool32 _isChild(Type *pTransform);
 
 		inline void _setLocalPositionOnly(PointType position);
 		inline void _setLocalScaleOnly(VectorType scale);

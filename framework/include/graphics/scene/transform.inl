@@ -4,7 +4,8 @@ namespace kgs
 	Transform<SPACE_TYPE>::Transform()
 		: BaseTransform()
 		, m_pParent(nullptr)
-		, m_pChildren()
+		, m_arrPChildren()
+		, m_mapPChildren()
 		, m_isChanged(KGS_FALSE)
 		, m_localPosition(0.0f)
 		, m_localPosMatrix(1.0f)
@@ -21,37 +22,75 @@ namespace kgs
 	template <SpaceType SPACE_TYPE>
 	uint32_t Transform<SPACE_TYPE>::getChildCount()
 	{
-		return m_pChildren.size();
+		return static_cast<uint32_t>(m_arrPChildren.size());
 	}
 
 	template <SpaceType SPACE_TYPE>
 	void Transform<SPACE_TYPE>::detachChildren()
 	{
-		m_pChildren.resize(0u);
+		for (const auto& item : m_arrPChildren)
+		{
+			item->_setParentOnly(nullptr);
+		}
+		m_arrPChildren.resize(0u);
+		m_mapPChildren.clear();
 	}
 
 	template <SpaceType SPACE_TYPE>
 	std::shared_ptr<typename Transform<SPACE_TYPE>::Type> Transform<SPACE_TYPE>::getChildWithIndex(uint32_t index)
 	{
-		return m_pChildren[index];
+		return m_arrPChildren[index];
 	}
 
 	template <SpaceType SPACE_TYPE>
-	Bool32 Transform<SPACE_TYPE>::isChild(std::shared_ptr<Type> pTransform)
+	Bool32 Transform<SPACE_TYPE>::isChild(Type *pTransform)
 	{
-		std::find(m_pChildren.cbegin(), m_pChildren.cend(), pTransform) != m_pChildren.cend();
+		return _isChild(pTransform);
 	}
 
 	template <SpaceType SPACE_TYPE>
-	std::shared_ptr<typename Transform<SPACE_TYPE>::Type> Transform<SPACE_TYPE>::getParent()
+	void Transform<SPACE_TYPE>::addChild(Type *pNewChild)
+	{
+		if (_isChild(pNewChild)) return;
+
+		_addChildOnly(pNewChild);
+		pNewChild->_setParentOnly(this);
+	}
+
+	template <SpaceType SPACE_TYPE>
+	void Transform<SPACE_TYPE>::removeChild(Type *pChild)
+	{
+		if (_isChild(pChild) == KGS_FALSE) return;
+
+		_removeChildOnly(pNewChild);
+		pNewChild->_setParentOnly(nullptr);
+	}
+
+	template <SpaceType SPACE_TYPE>
+	typename Transform<SPACE_TYPE>::Type *Transform<SPACE_TYPE>::getParent()
 	{
 		return m_pParent;
 	}
 
 	template <SpaceType SPACE_TYPE>
-	void Transform<SPACE_TYPE>::setParent(std::shared_ptr<Type> pParent)
+	void Transform<SPACE_TYPE>::setParent(Type *pParent)
 	{
-		
+		if (m_pParent == pParent) return;
+		if (pParent == nullptr)
+		{
+			_setParentOnly(nullptr);
+			m_pParent->_removeChildOnly(this);
+		}
+		else
+		{
+			if (m_pParent != nullptr)
+			{
+				setParent(nullptr);
+			}
+			_setParentOnly(pParent);
+			pParent->_addChildOnly(this);
+		}
+
 	}
 
 	template <SpaceType SPACE_TYPE>
@@ -114,7 +153,7 @@ namespace kgs
 	typename Transform<SPACE_TYPE>::RotationType Transform<SPACE_TYPE>::getRotation()
 	{
 		RotationType rotation = m_localRotation;
-		std::shared_ptr<Type> curr = m_pParent;
+		Type *curr = m_pParent;
 		while (curr != nullptr)
 		{
 			rotation = curr->m_localRotation * rotation;
@@ -186,15 +225,29 @@ namespace kgs
 	}
 
 	template <SpaceType SPACE_TYPE>
-	void Transform<SPACE_TYPE>::_setParentOnly(std::shared_ptr<Type> pNewParent)
+	void Transform<SPACE_TYPE>::_setParentOnly(Type *pNewParent)
 	{
 		m_pParent = pParent;
 	}
 
 	template <SpaceType SPACE_TYPE>
-	void Transform<SPACE_TYPE>::_setChildOnly(std::shared_ptr<Type> pNewChild)
+	void Transform<SPACE_TYPE>::_addChildOnly(Type *pNewChild)
 	{
+		m_arrPChildren.push_back(pNewChild);
+		m_mapPChildren[pNewChild->getID()] = pNewChild;
+	}
 
+	template <SpaceType SPACE_TYPE>
+	void Transform<SPACE_TYPE>::_removeChildOnly(Type *pChild)
+	{
+		std::remove(m_arrPChildren.begin(), m_arrPChildren.end(), pChild);
+		m_mapPChildren.erase(pChild->getID());
+	}
+
+	template <SpaceType SPACE_TYPE>
+	inline Bool32 Transform<SPACE_TYPE>::_isChild(Type *pTransform)
+	{
+		return m_mapPChildren.find(pTransform->getID()) != m_mapPChildren.cend();
 	}
 
 	template <SpaceType SPACE_TYPE>

@@ -19,18 +19,21 @@ namespace kgs
 		SCENE_OBJECT,
 		TRANSFORM
 	};
+
+	typedef uint32_t InstanceID;
+
 	class Base
 	{
 	public:
 		Base(BaseType baseType);
 		BaseType getBaseType();
-		uint32_t getID();
+		InstanceID getID();
 	protected:
 		BaseType m_baseType;
-		uint32_t m_id;
+		InstanceID m_id;
 	private:
 		Base() = delete;
-		static std::unordered_map<BaseType, std::uint32_t> m_idCreateor;
+		static std::unordered_map<BaseType, InstanceID> m_idCreateor;
 	};
 } //namespace kgs
 

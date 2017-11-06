@@ -1,0 +1,36 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <ItemGroup>
+    <Filter Include="include">
+      <UniqueIdentifier>{21f105b8-b95e-4ec6-81ee-73aa9dfef681}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="src">
+      <UniqueIdentifier>{18565fdb-b121-4075-ade6-faa7c0542689}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="include\test-triangle-2d">
+      <UniqueIdentifier>{4ac741cc-63aa-4159-9eb2-e2fdbe0fbf6f}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="src\test-triangle-2d">
+      <UniqueIdentifier>{0fd2632f-fc63-4bd5-94c0-e1b2661550f2}</UniqueIdentifier>
+    </Filter>
+  </ItemGroup>
+  <ItemGroup>
+    <ClInclude Include="..\..\test\include\test-triangle-2d\app.hpp">
+      <Filter>include\test-triangle-2d</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\test\include\test-triangle-2d\window.hpp">
+      <Filter>include\test-triangle-2d</Filter>
+    </ClInclude>
+  </ItemGroup>
+  <ItemGroup>
+    <ClCompile Include="..\..\test\src\test-triangle-2d\main.cpp">
+      <Filter>src\test-triangle-2d</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\test\src\test-triangle-2d\window.cpp">
+      <Filter>src\test-triangle-2d</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\test\src\test-triangle-2d\app.cpp">
+      <Filter>src\test-triangle-2d</Filter>
+    </ClCompile>
+  </ItemGroup>
+</Project>

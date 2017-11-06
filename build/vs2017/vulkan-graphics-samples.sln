@@ -54,6 +54,8 @@ Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "chalet", "chalet.vcxproj", 
 EndProject
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "sampleslib", "sampleslib.vcxproj", "{D9308C34-22D6-4272-9730-456EF880073C}"
 EndProject
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "test-triangle-2d", "test-triangle-2d.vcxproj", "{B8A10112-587E-4949-AC52-3E8A7E66F766}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|x64 = Debug|x64
@@ -126,6 +128,14 @@ Global
 		{D9308C34-22D6-4272-9730-456EF880073C}.Release|x64.Build.0 = Release|x64
 		{D9308C34-22D6-4272-9730-456EF880073C}.Release|x86.ActiveCfg = Release|Win32
 		{D9308C34-22D6-4272-9730-456EF880073C}.Release|x86.Build.0 = Release|Win32
+		{B8A10112-587E-4949-AC52-3E8A7E66F766}.Debug|x64.ActiveCfg = Debug|x64
+		{B8A10112-587E-4949-AC52-3E8A7E66F766}.Debug|x64.Build.0 = Debug|x64
+		{B8A10112-587E-4949-AC52-3E8A7E66F766}.Debug|x86.ActiveCfg = Debug|Win32
+		{B8A10112-587E-4949-AC52-3E8A7E66F766}.Debug|x86.Build.0 = Debug|Win32
+		{B8A10112-587E-4949-AC52-3E8A7E66F766}.Release|x64.ActiveCfg = Release|x64
+		{B8A10112-587E-4949-AC52-3E8A7E66F766}.Release|x64.Build.0 = Release|x64
+		{B8A10112-587E-4949-AC52-3E8A7E66F766}.Release|x86.ActiveCfg = Release|Win32
+		{B8A10112-587E-4949-AC52-3E8A7E66F766}.Release|x86.Build.0 = Release|Win32
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
@@ -139,6 +149,7 @@ Global
 		{00A0CD6D-426C-4B29-98E5-FAC47EE366EB} = {78127040-4317-4508-B5BC-702A9CA46370}
 		{F8172ACD-126E-4B67-BCF4-D9E277FC3E3B} = {82985DD9-B353-4A8C-A4A1-570234058DF2}
 		{D9308C34-22D6-4272-9730-456EF880073C} = {82985DD9-B353-4A8C-A4A1-570234058DF2}
+		{B8A10112-587E-4949-AC52-3E8A7E66F766} = {78127040-4317-4508-B5BC-702A9CA46370}
 	EndGlobalSection
 	GlobalSection(ExtensibilityGlobals) = postSolution
 		SolutionGuid = {162DD680-8D8A-4699-A2F0-E334B37BAD80}

@@ -5,7 +5,7 @@
 #include "testlib/tiny_obj_loader.h"
 #include "framework/framework.hpp"
 
-namespace testTriangle
+namespace testTriangle_2d
 {
 	class Window : public gfw::Window
 	{
@@ -21,15 +21,15 @@ namespace testTriangle
 		);
 
 	private:
-		std::vector<kgs::Vector3> m_tempPositions;
+		std::vector<kgs::Vector2> m_tempPositions;
 		std::vector<kgs::Color32> m_tempColors;
 		std::vector<uint32_t> m_tempIndices;
 
 
-		std::shared_ptr<kgs::Scene3> m_pScene;
-		std::shared_ptr<kgs::CameraOP3> m_pCamera;
-		std::shared_ptr<kgs::VisualObject3> m_pModel;
-		std::shared_ptr<kgs::Mesh3> m_pMesh;
+		std::shared_ptr<kgs::Scene2> m_pScene;
+		std::shared_ptr<kgs::CameraOP2> m_pCamera;
+		std::shared_ptr<kgs::VisualObject2> m_pModel;
+		std::shared_ptr<kgs::Mesh2> m_pMesh;
 		std::shared_ptr<kgs::Material> m_pMaterial;
 		std::shared_ptr<kgs::Pass> m_pPass;
 		std::shared_ptr<kgs::Shader> m_pShader;
@@ -51,7 +51,7 @@ namespace testTriangle
 		void _onPostUpdate() override;
 
 		void _onPreRender() override;
-	    void _onPostRender() override;
+		void _onPostRender() override;
 	};
 
 }

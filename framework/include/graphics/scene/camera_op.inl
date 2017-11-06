@@ -9,6 +9,12 @@ namespace kgs
 	}
 
 	template <SpaceType SPACE_TYPE>
+	void CameraOP<SPACE_TYPE>::apply()
+	{
+
+	}
+
+	template <SpaceType SPACE_TYPE>
 	void CameraOP<SPACE_TYPE>::updateProj(BoundsType viewBounds)
 	{
 		m_viewBounds = viewBounds;
@@ -48,7 +54,7 @@ namespace kgs
 			do
 			{
 				typename PointType::length_type j;
-				for (j = 1; j <= len; ++j)
+				for (j = 0; j < len; ++j)
 				{
 					if (places[j] == KGS_TRUE)
 					{

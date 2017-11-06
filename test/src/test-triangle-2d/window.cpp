@@ -1,6 +1,6 @@
-#include "test-triangle/window.hpp"
+#include "test-triangle-2d/window.hpp"
 
-namespace testTriangle
+namespace testTriangle_2d
 {
 	Window::Window(uint32_t width
 		, uint32_t height
@@ -9,7 +9,7 @@ namespace testTriangle
 		: gfw::Window(width
 			, height
 			, title
-			, RenderType::RENDERER_3
+			, RenderType::RENDERER_2
 		)
 	{
 		_loadModel();
@@ -24,7 +24,7 @@ namespace testTriangle
 	Window::Window(std::shared_ptr<GLFWwindow> pWindow
 		, std::shared_ptr<vk::SurfaceKHR> pSurface
 	)
-		: gfw::Window(RenderType::RENDERER_3
+		: gfw::Window(RenderType::RENDERER_2
 			, pWindow
 			, pSurface
 		)
@@ -40,9 +40,9 @@ namespace testTriangle
 
 	void Window::_loadModel()
 	{
-		m_tempPositions = { kgs::Vector3(0.0f, -0.5f, 0.5f)
-		, kgs::Vector3(-0.5f, 0.5f, 0.5f)
-		, kgs::Vector3(0.5f, 0.5f, 0.5f)
+		m_tempPositions = { kgs::Vector2(0.0f, -0.5f)
+		, kgs::Vector2(-0.5f, 0.5f)
+		, kgs::Vector2(0.5f, 0.5f)
 		};
 
 		m_tempColors = { kgs::Color32(255, 0, 0, 255)
@@ -57,7 +57,7 @@ namespace testTriangle
 
 	void Window::_createMesh()
 	{
-		m_pMesh = static_cast<std::shared_ptr<kgs::Mesh3>>(new kgs::Mesh3());
+		m_pMesh = static_cast<std::shared_ptr<kgs::Mesh2>>(new kgs::Mesh2());
 		m_pMesh->setVertexCount(static_cast<uint32_t>(m_tempPositions.size()));
 		m_pMesh->setPositions(m_tempPositions);
 		m_pMesh->setColors(m_tempColors);
@@ -67,7 +67,7 @@ namespace testTriangle
 
 	void Window::_createMaterial()
 	{
-		m_pShader = std::shared_ptr<kgs::Shader>(new kgs::Shader("shaders/triangle.vert.spv", "shaders/triangle.frag.spv"));
+		m_pShader = std::shared_ptr<kgs::Shader>(new kgs::Shader("shaders/triangle-2d.vert.spv", "shaders/triangle-2d.frag.spv"));
 		m_pPass = std::shared_ptr<kgs::Pass>(new kgs::Pass(m_pShader));
 		m_pMaterial = std::shared_ptr<kgs::Material>(new kgs::Material());
 		m_pMaterial->addPass(m_pPass);
@@ -78,21 +78,21 @@ namespace testTriangle
 
 	void Window::_createModel()
 	{
-		m_pModel = std::shared_ptr<kgs::VisualObject3>(new kgs::VisualObject3());
+		m_pModel = std::shared_ptr<kgs::VisualObject2>(new kgs::VisualObject2());
 		m_pModel->setMesh(m_pMesh);
 		m_pModel->setMaterial(m_pMaterial);
 	}
 
 	void Window::_createCamera()
 	{
-		m_pCamera = std::shared_ptr<kgs::CameraOP3>(new kgs::CameraOP3());
-		m_pCamera->updateProj({{ -1.0f, -1.0f, 0.1f }, { 1.0f, 1.0f, 10.0f }});
+		m_pCamera = std::shared_ptr<kgs::CameraOP2>(new kgs::CameraOP2());
+		m_pCamera->updateProj({ {-1.0f, -1.0f}, {1.0f, 1.0f} });
 		m_pCamera->apply();
 	}
 
 	void Window::_createScene()
 	{
-		m_pScene = std::shared_ptr<kgs::Scene3>(new kgs::Scene3());
+		m_pScene = std::shared_ptr<kgs::Scene2>(new kgs::Scene2());
 		m_pScene->addCamera(m_pCamera);
 		m_pScene->addVisualObject(m_pModel);
 	}
@@ -105,12 +105,7 @@ namespace testTriangle
 			{
 			case RenderType::RENDERER_2:
 			{
-				//dynamic_cast<kgs::Renderer2 *>(pRenderer.get())->reset(m_pScene, m_pCamera);
-				break;
-			}
-			case RenderType::RENDERER_3:
-			{
-				dynamic_cast<kgs::Renderer3 *>(pRenderer.get())->reset(m_pScene, m_pCamera);
+				dynamic_cast<kgs::Renderer2 *>(pRenderer.get())->reset(m_pScene, m_pCamera);
 				break;
 			}
 			}

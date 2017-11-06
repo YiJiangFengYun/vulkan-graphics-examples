@@ -1,8 +1,8 @@
 #include <exception>
 #include <iostream>
 #include "vulkan/vulkan.h"
-#include "test-triangle/window.hpp"
-#include "test-triangle/app.hpp"
+#include "test-triangle-2d/window.hpp"
+#include "test-triangle-2d/app.hpp"
 #include "graphics/global.hpp"
 
 //Main.obj will contain implementions of stb_image and tiny_obj_loader.
@@ -16,15 +16,15 @@ const uint32_t WINDOW_HEIGHT = 600;
 int main() {
 	gfw::moduleCreate();
 
-	testTriangle::App testTriangle;
-	testTriangle.init<testTriangle::Window>(WINDOW_WIDTH, WINDOW_HEIGHT, "test-triangle");
-	testTriangle.createSubWindow<testTriangle::Window>(200, 200, "sub window");
-	//testTriangle.createSubWindow<testTriangle::Window>(200, 400, "sub window2");
+	testTriangle_2d::App testTriangle_2d;
+	testTriangle_2d.init<testTriangle_2d::Window>(WINDOW_WIDTH, WINDOW_HEIGHT, "test-triangle-2d");
+	//testTriangle.createSubWindow<testTriangle::Window>(200, 200, "sub window", gfw::Window::RenderType::RENDERER_3);
+	//testTriangle.createSubWindow<testTriangle::Window>(200, 400, "sub window2", gfw::Window::RenderType::RENDERER_3);
 
 	LOG(plog::debug) << "Initialization completed." << std::endl;
 
 	LOG(plog::debug) << "Start to app run loop." << std::endl;
-	testTriangle.run();
+	testTriangle_2d.run();
 
 	return 0;
 }

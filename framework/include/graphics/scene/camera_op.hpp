@@ -11,7 +11,7 @@ namespace kgs
 	public:
 		CameraOP();
 		void updateProj(BoundsType viewBounds);
-		virtual void apply() = 0;
+		virtual void apply();
 		typename TransformType::MatrixType getProjMatrix() override;
 		BoundsType getViewBounds();
 		Bool32 isInView(Transform<SPACE_TYPE> *pTransform, BoundsType bounds) override;

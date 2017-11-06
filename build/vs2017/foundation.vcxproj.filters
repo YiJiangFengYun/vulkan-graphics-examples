@@ -45,4 +45,9 @@
       <Filter>include\foundation</Filter>
     </ClInclude>
   </ItemGroup>
+  <ItemGroup>
+    <None Include="..\..\framework\include\foundation\gemo.inl">
+      <Filter>include\foundation</Filter>
+    </None>
+  </ItemGroup>
 </Project>

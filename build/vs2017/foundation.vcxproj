@@ -31,6 +31,9 @@
     <ClInclude Include="..\..\framework\include\foundation\util.hpp" />
     <ClInclude Include="..\..\framework\include\foundation\wrapper.hpp" />
   </ItemGroup>
+  <ItemGroup>
+    <None Include="..\..\framework\include\foundation\gemo.inl" />
+  </ItemGroup>
   <PropertyGroup Label="Globals">
     <VCProjectVersion>15.0</VCProjectVersion>
     <ProjectGuid>{812C6731-B0FE-43CB-B23F-8D23EDC97EFB}</ProjectGuid>

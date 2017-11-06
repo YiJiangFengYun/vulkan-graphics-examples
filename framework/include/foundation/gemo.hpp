@@ -16,83 +16,28 @@ namespace fd
 		typedef typename ValueType::length_type length_type;
 		typedef typename ValueType::value_type vec_value_type;
 
-		Ray()
-		{
+		Ray();
 
-		}
+		Ray(ValueType origin, ValueType direction);
 
-		Ray(ValueType origin, ValueType direction):
-			m_origin(origin), m_direction(direction), m_isUpdateCache(FD_TRUE)
-		{
-#ifdef DEBUG
-			vec_value_type distSqr = glm::dot(direction, direction);
-			if (distSqr == 0)
-				throw std::invalid_argument("Invalid direction, direction length is 0.");
-#endif // DEBUG
-		}
+		Ray(const Ray<ValueType>& target);
 
-		Ray(const Ray<ValueType>& target) :
-			m_origin(target.m_origin),
-			m_direction(target.m_direction),
-			m_isUpdateCache(target.m_isUpdateCache),
-			m_invDir(target.m_invDir),
-			m_signs(target.m_signs)
-		{
-		}
+		Ray& operator =(const Ray<ValueType>& target);
 
-		Ray& operator =(const Ray<ValueType>& target)
-		{
-			m_origin = target.m_origin;
-			m_direction = target.m_direction;
-			m_isUpdateCache = target.m_isUpdateCache;
-			m_invDir = target.m_invDir;
-			m_signs = target.m_signs;
-			return *this;
-		}
+		ValueType getOrigin();
 
-		ValueType getOrigin()
-		{
-			return m_origin;
-		}
+		void setOrigin(ValueType origin);
 
-		void setOrigin(ValueType origin)
-		{
-			m_origin = origin;
-			m_isUpdateCache = true;
-		}
+		ValueType getDirection();
 
-		ValueType getDirection()
-		{
-			return m_direction;
-		}
+		void setDirection(ValueType direction);
 
-		void setDirection(ValueType direction)
-		{
-			m_direction = direction;
-			m_isUpdateCache = true;
-		}
+		ValueType getInvDir();
 
-		ValueType getInvDir()
-		{
-			_updateCache();
-			return m_invDir;
-		}
-
-		ValueType getSigns()
-		{
-			_updateCache();
-			return m_signs;
-		}
+		ValueType getSigns();
 
 		/*Returns a point at distance units along the ray.*/
-		ValueType getPoint(vec_value_type distance)
-		{
-			ValueType direction = m_direction;
-			glm::normalize(direction);
-			direction *= distance;
-			direction += m_origin;
-			return direction;
-		}
+		ValueType getPoint(vec_value_type distance);
 
 
 	private:
@@ -104,20 +49,7 @@ namespace fd
 		ValueType m_invDir;
 		ValueType m_signs;
 
-		inline void _updateCache()
-		{
-			if (m_isUpdateCache)
-			{
-				m_isUpdateCache = FD_FALSE;
-				length_type length = ValueType::length();
-				for (length_type i = 0; i < length; ++i)
-				{
-					m_invDir[i] = 1 / m_direction[i];
-					//negative is 0 and positive is 1, it is better to be used as array index.
-					m_signs[i] = m_direction[i] < 0 ? 0 : 1;
-				}
-			}
-		}
+		inline void _updateCache();
 	};
 
 	template <typename VecType = glm::vec3>
@@ -127,110 +59,36 @@ namespace fd
 		typedef VecType ValueType;
 		typedef typename ValueType::length_type length_type;
 		typedef typename ValueType::value_type vec_value_type;
-		Bounds()
-		{
-			_updateSize();
-		}
+		Bounds();
 
-		Bounds(ValueType min, ValueType max):
-			m_min(min), m_max(max)
-		{
-			_updateSize();
-		}
+		Bounds(ValueType min, ValueType max);
 
-		Bounds(const Bounds<ValueType>& target):
-			m_min(target.m_min),
-			m_max(target.m_max),
-			m_size(target.m_size)
-		{
-		}
+		Bounds(const Bounds<ValueType>& target);
 
-		Bounds& operator =(const Bounds<ValueType>& target)
-		{
-			m_min = target.m_min;
-			m_max = target.m_max;
-			m_size = target.m_size;
-			return *this;
-		}
+		Bounds& operator =(const Bounds<ValueType>& target);
 
-		ValueType getMin() { return m_min; }
-		/*void setMin(ValueType value)
-		{
-			m_min = value;
-			_updateSize();
-		}*/
+		ValueType getMin();
 
-		ValueType getMax() { return m_max; }
-		/*void setMax(ValueType value)
-		{
-			m_max = value;
-			_updateSize();
-		}*/
+		ValueType getMax();
 
 		/* Sets the bounds to the min and max value of the box.
            Using this function is faster than assigning min and max separately.*/
-		void setMinMax(ValueType min, ValueType max)
-		{
-			m_min = min;
-			m_max = max;
-			_updateSize();
-		}
+		void setMinMax(ValueType min, ValueType max);
 
-		ValueType getSize() { return m_size; }
-		void setSize(ValueType size)
-		{
-#ifdef DEBUG
-			length_type length = ValueType::length();
-			for (length_type i = 0; i < length; ++i)
-			{
-				if (size[i] < 0)throw std::invalid_argument("Invalid size of Bounds");
-			}
-#endif // DEBUG
-			m_size = size;
-			_updateMax();
-		}
+		ValueType getSize();
+		void setSize(ValueType size);
 
 		/* The closest point on the bounding box.
            If the point is inside the bounding box, unmodified point position will be returned.
 		*/
-		ValueType getClosestPoint(ValueType point)
-		{
-			length_type length = ValueType::length();
-			ValueType result;
-			for (length_type i = 0; i < length; ++i)
-			{
-				if (point[i] < m_min[i]) result[i] = m_min[i];
-				else if (point[i] < m_max[i]) result[i] = point[i];
-				else result[i] = m_max[i];
-			}
-			return result;
-		}
+		ValueType getClosestPoint(ValueType point);
 
 		/*Is point contained in the bounding box?
           If the point passed into Contains is inside the bounding box a value of True is returned.*/
-		Bool32 isContains(ValueType point)
-		{
-			length_type length = ValueType::length();
-			for (length_type i = 0; i < length; ++i)
-			{
-				if (point[i] < m_min[i] || point[i] > m_max[i])
-					return false;
-			}
-			return true;
-		}
+		Bool32 isContains(ValueType point);
 
 		/*Expand the bounds by increasing its size by amount along each side.*/
-		void expand(vec_value_type amount)
-		{
-			vec_value_type halt = amount / 2;
-			length_type length = ValueType::length();
-			for (length_type i = 0; i < length; ++i)
-			{
-				m_min[i] -= halt;
-				m_max[i] += halt;
-				m_size[i] += amount;
-			}
-		}
+		void expand(vec_value_type amount);
 
 		//todo
 		/*Does ray intersect this bounding box?
@@ -325,60 +183,74 @@ namespace fd
 		//}
 
 		/*Does another bounding box intersect with this bounding box?*/
-		Bool32 isIntersects(Bounds<ValueType> bounds)
-		{
-			typename ValueType::length_type length = ValueType::length();
-			for (typename ValueType::length_type i = 0; i < length; ++i)
-			{
-				if (m_min[i] > bounds.m_max[i] || m_max[i] < bounds.m_min[i])
-					return false;
-			}
-			return true;
-		}
+		Bool32 isIntersects(Bounds<ValueType> bounds);
 
 		/*The smallest squared distance between the point and this bounding box.*/
-		vec_value_type getSqrDistance(ValueType point)
-		{
-			ValueType closestPoint = getClosestPoint(point);
-			closestPoint -= point;
-			return glm::dot(closestPoint, closestPoint);
-		}
+		vec_value_type getSqrDistance(ValueType point);
 
-		~Bounds()
-		{
-
-		}
+		~Bounds();
 
 	private:
 		ValueType m_min;
 		ValueType m_max;
 		ValueType m_size;
 
-		inline void _updateSize()
-		{
-			length_type length = ValueType::length();
-			for (length_type i = 0; i < length; ++i)
-			{
-				m_size[i] = m_max[i] - m_min[i];
-			}
-#ifdef DEBUG
-			for (length_type i = 0; i < length; ++i)
-			{
-				if (m_size[i] < 0)
-					throw std::invalid_argument("Invalid size of Bounds");
-			}
-#endif // DEBUG
-		}
+		inline void _updateSize();
+		inline void _updateMax();
+	};
 
-		inline void _updateMax()
-		{
-			length_type length = ValueType::length();
-			for (length_type i = 0; i < length; ++i)
-			{
-				m_max[i] = m_min[i] + m_size[i];
-			}
-		}
+	struct Viewport
+	{
+		Viewport(float x_ = 0, float y_ = 0, float width_ = 1, float height_ = 1, float minDepth_ = 0, float maxDepth_ = 1);
+
+		Viewport& setX(float x_);
+
+		Viewport& setY(float y_);
+
+		Viewport& setWidth(float width_);
+
+		Viewport& setHeight(float height_);
+
+		Viewport& setMinDepth(float minDepth_);
+
+		Viewport& setMaxDepth(float maxDepth_);
+
+		bool operator==(Viewport const& rhs) const;
+
+		bool operator!=(Viewport const& rhs) const;
+
+		float x;
+		float y;
+		float width;
+		float height;
+		float minDepth;
+		float maxDepth;
+	};
+
+
+	struct Rect2D
+	{
+		Rect2D(float x_ = 0, float y_ = 0, float width_ = 1, float height_ = 1);
+
+		Rect2D& setX(float x_);
+
+		Rect2D& setY(float y_);
+
+		Rect2D& setWidth(float width_);
+
+		Rect2D& setHeight(float height_);
+
+		bool operator==(Rect2D const& rhs) const;
+
+		bool operator!=(Rect2D const& rhs) const;
+
+		float x;
+		float y;
+		float width;
+		float height;
 	};
 }
+
+#include "foundation/gemo.inl"
 
 #endif // !FD_GEMO_H

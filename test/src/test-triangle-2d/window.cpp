@@ -69,6 +69,7 @@ namespace testTriangle_2d
 	{
 		m_pShader = std::shared_ptr<kgs::Shader>(new kgs::Shader("shaders/triangle-2d.vert.spv", "shaders/triangle-2d.frag.spv"));
 		m_pPass = std::shared_ptr<kgs::Pass>(new kgs::Pass(m_pShader));
+		m_pPass->setScissor({ 0.0f, 0.0f, 0.5f, 1.0f });
 		m_pMaterial = std::shared_ptr<kgs::Material>(new kgs::Material());
 		m_pMaterial->addPass(m_pPass);
 		m_pMaterial->setRenderPriority(0u);

@@ -172,6 +172,11 @@ namespace chalet
 		m_pPass = std::shared_ptr<kgs::Pass>(new kgs::Pass(m_pShader));
 		m_pPass->setCullMode(kgs::CullModeFlagBits::eBack);
 		m_pPass->setFrontFace(kgs::FrontFaceType::eClockwise);
+		kgs::Pass::DepthStencilStateInfo depthStencilStateInfo;
+		depthStencilStateInfo.depthTestEnable = KGS_TRUE;
+		depthStencilStateInfo.depthWriteEnable = KGS_TRUE;
+		depthStencilStateInfo.depthCompareOp = vk::CompareOp::eLess;
+		m_pPass->setDepthStencilStateInfo(depthStencilStateInfo);
 		m_pMaterial = std::shared_ptr<kgs::Material>(new kgs::Material());
 		m_pMaterial->addPass(m_pPass);
 		m_pMaterial->setRenderPriority(0u);

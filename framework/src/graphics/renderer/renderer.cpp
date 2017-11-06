@@ -227,20 +227,24 @@ namespace kgs
 		};
 		createInfo.pMultisampleState = &multisampleStateCreateInfo;
 
+		auto depthStencilStateInfoOfPass = pPass->getDepthStencilStateInfo();
+
 		//depth and stencil info.
-		vk::PipelineDepthStencilStateCreateInfo depthStencilStateCreateInfo = {
-			vk::PipelineDepthStencilStateCreateFlags(),           //flags
-			VK_TRUE,                                              //depthTestEnable
-			VK_TRUE,                                              //depthWriteEnable
-			vk::CompareOp::eLess,                                 //depthCompareOp
-			VK_FALSE,                                             //depthBoundsTestEnable
-			VK_FALSE,                                             //stencilTestEnable
-			{},                                                   //front
-			{},                                                   //back
-			0.0f,                                                 //minDepthBounds
-			1.0f                                                  //maxDepthBounds
-		};
-		createInfo.pDepthStencilState = &depthStencilStateCreateInfo;
+		createInfo.pDepthStencilState = &depthStencilStateInfoOfPass;
+		//vk::PipelineDepthStencilStateCreateInfo depthStencilStateCreateInfo = {
+		//	vk::PipelineDepthStencilStateCreateFlags(),           //flags
+		//	depthStencilStateInfoOfPass.depthTestEnable,          //depthTestEnable
+		//	depthStencilStateInfoOfPass.depthWriteEnable,         //depthWriteEnable
+		//	depthStencilStateInfoOfPass.depthCompareOp,           //depthCompareOp
+		//	VK_FALSE,                                             //depthBoundsTestEnable
+		//	VK_FALSE,                                             //stencilTestEnable
+		//	{},                                                   //front
+		//	{},                                                   //back
+		//	0.0f,                                                 //minDepthBounds
+		//	1.0f                                                  //maxDepthBounds
+		//};
+
+		//createInfo.pDepthStencilState = &depthStencilStateCreateInfo;
 
 		//color blend info
 		vk::PipelineColorBlendAttachmentState colorBlendAttachmentState = {

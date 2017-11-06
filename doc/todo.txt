@@ -1,4 +1,3 @@
 Graphics:
-.Viewport and scissor of pass.
 .Setting of depth and stencil for passs as DepthStencilStateCreateInfo.
 .RenderArea of renderer to be rendered.

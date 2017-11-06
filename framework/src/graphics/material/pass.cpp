@@ -96,6 +96,7 @@ namespace kgs
 		, m_frontFace(FrontFaceType::eCounterClockwise)
 		, m_viewport(0.0f, 0.0f, 1.0f, 1.0f, 0.0f, 1.0f)
 		, m_scissor(0.0f, 0.0f, 1.0f, 1.0f)
+		, m_depthStencilStateInfo()
 		, m_buildInData()
 	{
 	}
@@ -109,6 +110,7 @@ namespace kgs
 		, m_frontFace(FrontFaceType::eCounterClockwise)
 		, m_viewport(0.0f, 0.0f, 1.0f, 1.0f, 0.0f, 1.0f)
 		, m_scissor(0.0f, 0.0f, 1.0f, 1.0f)
+		, m_depthStencilStateInfo()
 		, m_buildInData()
 	{
 
@@ -297,6 +299,17 @@ namespace kgs
 #endif // DEBUG
 		m_scissor = scissor;
 	}
+
+	const Pass::DepthStencilStateInfo &Pass::getDepthStencilStateInfo() const
+	{
+		return m_depthStencilStateInfo;
+	}
+
+	void Pass::setDepthStencilStateInfo(Pass::DepthStencilStateInfo value)
+	{
+		m_depthStencilStateInfo = value;
+	}
+
 
 	std::shared_ptr<Shader> Pass::_getShader()
 	{

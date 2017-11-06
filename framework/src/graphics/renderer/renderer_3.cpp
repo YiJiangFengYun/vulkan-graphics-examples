@@ -54,13 +54,11 @@ namespace kgs
 
 	void Renderer3::_render(const RenderInfo &info, RenderResultInfo &resultInfo)
 	{
-		auto queueTypeCount = static_cast<uint32_t>(RenderQueueType::RANGE_SIZE);
-
 		Renderer::_render(info, resultInfo);
 
+		auto queueTypeCount = static_cast<uint32_t>(RenderQueueType::RANGE_SIZE);
 		auto pDevice = pApp->getDevice();
 
-		//std::shared_ptr<Scene<SpaceType::SPACE_3>> pScene;
 		auto pScene = m_pScene;
 		uint32_t visualObjectCount = pScene->getVisualObjectCount();
 		
@@ -75,7 +73,7 @@ namespace kgs
 			auto pMesh = pVisualObject->getMesh();
 			auto bounds = dynamic_cast<SceneType::VisualObjectType::MeshType *>(pMesh.get())->getBounds();
 			auto pTransform = pVisualObject->getTransform();
-			if(m_pCamera->isInView(pTransform, bounds) == KGS_TRUE)
+			if(m_pCamera->isInView(pTransform.get(), bounds) == KGS_TRUE)
 			{
 				validVisualObjects[validVisualObjectCount++] = pVisualObject;
 			}
@@ -111,9 +109,7 @@ namespace kgs
 			queues[static_cast<size_t>(RenderQueueType::TRANSPARENT)].end(),
 			std::bind(&Renderer3::_sortObjectsWithCameraZ, this, std::placeholders::_1, std::placeholders::_2));
 
-
-		//-----Doing render.
-		//caculate total draw count.
+		//Caculate total draw count.
 		uint32_t drawCount = 0;
 		for (uint32_t typeIndex = 0u; typeIndex < queueTypeCount; ++typeIndex)
 		{
@@ -129,12 +125,18 @@ namespace kgs
 			}
 		}
 
+		//-----Doing render.
+		
 		vk::PipelineStageFlags waitStages[] = { vk::PipelineStageFlagBits::eColorAttachmentOutput };
 		std::vector<vk::SubmitInfo> submitInfos(drawCount);
 		m_arrPLastPipelineLayouts.resize(drawCount);
 		m_arrPLastPipelines.resize(drawCount);
 		m_arrPLastSemaphores.resize(drawCount);
 		m_arrSemaphores.resize(drawCount);
+
+		auto projMatrix = m_pCamera->getProjMatrix();
+		auto viewMatrix = m_pCamera->getTransform()->getMatrixWorldToLocal();
+
 		uint32_t drawIndex = 0;
 		for (uint32_t typeIndex = 0u; typeIndex < queueTypeCount; ++typeIndex)
 		{
@@ -142,8 +144,10 @@ namespace kgs
 			for (uint32_t objectIndex = 0u; objectIndex < queueLength; ++objectIndex)
 			{
 				auto pVisualObject = queues[typeIndex][objectIndex];
+				auto modelMatrix = pVisualObject->getTransform()->getMatrixLocalToWorld();
+				auto mvMatrix = viewMatrix * modelMatrix;
+				auto mvpMatrix = projMatrix * mvMatrix;
 				auto pMesh = pVisualObject->getMesh();
-
 				auto subMeshCount = pMesh->getSubMeshCount();
 				auto pMaterial = pVisualObject->getMaterial();
 				auto passCount = pMaterial->getPassCount();
@@ -152,15 +156,8 @@ namespace kgs
 				{
 					//update building in matrix variable.
 					auto pPass = pMaterial->getPassWithIndex(passIndex);
-					auto projMatrix = m_pCamera->getProjMatrix();
-					auto viewMatrix = m_pCamera->getTransform()->getMatrixWorldToLocal();
-					auto modelMatrix = pVisualObject->getTransform()->getMatrixLocalToWorld();
-					auto mvMatrix = viewMatrix * modelMatrix;
 
-					pPass->_setBuildInMatrixData(projMatrix * mvMatrix
-						, mvMatrix
-						, modelMatrix
-					);
+					pPass->_setBuildInMatrixData(mvpMatrix, mvMatrix, modelMatrix);
 
 					pPass->apply();
 				}

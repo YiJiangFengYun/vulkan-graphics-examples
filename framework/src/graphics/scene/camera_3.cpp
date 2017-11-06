@@ -77,7 +77,7 @@ namespace kgs
 		return m_projMatrix;
 	}
 
-	Bool32 Camera3::isInView(std::shared_ptr<TransformType> pTransform, BoundsType bounds)
+	Bool32 Camera3::isInView(Transform<SpaceType::SPACE_3> *pTransform, BoundsType bounds)
 	{
 		auto min = bounds.getMin();
 		auto max = bounds.getMax();

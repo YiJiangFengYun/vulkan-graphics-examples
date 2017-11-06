@@ -26,7 +26,7 @@ namespace kgs
 
 		virtual typename TransformType::MatrixType getProjMatrix() = 0;
 
-		virtual Bool32 isInView(std::shared_ptr<TransformType> pTransform, BoundsType bounds) = 0;
+		virtual Bool32 isInView(Transform<SPACE_TYPE> *pTransform, BoundsType bounds) = 0;
 	};
 } //namespace kgs
 

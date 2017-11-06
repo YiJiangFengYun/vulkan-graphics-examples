@@ -26,7 +26,7 @@ namespace kgs
 		void setZFar(float zFar);
 
 		typename TransformType::MatrixType getProjMatrix() override;
-		Bool32 isInView(std::shared_ptr<TransformType> pTransform, BoundsType bounds) override;
+		Bool32 isInView(Transform<SpaceType::SPACE_3> *pTransform, BoundsType bounds) override;
 	private:
 		float m_fovy, m_aspect, m_zNear, m_zFar;
 		TransformType::MatrixType m_projMatrix;

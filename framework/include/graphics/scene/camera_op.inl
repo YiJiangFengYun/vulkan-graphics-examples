@@ -28,7 +28,7 @@ namespace kgs
 	}
 
 	template <SpaceType SPACE_TYPE>
-	Bool32 CameraOP<SPACE_TYPE>::isInView(std::shared_ptr<TransformType> pTransform, BoundsType bounds)
+	Bool32 CameraOP<SPACE_TYPE>::isInView(Transform<SPACE_TYPE> *pTransform, BoundsType bounds)
 	{
 		auto min = bounds.getMin();
 		auto max = bounds.getMax();

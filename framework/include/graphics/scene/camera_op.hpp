@@ -14,7 +14,7 @@ namespace kgs
 		virtual void apply() = 0;
 		typename TransformType::MatrixType getProjMatrix() override;
 		BoundsType getViewBounds();
-		Bool32 isInView(std::shared_ptr<TransformType> pTransform, BoundsType bounds) override;
+		Bool32 isInView(Transform<SPACE_TYPE> *pTransform, BoundsType bounds) override;
 	protected:
 		BoundsType m_viewBounds;
 		typename TransformType::MatrixType m_projMatrix;

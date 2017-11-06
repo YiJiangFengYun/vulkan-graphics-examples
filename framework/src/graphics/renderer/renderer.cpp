@@ -19,6 +19,7 @@ namespace kgs
 		, m_clearValueColor(0.0f)
 		, m_clearValueDepth(1.0f)
 		, m_clearValueStencil(0u)
+		, m_renderArea(0.0f, 0.0f, 1.0f, 1.0f)
 	{
 		_init();
 	}
@@ -34,6 +35,7 @@ namespace kgs
 		, m_clearValueColor(0.0f)
 		, m_clearValueDepth(1.0f)
 		, m_clearValueStencil(0u)
+		, m_renderArea(0.0f, 0.0f, 1.0f, 1.0f)
 	{
 		_init();
 	}
@@ -73,7 +75,7 @@ namespace kgs
 		return m_depthStencilImageFormat;
 	}
 
-	Color BaseRenderer::getClearValueColor()
+	const Color &BaseRenderer::getClearValueColor() const
 	{
 		return m_clearValueColor;
 	}
@@ -83,7 +85,7 @@ namespace kgs
 		m_clearValueColor = color;
 	}
 
-	float BaseRenderer::getClearValueDepth()
+	float BaseRenderer::getClearValueDepth() const
 	{
 		return m_clearValueDepth;
 	}
@@ -93,7 +95,7 @@ namespace kgs
 		m_clearValueDepth = value;
 	}
 
-	uint32_t BaseRenderer::getClearValueStencil()
+	uint32_t BaseRenderer::getClearValueStencil() const
 	{
 		return m_clearValueStencil;
 	}
@@ -101,6 +103,35 @@ namespace kgs
 	void BaseRenderer::setClearValueStencil(uint32_t value)
 	{
 		m_clearValueStencil = value;
+	}
+
+	const fd::Rect2D &BaseRenderer::getClearArea() const
+	{
+		return m_renderArea;
+	}
+
+	void BaseRenderer::setClearArea(fd::Rect2D area)
+	{
+#ifdef DEBUG
+		if (area.width < 0)
+			throw std::invalid_argument("The width of area is smaller than 0!");
+		else if (area.width > 1)
+			throw std::invalid_argument("The width of area is bigger than 1!");
+		if (area.height < 0)
+			throw std::invalid_argument("The height of area is smaller than 0!");
+		else if (area.height > 1)
+			throw std::invalid_argument("The height of area is bigger than 1!");
+		if (area.x < 0)
+			throw std::invalid_argument("the x of area is smaller than 0!");
+		else if (area.x > area.width)
+			throw std::invalid_argument("The x of area is bigger than the width of area!");
+		if (area.y < 0)
+			throw std::invalid_argument("the y of area is smaller than 0!");
+		else if (area.y > area.height)
+			throw std::invalid_argument("The y of area is bigger than the height of area!");
+#endif // DEBUG
+
+		m_renderArea = area;
 	}
 
 	Bool32 BaseRenderer::_isValidForRender()
@@ -327,12 +358,19 @@ namespace kgs
 			, clearValueDepthStencil
 		};
 
+
+		const auto& renderArea = m_renderArea;
+
 		vk::RenderPassBeginInfo renderPassBeginInfo = {
 			*m_pRenderPass,                                   //renderPass
 			*m_pFrameBuffer,                                  //framebuffer
 			vk::Rect2D(                                       //renderArea
-				vk::Offset2D(0, 0),
-				vk::Extent2D(m_framebufferWidth, m_framebufferHeight)
+				vk::Offset2D(static_cast<int32_t>(std::round(m_framebufferWidth * renderArea.x))
+					, static_cast<int32_t>(std::round(m_framebufferHeight * renderArea.y))
+				),
+				vk::Extent2D(static_cast<uint32_t>(std::round(m_framebufferWidth * renderArea.width)),
+					static_cast<uint32_t>(std::round(m_framebufferHeight * renderArea.height))
+				)
 			),
 			static_cast<uint32_t>(clearValues.size()),      //clearValueCount
 			clearValues.data()                              //pClearValues

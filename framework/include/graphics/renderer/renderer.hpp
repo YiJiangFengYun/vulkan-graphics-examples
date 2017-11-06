@@ -48,12 +48,14 @@ namespace kgs
 		vk::Format getColorImageFormat();
 		vk::Format getDepthStencilImageFormat();
 
-		Color getClearValueColor();
+		const Color &getClearValueColor() const;
 		void setClearValueColor(Color color);
-		float getClearValueDepth();
+		float getClearValueDepth() const;
 		void setClearValueDepth(float value);
-		uint32_t getClearValueStencil();
+		uint32_t getClearValueStencil() const;
 		void setClearValueStencil(uint32_t value);
+		const fd::Rect2D &getClearArea() const;
+		void setClearArea(fd::Rect2D area);
 	protected:
 		//compositions
 		uint32_t m_framebufferWidth;
@@ -63,6 +65,7 @@ namespace kgs
 		Color m_clearValueColor;
 		float m_clearValueDepth;
 		uint32_t m_clearValueStencil;
+		fd::Rect2D m_renderArea;
 		std::shared_ptr<vk::RenderPass> m_pRenderPass;
 		std::shared_ptr<TextureDepthStencilAttachment> m_pDepthStencilTexture;
 		std::shared_ptr<vk::Framebuffer> m_pFrameBuffer;

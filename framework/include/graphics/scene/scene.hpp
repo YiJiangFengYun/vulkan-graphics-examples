@@ -37,6 +37,8 @@ namespace kgs
 
 		uint32_t getVisualObjectCount();
 		const std::shared_ptr<VisualObjectType> &getVisualObjectWithIndex(uint32_t index) const;
+		const std::shared_ptr<VisualObjectType> &getVisualObjectWithTransform(std::shared_ptr<TransformType> pTransform) const;
+		const std::shared_ptr<VisualObjectType> &getVisualObjectWithTransform(TransformType *pTransform) const;
 		Bool32 isHasVisualObject(const std::shared_ptr<VisualObjectType> pTarget) const;
 		void addVisualObject(const std::shared_ptr<VisualObjectType> pTarget
 			, const std::shared_ptr<VisualObjectType> pParent = nullptr);
@@ -44,6 +46,8 @@ namespace kgs
 
 		uint32_t getCameraCount();
 		const std::shared_ptr<CameraType> &getCameraWithIndex(uint32_t index) const;
+		const std::shared_ptr<CameraType> &getCameraWithTransform(std::shared_ptr<TransformType> pTransform) const;
+		const std::shared_ptr<CameraType> &getCameraWithTransform(TransformType *pTransform) const;
 		Bool32 isHasCamera(const std::shared_ptr<CameraType> pTarget) const;
 		void addCamera(const std::shared_ptr<CameraType> pTarget
 			, const std::shared_ptr<CameraType> pParent = nullptr);
@@ -51,6 +55,8 @@ namespace kgs
 
 		uint32_t getLightCount();
 		const std::shared_ptr<LightType> &getLightWithIndex(uint32_t index) const;
+		const std::shared_ptr<LightType> &getLightWithTransform(std::shared_ptr<TransformType> pTransform) const;
+		const std::shared_ptr<LightType> &getLightWithTransform(TransformType *pTransform) const;
 		Bool32 isHasLight(const std::shared_ptr<LightType> pTarget) const;
 		void addLight(const std::shared_ptr<LightType> pTarget
 			, const std::shared_ptr<LightType> pParent = nullptr);
@@ -62,10 +68,13 @@ namespace kgs
 		//aggregations
 		std::vector<std::shared_ptr<VisualObjectType>> m_arrPVisualObjects;
 		std::unordered_map<InstanceID, std::shared_ptr<VisualObjectType>> m_mapPVisualObjects;
+		std::unordered_map<InstanceID, std::shared_ptr<VisualObjectType>> m_mapTransformIdToVisualObjects;
 		std::vector<std::shared_ptr<CameraType>> m_arrPCameras;
 		std::unordered_map<InstanceID, std::shared_ptr<CameraType>> m_mapPCameras;
+		std::unordered_map<InstanceID, std::shared_ptr<CameraType>> m_mapTransformIdToCameras;
 		std::vector<std::shared_ptr<LightType>> m_arrPLights;
 		std::unordered_map<InstanceID, std::shared_ptr<LightType>> m_mapPLights;
+		std::unordered_map<InstanceID, std::shared_ptr<LightType>> m_mapTransformIdToLights;
 
 		virtual void _addVisualObject(const std::shared_ptr<VisualObjectType> pTarget
 			, const std::shared_ptr<VisualObjectType> pParent);
@@ -73,7 +82,6 @@ namespace kgs
 	private:
 		template <typename T>
 		inline Bool32 _isHasObject(const std::shared_ptr<T> &pTarget
-			, const std::vector<std::shared_ptr<T>> &arr
 			, const std::unordered_map<InstanceID, std::shared_ptr<T>> &map
 		) const;
 
@@ -81,6 +89,7 @@ namespace kgs
 		inline void _addObject(const std::shared_ptr<T> &pTarget
 			, std::vector<std::shared_ptr<T>> &arr
 			, std::unordered_map<InstanceID, std::shared_ptr<T>> &map
+			, std::unordered_map<InstanceID, std::shared_ptr<T>> &mapTransformToObjs
 			, const std::shared_ptr<TransformType> &root
 			, const std::shared_ptr<T> &pParent = nullptr
 		);
@@ -89,6 +98,7 @@ namespace kgs
 		inline void _removeObject(const std::shared_ptr<T> &pTarget
 			, std::vector<std::shared_ptr<T>> &arr
 			, std::unordered_map<InstanceID, std::shared_ptr<T>> &map
+			, std::unordered_map<InstanceID, std::shared_ptr<T>> &mapTransformToObjs
 		);
 	};
 } //namespace kgs

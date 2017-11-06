@@ -1,6 +1,4 @@
 Graphics:
-.Scene construction.
-.Base render logic for renderer2.
 .Viewport and scissor of pass.
 .Setting of depth and stencil for passs as DepthStencilStateCreateInfo.
 .RenderArea of renderer to be rendered.

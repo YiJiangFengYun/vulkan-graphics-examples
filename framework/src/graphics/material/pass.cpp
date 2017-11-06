@@ -94,6 +94,8 @@ namespace kgs
 		, m_applied(KGS_FALSE)
 		, m_cullMode(CullModeFlagBits::eBack)
 		, m_frontFace(FrontFaceType::eCounterClockwise)
+		, m_viewport(0.0f, 0.0f, 1.0f, 1.0f, 0.0f, 1.0f)
+		, m_scissor(0.0f, 0.0f, 1.0f, 1.0f)
 		, m_buildInData()
 	{
 	}
@@ -105,6 +107,9 @@ namespace kgs
 		, m_pShader(pShader)
 		, m_cullMode(CullModeFlagBits::eBack)
 		, m_frontFace(FrontFaceType::eCounterClockwise)
+		, m_viewport(0.0f, 0.0f, 1.0f, 1.0f, 0.0f, 1.0f)
+		, m_scissor(0.0f, 0.0f, 1.0f, 1.0f)
+		, m_buildInData()
 	{
 
 	}
@@ -226,6 +231,71 @@ namespace kgs
 	void Pass::setFrontFace(FrontFaceType frontFace)
 	{
 		m_frontFace = frontFace;
+	}
+
+	const fd::Viewport &Pass::getViewport() const
+	{
+		return m_viewport;
+	}
+
+	void Pass::setViewport(const fd::Viewport &viewport)
+	{
+#ifdef DEBUG
+		if (viewport.width < 0)
+			throw std::invalid_argument("The width of viewport is smaller than 0!");
+		else if (viewport.width > 1)
+			throw std::invalid_argument("The width of viewport is bigger than 1!");
+		if(viewport.height < 0)
+			throw std::invalid_argument("The height of viewport is smaller than 0!");
+		else if(viewport.height > 1)
+			throw std::invalid_argument("The height of viewport is bigger than 1!");
+		if(viewport.maxDepth < 0)
+			throw std::invalid_argument("The maxDepth of viewport is smaller than 0!");
+		else if(viewport.maxDepth > 1)
+			throw std::invalid_argument("The maxDepth of viewport is bigger than 1!");
+
+		if (viewport.x < 0)
+			throw std::invalid_argument("the x of viewport is smaller than 0!");
+		else if (viewport.x > viewport.width)
+			throw std::invalid_argument("The x of viewport is bigger than the width of viewport!");
+		if (viewport.y < 0)
+			throw std::invalid_argument("the y of viewport is smaller than 0!");
+		else if(viewport.y > viewport.height)
+			throw std::invalid_argument("The y of viewport is bigger than the height of viewport!");
+		if(viewport.minDepth < 0)
+			throw std::invalid_argument("the minDepth of viewport is smaller than 0!");
+		else if(viewport.minDepth > viewport.maxDepth)
+			throw std::invalid_argument("The minDepth of viewport is bigger than the maxDepth of viewport!");
+#endif // DEBUG
+		m_viewport = viewport;
+	}
+
+	const fd::Rect2D &Pass::getScissor() const
+	{
+		return m_scissor;
+	}
+
+	void Pass::setScissor(const fd::Rect2D &scissor)
+	{
+#ifdef DEBUG
+		if (scissor.width < 0)
+			throw std::invalid_argument("The width of scissor is smaller than 0!");
+		else if (scissor.width > 1)
+			throw std::invalid_argument("The width of scissor is bigger than 1!");
+		if (scissor.height < 0)
+			throw std::invalid_argument("The height of scissor is smaller than 0!");
+		else if (scissor.height > 1)
+			throw std::invalid_argument("The height of scissor is bigger than 1!");
+		if (scissor.x < 0)
+			throw std::invalid_argument("the x of scissor is smaller than 0!");
+		else if (scissor.x > scissor.width)
+			throw std::invalid_argument("The x of scissor is bigger than the width of scissor!");
+		if (scissor.y < 0)
+			throw std::invalid_argument("the y of scissor is smaller than 0!");
+		else if (scissor.y > scissor.height)
+			throw std::invalid_argument("The y of scissor is bigger than the height of scissor!");
+#endif // DEBUG
+		m_scissor = scissor;
 	}
 
 	std::shared_ptr<Shader> Pass::_getShader()

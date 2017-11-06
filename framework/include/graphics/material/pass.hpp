@@ -105,6 +105,12 @@ namespace kgs
 		FrontFaceType getFrontFace() const;
 		void setFrontFace(FrontFaceType frontFace);
 
+		const fd::Viewport &getViewport() const;
+		void setViewport(const fd::Viewport &viewport);
+
+		const fd::Rect2D &getScissor() const;
+		void setScissor(const fd::Rect2D &scissor);
+
 		std::shared_ptr<Shader> _getShader();
 		std::shared_ptr<vk::Buffer> _getUniformBuffer();
 		std::shared_ptr<vk::DeviceMemory> _getUniformBufferMemory();
@@ -125,6 +131,8 @@ namespace kgs
 
 		CullModeFlags m_cullMode;
 		FrontFaceType m_frontFace;
+		fd::Viewport m_viewport;
+		fd::Rect2D m_scissor;
 
 		MaterialData::BuildInData m_buildInData;
 

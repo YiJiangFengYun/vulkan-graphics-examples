@@ -164,24 +164,26 @@ namespace kgs
 		createInfo.pVertexInputState = &vertexInputStateInfo;
 		createInfo.pInputAssemblyState = &inputAssemblyStateInfo;
 
+		const auto& viewportOfPass = pPass->getViewport();
+		const auto& scissorOfPass = pPass->getScissor();
 		//View port info.
 		vk::Viewport viewport = {
-			0.0f,                                     //x
-			0.0f,                                     //y
-			(float)m_framebufferWidth,   //width
-			(float)m_framebufferHeight,  //height
-			0.0f,                                     //minDepth
-			1.0f                                      //maxDepth
+			(float)m_framebufferWidth * viewportOfPass.x,                                     //x
+			(float)m_framebufferHeight * viewportOfPass.y,                                     //y
+			(float)m_framebufferWidth * viewportOfPass.width,   //width
+			(float)m_framebufferHeight * viewportOfPass.height,  //height
+			1.0f * viewportOfPass.minDepth,                                     //minDepth
+			1.0f * viewportOfPass.maxDepth                                      //maxDepth
 		};
 
 		vk::Rect2D scissor = {
 			{                               //offset
-				0,                             //x
-				0                              //y
+				static_cast<int32_t>(std::round(m_framebufferWidth * scissorOfPass.x)),    //x
+				static_cast<int32_t>(std::round(m_framebufferHeight * scissorOfPass.y))    //y
 			},
 			{                               //extent
-				m_framebufferWidth,            //width
-				m_framebufferHeight            //height
+				static_cast<uint32_t>(std::round(m_framebufferWidth * scissorOfPass.width)),   //width
+				static_cast<uint32_t>(std::round(m_framebufferHeight * scissorOfPass.height))  //height
 			}
 		};
 

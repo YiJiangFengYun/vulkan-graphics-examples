@@ -2,6 +2,26 @@
 
 namespace kgs
 {
+	ColorBlendInfo::ColorBlendInfo()
+	{
+
+	}
+	void ColorBlendInfo::setColorBlendInfo(AttachmentInfo info)
+	{
+		m_vkColorBlendAttachmentStates.resize(0u);
+		m_vkColorBlendAttachmentStates[0] = info;
+	}
+
+	const std::vector<vk::PipelineColorBlendAttachmentState> &ColorBlendInfo::getColorBlendAttachmentStates() const
+	{
+		return m_vkColorBlendAttachmentStates;
+	}
+
+	const vk::PipelineColorBlendStateCreateInfo &ColorBlendInfo::getColorBlendStateCreateInfo() const
+	{
+		return m_vkColorBlendStateCreateInfo;
+	}
+
 	std::array<std::pair<DescriptorType, vk::DescriptorType>, static_cast<size_t>(DescriptorType::RANGE_SIZE)> arrDescriptorTypeToVK = {
 		std::pair<DescriptorType, vk::DescriptorType>(DescriptorType::COMBINED_IMAGE_SAMPLER, vk::DescriptorType::eCombinedImageSampler),
 		std::pair<DescriptorType, vk::DescriptorType>(DescriptorType::UNIFORM_BUFFER, vk::DescriptorType::eUniformBuffer)

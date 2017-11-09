@@ -47,8 +47,6 @@ namespace kgs
 			void updateSize(const std::shared_ptr<MaterialData> &pMaterialData);
 		};
 
-		using DepthStencilStateInfo = vk::PipelineDepthStencilStateCreateInfo;
-
 		Pass();
 		Pass(std::shared_ptr<Shader> pShader);
 		~Pass();
@@ -113,8 +111,11 @@ namespace kgs
 		const fd::Rect2D &getScissor() const;
 		void setScissor(const fd::Rect2D &scissor);
 
-		const DepthStencilStateInfo &getDepthStencilStateInfo() const;
-		void setDepthStencilStateInfo(DepthStencilStateInfo value);
+		const DepthStencilInfo &getDepthStencilStateInfo() const;
+		void setDepthStencilStateInfo(const DepthStencilInfo &value);
+
+		const ColorBlendInfo &getColorBlendInfo() const;
+		void setColorBlendInfo(const ColorBlendInfo &value);
 
 		std::shared_ptr<Shader> _getShader();
 		std::shared_ptr<vk::Buffer> _getUniformBuffer();
@@ -138,7 +139,8 @@ namespace kgs
 		FrontFaceType m_frontFace;
 		fd::Viewport m_viewport;
 		fd::Rect2D m_scissor;
-		DepthStencilStateInfo m_depthStencilStateInfo;
+		DepthStencilInfo m_depthStencilStateInfo;
+		ColorBlendInfo m_colorBlendInfo;
 
 		MaterialData::BuildInData m_buildInData;
 

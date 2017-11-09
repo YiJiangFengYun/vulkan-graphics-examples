@@ -262,23 +262,10 @@ namespace kgs
 
 		//depth and stencil info.
 		createInfo.pDepthStencilState = &depthStencilStateInfoOfPass;
-		//vk::PipelineDepthStencilStateCreateInfo depthStencilStateCreateInfo = {
-		//	vk::PipelineDepthStencilStateCreateFlags(),           //flags
-		//	depthStencilStateInfoOfPass.depthTestEnable,          //depthTestEnable
-		//	depthStencilStateInfoOfPass.depthWriteEnable,         //depthWriteEnable
-		//	depthStencilStateInfoOfPass.depthCompareOp,           //depthCompareOp
-		//	VK_FALSE,                                             //depthBoundsTestEnable
-		//	VK_FALSE,                                             //stencilTestEnable
-		//	{},                                                   //front
-		//	{},                                                   //back
-		//	0.0f,                                                 //minDepthBounds
-		//	1.0f                                                  //maxDepthBounds
-		//};
 
-		//createInfo.pDepthStencilState = &depthStencilStateCreateInfo;
-
+		const auto& colorBlendInfoOfPass = pPass->getColorBlendInfo();
 		//color blend info
-		vk::PipelineColorBlendAttachmentState colorBlendAttachmentState = {
+		vk::PipelineColorBlendAttachmentState defaultColorBlendAttachmentState = {
 			VK_FALSE,                                //blendEnable
 			vk::BlendFactor::eOne,                  //srcColorBlendFactor
 			vk::BlendFactor::eZero,                  //dstColorBlendFactor
@@ -292,13 +279,28 @@ namespace kgs
 			| vk::ColorComponentFlagBits::eA  //colorWriteMask
 		};
 
+		uint32_t attachmentCount = 1u;
+		std::vector<vk::PipelineColorBlendAttachmentState> colorBlendAttachmentStates(attachmentCount);
+		const auto& colorBlendAttachmentStatesOfPass = colorBlendInfoOfPass.getColorBlendAttachmentStates();
+		for (uint32_t i = 0; i < attachmentCount; ++i)
+		{
+			if (i < colorBlendAttachmentStatesOfPass.size())
+			{
+				colorBlendAttachmentStates[i] = colorBlendAttachmentStatesOfPass[i];
+			}
+			else
+			{
+				colorBlendAttachmentStates[i] = defaultColorBlendAttachmentState;
+			}
+		}
+
 		vk::PipelineColorBlendStateCreateInfo colorBlendStateCreateInfo = {
-			vk::PipelineColorBlendStateCreateFlags(),              //flags
-			VK_FALSE,                                              //logicOpEnable
-			vk::LogicOp::eCopy,                                   //logicOp
-			1u,                                                    //attachmentCount
-			&colorBlendAttachmentState,                            //pAttachments
-			{ 0.0f, 0.0f, 0.0f, 0.0f }                             //blendConstants
+			vk::PipelineColorBlendStateCreateFlags(),                     //flags
+			VK_FALSE,                                                     //logicOpEnable
+			vk::LogicOp::eCopy,                                           //logicOp
+			static_cast<uint32_t>(colorBlendAttachmentStates.size()),     //attachmentCount
+			colorBlendAttachmentStates.data(),                            //pAttachments
+			{ 0.0f, 0.0f, 0.0f, 0.0f }                                    //blendConstants
 		};
 		createInfo.pColorBlendState = &colorBlendStateCreateInfo;
 

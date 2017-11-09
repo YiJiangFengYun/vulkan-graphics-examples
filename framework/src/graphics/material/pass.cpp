@@ -97,6 +97,7 @@ namespace kgs
 		, m_viewport(0.0f, 0.0f, 1.0f, 1.0f, 0.0f, 1.0f)
 		, m_scissor(0.0f, 0.0f, 1.0f, 1.0f)
 		, m_depthStencilStateInfo()
+		, m_colorBlendInfo()
 		, m_buildInData()
 	{
 	}
@@ -111,6 +112,7 @@ namespace kgs
 		, m_viewport(0.0f, 0.0f, 1.0f, 1.0f, 0.0f, 1.0f)
 		, m_scissor(0.0f, 0.0f, 1.0f, 1.0f)
 		, m_depthStencilStateInfo()
+		, m_colorBlendInfo()
 		, m_buildInData()
 	{
 
@@ -300,14 +302,24 @@ namespace kgs
 		m_scissor = scissor;
 	}
 
-	const Pass::DepthStencilStateInfo &Pass::getDepthStencilStateInfo() const
+	const DepthStencilInfo &Pass::getDepthStencilStateInfo() const
 	{
 		return m_depthStencilStateInfo;
 	}
 
-	void Pass::setDepthStencilStateInfo(Pass::DepthStencilStateInfo value)
+	void Pass::setDepthStencilStateInfo(const DepthStencilInfo &value)
 	{
 		m_depthStencilStateInfo = value;
+	}
+
+	const ColorBlendInfo &Pass::getColorBlendInfo() const
+	{
+		return m_colorBlendInfo;
+	}
+
+	void Pass::setColorBlendInfo(const ColorBlendInfo &value)
+	{
+		m_colorBlendInfo = value;
 	}
 
 

@@ -48,6 +48,21 @@ namespace kgs
 		RANGE_SIZE = (END_RANGE - BEGIN_RANGE + 1)
 	};
 
+	using DepthStencilInfo = vk::PipelineDepthStencilStateCreateInfo;
+
+	struct ColorBlendInfo
+	{
+	public:
+		ColorBlendInfo();
+		using AttachmentInfo = vk::PipelineColorBlendAttachmentState;
+		void setColorBlendInfo(AttachmentInfo info);
+		const std::vector<vk::PipelineColorBlendAttachmentState> &getColorBlendAttachmentStates() const;
+		const vk::PipelineColorBlendStateCreateInfo &getColorBlendStateCreateInfo() const;
+	private:
+		std::vector<vk::PipelineColorBlendAttachmentState> m_vkColorBlendAttachmentStates;
+		vk::PipelineColorBlendStateCreateInfo m_vkColorBlendStateCreateInfo;
+	};
+
 	extern std::array<std::pair<DescriptorType, vk::DescriptorType>, static_cast<size_t>(DescriptorType::RANGE_SIZE)> arrDescriptorTypeToVK;
 	extern std::array<std::pair<ShaderStageFlagBits, vk::ShaderStageFlagBits>, static_cast<size_t>(ShaderStageFlagCount)> arrShaderStageFlagBitsToVK;
 	extern std::array<std::pair<CullModeFlagBits, vk::CullModeFlagBits>, static_cast<size_t>(CullModeFlagCount)> arrCullModeFlagBitsToVK;

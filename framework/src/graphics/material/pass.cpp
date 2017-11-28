@@ -587,7 +587,7 @@ namespace kgs
 					offsets[index] = offset;
 					names[index] = item.name;
 					descriptorCounts[index] = item.descriptorCount;
-					totalSize += item.size;
+					totalSize += item.bufferSize;
 					offset += item.bufferSize;
 					++index;
 				}

@@ -463,6 +463,7 @@ namespace kgs
 		for (size_t i = start, j = 0; i < size && j < oneLayerCount; ++i, ++j)
 		{
 			result[j] = m_arrTempColors[mipLevel][i];
+			result[j] /= 255.0f;
 		}
 		return result;
 	}
@@ -497,7 +498,13 @@ namespace kgs
 		size_t colorsSize = colors.size();
 		for (size_t i = 0, j = start; i < oneLayerSize && j < size; ++i, ++j)
 		{
-			if (i < colorsSize)m_arrTempColors[mipLevel][j] = colors[i];
+			auto tempColor = colors[i];
+			tempColor *= 255.0f;
+			tempColor.a = std::round(tempColor.a);
+			tempColor.r = std::round(tempColor.r);
+			tempColor.g = std::round(tempColor.g);
+			tempColor.b = std::round(tempColor.b);
+			if (i < colorsSize)m_arrTempColors[mipLevel][j] = tempColor;
 		}
 	}
 

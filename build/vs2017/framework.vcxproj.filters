@@ -1,89 +1,62 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
 <Project ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
   <ItemGroup>
-    <Filter Include="include">
-      <UniqueIdentifier>{93042209-0f15-403f-b33d-633f101842f7}</UniqueIdentifier>
+    <Filter Include="app">
+      <UniqueIdentifier>{a175b7bc-00a6-4d45-9a3f-8c6b8b8c3732}</UniqueIdentifier>
     </Filter>
-    <Filter Include="src">
-      <UniqueIdentifier>{92326229-821d-4df5-865a-eeb0b098d0e0}</UniqueIdentifier>
+    <Filter Include="util">
+      <UniqueIdentifier>{56ca0d77-d3ca-4aca-ae8c-93d58e189c10}</UniqueIdentifier>
     </Filter>
-    <Filter Include="include\framework">
-      <UniqueIdentifier>{dbc93ddc-2dd4-470a-8bbb-90168f50fac8}</UniqueIdentifier>
-    </Filter>
-    <Filter Include="include\framework\util">
-      <UniqueIdentifier>{cc1c0b45-3f2d-421a-b22b-920a17a4fbd2}</UniqueIdentifier>
-    </Filter>
-    <Filter Include="include\framework\world">
-      <UniqueIdentifier>{1ad2d87d-0b84-4886-80f2-2c8a6d19aa11}</UniqueIdentifier>
-    </Filter>
-    <Filter Include="src\framework">
-      <UniqueIdentifier>{84646f6f-be73-47b0-8834-cfb9516a77c9}</UniqueIdentifier>
-    </Filter>
-    <Filter Include="src\framework\app">
-      <UniqueIdentifier>{ccca9082-5e3d-4478-a158-7bfb9f8f6af4}</UniqueIdentifier>
-    </Filter>
-    <Filter Include="src\framework\util">
-      <UniqueIdentifier>{bc987f71-3747-4791-a7af-0d52b05eb072}</UniqueIdentifier>
-    </Filter>
-    <Filter Include="src\framework\world">
-      <UniqueIdentifier>{fb6f33a7-d86c-4e22-b41d-e8041af0c377}</UniqueIdentifier>
-    </Filter>
-    <Filter Include="include\framework\app">
-      <UniqueIdentifier>{e9e482ca-da74-4d1f-9fb8-6c101815aea4}</UniqueIdentifier>
+    <Filter Include="world">
+      <UniqueIdentifier>{f25d08d3-b1dc-42bf-9c08-0a397b5adf48}</UniqueIdentifier>
     </Filter>
   </ItemGroup>
   <ItemGroup>
-    <ClCompile Include="..\..\framework\src\framework\app\window.cpp">
-      <Filter>src\framework\app</Filter>
-    </ClCompile>
-    <ClCompile Include="..\..\framework\src\framework\world\scene.cpp">
-      <Filter>src\framework\world</Filter>
-    </ClCompile>
-    <ClCompile Include="..\..\framework\src\framework\world\entity.cpp">
-      <Filter>src\framework\world</Filter>
-    </ClCompile>
-    <ClCompile Include="..\..\framework\src\framework\util\thread_master.cpp">
-      <Filter>src\framework\util</Filter>
-    </ClCompile>
-    <ClCompile Include="..\..\framework\src\framework\global.cpp">
-      <Filter>src\framework</Filter>
-    </ClCompile>
-    <ClCompile Include="..\..\framework\src\framework\app\app.cpp">
-      <Filter>src\framework\app</Filter>
-    </ClCompile>
-  </ItemGroup>
-  <ItemGroup>
-    <ClInclude Include="..\..\framework\include\framework\world\scene.hpp">
-      <Filter>include\framework\world</Filter>
+    <ClInclude Include="..\..\framework\framework\framework.hpp" />
+    <ClInclude Include="..\..\framework\framework\global.hpp" />
+    <ClInclude Include="..\..\framework\framework\app\app.hpp">
+      <Filter>app</Filter>
     </ClInclude>
-    <ClInclude Include="..\..\framework\include\framework\world\entity.hpp">
-      <Filter>include\framework\world</Filter>
+    <ClInclude Include="..\..\framework\framework\app\window.hpp">
+      <Filter>app</Filter>
     </ClInclude>
-    <ClInclude Include="..\..\framework\include\framework\util\macro_util.hpp">
-      <Filter>include\framework\util</Filter>
+    <ClInclude Include="..\..\framework\framework\util\thread_master.hpp">
+      <Filter>util</Filter>
     </ClInclude>
-    <ClInclude Include="..\..\framework\include\framework\util\thread_master.hpp">
-      <Filter>include\framework\util</Filter>
+    <ClInclude Include="..\..\framework\framework\util\macro_util.hpp">
+      <Filter>util</Filter>
     </ClInclude>
-    <ClInclude Include="..\..\framework\include\framework\global.hpp">
-      <Filter>include\framework</Filter>
+    <ClInclude Include="..\..\framework\framework\world\entity.hpp">
+      <Filter>world</Filter>
     </ClInclude>
-    <ClInclude Include="..\..\framework\include\framework\framework.hpp">
-      <Filter>include\framework</Filter>
-    </ClInclude>
-    <ClInclude Include="..\..\framework\include\framework\app\window.hpp">
-      <Filter>include\framework\app</Filter>
-    </ClInclude>
-    <ClInclude Include="..\..\framework\include\framework\app\app.hpp">
-      <Filter>include\framework\app</Filter>
+    <ClInclude Include="..\..\framework\framework\world\scene.hpp">
+      <Filter>world</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>
-    <None Include="..\..\framework\include\framework\app\app.inl">
-      <Filter>include\framework\app</Filter>
+    <ClCompile Include="..\..\framework\framework\global.cpp" />
+    <ClCompile Include="..\..\framework\framework\app\window.cpp">
+      <Filter>app</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\framework\framework\app\app.cpp">
+      <Filter>app</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\framework\framework\util\thread_master.cpp">
+      <Filter>util</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\framework\framework\world\scene.cpp">
+      <Filter>world</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\framework\framework\world\entity.cpp">
+      <Filter>world</Filter>
+    </ClCompile>
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="..\..\framework\framework\app\app.inl">
+      <Filter>app</Filter>
     </None>
-    <None Include="..\..\framework\include\framework\app\window.inl">
-      <Filter>include\framework\app</Filter>
+    <None Include="..\..\framework\framework\app\window.inl">
+      <Filter>app</Filter>
     </None>
   </ItemGroup>
 </Project>

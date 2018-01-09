@@ -1,428 +1,381 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
 <Project ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
   <ItemGroup>
-    <Filter Include="include">
-      <UniqueIdentifier>{93042209-0f15-403f-b33d-633f101842f7}</UniqueIdentifier>
+    <Filter Include="app">
+      <UniqueIdentifier>{1990e23d-7b9c-4314-a473-c61a2b6d54a2}</UniqueIdentifier>
     </Filter>
-    <Filter Include="src">
-      <UniqueIdentifier>{92326229-821d-4df5-865a-eeb0b098d0e0}</UniqueIdentifier>
+    <Filter Include="material">
+      <UniqueIdentifier>{8e2c269e-4c3e-4dcf-8237-fbf99641295a}</UniqueIdentifier>
     </Filter>
-    <Filter Include="include\graphics">
-      <UniqueIdentifier>{19e20fb8-d5b0-4d01-bf50-245626f59e9c}</UniqueIdentifier>
+    <Filter Include="mesh">
+      <UniqueIdentifier>{22e39527-4eda-4574-98f5-e19383daf0cf}</UniqueIdentifier>
     </Filter>
-    <Filter Include="src\graphics">
-      <UniqueIdentifier>{9229891f-1c6d-44d6-b0e6-03dda2d1a1cd}</UniqueIdentifier>
+    <Filter Include="renderer">
+      <UniqueIdentifier>{c7ccc4e2-7650-4b8e-9c78-0d61b3fa894b}</UniqueIdentifier>
     </Filter>
-    <Filter Include="include\graphics\texture">
-      <UniqueIdentifier>{12584484-c077-498f-9bf8-d45cb2b39d28}</UniqueIdentifier>
+    <Filter Include="scene">
+      <UniqueIdentifier>{46635e07-0be1-4ddd-8e88-4ede77862520}</UniqueIdentifier>
     </Filter>
-    <Filter Include="src\graphics\texture">
-      <UniqueIdentifier>{7339c612-5a20-4e50-8bf6-28fe4cdd3c11}</UniqueIdentifier>
+    <Filter Include="texture">
+      <UniqueIdentifier>{e0ff18bf-3cd4-4d4e-9826-208e5e43c345}</UniqueIdentifier>
     </Filter>
-    <Filter Include="include\graphics\material">
-      <UniqueIdentifier>{c45d271f-9d93-4b6a-8098-4289c8ae304c}</UniqueIdentifier>
-    </Filter>
-    <Filter Include="src\graphics\material">
-      <UniqueIdentifier>{632c8a20-f18d-4e91-b9af-69bf64f5b626}</UniqueIdentifier>
-    </Filter>
-    <Filter Include="src\graphics\util">
-      <UniqueIdentifier>{ed6d1597-b27f-4b8e-949c-f5d60d7c1656}</UniqueIdentifier>
-    </Filter>
-    <Filter Include="include\graphics\util">
-      <UniqueIdentifier>{1a106b77-ae9d-4acb-83ba-a1c6a62c4d01}</UniqueIdentifier>
-    </Filter>
-    <Filter Include="include\graphics\mesh">
-      <UniqueIdentifier>{99440859-a6bb-4c56-b6d5-0835bc257e10}</UniqueIdentifier>
-    </Filter>
-    <Filter Include="src\graphics\mesh">
-      <UniqueIdentifier>{fd50da3c-5e88-4cac-b31d-b62cc18c1a73}</UniqueIdentifier>
-    </Filter>
-    <Filter Include="include\graphics\scene">
-      <UniqueIdentifier>{30b28376-058f-4645-a337-5487baae641e}</UniqueIdentifier>
-    </Filter>
-    <Filter Include="src\graphics\scene">
-      <UniqueIdentifier>{80de8901-f91f-4ad0-b05c-d8f2ae34b3f6}</UniqueIdentifier>
-    </Filter>
-    <Filter Include="include\graphics\renderer">
-      <UniqueIdentifier>{2f7fdcb2-b1a5-4ac7-b25f-7a881b7e4c33}</UniqueIdentifier>
-    </Filter>
-    <Filter Include="src\graphics\renderer">
-      <UniqueIdentifier>{b71dd6a9-b375-4df8-b6e3-df5ff150c182}</UniqueIdentifier>
-    </Filter>
-    <Filter Include="include\graphics\app">
-      <UniqueIdentifier>{b73a36a6-5994-4f4e-a1e9-e827f9e7fb68}</UniqueIdentifier>
-    </Filter>
-    <Filter Include="src\graphics\app">
-      <UniqueIdentifier>{d32ab61e-a74f-4a9e-9c01-89e8b933232c}</UniqueIdentifier>
+    <Filter Include="util">
+      <UniqueIdentifier>{e12948b7-0358-4157-9b18-8787080866de}</UniqueIdentifier>
     </Filter>
   </ItemGroup>
   <ItemGroup>
-    <ClCompile Include="..\..\framework\src\graphics\texture\texture.cpp">
-      <Filter>src\graphics\texture</Filter>
-    </ClCompile>
-    <ClCompile Include="..\..\framework\src\graphics\texture\texture_option.cpp">
-      <Filter>src\graphics\texture</Filter>
-    </ClCompile>
-    <ClCompile Include="..\..\framework\src\graphics\texture\texture_1d.cpp">
-      <Filter>src\graphics\texture</Filter>
-    </ClCompile>
-    <ClCompile Include="..\..\framework\src\graphics\global.cpp">
-      <Filter>src\graphics</Filter>
-    </ClCompile>
-    <ClCompile Include="..\..\framework\src\graphics\texture\texture_2d_array.cpp">
-      <Filter>src\graphics\texture</Filter>
-    </ClCompile>
-    <ClCompile Include="..\..\framework\src\graphics\texture\texture_3d.cpp">
-      <Filter>src\graphics\texture</Filter>
-    </ClCompile>
-    <ClCompile Include="..\..\framework\src\graphics\texture\texture_cube.cpp">
-      <Filter>src\graphics\texture</Filter>
-    </ClCompile>
-    <ClCompile Include="..\..\framework\src\graphics\texture\texture_cube_array.cpp">
-      <Filter>src\graphics\texture</Filter>
-    </ClCompile>
-    <ClCompile Include="..\..\framework\src\graphics\texture\texture_1d_array.cpp">
-      <Filter>src\graphics\texture</Filter>
-    </ClCompile>
-    <ClCompile Include="..\..\framework\src\graphics\texture\texture_2d.cpp">
-      <Filter>src\graphics\texture</Filter>
-    </ClCompile>
-    <ClCompile Include="..\..\framework\src\graphics\material\material.cpp">
-      <Filter>src\graphics\material</Filter>
-    </ClCompile>
-    <ClCompile Include="..\..\framework\src\graphics\material\shader.cpp">
-      <Filter>src\graphics\material</Filter>
-    </ClCompile>
-    <ClCompile Include="..\..\framework\src\graphics\material\pass.cpp">
-      <Filter>src\graphics\material</Filter>
-    </ClCompile>
-    <ClCompile Include="..\..\framework\src\graphics\material\pass_option.cpp">
-      <Filter>src\graphics\material</Filter>
-    </ClCompile>
-    <ClCompile Include="..\..\framework\src\graphics\material\material_data.cpp">
-      <Filter>src\graphics\material</Filter>
-    </ClCompile>
-    <ClCompile Include="..\..\framework\src\graphics\util\util.cpp">
-      <Filter>src\graphics\util</Filter>
-    </ClCompile>
-    <ClCompile Include="..\..\framework\src\graphics\util\find_memory.cpp">
-      <Filter>src\graphics\util</Filter>
-    </ClCompile>
-    <ClCompile Include="..\..\framework\src\graphics\mesh\mesh.cpp">
-      <Filter>src\graphics\mesh</Filter>
-    </ClCompile>
-    <ClCompile Include="..\..\framework\src\graphics\mesh\mesh_option.cpp">
-      <Filter>src\graphics\mesh</Filter>
-    </ClCompile>
-    <ClCompile Include="..\..\framework\src\graphics\mesh\mesh_data.cpp">
-      <Filter>src\graphics\mesh</Filter>
-    </ClCompile>
-    <ClCompile Include="..\..\framework\src\graphics\util\single_time_command.cpp">
-      <Filter>src\graphics\util</Filter>
-    </ClCompile>
-    <ClCompile Include="..\..\framework\src\graphics\scene\camera.cpp">
-      <Filter>src\graphics\scene</Filter>
-    </ClCompile>
-    <ClCompile Include="..\..\framework\src\graphics\scene\scene.cpp">
-      <Filter>src\graphics\scene</Filter>
-    </ClCompile>
-    <ClCompile Include="..\..\framework\src\graphics\renderer\renderer.cpp">
-      <Filter>src\graphics\renderer</Filter>
-    </ClCompile>
-    <ClCompile Include="..\..\framework\src\graphics\scene\object.cpp">
-      <Filter>src\graphics\scene</Filter>
-    </ClCompile>
-    <ClCompile Include="..\..\framework\src\graphics\scene\visual_object.cpp">
-      <Filter>src\graphics\scene</Filter>
-    </ClCompile>
-    <ClCompile Include="..\..\framework\src\graphics\scene\light.cpp">
-      <Filter>src\graphics\scene</Filter>
-    </ClCompile>
-    <ClCompile Include="..\..\framework\src\graphics\scene\transform.cpp">
-      <Filter>src\graphics\scene</Filter>
-    </ClCompile>
-    <ClCompile Include="..\..\framework\src\graphics\scene\transform_2.cpp">
-      <Filter>src\graphics\scene</Filter>
-    </ClCompile>
-    <ClCompile Include="..\..\framework\src\graphics\scene\transform_3.cpp">
-      <Filter>src\graphics\scene</Filter>
-    </ClCompile>
-    <ClCompile Include="..\..\framework\src\graphics\scene\visual_object_2.cpp">
-      <Filter>src\graphics\scene</Filter>
-    </ClCompile>
-    <ClCompile Include="..\..\framework\src\graphics\scene\visual_object_3.cpp">
-      <Filter>src\graphics\scene</Filter>
-    </ClCompile>
-    <ClCompile Include="..\..\framework\src\graphics\scene\camera_3.cpp">
-      <Filter>src\graphics\scene</Filter>
-    </ClCompile>
-    <ClCompile Include="..\..\framework\src\graphics\scene\light_2.cpp">
-      <Filter>src\graphics\scene</Filter>
-    </ClCompile>
-    <ClCompile Include="..\..\framework\src\graphics\scene\light_3.cpp">
-      <Filter>src\graphics\scene</Filter>
-    </ClCompile>
-    <ClCompile Include="..\..\framework\src\graphics\scene\scene_2.cpp">
-      <Filter>src\graphics\scene</Filter>
-    </ClCompile>
-    <ClCompile Include="..\..\framework\src\graphics\scene\scene_3.cpp">
-      <Filter>src\graphics\scene</Filter>
-    </ClCompile>
-    <ClCompile Include="..\..\framework\src\graphics\scene\space_info.cpp">
-      <Filter>src\graphics\scene</Filter>
-    </ClCompile>
-    <ClCompile Include="..\..\framework\src\graphics\scene\space_info_object.cpp">
-      <Filter>src\graphics\scene</Filter>
-    </ClCompile>
-    <ClCompile Include="..\..\framework\src\graphics\renderer\renderer_3.cpp">
-      <Filter>src\graphics\renderer</Filter>
-    </ClCompile>
-    <ClCompile Include="..\..\framework\src\graphics\renderer\renderer_2.cpp">
-      <Filter>src\graphics\renderer</Filter>
-    </ClCompile>
-    <ClCompile Include="..\..\framework\src\graphics\renderer\renderer_option.cpp">
-      <Filter>src\graphics\renderer</Filter>
-    </ClCompile>
-    <ClCompile Include="..\..\framework\src\graphics\texture\texture_color_attachment.cpp">
-      <Filter>src\graphics\texture</Filter>
-    </ClCompile>
-    <ClCompile Include="..\..\framework\src\graphics\texture\texture_depth_stencil_attachment.cpp">
-      <Filter>src\graphics\texture</Filter>
-    </ClCompile>
-    <ClCompile Include="..\..\framework\src\graphics\mesh\mesh_3.cpp">
-      <Filter>src\graphics\mesh</Filter>
-    </ClCompile>
-    <ClCompile Include="..\..\framework\src\graphics\mesh\mesh_2.cpp">
-      <Filter>src\graphics\mesh</Filter>
-    </ClCompile>
-    <ClCompile Include="..\..\framework\src\graphics\app\app.cpp">
-      <Filter>src\graphics\app</Filter>
-    </ClCompile>
-    <ClCompile Include="..\..\framework\src\graphics\util\vulkan_ext.cpp">
-      <Filter>src\graphics\util</Filter>
-    </ClCompile>
-    <ClCompile Include="..\..\framework\src\graphics\util\queue_family.cpp">
-      <Filter>src\graphics\util</Filter>
-    </ClCompile>
-    <ClCompile Include="..\..\framework\src\graphics\util\swapchain_info.cpp">
-      <Filter>src\graphics\util</Filter>
-    </ClCompile>
-    <ClCompile Include="..\..\framework\src\graphics\module.cpp">
-      <Filter>src\graphics</Filter>
-    </ClCompile>
-    <ClCompile Include="..\..\framework\src\graphics\util\queue_master.cpp">
-      <Filter>src\graphics\util</Filter>
-    </ClCompile>
-    <ClCompile Include="..\..\framework\src\graphics\scene\camera_op_2.cpp">
-      <Filter>src\graphics\scene</Filter>
-    </ClCompile>
-    <ClCompile Include="..\..\framework\src\graphics\scene\camera_op_3.cpp">
-      <Filter>src\graphics\scene</Filter>
-    </ClCompile>
-    <ClCompile Include="..\..\framework\src\graphics\scene\camera_op.cpp">
-      <Filter>src\graphics\scene</Filter>
-    </ClCompile>
-    <ClCompile Include="..\..\framework\src\graphics\base.cpp">
-      <Filter>src\graphics</Filter>
-    </ClCompile>
-  </ItemGroup>
-  <ItemGroup>
-    <ClInclude Include="..\..\framework\include\graphics\texture\texture.hpp">
-      <Filter>include\graphics\texture</Filter>
+    <ClInclude Include="..\..\framework\graphics\graphics.hpp" />
+    <ClInclude Include="..\..\framework\graphics\module.hpp" />
+    <ClInclude Include="..\..\framework\graphics\base.hpp" />
+    <ClInclude Include="..\..\framework\graphics\global.hpp" />
+    <ClInclude Include="..\..\framework\graphics\app\app.hpp">
+      <Filter>app</Filter>
     </ClInclude>
-    <ClInclude Include="..\..\framework\include\graphics\texture\texture_option.hpp">
-      <Filter>include\graphics\texture</Filter>
+    <ClInclude Include="..\..\framework\graphics\material\pass.hpp">
+      <Filter>material</Filter>
     </ClInclude>
-    <ClInclude Include="..\..\framework\include\graphics\texture\texture_1d.hpp">
-      <Filter>include\graphics\texture</Filter>
+    <ClInclude Include="..\..\framework\graphics\material\pass_option.hpp">
+      <Filter>material</Filter>
     </ClInclude>
-    <ClInclude Include="..\..\framework\include\graphics\texture\texture_cube.hpp">
-      <Filter>include\graphics\texture</Filter>
+    <ClInclude Include="..\..\framework\graphics\material\shader.hpp">
+      <Filter>material</Filter>
     </ClInclude>
-    <ClInclude Include="..\..\framework\include\graphics\texture\texture_cube_array.hpp">
-      <Filter>include\graphics\texture</Filter>
+    <ClInclude Include="..\..\framework\graphics\material\material.hpp">
+      <Filter>material</Filter>
     </ClInclude>
-    <ClInclude Include="..\..\framework\include\graphics\texture\texture_1d_array.hpp">
-      <Filter>include\graphics\texture</Filter>
+    <ClInclude Include="..\..\framework\graphics\material\material_data.hpp">
+      <Filter>material</Filter>
     </ClInclude>
-    <ClInclude Include="..\..\framework\include\graphics\texture\texture_2d.hpp">
-      <Filter>include\graphics\texture</Filter>
+    <ClInclude Include="..\..\framework\graphics\mesh\mesh_2.hpp">
+      <Filter>mesh</Filter>
     </ClInclude>
-    <ClInclude Include="..\..\framework\include\graphics\texture\texture_2d_array.hpp">
-      <Filter>include\graphics\texture</Filter>
+    <ClInclude Include="..\..\framework\graphics\mesh\mesh_3.hpp">
+      <Filter>mesh</Filter>
     </ClInclude>
-    <ClInclude Include="..\..\framework\include\graphics\texture\texture_3d.hpp">
-      <Filter>include\graphics\texture</Filter>
+    <ClInclude Include="..\..\framework\graphics\mesh\mesh_data.hpp">
+      <Filter>mesh</Filter>
     </ClInclude>
-    <ClInclude Include="..\..\framework\include\graphics\material\material.hpp">
-      <Filter>include\graphics\material</Filter>
+    <ClInclude Include="..\..\framework\graphics\mesh\mesh_option.hpp">
+      <Filter>mesh</Filter>
     </ClInclude>
-    <ClInclude Include="..\..\framework\include\graphics\material\shader.hpp">
-      <Filter>include\graphics\material</Filter>
+    <ClInclude Include="..\..\framework\graphics\mesh\mesh.hpp">
+      <Filter>mesh</Filter>
     </ClInclude>
-    <ClInclude Include="..\..\framework\include\graphics\material\pass.hpp">
-      <Filter>include\graphics\material</Filter>
+    <ClInclude Include="..\..\framework\graphics\renderer\renderer_2.hpp">
+      <Filter>renderer</Filter>
     </ClInclude>
-    <ClInclude Include="..\..\framework\include\graphics\material\pass_option.hpp">
-      <Filter>include\graphics\material</Filter>
+    <ClInclude Include="..\..\framework\graphics\renderer\renderer_3.hpp">
+      <Filter>renderer</Filter>
     </ClInclude>
-    <ClInclude Include="..\..\framework\include\graphics\material\material_data.hpp">
-      <Filter>include\graphics\material</Filter>
+    <ClInclude Include="..\..\framework\graphics\renderer\renderer_option.hpp">
+      <Filter>renderer</Filter>
     </ClInclude>
-    <ClInclude Include="..\..\framework\include\graphics\util\util.hpp">
-      <Filter>include\graphics\util</Filter>
+    <ClInclude Include="..\..\framework\graphics\renderer\renderer.hpp">
+      <Filter>renderer</Filter>
     </ClInclude>
-    <ClInclude Include="..\..\framework\include\graphics\util\find_memory.hpp">
-      <Filter>include\graphics\util</Filter>
+    <ClInclude Include="..\..\framework\graphics\scene\camera_op_2.hpp">
+      <Filter>scene</Filter>
     </ClInclude>
-    <ClInclude Include="..\..\framework\include\graphics\mesh\mesh.hpp">
-      <Filter>include\graphics\mesh</Filter>
+    <ClInclude Include="..\..\framework\graphics\scene\camera_op_3.hpp">
+      <Filter>scene</Filter>
     </ClInclude>
-    <ClInclude Include="..\..\framework\include\graphics\graphics.hpp">
-      <Filter>include\graphics</Filter>
+    <ClInclude Include="..\..\framework\graphics\scene\light.hpp">
+      <Filter>scene</Filter>
     </ClInclude>
-    <ClInclude Include="..\..\framework\include\graphics\mesh\mesh_option.hpp">
-      <Filter>include\graphics\mesh</Filter>
+    <ClInclude Include="..\..\framework\graphics\scene\light_2.hpp">
+      <Filter>scene</Filter>
     </ClInclude>
-    <ClInclude Include="..\..\framework\include\graphics\mesh\mesh_data.hpp">
-      <Filter>include\graphics\mesh</Filter>
+    <ClInclude Include="..\..\framework\graphics\scene\light_3.hpp">
+      <Filter>scene</Filter>
     </ClInclude>
-    <ClInclude Include="..\..\framework\include\graphics\util\single_time_command.hpp">
-      <Filter>include\graphics\util</Filter>
+    <ClInclude Include="..\..\framework\graphics\scene\object.hpp">
+      <Filter>scene</Filter>
     </ClInclude>
-    <ClInclude Include="..\..\framework\include\graphics\scene\camera.hpp">
-      <Filter>include\graphics\scene</Filter>
+    <ClInclude Include="..\..\framework\graphics\scene\scene.hpp">
+      <Filter>scene</Filter>
     </ClInclude>
-    <ClInclude Include="..\..\framework\include\graphics\scene\scene.hpp">
-      <Filter>include\graphics\scene</Filter>
+    <ClInclude Include="..\..\framework\graphics\scene\scene_2.hpp">
+      <Filter>scene</Filter>
     </ClInclude>
-    <ClInclude Include="..\..\framework\include\graphics\renderer\renderer.hpp">
-      <Filter>include\graphics\renderer</Filter>
+    <ClInclude Include="..\..\framework\graphics\scene\scene_3.hpp">
+      <Filter>scene</Filter>
     </ClInclude>
-    <ClInclude Include="..\..\framework\include\graphics\scene\object.hpp">
-      <Filter>include\graphics\scene</Filter>
+    <ClInclude Include="..\..\framework\graphics\scene\space_info.hpp">
+      <Filter>scene</Filter>
     </ClInclude>
-    <ClInclude Include="..\..\framework\include\graphics\scene\visual_object.hpp">
-      <Filter>include\graphics\scene</Filter>
+    <ClInclude Include="..\..\framework\graphics\scene\space_info_object.hpp">
+      <Filter>scene</Filter>
     </ClInclude>
-    <ClInclude Include="..\..\framework\include\graphics\scene\light.hpp">
-      <Filter>include\graphics\scene</Filter>
+    <ClInclude Include="..\..\framework\graphics\scene\transform.hpp">
+      <Filter>scene</Filter>
     </ClInclude>
-    <ClInclude Include="..\..\framework\include\graphics\scene\transform.hpp">
-      <Filter>include\graphics\scene</Filter>
+    <ClInclude Include="..\..\framework\graphics\scene\transform_2.hpp">
+      <Filter>scene</Filter>
     </ClInclude>
-    <ClInclude Include="..\..\framework\include\graphics\scene\transform_2.hpp">
-      <Filter>include\graphics\scene</Filter>
+    <ClInclude Include="..\..\framework\graphics\scene\transform_3.hpp">
+      <Filter>scene</Filter>
     </ClInclude>
-    <ClInclude Include="..\..\framework\include\graphics\scene\transform_3.hpp">
-      <Filter>include\graphics\scene</Filter>
+    <ClInclude Include="..\..\framework\graphics\scene\visual_object.hpp">
+      <Filter>scene</Filter>
     </ClInclude>
-    <ClInclude Include="..\..\framework\include\graphics\scene\scene_2.hpp">
-      <Filter>include\graphics\scene</Filter>
+    <ClInclude Include="..\..\framework\graphics\scene\visual_object_2.hpp">
+      <Filter>scene</Filter>
     </ClInclude>
-    <ClInclude Include="..\..\framework\include\graphics\scene\scene_3.hpp">
-      <Filter>include\graphics\scene</Filter>
+    <ClInclude Include="..\..\framework\graphics\scene\visual_object_3.hpp">
+      <Filter>scene</Filter>
     </ClInclude>
-    <ClInclude Include="..\..\framework\include\graphics\scene\visual_object_2.hpp">
-      <Filter>include\graphics\scene</Filter>
+    <ClInclude Include="..\..\framework\graphics\scene\camera.hpp">
+      <Filter>scene</Filter>
     </ClInclude>
-    <ClInclude Include="..\..\framework\include\graphics\scene\visual_object_3.hpp">
-      <Filter>include\graphics\scene</Filter>
+    <ClInclude Include="..\..\framework\graphics\scene\camera_3.hpp">
+      <Filter>scene</Filter>
     </ClInclude>
-    <ClInclude Include="..\..\framework\include\graphics\scene\camera_3.hpp">
-      <Filter>include\graphics\scene</Filter>
+    <ClInclude Include="..\..\framework\graphics\scene\camera_op.hpp">
+      <Filter>scene</Filter>
     </ClInclude>
-    <ClInclude Include="..\..\framework\include\graphics\scene\light_2.hpp">
-      <Filter>include\graphics\scene</Filter>
+    <ClInclude Include="..\..\framework\graphics\texture\texture_2d.hpp">
+      <Filter>texture</Filter>
     </ClInclude>
-    <ClInclude Include="..\..\framework\include\graphics\scene\light_3.hpp">
-      <Filter>include\graphics\scene</Filter>
+    <ClInclude Include="..\..\framework\graphics\texture\texture_2d_array.hpp">
+      <Filter>texture</Filter>
     </ClInclude>
-    <ClInclude Include="..\..\framework\include\graphics\scene\space_info.hpp">
-      <Filter>include\graphics\scene</Filter>
+    <ClInclude Include="..\..\framework\graphics\texture\texture_3d.hpp">
+      <Filter>texture</Filter>
     </ClInclude>
-    <ClInclude Include="..\..\framework\include\graphics\scene\space_info_object.hpp">
-      <Filter>include\graphics\scene</Filter>
+    <ClInclude Include="..\..\framework\graphics\texture\texture_color_attachment.hpp">
+      <Filter>texture</Filter>
     </ClInclude>
-    <ClInclude Include="..\..\framework\include\graphics\renderer\renderer_3.hpp">
-      <Filter>include\graphics\renderer</Filter>
+    <ClInclude Include="..\..\framework\graphics\texture\texture_cube.hpp">
+      <Filter>texture</Filter>
     </ClInclude>
-    <ClInclude Include="..\..\framework\include\graphics\renderer\renderer_2.hpp">
-      <Filter>include\graphics\renderer</Filter>
+    <ClInclude Include="..\..\framework\graphics\texture\texture_cube_array.hpp">
+      <Filter>texture</Filter>
     </ClInclude>
-    <ClInclude Include="..\..\framework\include\graphics\renderer\renderer_option.hpp">
-      <Filter>include\graphics\renderer</Filter>
+    <ClInclude Include="..\..\framework\graphics\texture\texture_depth_stencil_attachment.hpp">
+      <Filter>texture</Filter>
     </ClInclude>
-    <ClInclude Include="..\..\framework\include\graphics\texture\texture_color_attachment.hpp">
-      <Filter>include\graphics\texture</Filter>
+    <ClInclude Include="..\..\framework\graphics\texture\texture_option.hpp">
+      <Filter>texture</Filter>
     </ClInclude>
-    <ClInclude Include="..\..\framework\include\graphics\texture\texture_depth_stencil_attachment.hpp">
-      <Filter>include\graphics\texture</Filter>
+    <ClInclude Include="..\..\framework\graphics\texture\texture.hpp">
+      <Filter>texture</Filter>
     </ClInclude>
-    <ClInclude Include="..\..\framework\include\graphics\mesh\mesh_3.hpp">
-      <Filter>include\graphics\mesh</Filter>
+    <ClInclude Include="..\..\framework\graphics\texture\texture_1d.hpp">
+      <Filter>texture</Filter>
     </ClInclude>
-    <ClInclude Include="..\..\framework\include\graphics\mesh\mesh_2.hpp">
-      <Filter>include\graphics\mesh</Filter>
+    <ClInclude Include="..\..\framework\graphics\texture\texture_1d_array.hpp">
+      <Filter>texture</Filter>
     </ClInclude>
-    <ClInclude Include="..\..\framework\include\graphics\global.hpp">
-      <Filter>include\graphics</Filter>
+    <ClInclude Include="..\..\framework\graphics\util\queue_master.hpp">
+      <Filter>util</Filter>
     </ClInclude>
-    <ClInclude Include="..\..\framework\include\graphics\app\app.hpp">
-      <Filter>include\graphics\app</Filter>
+    <ClInclude Include="..\..\framework\graphics\util\single_time_command.hpp">
+      <Filter>util</Filter>
     </ClInclude>
-    <ClInclude Include="..\..\framework\include\graphics\util\vulkan_ext.hpp">
-      <Filter>include\graphics\util</Filter>
+    <ClInclude Include="..\..\framework\graphics\util\swapchain_info.hpp">
+      <Filter>util</Filter>
     </ClInclude>
-    <ClInclude Include="..\..\framework\include\graphics\util\queue_family.hpp">
-      <Filter>include\graphics\util</Filter>
+    <ClInclude Include="..\..\framework\graphics\util\util.hpp">
+      <Filter>util</Filter>
     </ClInclude>
-    <ClInclude Include="..\..\framework\include\graphics\util\swapchain_info.hpp">
-      <Filter>include\graphics\util</Filter>
+    <ClInclude Include="..\..\framework\graphics\util\vulkan_ext.hpp">
+      <Filter>util</Filter>
     </ClInclude>
-    <ClInclude Include="..\..\framework\include\graphics\module.hpp">
-      <Filter>include\graphics</Filter>
+    <ClInclude Include="..\..\framework\graphics\util\find_memory.hpp">
+      <Filter>util</Filter>
     </ClInclude>
-    <ClInclude Include="..\..\framework\include\graphics\util\queue_master.hpp">
-      <Filter>include\graphics\util</Filter>
-    </ClInclude>
-    <ClInclude Include="..\..\framework\include\graphics\scene\camera_op.hpp">
-      <Filter>include\graphics\scene</Filter>
-    </ClInclude>
-    <ClInclude Include="..\..\framework\include\graphics\scene\camera_op_2.hpp">
-      <Filter>include\graphics\scene</Filter>
-    </ClInclude>
-    <ClInclude Include="..\..\framework\include\graphics\scene\camera_op_3.hpp">
-      <Filter>include\graphics\scene</Filter>
-    </ClInclude>
-    <ClInclude Include="..\..\framework\include\graphics\base.hpp">
-      <Filter>include\graphics</Filter>
+    <ClInclude Include="..\..\framework\graphics\util\queue_family.hpp">
+      <Filter>util</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>
-    <None Include="..\..\framework\include\graphics\mesh\mesh.inl">
-      <Filter>include\graphics\mesh</Filter>
+    <ClCompile Include="..\..\framework\graphics\module.cpp" />
+    <ClCompile Include="..\..\framework\graphics\base.cpp" />
+    <ClCompile Include="..\..\framework\graphics\global.cpp" />
+    <ClCompile Include="..\..\framework\graphics\app\app.cpp">
+      <Filter>app</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\framework\graphics\material\pass.cpp">
+      <Filter>material</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\framework\graphics\material\pass_option.cpp">
+      <Filter>material</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\framework\graphics\material\shader.cpp">
+      <Filter>material</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\framework\graphics\material\material.cpp">
+      <Filter>material</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\framework\graphics\material\material_data.cpp">
+      <Filter>material</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\framework\graphics\mesh\mesh_2.cpp">
+      <Filter>mesh</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\framework\graphics\mesh\mesh_3.cpp">
+      <Filter>mesh</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\framework\graphics\mesh\mesh_data.cpp">
+      <Filter>mesh</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\framework\graphics\mesh\mesh_option.cpp">
+      <Filter>mesh</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\framework\graphics\mesh\mesh.cpp">
+      <Filter>mesh</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\framework\graphics\renderer\renderer_2.cpp">
+      <Filter>renderer</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\framework\graphics\renderer\renderer_3.cpp">
+      <Filter>renderer</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\framework\graphics\renderer\renderer_option.cpp">
+      <Filter>renderer</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\framework\graphics\renderer\renderer.cpp">
+      <Filter>renderer</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\framework\graphics\scene\camera_op_3.cpp">
+      <Filter>scene</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\framework\graphics\scene\light.cpp">
+      <Filter>scene</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\framework\graphics\scene\light_2.cpp">
+      <Filter>scene</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\framework\graphics\scene\light_3.cpp">
+      <Filter>scene</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\framework\graphics\scene\object.cpp">
+      <Filter>scene</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\framework\graphics\scene\scene.cpp">
+      <Filter>scene</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\framework\graphics\scene\scene_2.cpp">
+      <Filter>scene</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\framework\graphics\scene\scene_3.cpp">
+      <Filter>scene</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\framework\graphics\scene\space_info.cpp">
+      <Filter>scene</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\framework\graphics\scene\space_info_object.cpp">
+      <Filter>scene</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\framework\graphics\scene\transform.cpp">
+      <Filter>scene</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\framework\graphics\scene\transform_2.cpp">
+      <Filter>scene</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\framework\graphics\scene\transform_3.cpp">
+      <Filter>scene</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\framework\graphics\scene\visual_object.cpp">
+      <Filter>scene</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\framework\graphics\scene\visual_object_2.cpp">
+      <Filter>scene</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\framework\graphics\scene\visual_object_3.cpp">
+      <Filter>scene</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\framework\graphics\scene\camera.cpp">
+      <Filter>scene</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\framework\graphics\scene\camera_3.cpp">
+      <Filter>scene</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\framework\graphics\scene\camera_op.cpp">
+      <Filter>scene</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\framework\graphics\scene\camera_op_2.cpp">
+      <Filter>scene</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\framework\graphics\texture\texture_2d_array.cpp">
+      <Filter>texture</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\framework\graphics\texture\texture_3d.cpp">
+      <Filter>texture</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\framework\graphics\texture\texture_color_attachment.cpp">
+      <Filter>texture</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\framework\graphics\texture\texture_cube.cpp">
+      <Filter>texture</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\framework\graphics\texture\texture_cube_array.cpp">
+      <Filter>texture</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\framework\graphics\texture\texture_depth_stencil_attachment.cpp">
+      <Filter>texture</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\framework\graphics\texture\texture_option.cpp">
+      <Filter>texture</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\framework\graphics\texture\texture.cpp">
+      <Filter>texture</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\framework\graphics\texture\texture_1d.cpp">
+      <Filter>texture</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\framework\graphics\texture\texture_1d_array.cpp">
+      <Filter>texture</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\framework\graphics\texture\texture_2d.cpp">
+      <Filter>texture</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\framework\graphics\util\queue_master.cpp">
+      <Filter>util</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\framework\graphics\util\single_time_command.cpp">
+      <Filter>util</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\framework\graphics\util\swapchain_info.cpp">
+      <Filter>util</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\framework\graphics\util\util.cpp">
+      <Filter>util</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\framework\graphics\util\vulkan_ext.cpp">
+      <Filter>util</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\framework\graphics\util\find_memory.cpp">
+      <Filter>util</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\framework\graphics\util\queue_family.cpp">
+      <Filter>util</Filter>
+    </ClCompile>
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="..\..\framework\graphics\material\material_data.inl">
+      <Filter>material</Filter>
     </None>
-    <None Include="..\..\framework\include\graphics\renderer\renderer.inl">
-      <Filter>include\graphics\renderer</Filter>
+    <None Include="..\..\framework\graphics\material\pass.inl">
+      <Filter>material</Filter>
     </None>
-    <None Include="..\..\framework\include\graphics\scene\scene.inl">
-      <Filter>include\graphics\scene</Filter>
+    <None Include="..\..\framework\graphics\mesh\mesh_data.inl">
+      <Filter>mesh</Filter>
     </None>
-    <None Include="..\..\framework\include\graphics\scene\transform.inl">
-      <Filter>include\graphics\scene</Filter>
+    <None Include="..\..\framework\graphics\mesh\mesh.inl">
+      <Filter>mesh</Filter>
     </None>
-    <None Include="..\..\framework\include\graphics\mesh\mesh_data.inl">
-      <Filter>include\graphics\mesh</Filter>
+    <None Include="..\..\framework\graphics\renderer\renderer.inl">
+      <Filter>renderer</Filter>
     </None>
-    <None Include="..\..\framework\include\graphics\material\pass.inl">
-      <Filter>include\graphics\material</Filter>
+    <None Include="..\..\framework\graphics\scene\scene.inl">
+      <Filter>scene</Filter>
     </None>
-    <None Include="..\..\framework\include\graphics\material\material_data.inl">
-      <Filter>include\graphics\material</Filter>
+    <None Include="..\..\framework\graphics\scene\transform.inl">
+      <Filter>scene</Filter>
     </None>
-    <None Include="..\..\framework\include\graphics\scene\camera_op.inl">
-      <Filter>include\graphics\scene</Filter>
+    <None Include="..\..\framework\graphics\scene\camera_op.inl">
+      <Filter>scene</Filter>
     </None>
   </ItemGroup>
 </Project>

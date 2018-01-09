@@ -7,7 +7,7 @@ void testBounds();
 
 int main()
 {
-	gfw::init(); //init framework module, and it also init foundation and graphics modules at the same time.
+	gfw::moduleCreate(); //init framework module, and it also init foundation and graphics modules at the same time.
 	testBounds();
 	return 0;
 }

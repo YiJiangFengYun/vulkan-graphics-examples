@@ -1,25 +1,7 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
 <Project ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
   <ItemGroup>
-    <Filter Include="include">
-      <UniqueIdentifier>{93042209-0f15-403f-b33d-633f101842f7}</UniqueIdentifier>
-    </Filter>
-    <Filter Include="src">
-      <UniqueIdentifier>{92326229-821d-4df5-865a-eeb0b098d0e0}</UniqueIdentifier>
-    </Filter>
-    <Filter Include="include\testlib">
-      <UniqueIdentifier>{dbc93ddc-2dd4-470a-8bbb-90168f50fac8}</UniqueIdentifier>
-    </Filter>
-    <Filter Include="src\testlib">
-      <UniqueIdentifier>{84646f6f-be73-47b0-8834-cfb9516a77c9}</UniqueIdentifier>
-    </Filter>
-  </ItemGroup>
-  <ItemGroup>
-    <ClInclude Include="..\..\test\include\testlib\stb_image.h">
-      <Filter>include\testlib</Filter>
-    </ClInclude>
-    <ClInclude Include="..\..\test\include\testlib\tiny_obj_loader.h">
-      <Filter>include\testlib</Filter>
-    </ClInclude>
+    <ClInclude Include="..\..\test\testlib\stb_image.h" />
+    <ClInclude Include="..\..\test\testlib\tiny_obj_loader.h" />
   </ItemGroup>
 </Project>

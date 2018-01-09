@@ -1,53 +1,19 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
 <Project ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
   <ItemGroup>
-    <Filter Include="include">
-      <UniqueIdentifier>{93042209-0f15-403f-b33d-633f101842f7}</UniqueIdentifier>
-    </Filter>
-    <Filter Include="src">
-      <UniqueIdentifier>{92326229-821d-4df5-865a-eeb0b098d0e0}</UniqueIdentifier>
-    </Filter>
-    <Filter Include="include\foundation">
-      <UniqueIdentifier>{825e886c-cbdc-4733-971f-0b03cf0c5690}</UniqueIdentifier>
-    </Filter>
-    <Filter Include="src\foundation">
-      <UniqueIdentifier>{fe35b0bc-b8f8-46c4-9ff2-f1df7ce8761a}</UniqueIdentifier>
-    </Filter>
+    <ClCompile Include="..\..\framework\foundation\global.cpp" />
+    <ClCompile Include="..\..\framework\foundation\util.cpp" />
+    <ClCompile Include="..\..\framework\foundation\wrapper.cpp" />
+    <ClCompile Include="..\..\framework\foundation\gemo.cpp" />
   </ItemGroup>
   <ItemGroup>
-    <ClCompile Include="..\..\framework\src\foundation\wrapper.cpp">
-      <Filter>src\foundation</Filter>
-    </ClCompile>
-    <ClCompile Include="..\..\framework\src\foundation\util.cpp">
-      <Filter>src\foundation</Filter>
-    </ClCompile>
-    <ClCompile Include="..\..\framework\src\foundation\gemo.cpp">
-      <Filter>src\foundation</Filter>
-    </ClCompile>
-    <ClCompile Include="..\..\framework\src\foundation\global.cpp">
-      <Filter>src\foundation</Filter>
-    </ClCompile>
+    <ClInclude Include="..\..\framework\foundation\global.hpp" />
+    <ClInclude Include="..\..\framework\foundation\util.hpp" />
+    <ClInclude Include="..\..\framework\foundation\wrapper.hpp" />
+    <ClInclude Include="..\..\framework\foundation\foundation.hpp" />
+    <ClInclude Include="..\..\framework\foundation\gemo.hpp" />
   </ItemGroup>
   <ItemGroup>
-    <ClInclude Include="..\..\framework\include\foundation\gemo.hpp">
-      <Filter>include\foundation</Filter>
-    </ClInclude>
-    <ClInclude Include="..\..\framework\include\foundation\global.hpp">
-      <Filter>include\foundation</Filter>
-    </ClInclude>
-    <ClInclude Include="..\..\framework\include\foundation\util.hpp">
-      <Filter>include\foundation</Filter>
-    </ClInclude>
-    <ClInclude Include="..\..\framework\include\foundation\wrapper.hpp">
-      <Filter>include\foundation</Filter>
-    </ClInclude>
-    <ClInclude Include="..\..\framework\include\foundation\foundation.hpp">
-      <Filter>include\foundation</Filter>
-    </ClInclude>
-  </ItemGroup>
-  <ItemGroup>
-    <None Include="..\..\framework\include\foundation\gemo.inl">
-      <Filter>include\foundation</Filter>
-    </None>
+    <None Include="..\..\framework\foundation\gemo.inl" />
   </ItemGroup>
 </Project>

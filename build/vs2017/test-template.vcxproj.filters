@@ -1,17 +1,2 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
-<Project ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
-  <ItemGroup>
-    <Filter Include="include">
-      <UniqueIdentifier>{91b4d046-4469-4b1a-abfe-3c373385f27a}</UniqueIdentifier>
-    </Filter>
-    <Filter Include="src">
-      <UniqueIdentifier>{60c5cfcf-4bea-4bd6-8fd2-43d67b31f7cc}</UniqueIdentifier>
-    </Filter>
-    <Filter Include="include\test-template">
-      <UniqueIdentifier>{25d2a8a4-b5af-49ac-9a44-88b4cc1090b3}</UniqueIdentifier>
-    </Filter>
-    <Filter Include="src\test-template">
-      <UniqueIdentifier>{42875f5a-0078-4f08-9172-21568d59025b}</UniqueIdentifier>
-    </Filter>
-  </ItemGroup>
-</Project>
+<Project ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003" />

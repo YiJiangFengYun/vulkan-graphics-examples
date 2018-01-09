@@ -1,36 +1,12 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
 <Project ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
   <ItemGroup>
-    <Filter Include="include">
-      <UniqueIdentifier>{91b4d046-4469-4b1a-abfe-3c373385f27a}</UniqueIdentifier>
-    </Filter>
-    <Filter Include="src">
-      <UniqueIdentifier>{60c5cfcf-4bea-4bd6-8fd2-43d67b31f7cc}</UniqueIdentifier>
-    </Filter>
-    <Filter Include="include\test-triangle">
-      <UniqueIdentifier>{afb479f2-114c-4f0b-affe-e47165ef2207}</UniqueIdentifier>
-    </Filter>
-    <Filter Include="src\test-triangle">
-      <UniqueIdentifier>{cac45fc4-f841-48b4-9d47-590ece9ca715}</UniqueIdentifier>
-    </Filter>
+    <ClCompile Include="..\..\test\test-triangle\main.cpp" />
+    <ClCompile Include="..\..\test\test-triangle\window.cpp" />
+    <ClCompile Include="..\..\test\test-triangle\app.cpp" />
   </ItemGroup>
   <ItemGroup>
-    <ClCompile Include="..\..\test\src\test-triangle\main.cpp">
-      <Filter>src\test-triangle</Filter>
-    </ClCompile>
-    <ClCompile Include="..\..\test\src\test-triangle\window.cpp">
-      <Filter>src\test-triangle</Filter>
-    </ClCompile>
-    <ClCompile Include="..\..\test\src\test-triangle\app.cpp">
-      <Filter>src\test-triangle</Filter>
-    </ClCompile>
-  </ItemGroup>
-  <ItemGroup>
-    <ClInclude Include="..\..\test\include\test-triangle\window.hpp">
-      <Filter>include\test-triangle</Filter>
-    </ClInclude>
-    <ClInclude Include="..\..\test\include\test-triangle\app.hpp">
-      <Filter>include\test-triangle</Filter>
-    </ClInclude>
+    <ClInclude Include="..\..\test\test-triangle\window.hpp" />
+    <ClInclude Include="..\..\test\test-triangle\app.hpp" />
   </ItemGroup>
 </Project>

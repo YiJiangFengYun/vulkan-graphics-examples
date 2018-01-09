@@ -19,26 +19,26 @@
     </ProjectConfiguration>
   </ItemGroup>
   <ItemGroup>
-    <ClCompile Include="..\..\framework\src\framework\app\app.cpp" />
-    <ClCompile Include="..\..\framework\src\framework\app\window.cpp" />
-    <ClCompile Include="..\..\framework\src\framework\global.cpp" />
-    <ClCompile Include="..\..\framework\src\framework\util\thread_master.cpp" />
-    <ClCompile Include="..\..\framework\src\framework\world\entity.cpp" />
-    <ClCompile Include="..\..\framework\src\framework\world\scene.cpp" />
+    <ClInclude Include="..\..\framework\framework\app\app.hpp" />
+    <ClInclude Include="..\..\framework\framework\app\window.hpp" />
+    <ClInclude Include="..\..\framework\framework\framework.hpp" />
+    <ClInclude Include="..\..\framework\framework\global.hpp" />
+    <ClInclude Include="..\..\framework\framework\util\macro_util.hpp" />
+    <ClInclude Include="..\..\framework\framework\util\thread_master.hpp" />
+    <ClInclude Include="..\..\framework\framework\world\entity.hpp" />
+    <ClInclude Include="..\..\framework\framework\world\scene.hpp" />
   </ItemGroup>
   <ItemGroup>
-    <ClInclude Include="..\..\framework\include\framework\app\app.hpp" />
-    <ClInclude Include="..\..\framework\include\framework\app\window.hpp" />
-    <ClInclude Include="..\..\framework\include\framework\framework.hpp" />
-    <ClInclude Include="..\..\framework\include\framework\global.hpp" />
-    <ClInclude Include="..\..\framework\include\framework\util\macro_util.hpp" />
-    <ClInclude Include="..\..\framework\include\framework\util\thread_master.hpp" />
-    <ClInclude Include="..\..\framework\include\framework\world\entity.hpp" />
-    <ClInclude Include="..\..\framework\include\framework\world\scene.hpp" />
+    <ClCompile Include="..\..\framework\framework\app\app.cpp" />
+    <ClCompile Include="..\..\framework\framework\app\window.cpp" />
+    <ClCompile Include="..\..\framework\framework\global.cpp" />
+    <ClCompile Include="..\..\framework\framework\util\thread_master.cpp" />
+    <ClCompile Include="..\..\framework\framework\world\entity.cpp" />
+    <ClCompile Include="..\..\framework\framework\world\scene.cpp" />
   </ItemGroup>
   <ItemGroup>
-    <None Include="..\..\framework\include\framework\app\app.inl" />
-    <None Include="..\..\framework\include\framework\app\window.inl" />
+    <None Include="..\..\framework\framework\app\app.inl" />
+    <None Include="..\..\framework\framework\app\window.inl" />
   </ItemGroup>
   <PropertyGroup Label="Globals">
     <VCProjectVersion>15.0</VCProjectVersion>
@@ -93,25 +93,25 @@
   <PropertyGroup Label="UserMacros" />
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
     <TargetExt>.lib</TargetExt>
-    <IncludePath>$(GS_PROJECT_ROOT)\framework\include;$(GS_PROJECT_ROOT)\libs\plog.git\include;$(GS_PROJECT_ROOT)\libs\glm;$(GS_PROJECT_ROOT)\libs\glfw\include;$(VK_SDK_PATH)\Include;$(BOOST_PATH);$(IncludePath)</IncludePath>
+    <IncludePath>$(GS_PROJECT_ROOT)\framework;$(GS_PROJECT_ROOT)\libs\plog.git\include;$(GS_PROJECT_ROOT)\libs\glm;$(GS_PROJECT_ROOT)\libs\glfw\include;$(VK_SDK_PATH)\Include;$(BOOST_PATH);$(IncludePath)</IncludePath>
     <OutDir>$(GS_PROJECT_ROOT)\lib\$(Platform)\$(Configuration)\</OutDir>
     <IntDir>$(ProjectName)\$(Platform)\$(Configuration)\</IntDir>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
     <TargetExt>.lib</TargetExt>
-    <IncludePath>$(GS_PROJECT_ROOT)\framework\include;$(GS_PROJECT_ROOT)\libs\plog.git\include;$(GS_PROJECT_ROOT)\libs\glm;$(GS_PROJECT_ROOT)\libs\glfw\include;$(VK_SDK_PATH)\Include;$(BOOST_PATH);$(IncludePath)</IncludePath>
+    <IncludePath>$(GS_PROJECT_ROOT)\framework;$(GS_PROJECT_ROOT)\libs\plog.git\include;$(GS_PROJECT_ROOT)\libs\glm;$(GS_PROJECT_ROOT)\libs\glfw\include;$(VK_SDK_PATH)\Include;$(BOOST_PATH);$(IncludePath)</IncludePath>
     <OutDir>$(GS_PROJECT_ROOT)\lib\$(Platform)\$(Configuration)\</OutDir>
     <IntDir>$(ProjectName)\$(Platform)\$(Configuration)\</IntDir>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
     <TargetExt>.lib</TargetExt>
-    <IncludePath>$(GS_PROJECT_ROOT)\framework\include;$(GS_PROJECT_ROOT)\libs\plog.git\include;$(GS_PROJECT_ROOT)\libs\glm;$(GS_PROJECT_ROOT)\libs\glfw\include;$(VK_SDK_PATH)\Include;$(BOOST_PATH);$(IncludePath)</IncludePath>
+    <IncludePath>$(GS_PROJECT_ROOT)\framework;$(GS_PROJECT_ROOT)\libs\plog.git\include;$(GS_PROJECT_ROOT)\libs\glm;$(GS_PROJECT_ROOT)\libs\glfw\include;$(VK_SDK_PATH)\Include;$(BOOST_PATH);$(IncludePath)</IncludePath>
     <OutDir>$(GS_PROJECT_ROOT)\lib\$(Platform)\$(Configuration)\</OutDir>
     <IntDir>$(ProjectName)\$(Platform)\$(Configuration)\</IntDir>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
     <TargetExt>.lib</TargetExt>
-    <IncludePath>$(GS_PROJECT_ROOT)\framework\include;$(GS_PROJECT_ROOT)\libs\plog.git\include;$(GS_PROJECT_ROOT)\libs\glm;$(GS_PROJECT_ROOT)\libs\glfw\include;$(VK_SDK_PATH)\Include;$(BOOST_PATH);$(IncludePath)</IncludePath>
+    <IncludePath>$(GS_PROJECT_ROOT)\framework;$(GS_PROJECT_ROOT)\libs\plog.git\include;$(GS_PROJECT_ROOT)\libs\glm;$(GS_PROJECT_ROOT)\libs\glfw\include;$(VK_SDK_PATH)\Include;$(BOOST_PATH);$(IncludePath)</IncludePath>
     <OutDir>$(GS_PROJECT_ROOT)\lib\$(Platform)\$(Configuration)\</OutDir>
     <IntDir>$(ProjectName)\$(Platform)\$(Configuration)\</IntDir>
   </PropertyGroup>

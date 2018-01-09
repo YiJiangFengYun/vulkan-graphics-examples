@@ -19,8 +19,8 @@
     </ProjectConfiguration>
   </ItemGroup>
   <ItemGroup>
-    <ClInclude Include="..\..\test\include\testlib\stb_image.h" />
-    <ClInclude Include="..\..\test\include\testlib\tiny_obj_loader.h" />
+    <ClInclude Include="..\..\test\testlib\stb_image.h" />
+    <ClInclude Include="..\..\test\testlib\tiny_obj_loader.h" />
   </ItemGroup>
   <PropertyGroup Label="Globals">
     <VCProjectVersion>15.0</VCProjectVersion>
@@ -76,25 +76,25 @@
   <PropertyGroup Label="UserMacros" />
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
     <TargetExt>.lib</TargetExt>
-    <IncludePath>$(GS_PROJECT_ROOT)\test\include;$(GS_PROJECT_ROOT)\framework\include;$(GS_PROJECT_ROOT)\libs\plog.git\include;$(GS_PROJECT_ROOT)\libs\glm;$(GS_PROJECT_ROOT)\libs\glfw\include;$(VK_SDK_PATH)\Include;$(BOOST_PATH);$(IncludePath)</IncludePath>
+    <IncludePath>$(GS_PROJECT_ROOT)\test;$(GS_PROJECT_ROOT)\framework;$(GS_PROJECT_ROOT)\libs\plog.git\include;$(GS_PROJECT_ROOT)\libs\glm;$(GS_PROJECT_ROOT)\libs\glfw\include;$(VK_SDK_PATH)\Include;$(BOOST_PATH);$(IncludePath)</IncludePath>
     <OutDir>$(GS_PROJECT_ROOT)\lib\$(Platform)\$(Configuration)\</OutDir>
     <IntDir>$(ProjectName)\$(Platform)\$(Configuration)\</IntDir>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
     <TargetExt>.lib</TargetExt>
-    <IncludePath>$(GS_PROJECT_ROOT)\test\include;$(GS_PROJECT_ROOT)\framework\include;$(GS_PROJECT_ROOT)\libs\plog.git\include;$(GS_PROJECT_ROOT)\libs\glm;$(GS_PROJECT_ROOT)\libs\glfw\include;$(VK_SDK_PATH)\Include;$(BOOST_PATH);$(IncludePath)</IncludePath>
+    <IncludePath>$(GS_PROJECT_ROOT)\test;$(GS_PROJECT_ROOT)\framework;$(GS_PROJECT_ROOT)\libs\plog.git\include;$(GS_PROJECT_ROOT)\libs\glm;$(GS_PROJECT_ROOT)\libs\glfw\include;$(VK_SDK_PATH)\Include;$(BOOST_PATH);$(IncludePath)</IncludePath>
     <OutDir>$(GS_PROJECT_ROOT)\lib\$(Platform)\$(Configuration)\</OutDir>
     <IntDir>$(ProjectName)\$(Platform)\$(Configuration)\</IntDir>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
     <TargetExt>.lib</TargetExt>
-    <IncludePath>$(GS_PROJECT_ROOT)\test\include;$(GS_PROJECT_ROOT)\framework\include;$(GS_PROJECT_ROOT)\libs\plog.git\include;$(GS_PROJECT_ROOT)\libs\glm;$(GS_PROJECT_ROOT)\libs\glfw\include;$(VK_SDK_PATH)\Include;$(BOOST_PATH);$(IncludePath)</IncludePath>
+    <IncludePath>$(GS_PROJECT_ROOT)\test;$(GS_PROJECT_ROOT)\framework;$(GS_PROJECT_ROOT)\libs\plog.git\include;$(GS_PROJECT_ROOT)\libs\glm;$(GS_PROJECT_ROOT)\libs\glfw\include;$(VK_SDK_PATH)\Include;$(BOOST_PATH);$(IncludePath)</IncludePath>
     <OutDir>$(GS_PROJECT_ROOT)\lib\$(Platform)\$(Configuration)\</OutDir>
     <IntDir>$(ProjectName)\$(Platform)\$(Configuration)\</IntDir>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
     <TargetExt>.lib</TargetExt>
-    <IncludePath>$(GS_PROJECT_ROOT)\test\include;$(GS_PROJECT_ROOT)\framework\include;$(GS_PROJECT_ROOT)\libs\plog.git\include;$(GS_PROJECT_ROOT)\libs\glm;$(GS_PROJECT_ROOT)\libs\glfw\include;$(VK_SDK_PATH)\Include;$(BOOST_PATH);$(IncludePath)</IncludePath>
+    <IncludePath>$(GS_PROJECT_ROOT)\test;$(GS_PROJECT_ROOT)\framework;$(GS_PROJECT_ROOT)\libs\plog.git\include;$(GS_PROJECT_ROOT)\libs\glm;$(GS_PROJECT_ROOT)\libs\glfw\include;$(VK_SDK_PATH)\Include;$(BOOST_PATH);$(IncludePath)</IncludePath>
     <OutDir>$(GS_PROJECT_ROOT)\lib\$(Platform)\$(Configuration)\</OutDir>
     <IntDir>$(ProjectName)\$(Platform)\$(Configuration)\</IntDir>
   </PropertyGroup>

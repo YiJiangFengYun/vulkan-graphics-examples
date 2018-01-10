@@ -96,12 +96,21 @@ namespace fd
 		if (m_isUpdateCache)
 		{
 			m_isUpdateCache = FD_FALSE;
+			const vec_value_type Epsilon = std::numeric_limits<vec_value_type>::epsilon();
 			length_type length = ValueType::length();
 			for (length_type i = 0; i < length; ++i)
 			{
+				if(glm::abs(m_direction[i]) < Epsilon)
+				{
+					m_signs[i] = 0;
+					m_invDir[i] = 0;
+					continue;
+				}
 				m_invDir[i] = 1 / m_direction[i];
 				//negative is 0 and positive is 1, it is better to be used as array index.
-				m_signs[i] = m_direction[i] < 0 ? 0 : 1;
+				m_signs[i] = m_direction[i] < 0 ? 
+					static_cast<typename vec_value_type>(-1) : 
+					static_cast<typename vec_value_type>(1);
 			}
 		}
 	}
@@ -226,21 +235,27 @@ namespace fd
 
 		ValueType minMax[2] = { m_min, m_max };
 
-		length_type length = ValueType::length();
-		vec_value_type mins[length];
-		vec_value_type maxs[length];
-
+		const length_type length = ValueType::length();
+		const vec_value_type Epsilon = std::numeric_limits<vec_value_type>::epsilon();
 		length_type i = 0;
 		vec_value_type min = std::numeric_limits<vec_value_type>::lowest();
 		vec_value_type max = std::numeric_limits<vec_value_type>::max();
+		vec_value_type tMin;
+		vec_value_type tMax;
 		for (length_type i = 0; i < length; ++i)
 		{
-			tMin = (minMax[static_cast<size_t>(1 - signs[0])][i] - origin[i]) * invDir[i];
-			tMax = (minMax[static_cast<size_t>(signs[0])][i] - origin[i]) * invDir[i];
+			if (signs[i] == 0) {
+				if (origin[i] < minMax[0][i] || origin[i] > minMax[1][i]) return -1;
+				else continue;
+			}
+
+			uint32_t index = (static_cast<uint32_t>(signs[i]) + 1) / 2;
+			tMin = (minMax[static_cast<size_t>(1 - index)][i] - origin[i]) * invDir[i];
+			tMax = (minMax[static_cast<size_t>(index)][i] - origin[i]) * invDir[i];
 
 			if (isOnlyForward && tMax < 0) return -1; //ray is only positive direction. if tMax < 0, tMax and tMin < 0.
 
-			if (min > tMax || tmin > max)
+			if (min > tMax || tMin > max)
 				return -1;
 
 			if (tMin > min)

@@ -2,18 +2,8 @@
 #include <plog/Log.h>
 #include <foundation/foundation.hpp>
 
-void testBounds();
-
-int main()
+void testBounds(fd::Bounds<glm::vec3> bounds, fd::Ray<glm::vec3> ray)
 {
-	testBounds();
-	return 0;
-}
-
-void testBounds()
-{
-	/*fd::Bounds<glm::vec3> bounds(glm::vec3(0, 0, 0), glm::vec3(10, 10, 10));
-	fd::Ray<glm::vec3> ray(glm::vec3(0, -1, 0), glm::vec3(1, 0, 0));
 	float result = bounds.intersectRay(ray);
 
 	glm::vec3 min = bounds.getMin();
@@ -31,5 +21,30 @@ void testBounds()
 	else
 	{
 		LOG(plog::debug) << "The bounds intersect with the ray, the distance to the ray origin is: " << result << std::endl;
-	}*/
+	}
+}
+
+
+int main()
+{
+	fd::moduleCreate();
+
+	{
+		fd::Bounds<glm::vec3> bounds(glm::vec3(0, 0, 0), glm::vec3(10, 10, 10));
+		fd::Ray<glm::vec3> ray(glm::vec3(0, -1, 0), glm::vec3(1, 0, 0));
+		testBounds(bounds, ray);
+	}
+
+	{
+		fd::Bounds<glm::vec3> bounds(glm::vec3(0, 0, 0), glm::vec3(10, 10, 10));
+		fd::Ray<glm::vec3> ray(glm::vec3(0, -1, 0), glm::vec3(1, 1, 0));
+		testBounds(bounds, ray);
+	}
+
+	{
+		fd::Bounds<glm::vec3> bounds(glm::vec3(0, 0, 0), glm::vec3(10, 10, 10));
+		fd::Ray<glm::vec3> ray(glm::vec3(0, -1, 1), glm::vec3(1, 1, 0));
+		testBounds(bounds, ray);
+	}
+	return 0;
 }

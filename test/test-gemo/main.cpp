@@ -1,13 +1,11 @@
 
 #include <plog/Log.h>
-#include <framework/global.hpp>
-#include <foundation/gemo.hpp>
+#include <foundation/foundation.hpp>
 
 void testBounds();
 
 int main()
 {
-	gfw::moduleCreate(); //init framework module, and it also init foundation and graphics modules at the same time.
 	testBounds();
 	return 0;
 }

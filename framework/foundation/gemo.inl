@@ -7,7 +7,7 @@ namespace fd
 	}
 
 	template <typename VecType = glm::vec3>
-	Ray<VecType>::Ray(ValueType origin, ValueType direction) 
+	Ray<VecType>::Ray(ValueType origin, ValueType direction)
 		: m_origin(origin)
 		, m_direction(direction)
 		, m_isUpdateCache(FD_TRUE)
@@ -20,7 +20,7 @@ namespace fd
 	}
 
 	template <typename VecType = glm::vec3>
-	Ray<VecType>::Ray(const Ray<ValueType>& target) 
+	Ray<VecType>::Ray(const Ray<ValueType>& target)
 		: m_origin(target.m_origin)
 		, m_direction(target.m_direction)
 		, m_isUpdateCache(target.m_isUpdateCache)
@@ -211,6 +211,57 @@ namespace fd
 			m_max[i] += halt;
 			m_size[i] += amount;
 		}
+	}
+
+	template <typename VecType = glm::vec3>
+	typename Bounds<VecType>::vec_value_type Bounds<VecType>::intersectRay(Ray<ValueType> ray, Bool32 isOnlyForward)
+	{
+
+		////reference:
+		//// http://www.scratchapixel.com/lessons/3d-basic-rendering/minimal-ray-tracer-rendering-simple-shapes/ray-box-intersection
+		ValueType origin = ray.getOrigin();
+		ValueType dir = ray.getDirection();
+		ValueType invDir = ray.getInvDir();
+		ValueType signs = ray.getSigns();
+
+		ValueType minMax[2] = { m_min, m_max };
+
+		length_type length = ValueType::length();
+		vec_value_type mins[length];
+		vec_value_type maxs[length];
+
+		length_type i = 0;
+		vec_value_type min = std::numeric_limits<vec_value_type>::lowest();
+		vec_value_type max = std::numeric_limits<vec_value_type>::max();
+		for (length_type i = 0; i < length; ++i)
+		{
+			tMin = (minMax[static_cast<size_t>(1 - signs[0])][i] - origin[i]) * invDir[i];
+			tMax = (minMax[static_cast<size_t>(signs[0])][i] - origin[i]) * invDir[i];
+
+			if (isOnlyForward && tMax < 0) return -1; //ray is only positive direction. if tMax < 0, tMax and tMin < 0.
+
+			if (min > tMax || tmin > max)
+				return -1;
+
+			if (tMin > min)
+				min = tMin;
+			if (tMax < max)
+				max = tMax;
+		}
+
+		//calculate distance.
+		vec_value_type d;
+		if (tMin < 0)
+		{
+			d = tMax;
+		}
+		else
+		{
+			d = tMin;
+		}
+
+		return d * glm::length(dir);
+
 	}
 
 	template <typename VecType = glm::vec3>

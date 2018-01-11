@@ -88,7 +88,13 @@ namespace gfw {
 		pResultGLFWWindow = _createGLFWWindow(m_width, m_height, m_title);
 		pResultSurface = _createVKSurface(pResultGLFWWindow);
 
-		kgs::moduleCreateOther(pResultSurface, m_graphicsQueueCount, m_presentQueuecount);
+		vk::PhysicalDeviceFeatures needPhysicalDeviceFeatures;
+		needPhysicalDeviceFeatures.geometryShader = VK_TRUE;
+		needPhysicalDeviceFeatures.samplerAnisotropy = VK_TRUE;
+		kgs::moduleCreateOther(pResultSurface
+			, m_graphicsQueueCount
+			, m_presentQueuecount
+			, needPhysicalDeviceFeatures);
 	}
 
 	std::shared_ptr<GLFWwindow> App::_createGLFWWindow(uint32_t width, uint32_t height, const char* title)

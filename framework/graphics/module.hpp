@@ -11,7 +11,9 @@ namespace kgs
 	extern void moduleCreateVkinstance(std::string name, uint32_t version);
 	extern void moduleCreateOther(std::shared_ptr<vk::SurfaceKHR> pSurface
 		, uint32_t graphicsQueueCount
-		, uint32_t presentQueueCount);
+		, uint32_t presentQueueCount
+		, vk::PhysicalDeviceFeatures needPhysicalDeviceFeatures
+	);
 	extern void moduleDestory();
 } //namespace kgs
 

@@ -92,9 +92,10 @@ namespace kgs
 	void Application::initOther(std::shared_ptr<vk::SurfaceKHR> pSurface
 		, uint32_t graphicsQueueCount
 		, uint32_t presentQueueCount
+		, vk::PhysicalDeviceFeatures needPhysicalDeviceFeatures
 	)
 	{
-		_pickPhysicalDevice(pSurface);
+		_pickPhysicalDevice(pSurface, needPhysicalDeviceFeatures);
 		_createLogicDevice(pSurface, graphicsQueueCount, presentQueueCount);
 		_createCommandPool();
 	}
@@ -296,7 +297,9 @@ namespace kgs
 	}
 #endif // DEBUG
 
-	void Application::_pickPhysicalDevice(std::shared_ptr<vk::SurfaceKHR> pSurface)
+	void Application::_pickPhysicalDevice(std::shared_ptr<vk::SurfaceKHR> pSurface
+		, vk::PhysicalDeviceFeatures needPhysicalDeviceFeatures
+	)
 	{
 		auto physicalDevices = m_pInstance->enumeratePhysicalDevices();
 
@@ -307,16 +310,14 @@ namespace kgs
 			throw std::runtime_error("Failed to find GPUs with VULKAN support.");
 		}
 
-		const size_t size = physicalDevices.size();
-
 		for (auto it = physicalDevices.cbegin(); it != physicalDevices.cend();)
 		{
 			Bool32 isSuitable = [&](const vk::PhysicalDevice& physicalDevice)->Bool32
 			{
-				const vk::PhysicalDeviceProperties deviceProperties = physicalDevice.getProperties();
+				//const vk::PhysicalDeviceProperties deviceProperties = physicalDevice.getProperties();
 				const vk::PhysicalDeviceFeatures deviceFeatures = physicalDevice.getFeatures();
-				//Application can't function without geometry shaders
-				if (deviceFeatures.geometryShader == VK_FALSE)
+				//Application can't function without need features.
+				if (isContainStruct(deviceFeatures, needPhysicalDeviceFeatures) == KGS_FALSE)
 				{
 					return KGS_FALSE;
 				}
@@ -327,7 +328,6 @@ namespace kgs
 					return KGS_FALSE;
 				}
 
-				//Application can't function without support of device for swap chain extension.
 				if (checkDeviceExtensionSupport(physicalDevice, deviceExtensionNames) == KGS_FALSE)
 				{
 					return KGS_FALSE;
@@ -336,12 +336,6 @@ namespace kgs
 				//Application can't function without adequate support of device for swap chain.
 				SwapChainSupportDetails swapChainSupportDetails = SwapChainSupportDetails::querySwapChainSupport(physicalDevice, *pSurface);
 				if (swapChainSupportDetails.formats.empty() || swapChainSupportDetails.presentModes.empty())
-				{
-					return KGS_FALSE;
-				}
-
-				//Application can't function without feature of sampler anisotropy.
-				if (deviceFeatures.samplerAnisotropy == VK_FALSE)
 				{
 					return KGS_FALSE;
 				}

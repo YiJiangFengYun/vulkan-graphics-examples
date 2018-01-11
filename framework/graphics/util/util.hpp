@@ -45,5 +45,33 @@ namespace kgs
 			arr.push_back(name);
 		}
 	}
+
+	template <typename T>
+	inline Bool32 isContainStruct(T parent, T child)
+	{
+		size_t size = sizeof(T);
+		size_t index = 0;
+		typedef uint8_t sep_type;
+		size_t size2 = sizeof(sep_type);
+		size_t sep = size / size2 + 1;
+		Bool32 isContain = KGS_TRUE;
+		for (size_t i = 0; i < sep; ++i)
+		{
+			sep_type copy1 = 0;
+			sep_type copy2 = 0;
+			uint8_t *src1 = static_cast<uint8_t *>(static_cast<void *>(&parent)) + index;
+			uint8_t *src2 = static_cast<uint8_t *>(static_cast<void *>(&child)) + index;
+			memcpy(&copy1, src1, sizeof(sep_type));
+			memcpy(&copy2, src2, sizeof(sep_type));
+			if ((copy1 & copy2) != copy2)
+			{
+				isContain = KGS_FALSE;
+				break;
+			}
+			index += size2;
+		}
+
+		return isContain;
+	}
 } //namespace kgs
 #endif // !KGS_UTIL_H

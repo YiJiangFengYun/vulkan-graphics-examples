@@ -10,6 +10,7 @@
 
 #define ENGINE_NAME "iridescent cloud"
 #define ENGINE_VERSION VK_MAKE_VERSION(0, 0, 1)
+#define VK_API_VERSION VK_API_VERSION_1_0
 
 namespace kgs
 {

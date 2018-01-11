@@ -44,7 +44,7 @@ namespace kgs
 			throw std::runtime_error("Validation layers requested is not available!");
 		}
 #endif // ENABLE_VALIDATION_LAYERS
-		vk::ApplicationInfo appInfo = { m_appName.data(), m_appVersion, m_engineName, m_engineVersion, VK_API_VERSION_1_0 };
+		vk::ApplicationInfo appInfo = { m_appName.data(), m_appVersion, m_engineName, m_engineVersion, VK_API_VERSION };
 
 		//query application required extensions.
 		auto requiredExtensions = _getRequiredExtensions();

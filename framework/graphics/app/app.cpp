@@ -20,8 +20,8 @@ namespace kgs
 		: Base(BaseType::APP)
 		, m_appName(name)
 		, m_appVersion(version)
-		, m_engineName("No engine")
-		, m_engineVersion(VK_MAKE_VERSION(1, 0, 0))
+		, m_engineName(ENGINE_NAME)
+		, m_engineVersion(ENGINE_VERSION)
 	{
 
 	}

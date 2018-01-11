@@ -8,6 +8,9 @@
 #include "graphics/util/swapchain_info.hpp"
 #include "graphics/util/queue_master.hpp"
 
+#define ENGINE_NAME "iridescent cloud"
+#define ENGINE_VERSION VK_MAKE_VERSION(0, 0, 1)
+
 namespace kgs
 {
 #ifdef ENABLE_VALIDATION_LAYERS

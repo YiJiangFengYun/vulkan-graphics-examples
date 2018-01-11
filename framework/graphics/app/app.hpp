@@ -7,6 +7,7 @@
 #include "graphics/util/queue_family.hpp"
 #include "graphics/util/swapchain_info.hpp"
 #include "graphics/util/queue_master.hpp"
+#include "graphics/util/util.hpp"
 
 #define ENGINE_NAME "iridescent cloud"
 #define ENGINE_VERSION VK_MAKE_VERSION(0, 0, 1)
@@ -36,6 +37,7 @@ namespace kgs
 		void initOther(std::shared_ptr<vk::SurfaceKHR> pSurface
 			, uint32_t graphicsQueueCount
 			, uint32_t presentQueueCount
+			, vk::PhysicalDeviceFeatures needPhysicalDeviceFeatures
 			);
 
 		//gettor methods
@@ -91,7 +93,9 @@ namespace kgs
 			void* userData);
 #endif // DEBUG
 		std::vector<const char*> _getRequiredExtensions();
-		void _pickPhysicalDevice(std::shared_ptr<vk::SurfaceKHR> psurface);
+		void _pickPhysicalDevice(std::shared_ptr<vk::SurfaceKHR> psurface
+			, vk::PhysicalDeviceFeatures needPhysicalDeviceFeatures
+		);
 		void _createLogicDevice(std::shared_ptr<vk::SurfaceKHR> pSurface
 			, uint32_t graphicsQueueCount
 			, uint32_t presentQueueCount

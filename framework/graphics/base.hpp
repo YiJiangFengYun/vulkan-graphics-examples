@@ -33,7 +33,7 @@ namespace kgs
 		InstanceID m_id;
 	private:
 		Base() = delete;
-		static std::unordered_map<BaseType, InstanceID> m_idCreateor;
+		static std::unordered_map<BaseType, InstanceID> m_idCreator;
 	};
 } //namespace kgs
 

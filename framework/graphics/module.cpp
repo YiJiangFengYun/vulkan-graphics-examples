@@ -15,9 +15,13 @@ namespace kgs
 	void moduleCreateOther(std::shared_ptr<vk::SurfaceKHR> pSurface
 		, uint32_t graphicsQueueCount
 		, uint32_t presentQueueCount
+		, vk::PhysicalDeviceFeatures needPhysicalDeviceFeatures
 	)
 	{
-		pApp->initOther(pSurface, graphicsQueueCount, presentQueueCount);
+		pApp->initOther(pSurface
+			, graphicsQueueCount
+			, presentQueueCount
+			, needPhysicalDeviceFeatures);
 		isInited = KGS_TRUE;
 	}
 

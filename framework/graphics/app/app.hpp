@@ -99,6 +99,7 @@ namespace kgs
 		void _createLogicDevice(std::shared_ptr<vk::SurfaceKHR> pSurface
 			, uint32_t graphicsQueueCount
 			, uint32_t presentQueueCount
+			, vk::PhysicalDeviceFeatures needPhysicalDeviceFeatures
 		);
 		void _createCommandPool();
 	};

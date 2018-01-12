@@ -96,7 +96,11 @@ namespace kgs
 	)
 	{
 		_pickPhysicalDevice(pSurface, needPhysicalDeviceFeatures);
-		_createLogicDevice(pSurface, graphicsQueueCount, presentQueueCount);
+		_createLogicDevice(pSurface
+			, graphicsQueueCount
+			, presentQueueCount
+			, needPhysicalDeviceFeatures
+		);
 		_createCommandPool();
 	}
 
@@ -376,7 +380,7 @@ namespace kgs
 			{
 				result = deviceProperties1.limits.maxImageDimension2D - deviceProperties2.limits.maxImageDimension2D;
 			}
-			return result > 0;
+			return result >= 0;
 		});
 
 		m_pPhysicalDevice = std::shared_ptr<vk::PhysicalDevice>(new vk::PhysicalDevice(*physicalDevices.cbegin()));
@@ -386,6 +390,7 @@ namespace kgs
 	void Application::_createLogicDevice(std::shared_ptr<vk::SurfaceKHR> pSurface
 		, uint32_t graphicsQueueCount
 		, uint32_t presentQueueCount
+		, vk::PhysicalDeviceFeatures needPhysicalDeviceFeatures
 	)
 	{
 		UsedQueueFamily usedQueueFamily = UsedQueueFamily::findQueueFamilies(*m_pPhysicalDevice, *pSurface);
@@ -429,18 +434,15 @@ namespace kgs
 			++index;
 		}
 
-		vk::PhysicalDeviceFeatures deviceFeatures = {};
-		deviceFeatures.samplerAnisotropy = VK_TRUE;
-
 		vk::DeviceCreateInfo createInfo = {
-			vk::DeviceCreateFlags(),                         //flags
-			static_cast<uint32_t>(queueCreateInfos.size()),  //queueCreateInfoCount
-			queueCreateInfos.data(),                         //pQueueCreateInfos
-			0,                                               //enabledLayerCount
-			nullptr,                                         //ppEnabledLayerNames
-			static_cast<uint32_t>(deviceExtensionNames.size()),  //enabledExtensionCount
-			deviceExtensionNames.data(),                         //ppEnabledExtensionNames
-			&deviceFeatures                                      //pEnabledFeatures
+			vk::DeviceCreateFlags(),                                     //flags
+			static_cast<uint32_t>(queueCreateInfos.size()),              //queueCreateInfoCount
+			queueCreateInfos.data(),                                     //pQueueCreateInfos
+			0,                                                           //enabledLayerCount
+			nullptr,                                                     //ppEnabledLayerNames
+			static_cast<uint32_t>(deviceExtensionNames.size()),          //enabledExtensionCount
+			deviceExtensionNames.data(),                                 //ppEnabledExtensionNames
+			&needPhysicalDeviceFeatures                                  //pEnabledFeatures
 		};
 
 #ifdef ENABLE_VALIDATION_LAYERS

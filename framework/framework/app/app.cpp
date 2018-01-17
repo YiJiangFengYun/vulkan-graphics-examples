@@ -83,7 +83,19 @@ namespace gfw {
 		glfwWindowHint(GLFW_CLIENT_API, GLFW_NO_API);
 		glfwWindowHint(GLFW_RESIZABLE, GLFW_TRUE);
 
-		kgs::moduleCreateVkinstance("vulkan graphics", VK_MAKE_VERSION(1, 0, 0));
+		uint32_t glfwExtensionCount;
+		const char** glfwExtensions;
+		glfwExtensions = glfwGetRequiredInstanceExtensions(&glfwExtensionCount);
+		std::vector<const char*> vkExtensions(glfwExtensionCount);
+		uint32_t i = 0;
+		for (i = 0; i < glfwExtensionCount; ++i)
+		{
+			vkExtensions[i] = glfwExtensions[i];
+		}
+
+		kgs::moduleCreateVkinstance("vulkan graphics"
+			, VK_MAKE_VERSION(1, 0, 0)
+		    , vkExtensions);
 
 		pResultGLFWWindow = _createGLFWWindow(m_width, m_height, m_title);
 		pResultSurface = _createVKSurface(pResultGLFWWindow);
@@ -99,12 +111,12 @@ namespace gfw {
 
 	std::shared_ptr<GLFWwindow> App::_createGLFWWindow(uint32_t width, uint32_t height, const char* title)
 	{
-		return fd::createGLFWWindow(width, height, title);
+		return createGLFWWindow(width, height, title);
 	}
 
 	std::shared_ptr<vk::SurfaceKHR> App::_createVKSurface(std::shared_ptr<GLFWwindow> pWindow)
 	{
 		auto pInstance = kgs::pApp->getVKInstance();
-		return fd::createSurface(pInstance, pWindow);
+		return createSurface(pInstance, pWindow);
 	}
 }

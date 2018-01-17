@@ -3,7 +3,6 @@
 
 #include <memory>
 #include <vulkan/vulkan.hpp>
-#include <GLFW/glfw3.h>
 
 namespace fd
 {
@@ -12,11 +11,6 @@ namespace fd
 
 	extern std::shared_ptr<vk::Device> createDevice(const std::shared_ptr<vk::PhysicalDevice> pPhysicalDevice,
 		const vk::DeviceCreateInfo & createInfo, vk::Optional<const vk::AllocationCallbacks> allocator = nullptr);
-
-	extern std::shared_ptr<GLFWwindow> createGLFWWindow(uint32_t width, uint32_t height, const char* title);
-
-	extern std::shared_ptr<vk::SurfaceKHR> createSurface(std::shared_ptr<vk::Instance> pInstance,
-		std::shared_ptr<GLFWwindow> pWindow);
 
 	extern std::shared_ptr<vk::SwapchainKHR> createSwapchainKHR(const std::shared_ptr<vk::Device> pDevice,
 		const vk::SwapchainCreateInfoKHR & createInfo,

@@ -12,6 +12,12 @@
 
 namespace gfw
 {
+
+	extern std::shared_ptr<GLFWwindow> createGLFWWindow(uint32_t width, uint32_t height, const char* title);
+
+	extern std::shared_ptr<vk::SurfaceKHR> createSurface(std::shared_ptr<vk::Instance> pInstance,
+		std::shared_ptr<GLFWwindow> pWindow);
+
 	class Window
 	{
 	public:

@@ -13,7 +13,7 @@ namespace kgs
 		SwapChainSupportDetails static querySwapChainSupport(const vk::PhysicalDevice& physicalDevice, const vk::SurfaceKHR& surface);
 		vk::SurfaceFormatKHR chooseSurfaceFormat();
 		vk::PresentModeKHR choosePresentMode();
-		vk::Extent2D chooseExtent(GLFWwindow* window);
+		vk::Extent2D chooseExtent(int width, int height);
 	};
 } //namespace kgs
 

@@ -36,7 +36,7 @@ namespace kgs
 #endif // DEBUG
 	}
 
-	void Application::initCreateVkInstance()
+	void Application::initCreateVkInstance(std::vector<const char*> extensions)
 	{
 #ifdef ENABLE_VALIDATION_LAYERS
 		if (_checkValidationLayerSupport() == false)
@@ -48,7 +48,12 @@ namespace kgs
 
 		//query application required extensions.
 		auto requiredExtensions = _getRequiredExtensions();
-
+		uint32_t requiredExtIndex = requiredExtensions.size();
+		requiredExtensions.resize(requiredExtIndex + extensions.size());
+		for (const auto& extension : extensions) {
+			requiredExtensions[requiredExtIndex] = extension;
+			++requiredExtIndex;
+		}
 #ifdef DEBUG
 		//query available extensions.
 		auto availableExtensions = vk::enumerateInstanceExtensionProperties();
@@ -202,26 +207,18 @@ namespace kgs
 	{
 		std::vector<const char*> requiredExtensions;
 
-		uint32_t glfwExtensionCount = 0;
-		const char** glfwExtensions;
-
-		glfwExtensions = glfwGetRequiredInstanceExtensions(&glfwExtensionCount);
+		uint32_t extensionCount = 0;
 
 #ifdef ENABLE_VALIDATION_LAYERS
-		uint32_t requiredExtensionCount = glfwExtensionCount + 1;
+		uint32_t requiredExtensionCount = extensionCount + 1;
 #else
-		uint32_t requiredExtensionCount = glfwExtensionCount;
+		uint32_t requiredExtensionCount = extensionCount;
 #endif // ENABLE_VALIDATION_LAYERS
 
 		requiredExtensions.resize(requiredExtensionCount);
 
-		for (uint32_t i = 0; i < glfwExtensionCount; ++i)
-		{
-			requiredExtensions[i] = glfwExtensions[i];
-		}
-
 #ifdef ENABLE_VALIDATION_LAYERS
-		requiredExtensions[glfwExtensionCount] = VK_EXT_DEBUG_REPORT_EXTENSION_NAME;
+		requiredExtensions[extensionCount] = VK_EXT_DEBUG_REPORT_EXTENSION_NAME;
 #endif // ENABLE_VALIDATION_LAYERS
 
 		return requiredExtensions;

@@ -33,7 +33,7 @@ namespace kgs
 		Application(std::string name, uint32_t version);
 		~Application();
 
-		void initCreateVkInstance();
+		void initCreateVkInstance(std::vector<const char*> extensions);
 		void initOther(std::shared_ptr<Surface> pSurface
 			, uint32_t graphicsQueueCount
 			, uint32_t presentQueueCount

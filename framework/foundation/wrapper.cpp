@@ -24,35 +24,6 @@ namespace fd
 		});
 	}
 
-	std::shared_ptr<GLFWwindow> createGLFWWindow(uint32_t width,
-		uint32_t height, const char* title)
-	{
-		auto pWindow = glfwCreateWindow(width, height, title, nullptr, nullptr);
-		return std::shared_ptr<GLFWwindow>(pWindow,
-			[](GLFWwindow *p)
-		{
-			glfwDestroyWindow(p);
-		}
-		);
-	}
-
-	std::shared_ptr<vk::SurfaceKHR> createSurface(std::shared_ptr<vk::Instance> pInstance,
-		std::shared_ptr<GLFWwindow> pWindow)
-	{
-		VkSurfaceKHR surface;
-		auto result = static_cast<vk::Result> (glfwCreateWindowSurface(*pInstance,
-			pWindow.get(), nullptr, &surface));
-		if (result != vk::Result::eSuccess)
-		{
-			throw std::system_error(result, "gfw::Context::_createSurface");
-		}
-
-		return std::shared_ptr<vk::SurfaceKHR>(new vk::SurfaceKHR(surface),
-			[pInstance](vk::SurfaceKHR *p) {
-			pInstance->destroySurfaceKHR(*p);
-		});
-	}
-
 	std::shared_ptr<vk::SwapchainKHR> createSwapchainKHR(
 		const std::shared_ptr<vk::Device> pDevice,
 		const vk::SwapchainCreateInfoKHR & createInfo,

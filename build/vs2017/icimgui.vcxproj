@@ -18,6 +18,15 @@
       <Platform>x64</Platform>
     </ProjectConfiguration>
   </ItemGroup>
+  <ItemGroup>
+    <ClCompile Include="..\..\framework\icimgui\global.cpp" />
+    <ClCompile Include="..\..\framework\icimgui\module.cpp" />
+  </ItemGroup>
+  <ItemGroup>
+    <ClInclude Include="..\..\framework\icimgui\global.hpp" />
+    <ClInclude Include="..\..\framework\icimgui\icimgui.hpp" />
+    <ClInclude Include="..\..\framework\icimgui\module.hpp" />
+  </ItemGroup>
   <PropertyGroup Label="Globals">
     <VCProjectVersion>15.0</VCProjectVersion>
     <ProjectGuid>{3491D15B-620C-4E25-ADEC-2BFB7FE83BA7}</ProjectGuid>
@@ -71,25 +80,25 @@
   <PropertyGroup Label="UserMacros" />
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
     <TargetExt>.lib</TargetExt>
-    <IncludePath>$(GS_PROJECT_ROOT)\framework;$(GS_PROJECT_ROOT)\libs\imgui;$(GS_PROJECT_ROOT)\libs\plog\include;$(GS_PROJECT_ROOT)\libs\glm;$(GS_PROJECT_ROOT)\libs\glfw\include;$(VK_SDK_PATH)\Include;$(BOOST_PATH);$(IncludePath)</IncludePath>
+    <IncludePath>$(GS_PROJECT_ROOT)\framework;$(GS_PROJECT_ROOT)\libs;$(GS_PROJECT_ROOT)\libs\plog\include;$(GS_PROJECT_ROOT)\libs\glm;$(GS_PROJECT_ROOT)\libs\glfw\include;$(VK_SDK_PATH)\Include;$(BOOST_PATH);$(IncludePath)</IncludePath>
     <OutDir>$(GS_PROJECT_ROOT)\lib\$(Platform)\$(Configuration)\</OutDir>
     <IntDir>$(ProjectName)\$(Platform)\$(Configuration)\</IntDir>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
     <TargetExt>.lib</TargetExt>
-    <IncludePath>$(GS_PROJECT_ROOT)\framework;$(GS_PROJECT_ROOT)\libs\imgui;$(GS_PROJECT_ROOT)\libs\plog\include;$(GS_PROJECT_ROOT)\libs\glm;$(GS_PROJECT_ROOT)\libs\glfw\include;$(VK_SDK_PATH)\Include;$(BOOST_PATH);$(IncludePath)</IncludePath>
+    <IncludePath>$(GS_PROJECT_ROOT)\framework;$(GS_PROJECT_ROOT)\libs;$(GS_PROJECT_ROOT)\libs\plog\include;$(GS_PROJECT_ROOT)\libs\glm;$(GS_PROJECT_ROOT)\libs\glfw\include;$(VK_SDK_PATH)\Include;$(BOOST_PATH);$(IncludePath)</IncludePath>
     <OutDir>$(GS_PROJECT_ROOT)\lib\$(Platform)\$(Configuration)\</OutDir>
     <IntDir>$(ProjectName)\$(Platform)\$(Configuration)\</IntDir>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
     <TargetExt>.lib</TargetExt>
-    <IncludePath>$(GS_PROJECT_ROOT)\framework;$(GS_PROJECT_ROOT)\libs\imgui;$(GS_PROJECT_ROOT)\libs\plog\include;$(GS_PROJECT_ROOT)\libs\glm;$(GS_PROJECT_ROOT)\libs\glfw\include;$(VK_SDK_PATH)\Include;$(BOOST_PATH);$(IncludePath)</IncludePath>
+    <IncludePath>$(GS_PROJECT_ROOT)\framework;$(GS_PROJECT_ROOT)\libs;$(GS_PROJECT_ROOT)\libs\plog\include;$(GS_PROJECT_ROOT)\libs\glm;$(GS_PROJECT_ROOT)\libs\glfw\include;$(VK_SDK_PATH)\Include;$(BOOST_PATH);$(IncludePath)</IncludePath>
     <OutDir>$(GS_PROJECT_ROOT)\lib\$(Platform)\$(Configuration)\</OutDir>
     <IntDir>$(ProjectName)\$(Platform)\$(Configuration)\</IntDir>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
     <TargetExt>.lib</TargetExt>
-    <IncludePath>$(GS_PROJECT_ROOT)\framework;$(GS_PROJECT_ROOT)\libs\imgui;$(GS_PROJECT_ROOT)\libs\plog\include;$(GS_PROJECT_ROOT)\libs\glm;$(GS_PROJECT_ROOT)\libs\glfw\include;$(VK_SDK_PATH)\Include;$(BOOST_PATH);$(IncludePath)</IncludePath>
+    <IncludePath>$(GS_PROJECT_ROOT)\framework;$(GS_PROJECT_ROOT)\libs;$(GS_PROJECT_ROOT)\libs\plog\include;$(GS_PROJECT_ROOT)\libs\glm;$(GS_PROJECT_ROOT)\libs\glfw\include;$(VK_SDK_PATH)\Include;$(BOOST_PATH);$(IncludePath)</IncludePath>
     <OutDir>$(GS_PROJECT_ROOT)\lib\$(Platform)\$(Configuration)\</OutDir>
     <IntDir>$(ProjectName)\$(Platform)\$(Configuration)\</IntDir>
   </PropertyGroup>

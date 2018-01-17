@@ -53,7 +53,7 @@ namespace kgs
 		return currPresentMode;
 	}
 
-	vk::Extent2D SwapChainSupportDetails::chooseExtent(GLFWwindow* window)
+	vk::Extent2D SwapChainSupportDetails::chooseExtent(int width, int height)
 	{
 		if (capabilities.currentExtent.width != std::numeric_limits<uint32_t>::max()
 			&& capabilities.currentExtent.height != 0u)
@@ -62,9 +62,6 @@ namespace kgs
 		}
 		else
 		{
-			int width, height;
-			glfwGetWindowSize(window, &width, &height);
-
 			VkExtent2D actualExtent = { static_cast<uint32_t>(width), static_cast<uint32_t>(height) };
 
 			actualExtent.width = std::max(capabilities.minImageExtent.width,

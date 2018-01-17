@@ -4,12 +4,12 @@ namespace kgs
 {
 	std::shared_ptr<Application> pApp;
 	Bool32 isInited = KGS_FALSE;
-	void moduleCreateVkinstance(std::string name, uint32_t version)
+	void moduleCreateVkinstance(std::string name, uint32_t version, std::vector<const char*> vkExtensions)
 	{
 		if (isInited == KGS_TRUE) return;
 		fd::moduleCreate();
 		pApp = std::shared_ptr<Application>(new Application(name, version));
-		pApp->initCreateVkInstance();
+		pApp->initCreateVkInstance(vkExtensions);
 	}
 
 	void moduleCreateOther(std::shared_ptr<vk::SurfaceKHR> pSurface

@@ -6,6 +6,34 @@
 #include <set>
 
 namespace gfw {
+	std::shared_ptr<GLFWwindow> createGLFWWindow(uint32_t width,
+		uint32_t height, const char* title)
+	{
+		auto pWindow = glfwCreateWindow(width, height, title, nullptr, nullptr);
+		return std::shared_ptr<GLFWwindow>(pWindow,
+			[](GLFWwindow *p)
+		{
+			glfwDestroyWindow(p);
+		}
+		);
+	}
+
+	std::shared_ptr<vk::SurfaceKHR> createSurface(std::shared_ptr<vk::Instance> pInstance,
+		std::shared_ptr<GLFWwindow> pWindow)
+	{
+		VkSurfaceKHR surface;
+		auto result = static_cast<vk::Result> (glfwCreateWindowSurface(*pInstance,
+			pWindow.get(), nullptr, &surface));
+		if (result != vk::Result::eSuccess)
+		{
+			throw std::system_error(result, "gfw::Context::_createSurface");
+		}
+
+		return std::shared_ptr<vk::SurfaceKHR>(new vk::SurfaceKHR(surface),
+			[pInstance](vk::SurfaceKHR *p) {
+			pInstance->destroySurfaceKHR(*p);
+		});
+	}
 
 	Window::Window(uint32_t width
 		, uint32_t height
@@ -110,7 +138,7 @@ namespace gfw {
 
 	void Window::_createWindow(uint32_t width, uint32_t height, const char* title)
 	{
-		m_pWindow = fd::createGLFWWindow(width, height, title);
+		m_pWindow = createGLFWWindow(width, height, title);
 
 		glfwSetWindowUserPointer(m_pWindow.get(), this);
 		glfwSetWindowSizeCallback(m_pWindow.get(), onWindowResized);
@@ -119,7 +147,7 @@ namespace gfw {
 	void Window::_createSurface()
 	{
 		auto pInstance = kgs::pApp->getVKInstance();
-		m_pSurface = fd::createSurface(pInstance, m_pWindow);
+		m_pSurface = createSurface(pInstance, m_pWindow);
 		LOG(plog::debug) << "Create successfully surface.";
 	}
 
@@ -139,8 +167,10 @@ namespace gfw {
 		kgs::SwapChainSupportDetails details = kgs::SwapChainSupportDetails::querySwapChainSupport(*pPhysicalDevice, *m_pSurface);
 		vk::SurfaceFormatKHR surfaceFormat = details.chooseSurfaceFormat();
 		vk::PresentModeKHR presentMode = details.choosePresentMode();
-		vk::Extent2D extent = details.chooseExtent(m_pWindow.get());
-
+		int width, height;
+		glfwGetWindowSize(m_pWindow.get(), &width, &height);
+		vk::Extent2D extent = details.chooseExtent(width, height);
+		
 		//LOG(plog::debug) << "Swapchain surface format: " << surfaceFormat.format
 
 		uint32_t minImageCount = details.capabilities.minImageCount + 1;

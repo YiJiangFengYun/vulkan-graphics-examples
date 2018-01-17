@@ -107,7 +107,7 @@
       <WarningLevel>Level3</WarningLevel>
       <Optimization>Disabled</Optimization>
       <PreprocessorDefinitions>WIN32;_DEBUG;_CONSOLE;%(PreprocessorDefinitions)</PreprocessorDefinitions>
-      <AdditionalIncludeDirectories>$(GS_PROJECT_ROOT)\test;$(GS_PROJECT_ROOT)\framework;$(GS_PROJECT_ROOT)\libs\plog.git\include;$(VK_SDK_PATH)\Include;$(GS_PROJECT_ROOT)\libs\glfw\include;$(GS_PROJECT_ROOT)\libs\glm;$(BOOST_PATH);%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>$(GS_PROJECT_ROOT)\test;$(GS_PROJECT_ROOT)\framework;$(GS_PROJECT_ROOT)\libs\plog\include;$(VK_SDK_PATH)\Include;$(GS_PROJECT_ROOT)\libs\glfw\include;$(GS_PROJECT_ROOT)\libs\glm;$(BOOST_PATH);%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
     </ClCompile>
     <Link>
       <SubSystem>Console</SubSystem>
@@ -134,7 +134,7 @@ xcopy /y /v /f /i /e /k /q /d "%resources_path%\*.*" "$(OutDir)\"</Command>
       <WarningLevel>Level3</WarningLevel>
       <Optimization>Disabled</Optimization>
       <PreprocessorDefinitions>_DEBUG;_CONSOLE;%(PreprocessorDefinitions)</PreprocessorDefinitions>
-      <AdditionalIncludeDirectories>$(GS_PROJECT_ROOT)\test;$(GS_PROJECT_ROOT)\framework;$(GS_PROJECT_ROOT)\libs\plog.git\include;$(VK_SDK_PATH)\Include;$(GS_PROJECT_ROOT)\libs\glfw\include;$(GS_PROJECT_ROOT)\libs\glm;$(BOOST_PATH);%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>$(GS_PROJECT_ROOT)\test;$(GS_PROJECT_ROOT)\framework;$(GS_PROJECT_ROOT)\libs\plog\include;$(VK_SDK_PATH)\Include;$(GS_PROJECT_ROOT)\libs\glfw\include;$(GS_PROJECT_ROOT)\libs\glm;$(BOOST_PATH);%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
     </ClCompile>
     <Link>
       <SubSystem>Console</SubSystem>
@@ -163,7 +163,7 @@ xcopy /y /v /f /i /e /k /q /d "%resources_path%\*.*" "$(OutDir)\"</Command>
       <FunctionLevelLinking>true</FunctionLevelLinking>
       <IntrinsicFunctions>true</IntrinsicFunctions>
       <PreprocessorDefinitions>WIN32;NDEBUG;_CONSOLE;%(PreprocessorDefinitions)</PreprocessorDefinitions>
-      <AdditionalIncludeDirectories>$(GS_PROJECT_ROOT)\test;$(GS_PROJECT_ROOT)\framework;$(GS_PROJECT_ROOT)\libs\plog.git\include;$(VK_SDK_PATH)\Include;$(GS_PROJECT_ROOT)\libs\glfw\include;$(GS_PROJECT_ROOT)\libs\glm;$(BOOST_PATH);%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>$(GS_PROJECT_ROOT)\test;$(GS_PROJECT_ROOT)\framework;$(GS_PROJECT_ROOT)\libs\plog\include;$(VK_SDK_PATH)\Include;$(GS_PROJECT_ROOT)\libs\glfw\include;$(GS_PROJECT_ROOT)\libs\glm;$(BOOST_PATH);%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
     </ClCompile>
     <Link>
       <SubSystem>Console</SubSystem>
@@ -194,7 +194,7 @@ xcopy /y /v /f /i /e /k /q /d "%resources_path%\*.*" "$(OutDir)\"</Command>
       <FunctionLevelLinking>true</FunctionLevelLinking>
       <IntrinsicFunctions>true</IntrinsicFunctions>
       <PreprocessorDefinitions>NDEBUG;_CONSOLE;%(PreprocessorDefinitions)</PreprocessorDefinitions>
-      <AdditionalIncludeDirectories>$(GS_PROJECT_ROOT)\test;$(GS_PROJECT_ROOT)\framework;$(GS_PROJECT_ROOT)\libs\plog.git\include;$(VK_SDK_PATH)\Include;$(GS_PROJECT_ROOT)\libs\glfw\include;$(GS_PROJECT_ROOT)\libs\glm;$(BOOST_PATH);%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>$(GS_PROJECT_ROOT)\test;$(GS_PROJECT_ROOT)\framework;$(GS_PROJECT_ROOT)\libs\plog\include;$(VK_SDK_PATH)\Include;$(GS_PROJECT_ROOT)\libs\glfw\include;$(GS_PROJECT_ROOT)\libs\glm;$(BOOST_PATH);%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
     </ClCompile>
     <Link>
       <SubSystem>Console</SubSystem>

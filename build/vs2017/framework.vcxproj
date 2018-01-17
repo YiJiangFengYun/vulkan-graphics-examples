@@ -123,7 +123,11 @@
     </ClCompile>
     <Lib>
       <AdditionalLibraryDirectories>$(GS_PROJECT_ROOT)\lib\$(Platform)\$(Configuration)\;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
+<<<<<<< HEAD
       <AdditionalDependencies>graphics.lib</AdditionalDependencies>
+=======
+      <AdditionalDependencies>foundation.lib;graphics.lib</AdditionalDependencies>
+>>>>>>> 721404d829003eb46abe1975cb305c2d776499da
     </Lib>
     <BuildLog />
   </ItemDefinitionGroup>
@@ -136,7 +140,11 @@
     <Lib>
       <AdditionalLibraryDirectories>$(GS_PROJECT_ROOT)\lib\$(Platform)\$(Configuration)\;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
       <IgnoreAllDefaultLibraries>true</IgnoreAllDefaultLibraries>
+<<<<<<< HEAD
       <AdditionalDependencies>graphics.lib</AdditionalDependencies>
+=======
+      <AdditionalDependencies>foundation.lib;graphics.lib</AdditionalDependencies>
+>>>>>>> 721404d829003eb46abe1975cb305c2d776499da
     </Lib>
     <BuildLog />
   </ItemDefinitionGroup>
@@ -155,7 +163,11 @@
     <Lib>
       <AdditionalLibraryDirectories>$(GS_PROJECT_ROOT)\lib\$(Platform)\$(Configuration)\;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
       <IgnoreAllDefaultLibraries>true</IgnoreAllDefaultLibraries>
+<<<<<<< HEAD
       <AdditionalDependencies>graphics.lib</AdditionalDependencies>
+=======
+      <AdditionalDependencies>foundation.lib;graphics.lib</AdditionalDependencies>
+>>>>>>> 721404d829003eb46abe1975cb305c2d776499da
     </Lib>
     <BuildLog />
   </ItemDefinitionGroup>
@@ -173,7 +185,11 @@
     </Link>
     <Lib>
       <AdditionalLibraryDirectories>$(GS_PROJECT_ROOT)\lib\$(Platform)\$(Configuration)\;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
+<<<<<<< HEAD
       <AdditionalDependencies>graphics.lib</AdditionalDependencies>
+=======
+      <AdditionalDependencies>foundation.lib;graphics.lib</AdditionalDependencies>
+>>>>>>> 721404d829003eb46abe1975cb305c2d776499da
     </Lib>
     <BuildLog />
   </ItemDefinitionGroup>

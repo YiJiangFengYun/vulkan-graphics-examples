@@ -1,3 +1,9 @@
 [submodule "libs/plog.git"]
 	path = libs/plog.git
 	url = https://github.com/SergiusTheBest/plog.git
+[submodule "libs/imgui"]
+	path = libs/imgui
+	url = https://github.com/ocornut/imgui.git
+[submodule "libs/plog"]
+	path = libs/plog
+	url = https://github.com/SergiusTheBest/plog.git

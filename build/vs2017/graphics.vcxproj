@@ -227,7 +227,8 @@
       <SDLCheck>true</SDLCheck>
     </ClCompile>
     <Lib>
-      <AdditionalLibraryDirectories>$(GS_PROJECT_ROOT)\lib\$(Platform)\$(Configuration)\;$(VK_SDK_PATH)\Lib;$(GS_PROJECT_ROOT)\libs\glfw\lib-win64;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
+      <AdditionalLibraryDirectories>$(GS_PROJECT_ROOT)\lib\$(Platform)\$(Configuration)\;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
+      <AdditionalDependencies>foundation.lib</AdditionalDependencies>
     </Lib>
     <BuildLog />
   </ItemDefinitionGroup>
@@ -238,8 +239,9 @@
       <SDLCheck>true</SDLCheck>
     </ClCompile>
     <Lib>
-      <AdditionalLibraryDirectories>$(GS_PROJECT_ROOT)\lib\$(Platform)\$(Configuration)\;$(VK_SDK_PATH)\Lib32;$(GS_PROJECT_ROOT)\libs\glfw\lib-win32;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
+      <AdditionalLibraryDirectories>$(GS_PROJECT_ROOT)\lib\$(Platform)\$(Configuration)\;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
       <IgnoreAllDefaultLibraries>true</IgnoreAllDefaultLibraries>
+      <AdditionalDependencies>foundation.lib</AdditionalDependencies>
     </Lib>
     <BuildLog />
   </ItemDefinitionGroup>
@@ -256,8 +258,9 @@
       <OptimizeReferences>true</OptimizeReferences>
     </Link>
     <Lib>
-      <AdditionalLibraryDirectories>$(GS_PROJECT_ROOT)\lib\$(Platform)\$(Configuration)\;$(VK_SDK_PATH)\Lib32;$(GS_PROJECT_ROOT)\libs\glfw\lib-win32;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
+      <AdditionalLibraryDirectories>$(GS_PROJECT_ROOT)\lib\$(Platform)\$(Configuration)\;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
       <IgnoreAllDefaultLibraries>true</IgnoreAllDefaultLibraries>
+      <AdditionalDependencies>foundation.lib</AdditionalDependencies>
     </Lib>
     <BuildLog />
   </ItemDefinitionGroup>
@@ -274,7 +277,8 @@
       <OptimizeReferences>true</OptimizeReferences>
     </Link>
     <Lib>
-      <AdditionalLibraryDirectories>$(GS_PROJECT_ROOT)\lib\$(Platform)\$(Configuration)\;$(VK_SDK_PATH)\Lib;$(GS_PROJECT_ROOT)\libs\glfw\lib-win64;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
+      <AdditionalLibraryDirectories>$(GS_PROJECT_ROOT)\lib\$(Platform)\$(Configuration)\;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
+      <AdditionalDependencies>foundation.lib</AdditionalDependencies>
     </Lib>
     <BuildLog />
   </ItemDefinitionGroup>

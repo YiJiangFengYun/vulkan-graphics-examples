@@ -115,8 +115,8 @@
     </ClCompile>
     <Link>
       <SubSystem>Console</SubSystem>
-      <AdditionalLibraryDirectories>$(GS_PROJECT_ROOT)\lib\$(Platform)\$(Configuration)\;$(GS_PROJECT_ROOT)\libs\glfw\lib-win32;$(VK_SDK_PATH)\Lib32;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
-      <AdditionalDependencies>framework.lib;graphics.lib;foundation.lib;vulkan-1.lib;glfw3.lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <AdditionalLibraryDirectories>$(GS_PROJECT_ROOT)\lib\$(Platform)\$(Configuration)\;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
+      <AdditionalDependencies>framework.lib;%(AdditionalDependencies)</AdditionalDependencies>
     </Link>
     <PostBuildEvent>
       <Command>set resources_path=$(GS_PROJECT_ROOT)\samples\resources
@@ -142,8 +142,8 @@ xcopy /y /v /f /i /e /k /q /d "%resources_path%\*.*" "$(OutDir)\"</Command>
     </ClCompile>
     <Link>
       <SubSystem>Console</SubSystem>
-      <AdditionalLibraryDirectories>$(GS_PROJECT_ROOT)\lib\$(Platform)\$(Configuration)\;$(GS_PROJECT_ROOT)\libs\glfw\lib-win64;$(VK_SDK_PATH)\Lib;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
-      <AdditionalDependencies>framework.lib;graphics.lib;foundation.lib;vulkan-1.lib;glfw3.lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <AdditionalLibraryDirectories>$(GS_PROJECT_ROOT)\lib\$(Platform)\$(Configuration)\;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
+      <AdditionalDependencies>framework.lib;%(AdditionalDependencies)</AdditionalDependencies>
     </Link>
     <PostBuildEvent>
       <Command>set resources_path=$(GS_PROJECT_ROOT)\samples\resources
@@ -173,8 +173,8 @@ xcopy /y /v /f /i /e /k /q /d "%resources_path%\*.*" "$(OutDir)\"</Command>
       <SubSystem>Console</SubSystem>
       <EnableCOMDATFolding>true</EnableCOMDATFolding>
       <OptimizeReferences>true</OptimizeReferences>
-      <AdditionalLibraryDirectories>$(GS_PROJECT_ROOT)\lib\$(Platform)\$(Configuration)\;$(GS_PROJECT_ROOT)\libs\glfw\lib-win32;$(VK_SDK_PATH)\Lib32;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
-      <AdditionalDependencies>framework.lib;graphics.lib;foundation.lib;vulkan-1.lib;glfw3.lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <AdditionalLibraryDirectories>$(GS_PROJECT_ROOT)\lib\$(Platform)\$(Configuration)\;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
+      <AdditionalDependencies>framework.lib;%(AdditionalDependencies)</AdditionalDependencies>
     </Link>
     <PostBuildEvent>
       <Command>set resources_path=$(GS_PROJECT_ROOT)\samples\resources
@@ -204,8 +204,8 @@ xcopy /y /v /f /i /e /k /q /d "%resources_path%\*.*" "$(OutDir)\"</Command>
       <SubSystem>Console</SubSystem>
       <EnableCOMDATFolding>true</EnableCOMDATFolding>
       <OptimizeReferences>true</OptimizeReferences>
-      <AdditionalLibraryDirectories>$(GS_PROJECT_ROOT)\lib\$(Platform)\$(Configuration)\;$(GS_PROJECT_ROOT)\libs\glfw\lib-win64;$(VK_SDK_PATH)\Lib;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
-      <AdditionalDependencies>framework.lib;graphics.lib;foundation.lib;vulkan-1.lib;glfw3.lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <AdditionalLibraryDirectories>$(GS_PROJECT_ROOT)\lib\$(Platform)\$(Configuration)\;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
+      <AdditionalDependencies>framework.lib;%(AdditionalDependencies)</AdditionalDependencies>
     </Link>
     <PostBuildEvent>
       <Command>set resources_path=$(GS_PROJECT_ROOT)\samples\resources

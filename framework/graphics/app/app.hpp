@@ -25,7 +25,7 @@ namespace kgs
 		VK_KHR_SWAPCHAIN_EXTENSION_NAME
 	};
 
-	bool checkDeviceExtensionSupport(const vk::PhysicalDevice& physicalDevice, std::vector<const char*> deviceExtensionNames);
+	bool checkDeviceExtensionSupport(const PhysicalDevice& physicalDevice, std::vector<const char*> deviceExtensionNames);
 
 	class Application : public Base
 	{
@@ -34,10 +34,10 @@ namespace kgs
 		~Application();
 
 		void initCreateVkInstance();
-		void initOther(std::shared_ptr<vk::SurfaceKHR> pSurface
+		void initOther(std::shared_ptr<Surface> pSurface
 			, uint32_t graphicsQueueCount
 			, uint32_t presentQueueCount
-			, vk::PhysicalDeviceFeatures needPhysicalDeviceFeatures
+			, PhysicalDeviceFeatures needPhysicalDeviceFeatures
 			);
 
 		//gettor methods
@@ -50,8 +50,8 @@ namespace kgs
 		std::shared_ptr<vk::CommandPool> getCommandPoolForTransientBuffer();
 		std::shared_ptr<vk::CommandPool> getCommandPoolForResetBuffer();
 
-		void allocateGaphicsQueue(uint32_t &queueIndex, vk::Queue &queue);
-		void allocatePresentQueue(uint32_t &queueIndex, vk::Queue &queue);
+		void allocateGaphicsQueue(uint32_t &queueIndex, Queue &queue);
+		void allocatePresentQueue(uint32_t &queueIndex, Queue &queue);
 		void freeGraphicsQueue(uint32_t queueIndex);
 		void freePresentQueue(uint32_t queueIndex);
 	private:

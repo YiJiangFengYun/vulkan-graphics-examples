@@ -117,6 +117,7 @@
     </ClCompile>
     <Lib>
       <AdditionalLibraryDirectories>$(VK_SDK_PATH)\Lib;$(GS_PROJECT_ROOT)\libs\glfw\lib-win64;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
+      <AdditionalDependencies>vulkan-1.lib;glfw3.lib;%(AdditionalDependencies)</AdditionalDependencies>
     </Lib>
     <BuildLog />
   </ItemDefinitionGroup>
@@ -129,6 +130,7 @@
     <Lib>
       <AdditionalLibraryDirectories>$(VK_SDK_PATH)\Lib32;$(GS_PROJECT_ROOT)\libs\glfw\lib-win32;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
       <IgnoreAllDefaultLibraries>true</IgnoreAllDefaultLibraries>
+      <AdditionalDependencies>vulkan-1.lib;glfw3.lib;%(AdditionalDependencies)</AdditionalDependencies>
     </Lib>
     <BuildLog />
   </ItemDefinitionGroup>
@@ -147,6 +149,7 @@
     <Lib>
       <AdditionalLibraryDirectories>$(VK_SDK_PATH)\Lib32;$(GS_PROJECT_ROOT)\libs\glfw\lib-win32;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
       <IgnoreAllDefaultLibraries>true</IgnoreAllDefaultLibraries>
+      <AdditionalDependencies>vulkan-1.lib;glfw3.lib;%(AdditionalDependencies)</AdditionalDependencies>
     </Lib>
     <BuildLog />
   </ItemDefinitionGroup>
@@ -164,6 +167,7 @@
     </Link>
     <Lib>
       <AdditionalLibraryDirectories>$(VK_SDK_PATH)\Lib;$(GS_PROJECT_ROOT)\libs\glfw\lib-win64;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
+      <AdditionalDependencies>vulkan-1.lib;glfw3.lib;%(AdditionalDependencies)</AdditionalDependencies>
     </Lib>
     <BuildLog />
   </ItemDefinitionGroup>

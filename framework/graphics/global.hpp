@@ -33,6 +33,12 @@ namespace kgs
 	typedef fd::Bounds<glm::vec3> Bound3;
 	typedef glm::quat Quaternion;
 
+
+	typedef vk::PhysicalDevice PhysicalDevice;
+	typedef vk::PhysicalDeviceFeatures PhysicalDeviceFeatures;
+	typedef vk::Queue Queue;
+	typedef vk::SurfaceKHR Surface;
+
 	extern const Color COLOR_ZERO;
 	extern const Color COLOR_WHITE;
 	extern const Color COLOR_BLACK;

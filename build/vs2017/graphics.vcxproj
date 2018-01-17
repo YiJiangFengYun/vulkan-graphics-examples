@@ -228,10 +228,7 @@
     </ClCompile>
     <Lib>
       <AdditionalLibraryDirectories>$(GS_PROJECT_ROOT)\lib\$(Platform)\$(Configuration)\;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
-<<<<<<< HEAD
       <AdditionalDependencies>foundation.lib</AdditionalDependencies>
-=======
->>>>>>> 721404d829003eb46abe1975cb305c2d776499da
     </Lib>
     <BuildLog />
   </ItemDefinitionGroup>
@@ -281,10 +278,7 @@
     </Link>
     <Lib>
       <AdditionalLibraryDirectories>$(GS_PROJECT_ROOT)\lib\$(Platform)\$(Configuration)\;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
-<<<<<<< HEAD
       <AdditionalDependencies>foundation.lib</AdditionalDependencies>
-=======
->>>>>>> 721404d829003eb46abe1975cb305c2d776499da
     </Lib>
     <BuildLog />
   </ItemDefinitionGroup>

@@ -19,19 +19,20 @@
     </ProjectConfiguration>
   </ItemGroup>
   <ItemGroup>
-    <ClCompile Include="..\..\framework\icimgui\global.cpp" />
-    <ClCompile Include="..\..\framework\icimgui\module.cpp" />
+    <ClInclude Include="..\..\framework\kimgui\global.hpp" />
+    <ClInclude Include="..\..\framework\kimgui\kimgui.hpp" />
+    <ClInclude Include="..\..\framework\kimgui\module.hpp" />
   </ItemGroup>
   <ItemGroup>
-    <ClInclude Include="..\..\framework\icimgui\global.hpp" />
-    <ClInclude Include="..\..\framework\icimgui\icimgui.hpp" />
-    <ClInclude Include="..\..\framework\icimgui\module.hpp" />
+    <ClCompile Include="..\..\framework\kimgui\global.cpp" />
+    <ClCompile Include="..\..\framework\kimgui\module.cpp" />
   </ItemGroup>
   <PropertyGroup Label="Globals">
     <VCProjectVersion>15.0</VCProjectVersion>
     <ProjectGuid>{3491D15B-620C-4E25-ADEC-2BFB7FE83BA7}</ProjectGuid>
     <RootNamespace>graphicsframework</RootNamespace>
     <WindowsTargetPlatformVersion>10.0.14393.0</WindowsTargetPlatformVersion>
+    <ProjectName>kimgui</ProjectName>
   </PropertyGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.Default.props" />
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'" Label="Configuration">
@@ -110,7 +111,7 @@
     </ClCompile>
     <Lib>
       <AdditionalLibraryDirectories>$(GS_PROJECT_ROOT)\lib\$(Platform)\$(Configuration)\;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
-      <AdditionalDependencies>graphics.lib;imgui.lib</AdditionalDependencies>
+      <AdditionalDependencies>imgui.lib</AdditionalDependencies>
     </Lib>
     <BuildLog />
   </ItemDefinitionGroup>
@@ -123,7 +124,7 @@
     <Lib>
       <AdditionalLibraryDirectories>$(GS_PROJECT_ROOT)\lib\$(Platform)\$(Configuration)\;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
       <IgnoreAllDefaultLibraries>true</IgnoreAllDefaultLibraries>
-      <AdditionalDependencies>graphics.lib;imgui.lib</AdditionalDependencies>
+      <AdditionalDependencies>imgui.lib</AdditionalDependencies>
     </Lib>
     <BuildLog />
   </ItemDefinitionGroup>
@@ -142,7 +143,7 @@
     <Lib>
       <AdditionalLibraryDirectories>$(GS_PROJECT_ROOT)\lib\$(Platform)\$(Configuration)\;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
       <IgnoreAllDefaultLibraries>true</IgnoreAllDefaultLibraries>
-      <AdditionalDependencies>graphics.lib;imgui.lib</AdditionalDependencies>
+      <AdditionalDependencies>imgui.lib</AdditionalDependencies>
     </Lib>
     <BuildLog />
   </ItemDefinitionGroup>
@@ -160,7 +161,7 @@
     </Link>
     <Lib>
       <AdditionalLibraryDirectories>$(GS_PROJECT_ROOT)\lib\$(Platform)\$(Configuration)\;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
-      <AdditionalDependencies>graphics.lib;imgui.lib</AdditionalDependencies>
+      <AdditionalDependencies>imgui.lib</AdditionalDependencies>
     </Lib>
     <BuildLog />
   </ItemDefinitionGroup>

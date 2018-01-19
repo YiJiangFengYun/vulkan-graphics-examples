@@ -10,3 +10,6 @@
 [submodule "libs/libuv"]
 	path = libs/libuv
 	url = https://github.com/libuv/libuv.git
+[submodule "libs/glfw"]
+	path = libs/glfw
+	url = https://github.com/glfw/glfw.git

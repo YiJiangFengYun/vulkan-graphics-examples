@@ -22,7 +22,7 @@ namespace gfw {
 		std::shared_ptr<GLFWwindow> pWindow)
 	{
 		VkSurfaceKHR surface;
-		auto result = static_cast<vk::Result> (glfwCreateWindowSurface(*pInstance,
+		auto result = static_cast<vk::Result> (glfwCreateWindowSurface(static_cast<VkInstance>(*pInstance),
 			pWindow.get(), nullptr, &surface));
 		if (result != vk::Result::eSuccess)
 		{
@@ -322,10 +322,10 @@ namespace gfw {
 	{
 		auto pDevice = kgs::pApp->getDevice();
 		uint32_t imageIndex;
-		VkResult result = vkAcquireNextImageKHR(*pDevice
-			, *m_pSwapchain
+		VkResult result = vkAcquireNextImageKHR(static_cast<VkDevice>(*pDevice)
+			, static_cast<VkSwapchainKHR>(*m_pSwapchain)
 			, std::numeric_limits<uint64_t>::max()
-			, *m_pImageAvailableSemaphore
+			, static_cast<VkSemaphore>(*m_pImageAvailableSemaphore)
 			, VK_NULL_HANDLE
 			, &imageIndex);
 
@@ -360,7 +360,7 @@ namespace gfw {
 			vk::Queue queue;
 			uint32_t queueIndex;
 			kgs::pApp->allocatePresentQueue(queueIndex, queue);
-			result = vkQueuePresentKHR(queue, reinterpret_cast<VkPresentInfoKHR *>(&presentInfo));
+			result = vkQueuePresentKHR(static_cast<VkQueue>(queue), reinterpret_cast<VkPresentInfoKHR *>(&presentInfo));
 			if (result == VK_ERROR_OUT_OF_DATE_KHR || result == VK_SUBOPTIMAL_KHR)
 			{
 				_doReCreateSwapchain();
@@ -377,7 +377,7 @@ namespace gfw {
 			frame will not noticeably affect performance.
 			**/
 #ifdef ENABLE_VALIDATION_LAYERS
-			vkQueueWaitIdle(queue);
+			vkQueueWaitIdle(static_cast<VkQueue>(queue));
 #endif //ENABLE_VALIDATION_LAYERS
 			kgs::pApp->freePresentQueue(queueIndex);
 		}

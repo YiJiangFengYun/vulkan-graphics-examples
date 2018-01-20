@@ -1,8 +1,6 @@
 #ifndef KGS_TEXTURE_H
 #define KGS_TEXTURE_H
 
-#include <vulkan/vulkan.hpp>
-#include <plog/Log.h>
 #include "foundation/wrapper.hpp"
 #include "graphics/util/find_memory.hpp"
 #include "graphics/global.hpp"

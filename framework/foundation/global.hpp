@@ -8,6 +8,8 @@
 #define FD_FALSE 0
 #define FD_TRUE 1
 
+#define NOMINMAX
+
 #include <plog/Log.h>
 
 #define GLM_FORCE_RADIANS

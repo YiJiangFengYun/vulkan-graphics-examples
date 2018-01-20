@@ -1,6 +1,8 @@
 #ifndef KGS_GLOBAL_H
 #define KGS_GLOBAL_H
 
+#define NOMINMAX
+
 #ifdef _DEBUG
 #define DEBUG
 #endif // _DEBUG

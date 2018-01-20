@@ -2,13 +2,12 @@
 # add the binary tree directory to the search path for include files
 # include_directories( ${CMAKE_CURRENT_BINARY_DIR} )
 
-include_directories("${PROJECT_FRAMEWORK_DIR}/foundation")
-include_directories("${PROJECT_FRAMEWORK_DIR}/graphics")
-include_directories("${IMGUI_DIR}")
+include_directories("${PROJECT_FRAMEWORK_DIR}")
+include_directories("${IMGUI_DIR}/..")
 
 set(LIBRARY_NAME "kimgui")
-file(GLOB HEADERS *.hpp)
-file(GLOB SOURCES *.cpp)
+file(GLOB_RECURSE HEADERS *.hpp)
+file(GLOB_RECURSE SOURCES *.cpp)
 add_library(${LIBRARY_NAME} STATIC ${HEADERS} ${SOURCES})
 
 # install

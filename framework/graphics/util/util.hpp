@@ -53,7 +53,7 @@ namespace kgs
 		size_t index = 0;
 		typedef uint8_t sep_type;
 		size_t size2 = sizeof(sep_type);
-		size_t sep = size / size2 + 1;
+		size_t sep = size / size2;
 		Bool32 isContain = KGS_TRUE;
 		for (size_t i = 0; i < sep; ++i)
 		{

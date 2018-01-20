@@ -1,6 +1,6 @@
 cmake_minimum_required(VERSION 3.8.2)
 
-project(vulkan-graphics-samples CPP)
+project(vulkan-graphics-samples)
 
 #Set project variables.
 #    Global
@@ -26,7 +26,7 @@ option(USE_WAYLAND_WSI "Build the project using Wayland swapchain" OFF)
 
 configure_file(
 	"${PROJECT_SOURCE_DIR}/VGFConfig.hpp.in"
-	"${PROJECT_SOURCE_DIR}/VGFConfig.hpp"
+	"${PROJECT_BINARY_DIR}/VGFConfig.hpp"
 )
 
 set(PROJECT_DIR ${PROJECT_SOURCE_DIR})
@@ -48,6 +48,17 @@ set(IMGUI_DIR ${PROJECT_LIBS_DIR}/imgui)
 set(LIBUV_DIR ${PROJECT_LIBS_DIR}/libuv)
 set(PLOG_DIR ${PROJECT_LIBS_DIR}/plog)
 
+# glfw generation
+add_subdirectory(${GLFW_DIR})
+set(LIBRARIES ${LIBRARIES} glfw)
+
+# imgui generation
+set(LIBRARY_NAME "imgui")
+file(GLOB HEADERS ${IMGUI_DIR}/*.hpp)
+file(GLOB SOURCES ${IMGUI_DIR}/*.cpp)
+add_library(${LIBRARY_NAME} STATIC ${HEADERS} ${SOURCES})
+set(LIBRARIES ${LIBRARIES} ${LIBRARY_NAME})
+
 # Set compiler specific flags
 # if (MSVC)
 #     if (NOT USE_MSVC_RUNTIME_LIBRARY_DLL)
@@ -67,6 +78,8 @@ set(PLOG_DIR ${PROJECT_LIBS_DIR}/plog)
 #         endforeach()
 #     endif()
 # endif()
+
+# set (CMAKE_CXX_STANDARD 11)
 
 # vulkan
 find_package(Vulkan)
@@ -116,7 +129,12 @@ endif(WIN32)
 if (NOT Vulkan_FOUND)
 	message(FATAL_ERROR "Could not find Vulkan library!")
 else()
-	message(STATUS ${Vulkan_LIBRARY})
+	include_directories(${Vulkan_INCLUDE_DIRS})
+	set(LIBRARIES ${LIBRARIES} ${Vulkan_LIBRARIES})
+	message(STATUS "Vulkan_INCLUDE_DIR: ${Vulkan_INCLUDE_DIR}")
+	message(STATUS "Vulkan_INCLUDE_DIRS: ${Vulkan_INCLUDE_DIRS}")
+	message(STATUS "Vulkan_LIBRARY: ${Vulkan_LIBRARY}")
+	message(STATUS "Vulkan_LIBRARIES: ${Vulkan_LIBRARIES}")
 endif()
 
 # add the binary tree to the search path for include files
@@ -126,28 +144,11 @@ include_directories("${PROJECT_BINARY_DIR}")
 # global third party library include and link directories
 # include_directories("${LIBUV_DIR}/include")
 
-# glfw generation
-add_subdirectory(${GLFW_DIR})
-set(LIBRARIES ${LIBRARIES} glfw)
-
-# imgui generation
-set(LIBRARY_NAME "imgui")
-file(GLOB HEADERS ${IMGUI_DIR}/*.hpp)
-file(GLOB SOURCES ${IMGUI_DIR}/*.cpp)
-add_library(${LIBRARY_NAME} STATIC ${HEADERS} ${SOURCES})
-
-
 # libuv generation
 # todo
 
 # framework generation
 add_subdirectory(framework)
-
-# tests generation
-add_subdirectory(test)
-
-# samples generation
-add_subdirectory(samples)
 
 # samples generation
 if(BUILD_SAMPLES)

@@ -3,9 +3,9 @@
 # include_directories( ${CMAKE_CURRENT_BINARY_DIR} )
 
 set(EXE_NAME "test-triangle-2d")
-file(GLOB HEADERS *.hpp)
-file(GLOB SOURCES *.cpp)
-add_executable(${EXE_NAME} STATIC ${HEADERS} ${SOURCES})
+file(GLOB_RECURSE HEADERS *.hpp)
+file(GLOB_RECURSE SOURCES *.cpp)
+add_executable(${EXE_NAME} ${HEADERS} ${SOURCES})
 target_link_libraries(${EXE_NAME} ${LIBRARIES})
 
 # copy resource files

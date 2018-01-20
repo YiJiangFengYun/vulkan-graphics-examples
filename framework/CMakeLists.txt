@@ -1,4 +1,4 @@
-include_directories("${GLM_DIR}/glm")
+include_directories("${GLM_DIR}")
 include_directories("${PLOG_DIR}/include")
 
 add_subdirectory(foundation)

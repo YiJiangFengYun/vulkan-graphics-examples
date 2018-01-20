@@ -1,6 +1,7 @@
 #ifndef KGS_MESH_H
 #define KGS_MESH_H
 
+#define NOMINMAX
 #include <set>
 #include <utility>
 #include <glm/glm.hpp>

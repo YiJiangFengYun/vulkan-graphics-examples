@@ -3,10 +3,15 @@
 # include_directories( ${CMAKE_CURRENT_BINARY_DIR} )
 
 set(LIBRARY_NAME "testlib")
-file(GLOB HEADERS *.hpp)
+file(GLOB_RECURSE HEADERS *.hpp)
+file(GLOB_RECURSE HEADERS *.h)
 file(GLOB SOURCES *.cpp)
-add_library(${LIBRARY_NAME} STATIC ${HEADERS} ${SOURCES})
 
-# install
-install (TARGETS ${LIBRARY_NAME} DESTINATION bin)
-install (FILES ${HEADERS} DESTINATION include)
+if(SOURCES)
+    add_library(${LIBRARY_NAME} STATIC ${HEADERS} ${SOURCES})
+    set(LIBRARIES ${LIBRARIES} testlib)
+
+    # install
+    install (TARGETS ${LIBRARY_NAME} DESTINATION bin)
+    install (FILES ${HEADERS} DESTINATION include)
+endif(SOURCES)

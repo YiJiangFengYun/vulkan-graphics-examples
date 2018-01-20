@@ -1,17 +1,19 @@
 #ifndef GFW_GLOBAL_H
 #define GFW_GLOBAL_H
 
-#ifndef GLFW_INCLUDE_VULKAN
-#define GLFW_INCLUDE_VULKAN
-#endif // !GLFW_INCLUDE_VULKAN
-#include <GLFW/glfw3.h>
-
+#define NOMINMAX
 #define GFW_FALSE 0
 #define GFW_TRUE 1
 
 #include <cstdint>
+
 #include <foundation/foundation.hpp>
 #include <graphics/graphics.hpp>
+
+#ifndef GLFW_INCLUDE_VULKAN
+#define GLFW_INCLUDE_VULKAN
+#endif // !GLFW_INCLUDE_VULKAN
+#include <GLFW/glfw3.h>
 
 namespace gfw
 { 

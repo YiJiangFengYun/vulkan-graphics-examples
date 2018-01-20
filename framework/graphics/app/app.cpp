@@ -31,7 +31,8 @@ namespace kgs
 #ifdef DEBUG
 		if (m_debugReportCallBack != vk::DebugReportCallbackEXT(nullptr))
 		{
-			destroyDebugReportCallbackEXT(*m_pInstance, m_debugReportCallBack, nullptr);
+			destroyDebugReportCallbackEXT(static_cast<VkInstance>(*m_pInstance)
+				, static_cast<VkDebugReportCallbackEXT>(m_debugReportCallBack), nullptr);
 		}
 #endif // DEBUG
 	}
@@ -238,9 +239,9 @@ namespace kgs
 		};
 
 		VkDebugReportCallbackEXT callback;
-		createDebugReportCallbackEXT(*m_pInstance, &VkDebugReportCallbackCreateInfoEXT(createInfo),
+		createDebugReportCallbackEXT(static_cast<VkInstance>(*m_pInstance), &VkDebugReportCallbackCreateInfoEXT(createInfo),
 			nullptr, &callback);
-		m_debugReportCallBack = callback;
+		m_debugReportCallBack = static_cast<vk::DebugReportCallbackEXT>(callback);
 	}
 
 	void Application::_onDebugCallBack(vk::DebugReportFlagsEXT flags, vk::DebugReportObjectTypeEXT objType,
@@ -347,6 +348,7 @@ namespace kgs
 			if (isSuitable == KGS_FALSE)
 			{
 				physicalDevices.erase(it);
+				if (physicalDevices.size() == 0) break;
 			}
 			else
 			{
@@ -359,7 +361,7 @@ namespace kgs
 			throw std::runtime_error("Failed to find a suitable GPU!");
 		}
 
-		const std::vector<const char*>& deviceExtensions = deviceExtensionNames;
+		const auto& deviceExtensions = deviceExtensionNames;
 		std::sort(physicalDevices.begin(), physicalDevices.end(),
 			[&](const vk::PhysicalDevice& physicalDevice1, const vk::PhysicalDevice& physicalDevice2) {
 			int32_t result = 0;

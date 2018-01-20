@@ -13,8 +13,8 @@ set(LIBRARIES ${LIBRARIES} framework)
 add_subdirectory(testlib)
 
 set(RESOURCES_DIR "${CMAKE_CURRENT_SOURCE_DIR}/resources")
-set(RESOURCES_OUTPUT_DIR "${RUNTIME_OUTPUT_DIRECTORY}")
 set(SHADERS_DIR "${RESOURCES_DIR}/shaders")
+set(RESOURCES_OUTPUT_DIR "${CMAKE_CURRENT_BINARY_DIR}")
 set(SHADERS_OUTPUT_DIR "${RESOURCES_OUTPUT_DIR}/shaders")
 
 add_subdirectory(test-gemo)

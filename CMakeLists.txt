@@ -57,7 +57,7 @@ set(LIBRARIES ${LIBRARIES} glfw)
 
 # imgui generation
 set(LIBRARY_NAME "imgui")
-file(GLOB HEADERS ${IMGUI_DIR}/*.hpp)
+file(GLOB HEADERS ${IMGUI_DIR}/*.hpp ${IMGUI_DIR}/*.h)
 file(GLOB SOURCES ${IMGUI_DIR}/*.cpp)
 add_library(${LIBRARY_NAME} STATIC ${HEADERS} ${SOURCES})
 set(LIBRARIES ${LIBRARIES} ${LIBRARY_NAME})

@@ -3,8 +3,7 @@
 # include_directories( ${CMAKE_CURRENT_BINARY_DIR} )
 
 set(LIBRARY_NAME "testlib")
-file(GLOB_RECURSE HEADERS *.hpp)
-file(GLOB_RECURSE HEADERS *.h)
+file(GLOB_RECURSE HEADERS *.hpp *.h *.inl)
 file(GLOB SOURCES *.cpp)
 
 if(SOURCES)

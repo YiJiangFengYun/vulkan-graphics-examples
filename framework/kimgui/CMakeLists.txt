@@ -6,7 +6,7 @@ include_directories("${PROJECT_FRAMEWORK_DIR}")
 include_directories("${IMGUI_DIR}/..")
 
 set(LIBRARY_NAME "kimgui")
-file(GLOB_RECURSE HEADERS *.hpp)
+file(GLOB_RECURSE HEADERS *.hpp *.inl)
 file(GLOB_RECURSE SOURCES *.cpp)
 add_library(${LIBRARY_NAME} STATIC ${HEADERS} ${SOURCES})
 

@@ -301,3 +301,4 @@ __pycache__/
 
 # custom
 build/
+.vscode/

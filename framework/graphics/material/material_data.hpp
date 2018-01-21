@@ -17,7 +17,6 @@
 
 namespace kgs
 {
-
 #define TEMP_OPAQUE OPAQUE
 #define TEMP_TRANSPARENT TRANSPARENT
 #undef OPAQUE

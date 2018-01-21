@@ -17,10 +17,15 @@
 
 namespace kgs
 {
+#ifdef OPAQUE
 #define TEMP_OPAQUE OPAQUE
-#define TEMP_TRANSPARENT TRANSPARENT
 #undef OPAQUE
+#endif //OPAQUE
+
+#ifdef TRANSPARENT
+#define TEMP_TRANSPARENT TRANSPARENT
 #undef TRANSPARENT
+#endif //TRANSPARENT
 	enum class MaterialShowType
 	{
 		BACKGROUND,
@@ -31,9 +36,13 @@ namespace kgs
 		END_RANGE = OVERLAY,
 		RANGE_SIZE = (END_RANGE - BEGIN_RANGE + 1)
 	};
-
+#ifdef TEMP_OPAQUE
 #define OPAQUE TEMP_OPAQUE
+#endif //TEMP_OPAQUE
+
+#ifdef TEMP_TRANSPARENT
 #define TRANSPARENT TEMP_TRANSPARENT
+#endif //TEMP_TRANSPARENT
 
 	struct MaterialData
 	{

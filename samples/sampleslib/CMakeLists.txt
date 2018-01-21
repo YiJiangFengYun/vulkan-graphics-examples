@@ -2,7 +2,7 @@
 # add the binary tree directory to the search path for include files
 # include_directories( ${CMAKE_CURRENT_BINARY_DIR} )
 
-set(LIBRARY_NAME "testlib")
+set(LIBRARY_NAME "sampleslib")
 file(GLOB_RECURSE HEADERS *.hpp *.h *.inl)
 file(GLOB SOURCES *.cpp)
 

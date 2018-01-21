@@ -6,6 +6,7 @@ file(GLOB_RECURSE HEADERS *.hpp *.inl)
 file(GLOB_RECURSE SOURCES *.cpp)
 add_executable(${EXE_NAME} ${HEADERS} ${SOURCES})
 target_link_libraries(${EXE_NAME} ${LIBRARIES})
+set_property(TARGET ${EXE_NAME} PROPERTY FOLDER ${FOLDER_NAME})
 
 # install
 install (TARGETS ${EXE_NAME} DESTINATION bin)

@@ -1,6 +1,10 @@
+set_property(GLOBAL PROPERTY USE_FOLDERS ON)
+set(FOLDER_NAME "test")
+
 include_directories("${GLM_DIR}")
 include_directories("${PLOG_DIR}/include")
 include_directories("${PROJECT_FRAMEWORK_DIR}")
+
 include_directories("${GLFW_DIR}/include")
 include_directories("${IMGUI_DIR}")
 

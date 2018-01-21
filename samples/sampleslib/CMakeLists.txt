@@ -9,6 +9,7 @@ file(GLOB SOURCES *.cpp)
 if(SOURCES)
     add_library(${LIBRARY_NAME} STATIC ${HEADERS} ${SOURCES})
     set(LIBRARIES ${LIBRARIES} ${LIBRARY_NAME})
+    set_property(TARGET ${LIBRARY_NAME} PROPERTY FOLDER ${FOLDER_NAME})
 
     # install
     install (TARGETS ${LIBRARY_NAME} DESTINATION bin)

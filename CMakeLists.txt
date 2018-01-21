@@ -48,19 +48,11 @@ set(IMGUI_DIR ${PROJECT_LIBS_DIR}/imgui)
 set(LIBUV_DIR ${PROJECT_LIBS_DIR}/libuv)
 set(PLOG_DIR ${PROJECT_LIBS_DIR}/plog)
 
-set( CMAKE_RUNTIME_OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR}/bin )
-set( CMAKE_LIBRARY_OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR}/lib )
+set(CMAKE_RUNTIME_OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR}/bin )
+set(CMAKE_LIBRARY_OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR}/lib )
 
-# glfw generation
-add_subdirectory(${GLFW_DIR})
-set(LIBRARIES ${LIBRARIES} glfw)
-
-# imgui generation
-set(LIBRARY_NAME "imgui")
-file(GLOB HEADERS ${IMGUI_DIR}/*.hpp ${IMGUI_DIR}/*.h)
-file(GLOB SOURCES ${IMGUI_DIR}/*.cpp)
-add_library(${LIBRARY_NAME} STATIC ${HEADERS} ${SOURCES})
-set(LIBRARIES ${LIBRARIES} ${LIBRARY_NAME})
+set(LIBRARIES) #init variable
+add_subdirectory(libs)
 
 # Set compiler specific flags
 # if (MSVC)
@@ -146,9 +138,6 @@ include_directories("${PROJECT_BINARY_DIR}")
 
 # global third party library include and link directories
 # include_directories("${LIBUV_DIR}/include")
-
-# libuv generation
-# todo
 
 # framework generation
 add_subdirectory(framework)

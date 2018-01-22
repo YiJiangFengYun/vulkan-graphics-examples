@@ -48,8 +48,8 @@ set(IMGUI_DIR ${PROJECT_LIBS_DIR}/imgui)
 set(LIBUV_DIR ${PROJECT_LIBS_DIR}/libuv)
 set(PLOG_DIR ${PROJECT_LIBS_DIR}/plog)
 
-set(CMAKE_RUNTIME_OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR}/bin )
-set(CMAKE_LIBRARY_OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR}/lib )
+# set(CMAKE_RUNTIME_OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR}/bin )
+# set(CMAKE_LIBRARY_OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR}/lib )
 
 set(LIBRARIES) #init variable
 add_subdirectory(libs)
@@ -142,6 +142,9 @@ include_directories("${PROJECT_BINARY_DIR}")
 # framework generation
 add_subdirectory(framework)
 
+# enable test
+enable_testing ()
+
 # samples generation
 if(BUILD_SAMPLES)
     add_subdirectory(samples)
@@ -156,20 +159,6 @@ endif()
 install (FILES "${PROJECT_BINARY_DIR}/VGFConfig.hpp"
   DESTINATION include)
 
-# test
-# enable testing
-enable_testing ()
-
-#define a macro to simplify adding tests
-macro (do_test arg result)
-  add_test (TutorialComp${arg} Tutorial ${arg})
-  set_tests_properties (TutorialComp${arg}
-    PROPERTIES PASS_REGULAR_EXPRESSION ${result}
-    )
-endmacro ()
-
-# do a bunch of tests
-# todo
 
 
 

@@ -36,3 +36,7 @@ foreach(SHADER ${SHADERS})
 # install
 install (TARGETS ${EXE_NAME} DESTINATION bin)
 install (FILES ${HEADERS} DESTINATION include)
+
+
+# test
+add_test (${EXE_NAME} ${EXE_NAME})

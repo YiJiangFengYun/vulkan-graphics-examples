@@ -9,7 +9,7 @@
 //
 //	void static moduleCreate()
 //	{
-//		if (isInited == KGS_TRUE) return;
+//		if (isInited == VG_TRUE) return;
 //
 //		//Keyboard mapping. ImGui will use those indices to peek into the io.KeyDown[] array
 //		ImGuiIO& io = ImGui::GetIO();

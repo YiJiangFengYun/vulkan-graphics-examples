@@ -5,7 +5,7 @@
 #include <unordered_map>
 #include <set>
 
-namespace gfw {
+namespace vgf {
 	std::shared_ptr<GLFWwindow> createGLFWWindow(uint32_t width,
 		uint32_t height, const char* title)
 	{
@@ -146,7 +146,7 @@ namespace gfw {
 
 	void Window::_createSurface()
 	{
-		auto pInstance = kgs::pApp->getVKInstance();
+		auto pInstance = vg::pApp->getVKInstance();
 		m_pSurface = createSurface(pInstance, m_pWindow);
 		LOG(plog::debug) << "Create successfully surface.";
 	}
@@ -163,8 +163,8 @@ namespace gfw {
 
 	void Window::_createSwapchain()
 	{
-		auto pPhysicalDevice = kgs::pApp->getPhysicalDevice();
-		kgs::SwapChainSupportDetails details = kgs::SwapChainSupportDetails::querySwapChainSupport(*pPhysicalDevice, *m_pSurface);
+		auto pPhysicalDevice = vg::pApp->getPhysicalDevice();
+		vg::SwapChainSupportDetails details = vg::SwapChainSupportDetails::querySwapChainSupport(*pPhysicalDevice, *m_pSurface);
 		vk::SurfaceFormatKHR surfaceFormat = details.chooseSurfaceFormat();
 		vk::PresentModeKHR presentMode = details.choosePresentMode();
 		int width, height;
@@ -204,7 +204,7 @@ namespace gfw {
 			oldSwapchain                              //oldSwapchain
 		};
 
-		kgs::UsedQueueFamily usedQueueFamily = kgs::UsedQueueFamily::findQueueFamilies(*pPhysicalDevice, *m_pSurface);
+		vg::UsedQueueFamily usedQueueFamily = vg::UsedQueueFamily::findQueueFamilies(*pPhysicalDevice, *m_pSurface);
 		std::vector<uint32_t> queueFamilyIndices = {
 			(uint32_t)usedQueueFamily.graphicsFamily,
 			(uint32_t)usedQueueFamily.presentFamily
@@ -217,7 +217,7 @@ namespace gfw {
 			createInfo.pQueueFamilyIndices = queueFamilyIndices.data();
 		}
 
-		auto pDevice = kgs::pApp->getDevice();
+		auto pDevice = vg::pApp->getDevice();
 		m_pSwapchain = fd::createSwapchainKHR(pDevice, createInfo);
 		LOG(plog::debug) << "Create successfully swapchain.";
 
@@ -252,7 +252,7 @@ namespace gfw {
 			{
 			case RenderType::RENDERER_2:
 			{
-				m_pRenderers[i] = std::shared_ptr<kgs::BaseRenderer>(
+				m_pRenderers[i] = std::shared_ptr<vg::BaseRenderer>(
 					new RenderTypeInfo<RenderType::RENDERER_2>::RendererType(m_pSwapchainImageViews[i]
 						, m_swapchainImageFormat
 					    , m_swapchainExtent.width
@@ -263,7 +263,7 @@ namespace gfw {
 			}
 			case RenderType::RENDERER_3:
 			{
-				m_pRenderers[i] = std::shared_ptr<kgs::BaseRenderer>(
+				m_pRenderers[i] = std::shared_ptr<vg::BaseRenderer>(
 					new RenderTypeInfo<RenderType::RENDERER_3>::RendererType(m_pSwapchainImageViews[i]
 						, m_swapchainImageFormat
 					    , m_swapchainExtent.width
@@ -285,7 +285,7 @@ namespace gfw {
 		vk::SemaphoreCreateInfo createInfo = {
 			vk::SemaphoreCreateFlags()
 		};
-		auto pDevice = kgs::pApp->getDevice();
+		auto pDevice = vg::pApp->getDevice();
 		m_pImageAvailableSemaphore = fd::createSemaphore(pDevice, createInfo);
 		//m_pRenderFinishedSemaphore = fd::createSemaphore(m_pDevice, createInfo);
 	}
@@ -320,7 +320,7 @@ namespace gfw {
 
 	void Window::_render()
 	{
-		auto pDevice = kgs::pApp->getDevice();
+		auto pDevice = vg::pApp->getDevice();
 		uint32_t imageIndex;
 		VkResult result = vkAcquireNextImageKHR(static_cast<VkDevice>(*pDevice)
 			, static_cast<VkSwapchainKHR>(*m_pSwapchain)
@@ -340,11 +340,11 @@ namespace gfw {
 				throw std::runtime_error("Failed to acquire swap chain image");
 			}
 
-			kgs::BaseRenderer::RenderInfo info;
+			vg::BaseRenderer::RenderInfo info;
 			info.waitSemaphoreCount = 1u;
 			info.pWaitSemaphores = m_pImageAvailableSemaphore.get();
 
-			kgs::BaseRenderer::RenderResultInfo resultInfo;
+			vg::BaseRenderer::RenderResultInfo resultInfo;
 
 			m_pRenderers[imageIndex]->render(info, resultInfo);
 
@@ -359,7 +359,7 @@ namespace gfw {
 
 			vk::Queue queue;
 			uint32_t queueIndex;
-			kgs::pApp->allocatePresentQueue(queueIndex, queue);
+			vg::pApp->allocatePresentQueue(queueIndex, queue);
 			result = vkQueuePresentKHR(static_cast<VkQueue>(queue), reinterpret_cast<VkPresentInfoKHR *>(&presentInfo));
 			if (result == VK_ERROR_OUT_OF_DATE_KHR || result == VK_SUBOPTIMAL_KHR)
 			{
@@ -379,7 +379,7 @@ namespace gfw {
 #ifdef ENABLE_VALIDATION_LAYERS
 			vkQueueWaitIdle(static_cast<VkQueue>(queue));
 #endif //ENABLE_VALIDATION_LAYERS
-			kgs::pApp->freePresentQueue(queueIndex);
+			vg::pApp->freePresentQueue(queueIndex);
 		}
 		else
 		{
@@ -411,7 +411,7 @@ namespace gfw {
 			vk::ImageLayout::eUndefined
 		};
 
-		auto pDevice = kgs::pApp->getDevice();
+		auto pDevice = vg::pApp->getDevice();
 		pImage = fd::createImage(pDevice, createInfo);
 
 		auto memRequirements = pDevice->getImageMemoryRequirements(*pImage);
@@ -446,13 +446,13 @@ namespace gfw {
 				1u
 			}
 		};
-		auto pDevice = kgs::pApp->getDevice();
+		auto pDevice = vg::pApp->getDevice();
 		return fd::createImageView(pDevice, createInfo);
 	}
 
 	uint32_t Window::_findMemoryType(uint32_t typeFilter, vk::MemoryPropertyFlags properties)
 	{
-		auto pPhysicalDevice = kgs::pApp->getPhysicalDevice();
+		auto pPhysicalDevice = vg::pApp->getPhysicalDevice();
 		vk::PhysicalDeviceMemoryProperties memProperties = pPhysicalDevice->getMemoryProperties();
 		for (uint32_t i = 0; i < memProperties.memoryTypeCount; ++i)
 		{

@@ -2,7 +2,7 @@
 
 #include <functional>
 
-namespace kgs
+namespace vg
 {
 	Renderer3::Renderer3(std::shared_ptr<vk::ImageView> pSwapchainImageView
 		, vk::Format swapchainImageFormat
@@ -73,7 +73,7 @@ namespace kgs
 			auto pMesh = pVisualObject->getMesh();
 			auto bounds = dynamic_cast<SceneType::VisualObjectType::MeshType *>(pMesh.get())->getBounds();
 			auto pTransform = pVisualObject->getTransform();
-			if(m_pCamera->isInView(pTransform.get(), bounds) == KGS_TRUE)
+			if(m_pCamera->isInView(pTransform.get(), bounds) == VG_TRUE)
 			{
 				validVisualObjects[validVisualObjectCount++] = pVisualObject;
 			}

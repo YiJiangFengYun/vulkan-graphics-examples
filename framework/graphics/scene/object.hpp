@@ -1,11 +1,11 @@
-#ifndef KGS_OBJECT_H
-#define KGS_OBJECT_H
+#ifndef VG_OBJECT_H
+#define VG_OBJECT_H
 
 #include "graphics/global.hpp"
 #include "graphics/scene/space_info.hpp"
 #include "graphics/scene/space_info_object.hpp"
 
-namespace kgs
+namespace vg
 {
 	enum class ObjectType
 	{
@@ -51,4 +51,4 @@ namespace kgs
 
 } //namespace kgs
 
-#endif // !KGS_OBJECT_H
+#endif // !VG_OBJECT_H

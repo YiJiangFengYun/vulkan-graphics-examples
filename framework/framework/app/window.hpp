@@ -1,5 +1,5 @@
-#ifndef GFW_WINDOW_H
-#define GFW_WINDOW_H
+#ifndef VGF_WINDOW_H
+#define VGF_WINDOW_H
 
 #include <memory>
 #include <vector>
@@ -10,7 +10,7 @@
 #include <graphics/graphics.hpp>
 #include "framework/global.hpp"
 
-namespace gfw
+namespace vgf
 {
 
 	extern std::shared_ptr<GLFWwindow> createGLFWWindow(uint32_t width, uint32_t height, const char* title);
@@ -33,19 +33,19 @@ namespace gfw
 		template<RenderType type>
 		struct RenderTypeInfo
 		{
-			typedef kgs::BaseRenderer RendererType;
+			typedef vg::BaseRenderer RendererType;
 		};
 
 		template<>
 		struct RenderTypeInfo<RenderType::RENDERER_2>
 		{
-			typedef kgs::Renderer2 RendererType;
+			typedef vg::Renderer2 RendererType;
 		};
 
 		template<>
 		struct RenderTypeInfo<RenderType::RENDERER_3>
 		{
-			typedef kgs::Renderer3 RendererType;
+			typedef vg::Renderer3 RendererType;
 		};
 
 		Window(uint32_t width
@@ -71,7 +71,7 @@ namespace gfw
 		virtual ~Window();
 		void run();
 		void Window::windowSetShouldClose(Bool32 value);
-		gfw::Bool32 windowShouldClose();
+		vgf::Bool32 windowShouldClose();
 		std::shared_ptr<GLFWwindow> getGLFWWindow() const;
 	protected:
 		Window(const Window&) = delete;
@@ -88,7 +88,7 @@ namespace gfw
 		std::vector<std::shared_ptr<vk::ImageView>> m_pSwapchainImageViews;
 		//vk::Queue m_presentQueue;
 		//uint32_t m_presentQueueIndex;
-		std::vector<std::shared_ptr<kgs::BaseRenderer>> m_pRenderers;
+		std::vector<std::shared_ptr<vg::BaseRenderer>> m_pRenderers;
 		std::shared_ptr<vk::Semaphore> m_pImageAvailableSemaphore;
 
 		//std::mutex m_windowMutex;
@@ -143,5 +143,5 @@ namespace gfw
 #include "framework/app/window.inl"
 
 
-#endif // !GFW_WINDOW_H
+#endif // !VGF_WINDOW_H
 

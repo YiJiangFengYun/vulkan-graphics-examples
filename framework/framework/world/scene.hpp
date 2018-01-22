@@ -1,6 +1,6 @@
-#ifndef GFW_SCENE_H
-#define GFW_SCENE_H
+#ifndef VGF_SCENE_H
+#define VGF_SCENE_H
 
 
 
-#endif // !GFW_SCENE_H
+#endif // !VGF_SCENE_H

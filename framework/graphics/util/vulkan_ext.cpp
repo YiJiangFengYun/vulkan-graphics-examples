@@ -1,6 +1,6 @@
 #include "graphics/util/vulkan_ext.hpp"
 
-namespace kgs
+namespace vg
 {
 	VkResult createDebugReportCallbackEXT(VkInstance instance, const VkDebugReportCallbackCreateInfoEXT* pCreateInfo,
 		const VkAllocationCallbacks* pAllocator, VkDebugReportCallbackEXT* pCallback)

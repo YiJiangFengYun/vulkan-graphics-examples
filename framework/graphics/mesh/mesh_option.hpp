@@ -1,12 +1,12 @@
-#ifndef KGS_MESH_OPTION_H
-#define KGS_MESH_OPTION_H
+#ifndef VG_MESH_OPTION_H
+#define VG_MESH_OPTION_H
 
 #include <array>
 #include <vulkan/vulkan.hpp>
 #include "graphics/global.hpp"
 #include "graphics/mesh/mesh_data.hpp"
 
-namespace kgs
+namespace vg
 {
 	enum class MeshType
 	{
@@ -79,7 +79,7 @@ namespace kgs
 	{
 		vk::PrimitiveTopology vkTopology;
 #ifdef DEBUG
-		Bool32 isHave = KGS_FALSE;
+		Bool32 isHave = VG_FALSE;
 #endif // DEBUG
 		for (const auto& item2 : arrPrimitiveTopologyToVK)
 		{
@@ -87,14 +87,14 @@ namespace kgs
 			{
 				vkTopology = item2.second;
 #ifdef DEBUG
-				isHave = KGS_TRUE;
+				isHave = VG_TRUE;
 #endif // DEBUG
 				break;
 			}
 		}
 
 #ifdef DEBUG
-		if (isHave == KGS_FALSE)
+		if (isHave == VG_FALSE)
 		{
 			throw std::runtime_error("Invalid primitive topology.");
 		}
@@ -165,28 +165,28 @@ namespace kgs
 	const MeshData::DataType UVConstInfo<UVType::VECTOR_3>::ARRAY_TYPE = MeshData::DataType::VECTOR_3_ARRAY;*/
 
 	template<>
-	const std::string UVIndexInfo<UVIndex::UV_0>::VERTEX_NAME = KGS_VERTEX_UV0_NAME;
+	const std::string UVIndexInfo<UVIndex::UV_0>::VERTEX_NAME = VG_VERTEX_UV0_NAME;
 
 	template<>
-	const std::uint32_t UVIndexInfo<UVIndex::UV_0>::VERTEX_BINDING_PRIORITY = KGS_VERTEX_BINDING_PRIORITY_UV0;
+	const std::uint32_t UVIndexInfo<UVIndex::UV_0>::VERTEX_BINDING_PRIORITY = VG_VERTEX_BINDING_PRIORITY_UV0;
 
 	template<>
-	const std::string UVIndexInfo<UVIndex::UV_1>::VERTEX_NAME = KGS_VERTEX_UV1_NAME;
+	const std::string UVIndexInfo<UVIndex::UV_1>::VERTEX_NAME = VG_VERTEX_UV1_NAME;
 
 	template<>
-	const std::uint32_t UVIndexInfo<UVIndex::UV_1>::VERTEX_BINDING_PRIORITY = KGS_VERTEX_BINDING_PRIORITY_UV1;
+	const std::uint32_t UVIndexInfo<UVIndex::UV_1>::VERTEX_BINDING_PRIORITY = VG_VERTEX_BINDING_PRIORITY_UV1;
 
 	template<>
-	const std::string UVIndexInfo<UVIndex::UV_2>::VERTEX_NAME = KGS_VERTEX_UV2_NAME;
+	const std::string UVIndexInfo<UVIndex::UV_2>::VERTEX_NAME = VG_VERTEX_UV2_NAME;
 
 	template<>
-	const std::uint32_t UVIndexInfo<UVIndex::UV_2>::VERTEX_BINDING_PRIORITY = KGS_VERTEX_BINDING_PRIORITY_UV2;
+	const std::uint32_t UVIndexInfo<UVIndex::UV_2>::VERTEX_BINDING_PRIORITY = VG_VERTEX_BINDING_PRIORITY_UV2;
 
 	template<>
-	const std::string UVIndexInfo<UVIndex::UV_3>::VERTEX_NAME = KGS_VERTEX_UV3_NAME;
+	const std::string UVIndexInfo<UVIndex::UV_3>::VERTEX_NAME = VG_VERTEX_UV3_NAME;
 
 	template<>
-	const std::uint32_t UVIndexInfo<UVIndex::UV_3>::VERTEX_BINDING_PRIORITY = KGS_VERTEX_BINDING_PRIORITY_UV3;
+	const std::uint32_t UVIndexInfo<UVIndex::UV_3>::VERTEX_BINDING_PRIORITY = VG_VERTEX_BINDING_PRIORITY_UV3;
 } //namespace kgs
 
-#endif // !KGS_MESH_OPTION_H
+#endif // !VG_MESH_OPTION_H

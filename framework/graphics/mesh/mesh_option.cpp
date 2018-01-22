@@ -1,6 +1,6 @@
 #include "graphics/mesh/mesh_option.hpp"
 
-namespace kgs
+namespace vg
 {
 	std::array<std::pair<PrimitiveTopology, vk::PrimitiveTopology>, static_cast<size_t>(PrimitiveTopology::RANGE_SIZE)> arrPrimitiveTopologyToVK = {
 		std::pair<PrimitiveTopology, vk::PrimitiveTopology>(PrimitiveTopology::POINT_LIST, vk::PrimitiveTopology::ePointList),

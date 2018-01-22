@@ -1,6 +1,6 @@
 #include "graphics/texture/texture_1d_array.hpp"
 
-namespace kgs
+namespace vg
 {
 	Texture1DArray::Texture1DArray(TextureFormat format, Bool32 mipMap, uint32_t width, uint32_t arraylength)
 		:Texture(format, mipMap)

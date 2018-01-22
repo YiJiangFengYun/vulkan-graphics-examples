@@ -15,10 +15,10 @@ const uint32_t WINDOW_WIDTH = 800;
 const uint32_t WINDOW_HEIGHT = 600;
 int main() {
 
-	gfw::moduleCreate();
+	vgf::moduleCreate();
 
 	chalet::App app;
-	app.init<chalet::Window>(WINDOW_WIDTH, WINDOW_HEIGHT, "chalet", gfw::Window::RenderType::RENDERER_3);
+	app.init<chalet::Window>(WINDOW_WIDTH, WINDOW_HEIGHT, "chalet", vgf::Window::RenderType::RENDERER_3);
 
 	LOG(plog::debug) << "Initialization completed." << std::endl;
 

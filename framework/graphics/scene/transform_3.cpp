@@ -1,6 +1,6 @@
 #include "graphics/scene/transform_3.hpp"
 
-namespace kgs
+namespace vg
 {
 	Transform3::Transform3()
 		: Transform<SpaceType::SPACE_3>()
@@ -13,7 +13,7 @@ namespace kgs
 		auto matrix = glm::lookAt(getPosition(), worldTarget, worldUp);
 		if (m_pParent != nullptr)
 		{
-			auto m = _getMatrixLocalToWorld(KGS_FALSE);
+			auto m = _getMatrixLocalToWorld(VG_FALSE);
 			matrix = glm::inverse(m) * matrix;
 		}
 		setLocalMatrixInverse(matrix);
@@ -24,7 +24,7 @@ namespace kgs
 		auto matrix = glm::lookAt(worldEye, worldTarget, worldUp);
 		if (m_pParent != nullptr)
 		{
-			auto m = _getMatrixLocalToWorld(KGS_FALSE);
+			auto m = _getMatrixLocalToWorld(VG_FALSE);
 			matrix = glm::inverse(m) * matrix;
 		}
 		setLocalMatrixInverse(matrix);
@@ -46,7 +46,7 @@ namespace kgs
 		_setLocalScaleOnly(tempScale);
 		_setLocalRotationOnly(tempRotation);
 		_setLocalPositionOnly(tempTranslate);
-		m_isChanged = KGS_FALSE;
+		m_isChanged = VG_FALSE;
 
 		//_reCalculateLocalMatrix();
 	}

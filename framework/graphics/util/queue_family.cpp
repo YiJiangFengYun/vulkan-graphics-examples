@@ -1,6 +1,6 @@
 #include "graphics/util/queue_family.hpp"
 
-namespace kgs
+namespace vg
 {
 	UsedQueueFamily::UsedQueueFamily()
 		: graphicsFamily(-1)

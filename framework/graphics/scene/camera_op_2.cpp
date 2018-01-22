@@ -1,6 +1,6 @@
 #include "graphics/scene/camera_op_2.hpp"
 
-namespace kgs
+namespace vg
 {
 	CameraOP2::CameraOP2()
 		: CameraOP<SpaceType::SPACE_2>()

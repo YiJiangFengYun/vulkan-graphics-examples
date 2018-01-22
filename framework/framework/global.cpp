@@ -3,19 +3,19 @@
 #include "graphics/global.hpp"
 #include "foundation/global.hpp"
 
-namespace gfw
+namespace vgf
 {
-	Bool32 isInited = GFW_FALSE;
+	Bool32 isInited = VGF_FALSE;
 	void moduleCreate()
 	{
-		if (isInited == GFW_TRUE) return;
+		if (isInited == VGF_TRUE) return;
 		fd::moduleCreate();
-		isInited = GFW_TRUE;
+		isInited = VGF_TRUE;
 	}
 
 	void moduleDestroy()
 	{
 		fd::moduleDestroy();
-		isInited = GFW_FALSE;
+		isInited = VGF_FALSE;
 	}
 }

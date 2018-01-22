@@ -1,10 +1,10 @@
-#ifndef KGS_RENDERER_3_H
-#define KGS_RENDERER_3_H
+#ifndef VG_RENDERER_3_H
+#define VG_RENDERER_3_H
 
 #include "graphics/scene/space_info.hpp"
 #include "graphics/renderer/renderer.hpp"
 
-namespace kgs
+namespace vg
 {
 	class Renderer3 : public Renderer<SpaceType::SPACE_3>
 	{
@@ -53,4 +53,4 @@ namespace kgs
 	};
 } //namespace kgs
 
-#endif // !KGS_RENDERER_2_H
+#endif // !VG_RENDERER_2_H

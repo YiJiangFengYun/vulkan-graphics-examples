@@ -1,11 +1,11 @@
-#ifndef KGS_QUEUE_MASTER_H
-#define KGS_QUEUE_MASTER_H
+#ifndef VG_QUEUE_MASTER_H
+#define VG_QUEUE_MASTER_H
 
 #include <queue>
 #include <unordered_map>
 #include "graphics/global.hpp"
 
-namespace kgs
+namespace vg
 {
 	class QueueMaster
 	{
@@ -32,4 +32,4 @@ namespace kgs
 	};
 } //namespace kgs
 
-#endif // !KGS_QUEUE_MASTER_H
+#endif // !VG_QUEUE_MASTER_H

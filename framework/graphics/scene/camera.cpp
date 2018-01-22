@@ -1,6 +1,6 @@
 #include "graphics/scene/camera.hpp"
 
-namespace kgs
+namespace vg
 {
 
 }

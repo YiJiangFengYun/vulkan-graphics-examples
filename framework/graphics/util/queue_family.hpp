@@ -1,9 +1,9 @@
-#ifndef KGS_QUEUE_FAMILY_H
-#define KGS_QUEUE_FAMILY_H
+#ifndef VG_QUEUE_FAMILY_H
+#define VG_QUEUE_FAMILY_H
 
 #include "graphics/global.hpp"
 
-namespace kgs
+namespace vg
 {
 	struct UsedQueueFamily
 	{
@@ -21,5 +21,5 @@ namespace kgs
 	};
 }
 
-#endif // !KGS_QUEUE_FAMILY_H
+#endif // !VG_QUEUE_FAMILY_H
 

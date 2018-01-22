@@ -1,6 +1,6 @@
 #include "graphics/base.hpp"
 
-namespace kgs
+namespace vg
 {
 	std::unordered_map<BaseType, InstanceID> Base::m_idCreator = {};
 	Base::Base(BaseType baseType)

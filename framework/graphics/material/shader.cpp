@@ -1,6 +1,6 @@
 #include "graphics/material/shader.hpp"
 
-namespace kgs
+namespace vg
 {
 
 	Shader::Shader() 

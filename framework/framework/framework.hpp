@@ -1,13 +1,13 @@
-#ifndef GFW_FRAMEWORK_H
-#define GFW_FRAMEWORK_H
+#ifndef VGF_FRAMEWORK_H
+#define VGF_FRAMEWORK_H
 
 #include "framework/global.hpp"
 #include "framework/app/app.hpp"
 #include "framework/app/window.hpp"
 
-namespace gfw
+namespace vgf
 {
 
 } //namespace gfw
 
-#endif // !GFW_FRAMEWORK_H
+#endif // !VGF_FRAMEWORK_H

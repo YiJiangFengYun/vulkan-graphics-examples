@@ -1,6 +1,6 @@
 #include "graphics/scene/object.hpp"
 
-namespace kgs
+namespace vg
 {
 	BaseObject::BaseObject()
 		: Base(BaseType::SCENE_OBJECT)

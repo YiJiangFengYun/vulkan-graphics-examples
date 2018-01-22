@@ -1,5 +1,5 @@
-#ifndef KGS_MESH_DATA_H
-#define KGS_MESH_DATA_H
+#ifndef VG_MESH_DATA_H
+#define VG_MESH_DATA_H
 
 #include <cstdint>
 #include <vector>
@@ -7,26 +7,26 @@
 #include "graphics/global.hpp"
 #include "graphics/util/util.hpp"
 
-#define KGS_VERTEX_POSITION_NAME "_Position"
-#define KGS_VERTEX_COLOR_NAME "_Color"
-#define KGS_VERTEX_NORMAL_NAME "_Normal"
-#define KGS_VERTEX_TANGENT_NAME "_Tangent"
-#define KGS_VERTEX_UV0_NAME "_UV_0"
-#define KGS_VERTEX_UV1_NAME "_UV_1"
-#define KGS_VERTEX_UV2_NAME "_UV_2"
-#define KGS_VERTEX_UV3_NAME "_UV_3"
+#define VG_VERTEX_POSITION_NAME "_Position"
+#define VG_VERTEX_COLOR_NAME "_Color"
+#define VG_VERTEX_NORMAL_NAME "_Normal"
+#define VG_VERTEX_TANGENT_NAME "_Tangent"
+#define VG_VERTEX_UV0_NAME "_UV_0"
+#define VG_VERTEX_UV1_NAME "_UV_1"
+#define VG_VERTEX_UV2_NAME "_UV_2"
+#define VG_VERTEX_UV3_NAME "_UV_3"
 
-#define KGS_VERTEX_BINDING_PRIORITY_POSITION 0u
-#define KGS_VERTEX_BINDING_PRIORITY_COLOR 1u
-#define KGS_VERTEX_BINDING_PRIORITY_NORMAL 2u
-#define KGS_VERTEX_BINDING_PRIORITY_TANGENT 3u
-#define KGS_VERTEX_BINDING_PRIORITY_UV0 4u
-#define KGS_VERTEX_BINDING_PRIORITY_UV1 5u
-#define KGS_VERTEX_BINDING_PRIORITY_UV2 6u
-#define KGS_VERTEX_BINDING_PRIORITY_UV3 7u
-#define KGS_VERTEX_BINDING_PRIORITY_OTHER_MIN 8u
+#define VG_VERTEX_BINDING_PRIORITY_POSITION 0u
+#define VG_VERTEX_BINDING_PRIORITY_COLOR 1u
+#define VG_VERTEX_BINDING_PRIORITY_NORMAL 2u
+#define VG_VERTEX_BINDING_PRIORITY_TANGENT 3u
+#define VG_VERTEX_BINDING_PRIORITY_UV0 4u
+#define VG_VERTEX_BINDING_PRIORITY_UV1 5u
+#define VG_VERTEX_BINDING_PRIORITY_UV2 6u
+#define VG_VERTEX_BINDING_PRIORITY_UV3 7u
+#define VG_VERTEX_BINDING_PRIORITY_OTHER_MIN 8u
 
-namespace kgs
+namespace vg
 {
 	struct MeshData
 	{
@@ -192,4 +192,4 @@ namespace kgs
 
 #include "graphics/mesh/mesh_data.inl"
 
-#endif // !KGS_MESH_DATA_H
+#endif // !VG_MESH_DATA_H

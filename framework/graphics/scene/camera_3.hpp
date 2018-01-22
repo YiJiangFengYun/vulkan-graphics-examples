@@ -1,10 +1,10 @@
-#ifndef KGS_CAMERA_3_H
-#define KGS_CAMERA_3_H
+#ifndef VG_CAMERA_3_H
+#define VG_CAMERA_3_H
 
 #include "graphics/scene/space_info.hpp"
 #include "graphics/scene/camera.hpp"
 
-namespace kgs
+namespace vg
 {
 	class Camera3 : public Camera<SpaceType::SPACE_3>
 	{
@@ -34,4 +34,4 @@ namespace kgs
 
 } //namespace kgs
 
-#endif // !KGS_CAMERA_3_H
+#endif // !VG_CAMERA_3_H

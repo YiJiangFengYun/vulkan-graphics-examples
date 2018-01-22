@@ -1,6 +1,6 @@
 #include "graphics/material/material.hpp"
 
-namespace kgs
+namespace vg
 {
 	Material::Material()
 		: Base(BaseType::MATERIAL)
@@ -35,7 +35,7 @@ namespace kgs
 
 	void Material::removePass(const std::shared_ptr<Pass>& pPass)
 	{
-		if (isHas(pPass) == KGS_FALSE) return;
+		if (isHas(pPass) == VG_FALSE) return;
 		std::remove(m_arrPasses.begin(), m_arrPasses.end(), pPass);
 		m_mapPasses.erase(pPass->getID());
 	}

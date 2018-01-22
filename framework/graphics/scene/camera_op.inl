@@ -1,4 +1,4 @@
-namespace kgs
+namespace vg
 {
 	template <SpaceType SPACE_TYPE>
 	CameraOP<SPACE_TYPE>::CameraOP()
@@ -49,14 +49,14 @@ namespace kgs
 		std::vector<Bool32> places(len);
 		for (typename PointType::length_type i = 0; i <= len; ++i)
 		{
-			std::fill(places.begin(), places.end(), KGS_FALSE);
-			std::fill(places.begin(), places.begin() + i, KGS_TRUE);
+			std::fill(places.begin(), places.end(), VG_FALSE);
+			std::fill(places.begin(), places.begin() + i, VG_TRUE);
 			do
 			{
 				typename PointType::length_type j;
 				for (j = 0; j < len; ++j)
 				{
-					if (places[j] == KGS_TRUE)
+					if (places[j] == VG_TRUE)
 					{
 						points[pointIndex][j] = min[j];
 					}
@@ -96,11 +96,11 @@ namespace kgs
 
 		fd::Bounds<PointType> boundsInView(minInView, maxInView);
 
-		Bool32 isInsideCameraView = KGS_FALSE;
+		Bool32 isInsideCameraView = VG_FALSE;
 		////check if it is inside camera view.
 		if (m_viewBounds.isIntersects(boundsInView))
 		{
-			isInsideCameraView = KGS_TRUE;
+			isInsideCameraView = VG_TRUE;
 		}
 
 		return isInsideCameraView;

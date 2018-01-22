@@ -1,4 +1,4 @@
-namespace kgs
+namespace vg
 {
 	template <SpaceType SPACE_TYPE>
 	Transform<SPACE_TYPE>::Transform()
@@ -6,7 +6,7 @@ namespace kgs
 		, m_pParent(nullptr)
 		, m_arrPChildren()
 		, m_mapPChildren()
-		, m_isChanged(KGS_FALSE)
+		, m_isChanged(VG_FALSE)
 		, m_localPosition(0.0f)
 		, m_localPosMatrix(1.0f)
 		, m_localScale(1.0f)
@@ -82,7 +82,7 @@ namespace kgs
 	template <SpaceType SPACE_TYPE>
 	void Transform<SPACE_TYPE>::removeChild(Type *pChild)
 	{
-		if (_isChild(pChild) == KGS_FALSE) return;
+		if (_isChild(pChild) == VG_FALSE) return;
 
 		_removeChildOnly(pNewChild);
 		pNewChild->_setParentOnly(nullptr);
@@ -155,7 +155,7 @@ namespace kgs
 	template <SpaceType SPACE_TYPE>
 	typename Transform<SPACE_TYPE>::PointType Transform<SPACE_TYPE>::getPosition()
 	{
-		return _getMatrixLocalToWorld(KGS_FALSE) * MatrixVectorType(m_localPosition, 0.0);
+		return _getMatrixLocalToWorld(VG_FALSE) * MatrixVectorType(m_localPosition, 0.0);
 	}
 
 	template <SpaceType SPACE_TYPE>
@@ -237,13 +237,13 @@ namespace kgs
 	template <SpaceType SPACE_TYPE>
 	typename Transform<SPACE_TYPE>::MatrixType Transform<SPACE_TYPE>::getMatrixLocalToWorld()
 	{
-		return _getMatrixLocalToWorld(KGS_TRUE);
+		return _getMatrixLocalToWorld(VG_TRUE);
 	}
 
 	template <SpaceType SPACE_TYPE>
 	typename Transform<SPACE_TYPE>::MatrixType Transform<SPACE_TYPE>::getMatrixWorldToLocal()
 	{
-		return _getMatrixWorldToLocal(KGS_TRUE);
+		return _getMatrixWorldToLocal(VG_TRUE);
 	}
 
 	template <SpaceType SPACE_TYPE>
@@ -299,7 +299,7 @@ namespace kgs
 			m_localPosMatrix[length - 1] += normalMatrix[i] * position[i];
 		}
 		m_localPosMatrix[length - 1] += normalMatrix[i];
-		m_isChanged = KGS_TRUE;
+		m_isChanged = VG_TRUE;
 	}
 
 	template <SpaceType SPACE_TYPE>
@@ -316,7 +316,7 @@ namespace kgs
 		}
 		result[i] = normalMatrix[i];
 		m_localScaleMatrix = result;
-		m_isChanged = KGS_TRUE;
+		m_isChanged = VG_TRUE;
 	}
 
 	template <SpaceType SPACE_TYPE>
@@ -347,8 +347,8 @@ namespace kgs
 	template <SpaceType SPACE_TYPE>
 	void Transform<SPACE_TYPE>::_reCalculateLocalMatrix()
 	{
-		if (m_isChanged == KGS_FALSE) return;
+		if (m_isChanged == VG_FALSE) return;
 		_setLocalMatrixOnly(m_localPosMatrix * m_localRotationMatrix * m_localScaleMatrix);
-		m_isChanged = KGS_FALSE;
+		m_isChanged = VG_FALSE;
 	}
 } //namespace kgs

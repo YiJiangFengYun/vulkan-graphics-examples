@@ -1,5 +1,5 @@
-#ifndef KGS_TRANSFORM_H
-#define KGS_TRANSFORM_H
+#ifndef VG_TRANSFORM_H
+#define VG_TRANSFORM_H
 
 #include <memory>
 #include <algorithm>
@@ -7,7 +7,7 @@
 #include "graphics/scene/space_info.hpp"
 #include <glm/gtx/matrix_decompose.hpp>
 
-namespace kgs
+namespace vg
 {
 	class BaseTransform : public Base
 	{
@@ -79,7 +79,7 @@ namespace kgs
 
 		/*void apply()
 		{
-			m_isChanged = KGS_FALSE;
+			m_isChanged = VG_FALSE;
 		}*/
 
 		//-------------------------transform tool-------------------------------------
@@ -143,4 +143,4 @@ namespace kgs
 
 #include "graphics/scene/transform.inl"
 
-#endif // !KGS_TRANSFORM_H
+#endif // !VG_TRANSFORM_H

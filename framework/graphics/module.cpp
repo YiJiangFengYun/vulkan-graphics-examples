@@ -1,12 +1,12 @@
 #include "graphics/module.hpp"
 
-namespace kgs
+namespace vg
 {
 	std::shared_ptr<Application> pApp;
-	Bool32 isInited = KGS_FALSE;
+	Bool32 isInited = VG_FALSE;
 	void moduleCreateVkinstance(std::string name, uint32_t version, std::vector<const char*> vkExtensions)
 	{
-		if (isInited == KGS_TRUE) return;
+		if (isInited == VG_TRUE) return;
 		fd::moduleCreate();
 		pApp = std::shared_ptr<Application>(new Application(name, version));
 		pApp->initCreateVkInstance(vkExtensions);
@@ -22,13 +22,13 @@ namespace kgs
 			, graphicsQueueCount
 			, presentQueueCount
 			, needPhysicalDeviceFeatures);
-		isInited = KGS_TRUE;
+		isInited = VG_TRUE;
 	}
 
 	void moduleDestory()
 	{
 		pApp = nullptr;
 		//fd::moduleDestroy();
-		isInited = KGS_FALSE;
+		isInited = VG_FALSE;
 	}
 }

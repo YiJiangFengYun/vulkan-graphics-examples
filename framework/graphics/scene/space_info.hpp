@@ -1,10 +1,10 @@
-#ifndef KGS_SCENE_OPTION_H
-#define KGS_SCENE_OPTION_H
+#ifndef VG_SCENE_OPTION_H
+#define VG_SCENE_OPTION_H
 
 #include "graphics/global.hpp"
 #include "graphics/mesh/mesh_option.hpp"
 
-namespace kgs
+namespace vg
 {
 	enum class SpaceType
 	{
@@ -61,4 +61,4 @@ namespace kgs
 	const SpaceTypeInfo<SpaceType::SPACE_3>::VectorType SpaceConstInfo<SpaceType::SPACE_3>::UP_VECTOR = { 0.0f, 1.0f, 0.0f };
 } //namespace kgs
 
-#endif // !KGS_SCENE_OPTION_H
+#endif // !VG_SCENE_OPTION_H

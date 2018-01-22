@@ -1,11 +1,11 @@
-#ifndef KGS_SPACE_TRANSFORM_TYPE_INFO_H
-#define KGS_SPACE_TRANSFORM_TYPE_INFO_H
+#ifndef VG_SPACE_TRANSFORM_TYPE_INFO_H
+#define VG_SPACE_TRANSFORM_TYPE_INFO_H
 
 #include "graphics/scene/space_info.hpp"
 #include "graphics/scene/transform_2.hpp"
 #include "graphics/scene/transform_3.hpp"
 
-namespace kgs
+namespace vg
 {
 	template<SpaceType type>
 	struct SpaceTransformTypeInfo
@@ -26,4 +26,4 @@ namespace kgs
 	};
 } //namespace kgs
 
-#endif // !KGS_SPACE_TRANSFORM_TYPE_INFO_H
+#endif // !VG_SPACE_TRANSFORM_TYPE_INFO_H

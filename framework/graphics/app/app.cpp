@@ -1,6 +1,6 @@
 #include "graphics/app/app.hpp"
 
-namespace kgs
+namespace vg
 {
 	bool checkDeviceExtensionSupport(const vk::PhysicalDevice& physicalDevice, std::vector<const char*> deviceExtensionNames)
 	{
@@ -319,33 +319,33 @@ namespace kgs
 				//const vk::PhysicalDeviceProperties deviceProperties = physicalDevice.getProperties();
 				const vk::PhysicalDeviceFeatures deviceFeatures = physicalDevice.getFeatures();
 				//Application can't function without need features.
-				if (isContainStruct(deviceFeatures, needPhysicalDeviceFeatures) == KGS_FALSE)
+				if (isContainStruct(deviceFeatures, needPhysicalDeviceFeatures) == VG_FALSE)
 				{
-					return KGS_FALSE;
+					return VG_FALSE;
 				}
 
 				//Application can't function without queue family that supports graphics commands.
-				if (UsedQueueFamily::findQueueFamilies(physicalDevice, *pSurface).isComplete() == KGS_FALSE)
+				if (UsedQueueFamily::findQueueFamilies(physicalDevice, *pSurface).isComplete() == VG_FALSE)
 				{
-					return KGS_FALSE;
+					return VG_FALSE;
 				}
 
-				if (checkDeviceExtensionSupport(physicalDevice, deviceExtensionNames) == KGS_FALSE)
+				if (checkDeviceExtensionSupport(physicalDevice, deviceExtensionNames) == VG_FALSE)
 				{
-					return KGS_FALSE;
+					return VG_FALSE;
 				}
 
 				//Application can't function without adequate support of device for swap chain.
 				SwapChainSupportDetails swapChainSupportDetails = SwapChainSupportDetails::querySwapChainSupport(physicalDevice, *pSurface);
 				if (swapChainSupportDetails.formats.empty() || swapChainSupportDetails.presentModes.empty())
 				{
-					return KGS_FALSE;
+					return VG_FALSE;
 				}
 
-				return KGS_TRUE;
+				return VG_TRUE;
 			}(*it);
 
-			if (isSuitable == KGS_FALSE)
+			if (isSuitable == VG_FALSE)
 			{
 				physicalDevices.erase(it);
 				if (physicalDevices.size() == 0) break;

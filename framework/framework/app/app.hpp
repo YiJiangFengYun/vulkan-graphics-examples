@@ -1,5 +1,5 @@
-#ifndef GFW_APP_BASE_H
-#define GFW_APP_BASE_H
+#ifndef VGF_APP_BASE_H
+#define VGF_APP_BASE_H
 
 #include <memory>
 #include <mutex>
@@ -12,7 +12,7 @@
 #define DEFAULT_GRAPHICS_QUEUE_COUNT 10
 #define DEFAULT_PRESENT_QUEUE_COUNT 5
 
-namespace gfw
+namespace vgf
 {
 
 	class App
@@ -39,8 +39,8 @@ namespace gfw
 		const char *m_title;
 		uint32_t m_graphicsQueueCount;
 		uint32_t m_presentQueuecount;
-		std::shared_ptr<gfw::Window> m_pWindow;
-		std::vector<std::shared_ptr<gfw::Window>> m_pSubWindows;
+		std::shared_ptr<vgf::Window> m_pWindow;
+		std::vector<std::shared_ptr<vgf::Window>> m_pSubWindows;
 
 		//threads
 		//ThreadMaster m_threadMaster; 
@@ -65,4 +65,4 @@ namespace gfw
 
 #include "framework/app/app.inl"
 
-#endif // !GFW_APP_BASE_H
+#endif // !VGF_APP_BASE_H

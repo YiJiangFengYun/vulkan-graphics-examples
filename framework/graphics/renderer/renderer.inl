@@ -1,4 +1,4 @@
-namespace kgs
+namespace vg
 {
 	template <SpaceType SPACE_TYPE>
 	Renderer<SPACE_TYPE>::Renderer(std::shared_ptr<vk::ImageView> pSwapchainImageView
@@ -73,7 +73,7 @@ namespace kgs
 				//throw new std::runtime_error("Camera is not specified.");
 				LOG(plog::warning) << "Camera is not specified." << std::endl;
 			}
-			return KGS_FALSE;
+			return VG_FALSE;
 		}
 		return BaseRenderer::_isValidForRender();
 	}

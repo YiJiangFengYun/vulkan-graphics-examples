@@ -1,6 +1,6 @@
 #include "graphics/mesh/mesh_3.hpp"
 
-namespace kgs
+namespace vg
 {
 	Mesh3::Mesh3()
 		: Mesh<MeshType::SPACE_3>()

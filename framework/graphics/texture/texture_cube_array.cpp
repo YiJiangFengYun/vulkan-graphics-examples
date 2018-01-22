@@ -1,6 +1,6 @@
 #include "graphics/texture/texture_cube_array.hpp"
 
-namespace kgs
+namespace vg
 {
 	TextureCubeArray::TextureCubeArray(TextureFormat format, Bool32 mipMap, uint32_t size, uint32_t arraylength)
 		:Texture(format, mipMap)

@@ -1,10 +1,10 @@
-#ifndef KGS_SCENE_3_H
-#define KGS_SCENE_3_H
+#ifndef VG_SCENE_3_H
+#define VG_SCENE_3_H
 
 #include "graphics/scene/space_info.hpp"
 #include "graphics/scene/scene.hpp"
 
-namespace kgs
+namespace vg
 {
 	class Scene3 : public Scene<SpaceType::SPACE_3>
 	{
@@ -14,4 +14,4 @@ namespace kgs
 
 } //namespace kgs
 
-#endif // !KGS_SCENE_3_H
+#endif // !VG_SCENE_3_H

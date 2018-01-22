@@ -1,6 +1,6 @@
 #include "graphics/util/queue_master.hpp"
 
-namespace kgs
+namespace vg
 {
 	QueueMaster::QueueMaster(std::shared_ptr<vk::Device> pDevice
 		, std::vector<std::pair<uint32_t, uint32_t>> familiesAndCounts

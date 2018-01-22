@@ -14,7 +14,7 @@
 const uint32_t WINDOW_WIDTH = 800;
 const uint32_t WINDOW_HEIGHT = 600;
 int main() {
-	gfw::moduleCreate();
+	vgf::moduleCreate();
 
 	testTriangle_2d::App testTriangle_2d;
 	testTriangle_2d.init<testTriangle_2d::Window>(WINDOW_WIDTH, WINDOW_HEIGHT, "test-triangle-2d");

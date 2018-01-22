@@ -1,4 +1,4 @@
-namespace kgs
+namespace vg
 {
 	template<UVType uvType, UVIndex uvIndex>
 	const typename MeshData::DataTypeInfo<UVConstInfo<uvType>::ARRAY_TYPE>::ValueType &BaseMesh::getUVs() const
@@ -41,7 +41,7 @@ namespace kgs
 			bindingPriority
 		);
 		setValue(name, info, m_mapLayoutBindingInfos, m_arrLayoutBindingInfoNames);
-		m_applied = KGS_FALSE;
+		m_applied = VG_FALSE;
 	}
 
 	void BaseMesh::_sortLayoutBindingInfos()
@@ -97,37 +97,37 @@ namespace kgs
 	template <MeshType meshType>
 	const typename Mesh<meshType>::ArrayValueType &Mesh<meshType>::getPositions() const
 	{
-		return _getData<Mesh<meshType>::ARRAY_DATA_TYPE>(KGS_VERTEX_POSITION_NAME);
+		return _getData<Mesh<meshType>::ARRAY_DATA_TYPE>(VG_VERTEX_POSITION_NAME);
 	}
 
 	template <MeshType meshType>
 	void Mesh<meshType>::setPositions(const ArrayValueType &vertices)
 	{
-		_setData<Mesh<meshType>::ARRAY_DATA_TYPE>(KGS_VERTEX_POSITION_NAME, vertices, KGS_VERTEX_BINDING_PRIORITY_POSITION);
+		_setData<Mesh<meshType>::ARRAY_DATA_TYPE>(VG_VERTEX_POSITION_NAME, vertices, VG_VERTEX_BINDING_PRIORITY_POSITION);
 	}
 
 	template <MeshType meshType>
 	const typename Mesh<meshType>::ArrayValueType &Mesh<meshType>::getNormals() const
 	{
-		_getData<Mesh<meshType>::ARRAY_DATA_TYPE>(KGS_VERTEX_NORMAL_NAME);
+		_getData<Mesh<meshType>::ARRAY_DATA_TYPE>(VG_VERTEX_NORMAL_NAME);
 	}
 
 	template <MeshType meshType>
 	void Mesh<meshType>::setNormals(const ArrayValueType &normals)
 	{
-		_setData<Mesh<meshType>::ARRAY_DATA_TYPE>(KGS_VERTEX_NORMAL_NAME, normals, KGS_VERTEX_BINDING_PRIORITY_NORMAL);
+		_setData<Mesh<meshType>::ARRAY_DATA_TYPE>(VG_VERTEX_NORMAL_NAME, normals, VG_VERTEX_BINDING_PRIORITY_NORMAL);
 	}
 
 	template <MeshType meshType>
 	const typename Mesh<meshType>::ArrayValueType &Mesh<meshType>::getTangents() const
 	{
-		_getData<Mesh<meshType>::ARRAY_DATA_TYPE>(KGS_VERTEX_TANGENT_NAME);
+		_getData<Mesh<meshType>::ARRAY_DATA_TYPE>(VG_VERTEX_TANGENT_NAME);
 	}
 
 	template <MeshType meshType>
 	void Mesh<meshType>::setTangents(const ArrayValueType &tangents)
 	{
-		_setData<Mesh<meshType>::ARRAY_DATA_TYPE>(KGS_VERTEX_TANGENT_NAME, tangents, KGS_VERTEX_BINDING_PRIORITY_TANGENT);
+		_setData<Mesh<meshType>::ARRAY_DATA_TYPE>(VG_VERTEX_TANGENT_NAME, tangents, VG_VERTEX_BINDING_PRIORITY_TANGENT);
 	}
 
 	template <MeshType meshType>
@@ -185,7 +185,7 @@ namespace kgs
 			return;
 		}
 
-		auto vertices = m_pData->getDataValue<ARRAY_DATA_TYPE>(KGS_VERTEX_POSITION_NAME);
+		auto vertices = m_pData->getDataValue<ARRAY_DATA_TYPE>(VG_VERTEX_POSITION_NAME);
 		BaseValueType minPos;
 		BaseValueType maxPos;
 		BaseValueType::length_type len = BaseValueType::length();

@@ -6,7 +6,7 @@ namespace testTriangle_2d
 		, uint32_t height
 		, const char* title
 	)
-		: gfw::Window(width
+		: vgf::Window(width
 			, height
 			, title
 			, RenderType::RENDERER_2
@@ -24,7 +24,7 @@ namespace testTriangle_2d
 	Window::Window(std::shared_ptr<GLFWwindow> pWindow
 		, std::shared_ptr<vk::SurfaceKHR> pSurface
 	)
-		: gfw::Window(RenderType::RENDERER_2
+		: vgf::Window(RenderType::RENDERER_2
 			, pWindow
 			, pSurface
 		)
@@ -40,14 +40,14 @@ namespace testTriangle_2d
 
 	void Window::_loadModel()
 	{
-		m_tempPositions = { kgs::Vector2(0.0f, -0.5f)
-		, kgs::Vector2(-0.5f, 0.5f)
-		, kgs::Vector2(0.5f, 0.5f)
+		m_tempPositions = { vg::Vector2(0.0f, -0.5f)
+		, vg::Vector2(-0.5f, 0.5f)
+		, vg::Vector2(0.5f, 0.5f)
 		};
 
-		m_tempColors = { kgs::Color32(255, 0, 0, 255)
-		, kgs::Color32(0, 255, 0, 255)
-		, kgs::Color32(0, 0, 255, 255)
+		m_tempColors = { vg::Color32(255, 0, 0, 255)
+		, vg::Color32(0, 255, 0, 255)
+		, vg::Color32(0, 0, 255, 255)
 		};
 
 		m_tempIndices = {
@@ -57,43 +57,43 @@ namespace testTriangle_2d
 
 	void Window::_createMesh()
 	{
-		m_pMesh = static_cast<std::shared_ptr<kgs::Mesh2>>(new kgs::Mesh2());
+		m_pMesh = static_cast<std::shared_ptr<vg::Mesh2>>(new vg::Mesh2());
 		m_pMesh->setVertexCount(static_cast<uint32_t>(m_tempPositions.size()));
 		m_pMesh->setPositions(m_tempPositions);
 		m_pMesh->setColors(m_tempColors);
-		m_pMesh->setIndices(m_tempIndices, kgs::PrimitiveTopology::TRIANGLE_LIST, 0u);
-		m_pMesh->apply(KGS_TRUE);
+		m_pMesh->setIndices(m_tempIndices, vg::PrimitiveTopology::TRIANGLE_LIST, 0u);
+		m_pMesh->apply(VG_TRUE);
 	}
 
 	void Window::_createMaterial()
 	{
-		m_pShader = std::shared_ptr<kgs::Shader>(new kgs::Shader("shaders/triangle-2d.vert.spv", "shaders/triangle-2d.frag.spv"));
-		m_pPass = std::shared_ptr<kgs::Pass>(new kgs::Pass(m_pShader));
+		m_pShader = std::shared_ptr<vg::Shader>(new vg::Shader("shaders/triangle-2d.vert.spv", "shaders/triangle-2d.frag.spv"));
+		m_pPass = std::shared_ptr<vg::Pass>(new vg::Pass(m_pShader));
 		m_pPass->setScissor({ 0.0f, 0.0f, 0.5f, 1.0f });
-		m_pMaterial = std::shared_ptr<kgs::Material>(new kgs::Material());
+		m_pMaterial = std::shared_ptr<vg::Material>(new vg::Material());
 		m_pMaterial->addPass(m_pPass);
 		m_pMaterial->setRenderPriority(0u);
-		m_pMaterial->setRenderQueueType(kgs::MaterialShowType::OPAQUE);
+		m_pMaterial->setRenderQueueType(vg::MaterialShowType::OPAQUE);
 		m_pMaterial->apply();
 	}
 
 	void Window::_createModel()
 	{
-		m_pModel = std::shared_ptr<kgs::VisualObject2>(new kgs::VisualObject2());
+		m_pModel = std::shared_ptr<vg::VisualObject2>(new vg::VisualObject2());
 		m_pModel->setMesh(m_pMesh);
 		m_pModel->setMaterial(m_pMaterial);
 	}
 
 	void Window::_createCamera()
 	{
-		m_pCamera = std::shared_ptr<kgs::CameraOP2>(new kgs::CameraOP2());
+		m_pCamera = std::shared_ptr<vg::CameraOP2>(new vg::CameraOP2());
 		m_pCamera->updateProj({ {-1.0f, -1.0f}, {1.0f, 1.0f} });
 		m_pCamera->apply();
 	}
 
 	void Window::_createScene()
 	{
-		m_pScene = std::shared_ptr<kgs::Scene2>(new kgs::Scene2());
+		m_pScene = std::shared_ptr<vg::Scene2>(new vg::Scene2());
 		m_pScene->addCamera(m_pCamera);
 		m_pScene->addVisualObject(m_pModel);
 	}
@@ -106,7 +106,7 @@ namespace testTriangle_2d
 			{
 			case RenderType::RENDERER_2:
 			{
-				dynamic_cast<kgs::Renderer2 *>(pRenderer.get())->reset(m_pScene, m_pCamera);
+				dynamic_cast<vg::Renderer2 *>(pRenderer.get())->reset(m_pScene, m_pCamera);
 				break;
 			}
 			}
@@ -137,11 +137,11 @@ namespace testTriangle_2d
 		auto duration = currentTime - startTime;
 		float time = std::chrono::duration_cast<std::chrono::milliseconds>(currentTime - startTime).count() / 1000.0f;
 		float strength = remainder(time, 1.0f) / 1.0f;
-		m_pPass->setMainColor(kgs::Color(strength, strength, strength, 1.0f));
+		m_pPass->setMainColor(vg::Color(strength, strength, strength, 1.0f));
 
 		for (const auto& pRenderer : m_pRenderers)
 		{
-			pRenderer->setClearValueColor(kgs::Color(strength, 0.0f, 0.0f, 0.0f));
+			pRenderer->setClearValueColor(vg::Color(strength, 0.0f, 0.0f, 0.0f));
 		}
 	}
 

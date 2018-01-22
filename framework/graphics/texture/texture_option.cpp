@@ -1,6 +1,6 @@
 #include "graphics/texture/texture_option.hpp"
 
-namespace kgs
+namespace vg
 {
 	std::map<TextureType, std::string> mapTextureTypeToName =
 	{

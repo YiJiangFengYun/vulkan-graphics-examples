@@ -1,6 +1,6 @@
 #include "graphics/util/swapchain_info.hpp"
 
-namespace kgs
+namespace vg
 {
 	SwapChainSupportDetails SwapChainSupportDetails::querySwapChainSupport(const vk::PhysicalDevice& physicalDevice, const vk::SurfaceKHR& surface) {
 		SwapChainSupportDetails details;

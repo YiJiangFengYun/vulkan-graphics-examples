@@ -1,5 +1,5 @@
-#ifndef KGS_KIM_GUI_GLOBAL_H
-#define KGS_KIM_GUI_GLOBAL_H
+#ifndef VG_KIM_GUI_GLOBAL_H
+#define VG_KIM_GUI_GLOBAL_H
 
 #ifdef _DEBUG
 #define DEBUG
@@ -13,11 +13,11 @@
 #include <graphics/graphics.hpp>
 #include <imgui/imgui.h>
 
-#define ICIMGUI_FALSE KGS_FALSE
-#define ICIMGUI_TRUE KGS_TRUE
+#define ICIMGUI_FALSE VG_FALSE
+#define ICIMGUI_TRUE VG_TRUE
 
 namespace kimgui {
-	typedef kgs::Bool32 Bool32;
+	typedef vg::Bool32 Bool32;
 
 	//used to map to imgui key map enum.
 	enum class Key {
@@ -43,4 +43,4 @@ namespace kimgui {
 		ImGuiKey_COUNT
 	};
 } //kimgui
-#endif //KGS_KIM_GUI_GLOBAL_H
+#endif //VG_KIM_GUI_GLOBAL_H

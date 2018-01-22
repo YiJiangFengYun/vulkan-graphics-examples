@@ -1,6 +1,6 @@
 #include "graphics/scene/light.hpp"
 
-namespace kgs
+namespace vg
 {
 
 }

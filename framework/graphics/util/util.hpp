@@ -1,12 +1,12 @@
-#ifndef KGS_UTIL_H
-#define KGS_UTIL_H
+#ifndef VG_UTIL_H
+#define VG_UTIL_H
 
 #include <string>
 #include <unordered_map>
 #include <vector>
 #include "graphics/global.hpp"
 
-namespace kgs
+namespace vg
 {
 	template <typename T>
 	inline Bool32 isHas(std::string name, std::unordered_map<std::string, T>& map)
@@ -54,7 +54,7 @@ namespace kgs
 		typedef uint8_t sep_type;
 		size_t size2 = sizeof(sep_type);
 		size_t sep = size / size2;
-		Bool32 isContain = KGS_TRUE;
+		Bool32 isContain = VG_TRUE;
 		for (size_t i = 0; i < sep; ++i)
 		{
 			sep_type copy1 = 0;
@@ -65,7 +65,7 @@ namespace kgs
 			memcpy(&copy2, src2, sizeof(sep_type));
 			if ((copy1 & copy2) != copy2)
 			{
-				isContain = KGS_FALSE;
+				isContain = VG_FALSE;
 				break;
 			}
 			index += size2;
@@ -74,4 +74,4 @@ namespace kgs
 		return isContain;
 	}
 } //namespace kgs
-#endif // !KGS_UTIL_H
+#endif // !VG_UTIL_H

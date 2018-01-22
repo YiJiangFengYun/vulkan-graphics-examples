@@ -1,12 +1,12 @@
-#ifndef KGS_PASS_OPTION_H
-#define KGS_PASS_OPTION_H
+#ifndef VG_PASS_OPTION_H
+#define VG_PASS_OPTION_H
 
 #include <utility>
 #include <array>
 #include <vulkan/vulkan.hpp>
 #include <foundation/util.hpp>
 
-namespace kgs
+namespace vg
 {
 	enum class DescriptorType
 	{
@@ -72,7 +72,7 @@ namespace kgs
 	{
 		vk::FrontFace vkType;
 #ifdef DEBUG
-		Bool32 isHave = KGS_FALSE;
+		Bool32 isHave = VG_FALSE;
 #endif // DEBUG
 		for (const auto& item2 : arrFrontFaceTypeToVK)
 		{
@@ -80,14 +80,14 @@ namespace kgs
 			{
 				vkType = item2.second;
 #ifdef DEBUG
-				isHave = KGS_TRUE;
+				isHave = VG_TRUE;
 #endif // DEBUG
 				break;
 			}
 		}
 
 #ifdef DEBUG
-		if (isHave == KGS_FALSE)
+		if (isHave == VG_FALSE)
 		{
 			throw std::runtime_error("Invalid descriptor type ");
 		}
@@ -147,7 +147,7 @@ namespace kgs
 	{
 		vk::DescriptorType vkType;
 #ifdef DEBUG
-		Bool32 isHave = KGS_FALSE;
+		Bool32 isHave = VG_FALSE;
 #endif // DEBUG
 		for (const auto& item2 : arrDescriptorTypeToVK)
 		{
@@ -155,14 +155,14 @@ namespace kgs
 			{
 				vkType = item2.second;
 #ifdef DEBUG
-				isHave = KGS_TRUE;
+				isHave = VG_TRUE;
 #endif // DEBUG
 				break;
 			}
 		}
 
 #ifdef DEBUG
-		if (isHave == KGS_FALSE)
+		if (isHave == VG_FALSE)
 		{
 			throw std::runtime_error("Invalid descriptor type ");
 		}
@@ -171,4 +171,4 @@ namespace kgs
 	}
 }
 
-#endif // !KGS_PASS_OPTION_H
+#endif // !VG_PASS_OPTION_H

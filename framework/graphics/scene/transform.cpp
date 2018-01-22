@@ -1,6 +1,6 @@
 #include "graphics/scene/transform.hpp"
 
-namespace kgs
+namespace vg
 {	
 	BaseTransform::BaseTransform()
 		: Base(BaseType::TRANSFORM)
@@ -36,7 +36,7 @@ namespace kgs
 		result[1][0] = - glm::sin(rotation);
 		result[1][1] = glm::cos(rotation);
 		m_localRotationMatrix = result;
-		m_isChanged = KGS_TRUE;
+		m_isChanged = VG_TRUE;
 	}
 
 	template<>
@@ -44,7 +44,7 @@ namespace kgs
 	{
 		m_localRotation = rotation;
 		m_localRotationMatrix = glm::toMat4(rotation);
-		m_isChanged = KGS_TRUE;
+		m_isChanged = VG_TRUE;
 	}
 
 	template <>
@@ -60,7 +60,7 @@ namespace kgs
 		_setLocalScaleOnly(tempScale);
 		_setLocalRotationOnly(tempRotation);
 		_setLocalPositionOnly(tempTranslate);
-		m_isChanged = KGS_FALSE;
+		m_isChanged = VG_FALSE;
 	}
 
 
@@ -77,7 +77,7 @@ namespace kgs
 		_setLocalScaleOnly(tempScale);
 		_setLocalRotationOnly(tempRotation);
 		_setLocalPositionOnly(tempTranslate);
-		m_isChanged = KGS_FALSE;
+		m_isChanged = VG_FALSE;
 	}
 	
 

@@ -1,5 +1,5 @@
-#ifndef KGS_GRAPHICS_H
-#define KGS_GRAPHICS_H
+#ifndef VG_GRAPHICS_H
+#define VG_GRAPHICS_H
 
 #include <graphics/global.hpp>
 #include <graphics/module.hpp>
@@ -34,9 +34,9 @@
 #include <graphics/util/swapchain_info.hpp>
 
 
-namespace kgs
+namespace vg
 {
 
 } //namespace kgs
 
-#endif // !KGS_GRAPHICS_H
+#endif // !VG_GRAPHICS_H

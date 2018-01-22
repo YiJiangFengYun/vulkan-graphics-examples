@@ -1,5 +1,5 @@
-#ifndef KGS_KIM_GUI_MODULE_H
-#define KGS_KIM_GUI_MODULE_H
+#ifndef VG_KIM_GUI_MODULE_H
+#define VG_KIM_GUI_MODULE_H
 
 #include "kimgui/global.hpp"
 
@@ -10,4 +10,4 @@ namespace kimgui {
 	extern std::shared_ptr<GLFWwindow> getCurrWindow();
 	extern void setCurrWindow(std::shared_ptr<GLFWwindow> pWindow);
 } //kimgui
-#endif //KGS_KIM_GUI_MODULE_H
+#endif //VG_KIM_GUI_MODULE_H

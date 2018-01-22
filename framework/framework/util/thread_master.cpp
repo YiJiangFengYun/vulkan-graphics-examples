@@ -1,6 +1,6 @@
 #include "framework/util/thread_master.hpp"
 
-namespace gfw
+namespace vgf
 {
 	ThreadMaster::ThreadMaster()
 	{

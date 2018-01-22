@@ -1,6 +1,6 @@
 #include "graphics/mesh/mesh.hpp"
 
-namespace kgs
+namespace vg
 {
 	BaseMesh::LayoutBindingInfo::LayoutBindingInfo()
 	{
@@ -60,7 +60,7 @@ namespace kgs
 	BaseMesh::BaseMesh()
 		: Base(BaseType::MESH)
 		, m_multipliedColor(COLOR_WHITE) //default multiplied color should be (1, 1, 1, 1)
-		, m_applied(KGS_FALSE)
+		, m_applied(VG_FALSE)
 	{
 		_createMeshData();
 		setSubMeshCount(1u);
@@ -79,17 +79,17 @@ namespace kgs
 	void BaseMesh::setVertexCount(uint32_t value)
 	{
 		m_vertexCount = value;
-		m_applied = KGS_FALSE;
+		m_applied = VG_FALSE;
 	}
 
 	const std::vector<Color32> &BaseMesh::getColors() const
 	{
-		return _getData<MeshData::DataType::COLOR_32_ARRAY>(KGS_VERTEX_COLOR_NAME);
+		return _getData<MeshData::DataType::COLOR_32_ARRAY>(VG_VERTEX_COLOR_NAME);
 	}
 
 	void BaseMesh::setColors(const std::vector<Color32> &colors)
 	{
-		_setData<MeshData::DataType::COLOR_32_ARRAY>(KGS_VERTEX_COLOR_NAME, colors, KGS_VERTEX_BINDING_PRIORITY_COLOR);
+		_setData<MeshData::DataType::COLOR_32_ARRAY>(VG_VERTEX_COLOR_NAME, colors, VG_VERTEX_BINDING_PRIORITY_COLOR);
 	}
 
 	uint32_t BaseMesh::getSubMeshCount() const
@@ -104,7 +104,7 @@ namespace kgs
 		{
 			m_subMeshInfos.resize(value);
 		}
-		m_applied = KGS_FALSE;
+		m_applied = VG_FALSE;
 	}
 
 	const std::vector<uint32_t> &BaseMesh::getIndices(uint32_t subMeshIndex) const
@@ -123,7 +123,7 @@ namespace kgs
 		SubMeshInfo& subMeshInfo = m_subMeshInfos[subMeshIndex];
 		subMeshInfo.topology = topology;
 		subMeshInfo.indices = indices;
-		m_applied = KGS_FALSE;
+		m_applied = VG_FALSE;
 	}
 
 	uint32_t BaseMesh::getIndexCount(uint32_t subMeshIndex) const
@@ -163,7 +163,7 @@ namespace kgs
 	void BaseMesh::setMultipliedColor(Color value)
 	{
 		m_multipliedColor = value;
-		m_applied = KGS_FALSE;
+		m_applied = VG_FALSE;
 	}
 
 	Color BaseMesh::getAddedColor() const
@@ -174,12 +174,12 @@ namespace kgs
 	void BaseMesh::setAddedColor(Color value)
 	{
 		m_addedColor = value;
-		m_applied = KGS_FALSE;
+		m_applied = VG_FALSE;
 	}
 
 	void BaseMesh::apply(Bool32 makeUnreadable)
 	{
-		if (m_applied == KGS_FALSE)
+		if (m_applied == VG_FALSE)
 		{
 			m_appliedVertexCount = m_vertexCount;
 
@@ -195,7 +195,7 @@ namespace kgs
 			//create index buffer
 			_createIndexBuffer();
 
-			m_applied = KGS_TRUE;
+			m_applied = VG_TRUE;
 		}
 
 		if (makeUnreadable)
@@ -294,7 +294,7 @@ namespace kgs
 		vk::MemoryRequirements memReqs = pDevice->getBufferMemoryRequirements(*pStagingBuffer);
 		vk::MemoryAllocateInfo allocateInfo = {
 			memReqs.size,
-			kgs::findMemoryType(pPhysicalDevice, memReqs.memoryTypeBits, vk::MemoryPropertyFlagBits::eHostVisible | vk::MemoryPropertyFlagBits::eHostCoherent)
+			vg::findMemoryType(pPhysicalDevice, memReqs.memoryTypeBits, vk::MemoryPropertyFlagBits::eHostVisible | vk::MemoryPropertyFlagBits::eHostCoherent)
 		};
 
 		auto pStagingBufferMemory = fd::allocateMemory(pDevice, allocateInfo);
@@ -316,7 +316,7 @@ namespace kgs
 		m_pVertexBuffer = fd::createBuffer(pDevice, createInfo);
 		memReqs = pDevice->getBufferMemoryRequirements(*m_pVertexBuffer);
 		allocateInfo.allocationSize = memReqs.size;
-		allocateInfo.memoryTypeIndex = kgs::findMemoryType(pPhysicalDevice, memReqs.memoryTypeBits, vk::MemoryPropertyFlagBits::eDeviceLocal);
+		allocateInfo.memoryTypeIndex = vg::findMemoryType(pPhysicalDevice, memReqs.memoryTypeBits, vk::MemoryPropertyFlagBits::eDeviceLocal);
 		m_pVertexBufferMemory = fd::allocateMemory(pDevice, allocateInfo);
 		pDevice->bindBufferMemory(*m_pVertexBuffer, *m_pVertexBufferMemory, 0u);
 
@@ -349,7 +349,7 @@ namespace kgs
 		vk::MemoryRequirements memReqs = pDevice->getBufferMemoryRequirements(*pStagingBuffer);
 		vk::MemoryAllocateInfo allocateInfo = {
 			memReqs.size,
-			kgs::findMemoryType(pPhysicalDevice, memReqs.memoryTypeBits, vk::MemoryPropertyFlagBits::eHostVisible | vk::MemoryPropertyFlagBits::eHostCoherent)
+			vg::findMemoryType(pPhysicalDevice, memReqs.memoryTypeBits, vk::MemoryPropertyFlagBits::eHostVisible | vk::MemoryPropertyFlagBits::eHostCoherent)
 		};
 
 		auto pStagingBufferMemory = fd::allocateMemory(pDevice, allocateInfo);
@@ -373,7 +373,7 @@ namespace kgs
 		m_pIndexBuffer = fd::createBuffer(pDevice, createInfo);
 		memReqs = pDevice->getBufferMemoryRequirements(*m_pIndexBuffer);
 		allocateInfo.allocationSize = memReqs.size;
-		allocateInfo.memoryTypeIndex = kgs::findMemoryType(pPhysicalDevice, memReqs.memoryTypeBits, vk::MemoryPropertyFlagBits::eDeviceLocal);
+		allocateInfo.memoryTypeIndex = vg::findMemoryType(pPhysicalDevice, memReqs.memoryTypeBits, vk::MemoryPropertyFlagBits::eDeviceLocal);
 		m_pIndexBufferMemory = fd::allocateMemory(pDevice, allocateInfo);
 		pDevice->bindBufferMemory(*m_pIndexBuffer, *m_pIndexBufferMemory, 0u);
 

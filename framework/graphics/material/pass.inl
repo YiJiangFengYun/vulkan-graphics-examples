@@ -1,4 +1,4 @@
-namespace kgs
+namespace vg
 {
 	template <typename T>
 	T Pass::getDataValue(std::string name) const
@@ -25,7 +25,7 @@ namespace kgs
 		uint32_t descriptorCount = 1u;
 		LayoutBindingInfo info(
 			name,
-			KGS_FALSE,
+			VG_FALSE,
 			binding,
 			descriptorType,
 			descriptorCount,
@@ -33,7 +33,7 @@ namespace kgs
 		);
 		info.updateSize(m_pData);
 		setValue(name, info, m_mapLayoutBinds, m_arrLayoutBindNames);
-		m_applied = KGS_FALSE;
+		m_applied = VG_FALSE;
 	}
 
 	template<typename T>
@@ -49,7 +49,7 @@ namespace kgs
 		uint32_t descriptorCount = values.size();
 		LayoutBindingInfo info(
 			name,
-			KGS_FALSE,
+			VG_FALSE,
 			binding,
 			descriptorType,
 			descriptorCount,
@@ -57,6 +57,6 @@ namespace kgs
 		);
 		info.updateSize(m_pData);
 		setValue(name, info, m_mapLayoutBinds, m_arrLayoutBindNames);
-		m_applied = KGS_FALSE;
+		m_applied = VG_FALSE;
 	}
 } //namespace kgs

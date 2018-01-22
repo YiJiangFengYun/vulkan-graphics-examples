@@ -1,4 +1,4 @@
-namespace gfw
+namespace vgf
 {
 	template<typename MainWindow_T>
 	void App::init(uint32_t width, uint32_t height, const char *title)

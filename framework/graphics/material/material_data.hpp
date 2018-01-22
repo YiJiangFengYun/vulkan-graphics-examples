@@ -1,5 +1,5 @@
-#ifndef KGS_MATERIAL_DATA_H
-#define KGS_MATERIAL_DATA_H
+#ifndef VG_MATERIAL_DATA_H
+#define VG_MATERIAL_DATA_H
 
 #include <algorithm>
 #include <vector>
@@ -8,14 +8,14 @@
 #include "graphics/util/util.hpp"
 #include "graphics/texture/texture.hpp"
 
-#define KGS_M_MAIN_TEXTURE_NAME "_MainTex"
-#define KGS_M_BUILDIN_NAME "_BuildIn"
+#define VG_M_MAIN_TEXTURE_NAME "_MainTex"
+#define VG_M_BUILDIN_NAME "_BuildIn"
 
-#define KGS_M_BUILDIN_BINDING 0
-#define KGS_M_MAIN_TEXTURE_BINDING 1
-#define KGS_M_OTHER_MIN_BINDING 2
+#define VG_M_BUILDIN_BINDING 0
+#define VG_M_MAIN_TEXTURE_BINDING 1
+#define VG_M_OTHER_MIN_BINDING 2
 
-namespace kgs
+namespace vg
 {
 #ifdef OPAQUE
 #define TEMP_OPAQUE OPAQUE
@@ -99,4 +99,4 @@ namespace kgs
 
 #include "graphics/material/material_data.inl"
 
-#endif // !KGS_MATERIAL_DATA_H
+#endif // !VG_MATERIAL_DATA_H

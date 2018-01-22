@@ -3,7 +3,7 @@
 namespace chalet
 {
 	App::App():
-		gfw::App()
+		vgf::App()
 	{
 	}
 }

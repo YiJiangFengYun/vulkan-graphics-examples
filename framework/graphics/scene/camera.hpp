@@ -1,9 +1,9 @@
-#ifndef KGS_CAMERA_H
-#define KGS_CAMERA_H
+#ifndef VG_CAMERA_H
+#define VG_CAMERA_H
 
 #include "graphics/scene/object.hpp"
 
-namespace kgs
+namespace vg
 {
 	class BaseCamera
 	{
@@ -30,4 +30,4 @@ namespace kgs
 	};
 } //namespace kgs
 
-#endif // !KGS_CAMERA_H
+#endif // !VG_CAMERA_H

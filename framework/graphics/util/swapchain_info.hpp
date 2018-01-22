@@ -1,10 +1,10 @@
-#ifndef KGS_SWAPCHAIN_INFO_H
-#define KGS_SWAPCHAIN_INFO_H
+#ifndef VG_SWAPCHAIN_INFO_H
+#define VG_SWAPCHAIN_INFO_H
 
 #include <unordered_map>
 #include "graphics/global.hpp"
 
-namespace kgs
+namespace vg
 {
 	struct SwapChainSupportDetails {
 		vk::SurfaceCapabilitiesKHR capabilities;
@@ -17,4 +17,4 @@ namespace kgs
 	};
 } //namespace kgs
 
-#endif // !KGS_SWAPCHAIN_INFO_H
+#endif // !VG_SWAPCHAIN_INFO_H

@@ -1,6 +1,6 @@
 #include "graphics/material/pass_option.hpp"
 
-namespace kgs
+namespace vg
 {
 	ColorBlendInfo::ColorBlendInfo()
 	{

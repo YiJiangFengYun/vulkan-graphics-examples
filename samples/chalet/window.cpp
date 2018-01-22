@@ -13,7 +13,7 @@ namespace chalet
 		, uint32_t height
 		, const char* title
 	)
-		: gfw::Window(width
+		: vgf::Window(width
 			, height
 			, title
 		)
@@ -33,7 +33,7 @@ namespace chalet
 		, const char* title
 		, RenderType renderType
 	)
-		: gfw::Window(width
+		: vgf::Window(width
 			, height
 			, title
 			, renderType
@@ -52,7 +52,7 @@ namespace chalet
 	Window::Window(std::shared_ptr<GLFWwindow> pWindow
 		, std::shared_ptr<vk::SurfaceKHR> pSurface
 	)
-		: gfw::Window(pWindow
+		: vgf::Window(pWindow
 			, pSurface
 		)
 	{
@@ -70,7 +70,7 @@ namespace chalet
 		, std::shared_ptr<GLFWwindow> pWindow
 		, std::shared_ptr<vk::SurfaceKHR> pSurface
 	)
-		: gfw::Window(renderType
+		: vgf::Window(renderType
 			, pWindow
 			, pSurface
 		)
@@ -123,7 +123,7 @@ namespace chalet
 					uniqueVertices[vertex] = static_cast<uint32_t>(m_tempPositions.size());
 					m_tempPositions.push_back(vertex.pos);
 					m_tempTexCoords.push_back(vertex.texCoord);
-					m_tempColors.push_back(kgs::Color(vertex.color, 1.0f));
+					m_tempColors.push_back(vg::Color(vertex.color, 1.0f));
 				}
 
 				m_tempIndices.push_back(uniqueVertices[vertex]);
@@ -133,12 +133,12 @@ namespace chalet
 
 	void Window::_createMesh()
 	{
-		m_pMesh = static_cast<std::shared_ptr<kgs::Mesh3>>(new kgs::Mesh3());
+		m_pMesh = static_cast<std::shared_ptr<vg::Mesh3>>(new vg::Mesh3());
 		m_pMesh->setVertexCount(static_cast<uint32_t>(m_tempPositions.size()));
 		m_pMesh->setPositions(m_tempPositions);
-		m_pMesh->setUVs<kgs::UVType::VECTOR_2, kgs::UVIndex::UV_0>(m_tempTexCoords);
-		m_pMesh->setIndices(m_tempIndices, kgs::PrimitiveTopology::TRIANGLE_LIST, 0u);
-		m_pMesh->apply(KGS_TRUE);
+		m_pMesh->setUVs<vg::UVType::VECTOR_2, vg::UVIndex::UV_0>(m_tempTexCoords);
+		m_pMesh->setIndices(m_tempIndices, vg::PrimitiveTopology::TRIANGLE_LIST, 0u);
+		m_pMesh->apply(VG_TRUE);
 	}
 
 	void Window::_createTexture()
@@ -152,7 +152,7 @@ namespace chalet
 		}
 
 		uint32_t colorCount = texWidth * texHeight;
-		std::vector<kgs::Color32> colors(colorCount);
+		std::vector<vg::Color32> colors(colorCount);
 		for (uint32_t i = 0; i < colorCount; ++i)
 		{
 			colors[i].r = pixels[i * 4 + 0];
@@ -161,40 +161,40 @@ namespace chalet
 			colors[i].a = pixels[i * 4 + 3];
 		}
 
-		m_pTexture = std::shared_ptr<kgs::Texture2D>(new kgs::Texture2D(kgs::TextureFormat::R8G8B8A8_UNORM, KGS_FALSE, texWidth, texHeight));
+		m_pTexture = std::shared_ptr<vg::Texture2D>(new vg::Texture2D(vg::TextureFormat::R8G8B8A8_UNORM, VG_FALSE, texWidth, texHeight));
 		m_pTexture->setPixels32(colors);
-		m_pTexture->apply(KGS_FALSE, KGS_TRUE);
+		m_pTexture->apply(VG_FALSE, VG_TRUE);
 	}
 
 	void Window::_createMaterial()
 	{
-		m_pShader = std::shared_ptr<kgs::Shader>(new kgs::Shader("shaders/chalet.vert.spv", "shaders/chalet.frag.spv"));
-		m_pPass = std::shared_ptr<kgs::Pass>(new kgs::Pass(m_pShader));
-		m_pPass->setCullMode(kgs::CullModeFlagBits::eBack);
-		m_pPass->setFrontFace(kgs::FrontFaceType::eClockwise);
-		kgs::DepthStencilInfo depthStencilStateInfo;
-		depthStencilStateInfo.depthTestEnable = KGS_TRUE;
-		depthStencilStateInfo.depthWriteEnable = KGS_TRUE;
+		m_pShader = std::shared_ptr<vg::Shader>(new vg::Shader("shaders/chalet.vert.spv", "shaders/chalet.frag.spv"));
+		m_pPass = std::shared_ptr<vg::Pass>(new vg::Pass(m_pShader));
+		m_pPass->setCullMode(vg::CullModeFlagBits::eBack);
+		m_pPass->setFrontFace(vg::FrontFaceType::eClockwise);
+		vg::DepthStencilInfo depthStencilStateInfo;
+		depthStencilStateInfo.depthTestEnable = VG_TRUE;
+		depthStencilStateInfo.depthWriteEnable = VG_TRUE;
 		depthStencilStateInfo.depthCompareOp = vk::CompareOp::eLess;
 		m_pPass->setDepthStencilStateInfo(depthStencilStateInfo);
-		m_pMaterial = std::shared_ptr<kgs::Material>(new kgs::Material());
+		m_pMaterial = std::shared_ptr<vg::Material>(new vg::Material());
 		m_pMaterial->addPass(m_pPass);
 		m_pMaterial->setRenderPriority(0u);
-		m_pMaterial->setRenderQueueType(kgs::MaterialShowType::OPAQUE);
+		m_pMaterial->setRenderQueueType(vg::MaterialShowType::OPAQUE);
 		m_pPass->setMainTexture(m_pTexture);
 
 	}
 
 	void Window::_createModel()
 	{
-		m_pModel = std::shared_ptr<kgs::VisualObject3>(new kgs::VisualObject3());
+		m_pModel = std::shared_ptr<vg::VisualObject3>(new vg::VisualObject3());
 		m_pModel->setMesh(m_pMesh);
 		m_pModel->setMaterial(m_pMaterial);
 	}
 
 	void Window::_createCamera()
 	{
-		m_pCamera = std::shared_ptr<kgs::Camera3>(new kgs::Camera3());
+		m_pCamera = std::shared_ptr<vg::Camera3>(new vg::Camera3());
 		m_pCamera->setAspect(m_swapchainExtent.width / (float)(m_swapchainExtent.height));
 		m_pCamera->setFovY(glm::radians(45.0f));
 		m_pCamera->setZNear(0.1f);
@@ -204,7 +204,7 @@ namespace chalet
 
 	void Window::_createScene()
 	{
-		m_pScene = std::shared_ptr<kgs::Scene3>(new kgs::Scene3());
+		m_pScene = std::shared_ptr<vg::Scene3>(new vg::Scene3());
 		m_pScene->addCamera(m_pCamera);
 		m_pScene->addVisualObject(m_pModel);
 	}
@@ -222,7 +222,7 @@ namespace chalet
 			}
 			case RenderType::RENDERER_3:
 			{
-				dynamic_cast<kgs::Renderer3 *>(pRenderer.get())->reset(m_pScene, m_pCamera);
+				dynamic_cast<vg::Renderer3 *>(pRenderer.get())->reset(m_pScene, m_pCamera);
 				break;
 			}
 			}
@@ -254,11 +254,11 @@ namespace chalet
 
 		auto pTransform = m_pModel->getTransform();
 		//pTransform->rotateAround(kgs::Vector3(0.0f), kgs::Vector3(0.0f, 0.0f, 1.0f), glm::radians(90.0f) * time, kgs::Vector3(1.0f));
-		pTransform->setLocalRotation(glm::angleAxis(glm::radians(90.0f) * time, kgs::Vector3(0.0f, 0.0f, 1.0f)));
+		pTransform->setLocalRotation(glm::angleAxis(glm::radians(90.0f) * time, vg::Vector3(0.0f, 0.0f, 1.0f)));
 
 		pTransform = m_pCamera->getTransform();
 		//pTransform->setLocalPosition(kgs::Vector3(2.0f, 2.0f, 2.0f));
-		pTransform->lookAt2(kgs::Vector3(2.0f, 2.0f, 2.0f), kgs::Vector3(0.0f, 0.0f, 0.0f), kgs::Vector3(0.0f, 0.0f, 1.0f));
+		pTransform->lookAt2(vg::Vector3(2.0f, 2.0f, 2.0f), vg::Vector3(0.0f, 0.0f, 0.0f), vg::Vector3(0.0f, 0.0f, 1.0f));
 	}
 
 	void Window::_onPostUpdate()

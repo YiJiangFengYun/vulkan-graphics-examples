@@ -1,9 +1,9 @@
-#ifndef KGS_TRANSFORM_3_H
-#define KGS_TRANSFORM_3_H
+#ifndef VG_TRANSFORM_3_H
+#define VG_TRANSFORM_3_H
 
 #include "graphics/scene/transform.hpp"
 
-namespace kgs
+namespace vg
 {
 	class Transform3 : public Transform<SpaceType::SPACE_3>
 	{
@@ -17,4 +17,4 @@ namespace kgs
 	};
 } //namespace kgs
 
-#endif // !KGS_TRANSFORM_3_H
+#endif // !VG_TRANSFORM_3_H

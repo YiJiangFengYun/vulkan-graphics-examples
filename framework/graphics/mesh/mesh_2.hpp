@@ -1,7 +1,7 @@
-#ifndef KGS_MESH_2_H
+#ifndef VG_MESH_2_H
 
 #include "graphics/mesh/mesh.hpp"
-namespace kgs
+namespace vg
 {
 	class Mesh2 : public Mesh<MeshType::SPACE_2>
 	{
@@ -13,4 +13,4 @@ namespace kgs
 	};
 }
 
-#endif //KGS_MESH_2_H
+#endif //VG_MESH_2_H

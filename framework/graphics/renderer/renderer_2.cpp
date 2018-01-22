@@ -1,6 +1,6 @@
 #include "graphics/renderer/renderer_2.hpp"
 
-namespace kgs
+namespace vg
 {
 	void fillValidVisualObjects(
 		std::vector<std::shared_ptr<VisualObject<SpaceType::SPACE_2>>> &arrPVObjs,
@@ -196,7 +196,7 @@ namespace kgs
 			//Filter obj out of camera view.
 			auto pMeshOfChild = pVisualObjectOfChild->getMesh();
 			auto boundsOfChild = dynamic_cast<Mesh<MeshType::SPACE_2> *>(pMeshOfChild.get())->getBounds();
-			if (pCamera->isInView(pChild, boundsOfChild) == KGS_TRUE)
+			if (pCamera->isInView(pChild, boundsOfChild) == VG_TRUE)
 			{
 				arrPVObjs[PVObjIndex++] = pVisualObjectOfChild;
 			}

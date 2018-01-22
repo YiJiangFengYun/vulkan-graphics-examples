@@ -1,7 +1,7 @@
-#ifndef GFW_ENTITY_H
-#define GFW_ENTITY_H
+#ifndef VGF_ENTITY_H
+#define VGF_ENTITY_H
 
-namespace gfw
+namespace vgf
 {
 	class Entity
 	{
@@ -13,4 +13,4 @@ namespace gfw
 	};
 }
 
-#endif // !GFW_ENTITY_H
+#endif // !VGF_ENTITY_H

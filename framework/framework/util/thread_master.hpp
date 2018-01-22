@@ -1,11 +1,11 @@
-#ifndef GFW_THREAD_MASTER_H
-#define GFW_THREAD_MASTER_H
+#ifndef VGF_THREAD_MASTER_H
+#define VGF_THREAD_MASTER_H
 
 #include <vector>
 #include <memory>
 #include <thread>
 
-namespace gfw
+namespace vgf
 {
 	class ThreadMaster
 	{
@@ -20,4 +20,4 @@ namespace gfw
 	};
 }
 
-#endif // !GFW_THREAD_MASTER_H
+#endif // !VGF_THREAD_MASTER_H

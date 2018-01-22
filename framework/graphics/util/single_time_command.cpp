@@ -1,7 +1,7 @@
 #include "graphics/util/single_time_command.hpp"
 #include "graphics/module.hpp"
 
-namespace kgs
+namespace vg
 {
 	std::shared_ptr<vk::CommandBuffer> beginSingleTimeCommands() {
 		auto pDevice = pApp->getDevice();

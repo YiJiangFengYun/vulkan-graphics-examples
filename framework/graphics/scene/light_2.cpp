@@ -1,6 +1,6 @@
 #include "graphics/scene/light_2.hpp"
 
-namespace kgs
+namespace vg
 {
 	Light2::Light2()
 		: Light<SpaceType::SPACE_2>()

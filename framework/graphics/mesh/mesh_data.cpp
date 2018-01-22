@@ -1,6 +1,6 @@
 #include "graphics/mesh/mesh_data.hpp"
 
-namespace kgs
+namespace vg
 {
 	uint32_t MeshData::getDataBaseTypeSize(const DataType dataType)
 	{

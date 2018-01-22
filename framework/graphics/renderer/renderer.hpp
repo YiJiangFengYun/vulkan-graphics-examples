@@ -1,5 +1,5 @@
-#ifndef KGS_RENDERER_H
-#define KGS_RENDERER_H
+#ifndef VG_RENDERER_H
+#define VG_RENDERER_H
 
 #include "graphics/scene/space_info.hpp"
 #include "graphics/scene/scene.hpp"
@@ -11,7 +11,7 @@
 //todo: batch mesh,
 //todo: cache graphics pipeline.
 
-namespace kgs
+namespace vg
 {
 	class BaseRenderer : public Base
 	{
@@ -174,4 +174,4 @@ namespace kgs
 
 #include "graphics/renderer/renderer.inl"
 
-#endif // !KGS_RENDERER_H
+#endif // !VG_RENDERER_H

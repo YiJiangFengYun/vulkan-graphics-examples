@@ -1,6 +1,6 @@
 #include "graphics/material/material_data.hpp"
 
-namespace kgs
+namespace vg
 {
 	MaterialData::BuildInData::BuildInData()
 		: matrixObjectToNDC(1.0f)

@@ -1,5 +1,5 @@
-#ifndef KGS_MATERIAL_H
-#define KGS_MATERIAL_H
+#ifndef VG_MATERIAL_H
+#define VG_MATERIAL_H
 
 #include <memory>
 #include "graphics/global.hpp"
@@ -8,7 +8,7 @@
 #include "graphics/texture/texture.hpp"
 #include "graphics/material/material_data.hpp"
 
-namespace kgs
+namespace vg
 {
 	class Material : public Base
 	{
@@ -44,4 +44,4 @@ namespace kgs
 	};
 }
 
-#endif // !KGS_MATERIAL_H
+#endif // !VG_MATERIAL_H

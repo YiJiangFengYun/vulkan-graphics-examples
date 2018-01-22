@@ -1,10 +1,10 @@
-#ifndef KGS_MODULE_H
-#define KGS_MODULE_H
+#ifndef VG_MODULE_H
+#define VG_MODULE_H
 
 #include "graphics/global.hpp"
 #include "graphics/app/app.hpp"
 
-namespace kgs
+namespace vg
 {
 	extern Bool32 isInited;
 	extern std::shared_ptr<Application> pApp;
@@ -19,4 +19,4 @@ namespace kgs
 	extern void moduleDestory();
 } //namespace kgs
 
-#endif // !KGS_MODULE_H
+#endif // !VG_MODULE_H

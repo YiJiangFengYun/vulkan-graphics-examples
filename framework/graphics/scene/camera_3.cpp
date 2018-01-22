@@ -1,6 +1,6 @@
 #include "graphics/scene/camera_3.hpp"
 
-namespace kgs
+namespace vg
 {
 	const float Camera3::DEFAULT_FOVY = glm::radians(45.0f);
 	const float Camera3::DEFAULT_ASPECT = 1.0f;
@@ -92,14 +92,14 @@ namespace kgs
 		std::vector<Bool32> places(len);
 		for (typename PointType::length_type i = 0; i <= len; ++i)
 		{
-			std::fill(places.begin(), places.end(), KGS_FALSE);
-			std::fill(places.begin(), places.begin() + i, KGS_TRUE);
+			std::fill(places.begin(), places.end(), VG_FALSE);
+			std::fill(places.begin(), places.begin() + i, VG_TRUE);
 			do
 			{
 				typename PointType::length_type j;
 				for (j = 0; j < len; ++j)
 				{
-					if (places[j] == KGS_TRUE)
+					if (places[j] == VG_TRUE)
 					{
 						points[pointIndex][j] = min[j];
 					}
@@ -141,11 +141,11 @@ namespace kgs
 		fd::Bounds<PointType> boundsInView(minInView, maxInView);
 		fd::Bounds<PointType> boundsOfView(PointType(-1.0f, -1.0f, 0.0f), PointType(1.0f, 1.0f, 1.0f));
 
-		Bool32 isInsideCameraView = KGS_FALSE;
+		Bool32 isInsideCameraView = VG_FALSE;
 		////check if it is inside camera view.
 		if (boundsOfView.isIntersects(boundsInView))
 		{
-			isInsideCameraView = KGS_TRUE;
+			isInsideCameraView = VG_TRUE;
 		}
 
 		return isInsideCameraView;

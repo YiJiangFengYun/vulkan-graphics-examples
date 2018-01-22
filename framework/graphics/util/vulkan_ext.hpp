@@ -1,9 +1,9 @@
-#ifndef KGS_VULKAN_EXT_H
-#define KGS_VULKAN_EXT_H
+#ifndef VG_VULKAN_EXT_H
+#define VG_VULKAN_EXT_H
 
 #include <vulkan/vulkan.h>
 
-namespace kgs
+namespace vg
 {
 	VkResult createDebugReportCallbackEXT(VkInstance instance, const VkDebugReportCallbackCreateInfoEXT* pCreateInfo,
 		const VkAllocationCallbacks* pAllocator, VkDebugReportCallbackEXT* pCallback);
@@ -12,4 +12,4 @@ namespace kgs
 		const VkAllocationCallbacks* pAllocator);
 }
 
-#endif // !KGS_VULKAN_EXT_H
+#endif // !VG_VULKAN_EXT_H

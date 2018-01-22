@@ -1,6 +1,6 @@
 #include "graphics/renderer/renderer.hpp"
 
-namespace kgs
+namespace vg
 {
 	const vk::Format BaseRenderer::DEFAULT_DEPTH_STENCIL_FORMAT(vk::Format::eD32SfloatS8Uint);
 
@@ -136,7 +136,7 @@ namespace kgs
 
 	Bool32 BaseRenderer::_isValidForRender()
 	{
-		return KGS_TRUE;
+		return VG_TRUE;
 	}
 
 	void BaseRenderer::_render(const RenderInfo &info, RenderResultInfo &resultInfo)

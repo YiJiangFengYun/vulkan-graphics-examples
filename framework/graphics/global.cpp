@@ -1,7 +1,7 @@
 #include "graphics/global.hpp"
 
 #include "foundation/global.hpp"
-namespace kgs
+namespace vg
 {
 	const Color COLOR_ZERO = { 0, 0, 0, 0 };
 	const Color COLOR_WHITE = { 1, 1, 1, 1 };

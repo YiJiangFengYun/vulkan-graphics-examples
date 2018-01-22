@@ -1,6 +1,6 @@
 #include "graphics/texture/texture_3d.hpp"
 
-namespace kgs
+namespace vg
 {
 	Texture3D::Texture3D(TextureFormat format, Bool32 mipMap, uint32_t width, uint32_t height, uint32_t depth)
 		:Texture(format, mipMap)

@@ -1,5 +1,5 @@
-#ifndef KGS_TEXTURE_H
-#define KGS_TEXTURE_H
+#ifndef VG_TEXTURE_H
+#define VG_TEXTURE_H
 
 #include "foundation/wrapper.hpp"
 #include "graphics/util/find_memory.hpp"
@@ -8,7 +8,7 @@
 #include "graphics/util/single_time_command.hpp"
 #include "graphics/texture/texture_option.hpp"
 
-namespace kgs
+namespace vg
 {
 	class Texture : public Base
 	{
@@ -92,7 +92,7 @@ namespace kgs
 		std::vector<Color32> _getPixels32(uint32_t layer, uint32_t mipLevel = 0);
 		void _setPixels(std::vector<Color> colors, uint32_t layer, uint32_t mipLevel = 0);
 		void _setPixels32(std::vector<Color32> colors, uint32_t layer, uint32_t mipLevel = 0);
-		void _apply(Bool32 updateMipmaps = KGS_TRUE, Bool32 makeUnreadable = KGS_FALSE);
+		void _apply(Bool32 updateMipmaps = VG_TRUE, Bool32 makeUnreadable = VG_FALSE);
 		void _applyWithGenMipMap();
 		void _applyDirect();
 
@@ -109,4 +109,4 @@ namespace kgs
 	};
 }
 
-#endif // !KGS_TEXTURE_H
+#endif // !VG_TEXTURE_H

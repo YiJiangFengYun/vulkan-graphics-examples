@@ -1,6 +1,6 @@
 #include "graphics/texture/texture.hpp"
 
-namespace kgs
+namespace vg
 {
 	inline uint32_t caculateImageSizeWithMipmapLevel(uint32_t size, uint32_t mipmapLevel);
 
@@ -218,7 +218,7 @@ namespace kgs
 
 		vk::ImageType vkImageType;
 #ifdef DEBUG
-		isFind = KGS_FALSE;
+		isFind = VG_FALSE;
 #endif // DEBUG
 
 		for (const auto& item : arrTextureTypeToVKImageType)
@@ -227,13 +227,13 @@ namespace kgs
 			{
 				vkImageType = item.second;
 #ifdef DEBUG
-				isFind = KGS_TRUE;
+				isFind = VG_TRUE;
 #endif // DEBUG
 			}
 		}
 
 #ifdef DEBUG
-		if (isFind == KGS_FALSE)
+		if (isFind == VG_FALSE)
 		{
 			throw std::logic_error("Invalid texture type at creating image for texture.");
 		}
@@ -348,7 +348,7 @@ namespace kgs
 
 		vk::MemoryAllocateInfo allocInfo = {
 			memRequirements.size,
-			kgs::findMemoryType(pApp->getPhysicalDevice(), memRequirements.memoryTypeBits, vk::MemoryPropertyFlagBits::eDeviceLocal)
+			vg::findMemoryType(pApp->getPhysicalDevice(), memRequirements.memoryTypeBits, vk::MemoryPropertyFlagBits::eDeviceLocal)
 		};
 
 		m_pMemory = fd::allocateMemory(pDevice, allocInfo);
@@ -382,7 +382,7 @@ namespace kgs
 #endif // DEBUG
 		vk::ImageViewType vkImageViewType;
 #ifdef DEBUG
-		isFind = KGS_FALSE;
+		isFind = VG_FALSE;
 #endif // DEBUG
 
 		for (const auto& item : arrTextureTypeToVKImageViewType)
@@ -391,13 +391,13 @@ namespace kgs
 			{
 				vkImageViewType = item.second;
 #ifdef DEBUG
-				isFind = KGS_TRUE;
+				isFind = VG_TRUE;
 #endif // DEBUG
 			}
 		}
 
 #ifdef DEBUG
-		if (isFind == KGS_FALSE)
+		if (isFind == VG_FALSE)
 		{
 			throw std::invalid_argument("Invalid type argument at creating image view for texture.");
 		}
@@ -706,7 +706,7 @@ namespace kgs
 		vk::MemoryRequirements memReqs = pDevice->getBufferMemoryRequirements(*pBuffer);
 		vk::MemoryAllocateInfo allocateInfo = {
 			memReqs.size,
-			kgs::findMemoryType(pApp->getPhysicalDevice(), memReqs.memoryTypeBits, properties)
+			vg::findMemoryType(pApp->getPhysicalDevice(), memReqs.memoryTypeBits, properties)
 		};
 
 		pBufferMemory = fd::allocateMemory(pDevice, allocateInfo);
@@ -756,21 +756,21 @@ namespace kgs
 		};
 		vk::PipelineStageFlags srcStageMask;
 		vk::PipelineStageFlags dstStageMask;
-		Bool32 isFindSrc = KGS_FALSE;
-		Bool32 isFindDst = KGS_FALSE;
+		Bool32 isFindSrc = VG_FALSE;
+		Bool32 isFindDst = VG_FALSE;
 		for (const auto& item : arrLayoutToAccess)
 		{
 			if (oldLayout == std::get<0>(item))
 			{
 				barrier.srcAccessMask = std::get<1>(item);
 				srcStageMask = std::get<2>(item);
-				isFindSrc = KGS_TRUE;
+				isFindSrc = VG_TRUE;
 			}
 			if (newLayout == std::get<0>(item))
 			{
 				barrier.dstAccessMask = std::get<1>(item);
 				dstStageMask = std::get<2>(item);
-				isFindDst = KGS_TRUE;
+				isFindDst = VG_TRUE;
 			}
 			if (isFindSrc && isFindDst)
 			{

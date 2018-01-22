@@ -1,5 +1,5 @@
-#ifndef KGS_SCENE_H
-#define KGS_SCENE_H
+#ifndef VG_SCENE_H
+#define VG_SCENE_H
 
 #include <vector>
 #include <unordered_map>
@@ -9,7 +9,7 @@
 #include "graphics/scene/camera.hpp"
 #include "graphics/scene/light.hpp"
 
-namespace kgs
+namespace vg
 {
 	class BaseScene : public Base
 	{
@@ -105,4 +105,4 @@ namespace kgs
 
 #include "graphics/scene/scene.inl"
 
-#endif // !KGS_SCENE_H
+#endif // !VG_SCENE_H

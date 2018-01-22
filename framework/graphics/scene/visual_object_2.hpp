@@ -1,10 +1,10 @@
-#ifndef KGS_VISUAL_OBJECT_2_H
-#define KGS_VISUAL_OBJECT_2_H
+#ifndef VG_VISUAL_OBJECT_2_H
+#define VG_VISUAL_OBJECT_2_H
 
 #include "graphics/scene/space_info.hpp"
 #include "graphics/scene/visual_object.hpp"
 
-namespace kgs
+namespace vg
 {
 	class VisualObject2 : public VisualObject<SpaceType::SPACE_2>
 	{
@@ -14,4 +14,4 @@ namespace kgs
 
 } //namespace kgs
 
-#endif // !KGS_VISUAL_OBJECT_2_H
+#endif // !VG_VISUAL_OBJECT_2_H

@@ -1,9 +1,9 @@
-#ifndef KGS_BASE_H
-#define KGS_BASE_H
+#ifndef VG_BASE_H
+#define VG_BASE_H
 
 #include <unordered_map>
 
-namespace kgs
+namespace vg
 {
 	enum class BaseType
 	{
@@ -37,4 +37,4 @@ namespace kgs
 	};
 } //namespace kgs
 
-#endif // !KGS_BASE_H
+#endif // !VG_BASE_H

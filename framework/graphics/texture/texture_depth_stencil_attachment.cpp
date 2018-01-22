@@ -1,9 +1,9 @@
 #include "graphics/texture/texture_depth_stencil_attachment.hpp"
 
-namespace kgs
+namespace vg
 {
 	TextureDepthStencilAttachment::TextureDepthStencilAttachment(TextureFormat format, uint32_t width, uint32_t height)
-		:Texture(format, KGS_FALSE)
+		:Texture(format, VG_FALSE)
 	{
 		m_type = TextureType::DEPTH_STENCIL_ATTACHMENT;
 		m_width = width;

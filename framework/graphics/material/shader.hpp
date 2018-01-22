@@ -1,5 +1,5 @@
-#ifndef KGS_SHADER_H
-#define KGS_SHADER_H
+#ifndef VG_SHADER_H
+#define VG_SHADER_H
 
 #include <cstdint>
 #include <vector>
@@ -9,7 +9,7 @@
 #include "graphics/global.hpp"
 #include "graphics/module.hpp"
 
-namespace kgs
+namespace vg
 {
 	class Shader : public Base
 	{
@@ -41,4 +41,4 @@ namespace kgs
 	};
 }
 
-#endif // !KGS_SHADER_H
+#endif // !VG_SHADER_H

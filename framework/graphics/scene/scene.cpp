@@ -1,6 +1,6 @@
 #include "graphics/scene/scene.hpp"
 
-namespace kgs
+namespace vg
 {
 	BaseScene::BaseScene()
 		: Base(BaseType::SCENE)

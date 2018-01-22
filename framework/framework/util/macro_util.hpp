@@ -1,6 +1,6 @@
-#ifndef GFW_MACRO_UTIL_H
-#define GFW_MACRO_UTIL_H
+#ifndef VGF_MACRO_UTIL_H
+#define VGF_MACRO_UTIL_H
 
 
 
-#endif // !GFW_MACRO_UTIL_H
+#endif // !VGF_MACRO_UTIL_H

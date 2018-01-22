@@ -1,5 +1,5 @@
-#ifndef KGS_APP_H
-#define KGS_APP_H
+#ifndef VG_APP_H
+#define VG_APP_H
 
 #include <set>
 #include "graphics/global.hpp"
@@ -13,7 +13,7 @@
 #define ENGINE_VERSION VK_MAKE_VERSION(0, 0, 1)
 #define VK_API_VERSION VK_API_VERSION_1_0
 
-namespace kgs
+namespace vg
 {
 #ifdef ENABLE_VALIDATION_LAYERS
 	const std::vector<const char*> validationlayers = {
@@ -106,4 +106,4 @@ namespace kgs
 
 } //namespace kgs
 
-#endif // !KGS_APP_H
+#endif // !VG_APP_H

@@ -5,7 +5,7 @@
 
 namespace chalet
 {
-	class App : public gfw::App
+	class App : public vgf::App
 	{
 	public:
 		App();

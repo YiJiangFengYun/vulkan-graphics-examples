@@ -1,10 +1,10 @@
-#ifndef KGS_FIND_MEMORY_H
-#define KGS_FIND_MEMORY_H
+#ifndef VG_FIND_MEMORY_H
+#define VG_FIND_MEMORY_H
 
 #include <vulkan/vulkan.hpp>
-namespace kgs
+namespace vg
 {
 	extern uint32_t findMemoryType(std::shared_ptr<vk::PhysicalDevice> pPhysicalDevice, uint32_t typeFilter, vk::MemoryPropertyFlags properties);
 } //namespace fd
 
-#endif // !KGS_FIND_MEMORY_H
+#endif // !VG_FIND_MEMORY_H

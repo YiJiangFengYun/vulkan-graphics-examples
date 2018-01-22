@@ -1,5 +1,5 @@
-#ifndef KGS_PASS_H
-#define KGS_PASS_H
+#ifndef VG_PASS_H
+#define VG_PASS_H
 
 #include <unordered_map>
 #include "graphics/util/find_memory.hpp"
@@ -9,7 +9,7 @@
 #include "graphics/material/material_data.hpp"
 #include "graphics/util/util.hpp"
 
-namespace kgs
+namespace vg
 {
 	class Pass : public Base
 	{
@@ -58,7 +58,7 @@ namespace kgs
 
 		void setTexture(std::string name
 			, const std::shared_ptr<Texture> &pTex
-			, uint32_t binding = KGS_M_OTHER_MIN_BINDING
+			, uint32_t binding = VG_M_OTHER_MIN_BINDING
 			, DescriptorType descriptorType = DescriptorType::UNIFORM_BUFFER
 			, ShaderStageFlags stageFlags = ShaderStageFlagBits::VERTEX
 		);
@@ -72,7 +72,7 @@ namespace kgs
 		template<typename T>
 		void setDataValue(std::string name
 			, const T &value
-			, uint32_t binding = KGS_M_OTHER_MIN_BINDING
+			, uint32_t binding = VG_M_OTHER_MIN_BINDING
 			, DescriptorType descriptorType = DescriptorType::UNIFORM_BUFFER
 			, ShaderStageFlags stageFlags = ShaderStageFlagBits::VERTEX
 		);
@@ -80,7 +80,7 @@ namespace kgs
 		template<typename T>
 		void setDataValue(std::string name
 			, const std::vector<T> &values
-			, uint32_t binding = KGS_M_OTHER_MIN_BINDING
+			, uint32_t binding = VG_M_OTHER_MIN_BINDING
 			, DescriptorType descriptorType = DescriptorType::UNIFORM_BUFFER
 			, ShaderStageFlags stageFlags = ShaderStageFlagBits::VERTEX
 		);
@@ -160,4 +160,4 @@ namespace kgs
 
 #include "graphics/material/pass.inl"
 
-#endif // !KGS_PASS_H
+#endif // !VG_PASS_H

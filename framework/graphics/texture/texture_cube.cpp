@@ -1,6 +1,6 @@
 #include "graphics/texture/texture_cube.hpp"
 
-namespace kgs
+namespace vg
 {
 	TextureCube::TextureCube(TextureFormat format, Bool32 mipMap, uint32_t size)
 		:Texture(format, mipMap)

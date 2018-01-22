@@ -1,6 +1,6 @@
 #include "graphics/texture/texture_2d_array.hpp"
 
-namespace kgs
+namespace vg
 {
 	Texture2DArray::Texture2DArray(TextureFormat format, Bool32 mipMap, uint32_t width, uint32_t height, uint32_t arraylength)
 		:Texture(format, mipMap)

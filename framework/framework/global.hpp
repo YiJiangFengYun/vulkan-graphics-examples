@@ -1,9 +1,9 @@
-#ifndef GFW_GLOBAL_H
-#define GFW_GLOBAL_H
+#ifndef VGF_GLOBAL_H
+#define VGF_GLOBAL_H
 
 #define NOMINMAX
-#define GFW_FALSE 0
-#define GFW_TRUE 1
+#define VGF_FALSE 0
+#define VGF_TRUE 1
 
 #include <cstdint>
 
@@ -15,7 +15,7 @@
 #endif // !GLFW_INCLUDE_VULKAN
 #include <GLFW/glfw3.h>
 
-namespace gfw
+namespace vgf
 { 
 	typedef uint32_t Bool32;
 	extern Bool32 isInited;
@@ -23,7 +23,7 @@ namespace gfw
 	extern void moduleDestroy();
 }
 
-#endif // !GFW_GLOBAL_H
+#endif // !VGF_GLOBAL_H
 
 
 

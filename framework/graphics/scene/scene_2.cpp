@@ -1,6 +1,6 @@
 #include "graphics/scene/scene_2.hpp"
 
-namespace kgs
+namespace vg
 {
 	Scene2::Scene2()
 		: Scene<SpaceType::SPACE_2>()

@@ -1,5 +1,5 @@
-#ifndef KGS_GLOBAL_H
-#define KGS_GLOBAL_H
+#ifndef VG_GLOBAL_H
+#define VG_GLOBAL_H
 
 #define NOMINMAX
 
@@ -7,8 +7,8 @@
 #define DEBUG
 #endif // _DEBUG
 
-#define KGS_FALSE 0
-#define KGS_TRUE 1
+#define VG_FALSE 0
+#define VG_TRUE 1
 
 #ifdef DEBUG
 #define ENABLE_VALIDATION_LAYERS
@@ -19,7 +19,7 @@
 #include "graphics/base.hpp"
 
 
-namespace kgs
+namespace vg
 {
 	typedef uint32_t Bool32;
 	typedef unsigned char Byte;
@@ -55,4 +55,4 @@ namespace kgs
 }
 
 
-#endif // !KGS_GLOBAL_H
+#endif // !VG_GLOBAL_H

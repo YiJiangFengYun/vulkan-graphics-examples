@@ -5,7 +5,7 @@
 #include <set>
 #include <thread>
 
-namespace gfw {
+namespace vgf {
 
 	void runWindow(std::shared_ptr<Window> pSubWindow)
 	{
@@ -27,7 +27,7 @@ namespace gfw {
 		m_pWindow = nullptr;
 		m_pSubWindows.resize(0);
 
-		kgs::moduleDestory();
+		vg::moduleDestory();
 
 		glfwTerminate();
 	}
@@ -36,7 +36,7 @@ namespace gfw {
 	{
 		//std::thread thread_test;
 
-		while (m_pWindow->windowShouldClose() == GFW_FALSE)
+		while (m_pWindow->windowShouldClose() == VGF_FALSE)
 		{
 			//remove closed child(sub) windows.
 			m_pSubWindows.erase(std::remove_if(m_pSubWindows.begin(), m_pSubWindows.end(), [](const std::shared_ptr<Window>& item) {
@@ -58,7 +58,7 @@ namespace gfw {
 			{
 				pSubWindow->run();
 			};
-			kgs::pApp->getDevice()->waitIdle();
+			vg::pApp->getDevice()->waitIdle();
 			glfwPollEvents();
 		}
 	}
@@ -93,7 +93,7 @@ namespace gfw {
 			vkExtensions[i] = glfwExtensions[i];
 		}
 
-		kgs::moduleCreateVkinstance("vulkan graphics"
+		vg::moduleCreateVkinstance("vulkan graphics"
 			, VK_MAKE_VERSION(1, 0, 0)
 		    , vkExtensions);
 
@@ -103,7 +103,7 @@ namespace gfw {
 		vk::PhysicalDeviceFeatures needPhysicalDeviceFeatures;
 		needPhysicalDeviceFeatures.geometryShader = VK_TRUE;
 		needPhysicalDeviceFeatures.samplerAnisotropy = VK_TRUE;
-		kgs::moduleCreateOther(pResultSurface
+		vg::moduleCreateOther(pResultSurface
 			, m_graphicsQueueCount
 			, m_presentQueuecount
 			, needPhysicalDeviceFeatures);
@@ -116,7 +116,7 @@ namespace gfw {
 
 	std::shared_ptr<vk::SurfaceKHR> App::_createVKSurface(std::shared_ptr<GLFWwindow> pWindow)
 	{
-		auto pInstance = kgs::pApp->getVKInstance();
+		auto pInstance = vg::pApp->getVKInstance();
 		return createSurface(pInstance, pWindow);
 	}
 }

@@ -1,4 +1,4 @@
-namespace kgs
+namespace vg
 {
 	template <typename T>
 	T MaterialData::getDataValue(std::string name) const

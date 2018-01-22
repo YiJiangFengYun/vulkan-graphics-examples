@@ -1,12 +1,12 @@
-#ifndef KGS_TEXTURE_TYPE_H
-#define KGS_TEXTURE_TYPE_H
+#ifndef VG_TEXTURE_TYPE_H
+#define VG_TEXTURE_TYPE_H
 
 #include <utility>
 #include <Array>
 #include <map>
 #include <vulkan/vulkan.hpp>
 
-namespace kgs
+namespace vg
 {
 	enum class TextureType
 	{
@@ -77,4 +77,4 @@ namespace kgs
 }
 
 
-#endif // !KGS_TEXTURE_TYPE_H
+#endif // !VG_TEXTURE_TYPE_H

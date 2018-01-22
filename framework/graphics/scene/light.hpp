@@ -1,9 +1,9 @@
-#ifndef KGS_LIGHT_H
-#define KGS_LIGHT_H
+#ifndef VG_LIGHT_H
+#define VG_LIGHT_H
 
 #include "graphics/scene/object.hpp"
 
-namespace kgs
+namespace vg
 {
 	class BaseLight
 	{
@@ -26,4 +26,4 @@ namespace kgs
 	};
 } //namespace kgs
 
-#endif // !KGS_LIGHT_H
+#endif // !VG_LIGHT_H

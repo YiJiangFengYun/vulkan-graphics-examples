@@ -1,6 +1,6 @@
 #include "graphics/util/find_memory.hpp"
 
-namespace kgs
+namespace vg
 {
 	uint32_t findMemoryType(std::shared_ptr<vk::PhysicalDevice> pPhysicalDevice, uint32_t typeFilter, vk::MemoryPropertyFlags properties)
 	{

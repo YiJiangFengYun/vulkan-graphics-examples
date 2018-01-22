@@ -1,6 +1,6 @@
 #include "graphics/material/pass.hpp"
 
-namespace kgs
+namespace vg
 {
 	Pass::LayoutBindingInfo::LayoutBindingInfo()
 	{
@@ -91,7 +91,7 @@ namespace kgs
 	Pass::Pass() 
 		: Base(BaseType::PASS)
 		, m_pData(new MaterialData())
-		, m_applied(KGS_FALSE)
+		, m_applied(VG_FALSE)
 		, m_cullMode(CullModeFlagBits::eBack)
 		, m_frontFace(FrontFaceType::eCounterClockwise)
 		, m_viewport(0.0f, 0.0f, 1.0f, 1.0f, 0.0f, 1.0f)
@@ -105,7 +105,7 @@ namespace kgs
 	Pass::Pass(std::shared_ptr<Shader> pShader)
 		: Base(BaseType::PASS)
 		, m_pData(new MaterialData())
-		, m_applied(KGS_FALSE)
+		, m_applied(VG_FALSE)
 		, m_pShader(pShader)
 		, m_cullMode(CullModeFlagBits::eBack)
 		, m_frontFace(FrontFaceType::eCounterClockwise)
@@ -149,7 +149,7 @@ namespace kgs
 		uint32_t descriptorCount = 1u;
 		LayoutBindingInfo info(
 			name,
-			KGS_TRUE,
+			VG_TRUE,
 			binding,
 			descriptorType,
 			descriptorCount,
@@ -157,17 +157,17 @@ namespace kgs
 		);
 		info.updateSize(m_pData);
 		setValue(name, info, m_mapLayoutBinds, m_arrLayoutBindNames);
-		m_applied = KGS_FALSE;
+		m_applied = VG_FALSE;
 	}
 
 	const std::shared_ptr<Texture> &Pass::getMainTexture() const
 	{
-		return getTexture(KGS_M_MAIN_TEXTURE_NAME);
+		return getTexture(VG_M_MAIN_TEXTURE_NAME);
 	}
 
 	void Pass::setMainTexture(const std::shared_ptr<Texture> value)
 	{
-		setTexture(KGS_M_MAIN_TEXTURE_NAME, value, KGS_M_MAIN_TEXTURE_BINDING,
+		setTexture(VG_M_MAIN_TEXTURE_NAME, value, VG_M_MAIN_TEXTURE_BINDING,
 			DescriptorType::COMBINED_IMAGE_SAMPLER, ShaderStageFlagBits::FRAGMENT);
 	}
 
@@ -179,9 +179,9 @@ namespace kgs
 	void Pass::setMainColor(Color color)
 	{
 		m_buildInData.mainColor = color;
-		setDataValue(KGS_M_BUILDIN_NAME
+		setDataValue(VG_M_BUILDIN_NAME
 			, m_buildInData
-			, KGS_M_BUILDIN_BINDING
+			, VG_M_BUILDIN_BINDING
 			, DescriptorType::UNIFORM_BUFFER
 			, ShaderStageFlagBits::VERTEX
 		);
@@ -195,9 +195,9 @@ namespace kgs
 		m_buildInData.matrixObjectToNDC = matrixObjectToNDC;
 		m_buildInData.matrixObjectToView = matrixObjectToView;
 		m_buildInData.matrixObjectToWorld = matrixObjectToWorld;
-		setDataValue(KGS_M_BUILDIN_NAME
+		setDataValue(VG_M_BUILDIN_NAME
 			, m_buildInData
-			, KGS_M_BUILDIN_BINDING
+			, VG_M_BUILDIN_BINDING
 			, DescriptorType::UNIFORM_BUFFER
 			, ShaderStageFlagBits::VERTEX
 		);
@@ -205,7 +205,7 @@ namespace kgs
 
 	void Pass::apply()
 	{
-		if (m_applied == KGS_FALSE)
+		if (m_applied == VG_FALSE)
 		{
 			_createDescriptorSetLayout();
 			_createUniformBuffer();
@@ -213,7 +213,7 @@ namespace kgs
 			_updateDescriptorBufferInfo();
 			_updateDescriptorImageInfo();
 			_applyBufferContent();
-			m_applied = KGS_TRUE;
+			m_applied = VG_TRUE;
 		}
 	}
 
@@ -532,7 +532,7 @@ namespace kgs
 			if (item.descriptorType == DescriptorType::COMBINED_IMAGE_SAMPLER)
 			{
 #ifdef DEBUG
-				if (item.isTexture == KGS_FALSE)
+				if (item.isTexture == VG_FALSE)
 					throw std::runtime_error("The data type of binding should be is TEXTURE when its type is COMBINED_IMAGE_SAMPLER");
 				if (item.descriptorCount != 1u)
 					throw std::runtime_error("The descriptor count of binding shoubld be 1 when its type is COMBINED_IMAGE_SAMPLER");
@@ -619,7 +619,7 @@ namespace kgs
 		vk::MemoryRequirements memReqs = pDevice->getBufferMemoryRequirements(*pBuffer);
 		vk::MemoryAllocateInfo allocateInfo = {
 			memReqs.size,
-			kgs::findMemoryType(pApp->getPhysicalDevice(),
+			vg::findMemoryType(pApp->getPhysicalDevice(),
 			memReqs.memoryTypeBits,
 			vk::MemoryPropertyFlagBits::eHostVisible | vk::MemoryPropertyFlagBits::eHostCoherent)
 		};

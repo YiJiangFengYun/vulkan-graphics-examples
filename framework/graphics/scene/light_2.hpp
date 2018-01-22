@@ -1,10 +1,10 @@
-#ifndef KGS_LIGHT_2_H
-#define KGS_LIGHT_2_H
+#ifndef VG_LIGHT_2_H
+#define VG_LIGHT_2_H
 
 #include "graphics/scene/space_info.hpp"
 #include "graphics/scene/light.hpp"
 
-namespace kgs
+namespace vg
 {
 	class Light2 : public Light<SpaceType::SPACE_2>
 	{
@@ -14,4 +14,4 @@ namespace kgs
 
 } //namespace kgs
 
-#endif // !KGS_LIGHT_2_H
+#endif // !VG_LIGHT_2_H

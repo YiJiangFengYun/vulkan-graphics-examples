@@ -1,4 +1,4 @@
-namespace kgs
+namespace vg
 {
 	
 }  //namespace kgs

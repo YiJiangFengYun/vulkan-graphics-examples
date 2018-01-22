@@ -5,7 +5,7 @@
 
 namespace testTriangle
 {
-	class App : public gfw::App
+	class App : public vgf::App
 	{
 	public:
 		App();

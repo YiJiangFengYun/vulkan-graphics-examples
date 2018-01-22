@@ -1,5 +1,5 @@
-#ifndef KGS_MESH_H
-#define KGS_MESH_H
+#ifndef VG_MESH_H
+#define VG_MESH_H
 
 #define NOMINMAX
 #include <set>
@@ -13,7 +13,7 @@
 #include "graphics/mesh/mesh_option.hpp"
 #include "graphics/mesh/mesh_data.hpp"
 
-namespace kgs
+namespace vg
 {
 	class BaseMesh : public Base
 	{
@@ -102,7 +102,7 @@ namespace kgs
 		const typename MeshData::DataTypeInfo<dataType>::ValueType &getData(std::string name) const;
 
 		template <MeshData::DataType dataType>
-		void setData(const std::string name, const typename MeshData::DataTypeInfo<dataType>::ValueType &value, uint32_t bindingPriority = KGS_VERTEX_BINDING_PRIORITY_OTHER_MIN);
+		void setData(const std::string name, const typename MeshData::DataTypeInfo<dataType>::ValueType &value, uint32_t bindingPriority = VG_VERTEX_BINDING_PRIORITY_OTHER_MIN);
 
 
 		//----------------------For render---------------------------------------
@@ -150,7 +150,7 @@ namespace kgs
 		inline const typename MeshData::DataTypeInfo<dataType>::ValueType &_getData(std::string name) const;
 
 		template <MeshData::DataType dataType>
-		inline void _setData(std::string name, const typename MeshData::DataTypeInfo<dataType>::ValueType &value, uint32_t bindingPriority = KGS_VERTEX_BINDING_PRIORITY_OTHER_MIN);
+		inline void _setData(std::string name, const typename MeshData::DataTypeInfo<dataType>::ValueType &value, uint32_t bindingPriority = VG_VERTEX_BINDING_PRIORITY_OTHER_MIN);
 
 
 		inline void _sortLayoutBindingInfos();
@@ -212,4 +212,4 @@ namespace kgs
 
 #include "graphics/mesh/mesh.inl"
 
-#endif // !KGS_MESH_H
+#endif // !VG_MESH_H

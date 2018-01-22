@@ -1,6 +1,6 @@
 #include "framework/world/entity.hpp"
 
-namespace gfw
+namespace vgf
 {
 	Entity::Entity()
 	{

@@ -1,9 +1,9 @@
-#ifndef KGS_TEX_COLOR_ATTACHMENT_H
-#define KGS_TEX_COLOR_ATTACHMENT_H
+#ifndef VG_TEX_COLOR_ATTACHMENT_H
+#define VG_TEX_COLOR_ATTACHMENT_H
 
 #include "graphics/texture/texture.hpp"
 
-namespace kgs
+namespace vg
 {
 	class TextureColorAttachment : public Texture
 	{
@@ -27,4 +27,4 @@ namespace kgs
 	};
 } //namespace kgs
 
-#endif // !KGS_TEX_COLOR_ATTACHMENT_H
+#endif // !VG_TEX_COLOR_ATTACHMENT_H

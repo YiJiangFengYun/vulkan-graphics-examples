@@ -1,4 +1,4 @@
-namespace kgs
+namespace vg
 {
 	template <SpaceType SPACE_TYPE>
 	Scene<SPACE_TYPE>::Scene()
@@ -244,7 +244,7 @@ namespace kgs
 		, std::unordered_map<InstanceID, std::shared_ptr<T>> &mapTransformToObjs
 	)
 	{
-		if (_isHasObject(pTarget, map) == KGS_FALSE) return;
+		if (_isHasObject(pTarget, map) == VG_FALSE) return;
 		std::remove(arr.begin(), arr.end(), pTarget);
 		map.erase(pTarget->getID());
 		mapTransformToObjs.erase(pTarget->getTransform()->getID());

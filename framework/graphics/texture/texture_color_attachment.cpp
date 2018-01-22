@@ -1,9 +1,9 @@
 #include "graphics/texture/texture_color_attachment.hpp"
 
-namespace kgs
+namespace vg
 {
 	TextureColorAttachment::TextureColorAttachment(TextureFormat format, uint32_t width, uint32_t height)
-		:Texture(format, KGS_FALSE)
+		:Texture(format, VG_FALSE)
 	{
 		m_type = TextureType::COLOR_ATTACHMENT;
 		m_width = width;

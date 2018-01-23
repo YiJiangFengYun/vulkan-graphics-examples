@@ -74,22 +74,25 @@ namespace vg
 		void setTexture(std::string name, const std::shared_ptr<Texture> &pTex);
 
 		template <typename T>
-		T getDataValue(std::string name) const;
+		T getDataValue(const std::string name) const;
 
 		template <typename T>
-		std::vector<T> getDataValue(std::string name, uint32_t count) const;
+		std::vector<T> getDataValue(const std::string name, const uint32_t count) const;
 
 		template<typename T>
-		void setDataValue(std::string name, const T &value);
+		void setDataValue(const std::string name, const T &value);
 
 		template<typename T>
-		void setDataValue(std::string name, const std::vector<T> &values);
+		void setDataValue(const std::string name, const std::vector<T> &values);
 
-		uint32_t getDataBaseSize(std::string name) const;
+		template<typename T>
+		void setDataValue(const std::string name, const T * const pValue, const uint32_t count);
 
-		uint32_t getDataSize(std::string name) const;
+		uint32_t getDataBaseSize(const std::string name) const;
 
-		void memoryCopyData(std::string name
+		uint32_t getDataSize(const std::string name) const;
+
+		void memoryCopyData(const std::string name
 			, void* dst
 			, uint32_t offset
 			, uint32_t elementStart

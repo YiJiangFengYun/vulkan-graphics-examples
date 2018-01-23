@@ -1,7 +1,7 @@
 namespace vg
 {
 	template <typename T>
-	T MaterialData::getDataValue(std::string name) const
+	T MaterialData::getDataValue(const std::string name) const
 	{
 		const auto& bytes = getValue(name, mapDatas);
 		T t;
@@ -10,7 +10,7 @@ namespace vg
 	}
 
 	template <typename T>
-	std::vector<T> MaterialData::getDataValue(std::string name, uint32_t count) const
+	std::vector<T> MaterialData::getDataValue(const std::string name, const uint32_t count) const
 	{
 		const auto& bytes = getValue(name, mapDatas);
 		std::vector<T> ts(count);
@@ -19,7 +19,7 @@ namespace vg
 	}
 
 	template<typename T>
-	void MaterialData::setDataValue(std::string name, const T &value)
+	void MaterialData::setDataValue(const std::string name, const T &value)
 	{
 		mapDatas[name].resize(sizeof(T));
 		memcpy(mapDatas[name].data(), &value, sizeof(T));
@@ -32,16 +32,30 @@ namespace vg
 	}
 
 	template<typename T>
-	void MaterialData::setDataValue(std::string name, const std::vector<T> &values)
+	void MaterialData::setDataValue(const std::string name, const std::vector<T> &values)
 	{
 		size_t size = sizeof(T) * values.size();
 		mapDatas[name].resize(size);
-		memcpy(mapDatas[name].data(), &values, size);
+		memcpy(mapDatas[name].data(), values.data(), size);
 		auto iterator = std::find(arrDataNames.begin(), arrDataNames.end(), name);
 		if (iterator == arrDataNames.end())
 		{
 			arrDataNames.push_back(name);
 		}
 		mapDataCounts[name] = values.size();
+	}
+
+	template<typename T>
+	void MaterialData::setDataValue(const std::string name, const T * const pValue, const uint32_t count)
+	{
+		size_t size = sizeof(T) * count;
+		mapDatas[name].resize(size);
+		memcpy(mapDatas[name].data(), pValue, size);
+		auto iterator = std::find(arrDataNames.begin(), arrDataNames.end(), name);
+		if (iterator == arrDataNames.end())
+		{
+			arrDataNames.push_back(name);
+		}
+		mapDataCounts[name] = count;
 	}
 }

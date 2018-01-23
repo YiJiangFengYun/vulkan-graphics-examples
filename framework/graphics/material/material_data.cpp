@@ -51,20 +51,20 @@ namespace vg
 		setValue(name, pTex, mapTextures, arrTexNames);
 	}
 
-	uint32_t MaterialData::getDataBaseSize(std::string name) const
+	uint32_t MaterialData::getDataBaseSize(const std::string name) const
 	{
 		const auto& bytes = getValue(name, mapDatas);
 		const auto& count = getValue(name, mapDataCounts);
 		return static_cast<uint32_t>(bytes.size()) / count;
 	}
 
-	uint32_t MaterialData::getDataSize(std::string name) const
+	uint32_t MaterialData::getDataSize(const std::string name) const
 	{
 		const auto& bytes = getValue(name, mapDatas);
 		return static_cast<uint32_t>(bytes.size());
 	}
 
-	void MaterialData::memoryCopyData(std::string name
+	void MaterialData::memoryCopyData(const std::string name
 		, void* dst
 		, uint32_t offset
 		, uint32_t elementStart

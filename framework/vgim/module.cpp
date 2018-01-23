@@ -1,6 +1,6 @@
-//#include "kimgui/module.hpp"
+//#include "vgim/module.hpp"
 //
-//namespace kimgui {
+//namespace vgim {
 //	const char* getClipboardText(void* user_data);
 //	void setClipboardText(void* user_data, const char* text);
 //
@@ -91,4 +91,4 @@
 //		}
 //		glfwSetClipboardString(pCurrWindow.get(), text);
 //	}
-//} //icimgui
+//} //vgim

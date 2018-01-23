@@ -6,5 +6,9 @@ include_directories("${PLOG_DIR}/include")
 
 add_subdirectory(foundation)
 add_subdirectory(graphics)
-add_subdirectory(kimgui)
+
+if(USE_IMGUI_BIND)
+    add_subdirectory(vgim)    
+endif(USE_IMGUI_BIND)
+
 add_subdirectory(framework)

@@ -16,6 +16,7 @@ set(LIB_SUFFIX "" CACHE STRING "Takes an empty string or 64. Directory where lib
 
 # options
 # option(BUILD_SHARED_LIBS "Build shared libraries" OFF)
+option(USE_IMGUI_BIND "Build imgui bind" ON)
 option(BUILD_SAMPLES "Build the sample programs" ON)
 option(BUILD_TESTS "Build the test programs" ON)
 if (MSVC)

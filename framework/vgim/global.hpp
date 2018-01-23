@@ -1,5 +1,5 @@
-#ifndef VG_KIM_GUI_GLOBAL_H
-#define VG_KIM_GUI_GLOBAL_H
+#ifndef VG_IM_GLOBAL_H
+#define VG_IM_GLOBAL_H
 
 #ifdef _DEBUG
 #define DEBUG
@@ -16,7 +16,7 @@
 #define ICIMGUI_FALSE VG_FALSE
 #define ICIMGUI_TRUE VG_TRUE
 
-namespace kimgui {
+namespace vgim {
 	typedef vg::Bool32 Bool32;
 
 	//used to map to imgui key map enum.
@@ -43,4 +43,4 @@ namespace kimgui {
 		ImGuiKey_COUNT
 	};
 } //kimgui
-#endif //VG_KIM_GUI_GLOBAL_H
+#endif //VG_IM_GLOBAL_H

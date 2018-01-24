@@ -7,7 +7,6 @@ namespace vgim {
 	extern Bool32 isInited;
 	extern void moduleCreate();
 	extern void moduleDestory();
-	/*extern std::shared_ptr<GLFWwindow> getCurrWindow();
-	extern void setCurrWindow(std::shared_ptr<GLFWwindow> pWindow);*/
+	extern void renderImGUI();
 } //vgim
 #endif //VG_IM_MODULE_H

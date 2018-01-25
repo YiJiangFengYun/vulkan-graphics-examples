@@ -13,6 +13,8 @@ namespace vg
 		MATERIAL,
 		PASS,
 		SHADER,
+		VERTEX_DATA,
+		INDEX_DATA,
 		MESH,
 		RENDERER,
 		SCENE,

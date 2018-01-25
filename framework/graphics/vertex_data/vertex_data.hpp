@@ -70,7 +70,7 @@ namespace vg
         std::shared_ptr<vk::Buffer> m_pBuffer;
         std::shared_ptr<vk::DeviceMemory> m_pBufferMemory;
         uint32_t m_memorySize;
-        void* m_pMemory;
+        void *m_pMemory;
 
         void _setVertexInputStateCreateInfo(const vk::PipelineVertexInputStateCreateInfo &vertexInputStateCreateInfo);
         void _setInputAssemblyStateCreateInfo(const vk::PipelineInputAssemblyStateCreateInfo &inputAssemblyStateCreateInfo);

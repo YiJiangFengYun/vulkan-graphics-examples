@@ -1,7 +1,5 @@
 #include "graphics/vertex_data/vertex_data.hpp"
 
-#include <cstdlib>
-
 namespace vg 
 {
     VertexData::VertexData()

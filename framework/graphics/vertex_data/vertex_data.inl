@@ -28,7 +28,6 @@ namespace vg
 #ifdef DEBUG
         if (m_pMemory == nullptr) throw std::runtime_error("Failed to get vertex when not chache memory.");
 #endif //!DEBUG
-        // size_t offset = index * sizeof(VertexType);
         VertexType vertex;
         memcpy(&vertex, 
             static_cast<VertexType *>(m_pMemory) + index, 
@@ -42,7 +41,6 @@ namespace vg
 #ifdef DEBUG
         if (m_pMemory == nullptr) throw std::runtime_error("Failed to get verties when not chache memory.");
 #endif //!DEBUG
-        // size_t offset = index * sizeof(VertexType);
         std::vector<VertexType> vertices(count);
         memcpy(vertices.data(), 
             static_cast<VertexType *>(m_pMemory) + offset, 

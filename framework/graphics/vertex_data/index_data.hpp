@@ -11,9 +11,10 @@ namespace vg {
         struct SubIndexData {
             vk::PipelineInputAssemblyStateCreateInfo inputAssemblyStateCreateInfo;            
             uint32_t indexCount;
+            uint32_t bufferSize;
         };
         uint32_t getSubIndexDataCount() const;
-        const std::vector<SubIndexData> getSubIndexDatas() const;
+        const std::vector<SubIndexData> &getSubIndexDatas() const;
         uint32_t getBufferSize() const;
         std::shared_ptr<vk::Buffer> getBuffer() const;
         uint32_t getBufferMemorySize() const;

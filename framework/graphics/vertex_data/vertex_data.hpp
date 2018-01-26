@@ -14,9 +14,10 @@ namespace vg
             std::vector<vk::VertexInputAttributeDescription> attrDescs;
             vk::PipelineVertexInputStateCreateInfo vertexInputStateCreateInfo;
             uint32_t vertexCount;
+            uint32_t bufferSize;
         };
         uint32_t getSubVertexDataCount() const;
-        const std::vector<SubVertexData> getSubVertexDatas() const;
+        const std::vector<SubVertexData> &getSubVertexDatas() const;
         uint32_t getBuffersize() const;
         std::shared_ptr<vk::Buffer> getBuffer() const;
         uint32_t getBufferMemorySize() const;

@@ -32,7 +32,7 @@ namespace vg
         return m_subDataCount;
     }
     
-    const std::vector<VertexData::SubVertexData> VertexData::getSubVertexDatas() const
+    const std::vector<VertexData::SubVertexData> &VertexData::getSubVertexDatas() const
     {
         return m_subDatas;
     }
@@ -78,14 +78,14 @@ namespace vg
         SubVertexData &subData = subDatas[0];
         //copy arguments.
         uint32_t count = vertexInputStateCreateInfo.vertexBindingDescriptionCount;
-        size_t size = count * sizeof(vk::VertexInputBindingDescription);
+        size_t size2 = count * sizeof(vk::VertexInputBindingDescription);
         subData.bindingDescs.resize(count);
-        memcpy(subData.bindingDescs.data(), vertexInputStateCreateInfo.pVertexBindingDescriptions, size);
+        memcpy(subData.bindingDescs.data(), vertexInputStateCreateInfo.pVertexBindingDescriptions, size2);
 
         count = vertexInputStateCreateInfo.vertexAttributeDescriptionCount;
-        size = count * sizeof(vk::VertexInputAttributeDescription);
+		size2 = count * sizeof(vk::VertexInputAttributeDescription);
         subData.attrDescs.resize(count);
-        memcpy(subData.attrDescs.data(), vertexInputStateCreateInfo.pVertexAttributeDescriptions, size);
+        memcpy(subData.attrDescs.data(), vertexInputStateCreateInfo.pVertexAttributeDescriptions, size2);
 
         //set vertex input state create info.
         subData.vertexInputStateCreateInfo = vertexInputStateCreateInfo;
@@ -94,7 +94,9 @@ namespace vg
         subData.vertexInputStateCreateInfo.pVertexBindingDescriptions = subData.bindingDescs.data();
         subData.vertexInputStateCreateInfo.vertexAttributeDescriptionCount = vertexInputStateCreateInfo.vertexAttributeDescriptionCount;
         subData.vertexInputStateCreateInfo.pVertexAttributeDescriptions = subData.attrDescs.data();
-
+        
+        subData.vertexCount = vertexCount;
+        subData.bufferSize = size;
         init(subDatas, memory, size, cacheMemory);
     }
 
@@ -106,6 +108,11 @@ namespace vg
     {
         m_subDataCount = static_cast<uint32_t>(subDatas.size());
         m_subDatas = subDatas;
+		for (auto& subData : m_subDatas) 
+		{
+			subData.vertexInputStateCreateInfo.pVertexBindingDescriptions = subData.bindingDescs.data();
+			subData.vertexInputStateCreateInfo.pVertexAttributeDescriptions = subData.attrDescs.data();
+		}
         
         if (m_pMemory != nullptr && (m_memorySize != size || ! cacheMemory)) {
             free(m_pMemory);

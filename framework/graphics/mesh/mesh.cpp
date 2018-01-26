@@ -1,13 +1,42 @@
 #include "graphics/mesh/mesh.hpp"
 
+#include <cstdlib>
+
 namespace vg
 {
-	BaseMesh::LayoutBindingInfo::LayoutBindingInfo()
+	BaseMesh::BaseMesh()
+	    : Base(BaseType::MESH)
 	{
 
 	}
 
-	BaseMesh::LayoutBindingInfo::LayoutBindingInfo(std::string name,
+	BaseMesh::~BaseMesh()
+	{
+		
+	}
+
+	uint32_t BaseMesh::getSubMeshCount() const
+	{
+		return m_indexData.getSubIndexDataCount();
+	}
+
+
+	const VertexData &BaseMesh::getVertexData() const
+	{
+		return m_vertexData;
+	}
+
+	const IndexData &BaseMesh::getIndexData() const
+	{
+		return m_indexData;
+	}
+
+	SepMesh::LayoutBindingInfo::LayoutBindingInfo()
+	{
+
+	}
+
+	SepMesh::LayoutBindingInfo::LayoutBindingInfo(std::string name,
 		MeshData::DataType dataType,
 		uint32_t bindingPriority)
 		: name(name)
@@ -17,7 +46,7 @@ namespace vg
 
 	}
 
-	BaseMesh::LayoutBindingInfo::LayoutBindingInfo(const LayoutBindingInfo &target)
+	SepMesh::LayoutBindingInfo::LayoutBindingInfo(const LayoutBindingInfo &target)
 		: name(target.name)
 		, dataType(target.dataType)
 		, bindingPriority(target.bindingPriority)
@@ -25,7 +54,7 @@ namespace vg
 
 	}
 
-	BaseMesh::LayoutBindingInfo &BaseMesh::LayoutBindingInfo::operator=(const LayoutBindingInfo &target)
+	SepMesh::LayoutBindingInfo &SepMesh::LayoutBindingInfo::operator=(const LayoutBindingInfo &target)
 	{
 		name = target.name;
 		dataType = target.dataType;
@@ -34,7 +63,7 @@ namespace vg
 	}
 
 
-	BaseMesh::LayoutBindingInfo::LayoutBindingInfo(const LayoutBindingInfo &&target)
+	SepMesh::LayoutBindingInfo::LayoutBindingInfo(const LayoutBindingInfo &&target)
 		: name(target.name)
 		, dataType(target.dataType)
 		, bindingPriority(target.bindingPriority)
@@ -42,23 +71,23 @@ namespace vg
 
 	}
 
-	Bool32 BaseMesh::LayoutBindingInfo::operator ==(const LayoutBindingInfo &target) const
+	Bool32 SepMesh::LayoutBindingInfo::operator ==(const LayoutBindingInfo &target) const
 	{
 		return name == target.name && dataType == target.dataType && bindingPriority == target.bindingPriority;
 	}
 
-	Bool32 BaseMesh::LayoutBindingInfo::operator<(const LayoutBindingInfo &target) const
+	Bool32 SepMesh::LayoutBindingInfo::operator<(const LayoutBindingInfo &target) const
 	{
 		return bindingPriority < target.bindingPriority;
 	}
 
-	MeshType BaseMesh::getMeshType() const
+	MeshType SepMesh::getMeshType() const
 	{
 		return m_meshType;
 	}
 
-	BaseMesh::BaseMesh()
-		: Base(BaseType::MESH)
+	SepMesh::SepMesh()
+		: BaseMesh()
 		, m_multipliedColor(COLOR_WHITE) //default multiplied color should be (1, 1, 1, 1)
 		, m_applied(VG_FALSE)
 	{
@@ -66,38 +95,38 @@ namespace vg
 		setSubMeshCount(1u);
 	}
 
-	BaseMesh::~BaseMesh()
+	SepMesh::~SepMesh()
 	{
 
 	}
 
-	uint32_t BaseMesh::getVertexCount() const
+	uint32_t SepMesh::getVertexCount() const
 	{
 		return m_vertexCount;
 	}
 
-	void BaseMesh::setVertexCount(uint32_t value)
+	void SepMesh::setVertexCount(uint32_t value)
 	{
 		m_vertexCount = value;
 		m_applied = VG_FALSE;
 	}
 
-	const std::vector<Color32> &BaseMesh::getColors() const
+	const std::vector<Color32> &SepMesh::getColors() const
 	{
 		return _getData<MeshData::DataType::COLOR_32_ARRAY>(VG_VERTEX_COLOR_NAME);
 	}
 
-	void BaseMesh::setColors(const std::vector<Color32> &colors)
+	void SepMesh::setColors(const std::vector<Color32> &colors)
 	{
 		_setData<MeshData::DataType::COLOR_32_ARRAY>(VG_VERTEX_COLOR_NAME, colors, VG_VERTEX_BINDING_PRIORITY_COLOR);
 	}
 
-	uint32_t BaseMesh::getSubMeshCount() const
+	uint32_t SepMesh::getSubMeshCount() const
 	{
 		return m_subMeshCount;
 	}
 
-	void BaseMesh::setSubMeshCount(uint32_t value)
+	void SepMesh::setSubMeshCount(uint32_t value)
 	{
 		m_subMeshCount = value;
 		if (static_cast<uint32_t>(m_subMeshInfos.size()) < value)
@@ -107,7 +136,7 @@ namespace vg
 		m_applied = VG_FALSE;
 	}
 
-	const std::vector<uint32_t> &BaseMesh::getIndices(uint32_t subMeshIndex) const
+	const std::vector<uint32_t> &SepMesh::getIndices(uint32_t subMeshIndex) const
 	{
 #ifdef DEBUG
 		_verifySubMeshIndex(subMeshIndex);
@@ -115,7 +144,7 @@ namespace vg
 		return m_subMeshInfos[subMeshIndex].indices;
 	}
 
-	void BaseMesh::setIndices(const std::vector<uint32_t> &indices, PrimitiveTopology topology, uint32_t subMeshIndex)
+	void SepMesh::setIndices(const std::vector<uint32_t> &indices, PrimitiveTopology topology, uint32_t subMeshIndex)
 	{
 #ifdef DEBUG
 		_verifySubMeshIndex(subMeshIndex);
@@ -126,7 +155,7 @@ namespace vg
 		m_applied = VG_FALSE;
 	}
 
-	uint32_t BaseMesh::getIndexCount(uint32_t subMeshIndex) const
+	uint32_t SepMesh::getIndexCount(uint32_t subMeshIndex) const
 	{
 #ifdef DEBUG
 		_verifySubMeshIndex(subMeshIndex);
@@ -134,7 +163,7 @@ namespace vg
 		return _getIndexCount(subMeshIndex);
 	}
 
-	uint32_t BaseMesh::getIndexStart(uint32_t subMeshIndex) const
+	uint32_t SepMesh::getIndexStart(uint32_t subMeshIndex) const
 	{
 #ifdef DEBUG
 		_verifySubMeshIndex(subMeshIndex);
@@ -147,7 +176,7 @@ namespace vg
 		return start;
 	}
 
-	PrimitiveTopology BaseMesh::getTopology(uint32_t subMeshIndex) const
+	PrimitiveTopology SepMesh::getTopology(uint32_t subMeshIndex) const
 	{
 #ifdef DEBUG
 		_verifySubMeshIndex(subMeshIndex);
@@ -155,29 +184,29 @@ namespace vg
 		return m_subMeshInfos[subMeshIndex].topology;
 	}
 
-	Color BaseMesh::getMultipliedColor() const
+	Color SepMesh::getMultipliedColor() const
 	{
 		return m_multipliedColor;
 	}
 
-	void BaseMesh::setMultipliedColor(Color value)
+	void SepMesh::setMultipliedColor(Color value)
 	{
 		m_multipliedColor = value;
 		m_applied = VG_FALSE;
 	}
 
-	Color BaseMesh::getAddedColor() const
+	Color SepMesh::getAddedColor() const
 	{
 		return m_addedColor;
 	}
 
-	void BaseMesh::setAddedColor(Color value)
+	void SepMesh::setAddedColor(Color value)
 	{
 		m_addedColor = value;
 		m_applied = VG_FALSE;
 	}
 
-	void BaseMesh::apply(Bool32 makeUnreadable)
+	void SepMesh::apply(Bool32 makeUnreadable)
 	{
 		if (m_applied == VG_FALSE)
 		{
@@ -190,10 +219,10 @@ namespace vg
 			_sortLayoutBindingInfos();
 
 			//create vertex buffer
-			_createVertexBuffer();
+			_createVertexData();
 
 			//create index buffer
-			_createIndexBuffer();
+			_createIndexData();
 
 			m_applied = VG_TRUE;
 		}
@@ -217,59 +246,15 @@ namespace vg
 		}
 	}
 
-	uint32_t BaseMesh::_getSubMeshCountForRender() const
-	{
-		return m_appliedSubMeshCount;
-	}
-
-	vk::PrimitiveTopology BaseMesh::_getVKTopologyForRender(uint32_t subMeshIndex)
-	{
-		return tranPrimitiveTopologyTypeToVK(m_usingSubMeshInfos[subMeshIndex].topology);
-	}
-
-	uint32_t BaseMesh::_getIndexCountForRender(uint32_t subMeshIndex) const
-	{
-#ifdef DEBUG
-		if (subMeshIndex >= m_appliedSubMeshCount)
-			throw std::range_error("The subMeshIndex out of range of the actual sub mesh count.");
-#endif // DEBUG
-		return static_cast<uint32_t>(m_usingSubMeshInfos[subMeshIndex].indices.size());
-	}
-
-	void BaseMesh::_fillCommandBufferForRender(uint32_t subMeshIndex, vk::CommandBuffer &commandBuffer)
-	{
-		std::vector<vk::Buffer> vertexBuffers(m_layoutBindingInfos.size());
-		std::vector<vk::DeviceSize> offsets(m_layoutBindingInfos.size());
-		uint32_t offset = 0u;
-		uint32_t index = 0u;
-		for (const auto& layoutInfo : m_layoutBindingInfos)
-		{
-			vertexBuffers[index] = *m_pVertexBuffer;
-			offsets[index] = offset;
-			offset += MeshData::getDataBaseTypeSize(layoutInfo.dataType) * m_appliedVertexCount;
-			++index;
-		}
-
-		commandBuffer.bindVertexBuffers(0u, vertexBuffers, offsets);
-
-		offset = 0u;
-		for (uint32_t i = 0; i < subMeshIndex; ++i)
-		{
-			std::vector<uint32_t>& indices = m_usingSubMeshInfos[i].indices;
-			size_t size = indices.size() * sizeof(uint32_t);
-			offset += static_cast<uint32_t>(size);
-		}
-		commandBuffer.bindIndexBuffer(*m_pIndexBuffer, static_cast<vk::DeviceSize>(offset), vk::IndexType::eUint32);
-	}
-
-	void BaseMesh::_createMeshData()
+	void SepMesh::_createMeshData()
 	{
 		m_pData = std::shared_ptr<MeshData>(new MeshData());
 	}
 
-	void BaseMesh::_createVertexBuffer()
+	void SepMesh::_createVertexData()
 	{
 		auto vertexCount = m_appliedVertexCount;
+		vk::PipelineVertexInputStateCreateInfo createInfo;
 		//get size of every vertex
 		uint32_t size = 0u;
 		for (const auto& layoutInfo : m_layoutBindingInfos)
@@ -278,106 +263,73 @@ namespace vg
 		}
 		//get vertex buffer size.
 		uint32_t vertexBufferSize = size * vertexCount;
+		std::vector<vk::VertexInputBindingDescription> bindingdescs(m_layoutBindingInfos.size());
+		uint32_t index = 0u;
+		for (const auto& info : m_layoutBindingInfos)
+		{
+			bindingdescs[index].binding = index;
+			bindingdescs[index].stride = MeshData::getDataBaseTypeSize(info.dataType);
+			bindingdescs[index].inputRate = vk::VertexInputRate::eVertex;
+			++index;
+		}
 
-		//create staging buffer.
-		vk::BufferCreateInfo createInfo = {
-			vk::BufferCreateFlags(),
-			vertexBufferSize,
-			vk::BufferUsageFlagBits::eTransferSrc,
-			vk::SharingMode::eExclusive
-		};
+		std::vector<vk::VertexInputAttributeDescription> attriDescs(m_layoutBindingInfos.size());
+		index = 0u;
+		for (const auto& info : m_layoutBindingInfos)
+		{
+			attriDescs[index].binding = index;
+			attriDescs[index].location = index;
+			attriDescs[index].format = MeshData::getBaseFormatWithDataType(info.dataType);
+			attriDescs[index].offset = 0u;
+			++index;
+		}
 
-		auto pPhysicalDevice = pApp->getPhysicalDevice();
-		auto pDevice = pApp->getDevice();
-		auto pStagingBuffer = fd::createBuffer(pDevice, createInfo);
+		createInfo.vertexBindingDescriptionCount = static_cast<uint32_t>(bindingdescs.size());
+        createInfo.pVertexBindingDescriptions = bindingdescs.data();
+        createInfo.vertexAttributeDescriptionCount = static_cast<uint32_t>(attriDescs.size());
+        createInfo.pVertexAttributeDescriptions = attriDescs.data();
 
-		vk::MemoryRequirements memReqs = pDevice->getBufferMemoryRequirements(*pStagingBuffer);
-		vk::MemoryAllocateInfo allocateInfo = {
-			memReqs.size,
-			vg::findMemoryType(pPhysicalDevice, memReqs.memoryTypeBits, vk::MemoryPropertyFlagBits::eHostVisible | vk::MemoryPropertyFlagBits::eHostCoherent)
-		};
-
-		auto pStagingBufferMemory = fd::allocateMemory(pDevice, allocateInfo);
-
-		pDevice->bindBufferMemory(*pStagingBuffer, *pStagingBufferMemory, 0u);
-
-		void* data;
-		pDevice->mapMemory(*pStagingBufferMemory, 0u, static_cast<vk::DeviceSize>(vertexBufferSize), vk::MemoryMapFlags(), &data);
+		void *stagingMemory = malloc(vertexBufferSize);
 		uint32_t offset = 0u;
 		for (const auto& layoutInfo : m_layoutBindingInfos)
 		{
-			m_pData->memCopyDataValue(layoutInfo.name, layoutInfo.dataType, data, offset, 0u, vertexCount);
+			m_pData->memCopyDataValue(layoutInfo.name, layoutInfo.dataType, stagingMemory, offset, 0u, vertexCount);
 			offset += MeshData::getDataBaseTypeSize(layoutInfo.dataType) * vertexCount;
 		}
-		pDevice->unmapMemory(*pStagingBufferMemory);
 
-		//create vertex buffer
-		createInfo.usage = vk::BufferUsageFlagBits::eTransferDst | vk::BufferUsageFlagBits::eVertexBuffer;
-		m_pVertexBuffer = fd::createBuffer(pDevice, createInfo);
-		memReqs = pDevice->getBufferMemoryRequirements(*m_pVertexBuffer);
-		allocateInfo.allocationSize = memReqs.size;
-		allocateInfo.memoryTypeIndex = vg::findMemoryType(pPhysicalDevice, memReqs.memoryTypeBits, vk::MemoryPropertyFlagBits::eDeviceLocal);
-		m_pVertexBufferMemory = fd::allocateMemory(pDevice, allocateInfo);
-		pDevice->bindBufferMemory(*m_pVertexBuffer, *m_pVertexBufferMemory, 0u);
+		m_vertexData.init(vertexCount, stagingMemory, vertexBufferSize, VG_FALSE, createInfo);
 
-		//copy buffer from staging buffer to vertex buffer.
-		_copyBuffer(pStagingBuffer, m_pVertexBuffer, vertexBufferSize);
+		free(stagingMemory);
 	}
 
-	void BaseMesh::_createIndexBuffer()
+	void SepMesh::_createIndexData()
 	{
 		//get index buffer size
-		uint32_t indexBufferSize = 0u;
-		for (const auto& item : m_usingSubMeshInfos)
-		{
-			const std::vector<uint32_t>& indices = item.indices;
-			indexBufferSize += static_cast<uint32_t>(indices.size() * sizeof(uint32_t));
+		uint32_t subCount = m_usingSubMeshInfos.size();
+		uint32_t indexBufferSize = 0u;		
+		std::vector<IndexData::SubIndexData> subDatas(subCount);
+		for (uint32_t i = 0; i < subCount; ++i) {
+			const std::vector<uint32_t>& indices = m_usingSubMeshInfos[i].indices;
+			uint32_t subBufferSize = static_cast<uint32_t>(indices.size() * sizeof(uint32_t));
+			subDatas[i].bufferSize = subBufferSize;
+			subDatas[i].indexCount = indices.size();
+			subDatas[i].inputAssemblyStateCreateInfo.primitiveRestartEnable = VK_FALSE;
+			subDatas[i].inputAssemblyStateCreateInfo.topology = tranPrimitiveTopologyTypeToVK(m_usingSubMeshInfos[i].topology);
+			indexBufferSize += subBufferSize;
 		}
 
-		//create staging buffer.
-		vk::BufferCreateInfo createInfo = {
-			vk::BufferCreateFlags(),
-			indexBufferSize,
-			vk::BufferUsageFlagBits::eTransferSrc,
-			vk::SharingMode::eExclusive
-		};
-
-		auto pPhysicalDevice = pApp->getPhysicalDevice();
-		auto pDevice = pApp->getDevice();
-		auto pStagingBuffer = fd::createBuffer(pDevice, createInfo);
-
-		vk::MemoryRequirements memReqs = pDevice->getBufferMemoryRequirements(*pStagingBuffer);
-		vk::MemoryAllocateInfo allocateInfo = {
-			memReqs.size,
-			vg::findMemoryType(pPhysicalDevice, memReqs.memoryTypeBits, vk::MemoryPropertyFlagBits::eHostVisible | vk::MemoryPropertyFlagBits::eHostCoherent)
-		};
-
-		auto pStagingBufferMemory = fd::allocateMemory(pDevice, allocateInfo);
-
-		pDevice->bindBufferMemory(*pStagingBuffer, *pStagingBufferMemory, 0u);
-
-		void* data;
-		pDevice->mapMemory(*pStagingBufferMemory, 0u, static_cast<vk::DeviceSize>(indexBufferSize), vk::MemoryMapFlags(), &data);
+        void *stagingMemory = malloc(indexBufferSize);
 		uint32_t offset = 0u;
 		for (const auto& subMeshInfo : m_usingSubMeshInfos)
 		{
 			const std::vector<uint32_t>& indices = subMeshInfo.indices;
 			size_t size = indices.size() * sizeof(uint32_t);
-			memcpy((char*)data + offset, indices.data(), size);
+			memcpy((char*)stagingMemory + offset, indices.data(), size);
 			offset += static_cast<uint32_t>(size);
 		}
-		pDevice->unmapMemory(*pStagingBufferMemory);
 
-		//create index buffer
-		createInfo.usage = vk::BufferUsageFlagBits::eTransferDst | vk::BufferUsageFlagBits::eIndexBuffer;
-		m_pIndexBuffer = fd::createBuffer(pDevice, createInfo);
-		memReqs = pDevice->getBufferMemoryRequirements(*m_pIndexBuffer);
-		allocateInfo.allocationSize = memReqs.size;
-		allocateInfo.memoryTypeIndex = vg::findMemoryType(pPhysicalDevice, memReqs.memoryTypeBits, vk::MemoryPropertyFlagBits::eDeviceLocal);
-		m_pIndexBufferMemory = fd::allocateMemory(pDevice, allocateInfo);
-		pDevice->bindBufferMemory(*m_pIndexBuffer, *m_pIndexBufferMemory, 0u);
+		m_indexData.init(subDatas, stagingMemory, indexBufferSize, VG_FALSE);
 
-		//copy buffer from staging buffer to index buffer.
-		_copyBuffer(pStagingBuffer, m_pIndexBuffer, indexBufferSize);
+		free(stagingMemory);
 	}
 }

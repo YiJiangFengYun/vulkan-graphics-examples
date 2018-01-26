@@ -1,37 +1,37 @@
 namespace vg
 {
 	template<UVType uvType, UVIndex uvIndex>
-	const typename MeshData::DataTypeInfo<UVConstInfo<uvType>::ARRAY_TYPE>::ValueType &BaseMesh::getUVs() const
+	const typename MeshData::DataTypeInfo<UVConstInfo<uvType>::ARRAY_TYPE>::ValueType &SepMesh::getUVs() const
 	{
 		return _getData<UVConstInfo<uvType>::ARRAY_TYPE>(UVIndexInfo<uvIndex>::VERTEX_NAME);
 	}
 
 	template<UVType uvType, UVIndex uvIndex>
-	void BaseMesh::setUVs(const typename MeshData::DataTypeInfo<UVConstInfo<uvType>::ARRAY_TYPE>::ValueType &uvs)
+	void SepMesh::setUVs(const typename MeshData::DataTypeInfo<UVConstInfo<uvType>::ARRAY_TYPE>::ValueType &uvs)
 	{
 		_setData<UVConstInfo<uvType>::ARRAY_TYPE>(UVIndexInfo<uvIndex>::VERTEX_NAME, uvs, UVIndexInfo<uvIndex>::VERTEX_BINDING_PRIORITY);
 	}
 
 	template<MeshData::DataType dataType>
-	const typename MeshData::DataTypeInfo<dataType>::ValueType &BaseMesh::getData(std::string name) const
+	const typename MeshData::DataTypeInfo<dataType>::ValueType &SepMesh::getData(std::string name) const
 	{
 		return _getData<dataType>(name);
 	}
 
 	template <MeshData::DataType dataType>
-	void BaseMesh::setData(std::string name, const typename MeshData::DataTypeInfo<dataType>::ValueType &value, uint32_t bindingPriority)
+	void SepMesh::setData(std::string name, const typename MeshData::DataTypeInfo<dataType>::ValueType &value, uint32_t bindingPriority)
 	{
 		_setData<dataType>(name, value, bindingPriority);
 	}
 
 	template<MeshData::DataType dataType>
-	const typename MeshData::DataTypeInfo<dataType>::ValueType &BaseMesh::_getData(std::string name) const
+	const typename MeshData::DataTypeInfo<dataType>::ValueType &SepMesh::_getData(std::string name) const
 	{
 		return m_pData->getDataValue<dataType>(name);
 	}
 
 	template <MeshData::DataType dataType>
-	void BaseMesh::_setData(std::string name, const typename MeshData::DataTypeInfo<dataType>::ValueType &value, uint32_t bindingPriority)
+	void SepMesh::_setData(std::string name, const typename MeshData::DataTypeInfo<dataType>::ValueType &value, uint32_t bindingPriority)
 	{
 		m_pData->setDataValue<dataType>(name, value);
 		//update layout binding info
@@ -44,7 +44,7 @@ namespace vg
 		m_applied = VG_FALSE;
 	}
 
-	void BaseMesh::_sortLayoutBindingInfos()
+	void SepMesh::_sortLayoutBindingInfos()
 	{
 		m_layoutBindingInfos.clear();
 		for (const auto& name : m_arrLayoutBindingInfoNames)
@@ -55,35 +55,22 @@ namespace vg
 	}
 
 #ifdef DEBUG
-	void BaseMesh::_verifySubMeshIndex(uint32_t subMeshIndex) const
+	void SepMesh::_verifySubMeshIndex(uint32_t subMeshIndex) const
 	{
 		if (subMeshIndex >= m_subMeshCount)
 			throw std::range_error("The subMeshIndex out of range of the actual sub mesh count.");
 	}
 #endif // DEBUG
 
-	uint32_t BaseMesh::_getIndexCount(uint32_t subMeshIndex) const
+	uint32_t SepMesh::_getIndexCount(uint32_t subMeshIndex) const
 	{
 		SubMeshInfo subMeshInfo = m_subMeshInfos[subMeshIndex];
 		return static_cast<uint32_t>(subMeshInfo.indices.size());
 	}
 
-	void BaseMesh::_copyBuffer(std::shared_ptr<vk::Buffer>& pSrcBuffer, std::shared_ptr<vk::Buffer>& pDstBuffer, vk::DeviceSize size)
-	{
-		auto pCommandBuffer = beginSingleTimeCommands();
-
-		vk::BufferCopy copyRegin = {};
-		copyRegin.srcOffset = 0;
-		copyRegin.dstOffset = 0;
-		copyRegin.size = size;
-		pCommandBuffer->copyBuffer(*pSrcBuffer, *pDstBuffer, copyRegin);
-
-		endSingleTimeCommands(pCommandBuffer);
-	}
-
 	template <MeshType meshType>
 	Mesh<meshType>::Mesh() 
-		: BaseMesh()
+		: SepMesh()
 	{
 		m_meshType = meshType;
 	}
@@ -142,38 +129,7 @@ namespace vg
 		//caculate bounds
 		_updateBounds();
 
-		BaseMesh::apply(makeUnreadable);
-	}
-
-	template <MeshType meshType>
-	std::vector<vk::VertexInputBindingDescription> Mesh<meshType>::_getVertexInputBindingDescriptionsForRender()
-	{
-		std::vector<vk::VertexInputBindingDescription> descriptions(m_layoutBindingInfos.size());
-		uint32_t index = 0u;
-		for (const auto& info : m_layoutBindingInfos)
-		{
-			descriptions[index].binding = index;
-			descriptions[index].stride = MeshData::getDataBaseTypeSize(info.dataType);
-			descriptions[index].inputRate = vk::VertexInputRate::eVertex;
-			++index;
-		}
-		return descriptions;
-	}
-
-	template <MeshType meshType>
-	std::vector<vk::VertexInputAttributeDescription> Mesh<meshType>::_getVertexInputAttributeDescriptionsForRender()
-	{
-		std::vector<vk::VertexInputAttributeDescription> descriptions(m_layoutBindingInfos.size());
-		uint32_t index = 0u;
-		for (const auto& info : m_layoutBindingInfos)
-		{
-			descriptions[index].binding = index;
-			descriptions[index].location = index;
-			descriptions[index].format = MeshData::getBaseFormatWithDataType(info.dataType);
-			descriptions[index].offset = 0u;
-			++index;
-		}
-		return descriptions;
+		SepMesh::apply(makeUnreadable);
 	}
 
 	template <MeshType meshType>

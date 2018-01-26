@@ -1,5 +1,7 @@
 #include "graphics/renderer/renderer.hpp"
 
+#include "graphics/vertex_data/util.hpp"
+
 namespace vg
 {
 	const vk::Format BaseRenderer::DEFAULT_DEPTH_STENCIL_FORMAT(vk::Format::eD32SfloatS8Uint);
@@ -175,25 +177,11 @@ namespace vg
 		createInfo.stageCount = 2u;
 		createInfo.pStages = shaderStages;
 
-		//Fill binding description and attributeDescriptions for one sub mesh of the mesh.
-		std::vector<vk::VertexInputBindingDescription> bindingDescriptions = pMesh->_getVertexInputBindingDescriptionsForRender();
-		std::vector<vk::VertexInputAttributeDescription> attributeDescriptions = pMesh->_getVertexInputAttributeDescriptionsForRender();
-		vk::PipelineVertexInputStateCreateInfo vertexInputStateInfo = {
-			vk::PipelineVertexInputStateCreateFlags(),
-			static_cast<uint32_t>(bindingDescriptions.size()),
-			bindingDescriptions.data(),
-			static_cast<uint32_t>(attributeDescriptions.size()),
-			attributeDescriptions.data()
-		};
+		const VertexData::SubVertexData &subVertexData = pMesh->getVertexData().getSubVertexDatas()[0];
+		const IndexData::SubIndexData &subIndexData = pMesh->getIndexData().getSubIndexDatas()[subMeshIndex];
 
-		vk::PipelineInputAssemblyStateCreateInfo inputAssemblyStateInfo = {
-			vk::PipelineInputAssemblyStateCreateFlags(),
-			pMesh->_getVKTopologyForRender(subMeshIndex),
-			VK_FALSE
-		};
-
-		createInfo.pVertexInputState = &vertexInputStateInfo;
-		createInfo.pInputAssemblyState = &inputAssemblyStateInfo;
+		createInfo.pVertexInputState = &subVertexData.vertexInputStateCreateInfo;
+		createInfo.pInputAssemblyState = &subIndexData.inputAssemblyStateCreateInfo;
 
 		const auto& viewportOfPass = pPass->getViewport();
 		const auto& scissorOfPass = pPass->getScissor();
@@ -390,9 +378,9 @@ namespace vg
 		}
 		m_pCommandBuffer->bindDescriptorSets(vk::PipelineBindPoint::eGraphics, *pPipelineLayout, 0u, descriptorSets, nullptr);
 
-		pMesh->_fillCommandBufferForRender(subMeshIndex, *m_pCommandBuffer);
-
-		m_pCommandBuffer->drawIndexed(pMesh->_getIndexCountForRender(subMeshIndex), 1u, 0u, 0u, 0u);
+        vertexDataToCommandBuffer(pMesh->getVertexData(), *m_pCommandBuffer, 0);
+		indexDataToCommandBuffer(pMesh->getIndexData(), *m_pCommandBuffer, subMeshIndex);
+		m_pCommandBuffer->drawIndexed(pMesh->getIndexData().getSubIndexDatas()[subMeshIndex].indexCount, 1u, 0u, 0u, 0u);
 		//m_pCommandBuffer->draw(3, 1, 0, 0);
 
 		m_pCommandBuffer->endRenderPass();

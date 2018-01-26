@@ -9,11 +9,14 @@ namespace vg
     class VertexData : public Base
     {
     public:
-        const std::vector<vk::VertexInputBindingDescription> &getBindingDescs();
-        const std::vector<vk::VertexInputAttributeDescription> &getAttributeDecs();
-        const vk::PipelineVertexInputStateCreateInfo &getVertexInputStateCreateInfo();
-        const vk::PipelineInputAssemblyStateCreateInfo &getInputAssemblyStateCreateInfo();
-        uint32_t getVertexCount() const;
+        struct SubVertexData {
+            std::vector<vk::VertexInputBindingDescription> bindingDescs;
+            std::vector<vk::VertexInputAttributeDescription> attrDescs;
+            vk::PipelineVertexInputStateCreateInfo vertexInputStateCreateInfo;
+            uint32_t vertexCount;
+        };
+        uint32_t getSubVertexDataCount() const;
+        const std::vector<SubVertexData> getSubVertexDatas() const;
         uint32_t getBuffersize() const;
         std::shared_ptr<vk::Buffer> getBuffer() const;
         uint32_t getBufferMemorySize() const;
@@ -22,9 +25,6 @@ namespace vg
         const void *getMemory() const;
 
         VertexData();
-        VertexData(const vk::PipelineVertexInputStateCreateInfo &vertexInputStateCreateInfo
-            , const vk::PipelineInputAssemblyStateCreateInfo &inputAssemblyStateCreateInfo
-            );
 
         ~VertexData();
 
@@ -32,19 +32,12 @@ namespace vg
             , const void *memory
             , uint32_t size
             , Bool32 cacheMemory
+            , const vk::PipelineVertexInputStateCreateInfo &vertexInputStateCreateInfo 
             );
 
-        void init(uint32_t vertexCount
+        void init(const std::vector<SubVertexData> subDatas
             , const void *memory
             , uint32_t size
-            , Bool32 cacheMemory
-            , const vk::PipelineVertexInputStateCreateInfo &vertexInputStateCreateInfo
-            , const vk::PipelineInputAssemblyStateCreateInfo &inputAssemblyStateCreateInfo 
-            );
-
-        template<typename VertexType>
-        void init(uint32_t vertexCount 
-            , const void *memory
             , Bool32 cacheMemory
             );
         
@@ -53,7 +46,7 @@ namespace vg
             , const void *memory
             , Bool32 cacheMemory
             , const vk::PipelineVertexInputStateCreateInfo &vertexInputStateCreateInfo
-            , const vk::PipelineInputAssemblyStateCreateInfo &inputAssemblyStateCreateInfo);
+            );
         
         template<typename VertexType>
         VertexType getVertex(uint32_t index) const;
@@ -61,12 +54,9 @@ namespace vg
         template<typename VertexType>
         std::vector<VertexType> getVertices(uint32_t offset, uint32_t count) const;
 
-    private:        
-        std::vector<vk::VertexInputBindingDescription> m_bindingDescs;
-        std::vector<vk::VertexInputAttributeDescription> m_attrDescs;
-        vk::PipelineVertexInputStateCreateInfo m_vertexInputStateCreateInfo;
-        vk::PipelineInputAssemblyStateCreateInfo m_inputAssemblyStateCreateInfo;
-        uint32_t m_vertexCount;
+    private:
+        std::vector<SubVertexData> m_subDatas;
+        uint32_t m_subDataCount;
         uint32_t m_bufferSize;
         std::shared_ptr<vk::Buffer> m_pBuffer;
         uint32_t m_bufferMemorySize;
@@ -74,8 +64,6 @@ namespace vg
         uint32_t m_memorySize;
         void *m_pMemory;
 
-        void _setVertexInputStateCreateInfo(const vk::PipelineVertexInputStateCreateInfo &vertexInputStateCreateInfo);
-        void _setInputAssemblyStateCreateInfo(const vk::PipelineInputAssemblyStateCreateInfo &inputAssemblyStateCreateInfo);
         void _createBuffer(const void *pMemory, uint32_t memorySize);
     };
 

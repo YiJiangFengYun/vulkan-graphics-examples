@@ -8,7 +8,8 @@ namespace vg
 {
     IndexData::IndexData()
         : Base(BaseType::INDEX_DATA)
-        , m_indexCount()
+        , m_subDatas()
+        , m_subDataCount()
         , m_bufferSize()
         , m_pBuffer()
         , m_bufferMemorySize()
@@ -26,9 +27,14 @@ namespace vg
         }
     }
 
-    uint32_t IndexData::getIndexCount() const
+    uint32_t IndexData::getSubIndexDataCount() const
     {
-        return m_indexCount;
+        return m_subDataCount;
+    }
+
+    const std::vector<IndexData::SubIndexData> IndexData::getSubIndexDatas() const
+    {
+        return m_subDatas;
     }
 
     uint32_t IndexData::getBufferSize() const
@@ -61,13 +67,15 @@ namespace vg
         return m_pMemory;
     }
 
-    void IndexData::init(uint32_t indexCount
+    void IndexData::init(const std::vector<IndexData::SubIndexData> subDatas
         , const void *memory
         , uint32_t size
         , Bool32 cacheMemory
         )
     {
-        m_indexCount = indexCount;
+        m_subDataCount = static_cast<uint32_t>(subDatas.size());
+        m_subDatas = subDatas;
+
         if (m_pMemory != nullptr && (m_memorySize != size || ! cacheMemory)) {
             free(m_pMemory);
             m_memorySize = 0;
@@ -80,12 +88,26 @@ namespace vg
             }                       
             memcpy(m_pMemory, memory, size);
         }
+
+        _createBuffer(memory, size);
     }
 
-
+    void IndexData::init(uint32_t indexCount
+             , const void *memory
+             , uint32_t size
+             , Bool32 cacheMemory
+             , const vk::PipelineInputAssemblyStateCreateInfo &inputAssemblyStateCreateInfo
+             )
+    {
+        std::vector<SubIndexData> subDatas(1);
+        SubIndexData &subData = subDatas[0];
+        subData.inputAssemblyStateCreateInfo = inputAssemblyStateCreateInfo;
+        subData.inputAssemblyStateCreateInfo.pNext = nullptr;
+        init(subDatas, memory, size, cacheMemory);
+    }
+    
     void IndexData::_createBuffer(const void *pMemory, uint32_t memorySize)
     {
-        auto indexCount = m_indexCount;
 		auto bufferSize = memorySize;
 		//create staging buffer.
 		vk::BufferCreateInfo createInfo = {
@@ -122,7 +144,7 @@ namespace vg
 		    createInfo.usage = vk::BufferUsageFlagBits::eTransferDst | vk::BufferUsageFlagBits::eIndexBuffer;
 		    m_pBuffer = fd::createBuffer(pDevice, createInfo);
 		    memReqs = pDevice->getBufferMemoryRequirements(*m_pBuffer);
-            m_bufferMemorySize = memReqs.size;        
+            m_bufferMemorySize = static_cast<uint32_t>(memReqs.size);        
 		    allocateInfo.allocationSize = memReqs.size;
 		    allocateInfo.memoryTypeIndex = vg::findMemoryType(pPhysicalDevice, memReqs.memoryTypeBits, vk::MemoryPropertyFlagBits::eDeviceLocal);
 		    m_pBufferMemory = fd::allocateMemory(pDevice, allocateInfo);

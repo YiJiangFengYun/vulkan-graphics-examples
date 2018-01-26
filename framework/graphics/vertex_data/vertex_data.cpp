@@ -8,11 +8,8 @@ namespace vg
 {
     VertexData::VertexData()
         : Base(BaseType::VERTEX_DATA)
-        , m_bindingDescs()
-        , m_attrDescs()
-        , m_vertexInputStateCreateInfo()
-        , m_inputAssemblyStateCreateInfo()
-        , m_vertexCount(0u)
+        , m_subDatas()
+        , m_subDataCount()
         , m_bufferSize(0u)
         , m_pBuffer()
         , m_bufferMemorySize()
@@ -21,26 +18,6 @@ namespace vg
         , m_pMemory(nullptr)
     {
 
-    }
-
-    VertexData::VertexData(const vk::PipelineVertexInputStateCreateInfo &vertexInputStateCreateInfo
-        , const vk::PipelineInputAssemblyStateCreateInfo &inputAssemblyStateCreateInfo
-        )
-        : Base(BaseType::VERTEX_DATA)
-        , m_bindingDescs()
-        , m_attrDescs()
-        , m_vertexInputStateCreateInfo()
-        , m_inputAssemblyStateCreateInfo()
-        , m_vertexCount(0u)
-        , m_bufferSize(0u)
-        , m_pBuffer()
-        , m_bufferMemorySize()
-        , m_pBufferMemory()
-        , m_memorySize()
-        , m_pMemory(nullptr)
-    {
-        _setVertexInputStateCreateInfo(vertexInputStateCreateInfo);
-        _setInputAssemblyStateCreateInfo(inputAssemblyStateCreateInfo);
     }
 
     VertexData::~VertexData()
@@ -49,28 +26,15 @@ namespace vg
             free(m_pMemory);
         }
     }
-
-    const std::vector<vk::VertexInputBindingDescription> &VertexData::getBindingDescs()
+    
+    uint32_t VertexData::getSubVertexDataCount() const
     {
-        return m_bindingDescs;
+        return m_subDataCount;
     }
-    const std::vector<vk::VertexInputAttributeDescription> &VertexData::getAttributeDecs()
+    
+    const std::vector<VertexData::SubVertexData> VertexData::getSubVertexDatas() const
     {
-        return m_attrDescs;
-    }
-    const vk::PipelineVertexInputStateCreateInfo &VertexData::getVertexInputStateCreateInfo()
-    {
-        return m_vertexInputStateCreateInfo;
-    }
-
-    const vk::PipelineInputAssemblyStateCreateInfo &VertexData::getInputAssemblyStateCreateInfo()
-    {
-        return m_inputAssemblyStateCreateInfo;
-    }
-
-    uint32_t VertexData::getVertexCount() const
-    {
-        return m_vertexCount;
+        return m_subDatas;
     }
 
     uint32_t VertexData::getBuffersize() const
@@ -107,10 +71,42 @@ namespace vg
         , const void *memory
         , uint32_t size
         , Bool32 cacheMemory
+        , const vk::PipelineVertexInputStateCreateInfo &vertexInputStateCreateInfo
         )
     {
-        m_vertexCount = vertexCount;
+        std::vector<SubVertexData> subDatas(1);
+        SubVertexData &subData = subDatas[0];
+        //copy arguments.
+        uint32_t count = vertexInputStateCreateInfo.vertexBindingDescriptionCount;
+        size_t size = count * sizeof(vk::VertexInputBindingDescription);
+        subData.bindingDescs.resize(count);
+        memcpy(subData.bindingDescs.data(), vertexInputStateCreateInfo.pVertexBindingDescriptions, size);
 
+        count = vertexInputStateCreateInfo.vertexAttributeDescriptionCount;
+        size = count * sizeof(vk::VertexInputAttributeDescription);
+        subData.attrDescs.resize(count);
+        memcpy(subData.attrDescs.data(), vertexInputStateCreateInfo.pVertexAttributeDescriptions, size);
+
+        //set vertex input state create info.
+        subData.vertexInputStateCreateInfo = vertexInputStateCreateInfo;
+        subData.vertexInputStateCreateInfo.pNext = nullptr;
+        subData.vertexInputStateCreateInfo.vertexBindingDescriptionCount = vertexInputStateCreateInfo.vertexBindingDescriptionCount;
+        subData.vertexInputStateCreateInfo.pVertexBindingDescriptions = subData.bindingDescs.data();
+        subData.vertexInputStateCreateInfo.vertexAttributeDescriptionCount = vertexInputStateCreateInfo.vertexAttributeDescriptionCount;
+        subData.vertexInputStateCreateInfo.pVertexAttributeDescriptions = subData.attrDescs.data();
+
+        init(subDatas, memory, size, cacheMemory);
+    }
+
+    void VertexData::init(const std::vector<VertexData::SubVertexData> subDatas
+            , const void *memory
+            , uint32_t size
+            , Bool32 cacheMemory
+            )
+    {
+        m_subDataCount = static_cast<uint32_t>(subDatas.size());
+        m_subDatas = subDatas;
+        
         if (m_pMemory != nullptr && (m_memorySize != size || ! cacheMemory)) {
             free(m_pMemory);
             m_memorySize = 0;
@@ -124,53 +120,10 @@ namespace vg
         }
 
         _createBuffer(memory, size);
-
-    }
-
-    void VertexData::init(uint32_t vertexCount
-        , const void *memory
-        , uint32_t size
-        , Bool32 cacheMemory
-        , const vk::PipelineVertexInputStateCreateInfo &vertexInputStateCreateInfo
-        , const vk::PipelineInputAssemblyStateCreateInfo &inputAssemblyStateCreateInfo 
-        )
-    {
-        init(vertexCount, memory, size, cacheMemory);
-        _setVertexInputStateCreateInfo(vertexInputStateCreateInfo);
-        _setInputAssemblyStateCreateInfo(inputAssemblyStateCreateInfo);
-    }
-
-    void VertexData::_setVertexInputStateCreateInfo(const vk::PipelineVertexInputStateCreateInfo &vertexInputStateCreateInfo)
-    {
-        //copy arguments.
-        uint32_t count = vertexInputStateCreateInfo.vertexBindingDescriptionCount;
-        size_t size = count * sizeof(vk::VertexInputBindingDescription);
-        m_bindingDescs.resize(count);
-        memcpy(m_bindingDescs.data(), vertexInputStateCreateInfo.pVertexBindingDescriptions, size);
-
-        count = vertexInputStateCreateInfo.vertexAttributeDescriptionCount;
-        size = count * sizeof(vk::VertexInputAttributeDescription);
-        m_attrDescs.resize(count);
-        memcpy(m_attrDescs.data(), vertexInputStateCreateInfo.pVertexAttributeDescriptions, size);
-
-        //set vertex input state create info.
-        m_vertexInputStateCreateInfo = vertexInputStateCreateInfo;
-        m_vertexInputStateCreateInfo.pNext = nullptr;
-        m_vertexInputStateCreateInfo.vertexBindingDescriptionCount = vertexInputStateCreateInfo.vertexBindingDescriptionCount;
-        m_vertexInputStateCreateInfo.pVertexBindingDescriptions = m_bindingDescs.data();
-        m_vertexInputStateCreateInfo.vertexAttributeDescriptionCount = vertexInputStateCreateInfo.vertexAttributeDescriptionCount;
-        m_vertexInputStateCreateInfo.pVertexAttributeDescriptions = m_attrDescs.data();
-    }
-
-    void VertexData::_setInputAssemblyStateCreateInfo(const vk::PipelineInputAssemblyStateCreateInfo &inputAssemblyStateCreateInfo)
-    {
-        m_inputAssemblyStateCreateInfo = inputAssemblyStateCreateInfo;
-        m_inputAssemblyStateCreateInfo.pNext = nullptr; 
     }
 
     void VertexData::_createBuffer(const void *pMemory, uint32_t memorySize)
     {
-        auto vertexCount = m_vertexCount;
 		auto bufferSize = memorySize;
 		//create staging buffer.
 		vk::BufferCreateInfo createInfo = {
@@ -207,7 +160,7 @@ namespace vg
 		    createInfo.usage = vk::BufferUsageFlagBits::eTransferDst | vk::BufferUsageFlagBits::eVertexBuffer;
 		    m_pBuffer = fd::createBuffer(pDevice, createInfo);
 		    memReqs = pDevice->getBufferMemoryRequirements(*m_pBuffer);
-            m_bufferMemorySize = memReqs.size;        
+            m_bufferMemorySize = static_cast<uint32_t>(memReqs.size);        
 		    allocateInfo.allocationSize = memReqs.size;
 		    allocateInfo.memoryTypeIndex = vg::findMemoryType(pPhysicalDevice, memReqs.memoryTypeBits, vk::MemoryPropertyFlagBits::eDeviceLocal);
 		    m_pBufferMemory = fd::allocateMemory(pDevice, allocateInfo);

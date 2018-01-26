@@ -8,7 +8,12 @@ namespace vg {
      class IndexData : public Base
      {
      public:
-        uint32_t getIndexCount() const;
+        struct SubIndexData {
+            vk::PipelineInputAssemblyStateCreateInfo inputAssemblyStateCreateInfo;            
+            uint32_t indexCount;
+        };
+        uint32_t getSubIndexDataCount() const;
+        const std::vector<SubIndexData> getSubIndexDatas() const;
         uint32_t getBufferSize() const;
         std::shared_ptr<vk::Buffer> getBuffer() const;
         uint32_t getBufferMemorySize() const;
@@ -19,16 +24,24 @@ namespace vg {
         IndexData();
         ~IndexData();
 
+        void init(const std::vector<SubIndexData> subDatas
+            , const void *memory
+            , uint32_t size
+            , Bool32 cacheMemory
+            );
+
         void init(uint32_t indexCount
              , const void *memory
              , uint32_t size
              , Bool32 cacheMemory
+             , const vk::PipelineInputAssemblyStateCreateInfo &inputAssemblyStateCreateInfo
              );
         
         template<typename IndexType>
         void init(uint32_t indexCount
             , const void *memory
             , Bool32 cacheMemory
+            , const vk::PipelineInputAssemblyStateCreateInfo &inputAssemblyStateCreateInfo
             );
 
         template<typename IndexType>
@@ -38,7 +51,8 @@ namespace vg {
         std::vector<IndexType> getIndices(uint32_t offset, uint32_t count) const;
 
      private:
-        uint32_t m_indexCount;
+        std::vector<SubIndexData> m_subDatas;
+        uint32_t m_subDataCount;
         uint32_t m_bufferSize;
         std::shared_ptr<vk::Buffer> m_pBuffer;
         uint32_t m_bufferMemorySize;

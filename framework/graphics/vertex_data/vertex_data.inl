@@ -1,25 +1,14 @@
 namespace vg
 {
     template<typename VertexType>
-    void VertexData::init(uint32_t vertexCount 
-        , const void *memory
-        , Bool32 cacheMemory
-        )
-    {
-        uint32_t size = vertexCount * static_cast<uint32_t>(sizeof(VertexType));
-        init(vertexCount, memory, size, cacheMemory);
-    }
-
-    template<typename VertexType>
     void init(uint32_t vertexCount 
         , const void *memory
         , Bool32 cacheMemory
         , const vk::PipelineVertexInputStateCreateInfo &vertexInputStateCreateInfo
-        , const vk::PipelineInputAssemblyStateCreateInfo &inputAssemblyStateCreateInfo)
+        )
     {
-        init(vertexCount, memory, cacheMemory);
-        _setVertexInputStateCreateInfo(vertexInputStateCreateInfo);
-        _setInputAssemblyStateCreateInfo(inputAssemblyStateCreateInfo);
+        uint32_t size = vertexCount * static_cast<uint32_t>(sizeof(VertexType));
+        init(vertexCount, memory, size, cacheMemory, vertexInputStateCreateInfo);
     }
 
     template<typename VertexType>

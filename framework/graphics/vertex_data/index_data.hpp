@@ -11,6 +11,7 @@ namespace vg {
         uint32_t getIndexCount() const;
         uint32_t getBufferSize() const;
         std::shared_ptr<vk::Buffer> getBuffer() const;
+        uint32_t getBufferMemorySize() const;
         std::shared_ptr<vk::DeviceMemory> getBufferMemory() const;
         uint32_t getMemorySize() const;
         const void *getMemory() const;
@@ -40,9 +41,12 @@ namespace vg {
         uint32_t m_indexCount;
         uint32_t m_bufferSize;
         std::shared_ptr<vk::Buffer> m_pBuffer;
+        uint32_t m_bufferMemorySize;
         std::shared_ptr<vk::DeviceMemory> m_pBufferMemory;
         uint32_t m_memorySize;
         void *m_pMemory;
+
+        void _createBuffer(const void *pMemory, uint32_t memorySize);
      };
 } //!vg
 #include "graphics/vertex_data/index_data.inl"

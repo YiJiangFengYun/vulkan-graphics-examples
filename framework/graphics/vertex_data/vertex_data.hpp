@@ -16,6 +16,7 @@ namespace vg
         uint32_t getVertexCount() const;
         uint32_t getBuffersize() const;
         std::shared_ptr<vk::Buffer> getBuffer() const;
+        uint32_t getBufferMemorySize() const;
         std::shared_ptr<vk::DeviceMemory> getBufferMemory() const;
         uint32_t getMemorySize() const;
         const void *getMemory() const;
@@ -68,12 +69,14 @@ namespace vg
         uint32_t m_vertexCount;
         uint32_t m_bufferSize;
         std::shared_ptr<vk::Buffer> m_pBuffer;
+        uint32_t m_bufferMemorySize;
         std::shared_ptr<vk::DeviceMemory> m_pBufferMemory;
         uint32_t m_memorySize;
         void *m_pMemory;
 
         void _setVertexInputStateCreateInfo(const vk::PipelineVertexInputStateCreateInfo &vertexInputStateCreateInfo);
         void _setInputAssemblyStateCreateInfo(const vk::PipelineInputAssemblyStateCreateInfo &inputAssemblyStateCreateInfo);
+        void _createBuffer(const void *pMemory, uint32_t memorySize);
     };
 
 } //!vg

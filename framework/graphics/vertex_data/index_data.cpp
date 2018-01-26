@@ -32,7 +32,7 @@ namespace vg
         return m_subDataCount;
     }
 
-    const std::vector<IndexData::SubIndexData> IndexData::getSubIndexDatas() const
+    const std::vector<IndexData::SubIndexData> &IndexData::getSubIndexDatas() const
     {
         return m_subDatas;
     }
@@ -103,6 +103,9 @@ namespace vg
         SubIndexData &subData = subDatas[0];
         subData.inputAssemblyStateCreateInfo = inputAssemblyStateCreateInfo;
         subData.inputAssemblyStateCreateInfo.pNext = nullptr;
+
+        subData.indexCount = indexCount;
+        subData.bufferSize = size;
         init(subDatas, memory, size, cacheMemory);
     }
     

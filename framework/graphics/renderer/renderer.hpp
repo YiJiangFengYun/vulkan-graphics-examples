@@ -103,13 +103,13 @@ namespace vg
 
 		void _createPipelineForRender(std::shared_ptr<vk::PipelineLayout> &pPipelineLayout, 
 			std::shared_ptr<vk::Pipeline> &pPipeline,
-			std::shared_ptr<BaseMesh> pMesh,
+			std::shared_ptr<SepMesh> pMesh,
 			std::shared_ptr<Material> pMaterial,
 			uint32_t subMeshIndex = 0u,
 			uint32_t passIndex = 0u);
 		void _recordCommandBufferForRender(std::shared_ptr<vk::PipelineLayout> pPipelineLayout,
 			std::shared_ptr<vk::Pipeline> pPipeline,
-			std::shared_ptr<BaseMesh> pMesh,
+			std::shared_ptr<SepMesh> pMesh,
 			std::shared_ptr<Material> pMaterial,
 			uint32_t subMeshIndex = 0u,
 			uint32_t passIndex = 0u);

@@ -84,7 +84,7 @@ namespace vg
 		{
 			auto pVisualObject = validVisualObjects[i];
 			auto pMesh = pVisualObject->getMesh();
-			auto subMeshCount = pMesh->_getSubMeshCountForRender();
+			auto subMeshCount = pMesh->getIndexData().getSubIndexDataCount();
 			auto pMaterial = pVisualObject->getMaterial();
 			auto passCount = pMaterial->getPassCount();
 			drawCount += subMeshCount * passCount;

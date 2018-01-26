@@ -17,7 +17,7 @@ namespace vg
 		m_pMaterial = pMaterial;
 	}
 
-	std::shared_ptr<BaseMesh> BaseVisualObject::getMesh()
+	std::shared_ptr<SepMesh> BaseVisualObject::getMesh()
 	{
 		return m_pMesh;
 	}

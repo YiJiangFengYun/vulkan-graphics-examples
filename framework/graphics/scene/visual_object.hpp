@@ -17,11 +17,11 @@ namespace vg
 
 		void setMaterial(std::shared_ptr<Material> pMaterial);
 
-		std::shared_ptr<BaseMesh> getMesh();
+		std::shared_ptr<SepMesh> getMesh();
 
 	protected:
 		std::shared_ptr<Material> m_pMaterial;
-		std::shared_ptr<BaseMesh> m_pMesh;
+		std::shared_ptr<SepMesh> m_pMesh;
 	};
 
 	template <SpaceType SPACE_TYPE>

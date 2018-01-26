@@ -10,12 +10,30 @@
 #include "graphics/module.hpp"
 #include "graphics/util/find_memory.hpp"
 #include "graphics/util/single_time_command.hpp"
+#include "graphics/vertex_data/vertex_data.hpp"
+#include "graphics/vertex_data/index_data.hpp"
 #include "graphics/mesh/mesh_option.hpp"
 #include "graphics/mesh/mesh_data.hpp"
 
 namespace vg
 {
 	class BaseMesh : public Base
+	{
+public:
+        BaseMesh();
+		~BaseMesh();
+		const VertexData &getVertexData() const;
+		const IndexData &getIndexData() const;
+
+protected:
+        VertexData m_vertexData;
+		IndexData m_indexData;
+private:
+	};
+
+    
+	//This mesh class for separation atrtribute layout of vertex and sub mesh feature.
+	class SepMesh : public BaseMesh
 	{
 	public:
 		struct LayoutBindingInfo
@@ -47,9 +65,9 @@ namespace vg
 			std::vector<uint32_t> indices;
 		};
 
-		BaseMesh();
+		SepMesh();
 
-		~BaseMesh();
+		~SepMesh();
 
 		MeshType getMeshType() const;
 
@@ -104,20 +122,6 @@ namespace vg
 		template <MeshData::DataType dataType>
 		void setData(const std::string name, const typename MeshData::DataTypeInfo<dataType>::ValueType &value, uint32_t bindingPriority = VG_VERTEX_BINDING_PRIORITY_OTHER_MIN);
 
-
-		//----------------------For render---------------------------------------
-		uint32_t _getSubMeshCountForRender() const;
-
-		virtual std::vector<vk::VertexInputBindingDescription> _getVertexInputBindingDescriptionsForRender() = 0;
-
-		virtual std::vector<vk::VertexInputAttributeDescription> _getVertexInputAttributeDescriptionsForRender() = 0;
-
-		vk::PrimitiveTopology _getVKTopologyForRender(uint32_t subMeshIndex);
-
-		uint32_t _getIndexCountForRender(uint32_t subMeshIndex) const;
-
-		void _fillCommandBufferForRender(uint32_t subMeshIndex, vk::CommandBuffer &commandBuffer);
-
 	protected:
 		MeshType m_meshType;
 		uint32_t m_vertexCount;
@@ -135,16 +139,12 @@ namespace vg
 		uint32_t m_appliedSubMeshCount;
 		std::set<LayoutBindingInfo> m_layoutBindingInfos;
 		std::vector<SubMeshInfo> m_usingSubMeshInfos; //save sub mesh info to render.
-		std::shared_ptr<vk::Buffer> m_pVertexBuffer;
-		std::shared_ptr<vk::DeviceMemory> m_pVertexBufferMemory;
-		std::shared_ptr<vk::Buffer> m_pIndexBuffer;
-		std::shared_ptr<vk::DeviceMemory> m_pIndexBufferMemory;
 
 		void _createMeshData();
 
-		void _createVertexBuffer();
+		void _createVertexData();
 
-		void _createIndexBuffer();
+		void _createIndexData();
 
 		template<MeshData::DataType dataType>
 		inline const typename MeshData::DataTypeInfo<dataType>::ValueType &_getData(std::string name) const;
@@ -161,11 +161,10 @@ namespace vg
 
 		inline uint32_t _getIndexCount(uint32_t subMeshIndex) const;
 
-		inline void _copyBuffer(std::shared_ptr<vk::Buffer>& pSrcBuffer, std::shared_ptr<vk::Buffer>& pDstBuffer, vk::DeviceSize size);
 	};
 
 	template <MeshType meshType>
-	class Mesh : public BaseMesh
+	class Mesh : public SepMesh
 	{
 	public:
 		static const MeshData::DataType ARRAY_DATA_TYPE = MeshConstInfo<meshType>::ARRAY_TYPE;
@@ -200,11 +199,6 @@ namespace vg
 	private:
 		
 		fd::Bounds<PointType> m_bounds;
-
-		std::vector<vk::VertexInputBindingDescription> _getVertexInputBindingDescriptionsForRender() override;
-
-		std::vector<vk::VertexInputAttributeDescription> _getVertexInputAttributeDescriptionsForRender() override;
-
 
 		inline void _updateBounds();
 	};

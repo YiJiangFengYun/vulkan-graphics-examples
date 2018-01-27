@@ -96,10 +96,6 @@ namespace vg
 		void _createFramebuffer();
 		void _createCommandPool();
 		void _createCommandBuffer();
-		//void _allocateGraphicsQueue();
-
-
-		//void _freeGraphicsQueue();
 
 		void _createPipelineForRender(std::shared_ptr<vk::PipelineLayout> &pPipelineLayout, 
 			std::shared_ptr<vk::Pipeline> &pPipeline,

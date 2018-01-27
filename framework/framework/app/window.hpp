@@ -104,6 +104,7 @@ namespace vgf
 		void _createSwapchain();
 		void _createSwapchainImageViews();
 		void _createRenderers();
+		virtual std::shared_ptr<vg::BaseRenderer> _createRenderer(std::shared_ptr<vk::ImageView> pSwapchainImageView);
 		void _createSemaphores();
 
 		//void _freePresentQueue();

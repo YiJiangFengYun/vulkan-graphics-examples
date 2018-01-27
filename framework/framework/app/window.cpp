@@ -248,12 +248,19 @@ namespace vgf {
 		//Create the renders of the specified type.
 		for (size_t i = 0; i < num; ++i)
 		{
-			switch (m_renderType)
-			{
+			m_pRenderers[i] = _createRenderer(m_pSwapchainImageViews[i]);
+		}
+
+	}
+
+	std::shared_ptr<vg::BaseRenderer> Window::_createRenderer(std::shared_ptr<vk::ImageView> pSwapchainImageView)
+	{
+		switch (m_renderType)
+		{
 			case RenderType::RENDERER_2:
 			{
-				m_pRenderers[i] = std::shared_ptr<vg::BaseRenderer>(
-					new RenderTypeInfo<RenderType::RENDERER_2>::RendererType(m_pSwapchainImageViews[i]
+				return std::shared_ptr<vg::BaseRenderer>(
+					new RenderTypeInfo<RenderType::RENDERER_2>::RendererType(pSwapchainImageView
 						, m_swapchainImageFormat
 					    , m_swapchainExtent.width
 					    , m_swapchainExtent.height
@@ -263,8 +270,8 @@ namespace vgf {
 			}
 			case RenderType::RENDERER_3:
 			{
-				m_pRenderers[i] = std::shared_ptr<vg::BaseRenderer>(
-					new RenderTypeInfo<RenderType::RENDERER_3>::RendererType(m_pSwapchainImageViews[i]
+				return std::shared_ptr<vg::BaseRenderer>(
+					new RenderTypeInfo<RenderType::RENDERER_3>::RendererType(pSwapchainImageView
 						, m_swapchainImageFormat
 					    , m_swapchainExtent.width
 					    , m_swapchainExtent.height
@@ -275,10 +282,9 @@ namespace vgf {
 			default:
 				throw std::runtime_error("Render type of window is invalid.");
 				break;
-			}
 		}
-
 	}
+			
 
 	void Window::_createSemaphores()
 	{

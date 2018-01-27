@@ -93,7 +93,6 @@ namespace vg
 		//------Doing render.
 		vk::PipelineStageFlags waitStages[] = { vk::PipelineStageFlagBits::eColorAttachmentOutput };
 		std::vector<vk::SubmitInfo> submitInfos(drawCount);
-		m_arrPLastPipelineLayouts.resize(drawCount);
 		m_arrPLastPipelines.resize(drawCount);
 		m_arrPLastSemaphores.resize(drawCount);
 		m_arrSemaphores.resize(drawCount);
@@ -125,12 +124,10 @@ namespace vg
 			{
 				for (uint32_t passIndex = 0u; passIndex < passCount; ++passIndex)
 				{
-					std::shared_ptr<vk::PipelineLayout> pPipelineLayout;
 					std::shared_ptr<vk::Pipeline> pPipeline;
-					_createPipelineForRender(pPipelineLayout, pPipeline, pMesh, pMaterial, subMeshIndex, passIndex);
-					m_arrPLastPipelineLayouts[drawIndex] = pPipelineLayout;
+					_createPipelineForRender(pPipeline, pMesh, pMaterial, subMeshIndex, passIndex);
 					m_arrPLastPipelines[drawIndex] = pPipeline;
-					_recordCommandBufferForRender(pPipelineLayout, pPipeline, pMesh, pMaterial, subMeshIndex, passIndex);
+					_recordCommandBufferForRender(pPipeline, pMesh, pMaterial, subMeshIndex, passIndex);
 
 					//submit
 					std::shared_ptr<vk::Semaphore> pSemaphore = nullptr;

@@ -207,4 +207,15 @@ namespace fd
 			pDevice->destroyPipeline(*p);
 		});
 	}
+
+	std::shared_ptr<vk::PipelineCache> createPipelineCache(const std::shared_ptr<vk::Device> pDevice,
+	    const vk::PipelineCacheCreateInfo &createInfo,
+		vk::Optional<const vk::AllocationCallbacks> allocator)
+	{
+		auto pipelineCache = pDevice->createPipelineCache(createInfo, allocator);
+		return std::shared_ptr<vk::PipelineCache>(new vk::PipelineCache(pipelineCache),
+		    [pDevice](vk::PipelineCache *p) {
+				pDevice->destroyPipelineCache(*p);
+		});
+	}
 }

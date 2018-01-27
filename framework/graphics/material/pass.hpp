@@ -9,6 +9,8 @@
 #include "graphics/material/material_data.hpp"
 #include "graphics/util/util.hpp"
 
+//to do 
+//specilazation constant and push constant
 namespace vg
 {
 	class Pass : public Base
@@ -123,6 +125,7 @@ namespace vg
 		std::shared_ptr<vk::DescriptorSetLayout> _getDescriptorSetLayout();
 		std::shared_ptr<vk::DescriptorPool> _getDescriptorPool();
 		std::shared_ptr<vk::DescriptorSet> _getDescriptorSet();
+		std::shared_ptr<vk::PipelineLayout> _getPipelineLayout();  
 	private:
 		//compositons
 		std::shared_ptr<MaterialData> m_pData;
@@ -131,6 +134,7 @@ namespace vg
 		std::shared_ptr<vk::Buffer> m_pUniformBuffer;
 		std::shared_ptr<vk::DeviceMemory> m_pUniformBufferMemory;
 		std::shared_ptr<vk::DescriptorSetLayout> m_pDescriptorSetLayout;
+		std::shared_ptr<vk::PipelineLayout> m_pPipelineLayout;
 		std::shared_ptr<vk::DescriptorPool> m_pDescriptorPool;
 		std::shared_ptr<vk::DescriptorSet> m_pDescriptorSet;
 		Bool32 m_applied;
@@ -147,6 +151,7 @@ namespace vg
 		//aggregations
 		std::shared_ptr<Shader> m_pShader;
 		void _createDescriptorSetLayout();
+		void _createPipelineLayout();  
 		void _createUniformBuffer();
 		void _createDescriptorSet();
 		void _updateDescriptorBufferInfo();

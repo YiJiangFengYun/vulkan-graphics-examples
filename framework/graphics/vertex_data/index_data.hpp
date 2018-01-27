@@ -9,7 +9,7 @@ namespace vg {
      {
      public:
         struct SubIndexData {
-            vk::PipelineInputAssemblyStateCreateInfo inputAssemblyStateCreateInfo;            
+            vk::PipelineInputAssemblyStateCreateInfo inputAssemblyStateInfo;            
             uint32_t indexCount;
             uint32_t bufferSize;
         };
@@ -35,14 +35,14 @@ namespace vg {
              , const void *memory
              , uint32_t size
              , Bool32 cacheMemory
-             , const vk::PipelineInputAssemblyStateCreateInfo &inputAssemblyStateCreateInfo
+             , const vk::PipelineInputAssemblyStateCreateInfo &inputAssemblyStateInfo
              );
         
         template<typename IndexType>
         void init(uint32_t indexCount
             , const void *memory
             , Bool32 cacheMemory
-            , const vk::PipelineInputAssemblyStateCreateInfo &inputAssemblyStateCreateInfo
+            , const vk::PipelineInputAssemblyStateCreateInfo &inputAssemblyStateInfo
             );
 
         template<typename IndexType>

@@ -208,6 +208,7 @@ namespace vg
 		if (m_applied == VG_FALSE)
 		{
 			_createDescriptorSetLayout();
+			_createPipelineLayout();
 			_createUniformBuffer();
 			_createDescriptorSet();
 			_updateDescriptorBufferInfo();
@@ -343,6 +344,11 @@ namespace vg
 		return m_pDescriptorSetLayout;
 	}
 
+	std::shared_ptr<vk::PipelineLayout> Pass::_getPipelineLayout()
+	{
+		return m_pPipelineLayout;
+	}
+
 	std::shared_ptr<vk::DescriptorPool> Pass::_getDescriptorPool()
 	{
 		return m_pDescriptorPool;
@@ -386,6 +392,23 @@ namespace vg
 		{
 			m_pDescriptorSetLayout = nullptr;
 		}
+	}
+
+	void Pass::_createPipelineLayout()
+	{
+		auto pLayout = m_pDescriptorSetLayout;
+		uint32_t layoutCount = pLayout != nullptr ? 1 : 0;
+		auto pSetLayouts = pLayout != nullptr ? pLayout.get() : nullptr;
+		vk::PipelineLayoutCreateInfo pipelineLayoutCreateInfo = {
+			vk::PipelineLayoutCreateFlags(),             //flags
+			layoutCount,                                 //setLayoutCount
+			pSetLayouts,                                 //pSetLayouts
+			0,                                           //pushConstantRangeCount
+			nullptr                                      //pPushConstantRanges
+		};
+
+		auto pDevice = pApp->getDevice();
+		m_pPipelineLayout = fd::createPipelineLayout(pDevice, pipelineLayoutCreateInfo);
 	}
 
 	void Pass::_createUniformBuffer()

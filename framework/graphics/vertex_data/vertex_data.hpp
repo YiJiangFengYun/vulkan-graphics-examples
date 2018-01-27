@@ -12,7 +12,7 @@ namespace vg
         struct SubVertexData {
             std::vector<vk::VertexInputBindingDescription> bindingDescs;
             std::vector<vk::VertexInputAttributeDescription> attrDescs;
-            vk::PipelineVertexInputStateCreateInfo vertexInputStateCreateInfo;
+            vk::PipelineVertexInputStateCreateInfo vertexInputStateInfo;
             uint32_t vertexCount;
             uint32_t bufferSize;
         };
@@ -33,7 +33,7 @@ namespace vg
             , const void *memory
             , uint32_t size
             , Bool32 cacheMemory
-            , const vk::PipelineVertexInputStateCreateInfo &vertexInputStateCreateInfo 
+            , const vk::PipelineVertexInputStateCreateInfo &vertexInputStateInfo 
             );
 
         void init(const std::vector<SubVertexData> subDatas
@@ -46,7 +46,7 @@ namespace vg
         void init(uint32_t vertexCount 
             , const void *memory
             , Bool32 cacheMemory
-            , const vk::PipelineVertexInputStateCreateInfo &vertexInputStateCreateInfo
+            , const vk::PipelineVertexInputStateCreateInfo &vertexInputStateInfo
             );
         
         template<typename VertexType>

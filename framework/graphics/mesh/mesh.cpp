@@ -313,8 +313,8 @@ namespace vg
 			uint32_t subBufferSize = static_cast<uint32_t>(indices.size() * sizeof(uint32_t));
 			subDatas[i].bufferSize = subBufferSize;
 			subDatas[i].indexCount = indices.size();
-			subDatas[i].inputAssemblyStateCreateInfo.primitiveRestartEnable = VK_FALSE;
-			subDatas[i].inputAssemblyStateCreateInfo.topology = tranPrimitiveTopologyTypeToVK(m_usingSubMeshInfos[i].topology);
+			subDatas[i].inputAssemblyStateInfo.primitiveRestartEnable = VK_FALSE;
+			subDatas[i].inputAssemblyStateInfo.topology = tranPrimitiveTopologyTypeToVK(m_usingSubMeshInfos[i].topology);
 			indexBufferSize += subBufferSize;
 		}
 

@@ -65,6 +65,10 @@ namespace fd
 	extern std::shared_ptr<vk::Pipeline> createGraphicsPipeline(const std::shared_ptr<vk::Device> pDevice,
 		vk::PipelineCache pipelineCache, const vk::GraphicsPipelineCreateInfo & createInfo, 
 		vk::Optional<const vk::AllocationCallbacks> allocator = nullptr);
+
+	extern std::shared_ptr<vk::PipelineCache> createPipelineCache(const std::shared_ptr<vk::Device> pDevice,
+	    const vk::PipelineCacheCreateInfo &createInfo,
+		vk::Optional<const vk::AllocationCallbacks> allocator = nullptr);
 }
 
 #endif // !FD_VK_WRAPPER_H

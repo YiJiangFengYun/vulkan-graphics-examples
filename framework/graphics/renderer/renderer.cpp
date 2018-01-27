@@ -145,8 +145,7 @@ namespace vg
 	{
 	}
 
-	void BaseRenderer::_createPipelineForRender(std::shared_ptr<vk::PipelineLayout> &pPipelineLayout,
-		std::shared_ptr<vk::Pipeline> &pPipeline,
+	void BaseRenderer::_createPipelineForRender(std::shared_ptr<vk::Pipeline> &pPipeline,
 		std::shared_ptr<BaseMesh> pMesh,
 		std::shared_ptr<Material> pMaterial,
 		uint32_t subMeshIndex,
@@ -158,66 +157,19 @@ namespace vg
 		//Construct shader stage create info.
 		auto pPass = pMaterial->getPassWithIndex(passIndex);
 		auto pShader = pPass->_getShader();
-		vk::PipelineShaderStageCreateInfo vertShaderStageInfo = {
-			vk::PipelineShaderStageCreateFlags(),
-			vk::ShaderStageFlagBits::eVertex,
-			*pShader->getVertShaderModule(),
-			"main"
-		};
+		auto shaderStages = pShader->getShaderStageInfos();
 
-		vk::PipelineShaderStageCreateInfo fragShaderStageInfo = {
-			vk::PipelineShaderStageCreateFlags(),
-			vk::ShaderStageFlagBits::eFragment,
-			*pShader->getFragShaderModule(),
-			"main"
-		};
-
-		vk::PipelineShaderStageCreateInfo shaderStages[] = { vertShaderStageInfo, fragShaderStageInfo };
-
-		createInfo.stageCount = 2u;
-		createInfo.pStages = shaderStages;
+		createInfo.stageCount = shaderStages.size();
+		createInfo.pStages = shaderStages.data();
 
 		const VertexData::SubVertexData &subVertexData = pMesh->getVertexData().getSubVertexDatas()[0];
 		const IndexData::SubIndexData &subIndexData = pMesh->getIndexData().getSubIndexDatas()[subMeshIndex];
 
-		createInfo.pVertexInputState = &subVertexData.vertexInputStateCreateInfo;
-		createInfo.pInputAssemblyState = &subIndexData.inputAssemblyStateCreateInfo;
+		createInfo.pVertexInputState = &subVertexData.vertexInputStateInfo;
+		createInfo.pInputAssemblyState = &subIndexData.inputAssemblyStateInfo;
 
-		const auto& viewportOfPass = pPass->getViewport();
-		const auto& scissorOfPass = pPass->getScissor();
-		//View port info.
-		vk::Viewport viewport = {
-			(float)m_framebufferWidth * viewportOfPass.x,                                     //x
-			(float)m_framebufferHeight * viewportOfPass.y,                                     //y
-			(float)m_framebufferWidth * viewportOfPass.width,   //width
-			(float)m_framebufferHeight * viewportOfPass.height,  //height
-			1.0f * viewportOfPass.minDepth,                                     //minDepth
-			1.0f * viewportOfPass.maxDepth                                      //maxDepth
-		};
-
-		vk::Rect2D scissor = {
-			{                               //offset
-				static_cast<int32_t>(std::round(m_framebufferWidth * scissorOfPass.x)),    //x
-				static_cast<int32_t>(std::round(m_framebufferHeight * scissorOfPass.y))    //y
-			},
-			{                               //extent
-				static_cast<uint32_t>(std::round(m_framebufferWidth * scissorOfPass.width)),   //width
-				static_cast<uint32_t>(std::round(m_framebufferHeight * scissorOfPass.height))  //height
-			}
-		};
-
-		vk::PipelineViewportStateCreateInfo viewportStateCreateInfo = {
-			vk::PipelineViewportStateCreateFlags(),                  //flags
-			1u,                                                      //viewportCount
-			&viewport,                                               //pViewports
-			1u,                                                      //scissorCount
-			&scissor                                                 //pScissors
-		};
-		createInfo.pViewportState = &viewportStateCreateInfo;
-
-		auto cullMode = tranCullModeFlagsToVK(pPass->getCullMode());
+        auto cullMode = tranCullModeFlagsToVK(pPass->getCullMode());
 		auto frontFace = tranFrontFaceTypeToVK(pPass->getFrontFace());
-
 		//Rasterization info.
 		vk::PipelineRasterizationStateCreateInfo rasterizationStateCreateInfo = {
 			vk::PipelineRasterizationStateCreateFlags(),  //flags
@@ -233,18 +185,6 @@ namespace vg
 			1.0f                                          //lineWidth
 		};
 		createInfo.pRasterizationState = &rasterizationStateCreateInfo;
-
-		//Multisample info.
-		vk::PipelineMultisampleStateCreateInfo multisampleStateCreateInfo = {
-			vk::PipelineMultisampleStateCreateFlags(),              //flags
-			vk::SampleCountFlagBits::e1,                            //rasterizationSamples
-			VK_FALSE,                                               //sampleShadingEnable
-			0.0f,                                                   //minSampleShading
-			nullptr,                                                //pSampleMask
-			VK_FALSE,                                               //alphaToCoverageEnable
-			VK_FALSE                                                //alphaToOneEnable
-		};
-		createInfo.pMultisampleState = &multisampleStateCreateInfo;
 
 		auto depthStencilStateInfoOfPass = pPass->getDepthStencilStateInfo();
 
@@ -292,38 +232,60 @@ namespace vg
 		};
 		createInfo.pColorBlendState = &colorBlendStateCreateInfo;
 
-		auto pLayout = pPass->_getDescriptorSetLayout();
-		uint32_t layoutCount = pLayout != nullptr ? 1 : 0;
-		auto pSetLayouts = pLayout != nullptr ? pLayout.get() : nullptr;
-		vk::PipelineLayoutCreateInfo pipelineLayoutCreateInfo = {
-			vk::PipelineLayoutCreateFlags(),             //flags
-			layoutCount,                                          //setLayoutCount
-			pSetLayouts,      //pSetLayouts
-			0,                                           //pushConstantRangeCount
-			nullptr                                      //pPushConstantRanges
+		vk::PipelineViewportStateCreateInfo viewportStateCreateInfo = {
+			vk::PipelineViewportStateCreateFlags(),                  //flags
+			1u,                                                      //viewportCount
+			nullptr,                                               //pViewports
+			1u,                                                      //scissorCount
+		    nullptr                                                 //pScissors
+		};
+		createInfo.pViewportState = &viewportStateCreateInfo;
+
+		//Multisample info.
+		vk::PipelineMultisampleStateCreateInfo multisampleStateCreateInfo = {
+			vk::PipelineMultisampleStateCreateFlags(),              //flags
+			vk::SampleCountFlagBits::e1,                            //rasterizationSamples
+			VK_FALSE,                                               //sampleShadingEnable
+			0.0f,                                                   //minSampleShading
+			nullptr,                                                //pSampleMask
+			VK_FALSE,                                               //alphaToCoverageEnable
+			VK_FALSE                                                //alphaToOneEnable
+		};
+		createInfo.pMultisampleState = &multisampleStateCreateInfo;
+
+		std::vector<vk::DynamicState> dynamicStates = {
+			vk::DynamicState::eViewport,
+			vk::DynamicState::eScissor
 		};
 
-		auto pDevice = pApp->getDevice();
-		pPipelineLayout = fd::createPipelineLayout(pDevice, pipelineLayoutCreateInfo);
-		createInfo.layout = *pPipelineLayout;
+		vk::PipelineDynamicStateCreateInfo dynamicStateCreateInfo = {
+			vk::PipelineDynamicStateCreateFlags(),
+            dynamicStates.size(),
+			dynamicStates.data()
+		};
+		createInfo.pDynamicState = &dynamicStateCreateInfo;		
 
-		createInfo.pDynamicState = nullptr;
+		createInfo.layout = *pPass->_getPipelineLayout();
+
 		createInfo.renderPass = *m_pRenderPass;
 		createInfo.subpass = 0;
 		createInfo.basePipelineHandle = nullptr;
 		createInfo.basePipelineIndex = -1;
-
-		pPipeline = fd::createGraphicsPipeline(pDevice, nullptr, createInfo);
+        
+		auto pDevice = pApp->getDevice();
+		pPipeline = fd::createGraphicsPipeline(pDevice, *m_pPipelineCache, createInfo);
 	}
 
-	void BaseRenderer::_recordCommandBufferForRender(std::shared_ptr<vk::PipelineLayout> pPipelineLayout,
-		std::shared_ptr<vk::Pipeline> pPipeline,
+	void BaseRenderer::_recordCommandBufferForRender(std::shared_ptr<vk::Pipeline> pPipeline,
 		std::shared_ptr<BaseMesh> pMesh,
 		std::shared_ptr<Material> pMaterial,
 		uint32_t subMeshIndex,
 		uint32_t passIndex)
 	{
 		LOG(plog::debug) << "Pre begin command buffer for render." << std::endl;
+
+		auto pPass = pMaterial->getPassWithIndex(passIndex);
+		
 		vk::CommandBufferBeginInfo beginInfo = {
 			vk::CommandBufferUsageFlagBits::eSimultaneousUse,  //flags
 			nullptr                                            //pInheritanceInfo
@@ -367,15 +329,43 @@ namespace vg
 		};
 
 		m_pCommandBuffer->beginRenderPass(renderPassBeginInfo, vk::SubpassContents::eInline);
+        
+        const auto& viewportOfPass = pPass->getViewport();
+		const auto& scissorOfPass = pPass->getScissor();
+		//View port info.
+		vk::Viewport viewport = {
+			(float)m_framebufferWidth * viewportOfPass.x,                                     //x
+			(float)m_framebufferHeight * viewportOfPass.y,                                     //y
+			(float)m_framebufferWidth * viewportOfPass.width,   //width
+			(float)m_framebufferHeight * viewportOfPass.height,  //height
+			1.0f * viewportOfPass.minDepth,                                     //minDepth
+			1.0f * viewportOfPass.maxDepth                                      //maxDepth
+		};
+
+		m_pCommandBuffer->setViewport(0, viewport);
+
+		vk::Rect2D scissor = {
+			{                               //offset
+				static_cast<int32_t>(std::round(m_framebufferWidth * scissorOfPass.x)),    //x
+				static_cast<int32_t>(std::round(m_framebufferHeight * scissorOfPass.y))    //y
+			},
+			{                               //extent
+				static_cast<uint32_t>(std::round(m_framebufferWidth * scissorOfPass.width)),   //width
+				static_cast<uint32_t>(std::round(m_framebufferHeight * scissorOfPass.height))  //height
+			}
+		};
+
+		m_pCommandBuffer->setScissor(0, scissor);
+
 		m_pCommandBuffer->bindPipeline(vk::PipelineBindPoint::eGraphics, *pPipeline);
 
-		auto pPass = pMaterial->getPassWithIndex(passIndex);
 		uint32_t descriptSetCount = pPass->_getDescriptorSet() != nullptr ? 1 : 0;
 		std::vector<vk::DescriptorSet> descriptorSets(descriptSetCount);
 		if (pPass->_getDescriptorSet() != nullptr)
 		{
 			descriptorSets[0] = *pPass->_getDescriptorSet();
 		}
+		auto pPipelineLayout = pPass->_getPipelineLayout();
 		m_pCommandBuffer->bindDescriptorSets(vk::PipelineBindPoint::eGraphics, *pPipelineLayout, 0u, descriptorSets, nullptr);
 
         vertexDataToCommandBuffer(pMesh->getVertexData(), *m_pCommandBuffer, 0);
@@ -397,6 +387,7 @@ namespace vg
 		_createFramebuffer();
 		_createCommandPool();
 		_createCommandBuffer();
+		_createPipelineCache();
 		//_allocateGraphicsQueue();
 	}
 
@@ -536,6 +527,15 @@ namespace vg
 		LOG(plog::debug) << "Pre allocate command buffer from pool." << std::endl;
 		m_pCommandBuffer = fd::allocateCommandBuffer(pDevice, pCommandPool, allocateInfo);
 		LOG(plog::debug) << "Post allocate command buffer from pool." << std::endl;
+	}
+
+	void BaseRenderer::_createPipelineCache()
+	{
+		vk::PipelineCacheCreateInfo createInfo = {
+			vk::PipelineCacheCreateFlags()
+		};
+		auto pDevice = pApp->getDevice();
+		m_pPipelineCache = fd::createPipelineCache(pDevice, createInfo);
 	}
 
 	/*void BaseRenderer::_allocateGraphicsQueue()

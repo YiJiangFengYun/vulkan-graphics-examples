@@ -73,11 +73,13 @@ namespace vg
 		std::shared_ptr<vk::CommandPool> m_pCommandPool;
 		std::shared_ptr<vk::CommandBuffer> m_pCommandBuffer;
 
+		std::shared_ptr<vk::PipelineCache> m_pPipelineCache;
+
 		//Grahics queue for render safe in multiply threads.
 		//vk::Queue m_graphicsQueue;
 		//uint32_t m_graphicsQueueIndex;
 
-		std::vector<std::shared_ptr<vk::PipelineLayout>> m_arrPLastPipelineLayouts;
+		// std::vector<std::shared_ptr<vk::PipelineLayout>> m_arrPLastPipelineLayouts;
 		std::vector<std::shared_ptr<vk::Pipeline>> m_arrPLastPipelines;
 		std::vector<std::shared_ptr<vk::Semaphore>> m_arrPLastSemaphores;
 		std::vector<vk::Semaphore> m_arrSemaphores;
@@ -96,15 +98,14 @@ namespace vg
 		void _createFramebuffer();
 		void _createCommandPool();
 		void _createCommandBuffer();
+		void _createPipelineCache();
 
-		void _createPipelineForRender(std::shared_ptr<vk::PipelineLayout> &pPipelineLayout, 
-			std::shared_ptr<vk::Pipeline> &pPipeline,
+		void _createPipelineForRender(std::shared_ptr<vk::Pipeline> &pPipeline,
 			std::shared_ptr<BaseMesh> pMesh,
 			std::shared_ptr<Material> pMaterial,
 			uint32_t subMeshIndex = 0u,
 			uint32_t passIndex = 0u);
-		void _recordCommandBufferForRender(std::shared_ptr<vk::PipelineLayout> pPipelineLayout,
-			std::shared_ptr<vk::Pipeline> pPipeline,
+		void _recordCommandBufferForRender(std::shared_ptr<vk::Pipeline> pPipeline,
 			std::shared_ptr<BaseMesh> pMesh,
 			std::shared_ptr<Material> pMaterial,
 			uint32_t subMeshIndex = 0u,

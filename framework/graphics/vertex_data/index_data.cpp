@@ -96,13 +96,13 @@ namespace vg
              , const void *memory
              , uint32_t size
              , Bool32 cacheMemory
-             , const vk::PipelineInputAssemblyStateCreateInfo &inputAssemblyStateCreateInfo
+             , const vk::PipelineInputAssemblyStateCreateInfo &inputAssemblyStateInfo
              )
     {
         std::vector<SubIndexData> subDatas(1);
         SubIndexData &subData = subDatas[0];
-        subData.inputAssemblyStateCreateInfo = inputAssemblyStateCreateInfo;
-        subData.inputAssemblyStateCreateInfo.pNext = nullptr;
+        subData.inputAssemblyStateInfo = inputAssemblyStateInfo;
+        subData.inputAssemblyStateInfo.pNext = nullptr;
 
         subData.indexCount = indexCount;
         subData.bufferSize = size;

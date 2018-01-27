@@ -39,6 +39,41 @@ namespace vg
 		return m_pFragShaderModule;
 	}
 
+	std::vector<vk::PipelineShaderStageCreateInfo> Shader::getShaderStageInfos()
+	{
+		// vk::PipelineShaderStageCreateInfo vertShaderStageInfo = {
+		// 	vk::PipelineShaderStageCreateFlags(),
+		// 	vk::ShaderStageFlagBits::eVertex,
+		// 	*m_pVertShaderModule,
+		// 	"main"
+		// };
+
+		// vk::PipelineShaderStageCreateInfo fragShaderStageInfo = {
+		// 	vk::PipelineShaderStageCreateFlags(),
+		// 	vk::ShaderStageFlagBits::eFragment,
+		// 	*m_pFragShaderModule,
+		// 	"main"
+		// };
+
+		std::vector<vk::PipelineShaderStageCreateInfo> shaderStages = {
+			{
+			    vk::PipelineShaderStageCreateFlags(),
+			    vk::ShaderStageFlagBits::eVertex,
+			    *m_pVertShaderModule,
+			    "main"
+		    },
+			{
+				vk::PipelineShaderStageCreateFlags(),
+			    vk::ShaderStageFlagBits::eFragment,
+			    *m_pFragShaderModule,
+			    "main"
+			}
+		};
+
+		return shaderStages;
+
+	}
+
 	std::shared_ptr<vk::ShaderModule> Shader::_createShaderModule(const std::vector<char>& code)
 	{
 		auto device = pApp->getDevice();

@@ -8,7 +8,7 @@ namespace vg
 	}
 	void ColorBlendInfo::setColorBlendInfo(AttachmentInfo info)
 	{
-		m_vkColorBlendAttachmentStates.resize(0u);
+		m_vkColorBlendAttachmentStates.resize(1u);
 		m_vkColorBlendAttachmentStates[0] = info;
 	}
 

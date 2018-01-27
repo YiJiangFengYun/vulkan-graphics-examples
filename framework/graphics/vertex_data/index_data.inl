@@ -4,11 +4,11 @@ namespace vg
     void IndexData::init(uint32_t indexCount
             , const void *memory
             , Bool32 cacheMemory
-            , const vk::PipelineInputAssemblyStateCreateInfo &inputAssemblyStateCreateInfo
+            , const vk::PipelineInputAssemblyStateCreateInfo &inputAssemblyStateInfo
             )
     {
         uint32_t size = indexCount * static_cast<uint32_t>(sizeof(IndexType));
-        init(indexCount, memory, size, cacheMemory, inputAssemblyStateCreateInfo);
+        init(indexCount, memory, size, cacheMemory, inputAssemblyStateInfo);
     }
 
     template<typename IndexType>

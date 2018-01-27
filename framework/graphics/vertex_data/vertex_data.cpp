@@ -71,29 +71,29 @@ namespace vg
         , const void *memory
         , uint32_t size
         , Bool32 cacheMemory
-        , const vk::PipelineVertexInputStateCreateInfo &vertexInputStateCreateInfo
+        , const vk::PipelineVertexInputStateCreateInfo &vertexInputStateInfo
         )
     {
         std::vector<SubVertexData> subDatas(1);
         SubVertexData &subData = subDatas[0];
         //copy arguments.
-        uint32_t count = vertexInputStateCreateInfo.vertexBindingDescriptionCount;
+        uint32_t count = vertexInputStateInfo.vertexBindingDescriptionCount;
         size_t size2 = count * sizeof(vk::VertexInputBindingDescription);
         subData.bindingDescs.resize(count);
-        memcpy(subData.bindingDescs.data(), vertexInputStateCreateInfo.pVertexBindingDescriptions, size2);
+        memcpy(subData.bindingDescs.data(), vertexInputStateInfo.pVertexBindingDescriptions, size2);
 
-        count = vertexInputStateCreateInfo.vertexAttributeDescriptionCount;
+        count = vertexInputStateInfo.vertexAttributeDescriptionCount;
 		size2 = count * sizeof(vk::VertexInputAttributeDescription);
         subData.attrDescs.resize(count);
-        memcpy(subData.attrDescs.data(), vertexInputStateCreateInfo.pVertexAttributeDescriptions, size2);
+        memcpy(subData.attrDescs.data(), vertexInputStateInfo.pVertexAttributeDescriptions, size2);
 
         //set vertex input state create info.
-        subData.vertexInputStateCreateInfo = vertexInputStateCreateInfo;
-        subData.vertexInputStateCreateInfo.pNext = nullptr;
-        subData.vertexInputStateCreateInfo.vertexBindingDescriptionCount = vertexInputStateCreateInfo.vertexBindingDescriptionCount;
-        subData.vertexInputStateCreateInfo.pVertexBindingDescriptions = subData.bindingDescs.data();
-        subData.vertexInputStateCreateInfo.vertexAttributeDescriptionCount = vertexInputStateCreateInfo.vertexAttributeDescriptionCount;
-        subData.vertexInputStateCreateInfo.pVertexAttributeDescriptions = subData.attrDescs.data();
+        subData.vertexInputStateInfo = vertexInputStateInfo;
+        subData.vertexInputStateInfo.pNext = nullptr;
+        subData.vertexInputStateInfo.vertexBindingDescriptionCount = vertexInputStateInfo.vertexBindingDescriptionCount;
+        subData.vertexInputStateInfo.pVertexBindingDescriptions = subData.bindingDescs.data();
+        subData.vertexInputStateInfo.vertexAttributeDescriptionCount = vertexInputStateInfo.vertexAttributeDescriptionCount;
+        subData.vertexInputStateInfo.pVertexAttributeDescriptions = subData.attrDescs.data();
         
         subData.vertexCount = vertexCount;
         subData.bufferSize = size;
@@ -110,8 +110,8 @@ namespace vg
         m_subDatas = subDatas;
 		for (auto& subData : m_subDatas) 
 		{
-			subData.vertexInputStateCreateInfo.pVertexBindingDescriptions = subData.bindingDescs.data();
-			subData.vertexInputStateCreateInfo.pVertexAttributeDescriptions = subData.attrDescs.data();
+			subData.vertexInputStateInfo.pVertexBindingDescriptions = subData.bindingDescs.data();
+			subData.vertexInputStateInfo.pVertexAttributeDescriptions = subData.attrDescs.data();
 		}
         
         if (m_pMemory != nullptr && (m_memorySize != size || ! cacheMemory)) {

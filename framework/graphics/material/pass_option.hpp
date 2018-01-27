@@ -25,7 +25,7 @@ namespace vg
 
 	const uint32_t ShaderStageFlagCount = 2u;
 
-	using ShaderStageFlags = fd::Flags<ShaderStageFlagBits>;
+	typedef fd::Flags<ShaderStageFlagBits> ShaderStageFlags;
 
 	enum class CullModeFlagBits
 	{
@@ -37,7 +37,7 @@ namespace vg
 
 	const uint32_t CullModeFlagCount = 4u;
 
-	using CullModeFlags = fd::Flags<CullModeFlagBits>;
+	typedef fd::Flags<CullModeFlagBits> CullModeFlags;
 
 	enum class FrontFaceType
 	{
@@ -48,20 +48,21 @@ namespace vg
 		RANGE_SIZE = (END_RANGE - BEGIN_RANGE + 1)
 	};
 
-	using DepthStencilInfo = vk::PipelineDepthStencilStateCreateInfo;
+	typedef vk::PipelineDepthStencilStateCreateInfo DepthStencilInfo;
+	typedef vk::PipelineColorBlendStateCreateInfo ColorBlendInfo;
 
-	struct ColorBlendInfo
-	{
-	public:
-		ColorBlendInfo();
-		using AttachmentInfo = vk::PipelineColorBlendAttachmentState;
-		void setColorBlendInfo(AttachmentInfo info);
-		const std::vector<vk::PipelineColorBlendAttachmentState> &getColorBlendAttachmentStates() const;
-		const vk::PipelineColorBlendStateCreateInfo &getColorBlendStateCreateInfo() const;
-	private:
-		std::vector<vk::PipelineColorBlendAttachmentState> m_vkColorBlendAttachmentStates;
-		vk::PipelineColorBlendStateCreateInfo m_vkColorBlendStateCreateInfo;
-	};
+	// struct ColorBlendInfo
+	// {
+	// public:
+	// 	ColorBlendInfo();
+	// 	using AttachmentInfo = vk::PipelineColorBlendAttachmentState;
+	// 	void setColorBlendInfo(AttachmentInfo info);
+	// 	const std::vector<vk::PipelineColorBlendAttachmentState> &getColorBlendAttachmentStates() const;
+	// 	const vk::PipelineColorBlendStateCreateInfo &getColorBlendStateCreateInfo() const;
+	// private:
+	// 	std::vector<vk::PipelineColorBlendAttachmentState> m_vkColorBlendAttachmentStates;
+	// 	vk::PipelineColorBlendStateCreateInfo m_vkColorBlendStateCreateInfo;
+	// };
 
 	extern std::array<std::pair<DescriptorType, vk::DescriptorType>, static_cast<size_t>(DescriptorType::RANGE_SIZE)> arrDescriptorTypeToVK;
 	extern std::array<std::pair<ShaderStageFlagBits, vk::ShaderStageFlagBits>, static_cast<size_t>(ShaderStageFlagCount)> arrShaderStageFlagBitsToVK;

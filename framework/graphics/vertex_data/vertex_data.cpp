@@ -127,6 +127,8 @@ namespace vg
         }
 
         _createBuffer(memory, size);
+
+        updateStateID();
     }
 
     void VertexData::_createBuffer(const void *pMemory, uint32_t memorySize)

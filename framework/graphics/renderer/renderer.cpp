@@ -209,12 +209,11 @@ namespace vg
 
 		uint32_t attachmentCount = 1u;
 		std::vector<vk::PipelineColorBlendAttachmentState> colorBlendAttachmentStates(attachmentCount);
-		const auto& colorBlendAttachmentStatesOfPass = colorBlendInfoOfPass.getColorBlendAttachmentStates();
 		for (uint32_t i = 0; i < attachmentCount; ++i)
 		{
-			if (i < colorBlendAttachmentStatesOfPass.size())
+			if (i < colorBlendInfoOfPass.attachmentCount)
 			{
-				colorBlendAttachmentStates[i] = colorBlendAttachmentStatesOfPass[i];
+				colorBlendAttachmentStates[i] = *(colorBlendInfoOfPass.pAttachments + i);
 			}
 			else
 			{
@@ -222,14 +221,9 @@ namespace vg
 			}
 		}
 
-		vk::PipelineColorBlendStateCreateInfo colorBlendStateCreateInfo = {
-			vk::PipelineColorBlendStateCreateFlags(),                     //flags
-			VK_FALSE,                                                     //logicOpEnable
-			vk::LogicOp::eCopy,                                           //logicOp
-			static_cast<uint32_t>(colorBlendAttachmentStates.size()),     //attachmentCount
-			colorBlendAttachmentStates.data(),                            //pAttachments
-			{ 0.0f, 0.0f, 0.0f, 0.0f }                                    //blendConstants
-		};
+		vk::PipelineColorBlendStateCreateInfo colorBlendStateCreateInfo = colorBlendInfoOfPass;
+		colorBlendStateCreateInfo.attachmentCount = colorBlendAttachmentStates.size();
+		colorBlendStateCreateInfo.pAttachments = colorBlendAttachmentStates.data();
 		createInfo.pColorBlendState = &colorBlendStateCreateInfo;
 
 		vk::PipelineViewportStateCreateInfo viewportStateCreateInfo = {

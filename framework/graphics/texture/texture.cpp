@@ -37,6 +37,7 @@ namespace vg
 		m_anisotropy = value;
 		//Need to receate sampler when chaning anisotropy.
 		_createSampler();
+		updateStateID();
 	}
 
 	FilterMode Texture::getFilterMode()
@@ -49,6 +50,7 @@ namespace vg
 		m_filterMode = value;
 		//Need to receate sampler when chaning filterMode.
 		_createSampler();
+		updateStateID();
 	}
 
 	SamplerAddressMode Texture::getSamplerAddressMode()
@@ -61,6 +63,7 @@ namespace vg
 		m_samplerAddressMode = value;
 		//Need to receate sampler when chaning sampler address mode.
 		_createSampler();
+		updateStateID();
 	}
 
 	TextureType Texture::getType()
@@ -543,6 +546,8 @@ namespace vg
 			//clear really colors data with reallocate.
 			std::vector<std::vector<Color32>>().swap(m_arrTempColors);
 		}
+
+		updateStateID();
 	}
 
 	void Texture::_applyWithGenMipMap()

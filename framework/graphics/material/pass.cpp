@@ -131,6 +131,7 @@ namespace vg
 	void Pass::setShader(std::shared_ptr<Shader> pShader)
 	{
 		m_pShader = pShader;
+		updateStateID();
 	}
 
 	const std::shared_ptr<Texture> &Pass::getTexture(std::string name) const
@@ -158,6 +159,7 @@ namespace vg
 		info.updateSize(m_pData);
 		setValue(name, info, m_mapLayoutBinds, m_arrLayoutBindNames);
 		m_applied = VG_FALSE;
+		updateStateID();
 	}
 
 	const std::shared_ptr<Texture> &Pass::getMainTexture() const
@@ -215,6 +217,7 @@ namespace vg
 			_updateDescriptorImageInfo();
 			_applyBufferContent();
 			m_applied = VG_TRUE;
+			updateStateID();
 		}
 	}
 
@@ -226,6 +229,7 @@ namespace vg
 	void Pass::setCullMode(CullModeFlags cullMode)
 	{
 		m_cullMode = cullMode;
+		updateStateID();
 	}
 
 	FrontFaceType Pass::getFrontFace() const
@@ -236,6 +240,7 @@ namespace vg
 	void Pass::setFrontFace(FrontFaceType frontFace)
 	{
 		m_frontFace = frontFace;
+		updateStateID();
 	}
 
 	const fd::Viewport &Pass::getViewport() const
@@ -273,6 +278,7 @@ namespace vg
 			throw std::invalid_argument("The minDepth of viewport is bigger than the maxDepth of viewport!");
 #endif // DEBUG
 		m_viewport = viewport;
+		updateStateID();
 	}
 
 	const fd::Rect2D &Pass::getScissor() const
@@ -301,6 +307,7 @@ namespace vg
 			throw std::invalid_argument("The y of scissor is bigger than the height of scissor!");
 #endif // DEBUG
 		m_scissor = scissor;
+		updateStateID();
 	}
 
 	const DepthStencilInfo &Pass::getDepthStencilStateInfo() const
@@ -311,6 +318,7 @@ namespace vg
 	void Pass::setDepthStencilStateInfo(const DepthStencilInfo &value)
 	{
 		m_depthStencilStateInfo = value;
+		updateStateID();
 	}
 
 	const ColorBlendInfo &Pass::getColorBlendInfo() const
@@ -321,6 +329,7 @@ namespace vg
 	void Pass::setColorBlendInfo(const ColorBlendInfo &value)
 	{
 		m_colorBlendInfo = value;
+		updateStateID();
 	}
 
 

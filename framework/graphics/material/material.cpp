@@ -31,6 +31,7 @@ namespace vg
 		if (isHas(pPass)) return;
 		m_arrPasses.push_back(pPass);
 		m_mapPasses[pPass->getID()] = pPass;
+		updateStateID();
 	}
 
 	void Material::removePass(const std::shared_ptr<Pass>& pPass)
@@ -38,6 +39,7 @@ namespace vg
 		if (isHas(pPass) == VG_FALSE) return;
 		std::remove(m_arrPasses.begin(), m_arrPasses.end(), pPass);
 		m_mapPasses.erase(pPass->getID());
+		updateStateID();
 	}
 
 	void Material::apply()
@@ -56,6 +58,7 @@ namespace vg
 	void Material::setRenderQueueType(MaterialShowType type)
 	{
 		m_renderQueueType = type;
+		updateStateID();
 	}
 
 	uint32_t Material::getRenderPriority()
@@ -66,5 +69,6 @@ namespace vg
 	void Material::setRenderPriority(uint32_t priority)
 	{
 		m_renderPriority = priority;
+		updateStateID();
 	}
 }

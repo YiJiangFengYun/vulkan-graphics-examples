@@ -90,6 +90,8 @@ namespace vg
         }
 
         _createBuffer(memory, size);
+
+        updateStateID();
     }
 
     void IndexData::init(uint32_t indexCount

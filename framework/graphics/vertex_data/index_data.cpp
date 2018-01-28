@@ -78,6 +78,7 @@ namespace vg
 
         if (m_pMemory != nullptr && (m_memorySize != size || ! cacheMemory)) {
             free(m_pMemory);
+            m_pMemory = nullptr;
             m_memorySize = 0;
         }
 

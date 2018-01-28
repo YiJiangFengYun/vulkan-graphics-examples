@@ -20,7 +20,10 @@ namespace vg
 	enum class ShaderStageFlagBits
 	{
 		VERTEX = 1u,
-		FRAGMENT = 2u
+		FRAGMENT = 2u,
+		BEGIN_RANGE = VERTEX,
+		END_RANGE = FRAGMENT,
+		RANGE_SIZE = (END_RANGE - BEGIN_RANGE + 1)
 	};
 
 	const uint32_t ShaderStageFlagCount = 2u;

@@ -2,6 +2,85 @@
 
 namespace vg
 {
+	Pass::SpecializationData::SpecializationData()
+	    : m_mapEntries()
+		, m_info()
+		, m_size()
+		, m_pData(nullptr)
+	{
+
+	}
+
+	Pass::SpecializationData::~SpecializationData()
+	{
+		if (m_pData != nullptr)
+		{
+			free(m_pData);
+		}
+	}
+
+	Pass::SpecializationData::SpecializationData(const SpecializationData & target)
+	{
+		init(target.m_pData, target.m_size, target.m_info);
+	}
+
+	Pass::SpecializationData::SpecializationData(const SpecializationData && target)
+	    : m_mapEntries(std::move(target.m_mapEntries))
+		, m_info(std::move(target.m_info))
+		, m_size(std::move(target.m_size))
+		, m_pData(std::move(target.m_pData))
+	{
+
+	}
+
+	Pass::SpecializationData& Pass::SpecializationData::operator=(const SpecializationData & target)
+	{
+		init(target.m_pData, target.m_size, target.m_info);
+		return *this;
+	}
+
+	void Pass::SpecializationData::init(void* pData
+		, uint32_t size
+		, const vk::SpecializationInfo &info)
+	{
+		uint32_t count = info.mapEntryCount;
+		size_t sizeOfSrcMap = count * sizeof(vk::SpecializationMapEntry);
+		m_info.mapEntryCount = count;
+		m_mapEntries.resize(count);
+		memcpy(m_mapEntries.data(), info.pMapEntries, sizeOfSrcMap);
+        m_info.pMapEntries = m_mapEntries.data();
+		if (m_pData != nullptr && (m_size != size))
+		{
+			free(m_pData);
+			m_pData = nullptr;
+			m_size = 0;
+		}
+	
+		if (m_pData == nullptr)
+		{
+			m_pData = malloc(size);
+			m_size = size;
+		}
+		memcpy(m_pData, pData, size);
+		m_info.dataSize = size;
+		m_info.pData = m_pData;
+	}
+
+	const vk::SpecializationInfo Pass::SpecializationData::getInfo() const
+	{
+		return m_info;
+	}
+
+	const void * Pass::SpecializationData::getData() const
+	{
+		return m_pData;
+	}
+
+	const uint32_t Pass::SpecializationData::getSize() const
+	{
+		return m_size;
+	}
+
 	Pass::LayoutBindingInfo::LayoutBindingInfo()
 	{
 
@@ -98,6 +177,7 @@ namespace vg
 		, m_scissor(0.0f, 0.0f, 1.0f, 1.0f)
 		, m_depthStencilStateInfo()
 		, m_colorBlendInfo()
+		, m_arrSpecilizationDatas(static_cast<size_t>(ShaderStageFlagBits::RANGE_SIZE))
 		, m_buildInData()
 	{
 	}
@@ -113,6 +193,7 @@ namespace vg
 		, m_scissor(0.0f, 0.0f, 1.0f, 1.0f)
 		, m_depthStencilStateInfo()
 		, m_colorBlendInfo()
+		, m_arrSpecilizationDatas(static_cast<size_t>(ShaderStageFlagBits::RANGE_SIZE))
 		, m_buildInData()
 	{
 
@@ -330,6 +411,27 @@ namespace vg
 	{
 		m_colorBlendInfo = value;
 		updateStateID();
+	}
+
+	std::shared_ptr<Pass::SpecializationData> Pass::getSpecializationData(ShaderStageFlagBits shaderStage)
+	{
+		return m_arrSpecilizationDatas[static_cast<size_t>(shaderStage) - 
+		    static_cast<size_t>(ShaderStageFlagBits::BEGIN_RANGE)];
+	}
+
+	void Pass::setSpecializationData(ShaderStageFlagBits shaderStage
+		, void* pData
+		, uint32_t size
+		, const vk::SpecializationInfo &info)
+	{
+		size_t index = static_cast<size_t>(shaderStage) - static_cast<size_t>(ShaderStageFlagBits::BEGIN_RANGE);
+		std::shared_ptr<SpecializationData> pSpecializationData = m_arrSpecilizationDatas[index];
+		if (pSpecializationData == nullptr) 
+		{
+			m_arrSpecilizationDatas[index] = std::shared_ptr<SpecializationData>(new SpecializationData());
+			pSpecializationData = m_arrSpecilizationDatas[index];
+		}
+		pSpecializationData->init(pData, size, info);
 	}
 
 

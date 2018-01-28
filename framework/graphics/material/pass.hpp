@@ -16,6 +16,37 @@ namespace vg
 	class Pass : public Base
 	{
 	public:
+	    // to do
+	    class SpecializationData 
+		{
+        public:
+		    SpecializationData();
+			~SpecializationData();
+			SpecializationData(const SpecializationData &);
+			SpecializationData(const SpecializationData &&);
+			SpecializationData& operator=(const SpecializationData &);
+
+			void init(void* pData
+			    , uint32_t size
+				, const vk::SpecializationInfo &info);
+
+			template<typename T>
+			void init(const T &data
+				, const vk::SpecializationInfo &info);
+
+            const vk::SpecializationInfo getInfo() const;
+			const void * getData() const;
+			const uint32_t getSize() const;
+
+			template<typename T>
+			T getData() const;
+		private:
+			std::vector<vk::SpecializationMapEntry> m_mapEntries;
+			vk::SpecializationInfo m_info;
+			uint32_t m_size;
+			void *m_pData;
+		};
+
 		struct LayoutBindingInfo
 		{
 			std::string name;
@@ -119,6 +150,16 @@ namespace vg
 		const ColorBlendInfo &getColorBlendInfo() const;
 		void setColorBlendInfo(const ColorBlendInfo &value);
 
+		std::shared_ptr<SpecializationData> getSpecializationData(ShaderStageFlagBits shaderStage);
+		void setSpecializationData(ShaderStageFlagBits shaderStage
+		    , void* pData
+			, uint32_t size
+			, const vk::SpecializationInfo &info);
+		template<typename T>
+		void setSpecializationData(ShaderStageFlagBits shaderStage
+		    , const T &data
+			, const vk::SpecializationInfo &info);
+
 		std::shared_ptr<Shader> _getShader();
 		std::shared_ptr<vk::Buffer> _getUniformBuffer();
 		std::shared_ptr<vk::DeviceMemory> _getUniformBufferMemory();
@@ -137,6 +178,11 @@ namespace vg
 		std::shared_ptr<vk::PipelineLayout> m_pPipelineLayout;
 		std::shared_ptr<vk::DescriptorPool> m_pDescriptorPool;
 		std::shared_ptr<vk::DescriptorSet> m_pDescriptorSet;
+
+		//todo
+		//each stage may own a specilization constant data.
+        std::vector<std::shared_ptr<SpecializationData>> m_arrSpecilizationDatas;
+
 		Bool32 m_applied;
 
 		CullModeFlags m_cullMode;

@@ -133,6 +133,26 @@ else()
 	message(STATUS "Vulkan_LIBRARIES: ${Vulkan_LIBRARIES}")
 endif()
 
+#find boost
+#now we only use boost head file code.
+message(STATUS "Environment variable BOOST_ROOT: $ENV{BOOST_ROOT}")
+message(STATUS "Environment variable BOOST_INCLUDEDIR: $ENV{BOOST_INCLUDEDIR}")
+message(STATUS "Environment variable BOOST_LIBRARYDIR: $ENV{BOOST_LIBRARYDIR}")
+set(BOOST_ROOT $ENV{BOOST_ROOT})
+set(BOOST_INCLUDEDIR $ENV{BOOST_INCLUDEDIR})
+set(BOOST_LIBRARYDIR $ENV{BOOST_LIBRARYDIR})
+find_package(Boost)
+if (NOT Boost_FOUND)
+	message(FATAL_ERROR "Could not find Boost library!")
+else()
+	include_directories(${Boost_INCLUDE_DIRS})
+	message(STATUS "Boost_INCLUDE_DIRS: ${Boost_INCLUDE_DIRS}")
+	message(STATUS "Boost_LIBRARY_DIRS: ${Boost_LIBRARY_DIRS}")
+	message(STATUS "Boost_LIBRARIES: ${Boost_LIBRARIES}")
+	message(STATUS "Boost_VERSION: ${Boost_VERSION}")
+endif()
+
+
 # add the binary tree to the search path for include files
 # so that we will find VGFConfig.h
 include_directories("${PROJECT_BINARY_DIR}")

@@ -2,9 +2,9 @@
 
 namespace vg
 {
-    void vertexDataToCommandBuffer(const VertexData &vertexData, vk::CommandBuffer &commandBuffer, uint32_t subIndex)
+    void vertexDataToCommandBuffer(const std::shared_ptr<VertexData> &pVertexData, vk::CommandBuffer &commandBuffer, uint32_t subIndex)
 	{
-		const auto &subVertexDatas = vertexData.getSubVertexDatas();
+		const auto &subVertexDatas = pVertexData->getSubVertexDatas();
         const auto &subVertexData = subVertexDatas[subIndex];
         const auto &bindingDescs = subVertexData.bindingDescs;
         std::vector<vk::Buffer> vertexBuffers(bindingDescs.size());
@@ -16,7 +16,7 @@ namespace vg
 
         uint32_t count = static_cast<uint32_t>(bindingDescs.size());
         for (uint32_t i = 0; i < count; ++i) {
-            vertexBuffers[i] = *(vertexData.getBuffer());
+            vertexBuffers[i] = *(pVertexData->getBuffer());
             offsets[i] = offset;
             offset += bindingDescs[i].stride * subVertexData.vertexCount;
         }
@@ -24,7 +24,7 @@ namespace vg
 		commandBuffer.bindVertexBuffers(0u, vertexBuffers, offsets);
 	}
 
-    void indexDataToCommandBuffer(const IndexData &indexData, 
+    void indexDataToCommandBuffer(const std::shared_ptr<IndexData> &pIndexData, 
         vk::CommandBuffer &commandBuffer, 
         uint32_t subIndex, 
         vk::IndexType indexType
@@ -32,11 +32,11 @@ namespace vg
     {
         uint32_t offset = 0u;
         uint32_t index = 0u;
-        auto subIndexDatas = indexData.getSubIndexDatas();
+        auto subIndexDatas = pIndexData->getSubIndexDatas();
 		for (uint32_t i = 0; i < subIndex; ++i)
 		{
 			offset += subIndexDatas[i].bufferSize;
 		}
-		commandBuffer.bindIndexBuffer(*(indexData.getBuffer()), static_cast<vk::DeviceSize>(offset), vk::IndexType::eUint32);
+		commandBuffer.bindIndexBuffer(*(pIndexData->getBuffer()), static_cast<vk::DeviceSize>(offset), vk::IndexType::eUint32);
     }
 }

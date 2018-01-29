@@ -6,6 +6,8 @@ namespace vg
 {
 	BaseMesh::BaseMesh()
 	    : Base(BaseType::MESH)
+		, m_pVertexData(new VertexData())
+		, m_pIndexData(new IndexData())
 	{
 
 	}
@@ -17,18 +19,17 @@ namespace vg
 
 	uint32_t BaseMesh::getSubMeshCount() const
 	{
-		return m_indexData.getSubIndexDataCount();
+		return m_pIndexData->getSubIndexDataCount();
 	}
 
-
-	const VertexData &BaseMesh::getVertexData() const
+	const std::shared_ptr<VertexData> &BaseMesh::getVertexData() const
 	{
-		return m_vertexData;
+		return m_pVertexData;
 	}
 
-	const IndexData &BaseMesh::getIndexData() const
+	const std::shared_ptr<IndexData> &BaseMesh::getIndexData() const
 	{
-		return m_indexData;
+		return m_pIndexData;
 	}
 
 	SepMesh::LayoutBindingInfo::LayoutBindingInfo()
@@ -300,7 +301,7 @@ namespace vg
 			offset += MeshData::getDataBaseTypeSize(layoutInfo.dataType) * vertexCount;
 		}
 
-		m_vertexData.init(vertexCount, stagingMemory, vertexBufferSize, VG_FALSE, createInfo);
+		m_pVertexData->init(vertexCount, stagingMemory, vertexBufferSize, VG_FALSE, createInfo);
 
 		free(stagingMemory);
 	}
@@ -331,7 +332,7 @@ namespace vg
 			offset += static_cast<uint32_t>(size);
 		}
 
-		m_indexData.init(subDatas, stagingMemory, indexBufferSize, VG_FALSE);
+		m_pIndexData->init(subDatas, stagingMemory, indexBufferSize, VG_FALSE);
 
 		free(stagingMemory);
 	}

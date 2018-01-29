@@ -84,7 +84,7 @@ namespace vg
 		{
 			auto pVisualObject = validVisualObjects[i];
 			auto pMesh = pVisualObject->getMesh();
-			auto subMeshCount = pMesh->getIndexData().getSubIndexDataCount();
+			auto subMeshCount = pMesh->getIndexData()->getSubIndexDataCount();
 			auto pMaterial = pVisualObject->getMaterial();
 			auto passCount = pMaterial->getPassCount();
 			drawCount += subMeshCount * passCount;
@@ -93,7 +93,6 @@ namespace vg
 		//------Doing render.
 		vk::PipelineStageFlags waitStages[] = { vk::PipelineStageFlagBits::eColorAttachmentOutput };
 		std::vector<vk::SubmitInfo> submitInfos(drawCount);
-		m_arrPLastPipelines.resize(drawCount);
 		m_arrPLastSemaphores.resize(drawCount);
 		m_arrSemaphores.resize(drawCount);
 
@@ -108,7 +107,7 @@ namespace vg
 			auto mvMatrix = viewMatrix * modelMatrix;
 			auto mvpMatrix = projMatrix * mvMatrix;
 			auto pMesh = pVisualObject->getMesh();
-			auto subMeshCount = pMesh->getIndexData().getSubIndexDataCount();
+			auto subMeshCount = pMesh->getIndexData()->getSubIndexDataCount();
 			auto pMaterial = pVisualObject->getMaterial();
 			auto passCount = pMaterial->getPassCount();
 			for (uint32_t passIndex = 0u; passIndex < passCount; ++passIndex)
@@ -126,7 +125,6 @@ namespace vg
 				{
 					std::shared_ptr<vk::Pipeline> pPipeline;
 					_createPipelineForRender(pPipeline, pMesh, pMaterial, subMeshIndex, passIndex);
-					m_arrPLastPipelines[drawIndex] = pPipeline;
 					_recordCommandBufferForRender(pPipeline, pMesh, pMaterial, subMeshIndex, passIndex);
 
 					//submit

@@ -22,13 +22,13 @@ namespace vg
 public:
         BaseMesh();
 		~BaseMesh();
-		const VertexData &getVertexData() const;
-		const IndexData &getIndexData() const;
+		const std::shared_ptr<VertexData> &getVertexData() const;
+		const std::shared_ptr<IndexData> &getIndexData() const;
 		virtual uint32_t getSubMeshCount() const;
 
 protected:
-        VertexData m_vertexData;
-		IndexData m_indexData;
+        std::shared_ptr<VertexData> m_pVertexData;
+		std::shared_ptr<IndexData> m_pIndexData;
 private:
 	};
 

@@ -22,6 +22,7 @@ namespace vg
 		, m_clearValueDepth(1.0f)
 		, m_clearValueStencil(0u)
 		, m_renderArea(0.0f, 0.0f, 1.0f, 1.0f)
+		, m_pipelineCache()
 	{
 		_init();
 	}
@@ -38,6 +39,7 @@ namespace vg
 		, m_clearValueDepth(1.0f)
 		, m_clearValueStencil(0u)
 		, m_renderArea(0.0f, 0.0f, 1.0f, 1.0f)
+		, m_pipelineCache()
 	{
 		_init();
 	}
@@ -54,7 +56,9 @@ namespace vg
 
 	void BaseRenderer::render(const RenderInfo &info, RenderResultInfo &resultInfo)
 	{
+		_preRender();
 		_render(info, resultInfo);
+		_postRender();
 	}
 
 	uint32_t BaseRenderer::getFramebufferWidth()
@@ -141,8 +145,18 @@ namespace vg
 		return VG_TRUE;
 	}
 
+	void BaseRenderer::_preRender()
+	{
+		m_pipelineCache.start();
+	}
+
 	void BaseRenderer::_render(const RenderInfo &info, RenderResultInfo &resultInfo)
 	{
+	}
+
+	void BaseRenderer::_postRender()
+	{
+		m_pipelineCache.end();
 	}
 
 	void BaseRenderer::_createPipelineForRender(std::shared_ptr<vk::Pipeline> &pPipeline,
@@ -151,123 +165,16 @@ namespace vg
 		uint32_t subMeshIndex,
 		uint32_t passIndex)
 	{
-		//Create graphics pipeline create info. 
-		vk::GraphicsPipelineCreateInfo createInfo = {};
-
-		//Construct shader stage create info.
 		auto pPass = pMaterial->getPassWithIndex(passIndex);
-		auto pShader = pPass->_getShader();
-		auto shaderStages = pShader->getShaderStageInfos();
-
-		createInfo.stageCount = shaderStages.size();
-		createInfo.pStages = shaderStages.data();
-
-		const VertexData::SubVertexData &subVertexData = pMesh->getVertexData().getSubVertexDatas()[0];
-		const IndexData::SubIndexData &subIndexData = pMesh->getIndexData().getSubIndexDatas()[subMeshIndex];
-
-		createInfo.pVertexInputState = &subVertexData.vertexInputStateInfo;
-		createInfo.pInputAssemblyState = &subIndexData.inputAssemblyStateInfo;
-
-        auto cullMode = tranCullModeFlagsToVK(pPass->getCullMode());
-		auto frontFace = tranFrontFaceTypeToVK(pPass->getFrontFace());
-		//Rasterization info.
-		vk::PipelineRasterizationStateCreateInfo rasterizationStateCreateInfo = {
-			vk::PipelineRasterizationStateCreateFlags(),  //flags
-			VK_FALSE,                                     //depthClampEnable
-			VK_FALSE,                                     //rasterizerDiscardEnable
-			vk::PolygonMode::eFill,                       //polygonMode
-			cullMode,                                     //cullMode
-			frontFace,                                    //frontFace
-			VK_FALSE,                                     //depthBiasEnable
-			0.0f,                                         //depthBiasConstantFactor
-			0.0f,                                         //depthBiasClamp
-			0.0f,                                         //depthBiasSlopeFactor
-			1.0f                                          //lineWidth
-		};
-		createInfo.pRasterizationState = &rasterizationStateCreateInfo;
-
-		auto depthStencilStateInfoOfPass = pPass->getDepthStencilStateInfo();
-
-		//depth and stencil info.
-		createInfo.pDepthStencilState = &depthStencilStateInfoOfPass;
-
-		const auto& colorBlendInfoOfPass = pPass->getColorBlendInfo();
-		//color blend info
-		vk::PipelineColorBlendAttachmentState defaultColorBlendAttachmentState = {
-			VK_FALSE,                                //blendEnable
-			vk::BlendFactor::eOne,                  //srcColorBlendFactor
-			vk::BlendFactor::eZero,                  //dstColorBlendFactor
-			vk::BlendOp::eAdd,                       //colorBlendOp
-			vk::BlendFactor::eOne,                  //srcAlphaBlendFactor
-			vk::BlendFactor::eZero,                  //desAlphaBlendFactor
-			vk::BlendOp::eAdd,                       //alphaBlendOp
-			vk::ColorComponentFlagBits::eR
-			| vk::ColorComponentFlagBits::eG
-			| vk::ColorComponentFlagBits::eB
-			| vk::ColorComponentFlagBits::eA  //colorWriteMask
-		};
-
-		uint32_t attachmentCount = 1u;
-		std::vector<vk::PipelineColorBlendAttachmentState> colorBlendAttachmentStates(attachmentCount);
-		for (uint32_t i = 0; i < attachmentCount; ++i)
-		{
-			if (i < colorBlendInfoOfPass.attachmentCount)
-			{
-				colorBlendAttachmentStates[i] = *(colorBlendInfoOfPass.pAttachments + i);
-			}
-			else
-			{
-				colorBlendAttachmentStates[i] = defaultColorBlendAttachmentState;
-			}
-		}
-
-		vk::PipelineColorBlendStateCreateInfo colorBlendStateCreateInfo = colorBlendInfoOfPass;
-		colorBlendStateCreateInfo.attachmentCount = colorBlendAttachmentStates.size();
-		colorBlendStateCreateInfo.pAttachments = colorBlendAttachmentStates.data();
-		createInfo.pColorBlendState = &colorBlendStateCreateInfo;
-
-		vk::PipelineViewportStateCreateInfo viewportStateCreateInfo = {
-			vk::PipelineViewportStateCreateFlags(),                  //flags
-			1u,                                                      //viewportCount
-			nullptr,                                               //pViewports
-			1u,                                                      //scissorCount
-		    nullptr                                                 //pScissors
-		};
-		createInfo.pViewportState = &viewportStateCreateInfo;
-
-		//Multisample info.
-		vk::PipelineMultisampleStateCreateInfo multisampleStateCreateInfo = {
-			vk::PipelineMultisampleStateCreateFlags(),              //flags
-			vk::SampleCountFlagBits::e1,                            //rasterizationSamples
-			VK_FALSE,                                               //sampleShadingEnable
-			0.0f,                                                   //minSampleShading
-			nullptr,                                                //pSampleMask
-			VK_FALSE,                                               //alphaToCoverageEnable
-			VK_FALSE                                                //alphaToOneEnable
-		};
-		createInfo.pMultisampleState = &multisampleStateCreateInfo;
-
-		std::vector<vk::DynamicState> dynamicStates = {
-			vk::DynamicState::eViewport,
-			vk::DynamicState::eScissor
-		};
-
-		vk::PipelineDynamicStateCreateInfo dynamicStateCreateInfo = {
-			vk::PipelineDynamicStateCreateFlags(),
-            dynamicStates.size(),
-			dynamicStates.data()
-		};
-		createInfo.pDynamicState = &dynamicStateCreateInfo;		
-
-		createInfo.layout = *pPass->_getPipelineLayout();
-
-		createInfo.renderPass = *m_pRenderPass;
-		createInfo.subpass = 0;
-		createInfo.basePipelineHandle = nullptr;
-		createInfo.basePipelineIndex = -1;
-        
-		auto pDevice = pApp->getDevice();
-		pPipeline = fd::createGraphicsPipeline(pDevice, *m_pPipelineCache, createInfo);
+		PipelineCache::Info info(
+			*m_pRenderPass,
+			pPass,
+			pMesh->getVertexData(),
+			0u,
+			pMesh->getIndexData(),
+			subMeshIndex
+		);
+		pPipeline = m_pipelineCache.caching(info);
 	}
 
 	void BaseRenderer::_recordCommandBufferForRender(std::shared_ptr<vk::Pipeline> pPipeline,
@@ -364,7 +271,7 @@ namespace vg
 
         vertexDataToCommandBuffer(pMesh->getVertexData(), *m_pCommandBuffer, 0);
 		indexDataToCommandBuffer(pMesh->getIndexData(), *m_pCommandBuffer, subMeshIndex);
-		m_pCommandBuffer->drawIndexed(pMesh->getIndexData().getSubIndexDatas()[subMeshIndex].indexCount, 1u, 0u, 0u, 0u);
+		m_pCommandBuffer->drawIndexed(pMesh->getIndexData()->getSubIndexDatas()[subMeshIndex].indexCount, 1u, 0u, 0u, 0u);
 		//m_pCommandBuffer->draw(3, 1, 0, 0);
 
 		m_pCommandBuffer->endRenderPass();
@@ -381,8 +288,6 @@ namespace vg
 		_createFramebuffer();
 		_createCommandPool();
 		_createCommandBuffer();
-		_createPipelineCache();
-		//_allocateGraphicsQueue();
 	}
 
 	void BaseRenderer::_createRenderPass()
@@ -522,23 +427,4 @@ namespace vg
 		m_pCommandBuffer = fd::allocateCommandBuffer(pDevice, pCommandPool, allocateInfo);
 		LOG(plog::debug) << "Post allocate command buffer from pool." << std::endl;
 	}
-
-	void BaseRenderer::_createPipelineCache()
-	{
-		vk::PipelineCacheCreateInfo createInfo = {
-			vk::PipelineCacheCreateFlags()
-		};
-		auto pDevice = pApp->getDevice();
-		m_pPipelineCache = fd::createPipelineCache(pDevice, createInfo);
-	}
-
-	/*void BaseRenderer::_allocateGraphicsQueue()
-	{
-		pApp->allocateGaphicsQueue(m_graphicsQueueIndex, m_graphicsQueue);
-	}
-
-	void BaseRenderer::_freeGraphicsQueue()
-	{
-		pApp->freeGraphicsQueue(m_graphicsQueueIndex);
-	}*/
 }

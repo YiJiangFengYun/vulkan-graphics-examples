@@ -78,22 +78,6 @@ namespace vg
 		return BaseRenderer::_isValidForRender();
 	}
 
-	/*template <SpaceType SPACE_TYPE>
-	void Renderer<SPACE_TYPE>::_update(UpdateInfo updateInfo)
-	{
-		if (m_pScene == nullptr)
-		{
-			throw new std::runtime_error("Scene is not specified.");
-		}
-
-		if (m_pCamera == nullptr)
-		{
-			throw new std::runtime_error("Camera is not specified.");
-		}
-
-		BaseRenderer::_update(updateInfo);
-	}*/
-
 	template <SpaceType SPACE_TYPE>
 	void Renderer<SPACE_TYPE>::_render(const RenderInfo &info, RenderResultInfo &resultInfo)
 	{
@@ -113,7 +97,6 @@ namespace vg
 	template <SpaceType SPACE_TYPE>
 	typename SpaceTypeInfo<SPACE_TYPE>::MatrixType Renderer<SPACE_TYPE>::_getMVPMatrix(std::shared_ptr<typename SceneType::ObjectType> pObject)
 	{
-		//return m_pCamera->getTransform().getMatrixWorldToLocal() * pObject->getTransform().getMatrixLocalToWorld();
 		return _getMVMatrix(pObject);
 	}
 

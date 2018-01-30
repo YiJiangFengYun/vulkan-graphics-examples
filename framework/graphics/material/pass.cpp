@@ -275,6 +275,10 @@ namespace vg
 		, Matrix4x4 matrixObjectToWorld
 	)
 	{
+		if (m_buildInData.matrixObjectToNDC == matrixObjectToNDC &&
+			m_buildInData.matrixObjectToView == matrixObjectToView &&
+			m_buildInData.matrixObjectToWorld == matrixObjectToWorld)
+			return;
 		m_buildInData.matrixObjectToNDC = matrixObjectToNDC;
 		m_buildInData.matrixObjectToView = matrixObjectToView;
 		m_buildInData.matrixObjectToWorld = matrixObjectToWorld;

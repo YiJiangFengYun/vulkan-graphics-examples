@@ -237,8 +237,8 @@ namespace vg
 		vk::Viewport viewport = {
 			(float)m_framebufferWidth * viewportOfPass.x,                                     //x
 			(float)m_framebufferHeight * viewportOfPass.y,                                     //y
-			(float)m_framebufferWidth * viewportOfPass.width,   //width
-			(float)m_framebufferHeight * viewportOfPass.height,  //height
+			(float)m_framebufferWidth * viewportOfPass.width,                     //width
+			(float)m_framebufferHeight * viewportOfPass.height,                 //height
 			1.0f * viewportOfPass.minDepth,                                     //minDepth
 			1.0f * viewportOfPass.maxDepth                                      //maxDepth
 		};

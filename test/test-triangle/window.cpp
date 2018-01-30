@@ -134,18 +134,14 @@ namespace testTriangle
 
 	void Window::_update()
 	{
-		static auto startTime = std::chrono::high_resolution_clock::now();
+		/*static auto startTime = std::chrono::high_resolution_clock::now();
 
 		auto currentTime = std::chrono::high_resolution_clock::now();
 		auto duration = currentTime - startTime;
-		float time = std::chrono::duration_cast<std::chrono::milliseconds>(currentTime - startTime).count() / 1000.0f;
-		float strength = remainder(time, 1.0f) / 1.0f;
-		m_pPass->setMainColor(vg::Color(strength, strength, strength, 1.0f));
+		float time = std::chrono::duration_cast<std::chrono::milliseconds>(currentTime - startTime).count() / 2000.0f;
 
-		for (const auto& pRenderer : m_pRenderers)
-		{
-			pRenderer->setClearValueColor(vg::Color(strength, 0.0f, 0.0f, 0.0f));
-		}
+		auto pTransform = m_pModel->getTransform();
+		pTransform->setLocalRotation(glm::angleAxis(glm::radians(10.0f) * time, vg::Vector3(0.0f, 0.0f, 1.0f)));*/
 	}
 
 	void Window::_onPostUpdate()

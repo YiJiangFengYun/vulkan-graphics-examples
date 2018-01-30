@@ -129,7 +129,8 @@ namespace vg
 		
 		vk::PipelineStageFlags waitStages[] = { vk::PipelineStageFlagBits::eColorAttachmentOutput };
 		std::vector<vk::SubmitInfo> submitInfos(drawCount);
-		m_arrPLastSemaphores.resize(drawCount);
+		if (m_arrCachePSemaphores.size() < drawCount)
+		    m_arrCachePSemaphores.resize(drawCount);
 		m_arrSemaphores.resize(drawCount);
 
 		auto projMatrix = m_pCamera->getProjMatrix();
@@ -170,9 +171,9 @@ namespace vg
 
 						//submit
 						std::shared_ptr<vk::Semaphore> pSemaphore = nullptr;
-						if (m_arrPLastSemaphores[drawIndex] != nullptr)
+						if (m_arrCachePSemaphores[drawIndex] != nullptr)
 						{
-							pSemaphore = m_arrPLastSemaphores[drawIndex];
+							pSemaphore = m_arrCachePSemaphores[drawIndex];
 						}
 						else
 						{
@@ -180,7 +181,7 @@ namespace vg
 								vk::SemaphoreCreateFlags()
 							};
 							pSemaphore = fd::createSemaphore(pDevice, createInfo);
-							m_arrPLastSemaphores[drawIndex] = pSemaphore;
+							m_arrCachePSemaphores[drawIndex] = pSemaphore;
 						}
 						m_arrSemaphores[drawIndex] = *pSemaphore;
 

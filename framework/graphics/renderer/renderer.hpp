@@ -75,7 +75,7 @@ namespace vg
 		std::shared_ptr<vk::CommandBuffer> m_pCommandBuffer;
 		PipelineCache m_pipelineCache;
 		
-		std::vector<std::shared_ptr<vk::Semaphore>> m_arrPLastSemaphores;
+		std::vector<std::shared_ptr<vk::Semaphore>> m_arrCachePSemaphores;
 		std::vector<vk::Semaphore> m_arrSemaphores;
 		//aggregations
 		//Renderer will use swapchain image when color attachment texture is null.

@@ -6,7 +6,6 @@ namespace vg
 	Base::Base(BaseType baseType)
 		: m_baseType(baseType)
 		, m_id(++Base::m_idCreator[baseType])
-		, m_stateID(VG_BASE_INIT_STATE_ID)
 	{
 		
 	}
@@ -20,19 +19,4 @@ namespace vg
 	{
 		return m_id;
 	}
-
-	StateID Base::getStateID()
-	{
-		return m_stateID;
-	}
-	
-	void Base::updateStateID()
-	{
-		++m_stateID;
-		if ( m_stateID == std::numeric_limits<uint32_t>::max())
-		{
-			m_stateID = VG_BASE_INIT_STATE_ID;
-		}
-	}
-
 }

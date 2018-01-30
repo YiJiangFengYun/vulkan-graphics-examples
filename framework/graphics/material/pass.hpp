@@ -16,6 +16,7 @@ namespace vg
 	class Pass : public Base
 	{
 	public:
+	    using PipelineStateID = uint32_t;	    
 	    // to do
 	    class SpecializationData 
 		{
@@ -131,6 +132,8 @@ namespace vg
 		);
 
 		void apply();
+        
+		PipelineStateID getPipelineStateID() const;
 
 		CullModeFlags getCullMode() const;
 		void setCullMode(CullModeFlags cullMode);
@@ -179,18 +182,18 @@ namespace vg
 		std::shared_ptr<vk::DescriptorPool> m_pDescriptorPool;
 		std::shared_ptr<vk::DescriptorSet> m_pDescriptorSet;
 
-		//todo
-		//each stage may own a specilization constant data.
-        std::vector<std::shared_ptr<SpecializationData>> m_arrSpecilizationDatas;
-
 		Bool32 m_applied;
 
+        PipelineStateID m_pipelineStateID;
 		CullModeFlags m_cullMode;
 		FrontFaceType m_frontFace;
 		fd::Viewport m_viewport;
 		fd::Rect2D m_scissor;
 		DepthStencilInfo m_depthStencilStateInfo;
 		ColorBlendInfo m_colorBlendInfo;
+		//todo
+		//each stage may own a specilization constant data.
+        std::vector<std::shared_ptr<SpecializationData>> m_arrSpecilizationDatas;
 
 		MaterialData::BuildInData m_buildInData;
 
@@ -203,6 +206,7 @@ namespace vg
 		void _updateDescriptorBufferInfo();
 		void _updateDescriptorImageInfo();
 		void _applyBufferContent();
+		void _updatePipelineStateID();
 
 		//tool methods
 		void createBuffer(vk::DeviceSize size, std::shared_ptr<vk::Buffer> &pBuffer, std::shared_ptr<vk::DeviceMemory> &pBufferMemory);

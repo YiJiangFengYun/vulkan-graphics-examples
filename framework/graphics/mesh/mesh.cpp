@@ -194,7 +194,6 @@ namespace vg
 	{
 		m_multipliedColor = value;
 		// m_applied = VG_FALSE;
-		updateStateID();
 	}
 
 	Color SepMesh::getAddedColor() const
@@ -206,7 +205,6 @@ namespace vg
 	{
 		m_addedColor = value;
 		// m_applied = VG_FALSE;
-		updateStateID();
 	}
 
 	void SepMesh::apply(Bool32 makeUnreadable)
@@ -228,7 +226,6 @@ namespace vg
 			_createIndexData();
 
 			m_applied = VG_TRUE;
-			updateStateID();
 		}
 
 		if (makeUnreadable)

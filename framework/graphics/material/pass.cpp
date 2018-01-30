@@ -179,6 +179,7 @@ namespace vg
 		, m_colorBlendInfo()
 		, m_arrSpecilizationDatas(static_cast<size_t>(ShaderStageFlagBits::RANGE_SIZE))
 		, m_buildInData()
+		, m_pipelineStateID()
 	{
 	}
 
@@ -195,6 +196,7 @@ namespace vg
 		, m_colorBlendInfo()
 		, m_arrSpecilizationDatas(static_cast<size_t>(ShaderStageFlagBits::RANGE_SIZE))
 		, m_buildInData()
+		, m_pipelineStateID()
 	{
 
 	}
@@ -212,7 +214,7 @@ namespace vg
 	void Pass::setShader(std::shared_ptr<Shader> pShader)
 	{
 		m_pShader = pShader;
-		updateStateID();
+		_updatePipelineStateID();
 	}
 
 	const std::shared_ptr<Texture> &Pass::getTexture(std::string name) const
@@ -240,7 +242,6 @@ namespace vg
 		info.updateSize(m_pData);
 		setValue(name, info, m_mapLayoutBinds, m_arrLayoutBindNames);
 		m_applied = VG_FALSE;
-		updateStateID();
 	}
 
 	const std::shared_ptr<Texture> &Pass::getMainTexture() const
@@ -302,7 +303,6 @@ namespace vg
 			_updateDescriptorImageInfo();
 			_applyBufferContent();
 			m_applied = VG_TRUE;
-			updateStateID();
 		}
 	}
 
@@ -314,7 +314,7 @@ namespace vg
 	void Pass::setCullMode(CullModeFlags cullMode)
 	{
 		m_cullMode = cullMode;
-		updateStateID();
+		_updatePipelineStateID();
 	}
 
 	FrontFaceType Pass::getFrontFace() const
@@ -325,7 +325,7 @@ namespace vg
 	void Pass::setFrontFace(FrontFaceType frontFace)
 	{
 		m_frontFace = frontFace;
-		updateStateID();
+		_updatePipelineStateID();
 	}
 
 	const fd::Viewport &Pass::getViewport() const
@@ -363,7 +363,7 @@ namespace vg
 			throw std::invalid_argument("The minDepth of viewport is bigger than the maxDepth of viewport!");
 #endif // DEBUG
 		m_viewport = viewport;
-		updateStateID();
+		_updatePipelineStateID();
 	}
 
 	const fd::Rect2D &Pass::getScissor() const
@@ -392,7 +392,7 @@ namespace vg
 			throw std::invalid_argument("The y of scissor is bigger than the height of scissor!");
 #endif // DEBUG
 		m_scissor = scissor;
-		updateStateID();
+		_updatePipelineStateID();
 	}
 
 	const DepthStencilInfo &Pass::getDepthStencilStateInfo() const
@@ -403,7 +403,7 @@ namespace vg
 	void Pass::setDepthStencilStateInfo(const DepthStencilInfo &value)
 	{
 		m_depthStencilStateInfo = value;
-		updateStateID();
+		_updatePipelineStateID();
 	}
 
 	const ColorBlendInfo &Pass::getColorBlendInfo() const
@@ -414,7 +414,7 @@ namespace vg
 	void Pass::setColorBlendInfo(const ColorBlendInfo &value)
 	{
 		m_colorBlendInfo = value;
-		updateStateID();
+		_updatePipelineStateID();
 	}
 
 	std::shared_ptr<Pass::SpecializationData> Pass::getSpecializationData(ShaderStageFlagBits shaderStage)
@@ -422,6 +422,11 @@ namespace vg
 		return m_arrSpecilizationDatas[static_cast<size_t>(shaderStage) - 
 		    static_cast<size_t>(ShaderStageFlagBits::BEGIN_RANGE)];
 	}
+
+	Pass::PipelineStateID Pass::getPipelineStateID() const
+    {
+        return m_pipelineStateID;
+    }
 
 	void Pass::setSpecializationData(ShaderStageFlagBits shaderStage
 		, void* pData
@@ -765,5 +770,14 @@ namespace vg
 		pBufferMemory = fd::allocateMemory(pDevice, allocateInfo);
 
 		pDevice->bindBufferMemory(*pBuffer, *pBufferMemory, 0);
+	}
+
+	void Pass::_updatePipelineStateID()
+	{
+		++m_pipelineStateID;
+		if ( m_pipelineStateID == std::numeric_limits<PipelineStateID>::max())
+		{
+			m_pipelineStateID = 0;
+		}
 	}
 }

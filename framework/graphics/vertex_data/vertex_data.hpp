@@ -9,6 +9,7 @@ namespace vg
     class VertexData : public Base
     {
     public:
+        using PipelineStateID = uint32_t;
         struct SubVertexData {
             std::vector<vk::VertexInputBindingDescription> bindingDescs;
             std::vector<vk::VertexInputAttributeDescription> attrDescs;
@@ -54,8 +55,10 @@ namespace vg
 
         template<typename VertexType>
         std::vector<VertexType> getVertices(uint32_t offset, uint32_t count) const;
-
+        
+        PipelineStateID getPipelineStateID() const;
     private:
+        PipelineStateID m_pipelineStateID;
         std::vector<SubVertexData> m_subDatas;
         uint32_t m_subDataCount;
         uint32_t m_bufferSize;
@@ -66,6 +69,7 @@ namespace vg
         void *m_pMemory;
 
         void _createBuffer(const void *pMemory, uint32_t memorySize);
+        void _updatePipelineStateID();
     };
 
 } //!vg

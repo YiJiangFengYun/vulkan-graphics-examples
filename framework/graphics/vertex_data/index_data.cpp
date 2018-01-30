@@ -16,6 +16,7 @@ namespace vg
         , m_pBufferMemory()
         , m_memorySize()
         , m_pMemory(nullptr)
+        , m_pipelineStateID()
     {
 
     }
@@ -67,6 +68,11 @@ namespace vg
         return m_pMemory;
     }
 
+    IndexData::PipelineStateID IndexData::getPipelineStateID() const
+    {
+        return m_pipelineStateID;
+    }
+
     void IndexData::init(const std::vector<IndexData::SubIndexData> subDatas
         , const void *memory
         , uint32_t size
@@ -92,7 +98,7 @@ namespace vg
 
         _createBuffer(memory, size);
 
-        updateStateID();
+        _updatePipelineStateID();
     }
 
     void IndexData::init(uint32_t indexCount
@@ -168,4 +174,13 @@ namespace vg
 
 		endSingleTimeCommands(pCommandBuffer);
     }
+
+    void IndexData::_updatePipelineStateID()
+	{
+		++m_pipelineStateID;
+		if ( m_pipelineStateID == std::numeric_limits<PipelineStateID>::max())
+		{
+			m_pipelineStateID = 0;
+		}
+	}
 }

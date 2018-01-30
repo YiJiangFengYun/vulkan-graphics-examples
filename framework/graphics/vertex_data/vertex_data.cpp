@@ -16,6 +16,7 @@ namespace vg
         , m_pBufferMemory()
         , m_memorySize()
         , m_pMemory(nullptr)
+        , m_pipelineStateID()
     {
 
     }
@@ -65,6 +66,11 @@ namespace vg
     const void *VertexData::getMemory() const
     {
         return m_pMemory;
+    }
+
+    VertexData::PipelineStateID VertexData::getPipelineStateID() const
+    {
+        return m_pipelineStateID;
     }
 
     void VertexData::init(uint32_t vertexCount
@@ -129,7 +135,7 @@ namespace vg
 
         _createBuffer(memory, size);
 
-        updateStateID();
+        _updatePipelineStateID();
     }
 
     void VertexData::_createBuffer(const void *pMemory, uint32_t memorySize)
@@ -188,4 +194,13 @@ namespace vg
 
 		endSingleTimeCommands(pCommandBuffer);
     }
+
+    void VertexData::_updatePipelineStateID()
+	{
+		++m_pipelineStateID;
+		if ( m_pipelineStateID == std::numeric_limits<PipelineStateID>::max())
+		{
+			m_pipelineStateID = 0;
+		}
+	}
 }

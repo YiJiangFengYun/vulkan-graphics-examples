@@ -91,9 +91,9 @@ namespace vg
 
     size_t PipelineCache::HashFull::operator()(const Info& info) const {
         std::size_t seed = HashNoState()(info);
-        boost::hash_combine(seed, info.pPass->getStateID());
-        boost::hash_combine(seed, info.pVertexData->getStateID());
-        boost::hash_combine(seed, info.pIndexData->getStateID());
+        boost::hash_combine(seed, info.pPass->getPipelineStateID());
+        boost::hash_combine(seed, info.pVertexData->getPipelineStateID());
+        boost::hash_combine(seed, info.pIndexData->getPipelineStateID());
         return seed;
 	}
 

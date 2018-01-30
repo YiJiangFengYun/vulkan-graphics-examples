@@ -27,7 +27,6 @@ namespace vg
 		auto fragShaderCode = _readFile(fragShaderPath);
 		m_pVertShaderModule = _createShaderModule(vertShaderCode);
 		m_pFragShaderModule = _createShaderModule(fragShaderCode);
-		updateStateID();
 	}
 
 	std::shared_ptr<vk::ShaderModule> Shader::getVertShaderModule()

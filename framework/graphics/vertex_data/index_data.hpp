@@ -8,6 +8,7 @@ namespace vg {
      class IndexData : public Base
      {
      public:
+        using PipelineStateID = uint32_t;
         struct SubIndexData {
             vk::PipelineInputAssemblyStateCreateInfo inputAssemblyStateInfo;            
             uint32_t indexCount;
@@ -50,8 +51,10 @@ namespace vg {
 
         template<typename IndexType>
         std::vector<IndexType> getIndices(uint32_t offset, uint32_t count) const;
-
+        
+        PipelineStateID getPipelineStateID() const;
      private:
+        PipelineStateID m_pipelineStateID;
         std::vector<SubIndexData> m_subDatas;
         uint32_t m_subDataCount;
         uint32_t m_bufferSize;
@@ -62,6 +65,7 @@ namespace vg {
         void *m_pMemory;
 
         void _createBuffer(const void *pMemory, uint32_t memorySize);
+         void _updatePipelineStateID();
      };
 } //!vg
 #include "graphics/vertex_data/index_data.inl"

@@ -197,6 +197,9 @@ namespace vg
 
 		MaterialData::BuildInData m_buildInData;
 
+		//cache
+		std::vector<vk::DescriptorSetLayoutBinding> m_lastBindings;
+
 		//aggregations
 		std::shared_ptr<Shader> m_pShader;
 		void _createDescriptorSetLayout();

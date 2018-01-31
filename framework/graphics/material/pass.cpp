@@ -180,6 +180,7 @@ namespace vg
 		, m_arrSpecilizationDatas(static_cast<size_t>(ShaderStageFlagBits::RANGE_SIZE))
 		, m_buildInData()
 		, m_pipelineStateID()
+		, m_lastBindings()
 	{
 	}
 
@@ -197,6 +198,7 @@ namespace vg
 		, m_arrSpecilizationDatas(static_cast<size_t>(ShaderStageFlagBits::RANGE_SIZE))
 		, m_buildInData()
 		, m_pipelineStateID()
+		, m_lastBindings()
 	{
 
 	}
@@ -494,6 +496,8 @@ namespace vg
 
 		}
 
+		if (m_lastBindings == bindings) return;
+
 		auto pDevice = pApp->getDevice();
 
 		//create descriptor set layout.
@@ -512,6 +516,9 @@ namespace vg
 		{
 			m_pDescriptorSetLayout = nullptr;
 		}
+
+		m_lastBindings = bindings;
+		_updatePipelineStateID();
 	}
 
 	void Pass::_createPipelineLayout()

@@ -190,8 +190,8 @@ namespace vg
 		const std::shared_ptr<SpecializationData> &getSpecializationData(vk::ShaderStageFlagBits shaderStage) const;
 
 		const std::unordered_map<vk::ShaderStageFlagBits, std::shared_ptr<Pass::SpecializationData>> &getSpecilizationDatas() const;
-		const std::vector<std::shared_ptr<vk::PushConstantRange>> &getPushConstantRanges() const;
-		const std::vector<std::shared_ptr<PushConstantUpdate>> &getPushconstantUpdate() const;
+		std::vector<vk::PushConstantRange> &getPushConstantRanges() const;
+		std::vector<std::shared_ptr<PushConstantUpdate>> &getPushconstantUpdate() const;
 
 		void setSpecializationData(ShaderStageFlagBits shaderStage
 		    , void* pData
@@ -202,6 +202,23 @@ namespace vg
 		void setSpecializationData(ShaderStageFlagBits shaderStage
 		    , const T &data
 			, const vk::SpecializationInfo &info);
+
+	    void setPushConstantRange(std::string name
+		    , vk::ShaderStageFlags stageFlags
+			, uint32_t offset
+			, uint32_t size);
+
+		void setPushConstantUpdate(std::string name
+		    , const void *pData
+			, uint32_t size
+			, vk::ShaderStageFlags stageFlags
+			, uint32_t offset);
+
+        template<typename T>
+		void setPushConstantUpdate(std::string name
+		    , const T &data
+			, vk::ShaderStageFlags stageFlags 
+			, uint32_t offset);
 
 		const std::shared_ptr<Shader> & getShader() const;
 		const std::shared_ptr<vk::Buffer> &getUniformBuffer() const;
@@ -234,10 +251,10 @@ namespace vg
 		//todo
 		//each stage may own a specilization constant data.
 		std::unordered_map<vk::ShaderStageFlagBits, std::shared_ptr<SpecializationData>> m_mapSpecilizationDatas;
-		std::vector<std::shared_ptr<vk::PushConstantRange>> m_arrPPushConstantRanges;
-		std::unordered_map<std::string, std::shared_ptr<vk::PushConstantRange>> m_mapPPushConstantRanges;
-		std::vector<std::shared_ptr<PushConstantUpdate>> m_arrPPushConstantUpdates;
+		std::unordered_map<std::string, vk::PushConstantRange> m_mapPushConstantRanges;
+		std::vector<std::string> m_arrPushConstantRangeNames;		
 		std::unordered_map<std::string, std::shared_ptr<PushConstantUpdate>> m_mapPPushConstantUpdates;
+		std::vector<std::string> m_arrPushConstantUpdateNames;		
 
 		MaterialData::BuildInData m_buildInData;
 

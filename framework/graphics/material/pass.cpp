@@ -237,10 +237,10 @@ namespace vg
 		, m_depthStencilStateInfo()
 		, m_colorBlendInfo()
 		, m_mapSpecilizationDatas()
-		, m_arrPPushConstantRanges()
-		, m_mapPPushConstantRanges()
-		, m_arrPPushConstantUpdates()
-		, m_mapPPushConstantUpdates()
+		, m_mapPushConstantRanges()
+		, m_arrPushConstantRangeNames()
+		, m_mapPPushConstantUpdates()		
+		, m_arrPushConstantUpdateNames()
 		, m_buildInData()
 		, m_pipelineStateID()
 		, m_lastBindings()
@@ -259,10 +259,10 @@ namespace vg
 		, m_depthStencilStateInfo()
 		, m_colorBlendInfo()
 		, m_mapSpecilizationDatas()
-		, m_arrPPushConstantRanges()
-		, m_mapPPushConstantRanges()
-		, m_arrPPushConstantUpdates()
-		, m_mapPPushConstantUpdates()
+		, m_mapPushConstantRanges()
+		, m_arrPushConstantRangeNames()
+		, m_mapPPushConstantUpdates()		
+		, m_arrPushConstantUpdateNames()
 		, m_buildInData()
 		, m_pipelineStateID()
 		, m_lastBindings()
@@ -533,14 +533,30 @@ namespace vg
 		return m_mapSpecilizationDatas;
 	}
 
-	const std::vector<std::shared_ptr<vk::PushConstantRange>> &Pass::getPushConstantRanges() const
+	std::vector<vk::PushConstantRange> &Pass::getPushConstantRanges() const
 	{
-		return m_arrPPushConstantRanges;
+		size_t size = m_arrPushConstantRangeNames.size();
+		std::vector<vk::PushConstantRange> pushConstantRanges(size);
+		for (size_t i = 0; i < size; ++i)
+		{
+			const auto &name = m_arrPushConstantRangeNames[i];
+			const auto &iterator = m_mapPushConstantRanges.find(name);
+			pushConstantRanges[i] = iterator->second;
+		}
+		return pushConstantRanges;
 	}
 
-    const std::vector<std::shared_ptr<Pass::PushConstantUpdate>> &Pass::getPushconstantUpdate() const
+    std::vector<std::shared_ptr<Pass::PushConstantUpdate>> &Pass::getPushconstantUpdate() const
 	{
-		return m_arrPPushConstantUpdates;
+		size_t size = m_arrPushConstantUpdateNames.size();
+		std::vector<std::shared_ptr<Pass::PushConstantUpdate>> pPushConstantUpdates(size);
+		for (size_t i = 0; i < size; ++i)
+		{
+			const auto &name = m_arrPushConstantUpdateNames[i];
+			const auto &iterator = m_mapPPushConstantUpdates.find(name);
+			pPushConstantUpdates[i] = iterator->second;
+		}
+		return pPushConstantUpdates;
 	}
 
 	Pass::PipelineStateID Pass::getPipelineStateID() const
@@ -562,6 +578,26 @@ namespace vg
 		}
 		pSpecializationData->init(pData, size, info);
 		_updatePipelineStateID();
+	}
+
+	void Pass::setPushConstantRange(std::string name
+		, vk::ShaderStageFlags stageFlags
+		, uint32_t offset
+		, uint32_t size)
+	{
+		vk::PushConstantRange pushConstantRange(stageFlags, offset, size);
+		setValue(name, pushConstantRange, m_mapPushConstantRanges, m_arrPushConstantRangeNames);
+	}
+
+	void Pass::setPushConstantUpdate(std::string name
+		, const void *pData
+		, uint32_t size
+		, vk::ShaderStageFlags stageFlags
+		, uint32_t offset)
+	{
+		std::shared_ptr<PushConstantUpdate> pPushConstantUpdate(new PushConstantUpdate());
+		pPushConstantUpdate->init(pData, size, stageFlags, offset);
+		setValue(name, pPushConstantUpdate, m_mapPPushConstantUpdates, m_arrPushConstantUpdateNames);
 	}
 
 

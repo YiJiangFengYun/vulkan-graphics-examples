@@ -4,11 +4,28 @@ namespace vg
 	void Pass::SpecializationData::init(const T &data
 		, const vk::SpecializationInfo &info)
 	{
-		init(&data, stati_cast<uin32_t>(sizeof(T)), info);
+		init(&data, static_cast<uin32_t>(sizeof(T)), info);
 	}
 
 	template<typename T>
 	T Pass::SpecializationData::getData() const
+	{
+		size_t size = sizeof(T);
+		T data;
+		memcpy(&data, m_pData, size);
+		return data;
+	}
+
+	template<typename T>
+	void Pass::PushConstantUpdate::init(const T &data
+		, vk::ShaderStageFlags stageFlags 
+		, uint32_t offset)
+	{
+		init(&data, static_cast<uint32_t>(sizeof(T)), stageFlags, offset);
+	}
+
+    template<typename T>
+	T Pass::PushConstantUpdate::getData() const
 	{
 		size_t size = sizeof(T);
 		T data;

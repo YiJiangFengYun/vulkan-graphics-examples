@@ -27,7 +27,7 @@ namespace vg
 			SpecializationData(const SpecializationData &&);
 			SpecializationData& operator=(const SpecializationData &);
 
-			void init(void* pData
+			void init(const void* pData
 			    , uint32_t size
 				, const vk::SpecializationInfo &info);
 
@@ -37,7 +37,7 @@ namespace vg
 
             const vk::SpecializationInfo getInfo() const;
 			const void * getData() const;
-			const uint32_t getSize() const;
+			uint32_t getSize() const;
 
 			template<typename T>
 			T getData() const;
@@ -46,6 +46,36 @@ namespace vg
 			vk::SpecializationInfo m_info;
 			uint32_t m_size;
 			void *m_pData;
+		};
+
+		class PushConstantUpdate 
+		{
+		public:
+	        PushConstantUpdate();
+			~PushConstantUpdate();
+
+			void init(const void *pData
+			     , uint32_t size
+				 , vk::ShaderStageFlags stageFlags
+				 , uint32_t offset);
+
+			template<typename T>
+			void init(const T &data
+			    , vk::ShaderStageFlags stageFlags 
+				, uint32_t offset);
+
+			vk::ShaderStageFlags getStageFlags() const;
+			uint32_t getOffset() const;
+			const void *getData() const;
+			uint32_t getSize() const;			
+
+            template<typename T>
+			T getData() const;
+		private:
+		   vk::ShaderStageFlags m_stageFlags;
+		   uint32_t m_offset;
+		   uint32_t m_size;
+		   void* m_pData;
 		};
 
 		struct LayoutBindingInfo
@@ -160,6 +190,8 @@ namespace vg
 		const std::shared_ptr<SpecializationData> &getSpecializationData(vk::ShaderStageFlagBits shaderStage) const;
 
 		const std::unordered_map<vk::ShaderStageFlagBits, std::shared_ptr<Pass::SpecializationData>> &getSpecilizationDatas() const;
+		const std::vector<std::shared_ptr<vk::PushConstantRange>> &getPushConstantRanges() const;
+		const std::vector<std::shared_ptr<PushConstantUpdate>> &getPushconstantUpdate() const;
 
 		void setSpecializationData(ShaderStageFlagBits shaderStage
 		    , void* pData
@@ -202,6 +234,10 @@ namespace vg
 		//todo
 		//each stage may own a specilization constant data.
 		std::unordered_map<vk::ShaderStageFlagBits, std::shared_ptr<SpecializationData>> m_mapSpecilizationDatas;
+		std::vector<std::shared_ptr<vk::PushConstantRange>> m_arrPPushConstantRanges;
+		std::unordered_map<std::string, std::shared_ptr<vk::PushConstantRange>> m_mapPPushConstantRanges;
+		std::vector<std::shared_ptr<PushConstantUpdate>> m_arrPPushConstantUpdates;
+		std::unordered_map<std::string, std::shared_ptr<PushConstantUpdate>> m_mapPPushConstantUpdates;
 
 		MaterialData::BuildInData m_buildInData;
 

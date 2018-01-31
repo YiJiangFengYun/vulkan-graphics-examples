@@ -39,7 +39,7 @@ namespace vg
 		return *this;
 	}
 
-	void Pass::SpecializationData::init(void* pData
+	void Pass::SpecializationData::init(const void* pData
 		, uint32_t size
 		, const vk::SpecializationInfo &info)
 	{
@@ -76,14 +76,73 @@ namespace vg
 		return m_pData;
 	}
 
-	const uint32_t Pass::SpecializationData::getSize() const
+	uint32_t Pass::SpecializationData::getSize() const
+	{
+		return m_size;
+	}
+
+	Pass::PushConstantUpdate::PushConstantUpdate()
+	    : m_stageFlags()
+		, m_offset()
+		, m_size()
+		, m_pData(nullptr)
+	{
+
+	}
+	
+	Pass::PushConstantUpdate::~PushConstantUpdate()
+	{
+		if (m_pData != nullptr)
+		{
+			free(m_pData);
+		}
+	}
+
+	void Pass::PushConstantUpdate::init(const void *pData
+		, uint32_t size
+		, vk::ShaderStageFlags stageFlags
+		, uint32_t offset)
+	{
+		if (m_pData != nullptr && (m_size != size))
+		{
+			free(m_pData);
+			m_pData = nullptr;
+			m_size = 0;
+		}
+	
+		if (m_pData == nullptr)
+		{
+			m_pData = malloc(size);
+			m_size = size;
+		}
+		memcpy(m_pData, pData, size);
+
+		m_stageFlags = stageFlags;
+		m_offset = offset;
+	}
+
+	vk::ShaderStageFlags Pass::PushConstantUpdate::getStageFlags() const
+	{
+		return m_stageFlags;
+	}
+
+	uint32_t Pass::PushConstantUpdate::getOffset() const
+	{
+		return m_offset;
+	}
+
+	const void *Pass::PushConstantUpdate::getData() const
+	{
+		return m_pData;
+	}
+
+	uint32_t Pass::PushConstantUpdate::getSize() const
 	{
 		return m_size;
 	}
 
 	Pass::LayoutBindingInfo::LayoutBindingInfo()
 	{
-
 	}
 
 	Pass::LayoutBindingInfo::LayoutBindingInfo(std::string name
@@ -178,6 +237,10 @@ namespace vg
 		, m_depthStencilStateInfo()
 		, m_colorBlendInfo()
 		, m_mapSpecilizationDatas()
+		, m_arrPPushConstantRanges()
+		, m_mapPPushConstantRanges()
+		, m_arrPPushConstantUpdates()
+		, m_mapPPushConstantUpdates()
 		, m_buildInData()
 		, m_pipelineStateID()
 		, m_lastBindings()
@@ -196,6 +259,10 @@ namespace vg
 		, m_depthStencilStateInfo()
 		, m_colorBlendInfo()
 		, m_mapSpecilizationDatas()
+		, m_arrPPushConstantRanges()
+		, m_mapPPushConstantRanges()
+		, m_arrPPushConstantUpdates()
+		, m_mapPPushConstantUpdates()
 		, m_buildInData()
 		, m_pipelineStateID()
 		, m_lastBindings()
@@ -464,6 +531,16 @@ namespace vg
 	const std::unordered_map<vk::ShaderStageFlagBits, std::shared_ptr<Pass::SpecializationData>> &Pass::getSpecilizationDatas() const
 	{
 		return m_mapSpecilizationDatas;
+	}
+
+	const std::vector<std::shared_ptr<vk::PushConstantRange>> &Pass::getPushConstantRanges() const
+	{
+		return m_arrPPushConstantRanges;
+	}
+
+    const std::vector<std::shared_ptr<Pass::PushConstantUpdate>> &Pass::getPushconstantUpdate() const
+	{
+		return m_arrPPushConstantUpdates;
 	}
 
 	Pass::PipelineStateID Pass::getPipelineStateID() const

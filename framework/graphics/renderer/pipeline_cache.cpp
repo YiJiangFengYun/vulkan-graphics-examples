@@ -163,8 +163,17 @@ namespace vg
 
 		//Construct shader stage create info.
         const auto &pPass = info.pPass;
-		const auto &pShader = pPass->_getShader();
-		const auto &shaderStages = pShader->getShaderStageInfos();
+		const auto &pShader = pPass->getShader();
+		auto &shaderStages = pShader->getShaderStageInfos();
+
+        //Fill specialization data from pass.
+        for (auto &shaderStage : shaderStages)
+        {
+            if (pPass->IsHasSpecializationData(shaderStage.stage)) 
+            {
+                shaderStage.pSpecializationInfo = &(pPass->getSpecializationData(shaderStage.stage)->getInfo());
+            }
+        }
 
 		createInfo.stageCount = shaderStages.size();
 		createInfo.pStages = shaderStages.data();
@@ -268,7 +277,7 @@ namespace vg
 		};
 		createInfo.pDynamicState = &dynamicStateCreateInfo;		
 
-		createInfo.layout = *pPass->_getPipelineLayout();
+		createInfo.layout = *pPass->getPipelineLayout();
 
 		createInfo.renderPass = info.renderPass;
 		createInfo.subpass = 0;

@@ -260,13 +260,13 @@ namespace vg
 
 		m_pCommandBuffer->bindPipeline(vk::PipelineBindPoint::eGraphics, *pPipeline);
 
-		uint32_t descriptSetCount = pPass->_getDescriptorSet() != nullptr ? 1 : 0;
+		uint32_t descriptSetCount = pPass->getDescriptorSet() != nullptr ? 1 : 0;
 		std::vector<vk::DescriptorSet> descriptorSets(descriptSetCount);
-		if (pPass->_getDescriptorSet() != nullptr)
+		if (pPass->getDescriptorSet() != nullptr)
 		{
-			descriptorSets[0] = *pPass->_getDescriptorSet();
+			descriptorSets[0] = *pPass->getDescriptorSet();
 		}
-		auto pPipelineLayout = pPass->_getPipelineLayout();
+		auto pPipelineLayout = pPass->getPipelineLayout();
 		m_pCommandBuffer->bindDescriptorSets(vk::PipelineBindPoint::eGraphics, *pPipelineLayout, 0u, descriptorSets, nullptr);
 
         vertexDataToCommandBuffer(pMesh->getVertexData(), *m_pCommandBuffer, 0);

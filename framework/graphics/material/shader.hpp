@@ -27,7 +27,7 @@ namespace vg
 		std::shared_ptr<vk::ShaderModule> getVertShaderModule();
 		std::shared_ptr<vk::ShaderModule> getFragShaderModule();
 
-		std::vector<vk::PipelineShaderStageCreateInfo> getShaderStageInfos();
+		std::vector<vk::PipelineShaderStageCreateInfo> getShaderStageInfos() const;
 
 	private:
 		//compositions

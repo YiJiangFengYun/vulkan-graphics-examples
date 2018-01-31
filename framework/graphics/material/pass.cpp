@@ -177,7 +177,7 @@ namespace vg
 		, m_scissor(0.0f, 0.0f, 1.0f, 1.0f)
 		, m_depthStencilStateInfo()
 		, m_colorBlendInfo()
-		, m_arrSpecilizationDatas(static_cast<size_t>(ShaderStageFlagBits::RANGE_SIZE))
+		, m_mapSpecilizationDatas()
 		, m_buildInData()
 		, m_pipelineStateID()
 		, m_lastBindings()
@@ -195,7 +195,7 @@ namespace vg
 		, m_scissor(0.0f, 0.0f, 1.0f, 1.0f)
 		, m_depthStencilStateInfo()
 		, m_colorBlendInfo()
-		, m_arrSpecilizationDatas(static_cast<size_t>(ShaderStageFlagBits::RANGE_SIZE))
+		, m_mapSpecilizationDatas()
 		, m_buildInData()
 		, m_pipelineStateID()
 		, m_lastBindings()
@@ -419,10 +419,51 @@ namespace vg
 		_updatePipelineStateID();
 	}
 
-	std::shared_ptr<Pass::SpecializationData> Pass::getSpecializationData(ShaderStageFlagBits shaderStage)
+	const Bool32 Pass::IsHasSpecializationData(ShaderStageFlagBits shaderStage) const
 	{
-		return m_arrSpecilizationDatas[static_cast<size_t>(shaderStage) - 
-		    static_cast<size_t>(ShaderStageFlagBits::BEGIN_RANGE)];
+		auto vkStage = tranShaderStageFlagBitToVK(shaderStage);
+		const auto& map = m_mapSpecilizationDatas;
+		return map.count(vkStage) != 0;
+	}
+
+	const Bool32 Pass::IsHasSpecializationData(vk::ShaderStageFlagBits shaderStage) const
+	{
+		const auto& map = m_mapSpecilizationDatas;
+		return map.count(shaderStage) != 0;
+	}
+
+	const std::shared_ptr<Pass::SpecializationData> &Pass::getSpecializationData(ShaderStageFlagBits shaderStage) const
+	{
+		auto vkStage = tranShaderStageFlagBitToVK(shaderStage);
+		const auto& map = m_mapSpecilizationDatas;
+		const auto& iterator = map.find(vkStage);
+		if (iterator == map.cend())
+		{
+			throw std::runtime_error("SpecializationData don't exit.");
+		}
+		else
+		{
+			return iterator->second;
+		}
+	}
+
+	const std::shared_ptr<Pass::SpecializationData> &Pass::getSpecializationData(vk::ShaderStageFlagBits shaderStage) const
+	{
+		const auto& map = m_mapSpecilizationDatas;
+		const auto& iterator = map.find(shaderStage);
+		if (iterator == map.cend())
+		{
+			throw std::runtime_error("SpecializationData don't exit.");
+		}
+		else
+		{
+			return iterator->second;
+		}
+	}
+
+	const std::unordered_map<vk::ShaderStageFlagBits, std::shared_ptr<Pass::SpecializationData>> &Pass::getSpecilizationDatas() const
+	{
+		return m_mapSpecilizationDatas;
 	}
 
 	Pass::PipelineStateID Pass::getPipelineStateID() const
@@ -435,48 +476,49 @@ namespace vg
 		, uint32_t size
 		, const vk::SpecializationInfo &info)
 	{
-		size_t index = static_cast<size_t>(shaderStage) - static_cast<size_t>(ShaderStageFlagBits::BEGIN_RANGE);
-		std::shared_ptr<SpecializationData> pSpecializationData = m_arrSpecilizationDatas[index];
+		auto vkStage = tranShaderStageFlagBitToVK(shaderStage);
+		std::shared_ptr<SpecializationData> pSpecializationData = m_mapSpecilizationDatas[vkStage];
 		if (pSpecializationData == nullptr) 
 		{
-			m_arrSpecilizationDatas[index] = std::shared_ptr<SpecializationData>(new SpecializationData());
-			pSpecializationData = m_arrSpecilizationDatas[index];
+			pSpecializationData = std::shared_ptr<SpecializationData>(new SpecializationData());
+			m_mapSpecilizationDatas[vkStage] = pSpecializationData;
 		}
 		pSpecializationData->init(pData, size, info);
+		_updatePipelineStateID();
 	}
 
 
-	std::shared_ptr<Shader> Pass::_getShader()
+	const std::shared_ptr<Shader> &Pass::getShader() const
 	{
 		return m_pShader;
 	}
 
-	std::shared_ptr<vk::Buffer> Pass::_getUniformBuffer()
+	const std::shared_ptr<vk::Buffer> &Pass::getUniformBuffer() const
 	{
 		return m_pUniformBuffer;
 	}
 
-	std::shared_ptr<vk::DeviceMemory> Pass::_getUniformBufferMemory()
+	const std::shared_ptr<vk::DeviceMemory> &Pass::getUniformBufferMemory() const
 	{
 		return m_pUniformBufferMemory;
 	}
 
-	std::shared_ptr<vk::DescriptorSetLayout> Pass::_getDescriptorSetLayout()
+	const std::shared_ptr<vk::DescriptorSetLayout> &Pass::getDescriptorSetLayout() const
 	{
 		return m_pDescriptorSetLayout;
 	}
 
-	std::shared_ptr<vk::PipelineLayout> Pass::_getPipelineLayout()
+	const std::shared_ptr<vk::PipelineLayout> &Pass::getPipelineLayout() const
 	{
 		return m_pPipelineLayout;
 	}
 
-	std::shared_ptr<vk::DescriptorPool> Pass::_getDescriptorPool()
+	const std::shared_ptr<vk::DescriptorPool> &Pass::getDescriptorPool() const
 	{
 		return m_pDescriptorPool;
 	}
 
-	std::shared_ptr<vk::DescriptorSet> Pass::_getDescriptorSet()
+	const std::shared_ptr<vk::DescriptorSet> &Pass::getDescriptorSet() const
 	{
 		return m_pDescriptorSet;
 	}

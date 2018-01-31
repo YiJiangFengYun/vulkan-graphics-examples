@@ -153,23 +153,31 @@ namespace vg
 		const ColorBlendInfo &getColorBlendInfo() const;
 		void setColorBlendInfo(const ColorBlendInfo &value);
 
-		std::shared_ptr<SpecializationData> getSpecializationData(ShaderStageFlagBits shaderStage);
+		const Bool32 IsHasSpecializationData(ShaderStageFlagBits shaderStage) const;
+		const Bool32 IsHasSpecializationData(vk::ShaderStageFlagBits shaderStage) const;
+
+		const std::shared_ptr<SpecializationData> &getSpecializationData(ShaderStageFlagBits shaderStage) const;
+		const std::shared_ptr<SpecializationData> &getSpecializationData(vk::ShaderStageFlagBits shaderStage) const;
+
+		const std::unordered_map<vk::ShaderStageFlagBits, std::shared_ptr<Pass::SpecializationData>> &getSpecilizationDatas() const;
+
 		void setSpecializationData(ShaderStageFlagBits shaderStage
 		    , void* pData
 			, uint32_t size
 			, const vk::SpecializationInfo &info);
+
 		template<typename T>
 		void setSpecializationData(ShaderStageFlagBits shaderStage
 		    , const T &data
 			, const vk::SpecializationInfo &info);
 
-		std::shared_ptr<Shader> _getShader();
-		std::shared_ptr<vk::Buffer> _getUniformBuffer();
-		std::shared_ptr<vk::DeviceMemory> _getUniformBufferMemory();
-		std::shared_ptr<vk::DescriptorSetLayout> _getDescriptorSetLayout();
-		std::shared_ptr<vk::DescriptorPool> _getDescriptorPool();
-		std::shared_ptr<vk::DescriptorSet> _getDescriptorSet();
-		std::shared_ptr<vk::PipelineLayout> _getPipelineLayout();  
+		const std::shared_ptr<Shader> & getShader() const;
+		const std::shared_ptr<vk::Buffer> &getUniformBuffer() const;
+		const std::shared_ptr<vk::DeviceMemory> &getUniformBufferMemory() const;
+		const std::shared_ptr<vk::DescriptorSetLayout> &getDescriptorSetLayout() const;
+		const std::shared_ptr<vk::DescriptorPool> &getDescriptorPool() const;
+		const std::shared_ptr<vk::DescriptorSet> &getDescriptorSet() const;
+		const std::shared_ptr<vk::PipelineLayout> &getPipelineLayout() const;  
 	private:
 		//compositons
 		std::shared_ptr<MaterialData> m_pData;
@@ -193,7 +201,7 @@ namespace vg
 		ColorBlendInfo m_colorBlendInfo;
 		//todo
 		//each stage may own a specilization constant data.
-        std::vector<std::shared_ptr<SpecializationData>> m_arrSpecilizationDatas;
+		std::unordered_map<vk::ShaderStageFlagBits, std::shared_ptr<SpecializationData>> m_mapSpecilizationDatas;
 
 		MaterialData::BuildInData m_buildInData;
 

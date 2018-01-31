@@ -20,10 +20,7 @@ namespace vg
 	enum class ShaderStageFlagBits
 	{
 		VERTEX = 1u,
-		FRAGMENT = 2u,
-		BEGIN_RANGE = VERTEX,
-		END_RANGE = FRAGMENT,
-		RANGE_SIZE = (END_RANGE - BEGIN_RANGE + 1)
+		FRAGMENT = 2u
 	};
 
 	const uint32_t ShaderStageFlagCount = 2u;
@@ -121,6 +118,19 @@ namespace vg
 		}
 
 		return result;
+	}
+
+	inline vk::ShaderStageFlagBits tranShaderStageFlagBitToVK(ShaderStageFlagBits flagBit) 
+	{
+		size_t size = arrShaderStageFlagBitsToVK.size();
+		for (uint32_t i = 0; i < size; ++i)
+		{
+			if (arrShaderStageFlagBitsToVK[i].first == flagBit)
+			{
+				return arrShaderStageFlagBitsToVK[i].second;
+			}
+		}
+		throw std::invalid_argument("Error to transform vg::ShaderStageFlagBit to vk.");
 	}
 
 	inline vk::ShaderStageFlags tranShaderStageFlagsToVK(ShaderStageFlags flags)

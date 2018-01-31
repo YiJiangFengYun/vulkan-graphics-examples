@@ -39,7 +39,7 @@ namespace vg
 		return m_pFragShaderModule;
 	}
 
-	std::vector<vk::PipelineShaderStageCreateInfo> Shader::getShaderStageInfos()
+	std::vector<vk::PipelineShaderStageCreateInfo> Shader::getShaderStageInfos() const
 	{
 		// vk::PipelineShaderStageCreateInfo vertShaderStageInfo = {
 		// 	vk::PipelineShaderStageCreateFlags(),

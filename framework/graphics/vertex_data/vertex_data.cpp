@@ -80,30 +80,35 @@ namespace vg
         , const vk::PipelineVertexInputStateCreateInfo &vertexInputStateInfo
         )
     {
-        std::vector<SubVertexData> subDatas(1);
-        SubVertexData &subData = subDatas[0];
-        //copy arguments.
-        uint32_t count = vertexInputStateInfo.vertexBindingDescriptionCount;
-        size_t size2 = count * sizeof(vk::VertexInputBindingDescription);
-        subData.bindingDescs.resize(count);
-        memcpy(subData.bindingDescs.data(), vertexInputStateInfo.pVertexBindingDescriptions, size2);
-
-        count = vertexInputStateInfo.vertexAttributeDescriptionCount;
-		size2 = count * sizeof(vk::VertexInputAttributeDescription);
-        subData.attrDescs.resize(count);
-        memcpy(subData.attrDescs.data(), vertexInputStateInfo.pVertexAttributeDescriptions, size2);
-
-        //set vertex input state create info.
-        subData.vertexInputStateInfo = vertexInputStateInfo;
-        subData.vertexInputStateInfo.pNext = nullptr;
-        subData.vertexInputStateInfo.vertexBindingDescriptionCount = vertexInputStateInfo.vertexBindingDescriptionCount;
-        subData.vertexInputStateInfo.pVertexBindingDescriptions = subData.bindingDescs.data();
-        subData.vertexInputStateInfo.vertexAttributeDescriptionCount = vertexInputStateInfo.vertexAttributeDescriptionCount;
-        subData.vertexInputStateInfo.pVertexAttributeDescriptions = subData.attrDescs.data();
+        if (m_subDatas.size() != 1u || _isEqual(m_subDatas[0].vertexInputStateInfo, vertexInputStateInfo) == VG_FALSE) {
+            std::vector<SubVertexData> subDatas(1);
+            SubVertexData &subData = subDatas[0];
+            //copy arguments.
+            uint32_t count = vertexInputStateInfo.vertexBindingDescriptionCount;
+            size_t size2 = count * sizeof(vk::VertexInputBindingDescription);
+            subData.bindingDescs.resize(count);
+            memcpy(subData.bindingDescs.data(), vertexInputStateInfo.pVertexBindingDescriptions, size2);
+    
+            count = vertexInputStateInfo.vertexAttributeDescriptionCount;
+		    size2 = count * sizeof(vk::VertexInputAttributeDescription);
+            subData.attrDescs.resize(count);
+            memcpy(subData.attrDescs.data(), vertexInputStateInfo.pVertexAttributeDescriptions, size2);
+    
+            //set vertex input state create info.
+            subData.vertexInputStateInfo = vertexInputStateInfo;
+            subData.vertexInputStateInfo.pNext = nullptr;
+            // subData.vertexInputStateInfo.vertexBindingDescriptionCount = vertexInputStateInfo.vertexBindingDescriptionCount;
+            subData.vertexInputStateInfo.pVertexBindingDescriptions = subData.bindingDescs.data();
+            // subData.vertexInputStateInfo.vertexAttributeDescriptionCount = vertexInputStateInfo.vertexAttributeDescriptionCount;
+            subData.vertexInputStateInfo.pVertexAttributeDescriptions = subData.attrDescs.data();
+            
+            subData.vertexCount = vertexCount;
+            subData.bufferSize = size;
+            init(subDatas, memory, size, cacheMemory);
+        } else {
+            init(m_subDatas, memory, size, cacheMemory);
+        }
         
-        subData.vertexCount = vertexCount;
-        subData.bufferSize = size;
-        init(subDatas, memory, size, cacheMemory);
     }
 
     void VertexData::init(const std::vector<VertexData::SubVertexData> subDatas
@@ -112,13 +117,17 @@ namespace vg
             , Bool32 cacheMemory
             )
     {
-        m_subDataCount = static_cast<uint32_t>(subDatas.size());
-        m_subDatas = subDatas;
-		for (auto& subData : m_subDatas) 
-		{
-			subData.vertexInputStateInfo.pVertexBindingDescriptions = subData.bindingDescs.data();
-			subData.vertexInputStateInfo.pVertexAttributeDescriptions = subData.attrDescs.data();
-		}
+        if (_isEqual(m_subDatas, subDatas) == VG_FALSE) {
+            m_subDataCount = static_cast<uint32_t>(subDatas.size());
+            m_subDatas = subDatas;
+		    for (auto& subData : m_subDatas) 
+		    {
+		    	subData.vertexInputStateInfo.pVertexBindingDescriptions = subData.bindingDescs.data();
+		    	subData.vertexInputStateInfo.pVertexAttributeDescriptions = subData.attrDescs.data();
+		    }
+
+            _updatePipelineStateID();            
+        }
         
         if (m_pMemory != nullptr && (m_memorySize != size || ! cacheMemory)) {
             free(m_pMemory);
@@ -135,7 +144,6 @@ namespace vg
 
         _createBuffer(memory, size);
 
-        _updatePipelineStateID();
     }
 
     void VertexData::_createBuffer(const void *pMemory, uint32_t memorySize)
@@ -203,4 +211,45 @@ namespace vg
 			m_pipelineStateID = 0;
 		}
 	}
+
+    Bool32 VertexData::_isEqual(const std::vector<VertexData::SubVertexData> &subDatas1, 
+        const std::vector<VertexData::SubVertexData> &subDatas2)
+    {
+        if (subDatas1.size() != subDatas2.size()) return VG_FALSE;
+
+        size_t count = subDatas1.size();
+
+        for (size_t i = 0; i < count; ++i)
+        {
+            if (subDatas1[i].bufferSize != subDatas2[i].bufferSize) return VG_FALSE;
+            if (subDatas1[i].vertexCount != subDatas2[i].vertexCount) return VG_FALSE;
+            if (_isEqual(subDatas1[i].vertexInputStateInfo, subDatas2[i].vertexInputStateInfo) == VG_FALSE) return VG_FALSE;
+        }
+    
+
+        return VG_TRUE;
+    }
+
+    Bool32 VertexData::_isEqual(const vk::PipelineVertexInputStateCreateInfo &vertexInputStateInfo1, 
+            const vk::PipelineVertexInputStateCreateInfo &vertexInputStateInfo2)
+    {
+        if (vertexInputStateInfo1.flags != vertexInputStateInfo2.flags) return VG_FALSE;
+        if (vertexInputStateInfo1.vertexBindingDescriptionCount != vertexInputStateInfo2.vertexBindingDescriptionCount) return VG_FALSE;
+        if (vertexInputStateInfo1.vertexAttributeDescriptionCount != vertexInputStateInfo2.vertexAttributeDescriptionCount) return VG_FALSE;
+        if (vertexInputStateInfo1.pNext != vertexInputStateInfo2.pNext) return VG_FALSE;
+
+        uint32_t count = vertexInputStateInfo1.vertexBindingDescriptionCount;
+        for (uint32_t i = 0; i < count; ++i) 
+        {
+            if (*(vertexInputStateInfo1.pVertexBindingDescriptions + i) != *(vertexInputStateInfo2.pVertexBindingDescriptions + i)) return VG_FALSE;
+        }
+
+        count = vertexInputStateInfo1.vertexAttributeDescriptionCount;
+        for (uint32_t i = 0; i < count; ++i)
+        {
+            if (*(vertexInputStateInfo1.pVertexAttributeDescriptions + i) != *(vertexInputStateInfo2.pVertexAttributeDescriptions + i)) return VG_FALSE;
+        }
+
+        return VG_TRUE;
+    }
 }

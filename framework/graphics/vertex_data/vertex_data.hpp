@@ -70,6 +70,10 @@ namespace vg
 
         void _createBuffer(const void *pMemory, uint32_t memorySize);
         void _updatePipelineStateID();
+        Bool32 _isEqual(const std::vector<VertexData::SubVertexData> &subDatas1, 
+            const std::vector<VertexData::SubVertexData> &subDatas2);
+        Bool32 _isEqual(const vk::PipelineVertexInputStateCreateInfo &vertexInputStateInfo1, 
+            const vk::PipelineVertexInputStateCreateInfo &vertexInputStateInfo2);
     };
 
 } //!vg

@@ -79,8 +79,11 @@ namespace vg
         , Bool32 cacheMemory
         )
     {
-        m_subDataCount = static_cast<uint32_t>(subDatas.size());
-        m_subDatas = subDatas;
+        if (_isEqual(m_subDatas, subDatas) == VG_FALSE) {
+            m_subDataCount = static_cast<uint32_t>(subDatas.size());
+            m_subDatas = subDatas;
+            _updatePipelineStateID();            
+        }
 
         if (m_pMemory != nullptr && (m_memorySize != size || ! cacheMemory)) {
             free(m_pMemory);
@@ -98,7 +101,6 @@ namespace vg
 
         _createBuffer(memory, size);
 
-        _updatePipelineStateID();
     }
 
     void IndexData::init(uint32_t indexCount
@@ -108,14 +110,23 @@ namespace vg
              , const vk::PipelineInputAssemblyStateCreateInfo &inputAssemblyStateInfo
              )
     {
-        std::vector<SubIndexData> subDatas(1);
-        SubIndexData &subData = subDatas[0];
-        subData.inputAssemblyStateInfo = inputAssemblyStateInfo;
-        subData.inputAssemblyStateInfo.pNext = nullptr;
-
-        subData.indexCount = indexCount;
-        subData.bufferSize = size;
-        init(subDatas, memory, size, cacheMemory);
+        if (m_subDatas.size() != 1u ||
+            m_subDatas[0].bufferSize != size || 
+            m_subDatas[0].indexCount != indexCount || 
+            m_subDatas[0].inputAssemblyStateInfo != inputAssemblyStateInfo
+            )
+        {
+            std::vector<SubIndexData> subDatas(1);
+            SubIndexData &subData = subDatas[0];
+            subData.inputAssemblyStateInfo = inputAssemblyStateInfo;
+            subData.inputAssemblyStateInfo.pNext = nullptr;
+    
+            subData.indexCount = indexCount;
+            subData.bufferSize = size;
+            init(subDatas, memory, size, cacheMemory);            
+        } else {
+            init(m_subDatas, memory, size, cacheMemory);
+        }
     }
     
     void IndexData::_createBuffer(const void *pMemory, uint32_t memorySize)
@@ -183,4 +194,18 @@ namespace vg
 			m_pipelineStateID = 0;
 		}
 	}
+
+    Bool32 IndexData::_isEqual(std::vector<SubIndexData> subDatas1, std::vector<SubIndexData> subDatas2)
+    {
+        if (subDatas1.size() != subDatas2.size()) return VG_FALSE;
+
+        size_t count = subDatas1.size();
+        for (size_t i = 0; i < count; ++i) {
+            if (subDatas1[i].bufferSize != subDatas2[i].bufferSize) return VG_FALSE;
+            if (subDatas1[i].indexCount != subDatas2[i].indexCount) return VG_FALSE;
+            if (subDatas1[i].inputAssemblyStateInfo != subDatas2[i].inputAssemblyStateInfo) return VG_FALSE;
+        }
+
+        return VG_TRUE;
+    }
 }

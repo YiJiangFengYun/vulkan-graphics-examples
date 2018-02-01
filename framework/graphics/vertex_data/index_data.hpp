@@ -65,7 +65,8 @@ namespace vg {
         void *m_pMemory;
 
         void _createBuffer(const void *pMemory, uint32_t memorySize);
-         void _updatePipelineStateID();
+        void _updatePipelineStateID();
+        Bool32 _isEqual(std::vector<SubIndexData> subDatas1, std::vector<SubIndexData> subDatas2);
      };
 } //!vg
 #include "graphics/vertex_data/index_data.inl"

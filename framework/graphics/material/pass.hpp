@@ -190,8 +190,8 @@ namespace vg
 		const std::shared_ptr<SpecializationData> &getSpecializationData(vk::ShaderStageFlagBits shaderStage) const;
 
 		const std::unordered_map<vk::ShaderStageFlagBits, std::shared_ptr<Pass::SpecializationData>> &getSpecilizationDatas() const;
-		std::vector<vk::PushConstantRange> &getPushConstantRanges() const;
-		std::vector<std::shared_ptr<PushConstantUpdate>> &getPushconstantUpdate() const;
+		std::vector<vk::PushConstantRange> getPushConstantRanges() const;
+		std::vector<std::shared_ptr<PushConstantUpdate>> getPushconstantUpdates() const;
 
 		void setSpecializationData(ShaderStageFlagBits shaderStage
 		    , void* pData

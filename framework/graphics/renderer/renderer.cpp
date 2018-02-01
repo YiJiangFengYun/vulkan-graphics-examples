@@ -235,9 +235,9 @@ namespace vg
 		const auto& scissorOfPass = pPass->getScissor();
 		//View port info.
 		vk::Viewport viewport = {
-			(float)m_framebufferWidth * viewportOfPass.x,                                     //x
-			(float)m_framebufferHeight * viewportOfPass.y,                                     //y
-			(float)m_framebufferWidth * viewportOfPass.width,                     //width
+			(float)m_framebufferWidth * viewportOfPass.x,                      //x
+			(float)m_framebufferHeight * viewportOfPass.y,                     //y
+			(float)m_framebufferWidth * viewportOfPass.width,                  //width
 			(float)m_framebufferHeight * viewportOfPass.height,                 //height
 			1.0f * viewportOfPass.minDepth,                                     //minDepth
 			1.0f * viewportOfPass.maxDepth                                      //maxDepth
@@ -258,6 +258,20 @@ namespace vg
 
 		m_pCommandBuffer->setScissor(0, scissor);
 
+		auto pPipelineLayout = pPass->getPipelineLayout();		
+
+		//push constants
+		auto pushConstantUpdates = pPass->getPushconstantUpdates();
+		for(const auto& pPushConstantUpdate : pushConstantUpdates)
+		{
+			m_pCommandBuffer->pushConstants(*pPipelineLayout, 
+			    pPushConstantUpdate->getStageFlags(), 
+				pPushConstantUpdate->getOffset(),
+				pPushConstantUpdate->getSize(),
+				pPushConstantUpdate->getData());
+		}
+
+
 		m_pCommandBuffer->bindPipeline(vk::PipelineBindPoint::eGraphics, *pPipeline);
 
 		uint32_t descriptSetCount = pPass->getDescriptorSet() != nullptr ? 1 : 0;
@@ -266,7 +280,6 @@ namespace vg
 		{
 			descriptorSets[0] = *pPass->getDescriptorSet();
 		}
-		auto pPipelineLayout = pPass->getPipelineLayout();
 		m_pCommandBuffer->bindDescriptorSets(vk::PipelineBindPoint::eGraphics, *pPipelineLayout, 0u, descriptorSets, nullptr);
 
         vertexDataToCommandBuffer(pMesh->getVertexData(), *m_pCommandBuffer, 0);

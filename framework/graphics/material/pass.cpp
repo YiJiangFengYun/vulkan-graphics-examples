@@ -533,7 +533,7 @@ namespace vg
 		return m_mapSpecilizationDatas;
 	}
 
-	std::vector<vk::PushConstantRange> &Pass::getPushConstantRanges() const
+	std::vector<vk::PushConstantRange> Pass::getPushConstantRanges() const
 	{
 		size_t size = m_arrPushConstantRangeNames.size();
 		std::vector<vk::PushConstantRange> pushConstantRanges(size);
@@ -546,7 +546,7 @@ namespace vg
 		return pushConstantRanges;
 	}
 
-    std::vector<std::shared_ptr<Pass::PushConstantUpdate>> &Pass::getPushconstantUpdate() const
+    std::vector<std::shared_ptr<Pass::PushConstantUpdate>> Pass::getPushconstantUpdates() const
 	{
 		size_t size = m_arrPushConstantUpdateNames.size();
 		std::vector<std::shared_ptr<Pass::PushConstantUpdate>> pPushConstantUpdates(size);
@@ -587,6 +587,7 @@ namespace vg
 	{
 		vk::PushConstantRange pushConstantRange(stageFlags, offset, size);
 		setValue(name, pushConstantRange, m_mapPushConstantRanges, m_arrPushConstantRangeNames);
+		m_applied = VG_FALSE;
 	}
 
 	void Pass::setPushConstantUpdate(std::string name
@@ -681,12 +682,15 @@ namespace vg
 		auto pLayout = m_pDescriptorSetLayout;
 		uint32_t layoutCount = pLayout != nullptr ? 1 : 0;
 		auto pSetLayouts = pLayout != nullptr ? pLayout.get() : nullptr;
+		
+		auto pushConstantRanges = getPushConstantRanges();
+
 		vk::PipelineLayoutCreateInfo pipelineLayoutCreateInfo = {
 			vk::PipelineLayoutCreateFlags(),             //flags
 			layoutCount,                                 //setLayoutCount
 			pSetLayouts,                                 //pSetLayouts
-			0,                                           //pushConstantRangeCount
-			nullptr                                      //pPushConstantRanges
+			pushConstantRanges.size(),                   //pushConstantRangeCount
+			pushConstantRanges.data()                    //pPushConstantRanges
 		};
 
 		auto pDevice = pApp->getDevice();

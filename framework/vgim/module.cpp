@@ -5,13 +5,13 @@ namespace vgim {
 	{
 		if (isInited == VG_TRUE) return;
 		//Indicate module was initialized.
-		isInited = ICIMGUI_TRUE;
+		isInited = VG_IM_TRUE;
 	}
 
 	void moduleDestory()
 	{
 
-		isInited = ICIMGUI_FALSE;
+		isInited = VG_IM_FALSE;
 	}
 
     void renderImGUI()

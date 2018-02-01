@@ -13,8 +13,8 @@
 #include <graphics/graphics.hpp>
 #include <imgui/imgui.h>
 
-#define ICIMGUI_FALSE VG_FALSE
-#define ICIMGUI_TRUE VG_TRUE
+#define VG_IM_FALSE VG_FALSE
+#define VG_IM_TRUE VG_TRUE
 
 namespace vgim {
 	typedef vg::Bool32 Bool32;

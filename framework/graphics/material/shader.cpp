@@ -29,6 +29,20 @@ namespace vg
 		m_pFragShaderModule = _createShaderModule(fragShaderCode);
 	}
 
+	void Shader::load(const void *codeVertShader, uint32_t sizeVertShader, 
+	    const void *codeFragShader, uint32_t sizeFragShader)
+	{
+		m_pVertShaderModule = _createShaderModule(codeVertShader, sizeVertShader);
+		m_pFragShaderModule = _createShaderModule(codeFragShader, sizeFragShader);
+	}
+
+	void Shader::load(const uint32_t *codeVertShader, uint32_t sizeVertShader, 
+	    const uint32_t *codeFragShader, uint32_t sizeFragShader)
+	{
+		m_pVertShaderModule = _createShaderModule(codeVertShader, sizeVertShader);
+		m_pFragShaderModule = _createShaderModule(codeFragShader, sizeFragShader);
+	}
+
 	std::shared_ptr<vk::ShaderModule> Shader::getVertShaderModule()
 	{
 		return m_pVertShaderModule;
@@ -41,20 +55,6 @@ namespace vg
 
 	std::vector<vk::PipelineShaderStageCreateInfo> Shader::getShaderStageInfos() const
 	{
-		// vk::PipelineShaderStageCreateInfo vertShaderStageInfo = {
-		// 	vk::PipelineShaderStageCreateFlags(),
-		// 	vk::ShaderStageFlagBits::eVertex,
-		// 	*m_pVertShaderModule,
-		// 	"main"
-		// };
-
-		// vk::PipelineShaderStageCreateInfo fragShaderStageInfo = {
-		// 	vk::PipelineShaderStageCreateFlags(),
-		// 	vk::ShaderStageFlagBits::eFragment,
-		// 	*m_pFragShaderModule,
-		// 	"main"
-		// };
-
 		std::vector<vk::PipelineShaderStageCreateInfo> shaderStages = {
 			{
 			    vk::PipelineShaderStageCreateFlags(),
@@ -78,17 +78,48 @@ namespace vg
 	{
 		auto device = pApp->getDevice();
 
-		/*std::vector<uint32_t> codeAligned(code.size() / sizeof(uint32_t) + 1);
-		memcpy(codeAligned.data(), code.data(), code.size());*/
+		std::vector<uint32_t> codeAligned(code.size() / sizeof(uint32_t) + 1);
+		memcpy(codeAligned.data(), code.data(), code.size());
 
 		vk::ShaderModuleCreateInfo createInfo = {
 			vk::ShaderModuleCreateFlags(),
-			code.size(),
-			/*codeAligned.data()*/reinterpret_cast<const uint32_t*>(code.data())
+			codeAligned.size(),
+			codeAligned.data()
 		};
 
 		return fd::createShaderModule(device, createInfo);
 	}
+
+	std::shared_ptr<vk::ShaderModule> Shader::_createShaderModule(const void* code, uint32_t size)
+	{
+		auto device = pApp->getDevice();
+
+		std::vector<uint32_t> codeAligned(size / sizeof(uint32_t) + 1);
+		memcpy(codeAligned.data(), code, size);
+
+		vk::ShaderModuleCreateInfo createInfo = {
+			vk::ShaderModuleCreateFlags(),
+			codeAligned.size(),
+			codeAligned.data()
+		};
+
+		return fd::createShaderModule(device, createInfo);
+	}
+
+	std::shared_ptr<vk::ShaderModule> Shader::_createShaderModule(const uint32_t* code, uint32_t size)
+	{
+		auto device = pApp->getDevice();
+
+		vk::ShaderModuleCreateInfo createInfo = {
+			vk::ShaderModuleCreateFlags(),
+			size,
+			code
+		};
+
+		return fd::createShaderModule(device, createInfo);
+	}
+
+
 
 	std::vector<char> Shader::_readFile(const std::string& filePath)
 	{

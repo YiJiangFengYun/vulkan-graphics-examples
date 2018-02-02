@@ -15,14 +15,12 @@ namespace vg
 	{
 	public:
 		Shader();
-		//Shader(std::string vertShaderPath);
-		//Shader(std::string fragShaderPath);
 		Shader(std::string vertShaderPath, std::string fragShaderPath);
 		~Shader();
 
-		//void load(std::string vertShaderPath);
-		//void load(std::string fragShaderPath);
 		void load(std::string vertShaderPath, std::string fragShaderPath);
+		void load(const void *codeVertShader, uint32_t sizeVertShader, const void *codeFragShader, uint32_t sizeFragShader);
+		void load(const uint32_t *codeVertShader, uint32_t sizeVertShader, const uint32_t *codeFragShader, uint32_t sizeFragShader);
 
 		std::shared_ptr<vk::ShaderModule> getVertShaderModule();
 		std::shared_ptr<vk::ShaderModule> getFragShaderModule();
@@ -39,6 +37,8 @@ namespace vg
 
 		//tool methods
 		std::shared_ptr<vk::ShaderModule> _createShaderModule(const std::vector<char>& code);
+		std::shared_ptr<vk::ShaderModule> _createShaderModule(const void *code, uint32_t size);
+		std::shared_ptr<vk::ShaderModule> _createShaderModule(const uint32_t *code, uint32_t size);
 		std::vector<char> _readFile(const std::string& filePath);
 	};
 }

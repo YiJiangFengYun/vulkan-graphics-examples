@@ -97,37 +97,37 @@ namespace vg
 	template <MeshDimType meshDimType>
 	const typename DimSepMesh<meshDimType>::ArrayValueType &DimSepMesh<meshDimType>::getPositions() const
 	{
-		return _getData<Mesh<meshDimType>::ARRAY_DATA_TYPE>(VG_VERTEX_POSITION_NAME);
+		return _getData<DimSepMesh<meshDimType>::ARRAY_DATA_TYPE>(VG_VERTEX_POSITION_NAME);
 	}
 
 	template <MeshDimType meshDimType>
 	void DimSepMesh<meshDimType>::setPositions(const ArrayValueType &vertices)
 	{
-		_setData<Mesh<meshDimType>::ARRAY_DATA_TYPE>(VG_VERTEX_POSITION_NAME, vertices, VG_VERTEX_BINDING_PRIORITY_POSITION);
+		_setData<DimSepMesh<meshDimType>::ARRAY_DATA_TYPE>(VG_VERTEX_POSITION_NAME, vertices, VG_VERTEX_BINDING_PRIORITY_POSITION);
 	}
 
 	template <MeshDimType meshDimType>
 	const typename DimSepMesh<meshDimType>::ArrayValueType &DimSepMesh<meshDimType>::getNormals() const
 	{
-		return _getData<Mesh<meshDimType>::ARRAY_DATA_TYPE>(VG_VERTEX_NORMAL_NAME);
+		return _getData<DimSepMesh<meshDimType>::ARRAY_DATA_TYPE>(VG_VERTEX_NORMAL_NAME);
 	}
 
 	template <MeshDimType meshDimType>
 	void DimSepMesh<meshDimType>::setNormals(const ArrayValueType &normals)
 	{
-		_setData<Mesh<meshDimType>::ARRAY_DATA_TYPE>(VG_VERTEX_NORMAL_NAME, normals, VG_VERTEX_BINDING_PRIORITY_NORMAL);
+		_setData<DimSepMesh<meshDimType>::ARRAY_DATA_TYPE>(VG_VERTEX_NORMAL_NAME, normals, VG_VERTEX_BINDING_PRIORITY_NORMAL);
 	}
 
 	template <MeshDimType meshDimType>
 	const typename DimSepMesh<meshDimType>::ArrayValueType &DimSepMesh<meshDimType>::getTangents() const
 	{
-		return _getData<Mesh<meshDimType>::ARRAY_DATA_TYPE>(VG_VERTEX_TANGENT_NAME);
+		return _getData<DimSepMesh<meshDimType>::ARRAY_DATA_TYPE>(VG_VERTEX_TANGENT_NAME);
 	}
 
 	template <MeshDimType meshDimType>
 	void DimSepMesh<meshDimType>::setTangents(const ArrayValueType &tangents)
 	{
-		_setData<Mesh<meshDimType>::ARRAY_DATA_TYPE>(VG_VERTEX_TANGENT_NAME, tangents, VG_VERTEX_BINDING_PRIORITY_TANGENT);
+		_setData<DimSepMesh<meshDimType>::ARRAY_DATA_TYPE>(VG_VERTEX_TANGENT_NAME, tangents, VG_VERTEX_BINDING_PRIORITY_TANGENT);
 	}
 
     template <MeshDimType meshDimType>

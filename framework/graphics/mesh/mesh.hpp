@@ -38,29 +38,11 @@ namespace vg
 	class Mesh : public DimensionMesh
 	{
     public:
-	    static const MeshData::DataType ARRAY_DATA_TYPE = MeshConstInfo<meshDimType>::ARRAY_TYPE;
-		typedef typename MeshData::DataTypeInfo<ARRAY_DATA_TYPE>::BaseType BaseValueType;
-		typedef typename MeshData::DataTypeInfo<ARRAY_DATA_TYPE>::ValueType ArrayValueType;
-		typedef typename MeshTypeInfo<meshDimType>::PointType PointType;
+	    typedef typename MeshTypeInfo<meshDimType>::PointType PointType;
 
 		Mesh();
 
 		MeshDimType getMeshDimType() const;
-
-		//position
-		virtual const ArrayValueType &getPositions() const = 0;
-
-		virtual void setPositions(const ArrayValueType &vertices) = 0;
-
-		//normal
-		virtual const ArrayValueType &getNormals() const = 0;
-
-		virtual void setNormals(const ArrayValueType &normals) = 0;
-
-		//tangent
-		virtual const ArrayValueType &getTangents() const = 0;
-
-		virtual void setTangents(const ArrayValueType &tangents) = 0;
 
         virtual Bool32 getIsHasBounds() = 0;
 		/*The bounding volume of the mesh*/
@@ -215,24 +197,28 @@ namespace vg
 	class DimSepMesh : public SepMesh, public Mesh<meshDimType>
 	{
 	public:
+	    static const MeshData::DataType ARRAY_DATA_TYPE = MeshConstInfo<meshDimType>::ARRAY_TYPE;
+		typedef typename MeshData::DataTypeInfo<ARRAY_DATA_TYPE>::BaseType BaseValueType;
+		typedef typename MeshData::DataTypeInfo<ARRAY_DATA_TYPE>::ValueType ArrayValueType;
+
 		DimSepMesh();
 
 		virtual ~DimSepMesh();
 
 		//position
-		virtual const ArrayValueType &getPositions() const override;
+		virtual const ArrayValueType &getPositions() const;
 
-		virtual void setPositions(const ArrayValueType &vertices) override;
+		virtual void setPositions(const ArrayValueType &vertices);
 
 		//normal
-		virtual const ArrayValueType &getNormals() const override;
+		virtual const ArrayValueType &getNormals() const;
 
-		virtual void setNormals(const ArrayValueType &normals) override;
+		virtual void setNormals(const ArrayValueType &normals);
 
 		//tangent
-		virtual const ArrayValueType &getTangents() const override;
+		virtual const ArrayValueType &getTangents() const;
 
-		virtual void setTangents(const ArrayValueType &tangents) override;
+		virtual void setTangents(const ArrayValueType &tangents);
 
 		virtual void apply(Bool32 makeUnreadable) override;
 
@@ -260,28 +246,10 @@ namespace vg
 	// {
 	// public: 
     //     DimSimpleMesh();
-
-	// 	//position
-	// 	const ArrayValueType &getPositions() const override;
-
-	// 	void setPositions(const ArrayValueType &vertices) override;
-
-	// 	//normal
-	// 	const ArrayValueType &getNormals() const override;
-
-	// 	void setNormals(const ArrayValueType &normals) override;
-
-	// 	//tangent
-	// 	const ArrayValueType &getTangents() const override;
-
-	// 	void setTangents(const ArrayValueType &tangents) override;
-
-	// 	void apply(Bool32 makeUnreadable) override;
-
+	        // virtual Bool32 getIsHasBounds() override;
 	// 	/*The bounding volume of the mesh*/
 	// 	fd::Bounds<PointType> getBounds() override;
 	// private:
-	//     fd::Bounds<PointType> m_bounds;
 	// };
 }
 

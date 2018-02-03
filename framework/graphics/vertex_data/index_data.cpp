@@ -79,12 +79,74 @@ namespace vg
         , Bool32 cacheMemory
         )
     {
+        updateDesData(subDatas);
+        updateBuffer(memory, size, cacheMemory);
+    }
+
+    void IndexData::init(uint32_t indexCount
+             , const void *memory
+             , uint32_t size
+             , Bool32 cacheMemory
+             , const vk::PipelineInputAssemblyStateCreateInfo &inputAssemblyStateInfo
+             )
+    {
+        updateDesData(indexCount, size, inputAssemblyStateInfo);
+        updateBuffer(memory, size, cacheMemory);
+    }
+
+    void IndexData::updateDesData(const std::vector<SubIndexData> subDatas)
+    {
         if (_isEqual(m_subDatas, subDatas) == VG_FALSE) {
             m_subDataCount = static_cast<uint32_t>(subDatas.size());
             m_subDatas = subDatas;
             _updatePipelineStateID();            
         }
+    }
 
+    void IndexData::updateDesData(uint32_t indexCount, uint32_t size, const vk::PipelineInputAssemblyStateCreateInfo &inputAssemblyStateInfo)
+    {
+        if (m_subDatas.size() != 1u ||
+            m_subDatas[0].bufferSize != size || 
+            m_subDatas[0].indexCount != indexCount || 
+            m_subDatas[0].inputAssemblyStateInfo != inputAssemblyStateInfo
+            )
+        {
+            std::vector<SubIndexData> subDatas(1);
+            SubIndexData &subData = subDatas[0];
+            subData.inputAssemblyStateInfo = inputAssemblyStateInfo;
+            subData.inputAssemblyStateInfo.pNext = nullptr;
+    
+            subData.indexCount = indexCount;
+            subData.bufferSize = size;
+            updateDesData(subDatas);
+        }
+    }
+
+    void IndexData::updateDesData(const vk::PipelineInputAssemblyStateCreateInfo &inputAssemblyStateInfo)
+    {
+        updateDesData(0u, 0u, inputAssemblyStateInfo);
+    }
+
+    void IndexData::updateIndexCount(fd::ArrayProxy<uint32_t> indexCounts)
+    {
+        uint32_t size = indexCounts.size();
+        for(uint32_t i = 0; i < size; ++i)
+        {
+            m_subDatas[i].indexCount = *(indexCounts.data() + i);
+        }
+    }
+    
+    void IndexData::updateBufferSize(fd::ArrayProxy<uint32_t> bufferSizes)
+    {
+        uint32_t size = bufferSizes.size();
+        for(uint32_t i = 0; i < size; ++i)
+        {
+            m_subDatas[i].bufferSize = *(bufferSizes.data() + i);
+        }
+    }
+
+    void IndexData::updateBuffer(const void *memory, uint32_t size, Bool32 cacheMemory)
+    {
         if (m_pMemory != nullptr && (m_memorySize != size || ! cacheMemory)) {
             free(m_pMemory);
             m_pMemory = nullptr;
@@ -100,33 +162,6 @@ namespace vg
         }
 
         _createBuffer(memory, size);
-
-    }
-
-    void IndexData::init(uint32_t indexCount
-             , const void *memory
-             , uint32_t size
-             , Bool32 cacheMemory
-             , const vk::PipelineInputAssemblyStateCreateInfo &inputAssemblyStateInfo
-             )
-    {
-        if (m_subDatas.size() != 1u ||
-            m_subDatas[0].bufferSize != size || 
-            m_subDatas[0].indexCount != indexCount || 
-            m_subDatas[0].inputAssemblyStateInfo != inputAssemblyStateInfo
-            )
-        {
-            std::vector<SubIndexData> subDatas(1);
-            SubIndexData &subData = subDatas[0];
-            subData.inputAssemblyStateInfo = inputAssemblyStateInfo;
-            subData.inputAssemblyStateInfo.pNext = nullptr;
-    
-            subData.indexCount = indexCount;
-            subData.bufferSize = size;
-            init(subDatas, memory, size, cacheMemory);            
-        } else {
-            init(m_subDatas, memory, size, cacheMemory);
-        }
     }
     
     void IndexData::_createBuffer(const void *pMemory, uint32_t memorySize)

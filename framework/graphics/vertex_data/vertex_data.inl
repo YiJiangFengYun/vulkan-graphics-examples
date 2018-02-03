@@ -1,7 +1,7 @@
 namespace vg
 {
     template<typename VertexType>
-    void init(uint32_t vertexCount 
+    void VertexData::init(uint32_t vertexCount 
         , const void *memory
         , Bool32 cacheMemory
         , const vk::PipelineVertexInputStateCreateInfo &vertexInputStateInfo
@@ -9,6 +9,19 @@ namespace vg
     {
         uint32_t size = vertexCount * static_cast<uint32_t>(sizeof(VertexType));
         init(vertexCount, memory, size, cacheMemory, vertexInputStateInfo);
+    }
+
+    template<typename VertexType>
+    void VertexData::updateDesData(uint32_t vertexCount, const vk::PipelineVertexInputStateCreateInfo &vertexInputStateInfo)
+    {
+        uint32_t size = vertexCount * static_cast<uint32_t>(sizeof(VertexType));
+        updateDesData(vertexCount, size, vertexInputStateInfo);
+    }
+
+    template<typename VertexType>
+    void VertexData::updateDesData(const vk::PipelineVertexInputStateCreateInfo &vertexInputStateInfo)
+    {
+        updateDesData(vertexInputStateInfo);
     }
 
     template<typename VertexType>

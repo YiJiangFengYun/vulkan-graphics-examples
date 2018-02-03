@@ -12,6 +12,19 @@ namespace vg
     }
 
     template<typename IndexType>
+    void IndexData::updateDesData(uint32_t indexCount, const vk::PipelineInputAssemblyStateCreateInfo &inputAssemblyStateInfo)
+    {
+        uint32_t size = indexCount * static_cast<uint32_t>(sizeof(IndexType));
+        updateDesData(indexCount, size, inputAssemblyStateInfo);
+    }
+
+    template<typename IndexType>
+    void IndexData::updateDesData(const vk::PipelineInputAssemblyStateCreateInfo &inputAssemblyStateInfo)
+    {
+        updateDesData(inputAssemblyStateInfo);
+    }
+
+    template<typename IndexType>
     IndexType IndexData::getIndex(uint32_t index) const
     {
 #ifdef DEBUG

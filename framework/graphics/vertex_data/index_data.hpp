@@ -46,6 +46,19 @@ namespace vg {
             , const vk::PipelineInputAssemblyStateCreateInfo &inputAssemblyStateInfo
             );
 
+        void updateDesData(const std::vector<SubIndexData> subDatas);
+        void updateDesData(const vk::PipelineInputAssemblyStateCreateInfo &inputAssemblyStateInfo);
+        void updateDesData(uint32_t indexCount, uint32_t size, const vk::PipelineInputAssemblyStateCreateInfo &inputAssemblyStateInfo);
+        template<typename IndexType>
+        void updateDesData(uint32_t indexCount, const vk::PipelineInputAssemblyStateCreateInfo &inputAssemblyStateInfo);
+        template<typename IndexType>
+        void updateDesData(const vk::PipelineInputAssemblyStateCreateInfo &inputAssemblyStateInfo);
+
+        void updateIndexCount(fd::ArrayProxy<uint32_t> indexCounts);
+        void updateBufferSize(fd::ArrayProxy<uint32_t> bufferSizes);
+
+        void updateBuffer(const void *memory, uint32_t size, Bool32 cacheMemory);
+
         template<typename IndexType>
         IndexType getIndex(uint32_t index) const;
 

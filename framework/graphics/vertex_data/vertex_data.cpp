@@ -80,6 +80,29 @@ namespace vg
         , const vk::PipelineVertexInputStateCreateInfo &vertexInputStateInfo
         )
     {
+        updateDesData(vertexCount, size, vertexInputStateInfo);
+        updateBuffer(memory, size, cacheMemory);        
+    }
+
+    void VertexData::init(const std::vector<VertexData::SubVertexData> subDatas
+            , const void *memory
+            , uint32_t size
+            , Bool32 cacheMemory
+            )
+    {
+        
+        updateDesData(subDatas);
+        updateBuffer(memory, size, cacheMemory);
+
+    }
+
+    void VertexData::updateDesData(const vk::PipelineVertexInputStateCreateInfo &vertexInputStateInfo)
+    {
+        updateDesData(0u, 0u, vertexInputStateInfo);
+    }
+
+    void VertexData::updateDesData(uint32_t vertexCount, uint32_t size, const vk::PipelineVertexInputStateCreateInfo &vertexInputStateInfo)
+    {
         if (m_subDatas.size() != 1u || _isEqual(m_subDatas[0].vertexInputStateInfo, vertexInputStateInfo) == VG_FALSE) {
             std::vector<SubVertexData> subDatas(1);
             SubVertexData &subData = subDatas[0];
@@ -104,18 +127,11 @@ namespace vg
             
             subData.vertexCount = vertexCount;
             subData.bufferSize = size;
-            init(subDatas, memory, size, cacheMemory);
-        } else {
-            init(m_subDatas, memory, size, cacheMemory);
+            updateDesData(subDatas);
         }
-        
     }
 
-    void VertexData::init(const std::vector<VertexData::SubVertexData> subDatas
-            , const void *memory
-            , uint32_t size
-            , Bool32 cacheMemory
-            )
+    void VertexData::updateDesData(const std::vector<SubVertexData> subDatas)
     {
         if (_isEqual(m_subDatas, subDatas) == VG_FALSE) {
             m_subDataCount = static_cast<uint32_t>(subDatas.size());
@@ -128,7 +144,28 @@ namespace vg
 
             _updatePipelineStateID();            
         }
-        
+    }
+
+    void VertexData::updateVertexCount(fd::ArrayProxy<uint32_t> vertexCounts)
+    {
+        uint32_t size = vertexCounts.size();
+        for(uint32_t i = 0; i < size; ++i)
+        {
+            m_subDatas[i].vertexCount = *(vertexCounts.data() + i);
+        }
+    }
+    
+    void VertexData::updateBufferSize(fd::ArrayProxy<uint32_t> bufferSizes)
+    {
+        uint32_t size = bufferSizes.size();
+        for(uint32_t i = 0; i < size; ++i)
+        {
+            m_subDatas[i].bufferSize = *(bufferSizes.data() + i);
+        }
+    }
+
+    void VertexData::updateBuffer(const void *memory, uint32_t size, Bool32 cacheMemory)
+    {
         if (m_pMemory != nullptr && (m_memorySize != size || ! cacheMemory)) {
             free(m_pMemory);
             m_pMemory = nullptr;
@@ -143,7 +180,6 @@ namespace vg
         }
 
         _createBuffer(memory, size);
-
     }
 
     void VertexData::_createBuffer(const void *pMemory, uint32_t memorySize)

@@ -49,6 +49,25 @@ namespace vg
             , Bool32 cacheMemory
             , const vk::PipelineVertexInputStateCreateInfo &vertexInputStateInfo
             );
+
+        void updateDesData(const vk::PipelineVertexInputStateCreateInfo &vertexInputStateInfo);
+        void updateDesData(uint32_t vertexCount, uint32_t size, const vk::PipelineVertexInputStateCreateInfo &vertexInputStateInfo);
+
+        void updateDesData(const std::vector<SubVertexData> subDatas);
+
+        template<typename VertexType>
+        void updateDesData(uint32_t vertexCount, const vk::PipelineVertexInputStateCreateInfo &vertexInputStateInfo);
+
+        template<typename VertexType>
+        void updateDesData(const vk::PipelineVertexInputStateCreateInfo &vertexInputStateInfo);
+
+        void updateVertexCount(fd::ArrayProxy<uint32_t> vertexCounts);
+        void updateBufferSize(fd::ArrayProxy<uint32_t> bufferSizes);
+
+        void updateBuffer(const void *memory
+            , uint32_t size
+            , Bool32 cacheMemory
+            );
         
         template<typename VertexType>
         VertexType getVertex(uint32_t index) const;

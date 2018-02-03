@@ -11,17 +11,29 @@ namespace vg
 
 	}
 
-	Shader::Shader(std::string vertShaderPath, std::string fragShaderPath)
+	Shader::Shader(const std::string &vertShaderPath, const std::string &fragShaderPath)
 		: Base(BaseType::SHADER)
 	{
 		load(vertShaderPath, fragShaderPath);
+	}
+
+	Shader::Shader(const void *codeVertShader, uint32_t sizeVertShader, const void *codeFragShader, uint32_t sizeFragShader)
+	    :  Base(BaseType::SHADER)
+	{
+		load(codeVertShader, sizeVertShader, codeFragShader, sizeFragShader);
+	}
+
+	Shader::Shader(const uint32_t *codeVertShader, uint32_t sizeVertShader, const uint32_t *codeFragShader, uint32_t sizeFragShader)
+	    :  Base(BaseType::SHADER)
+	{
+		load(codeVertShader, sizeVertShader, codeFragShader, sizeFragShader);
 	}
 
 	Shader::~Shader()
 	{
 	}
 
-	void Shader::load(std::string vertShaderPath, std::string fragShaderPath)
+	void Shader::load(const std::string &vertShaderPath, const std::string &fragShaderPath)
 	{
 		auto vertShaderCode = _readFile(vertShaderPath);
 		auto fragShaderCode = _readFile(fragShaderPath);
@@ -78,12 +90,12 @@ namespace vg
 	{
 		auto device = pApp->getDevice();
 
-		std::vector<uint32_t> codeAligned(code.size() / sizeof(uint32_t) + 1);
+		std::vector<uint32_t> codeAligned((code.size() - 1) / sizeof(uint32_t) + 1);
 		memcpy(codeAligned.data(), code.data(), code.size());
 
 		vk::ShaderModuleCreateInfo createInfo = {
 			vk::ShaderModuleCreateFlags(),
-			codeAligned.size(),
+			codeAligned.size() * sizeof(uint32_t),
 			codeAligned.data()
 		};
 
@@ -94,12 +106,12 @@ namespace vg
 	{
 		auto device = pApp->getDevice();
 
-		std::vector<uint32_t> codeAligned(size / sizeof(uint32_t) + 1);
+		std::vector<uint32_t> codeAligned((size - 1) / sizeof(uint32_t) + 1);
 		memcpy(codeAligned.data(), code, size);
 
 		vk::ShaderModuleCreateInfo createInfo = {
 			vk::ShaderModuleCreateFlags(),
-			codeAligned.size(),
+			codeAligned.size() * sizeof(uint32_t),
 			codeAligned.data()
 		};
 

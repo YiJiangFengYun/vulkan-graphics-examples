@@ -15,10 +15,12 @@ namespace vg
 	{
 	public:
 		Shader();
-		Shader(std::string vertShaderPath, std::string fragShaderPath);
+		Shader(const std::string &vertShaderPath, const std::string &fragShaderPath);
+		Shader(const void *codeVertShader, uint32_t sizeVertShader, const void *codeFragShader, uint32_t sizeFragShader);
+		Shader(const uint32_t *codeVertShader, uint32_t sizeVertShader, const uint32_t *codeFragShader, uint32_t sizeFragShader);
 		~Shader();
 
-		void load(std::string vertShaderPath, std::string fragShaderPath);
+		void load(const std::string &vertShaderPath, const std::string &fragShaderPath);
 		void load(const void *codeVertShader, uint32_t sizeVertShader, const void *codeFragShader, uint32_t sizeFragShader);
 		void load(const uint32_t *codeVertShader, uint32_t sizeVertShader, const uint32_t *codeFragShader, uint32_t sizeFragShader);
 

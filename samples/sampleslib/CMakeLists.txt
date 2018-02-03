@@ -4,7 +4,7 @@
 
 set(LIBRARY_NAME "sampleslib")
 file(GLOB_RECURSE HEADERS *.hpp *.h *.inl)
-file(GLOB SOURCES *.cpp)
+file(GLOB_RECURSE SOURCES *.cpp)
 
 if(SOURCES)
     add_library(${LIBRARY_NAME} STATIC ${HEADERS} ${SOURCES})
@@ -14,4 +14,4 @@ if(SOURCES)
     # install
     install (TARGETS ${LIBRARY_NAME} DESTINATION bin)
     install (FILES ${HEADERS} DESTINATION include)
-endif(SOURCES)
+endif()

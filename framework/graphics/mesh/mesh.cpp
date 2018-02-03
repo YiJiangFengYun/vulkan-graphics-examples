@@ -339,9 +339,9 @@ namespace vg
 		free(stagingMemory);
 	}
 
-	// SimpleMesh::SimpleMesh()
-	//     : ContentMesh()
-	// {
+	SimpleMesh::SimpleMesh()
+	    : ContentMesh()
+	{
 		
-	// }
+	}
 }

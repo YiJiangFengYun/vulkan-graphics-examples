@@ -178,31 +178,23 @@ namespace vg
 		m_bounds.setMinMax(minPos, maxPos);
 	}
 
-    // template <MeshDimType meshDimType>
-	// DimSimpleMesh<meshDimType>::DimSimpleMesh()
-	//     : SimpleMesh()
-	// 	, 
-	// {
+    template <MeshDimType meshDimType>
+	DimSimpleMesh<meshDimType>::DimSimpleMesh()
+	    : SimpleMesh()
+		, Mesh<meshDimType>()
+	{
 
-	// }
+	}
 
-	// 	//position
-	// 	const ArrayValueType &getPositions() const override;
-
-	// 	void setPositions(const ArrayValueType &vertices) override;
-
-	// 	//normal
-	// 	const ArrayValueType &getNormals() const override;
-
-	// 	void setNormals(const ArrayValueType &normals) override;
-
-	// 	//tangent
-	// 	const ArrayValueType &getTangents() const override;
-
-	// 	void setTangents(const ArrayValueType &tangents) override;
-
-	// 	void apply(Bool32 makeUnreadable) override;
-
-	// 	/*The bounding volume of the mesh*/
-	// 	fd::Bounds<PointType> getBounds() override;
+    template <MeshDimType meshDimType>
+	Bool32 DimSimpleMesh<meshDimType>::getIsHasBounds()
+	{
+		return VG_FALSE;
+	}
+    
+	template <MeshDimType meshDimType>
+	fd::Bounds<typename DimSimpleMesh<meshDimType>::PointType> DimSimpleMesh<meshDimType>::getBounds()
+	{
+		throw std::runtime_error("Don't own a bounds but call its getBounds() method.");
+	}
 } //namespace kgs

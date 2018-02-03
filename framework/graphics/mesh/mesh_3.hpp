@@ -10,6 +10,14 @@ namespace vg
 	private:
 
 	};
+
+	class DimSimpleMesh3 : public DimSimpleMesh<MeshDimType::SPACE_3>
+	{
+	public:
+		DimSimpleMesh3();
+	private:
+
+	};
 }
 
 #endif //VG_MESH_2_H

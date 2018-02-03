@@ -234,23 +234,23 @@ namespace vg
 		inline void _updateBounds();
 	};
 
-	// class SimpleMesh : public ContentMesh
-	// {
-	// public:
-	//     SimpleMesh();
-	// protected:
-	// };
+	class SimpleMesh : public ContentMesh
+	{
+	public:
+	    SimpleMesh();
+	protected:
+	};
 
-	// template <MeshDimType meshDimType>
-	// class DimSimpleMesh : public SimpleMesh
-	// {
-	// public: 
-    //     DimSimpleMesh();
-	        // virtual Bool32 getIsHasBounds() override;
-	// 	/*The bounding volume of the mesh*/
-	// 	fd::Bounds<PointType> getBounds() override;
-	// private:
-	// };
+	template <MeshDimType meshDimType>
+	class DimSimpleMesh : public SimpleMesh, public Mesh<meshDimType>
+	{
+	public: 
+        DimSimpleMesh();
+	    virtual Bool32 getIsHasBounds() override;
+		/*The bounding volume of the mesh*/
+		fd::Bounds<PointType> getBounds() override;
+	private:
+	};
 }
 
 #include "graphics/mesh/mesh.inl"

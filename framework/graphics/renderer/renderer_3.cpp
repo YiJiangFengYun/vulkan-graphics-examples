@@ -71,7 +71,7 @@ namespace vg
 		{
 			auto pVisualObject = pScene->getVisualObjectWithIndex(i);
 			auto pMesh = pVisualObject->getMesh();
-			auto bounds = dynamic_cast<SceneType::VisualObjectType::MeshType *>(pMesh.get())->getBounds();
+			auto bounds = dynamic_cast<SceneType::VisualObjectType::MeshDimType *>(pMesh.get())->getBounds();
 			auto pTransform = pVisualObject->getTransform();
 			if(m_pCamera->isInView(pTransform.get(), bounds) == VG_TRUE)
 			{
@@ -118,7 +118,8 @@ namespace vg
 			{
 				auto pVisualObject = queues[typeIndex][objectIndex];
 				auto pMesh = pVisualObject->getMesh();
-				auto subMeshCount = pMesh->getIndexData()->getSubIndexDataCount();
+				auto pContentMesh = dynamic_cast<ContentMesh *>(pMesh.get());
+				auto subMeshCount = pContentMesh->getIndexData()->getSubIndexDataCount();
 				auto pMaterial = pVisualObject->getMaterial();
 				auto passCount = pMaterial->getPassCount();
 				drawCount += subMeshCount * passCount;
@@ -147,7 +148,8 @@ namespace vg
 				auto mvMatrix = viewMatrix * modelMatrix;
 				auto mvpMatrix = projMatrix * mvMatrix;
 				auto pMesh = pVisualObject->getMesh();
-				auto subMeshCount = pMesh->getSubMeshCount();
+				auto pContentMesh = dynamic_cast<ContentMesh *>(pMesh.get());
+				auto subMeshCount = pContentMesh->getSubMeshCount();
 				auto pMaterial = pVisualObject->getMaterial();
 				auto passCount = pMaterial->getPassCount();
 

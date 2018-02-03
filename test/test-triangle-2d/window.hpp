@@ -29,7 +29,7 @@ namespace testTriangle_2d
 		std::shared_ptr<vg::Scene2> m_pScene;
 		std::shared_ptr<vg::CameraOP2> m_pCamera;
 		std::shared_ptr<vg::VisualObject2> m_pModel;
-		std::shared_ptr<vg::Mesh2> m_pMesh;
+		std::shared_ptr<vg::DimSepMesh2> m_pMesh;
 		std::shared_ptr<vg::Material> m_pMaterial;
 		std::shared_ptr<vg::Pass> m_pPass;
 		std::shared_ptr<vg::Shader> m_pShader;

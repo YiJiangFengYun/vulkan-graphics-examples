@@ -18,7 +18,7 @@ namespace vg
 	template<SpaceType type>
 	struct SpaceTypeInfo
 	{
-		static const MeshType MESH_TYPE;
+		static const MeshDimType MESH_DIM_TYPE;
 		typedef void VectorType;
 		typedef void PointType;
 		typedef void MatrixVectorType;
@@ -35,7 +35,7 @@ namespace vg
 	template<>
 	struct SpaceTypeInfo<SpaceType::SPACE_2>
 	{
-		static const MeshType MESH_TYPE = MeshType::SPACE_2;
+		static const MeshDimType MESH_DIM_TYPE = MeshDimType::SPACE_2;
 		typedef Vector2 VectorType;
 		typedef Vector2 PointType;
 		typedef Vector3 MatrixVectorType;
@@ -46,7 +46,7 @@ namespace vg
 	template<>
 	struct SpaceTypeInfo<SpaceType::SPACE_3>
 	{
-		static const MeshType MESH_TYPE = MeshType::SPACE_3;
+		static const MeshDimType MESH_DIM_TYPE = MeshDimType::SPACE_3;
 		typedef Vector3 VectorType;
 		typedef Vector3 PointType;
 		typedef Vector4 MatrixVectorType;

@@ -14,11 +14,12 @@ set(LIBRARIES ${LIBRARIES} foundation)
 set(LIBRARIES ${LIBRARIES} graphics)
 set(LIBRARIES ${LIBRARIES} framework)
 
-add_subdirectory(sampleslib)
 
 set(RESOURCES_DIR "${CMAKE_CURRENT_SOURCE_DIR}/resources")
 set(SHADERS_DIR "${RESOURCES_DIR}/shaders")
 set(RESOURCES_OUTPUT_DIR "${CMAKE_CURRENT_BINARY_DIR}")
 set(SHADERS_OUTPUT_DIR "${RESOURCES_OUTPUT_DIR}/shaders")
+
+add_subdirectory(sampleslib)
 
 add_subdirectory(chalet)

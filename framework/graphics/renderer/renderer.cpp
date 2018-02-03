@@ -165,13 +165,14 @@ namespace vg
 		uint32_t subMeshIndex,
 		uint32_t passIndex)
 	{
+		ContentMesh * pContentMesh = dynamic_cast<ContentMesh *>(pMesh.get());
 		auto pPass = pMaterial->getPassWithIndex(passIndex);
 		PipelineCache::Info info(
 			*m_pRenderPass,
 			pPass,
-			pMesh->getVertexData(),
+			pContentMesh->getVertexData(),
 			0u,
-			pMesh->getIndexData(),
+			pContentMesh->getIndexData(),
 			subMeshIndex
 		);
 		pPipeline = m_pipelineCache.caching(info);
@@ -184,7 +185,7 @@ namespace vg
 		uint32_t passIndex)
 	{
 		LOG(plog::debug) << "Pre begin command buffer for render." << std::endl;
-
+		ContentMesh * pContentMesh = dynamic_cast<ContentMesh *>(pMesh.get());
 		auto pPass = pMaterial->getPassWithIndex(passIndex);
 		
 		vk::CommandBufferBeginInfo beginInfo = {
@@ -282,9 +283,9 @@ namespace vg
 		}
 		m_pCommandBuffer->bindDescriptorSets(vk::PipelineBindPoint::eGraphics, *pPipelineLayout, 0u, descriptorSets, nullptr);
 
-        vertexDataToCommandBuffer(pMesh->getVertexData(), *m_pCommandBuffer, 0);
-		indexDataToCommandBuffer(pMesh->getIndexData(), *m_pCommandBuffer, subMeshIndex);
-		m_pCommandBuffer->drawIndexed(pMesh->getIndexData()->getSubIndexDatas()[subMeshIndex].indexCount, 1u, 0u, 0u, 0u);
+        vertexDataToCommandBuffer(pContentMesh->getVertexData(), *m_pCommandBuffer, 0);
+		indexDataToCommandBuffer(pContentMesh->getIndexData(), *m_pCommandBuffer, subMeshIndex);
+		m_pCommandBuffer->drawIndexed(pContentMesh->getIndexData()->getSubIndexDatas()[subMeshIndex].indexCount, 1u, 0u, 0u, 0u);
 		//m_pCommandBuffer->draw(3, 1, 0, 0);
 
 		m_pCommandBuffer->endRenderPass();

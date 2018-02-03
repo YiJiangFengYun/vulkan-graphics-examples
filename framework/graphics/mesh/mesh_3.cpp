@@ -2,8 +2,8 @@
 
 namespace vg
 {
-	Mesh3::Mesh3()
-		: Mesh<MeshType::SPACE_3>()
+	DimSepMesh3::DimSepMesh3()
+		: DimSepMesh<MeshDimType::SPACE_3>()
 	{
 	}
 } //namespace kgs

@@ -8,7 +8,7 @@
 
 namespace vg
 {
-	enum class MeshType
+	enum class MeshDimType
 	{
 		SPACE_2,
 		SPACE_3,
@@ -17,13 +17,13 @@ namespace vg
 		RANGE_SIZE = (END_RANGE - BEGIN_RANGE + 1)
 	};
 
-	template<MeshType type>
+	template<MeshDimType type>
 	struct MeshTypeInfo
 	{
 		typedef void PointType;
 	};
 
-	template<MeshType type>
+	template<MeshDimType type>
 	struct MeshConstInfo
 	{
 		static const MeshData::DataType ARRAY_TYPE;
@@ -106,13 +106,13 @@ namespace vg
 	//-------specialization--------------------------------------------------------------------------
 
 	template<>
-	struct MeshTypeInfo<MeshType::SPACE_2>
+	struct MeshTypeInfo<MeshDimType::SPACE_2>
 	{
 		typedef Vector2 PointType;
 	};
 
 	template<>
-	struct MeshTypeInfo<MeshType::SPACE_3>
+	struct MeshTypeInfo<MeshDimType::SPACE_3>
 	{
 		typedef Vector3 PointType;
 	};
@@ -120,13 +120,13 @@ namespace vg
 	// Using struct declaration type specialization, so these members can't be used to indicate innter type of class when declarated.
 	// Otherwise, these member value will not be definited when class declaration.
 	template<>
-	struct MeshConstInfo<MeshType::SPACE_2>
+	struct MeshConstInfo<MeshDimType::SPACE_2>
 	{
 		static const MeshData::DataType ARRAY_TYPE = MeshData::DataType::VECTOR_2_ARRAY;
 	};
 
 	template<>
-	struct MeshConstInfo<MeshType::SPACE_3>
+	struct MeshConstInfo<MeshDimType::SPACE_3>
 	{
 		static const MeshData::DataType ARRAY_TYPE = MeshData::DataType::VECTOR_3_ARRAY;
 	};

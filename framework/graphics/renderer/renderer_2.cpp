@@ -84,7 +84,8 @@ namespace vg
 		{
 			auto pVisualObject = validVisualObjects[i];
 			auto pMesh = pVisualObject->getMesh();
-			auto subMeshCount = pMesh->getIndexData()->getSubIndexDataCount();
+			auto pContentMesh = dynamic_cast<ContentMesh *>(pMesh.get());
+			auto subMeshCount = pContentMesh->getIndexData()->getSubIndexDataCount();
 			auto pMaterial = pVisualObject->getMaterial();
 			auto passCount = pMaterial->getPassCount();
 			drawCount += subMeshCount * passCount;
@@ -108,7 +109,8 @@ namespace vg
 			auto mvMatrix = viewMatrix * modelMatrix;
 			auto mvpMatrix = projMatrix * mvMatrix;
 			auto pMesh = pVisualObject->getMesh();
-			auto subMeshCount = pMesh->getIndexData()->getSubIndexDataCount();
+			auto pContentMesh = dynamic_cast<ContentMesh *>(pMesh.get());
+			auto subMeshCount = pContentMesh->getIndexData()->getSubIndexDataCount();
 			auto pMaterial = pVisualObject->getMaterial();
 			auto passCount = pMaterial->getPassCount();
 			for (uint32_t passIndex = 0u; passIndex < passCount; ++passIndex)
@@ -191,7 +193,7 @@ namespace vg
 			pVisualObjectOfChild = pScene->getVisualObjectWithTransform(pChild);
 			//Filter obj out of camera view.
 			auto pMeshOfChild = pVisualObjectOfChild->getMesh();
-			auto boundsOfChild = dynamic_cast<Mesh<MeshType::SPACE_2> *>(pMeshOfChild.get())->getBounds();
+			auto boundsOfChild = dynamic_cast<Mesh<MeshDimType::SPACE_2> *>(pMeshOfChild.get())->getBounds();
 			if (pCamera->isInView(pChild, boundsOfChild) == VG_TRUE)
 			{
 				arrPVObjs[PVObjIndex++] = pVisualObjectOfChild;

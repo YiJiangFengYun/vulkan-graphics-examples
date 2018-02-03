@@ -3,10 +3,10 @@
 #include "graphics/mesh/mesh.hpp"
 namespace vg
 {
-	class Mesh2 : public Mesh<MeshType::SPACE_2>
+	class DimSepMesh2 : public DimSepMesh<MeshDimType::SPACE_2>
 	{
 	public:
-		Mesh2();
+		DimSepMesh2();
 
 	private:
 

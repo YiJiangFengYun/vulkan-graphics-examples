@@ -1,5 +1,18 @@
 namespace vg
 {
+	template<MeshDimType meshDimType>
+	Mesh<meshDimType>::Mesh()
+		: DimensionMesh()
+		, m_meshDimType(meshDimType)
+	{
+	}
+
+	template<MeshDimType meshDimType>
+	MeshDimType Mesh<meshDimType>::getMeshDimType() const
+	{
+		return m_meshDimType;
+	}
+
 	template<UVType uvType, UVIndex uvIndex>
 	const typename MeshData::DataTypeInfo<UVConstInfo<uvType>::ARRAY_TYPE>::ValueType &SepMesh::getUVs() const
 	{
@@ -68,63 +81,63 @@ namespace vg
 		return static_cast<uint32_t>(subMeshInfo.indices.size());
 	}
 
-	template <MeshType meshType>
-	Mesh<meshType>::Mesh() 
+	template <MeshDimType meshDimType>
+	DimSepMesh<meshDimType>::DimSepMesh() 
 		: SepMesh()
+		, Mesh<meshDimType>()
 	{
-		m_meshType = meshType;
 	}
 
-	template <MeshType meshType>
-	Mesh<meshType>::~Mesh()
+	template <MeshDimType meshDimType>
+	DimSepMesh<meshDimType>::~DimSepMesh()
 	{
 
 	}
 
-	template <MeshType meshType>
-	const typename Mesh<meshType>::ArrayValueType &Mesh<meshType>::getPositions() const
+	template <MeshDimType meshDimType>
+	const typename DimSepMesh<meshDimType>::ArrayValueType &DimSepMesh<meshDimType>::getPositions() const
 	{
-		return _getData<Mesh<meshType>::ARRAY_DATA_TYPE>(VG_VERTEX_POSITION_NAME);
+		return _getData<Mesh<meshDimType>::ARRAY_DATA_TYPE>(VG_VERTEX_POSITION_NAME);
 	}
 
-	template <MeshType meshType>
-	void Mesh<meshType>::setPositions(const ArrayValueType &vertices)
+	template <MeshDimType meshDimType>
+	void DimSepMesh<meshDimType>::setPositions(const ArrayValueType &vertices)
 	{
-		_setData<Mesh<meshType>::ARRAY_DATA_TYPE>(VG_VERTEX_POSITION_NAME, vertices, VG_VERTEX_BINDING_PRIORITY_POSITION);
+		_setData<Mesh<meshDimType>::ARRAY_DATA_TYPE>(VG_VERTEX_POSITION_NAME, vertices, VG_VERTEX_BINDING_PRIORITY_POSITION);
 	}
 
-	template <MeshType meshType>
-	const typename Mesh<meshType>::ArrayValueType &Mesh<meshType>::getNormals() const
+	template <MeshDimType meshDimType>
+	const typename DimSepMesh<meshDimType>::ArrayValueType &DimSepMesh<meshDimType>::getNormals() const
 	{
-		_getData<Mesh<meshType>::ARRAY_DATA_TYPE>(VG_VERTEX_NORMAL_NAME);
+		return _getData<Mesh<meshDimType>::ARRAY_DATA_TYPE>(VG_VERTEX_NORMAL_NAME);
 	}
 
-	template <MeshType meshType>
-	void Mesh<meshType>::setNormals(const ArrayValueType &normals)
+	template <MeshDimType meshDimType>
+	void DimSepMesh<meshDimType>::setNormals(const ArrayValueType &normals)
 	{
-		_setData<Mesh<meshType>::ARRAY_DATA_TYPE>(VG_VERTEX_NORMAL_NAME, normals, VG_VERTEX_BINDING_PRIORITY_NORMAL);
+		_setData<Mesh<meshDimType>::ARRAY_DATA_TYPE>(VG_VERTEX_NORMAL_NAME, normals, VG_VERTEX_BINDING_PRIORITY_NORMAL);
 	}
 
-	template <MeshType meshType>
-	const typename Mesh<meshType>::ArrayValueType &Mesh<meshType>::getTangents() const
+	template <MeshDimType meshDimType>
+	const typename DimSepMesh<meshDimType>::ArrayValueType &DimSepMesh<meshDimType>::getTangents() const
 	{
-		_getData<Mesh<meshType>::ARRAY_DATA_TYPE>(VG_VERTEX_TANGENT_NAME);
+		return _getData<Mesh<meshDimType>::ARRAY_DATA_TYPE>(VG_VERTEX_TANGENT_NAME);
 	}
 
-	template <MeshType meshType>
-	void Mesh<meshType>::setTangents(const ArrayValueType &tangents)
+	template <MeshDimType meshDimType>
+	void DimSepMesh<meshDimType>::setTangents(const ArrayValueType &tangents)
 	{
-		_setData<Mesh<meshType>::ARRAY_DATA_TYPE>(VG_VERTEX_TANGENT_NAME, tangents, VG_VERTEX_BINDING_PRIORITY_TANGENT);
+		_setData<Mesh<meshDimType>::ARRAY_DATA_TYPE>(VG_VERTEX_TANGENT_NAME, tangents, VG_VERTEX_BINDING_PRIORITY_TANGENT);
 	}
 
-	template <MeshType meshType>
-	fd::Bounds<typename Mesh<meshType>::PointType> Mesh<meshType>::getBounds()
+	template <MeshDimType meshDimType>
+	fd::Bounds<typename DimSepMesh<meshDimType>::PointType> DimSepMesh<meshDimType>::getBounds()
 	{
 		return m_bounds;
 	}
 
-	template <MeshType meshType>
-	void Mesh<meshType>::apply(Bool32 makeUnreadable)
+	template <MeshDimType meshDimType>
+	void DimSepMesh<meshDimType>::apply(Bool32 makeUnreadable)
 	{
 		//caculate bounds
 		_updateBounds();
@@ -132,8 +145,8 @@ namespace vg
 		SepMesh::apply(makeUnreadable);
 	}
 
-	template <MeshType meshType>
-	inline void Mesh<meshType>::_updateBounds()
+	template <MeshDimType meshDimType>
+	inline void DimSepMesh<meshDimType>::_updateBounds()
 	{
 		if (m_vertexCount == 0u)
 		{

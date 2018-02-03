@@ -28,7 +28,7 @@ namespace vg
 	class VisualObject : public BaseVisualObject, public Object<SPACE_TYPE>
 	{
 	public:
-		typedef Mesh<SpaceTypeInfo<SPACE_TYPE>::MESH_TYPE> MeshType;
+		typedef Mesh<SpaceTypeInfo<SPACE_TYPE>::MESH_DIM_TYPE> MeshDimType;
 
 		VisualObject()
 			: BaseVisualObject()
@@ -38,7 +38,7 @@ namespace vg
 
 		}
 
-		void setMesh(std::shared_ptr<MeshType> pMesh)
+		void setMesh(std::shared_ptr<MeshDimType> pMesh)
 		{
 			m_pMesh = pMesh;
 		}

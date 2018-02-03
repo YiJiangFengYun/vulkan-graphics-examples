@@ -133,7 +133,7 @@ namespace chalet
 
 	void Window::_createMesh()
 	{
-		m_pMesh = static_cast<std::shared_ptr<vg::Mesh3>>(new vg::Mesh3());
+		m_pMesh = static_cast<std::shared_ptr<vg::DimSepMesh3>>(new vg::DimSepMesh3());
 		m_pMesh->setVertexCount(static_cast<uint32_t>(m_tempPositions.size()));
 		m_pMesh->setPositions(m_tempPositions);
 		m_pMesh->setUVs<vg::UVType::VECTOR_2, vg::UVIndex::UV_0>(m_tempTexCoords);

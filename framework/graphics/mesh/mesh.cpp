@@ -6,8 +6,6 @@ namespace vg
 {
 	BaseMesh::BaseMesh()
 	    : Base(BaseType::MESH)
-		, m_pVertexData(new VertexData())
-		, m_pIndexData(new IndexData())
 	{
 
 	}
@@ -17,17 +15,25 @@ namespace vg
 		
 	}
 
-	uint32_t BaseMesh::getSubMeshCount() const
+	ContentMesh::ContentMesh()
+	    : BaseMesh()
+		, m_pVertexData(new VertexData())
+		, m_pIndexData(new IndexData())
+	{
+
+	}
+
+	uint32_t ContentMesh::getSubMeshCount() const
 	{
 		return m_pIndexData->getSubIndexDataCount();
 	}
 
-	const std::shared_ptr<VertexData> &BaseMesh::getVertexData() const
+	const std::shared_ptr<VertexData> &ContentMesh::getVertexData() const
 	{
 		return m_pVertexData;
 	}
 
-	const std::shared_ptr<IndexData> &BaseMesh::getIndexData() const
+	const std::shared_ptr<IndexData> &ContentMesh::getIndexData() const
 	{
 		return m_pIndexData;
 	}
@@ -82,13 +88,8 @@ namespace vg
 		return bindingPriority < target.bindingPriority;
 	}
 
-	MeshType SepMesh::getMeshType() const
-	{
-		return m_meshType;
-	}
-
 	SepMesh::SepMesh()
-		: BaseMesh()
+		: ContentMesh()
 		, m_multipliedColor(COLOR_WHITE) //default multiplied color should be (1, 1, 1, 1)
 		, m_applied(VG_FALSE)
 	{

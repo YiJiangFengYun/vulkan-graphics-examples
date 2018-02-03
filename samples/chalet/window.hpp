@@ -49,7 +49,7 @@ namespace chalet
 		std::shared_ptr<vg::Scene3> m_pScene;
 		std::shared_ptr<vg::Camera3> m_pCamera;
 		std::shared_ptr<vg::VisualObject3> m_pModel;
-		std::shared_ptr<vg::Mesh3> m_pMesh;
+		std::shared_ptr<vg::DimSepMesh3> m_pMesh;
 		std::shared_ptr<vg::Material> m_pMaterial;
 		std::shared_ptr<vg::Pass> m_pPass;
 		std::shared_ptr<vg::Shader> m_pShader;

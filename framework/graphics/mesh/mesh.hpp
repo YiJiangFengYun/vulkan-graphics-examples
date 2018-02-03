@@ -19,22 +19,71 @@ namespace vg
 {
 	class BaseMesh : public Base
 	{
-public:
+    public:
         BaseMesh();
-		~BaseMesh();
+		virtual ~BaseMesh();
+
+    protected:
+    private:
+	};
+
+	class DimensionMesh : public BaseMesh
+	{
+    public:
+
+	protected:
+	};
+
+    template <MeshDimType meshDimType>
+	class Mesh : public DimensionMesh
+	{
+    public:
+	    static const MeshData::DataType ARRAY_DATA_TYPE = MeshConstInfo<meshDimType>::ARRAY_TYPE;
+		typedef typename MeshData::DataTypeInfo<ARRAY_DATA_TYPE>::BaseType BaseValueType;
+		typedef typename MeshData::DataTypeInfo<ARRAY_DATA_TYPE>::ValueType ArrayValueType;
+		typedef typename MeshTypeInfo<meshDimType>::PointType PointType;
+
+		Mesh();
+
+		MeshDimType getMeshDimType() const;
+
+		//position
+		virtual const ArrayValueType &getPositions() const = 0;
+
+		virtual void setPositions(const ArrayValueType &vertices) = 0;
+
+		//normal
+		virtual const ArrayValueType &getNormals() const = 0;
+
+		virtual void setNormals(const ArrayValueType &normals) = 0;
+
+		//tangent
+		virtual const ArrayValueType &getTangents() const = 0;
+
+		virtual void setTangents(const ArrayValueType &tangents) = 0;
+
+		/*The bounding volume of the mesh*/
+		virtual fd::Bounds<PointType> getBounds() = 0;
+	protected:
+		MeshDimType m_meshDimType;
+	};
+	
+
+	class ContentMesh : public BaseMesh
+	{
+	public:
+        ContentMesh();
 		const std::shared_ptr<VertexData> &getVertexData() const;
 		const std::shared_ptr<IndexData> &getIndexData() const;
 		virtual uint32_t getSubMeshCount() const;
-
-protected:
+	protected:
         std::shared_ptr<VertexData> m_pVertexData;
 		std::shared_ptr<IndexData> m_pIndexData;
-private:
 	};
 
     
 	//This mesh class for separation atrtribute layout of vertex and sub mesh feature.
-	class SepMesh : public BaseMesh
+	class SepMesh : public ContentMesh
 	{
 	public:
 		struct LayoutBindingInfo
@@ -69,8 +118,6 @@ private:
 		SepMesh();
 
 		~SepMesh();
-
-		MeshType getMeshType() const;
 
 		uint32_t getVertexCount() const;
 
@@ -124,7 +171,6 @@ private:
 		void setData(const std::string name, const typename MeshData::DataTypeInfo<dataType>::ValueType &value, uint32_t bindingPriority = VG_VERTEX_BINDING_PRIORITY_OTHER_MIN);
 
 	protected:
-		MeshType m_meshType;
 		uint32_t m_vertexCount;
 		std::shared_ptr<MeshData> m_pData;
 		std::vector<std::string> m_arrLayoutBindingInfoNames;
@@ -164,38 +210,33 @@ private:
 
 	};
 
-	template <MeshType meshType>
-	class Mesh : public SepMesh
+	template <MeshDimType meshDimType>
+	class DimSepMesh : public SepMesh, public Mesh<meshDimType>
 	{
 	public:
-		static const MeshData::DataType ARRAY_DATA_TYPE = MeshConstInfo<meshType>::ARRAY_TYPE;
-		typedef typename MeshData::DataTypeInfo<ARRAY_DATA_TYPE>::BaseType BaseValueType;
-		typedef typename MeshData::DataTypeInfo<ARRAY_DATA_TYPE>::ValueType ArrayValueType;
-		typedef typename MeshTypeInfo<meshType>::PointType PointType;
+		DimSepMesh();
 
-		Mesh();
-
-		~Mesh();
+		~DimSepMesh();
 
 		//position
-		const ArrayValueType &getPositions() const;
+		const ArrayValueType &getPositions() const override;
 
-		void setPositions(const ArrayValueType &vertices);
+		void setPositions(const ArrayValueType &vertices) override;
 
 		//normal
-		const ArrayValueType &getNormals() const;
+		const ArrayValueType &getNormals() const override;
 
-		void setNormals(const ArrayValueType &normals);
+		void setNormals(const ArrayValueType &normals) override;
 
 		//tangent
-		const ArrayValueType &getTangents() const;
+		const ArrayValueType &getTangents() const override;
 
-		void setTangents(const ArrayValueType &tangents);
+		void setTangents(const ArrayValueType &tangents) override;
 
 		void apply(Bool32 makeUnreadable) override;
 
 		/*The bounding volume of the mesh*/
-		fd::Bounds<PointType> getBounds();
+		fd::Bounds<PointType> getBounds() override;
 
 	private:
 		

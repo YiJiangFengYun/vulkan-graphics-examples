@@ -57,7 +57,7 @@ namespace testTriangle_2d
 
 	void Window::_createMesh()
 	{
-		m_pMesh = static_cast<std::shared_ptr<vg::Mesh2>>(new vg::Mesh2());
+		m_pMesh = static_cast<std::shared_ptr<vg::DimSepMesh2>>(new vg::DimSepMesh2());
 		m_pMesh->setVertexCount(static_cast<uint32_t>(m_tempPositions.size()));
 		m_pMesh->setPositions(m_tempPositions);
 		m_pMesh->setColors(m_tempColors);

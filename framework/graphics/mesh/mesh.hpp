@@ -62,6 +62,7 @@ namespace vg
 
 		virtual void setTangents(const ArrayValueType &tangents) = 0;
 
+        virtual Bool32 getIsHasBounds() = 0;
 		/*The bounding volume of the mesh*/
 		virtual fd::Bounds<PointType> getBounds() = 0;
 	protected:
@@ -81,7 +82,6 @@ namespace vg
         std::shared_ptr<VertexData> m_pVertexData;
 		std::shared_ptr<IndexData> m_pIndexData;
 	};
-
     
 	//This mesh class for separation atrtribute layout of vertex and sub mesh feature.
 	class SepMesh : public ContentMesh
@@ -217,27 +217,29 @@ namespace vg
 	public:
 		DimSepMesh();
 
-		~DimSepMesh();
+		virtual ~DimSepMesh();
 
 		//position
-		const ArrayValueType &getPositions() const override;
+		virtual const ArrayValueType &getPositions() const override;
 
-		void setPositions(const ArrayValueType &vertices) override;
+		virtual void setPositions(const ArrayValueType &vertices) override;
 
 		//normal
-		const ArrayValueType &getNormals() const override;
+		virtual const ArrayValueType &getNormals() const override;
 
-		void setNormals(const ArrayValueType &normals) override;
+		virtual void setNormals(const ArrayValueType &normals) override;
 
 		//tangent
-		const ArrayValueType &getTangents() const override;
+		virtual const ArrayValueType &getTangents() const override;
 
-		void setTangents(const ArrayValueType &tangents) override;
+		virtual void setTangents(const ArrayValueType &tangents) override;
 
-		void apply(Bool32 makeUnreadable) override;
+		virtual void apply(Bool32 makeUnreadable) override;
+
+        virtual Bool32 getIsHasBounds() override;
 
 		/*The bounding volume of the mesh*/
-		fd::Bounds<PointType> getBounds() override;
+		virtual fd::Bounds<PointType> getBounds() override;
 
 	private:
 		
@@ -245,6 +247,42 @@ namespace vg
 
 		inline void _updateBounds();
 	};
+
+	// class SimpleMesh : public ContentMesh
+	// {
+	// public:
+	//     SimpleMesh();
+	// protected:
+	// };
+
+	// template <MeshDimType meshDimType>
+	// class DimSimpleMesh : public SimpleMesh
+	// {
+	// public: 
+    //     DimSimpleMesh();
+
+	// 	//position
+	// 	const ArrayValueType &getPositions() const override;
+
+	// 	void setPositions(const ArrayValueType &vertices) override;
+
+	// 	//normal
+	// 	const ArrayValueType &getNormals() const override;
+
+	// 	void setNormals(const ArrayValueType &normals) override;
+
+	// 	//tangent
+	// 	const ArrayValueType &getTangents() const override;
+
+	// 	void setTangents(const ArrayValueType &tangents) override;
+
+	// 	void apply(Bool32 makeUnreadable) override;
+
+	// 	/*The bounding volume of the mesh*/
+	// 	fd::Bounds<PointType> getBounds() override;
+	// private:
+	//     fd::Bounds<PointType> m_bounds;
+	// };
 }
 
 #include "graphics/mesh/mesh.inl"

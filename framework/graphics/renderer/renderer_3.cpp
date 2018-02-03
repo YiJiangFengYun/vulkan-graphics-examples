@@ -71,11 +71,19 @@ namespace vg
 		{
 			auto pVisualObject = pScene->getVisualObjectWithIndex(i);
 			auto pMesh = pVisualObject->getMesh();
-			auto bounds = dynamic_cast<SceneType::VisualObjectType::MeshDimType *>(pMesh.get())->getBounds();
-			auto pTransform = pVisualObject->getTransform();
-			if(m_pCamera->isInView(pTransform.get(), bounds) == VG_TRUE)
+			auto isHasBounds = dynamic_cast<SceneType::VisualObjectType::MeshDimType *>(pMesh.get())->getIsHasBounds();
+			if (isHasBounds == VG_FALSE)
 			{
 				validVisualObjects[validVisualObjectCount++] = pVisualObject;
+			}
+			else 
+			{
+			    auto bounds = dynamic_cast<SceneType::VisualObjectType::MeshDimType *>(pMesh.get())->getBounds();
+			    auto pTransform = pVisualObject->getTransform();
+			    if(m_pCamera->isInView(pTransform.get(), bounds) == VG_TRUE)
+			    {
+			    	validVisualObjects[validVisualObjectCount++] = pVisualObject;
+			    }
 			}
 		}
 

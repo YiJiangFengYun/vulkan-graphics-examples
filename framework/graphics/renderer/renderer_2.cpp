@@ -193,10 +193,17 @@ namespace vg
 			pVisualObjectOfChild = pScene->getVisualObjectWithTransform(pChild);
 			//Filter obj out of camera view.
 			auto pMeshOfChild = pVisualObjectOfChild->getMesh();
-			auto boundsOfChild = dynamic_cast<Mesh<MeshDimType::SPACE_2> *>(pMeshOfChild.get())->getBounds();
-			if (pCamera->isInView(pChild, boundsOfChild) == VG_TRUE)
+			auto isHasBoundsOfChild = dynamic_cast<Mesh<MeshDimType::SPACE_2> *>(pMeshOfChild.get())->getIsHasBounds();
+			if (isHasBoundsOfChild == VG_FALSE) 
 			{
 				arrPVObjs[PVObjIndex++] = pVisualObjectOfChild;
+			}
+			else {
+			    auto boundsOfChild = dynamic_cast<Mesh<MeshDimType::SPACE_2> *>(pMeshOfChild.get())->getBounds();
+			    if (pCamera->isInView(pChild, boundsOfChild) == VG_TRUE)
+			    {
+			    	arrPVObjs[PVObjIndex++] = pVisualObjectOfChild;
+			    }
 			}
 		}
 	}

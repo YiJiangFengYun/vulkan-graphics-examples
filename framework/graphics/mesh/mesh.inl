@@ -130,6 +130,12 @@ namespace vg
 		_setData<Mesh<meshDimType>::ARRAY_DATA_TYPE>(VG_VERTEX_TANGENT_NAME, tangents, VG_VERTEX_BINDING_PRIORITY_TANGENT);
 	}
 
+    template <MeshDimType meshDimType>
+	Bool32 DimSepMesh<meshDimType>::getIsHasBounds()
+	{
+		return VG_TRUE;
+	}
+
 	template <MeshDimType meshDimType>
 	fd::Bounds<typename DimSepMesh<meshDimType>::PointType> DimSepMesh<meshDimType>::getBounds()
 	{
@@ -171,4 +177,32 @@ namespace vg
 		}
 		m_bounds.setMinMax(minPos, maxPos);
 	}
+
+    // template <MeshDimType meshDimType>
+	// DimSimpleMesh<meshDimType>::DimSimpleMesh()
+	//     : SimpleMesh()
+	// 	, 
+	// {
+
+	// }
+
+	// 	//position
+	// 	const ArrayValueType &getPositions() const override;
+
+	// 	void setPositions(const ArrayValueType &vertices) override;
+
+	// 	//normal
+	// 	const ArrayValueType &getNormals() const override;
+
+	// 	void setNormals(const ArrayValueType &normals) override;
+
+	// 	//tangent
+	// 	const ArrayValueType &getTangents() const override;
+
+	// 	void setTangents(const ArrayValueType &tangents) override;
+
+	// 	void apply(Bool32 makeUnreadable) override;
+
+	// 	/*The bounding volume of the mesh*/
+	// 	fd::Bounds<PointType> getBounds() override;
 } //namespace kgs

@@ -16,9 +16,13 @@ namespace vg
 	}
 
 	ContentMesh::ContentMesh()
-	    : BaseMesh()
-		, m_pVertexData(new VertexData())
+	    : m_pVertexData(new VertexData())
 		, m_pIndexData(new IndexData())
+	{
+
+	}
+
+	ContentMesh::~ContentMesh()
 	{
 
 	}

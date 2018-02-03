@@ -69,10 +69,11 @@ namespace vg
 	};
 	
 
-	class ContentMesh : public BaseMesh
+	class ContentMesh
 	{
 	public:
         ContentMesh();
+		virtual ~ContentMesh();
 		const std::shared_ptr<VertexData> &getVertexData() const;
 		const std::shared_ptr<IndexData> &getIndexData() const;
 		virtual uint32_t getSubMeshCount() const;

@@ -238,7 +238,7 @@ namespace vg
     
 		    //create index buffer
             // if old buffer size is same as required buffer size, we don't to create a new buffer for it.
-            if (m_bufferSize != bufferSize) {
+            if (m_bufferSize < bufferSize) {
                 m_bufferSize = bufferSize;
 		        createInfo.usage = vk::BufferUsageFlagBits::eTransferDst | vk::BufferUsageFlagBits::eIndexBuffer;
 		        m_pBuffer = fd::createBuffer(pDevice, createInfo);
@@ -265,7 +265,7 @@ namespace vg
         {
              //create index buffer
             // if old buffer size is same as required buffer size, we don't to create a new buffer for it.
-            if (m_bufferSize != bufferSize)
+            if (m_bufferSize < bufferSize)
             {
                 m_bufferSize = bufferSize;
                 //create staging buffer.

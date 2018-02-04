@@ -89,6 +89,13 @@ namespace vg
 	}
 
 	template <MeshDimType meshDimType>
+	DimSepMesh<meshDimType>::DimSepMesh(MemoryPropertyFlags bufferMemoryPropertyFlags) 
+		: SepMesh(bufferMemoryPropertyFlags)
+		, Mesh<meshDimType>()
+	{
+	}
+
+	template <MeshDimType meshDimType>
 	DimSepMesh<meshDimType>::~DimSepMesh()
 	{
 
@@ -181,6 +188,14 @@ namespace vg
     template <MeshDimType meshDimType>
 	DimSimpleMesh<meshDimType>::DimSimpleMesh()
 	    : SimpleMesh()
+		, Mesh<meshDimType>()
+	{
+
+	}
+
+	template <MeshDimType meshDimType>
+	DimSimpleMesh<meshDimType>::DimSimpleMesh(MemoryPropertyFlags bufferMemoryPropertyFlags)
+	    : SimpleMesh(bufferMemoryPropertyFlags)
 		, Mesh<meshDimType>()
 	{
 

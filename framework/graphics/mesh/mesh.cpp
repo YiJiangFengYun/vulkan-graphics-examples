@@ -22,6 +22,13 @@ namespace vg
 
 	}
 
+	ContentMesh::ContentMesh(MemoryPropertyFlags bufferMemoryPropertyFlags)
+	    : m_pVertexData(new VertexData(bufferMemoryPropertyFlags))
+		, m_pIndexData(new IndexData(bufferMemoryPropertyFlags))
+	{
+
+	}
+
 	ContentMesh::~ContentMesh()
 	{
 
@@ -94,6 +101,15 @@ namespace vg
 
 	SepMesh::SepMesh()
 		: ContentMesh()
+		, m_multipliedColor(COLOR_WHITE) //default multiplied color should be (1, 1, 1, 1)
+		, m_applied(VG_FALSE)
+	{
+		_createMeshData();
+		setSubMeshCount(1u);
+	}
+
+	SepMesh::SepMesh(MemoryPropertyFlags bufferMemoryPropertyFlags)
+		: ContentMesh(bufferMemoryPropertyFlags)
 		, m_multipliedColor(COLOR_WHITE) //default multiplied color should be (1, 1, 1, 1)
 		, m_applied(VG_FALSE)
 	{
@@ -341,6 +357,12 @@ namespace vg
 
 	SimpleMesh::SimpleMesh()
 	    : ContentMesh()
+	{
+		
+	}
+
+	SimpleMesh::SimpleMesh(MemoryPropertyFlags bufferMemoryPropertyFlags)
+	    : ContentMesh(bufferMemoryPropertyFlags)
 	{
 		
 	}

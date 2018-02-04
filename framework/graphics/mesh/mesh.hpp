@@ -10,6 +10,7 @@
 #include "graphics/module.hpp"
 #include "graphics/util/find_memory.hpp"
 #include "graphics/util/single_time_command.hpp"
+#include "graphics/vertex_data/vertex_data_option.hpp"
 #include "graphics/vertex_data/vertex_data.hpp"
 #include "graphics/vertex_data/index_data.hpp"
 #include "graphics/mesh/mesh_option.hpp"
@@ -56,6 +57,7 @@ namespace vg
 	{
 	public:
         ContentMesh();
+        ContentMesh(MemoryPropertyFlags bufferMemoryPropertyFlags);
 		virtual ~ContentMesh();
 		const std::shared_ptr<VertexData> &getVertexData() const;
 		const std::shared_ptr<IndexData> &getIndexData() const;
@@ -99,6 +101,7 @@ namespace vg
 		};
 
 		SepMesh();
+		SepMesh(MemoryPropertyFlags bufferMemoryPropertyFlags);
 
 		~SepMesh();
 
@@ -202,6 +205,7 @@ namespace vg
 		typedef typename MeshData::DataTypeInfo<ARRAY_DATA_TYPE>::ValueType ArrayValueType;
 
 		DimSepMesh();
+		DimSepMesh(MemoryPropertyFlags bufferMemoryPropertyFlags);
 
 		virtual ~DimSepMesh();
 
@@ -238,6 +242,7 @@ namespace vg
 	{
 	public:
 	    SimpleMesh();
+	    SimpleMesh(MemoryPropertyFlags bufferMemoryPropertyFlags);
 	protected:
 	};
 
@@ -246,6 +251,7 @@ namespace vg
 	{
 	public: 
         DimSimpleMesh();
+        DimSimpleMesh(MemoryPropertyFlags bufferMemoryPropertyFlags);
 	    virtual Bool32 getIsHasBounds() override;
 		/*The bounding volume of the mesh*/
 		fd::Bounds<PointType> getBounds() override;

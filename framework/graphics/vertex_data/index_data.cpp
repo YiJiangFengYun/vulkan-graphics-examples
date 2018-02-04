@@ -8,6 +8,7 @@ namespace vg
 {
     IndexData::IndexData()
         : Base(BaseType::INDEX_DATA)
+        , m_bufferMemoryPropertyFlags()
         , m_subDatas()
         , m_subDataCount()
         , m_bufferSize()
@@ -18,7 +19,31 @@ namespace vg
         , m_pMemory(nullptr)
         , m_pipelineStateID()
     {
+         //default is device local.
+        if (! m_bufferMemoryPropertyFlags) 
+        {
+            m_bufferMemoryPropertyFlags |= MemoryPropertyFlagBits::DEVICE_LOCAL;
+        }
+    }
 
+    IndexData::IndexData(MemoryPropertyFlags bufferMemoryPropertyFlags)
+        : Base(BaseType::INDEX_DATA)
+        , m_bufferMemoryPropertyFlags()
+        , m_subDatas()
+        , m_subDataCount()
+        , m_bufferSize()
+        , m_pBuffer()
+        , m_bufferMemorySize()
+        , m_pBufferMemory()
+        , m_memorySize()
+        , m_pMemory(nullptr)
+        , m_pipelineStateID()
+    {
+        //default is device local.
+        if (! m_bufferMemoryPropertyFlags) 
+        {
+            m_bufferMemoryPropertyFlags |= MemoryPropertyFlagBits::DEVICE_LOCAL;
+        }
     }
 
     IndexData::~IndexData()
@@ -65,7 +90,14 @@ namespace vg
 
     const void *IndexData::getMemory() const
     {
-        return m_pMemory;
+        if (_isDeviceMemoryLocal() == VG_TRUE)
+        {
+            return m_pMemory;            
+        }
+        else
+        {
+            return m_pMmemoryForHostVisible;
+        }
     }
 
     IndexData::PipelineStateID IndexData::getPipelineStateID() const
@@ -147,6 +179,8 @@ namespace vg
 
     void IndexData::updateBuffer(const void *memory, uint32_t size, Bool32 cacheMemory)
     {
+        //Caching memory when memory is device local.
+        cacheMemory = cacheMemory && _isDeviceMemoryLocal();
         if (m_pMemory != nullptr && (m_memorySize != size || ! cacheMemory)) {
             free(m_pMemory);
             m_pMemory = nullptr;
@@ -163,62 +197,102 @@ namespace vg
 
         _createBuffer(memory, size);
     }
+
+    Bool32 IndexData::_isDeviceMemoryLocal() const
+    {
+        return (m_bufferMemoryPropertyFlags & MemoryPropertyFlagBits::DEVICE_LOCAL) == MemoryPropertyFlagBits::DEVICE_LOCAL;
+    }
     
     void IndexData::_createBuffer(const void *pMemory, uint32_t memorySize)
     {
 		auto bufferSize = memorySize;
-		//create staging buffer.
-		vk::BufferCreateInfo createInfo = {
-			vk::BufferCreateFlags(),
-			bufferSize,
-			vk::BufferUsageFlagBits::eTransferSrc,
-			vk::SharingMode::eExclusive
-		};
-
-		auto pPhysicalDevice = pApp->getPhysicalDevice();
-		auto pDevice = pApp->getDevice();
-		auto pStagingBuffer = fd::createBuffer(pDevice, createInfo);
-
-		vk::MemoryRequirements memReqs = pDevice->getBufferMemoryRequirements(*pStagingBuffer);
-		vk::MemoryAllocateInfo allocateInfo = {
-			memReqs.size,
-			vg::findMemoryType(pPhysicalDevice, memReqs.memoryTypeBits, vk::MemoryPropertyFlagBits::eHostVisible | vk::MemoryPropertyFlagBits::eHostCoherent)
-		};
-
-		auto pStagingBufferMemory = fd::allocateMemory(pDevice, allocateInfo);
-
-		pDevice->bindBufferMemory(*pStagingBuffer, *pStagingBufferMemory, 0u);
-
-		void* data;
-		pDevice->mapMemory(*pStagingBufferMemory, 0u, static_cast<vk::DeviceSize>(bufferSize), vk::MemoryMapFlags(), &data);
-		uint32_t offset = 0u;
-        memcpy(data, pMemory, bufferSize);
-		pDevice->unmapMemory(*pStagingBufferMemory);
-
-		//create vertex buffer
-        // if old buffer size is same as required buffer size, we don't to create a new buffer for it.
-        if (m_bufferSize != bufferSize) {
-            m_bufferSize = bufferSize;
-		    createInfo.usage = vk::BufferUsageFlagBits::eTransferDst | vk::BufferUsageFlagBits::eIndexBuffer;
-		    m_pBuffer = fd::createBuffer(pDevice, createInfo);
-		    memReqs = pDevice->getBufferMemoryRequirements(*m_pBuffer);
-            m_bufferMemorySize = static_cast<uint32_t>(memReqs.size);        
-		    allocateInfo.allocationSize = memReqs.size;
-		    allocateInfo.memoryTypeIndex = vg::findMemoryType(pPhysicalDevice, memReqs.memoryTypeBits, vk::MemoryPropertyFlagBits::eDeviceLocal);
-		    m_pBufferMemory = fd::allocateMemory(pDevice, allocateInfo);
-		    pDevice->bindBufferMemory(*m_pBuffer, *m_pBufferMemory, 0u);
+        if (_isDeviceMemoryLocal() == VG_TRUE)
+        {
+            //create staging buffer.
+		    vk::BufferCreateInfo createInfo = {
+		    	vk::BufferCreateFlags(),
+		    	bufferSize,
+		    	vk::BufferUsageFlagBits::eTransferSrc,
+		    	vk::SharingMode::eExclusive
+		    };
+    
+		    auto pPhysicalDevice = pApp->getPhysicalDevice();
+		    auto pDevice = pApp->getDevice();
+		    auto pStagingBuffer = fd::createBuffer(pDevice, createInfo);
+    
+		    vk::MemoryRequirements memReqs = pDevice->getBufferMemoryRequirements(*pStagingBuffer);
+		    vk::MemoryAllocateInfo allocateInfo = {
+		    	memReqs.size,
+		    	vg::findMemoryType(pPhysicalDevice, memReqs.memoryTypeBits, vk::MemoryPropertyFlagBits::eHostVisible | vk::MemoryPropertyFlagBits::eHostCoherent)
+		    };
+    
+		    auto pStagingBufferMemory = fd::allocateMemory(pDevice, allocateInfo);
+    
+		    pDevice->bindBufferMemory(*pStagingBuffer, *pStagingBufferMemory, 0u);
+    
+		    void* data;
+		    pDevice->mapMemory(*pStagingBufferMemory, 0u, static_cast<vk::DeviceSize>(bufferSize), vk::MemoryMapFlags(), &data);
+		    uint32_t offset = 0u;
+            memcpy(data, pMemory, bufferSize);
+		    pDevice->unmapMemory(*pStagingBufferMemory);
+    
+		    //create index buffer
+            // if old buffer size is same as required buffer size, we don't to create a new buffer for it.
+            if (m_bufferSize != bufferSize) {
+                m_bufferSize = bufferSize;
+		        createInfo.usage = vk::BufferUsageFlagBits::eTransferDst | vk::BufferUsageFlagBits::eIndexBuffer;
+		        m_pBuffer = fd::createBuffer(pDevice, createInfo);
+		        memReqs = pDevice->getBufferMemoryRequirements(*m_pBuffer);
+                m_bufferMemorySize = static_cast<uint32_t>(memReqs.size);        
+		        allocateInfo.allocationSize = memReqs.size;
+		        allocateInfo.memoryTypeIndex = vg::findMemoryType(pPhysicalDevice, memReqs.memoryTypeBits, vk::MemoryPropertyFlagBits::eDeviceLocal);
+		        m_pBufferMemory = fd::allocateMemory(pDevice, allocateInfo);
+		        pDevice->bindBufferMemory(*m_pBuffer, *m_pBufferMemory, 0u);
+            }
+    
+		    //copy buffer from staging buffer to vertex buffer.
+		    auto pCommandBuffer = beginSingleTimeCommands();
+    
+		    vk::BufferCopy copyRegin = {};
+		    copyRegin.srcOffset = 0;
+		    copyRegin.dstOffset = 0;
+		    copyRegin.size = bufferSize;
+		    pCommandBuffer->copyBuffer(*pStagingBuffer, *m_pBuffer, copyRegin);
+    
+		    endSingleTimeCommands(pCommandBuffer);
         }
-
-		//copy buffer from staging buffer to vertex buffer.
-		auto pCommandBuffer = beginSingleTimeCommands();
-
-		vk::BufferCopy copyRegin = {};
-		copyRegin.srcOffset = 0;
-		copyRegin.dstOffset = 0;
-		copyRegin.size = bufferSize;
-		pCommandBuffer->copyBuffer(*pStagingBuffer, *m_pBuffer, copyRegin);
-
-		endSingleTimeCommands(pCommandBuffer);
+		else
+        {
+             //create index buffer
+            // if old buffer size is same as required buffer size, we don't to create a new buffer for it.
+            if (m_bufferSize != bufferSize)
+            {
+                m_bufferSize = bufferSize;
+                //create staging buffer.
+		        vk::BufferCreateInfo createInfo = {
+		        	vk::BufferCreateFlags(),
+		        	bufferSize,
+		        	vk::BufferUsageFlagBits::eIndexBuffer,
+		        	vk::SharingMode::eExclusive
+		        };
+        
+		        auto pPhysicalDevice = pApp->getPhysicalDevice();
+		        auto pDevice = pApp->getDevice();
+		        m_pBuffer = fd::createBuffer(pDevice, createInfo);
+                vk::MemoryRequirements memReqs = pDevice->getBufferMemoryRequirements(*m_pBuffer);
+		        vk::MemoryAllocateInfo allocateInfo = {
+		        	memReqs.size,
+		        	vg::findMemoryType(pPhysicalDevice, memReqs.memoryTypeBits, vk::MemoryPropertyFlagBits::eHostVisible | vk::MemoryPropertyFlagBits::eHostCoherent)
+		        };
+        
+		        m_pBufferMemory = fd::allocateMemory(pDevice, allocateInfo);
+        
+		        pDevice->bindBufferMemory(*m_pBuffer, *m_pBufferMemory, 0u);
+        
+		        pDevice->mapMemory(*m_pBufferMemory, 0u, static_cast<vk::DeviceSize>(bufferSize), vk::MemoryMapFlags(), &m_pMmemoryForHostVisible);
+            }
+            memcpy(m_pMmemoryForHostVisible, pMemory, bufferSize);
+        }
     }
 
     void IndexData::_updatePipelineStateID()

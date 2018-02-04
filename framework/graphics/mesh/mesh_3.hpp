@@ -7,6 +7,7 @@ namespace vg
 	{
 	public:
 		DimSepMesh3();
+		DimSepMesh3(MemoryPropertyFlags bufferMemoryPropertyFlags);
 	private:
 
 	};
@@ -15,6 +16,7 @@ namespace vg
 	{
 	public:
 		DimSimpleMesh3();
+		DimSimpleMesh3(MemoryPropertyFlags bufferMemoryPropertyFlags);
 	private:
 
 	};

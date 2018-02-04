@@ -3,6 +3,7 @@
 
 #include <foundation/foundation.hpp>
 #include "graphics/global.hpp"
+#include "graphics/vertex_data/vertex_data_option.hpp"
 
 namespace vg 
 {
@@ -27,6 +28,7 @@ namespace vg
         const void *getMemory() const;
 
         VertexData();
+        VertexData(MemoryPropertyFlags bufferMemoryPropertyFlags);
 
         ~VertexData();
 
@@ -77,6 +79,7 @@ namespace vg
         
         PipelineStateID getPipelineStateID() const;
     private:
+        MemoryPropertyFlags m_bufferMemoryPropertyFlags;
         PipelineStateID m_pipelineStateID;
         std::vector<SubVertexData> m_subDatas;
         uint32_t m_subDataCount;
@@ -86,7 +89,9 @@ namespace vg
         std::shared_ptr<vk::DeviceMemory> m_pBufferMemory;
         uint32_t m_memorySize;
         void *m_pMemory;
+        void *m_pMmemoryForHostVisible;
 
+        Bool32 _isDeviceMemoryLocal() const;
         void _createBuffer(const void *pMemory, uint32_t memorySize);
         void _updatePipelineStateID();
         Bool32 _isEqual(const std::vector<VertexData::SubVertexData> &subDatas1, 

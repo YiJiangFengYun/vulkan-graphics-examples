@@ -123,9 +123,29 @@ namespace vgim {
 
         pVertexData->updateVertexCount(vertexCount);
         pVertexData->updateBufferSize(vertexSize);
-
         pIndexData->updateIndexCount(indexCount);
         pIndexData->updateBufferSize(indexSize);
+
+        std::vector<vg::MemorySlice> vertexSlices(drawData->CmdListsCount);
+        std::vector<vg::MemorySlice> indexSlices(drawData->CmdListsCount);
+        uint32_t vertexOffset;
+        uint32_t indexOffset;
+        for (int i = 0; i < drawData->CmdListsCount; ++i)
+        {
+            const ImDrawList* cmdList = drawData->CmdLists[i];
+            vertexSlices[i].offset = vertexOffset;
+            vertexSlices[i].size = static_cast<uint32_t>(cmdList->VtxBuffer.Size) * static_cast<uint32_t>(sizeof(ImDrawVert));
+            vertexSlices[i].pMemory = cmdList->VtxBuffer.Data;
+
+            indexSlices[i].offset = indexOffset;
+            indexSlices[i].size = static_cast<uint32_t>(cmdList->IdxBuffer.Size) * static_cast<uint32_t>(sizeof(ImDrawVert));
+            indexSlices[i].pMemory = cmdList->IdxBuffer.Data;
+
+            vertexOffset += vertexSlices[i].size;
+            indexOffset += vertexSlices[i].size;
+        }
+        pVertexData->updateBuffer(vertexSlices, vertexSize, VG_FALSE);
+        pIndexData->updateBuffer(indexSlices, indexSize, VG_FALSE);
         
     }
 
@@ -148,11 +168,11 @@ namespace vgim {
      {
         if (m_dimType == DimType::SPACE_2) 
         {
-           m_pMesh = static_cast<std::shared_ptr<vg::SimpleMesh>>(new vg::DimSimpleMesh2());
+           m_pMesh = static_cast<std::shared_ptr<vg::SimpleMesh>>(new vg::DimSimpleMesh2(vg::MemoryPropertyFlagBits::HOST_VISIBLE));
         }
         else
         {
-           m_pMesh = static_cast<std::shared_ptr<vg::SimpleMesh>>(new vg::DimSimpleMesh3());            
+           m_pMesh = static_cast<std::shared_ptr<vg::SimpleMesh>>(new vg::DimSimpleMesh3(vg::MemoryPropertyFlagBits::HOST_VISIBLE));            
         }
 
         const auto& pVertexData = m_pMesh->getVertexData();

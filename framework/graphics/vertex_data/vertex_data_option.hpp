@@ -12,6 +12,13 @@ namespace vg
   };
 
   using MemoryPropertyFlags = fd::Flags<MemoryPropertyFlagBits, VkMemoryPropertyFlags>;
+
+  struct MemorySlice
+  {
+    const void *pMemory;
+    uint32_t offset;
+    uint32_t size;
+  };
 } //vg
 
 #endif //VG_VERTEX_DATA_OPTION_HPP

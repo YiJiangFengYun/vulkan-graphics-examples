@@ -179,6 +179,18 @@ namespace vg
 
     void IndexData::updateBuffer(const void *memory, uint32_t size, Bool32 cacheMemory)
     {
+        MemorySlice slice;
+        slice.offset = 0u;
+        slice.size = size;
+        slice.pMemory = memory;
+        updateBuffer(slice, size, cacheMemory);
+    }
+
+    void IndexData::updateBuffer(fd::ArrayProxy<MemorySlice> memories
+           , uint32_t size
+           , Bool32 cacheMemory
+           )
+    {
         //Caching memory when memory is device local.
         cacheMemory = cacheMemory && _isDeviceMemoryLocal();
         if (m_pMemory != nullptr && (m_memorySize != size || ! cacheMemory)) {
@@ -192,10 +204,17 @@ namespace vg
                 m_pMemory = malloc(size);
                 m_memorySize = size;                
             }                       
-            memcpy(m_pMemory, memory, size);
+            uint32_t count = memories.size();
+            uint32_t offset = 0;
+            uint32_t size = 0;
+            for (uint32_t i = 0; i < count; ++i) {
+                offset = (*(memories.data() + i)).offset;
+                size = (*(memories.data() + i)).size;
+                memcpy(((char*)m_pMemory + offset), (*(memories.data() + i)).pMemory, size);
+            }     
         }
 
-        _createBuffer(memory, size);
+        _createBuffer(memories, size);
     }
 
     Bool32 IndexData::_isDeviceMemoryLocal() const
@@ -203,7 +222,7 @@ namespace vg
         return (m_bufferMemoryPropertyFlags & MemoryPropertyFlagBits::DEVICE_LOCAL) == MemoryPropertyFlagBits::DEVICE_LOCAL;
     }
     
-    void IndexData::_createBuffer(const void *pMemory, uint32_t memorySize)
+    void IndexData::_createBuffer(fd::ArrayProxy<MemorySlice> memories, uint32_t memorySize)
     {
 		auto bufferSize = memorySize;
         if (_isDeviceMemoryLocal() == VG_TRUE)
@@ -223,7 +242,7 @@ namespace vg
 		    vk::MemoryRequirements memReqs = pDevice->getBufferMemoryRequirements(*pStagingBuffer);
 		    vk::MemoryAllocateInfo allocateInfo = {
 		    	memReqs.size,
-		    	vg::findMemoryType(pPhysicalDevice, memReqs.memoryTypeBits, vk::MemoryPropertyFlagBits::eHostVisible | vk::MemoryPropertyFlagBits::eHostCoherent)
+		    	vg::findMemoryType(pPhysicalDevice, memReqs.memoryTypeBits, vk::MemoryPropertyFlagBits::eHostVisible)
 		    };
     
 		    auto pStagingBufferMemory = fd::allocateMemory(pDevice, allocateInfo);
@@ -232,8 +251,19 @@ namespace vg
     
 		    void* data;
 		    pDevice->mapMemory(*pStagingBufferMemory, 0u, static_cast<vk::DeviceSize>(bufferSize), vk::MemoryMapFlags(), &data);
-		    uint32_t offset = 0u;
-            memcpy(data, pMemory, bufferSize);
+            uint32_t count = memories.size();
+            uint32_t offset = 0;
+            uint32_t size = 0;
+            std::vector<vk::MappedMemoryRange> ranges(count);
+            for (uint32_t i = 0; i < count; ++i) {
+                offset = (*(memories.data() + i)).offset;
+                size = (*(memories.data() + i)).size;
+                memcpy(((char*)data + offset), (*(memories.data() + i)).pMemory, size);
+                ranges[i].memory = *pStagingBufferMemory;
+                ranges[i].offset = offset;
+                ranges[i].size = size;
+            }
+            pDevice->flushMappedMemoryRanges(ranges);
 		    pDevice->unmapMemory(*pStagingBufferMemory);
     
 		    //create index buffer
@@ -249,17 +279,24 @@ namespace vg
 		        m_pBufferMemory = fd::allocateMemory(pDevice, allocateInfo);
 		        pDevice->bindBufferMemory(*m_pBuffer, *m_pBufferMemory, 0u);
             }
-    
-		    //copy buffer from staging buffer to vertex buffer.
-		    auto pCommandBuffer = beginSingleTimeCommands();
-    
-		    vk::BufferCopy copyRegin = {};
-		    copyRegin.srcOffset = 0;
-		    copyRegin.dstOffset = 0;
-		    copyRegin.size = bufferSize;
-		    pCommandBuffer->copyBuffer(*pStagingBuffer, *m_pBuffer, copyRegin);
-    
-		    endSingleTimeCommands(pCommandBuffer);
+            
+            {
+                uint32_t offset = 0u;            
+		        //copy buffer from staging buffer to vertex buffer.
+		        auto pCommandBuffer = beginSingleTimeCommands();
+                
+                std::vector<vk::BufferCopy> regions(count);
+                for (uint32_t i = 0; i < count; ++i)
+                {
+                    regions[i].dstOffset = ranges[i].offset;
+                    regions[i].srcOffset = ranges[i].offset;                    
+                    regions[i].size = ranges[i].size;
+                }
+
+		        pCommandBuffer->copyBuffer(*pStagingBuffer, *m_pBuffer, regions);
+        
+		        endSingleTimeCommands(pCommandBuffer);
+            }
         }
 		else
         {
@@ -282,7 +319,7 @@ namespace vg
                 vk::MemoryRequirements memReqs = pDevice->getBufferMemoryRequirements(*m_pBuffer);
 		        vk::MemoryAllocateInfo allocateInfo = {
 		        	memReqs.size,
-		        	vg::findMemoryType(pPhysicalDevice, memReqs.memoryTypeBits, vk::MemoryPropertyFlagBits::eHostVisible | vk::MemoryPropertyFlagBits::eHostCoherent)
+		        	vg::findMemoryType(pPhysicalDevice, memReqs.memoryTypeBits, vk::MemoryPropertyFlagBits::eHostVisible)
 		        };
         
 		        m_pBufferMemory = fd::allocateMemory(pDevice, allocateInfo);
@@ -291,7 +328,20 @@ namespace vg
         
 		        pDevice->mapMemory(*m_pBufferMemory, 0u, static_cast<vk::DeviceSize>(bufferSize), vk::MemoryMapFlags(), &m_pMmemoryForHostVisible);
             }
-            memcpy(m_pMmemoryForHostVisible, pMemory, bufferSize);
+            uint32_t count = memories.size();
+            uint32_t offset = 0;
+            uint32_t size = 0;
+            std::vector<vk::MappedMemoryRange> ranges(count);
+            for (uint32_t i = 0; i < count; ++i) {
+                offset = (*(memories.data() + i)).offset;
+                size = (*(memories.data() + i)).size;
+                memcpy(((char*)m_pMmemoryForHostVisible + offset), (*(memories.data() + i)).pMemory, size);
+                ranges[i].memory = *m_pBufferMemory;
+                ranges[i].offset = offset;
+                ranges[i].size = size;
+            }
+		    auto pDevice = pApp->getDevice();
+            pDevice->flushMappedMemoryRanges(ranges);
         }
     }
 

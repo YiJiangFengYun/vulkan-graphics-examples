@@ -60,6 +60,10 @@ namespace vg {
         void updateBufferSize(fd::ArrayProxy<uint32_t> bufferSizes);
 
         void updateBuffer(const void *memory, uint32_t size, Bool32 cacheMemory);
+        void updateBuffer(fd::ArrayProxy<MemorySlice> memories
+           , uint32_t size
+           , Bool32 cacheMemory
+           );
 
         template<typename IndexType>
         IndexType getIndex(uint32_t index) const;
@@ -82,7 +86,7 @@ namespace vg {
         void *m_pMmemoryForHostVisible;
         
         Bool32 _isDeviceMemoryLocal() const;
-        void _createBuffer(const void *pMemory, uint32_t memorySize);
+        void _createBuffer(fd::ArrayProxy<MemorySlice> memories, uint32_t memorySize);
         void _updatePipelineStateID();
         Bool32 _isEqual(std::vector<SubIndexData> subDatas1, std::vector<SubIndexData> subDatas2);
      };

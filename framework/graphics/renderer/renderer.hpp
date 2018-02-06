@@ -27,7 +27,7 @@ namespace vg
 
 		struct RenderInfo {
 			const SceneAndCamera *pSceneAndCamera;
-			uint32_t countSceneAndCamera;
+			uint32_t sceneAndCameraCount;
 			uint32_t waitSemaphoreCount;
 			const vk::Semaphore* pWaitSemaphores;
 		};
@@ -49,14 +49,14 @@ namespace vg
 
 		~Renderer();
 
-		Bool32 isValidForRender();
+		Bool32 isValidForRender() const;
 
 		void render(const RenderInfo &info, RenderResultInfo &resultInfo);
 
-		uint32_t getFramebufferWidth();
-		uint32_t getFramebufferHeight();
-		vk::Format getColorImageFormat();
-		vk::Format getDepthStencilImageFormat();
+		uint32_t getFramebufferWidth() const ;
+		uint32_t getFramebufferHeight() const;
+		vk::Format getColorImageFormat() const;
+		vk::Format getDepthStencilImageFormat() const;
 
 		const Color &getClearValueColor() const;
 		void setClearValueColor(Color color);
@@ -96,7 +96,7 @@ namespace vg
 		virtual void _preRender();
 		virtual void _render(const RenderInfo &info, RenderResultInfo &resultInfo);
 		virtual void _postRender();
-		virtual Bool32 _isValidForRender();
+		virtual Bool32 _isValidForRender() const;
 
 		void _createRenderPass();
 		void _createDepthStencilTex();

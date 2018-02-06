@@ -142,7 +142,7 @@ namespace testTriangle
 		sceneAndCamera.pScene = m_pScene.get();
 		sceneAndCamera.pCamera = m_pCamera.get();
 		auto myInfo = info;
-		myInfo.countSceneAndCamera = 1u;
+		myInfo.sceneAndCameraCount = 1u;
 		myInfo.pSceneAndCamera = &sceneAndCamera;
 		pRenderer->render(myInfo, resultInfo);
 	}

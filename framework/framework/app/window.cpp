@@ -290,7 +290,7 @@ namespace vgf {
 			}
 
 			vg::Renderer::RenderInfo info;
-			info.countSceneAndCamera = 0;
+			info.sceneAndCameraCount = 0;
 			info.pSceneAndCamera = nullptr;
 			info.waitSemaphoreCount = 1u;
 			info.pWaitSemaphores = m_pImageAvailableSemaphore.get();

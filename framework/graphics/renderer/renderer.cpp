@@ -54,7 +54,7 @@ namespace vg
 		//_freeGraphicsQueue();
 	}
 
-	Bool32 Renderer::isValidForRender()
+	Bool32 Renderer::isValidForRender() const
 	{
 		return _isValidForRender();
 	}
@@ -67,22 +67,22 @@ namespace vg
 		_postRender();
 	}
 
-	uint32_t Renderer::getFramebufferWidth()
+	uint32_t Renderer::getFramebufferWidth() const
 	{
 		return m_framebufferWidth;
 	}
 
-	uint32_t Renderer::getFramebufferHeight()
+	uint32_t Renderer::getFramebufferHeight() const
 	{
 		return m_framebufferHeight;
 	}
 
-	vk::Format Renderer::getColorImageFormat()
+	vk::Format Renderer::getColorImageFormat() const
 	{
 		return m_colorImageFormat;
 	}
 
-	vk::Format Renderer::getDepthStencilImageFormat()
+	vk::Format Renderer::getDepthStencilImageFormat() const
 	{
 		return m_depthStencilImageFormat;
 	}
@@ -146,7 +146,7 @@ namespace vg
 		m_renderArea = area;
 	}
 
-	Bool32 Renderer::_isValidForRender()
+	Bool32 Renderer::_isValidForRender() const
 	{
 		return VG_TRUE;
 	}
@@ -160,7 +160,7 @@ namespace vg
 		, RenderResultInfo &resultInfo)
 	{
 		resultInfo.signalSemaphoreCount = 0u;
-		uint32_t count = info.countSceneAndCamera;
+		uint32_t count = info.sceneAndCameraCount;
 		for (uint32_t i = 0; i < count; ++i)
 		{
 			resultInfo.isRendered = VG_TRUE;

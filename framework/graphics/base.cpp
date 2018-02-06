@@ -10,6 +10,11 @@ namespace vg
 		
 	}
 
+	Base::~Base()
+	{
+		
+	}
+
 	BaseType Base::getBaseType()
 	{
 		return m_baseType;

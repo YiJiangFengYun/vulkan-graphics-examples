@@ -13,11 +13,16 @@ namespace vgim {
 		RANGE_SIZE = (END_RANGE - BEGIN_RANGE + 1)
 	};
 
+	
+
 	extern Bool32 isInited;
 	extern void moduleCreate(DimType dimensionType);
 	extern void moduleDestory();
 	extern const std::shared_ptr<vg::Material> getMaterial();
 	extern const std::shared_ptr<vg::SimpleMesh> getMesh();
+	extern const std::shared_ptr<vg::VisualObject2> getUIObject();
+	extern const std::shared_ptr<vg::CameraOP2> getCamera();
+	extern const std::shared_ptr<vg::Scene2> getScene();
 	extern void updateFromImGUI();
 } //vgim
 #endif //VG_IM_MODULE_H

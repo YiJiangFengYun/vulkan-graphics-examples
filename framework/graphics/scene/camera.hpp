@@ -8,7 +8,8 @@ namespace vg
 	class BaseCamera
 	{
 	public:
-
+	    BaseCamera();
+		virtual ~BaseCamera();
 	protected:
 
 	};
@@ -24,9 +25,9 @@ namespace vg
 			m_objectType = ObjectType::CAMERA;
 		}
 
-		virtual typename TransformType::MatrixType getProjMatrix() = 0;
+		virtual typename TransformType::MatrixType getProjMatrix() const = 0;
 
-		virtual Bool32 isInView(Transform<SPACE_TYPE> *pTransform, BoundsType bounds) = 0;
+		virtual Bool32 isInView(Transform<SPACE_TYPE> *pTransform, BoundsType bounds) const = 0;
 	};
 } //namespace kgs
 

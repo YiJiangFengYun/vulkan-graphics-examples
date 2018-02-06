@@ -24,20 +24,20 @@ namespace fd
 
 		Ray& operator =(const Ray<ValueType>& target);
 
-		ValueType getOrigin();
+		ValueType getOrigin() const;
 
 		void setOrigin(ValueType origin);
 
-		ValueType getDirection();
+		ValueType getDirection() const;
 
 		void setDirection(ValueType direction);
 
-		ValueType getInvDir();
+		ValueType getInvDir() const;
 
-		ValueType getSigns();
+		ValueType getSigns() const;
 
 		/*Returns a point at distance units along the ray.*/
-		ValueType getPoint(vec_value_type distance);
+		ValueType getPoint(vec_value_type distance) const;
 
 
 	private:
@@ -61,15 +61,17 @@ namespace fd
 		typedef typename ValueType::value_type vec_value_type;
 		Bounds();
 
+		~Bounds();		
+
 		Bounds(ValueType min, ValueType max);
 
 		Bounds(const Bounds<ValueType>& target);
 
 		Bounds& operator =(const Bounds<ValueType>& target);
 
-		ValueType getMin();
+		ValueType getMin() const;
 
-		ValueType getMax();
+		ValueType getMax() const;
 
 		/* Sets the bounds to the min and max value of the box.
            Using this function is faster than assigning min and max separately.*/
@@ -81,11 +83,11 @@ namespace fd
 		/* The closest point on the bounding box.
            If the point is inside the bounding box, unmodified point position will be returned.
 		*/
-		ValueType getClosestPoint(ValueType point);
+		ValueType getClosestPoint(ValueType point) const;
 
 		/*Is point contained in the bounding box?
           If the point passed into Contains is inside the bounding box a value of True is returned.*/
-		Bool32 isContains(ValueType point);
+		Bool32 isContains(ValueType point) const;
 
 		/*Expand the bounds by increasing its size by amount along each side.*/
 		void expand(vec_value_type amount);
@@ -93,15 +95,13 @@ namespace fd
 		/*Does ray intersect this bounding box?
           if true, return the distance to the ray's origin will be returned,
           or else return number -1.*/
-		vec_value_type intersectRay(Ray<ValueType> ray, Bool32 isOnlyForward = true);
+		vec_value_type intersectRay(Ray<ValueType> ray, Bool32 isOnlyForward = true) const;
 
 		/*Does another bounding box intersect with this bounding box?*/
-		Bool32 isIntersects(Bounds<ValueType> bounds);
+		Bool32 isIntersects(Bounds<ValueType> bounds) const;
 
 		/*The smallest squared distance between the point and this bounding box.*/
-		vec_value_type getSqrDistance(ValueType point);
-
-		~Bounds();
+		vec_value_type getSqrDistance(ValueType point) const;
 
 	private:
 		ValueType m_min;

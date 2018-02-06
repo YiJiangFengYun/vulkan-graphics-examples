@@ -21,50 +21,12 @@ namespace vgf
 	class Window
 	{
 	public:
-		enum class RenderType
-		{
-			RENDERER_2,
-			RENDERER_3,
-			BEGIN_RANGE = RENDERER_2,
-			END_RANGE = RENDERER_3,
-			RANGE_SIZE = (END_RANGE - BEGIN_RANGE + 1)
-		};
-
-		template<RenderType type>
-		struct RenderTypeInfo
-		{
-			typedef vg::BaseRenderer RendererType;
-		};
-
-		template<>
-		struct RenderTypeInfo<RenderType::RENDERER_2>
-		{
-			typedef vg::Renderer2 RendererType;
-		};
-
-		template<>
-		struct RenderTypeInfo<RenderType::RENDERER_3>
-		{
-			typedef vg::Renderer3 RendererType;
-		};
-
 		Window(uint32_t width
 			, uint32_t height
 			, const char* title
-		);
-
-		Window(uint32_t width
-			, uint32_t height
-			, const char* title
-			, RenderType renderType
 		);
 
 		Window(std::shared_ptr<GLFWwindow> pWindow
-			, std::shared_ptr<vk::SurfaceKHR> pSurface
-		);
-
-		Window(RenderType renderType
-			, std::shared_ptr<GLFWwindow> pWindow
 			, std::shared_ptr<vk::SurfaceKHR> pSurface
 		);
 
@@ -77,8 +39,7 @@ namespace vgf
 		Window(const Window&) = delete;
 
 		//--compositions
-		RenderType m_renderType;
-
+		
 		std::shared_ptr<GLFWwindow> m_pWindow;
 		std::shared_ptr<vk::SurfaceKHR> m_pSurface;
 		std::shared_ptr<vk::SwapchainKHR> m_pSwapchain;
@@ -88,7 +49,7 @@ namespace vgf
 		std::vector<std::shared_ptr<vk::ImageView>> m_pSwapchainImageViews;
 		//vk::Queue m_presentQueue;
 		//uint32_t m_presentQueueIndex;
-		std::vector<std::shared_ptr<vg::BaseRenderer>> m_pRenderers;
+		std::vector<std::shared_ptr<vg::Renderer>> m_pRenderers;
 		std::shared_ptr<vk::Semaphore> m_pImageAvailableSemaphore;
 
 		//std::mutex m_windowMutex;
@@ -104,7 +65,7 @@ namespace vgf
 		void _createSwapchain();
 		void _createSwapchainImageViews();
 		void _createRenderers();
-		virtual std::shared_ptr<vg::BaseRenderer> _createRenderer(std::shared_ptr<vk::ImageView> pSwapchainImageView);
+		virtual std::shared_ptr<vg::Renderer> _createRenderer(std::shared_ptr<vk::ImageView> pSwapchainImageView);
 		void _createSemaphores();
 
 		//void _freePresentQueue();
@@ -126,6 +87,10 @@ namespace vgf
 		virtual void _onPreRender() = 0;
 		virtual void _render();
 		virtual void _onPostRender() = 0;
+
+		virtual void _renderWithRenderer(const std::shared_ptr<vg::Renderer> &pRenderer
+		    , const vg::Renderer::RenderInfo &info
+			, vg::Renderer::RenderResultInfo &resultInfo) = 0;
 
 		// tool methods
 		void _createImage(uint32_t width, uint32_t height, vk::Format format, vk::ImageTiling tiling,

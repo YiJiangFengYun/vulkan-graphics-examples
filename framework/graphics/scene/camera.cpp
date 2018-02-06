@@ -2,5 +2,13 @@
 
 namespace vg
 {
+    BaseCamera::BaseCamera()
+    {
 
+    }
+
+    BaseCamera::~BaseCamera()
+    {
+        
+    }
 }

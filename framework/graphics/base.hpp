@@ -27,6 +27,7 @@ namespace vg
 	{
 	public:
 		Base(BaseType baseType);
+		virtual ~Base();
 		BaseType getBaseType();
 		InstanceID getID();
 	protected:

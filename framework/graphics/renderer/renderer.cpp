@@ -4,9 +4,15 @@
 
 namespace vg
 {
-	const vk::Format BaseRenderer::DEFAULT_DEPTH_STENCIL_FORMAT(vk::Format::eD32SfloatS8Uint);
+	void fillValidVisualObjects(std::vector<std::shared_ptr<VisualObject<SpaceType::SPACE_2>>> &arrPVObjs,
+		uint32_t &PVObjIndex,
+		const Transform<SpaceType::SPACE_2> *pTransform,
+		const Scene<SpaceType::SPACE_2> *pScene,
+	    const Camera<SpaceType::SPACE_2> *pCamera);
 
-	BaseRenderer::BaseRenderer(std::shared_ptr<vk::ImageView> pSwapchainImageView
+	const vk::Format Renderer::DEFAULT_DEPTH_STENCIL_FORMAT(vk::Format::eD32SfloatS8Uint);
+
+	Renderer::Renderer(std::shared_ptr<vk::ImageView> pSwapchainImageView
 		, vk::Format swapchainImageFormat
 		, uint32_t swapchainImageWidth
 		, uint32_t swapchainImageHeight
@@ -27,8 +33,7 @@ namespace vg
 		_init();
 	}
 
-	BaseRenderer::BaseRenderer(std::shared_ptr<TextureColorAttachment> pColorAttachmentTex
-	)
+	Renderer::Renderer(std::shared_ptr<TextureColorAttachment> pColorAttachmentTex)
 		: Base(BaseType::RENDERER)
 		, m_pColorTexture(pColorAttachmentTex)
 		, m_colorImageFormat(pColorAttachmentTex->_getVKFormat())
@@ -44,79 +49,80 @@ namespace vg
 		_init();
 	}
 
-	BaseRenderer::~BaseRenderer()
+	Renderer::~Renderer()
 	{
 		//_freeGraphicsQueue();
 	}
 
-	Bool32 BaseRenderer::isValidForRender()
+	Bool32 Renderer::isValidForRender()
 	{
 		return _isValidForRender();
 	}
 
-	void BaseRenderer::render(const RenderInfo &info, RenderResultInfo &resultInfo)
+	void Renderer::render(const RenderInfo &info, 
+		RenderResultInfo &resultInfo)
 	{
 		_preRender();
 		_render(info, resultInfo);
 		_postRender();
 	}
 
-	uint32_t BaseRenderer::getFramebufferWidth()
+	uint32_t Renderer::getFramebufferWidth()
 	{
 		return m_framebufferWidth;
 	}
 
-	uint32_t BaseRenderer::getFramebufferHeight()
+	uint32_t Renderer::getFramebufferHeight()
 	{
 		return m_framebufferHeight;
 	}
 
-	vk::Format BaseRenderer::getColorImageFormat()
+	vk::Format Renderer::getColorImageFormat()
 	{
 		return m_colorImageFormat;
 	}
 
-	vk::Format BaseRenderer::getDepthStencilImageFormat()
+	vk::Format Renderer::getDepthStencilImageFormat()
 	{
 		return m_depthStencilImageFormat;
 	}
 
-	const Color &BaseRenderer::getClearValueColor() const
+	const Color &Renderer::getClearValueColor() const
 	{
 		return m_clearValueColor;
 	}
 
-	void BaseRenderer::setClearValueColor(Color color)
+	void Renderer::setClearValueColor(Color color)
 	{
 		m_clearValueColor = color;
 	}
 
-	float BaseRenderer::getClearValueDepth() const
+	float Renderer::getClearValueDepth() const
 	{
 		return m_clearValueDepth;
 	}
 
-	void BaseRenderer::setClearValueDepth(float value)
+	void Renderer::setClearValueDepth(float value)
 	{
 		m_clearValueDepth = value;
 	}
 
-	uint32_t BaseRenderer::getClearValueStencil() const
+	uint32_t Renderer::getClearValueStencil() const
 	{
 		return m_clearValueStencil;
 	}
 
-	void BaseRenderer::setClearValueStencil(uint32_t value)
+	void Renderer::setClearValueStencil(uint32_t value)
 	{
 		m_clearValueStencil = value;
 	}
 
-	const fd::Rect2D &BaseRenderer::getClearArea() const
+	const fd::Rect2D &Renderer::getClearArea() const
 	{
 		return m_renderArea;
 	}
 
-	void BaseRenderer::setClearArea(fd::Rect2D area)
+	void Renderer::setClearArea(fd::Rect2D area)
 	{
 #ifdef DEBUG
 		if (area.width < 0)
@@ -140,26 +146,51 @@ namespace vg
 		m_renderArea = area;
 	}
 
-	Bool32 BaseRenderer::_isValidForRender()
+	Bool32 Renderer::_isValidForRender()
 	{
 		return VG_TRUE;
 	}
 
-	void BaseRenderer::_preRender()
+	void Renderer::_preRender()
 	{
 		m_pipelineCache.start();
 	}
 
-	void BaseRenderer::_render(const RenderInfo &info, RenderResultInfo &resultInfo)
+	void Renderer::_render(const RenderInfo &info
+		, RenderResultInfo &resultInfo)
 	{
+		resultInfo.signalSemaphoreCount = 0u;
+		uint32_t count = info.countSceneAndCamera;
+		for (uint32_t i = 0; i < count; ++i)
+		{
+			resultInfo.isRendered = VG_TRUE;
+			const auto &pScene = (*(info.pSceneAndCamera + i)).pScene;
+			const auto &pCamera = (*(info.pSceneAndCamera + i)).pCamera;
+
+			if (pScene->getSpaceType() == SpaceType::SPACE_2)
+			{
+				_renderScene2(dynamic_cast<const Scene<SpaceType::SPACE_2> *>(pScene), 
+				    dynamic_cast<const Camera<SpaceType::SPACE_2> *>(pCamera), 
+					info, 
+					resultInfo);
+			} else if (pScene->getSpaceType() == SpaceType::SPACE_3)
+			{
+				_renderScene3(dynamic_cast<const Scene<SpaceType::SPACE_3> *>(pScene), 
+				    dynamic_cast<const Camera<SpaceType::SPACE_3> *>(pCamera), 
+					info, 
+					resultInfo);
+			} else {
+				//todo
+			}
+		}
 	}
 
-	void BaseRenderer::_postRender()
+	void Renderer::_postRender()
 	{
 		m_pipelineCache.end();
 	}
 
-	void BaseRenderer::_createPipelineForRender(std::shared_ptr<vk::Pipeline> &pPipeline,
+	void Renderer::_createPipelineForRender(std::shared_ptr<vk::Pipeline> &pPipeline,
 		std::shared_ptr<BaseMesh> pMesh,
 		std::shared_ptr<Material> pMaterial,
 		uint32_t subMeshIndex,
@@ -178,7 +209,7 @@ namespace vg
 		pPipeline = m_pipelineCache.caching(info);
 	}
 
-	void BaseRenderer::_recordCommandBufferForRender(std::shared_ptr<vk::Pipeline> pPipeline,
+	void Renderer::_recordCommandBufferForRender(std::shared_ptr<vk::Pipeline> pPipeline,
 		std::shared_ptr<BaseMesh> pMesh,
 		std::shared_ptr<Material> pMaterial,
 		uint32_t subMeshIndex,
@@ -295,7 +326,7 @@ namespace vg
 		LOG(plog::debug) << "Post end command buffer." << std::endl;
 	}
 
-	void BaseRenderer::_init()
+	void Renderer::_init()
 	{
 		_createRenderPass();
 		_createDepthStencilTex();
@@ -304,7 +335,7 @@ namespace vg
 		_createCommandBuffer();
 	}
 
-	void BaseRenderer::_createRenderPass()
+	void Renderer::_createRenderPass()
 	{
 		vk::AttachmentDescription colorAttachment = {
 			vk::AttachmentDescriptionFlags(),     //flags
@@ -378,7 +409,7 @@ namespace vg
 		m_pRenderPass = fd::createRenderPass(pDevice, createInfo);
 	}
 
-	void BaseRenderer::_createDepthStencilTex()
+	void Renderer::_createDepthStencilTex()
 	{
 		m_pDepthStencilTexture = std::shared_ptr<TextureDepthStencilAttachment>(
 			new TextureDepthStencilAttachment(
@@ -389,7 +420,7 @@ namespace vg
 			);
 	}
 
-	void BaseRenderer::_createFramebuffer()
+	void Renderer::_createFramebuffer()
 	{
 		std::array<vk::ImageView, 2> attachments;
 		if (m_pColorTexture != nullptr)
@@ -415,7 +446,7 @@ namespace vg
 		m_pFrameBuffer = fd::createFrameBuffer(pDevice, createInfo);
 	}
 
-	void BaseRenderer::_createCommandPool()
+	void Renderer::_createCommandPool()
 	{
 		auto pDevice = pApp->getDevice();
 		auto graphicsFamily = pApp->getGraphicsFamily();
@@ -426,7 +457,7 @@ namespace vg
 		m_pCommandPool = fd::createCommandPool(pDevice, createInfo);
 	}
 
-	void BaseRenderer::_createCommandBuffer()
+	void Renderer::_createCommandBuffer()
 	{
 		auto pCommandPool = m_pCommandPool;
 		vk::CommandBufferAllocateInfo allocateInfo = {
@@ -440,5 +471,354 @@ namespace vg
 		LOG(plog::debug) << "Pre allocate command buffer from pool." << std::endl;
 		m_pCommandBuffer = fd::allocateCommandBuffer(pDevice, pCommandPool, allocateInfo);
 		LOG(plog::debug) << "Post allocate command buffer from pool." << std::endl;
+	}
+
+	void Renderer::_renderScene2(const Scene<SpaceType::SPACE_2> *pScene
+		, const Camera<SpaceType::SPACE_2> *pCamera
+	    , const RenderInfo &info
+	    , RenderResultInfo &resultInfo)
+	{
+		using SceneType = Scene<SpaceType::SPACE_2>;
+		auto pDevice = pApp->getDevice();
+		auto projMatrix = pCamera->getProjMatrix();
+		auto viewMatrix = pCamera->getTransform()->getMatrixWorldToLocal();
+		uint32_t visualObjectCount = pScene->getVisualObjectCount();
+
+		//flat visual objects and filter them that is out of camera with its bounds.
+		//allocate enough space for array to storage points.
+		std::vector<std::shared_ptr<SceneType::VisualObjectType>> validVisualObjects(visualObjectCount);
+		uint32_t validVisualObjectCount(0u);
+		auto pRoot = pScene->pRootTransformForVisualObject;
+		auto pTransform = pRoot;
+		fillValidVisualObjects(validVisualObjects
+			, validVisualObjectCount
+			, pTransform.get()
+			, pScene
+			, pCamera
+		);
+
+		//Caculate total draw count.
+		uint32_t drawCount = 0;
+		for (uint32_t i = 0; i < validVisualObjectCount; ++i)
+		{
+			auto pVisualObject = validVisualObjects[i];
+			auto pMesh = pVisualObject->getMesh();
+			auto pContentMesh = dynamic_cast<ContentMesh *>(pMesh.get());
+			auto subMeshCount = pContentMesh->getIndexData()->getSubIndexDataCount();
+			auto pMaterial = pVisualObject->getMaterial();
+			auto passCount = pMaterial->getPassCount();
+			drawCount += subMeshCount * passCount;
+		}
+
+		//------Doing render.
+		vk::PipelineStageFlags waitStages[] = { vk::PipelineStageFlagBits::eColorAttachmentOutput };
+		std::vector<vk::SubmitInfo> submitInfos(drawCount);
+		uint32_t semaphoreCount = resultInfo.signalSemaphoreCount + drawCount;
+		uint32_t semaphoreIndex = resultInfo.signalSemaphoreCount;
+		if (m_arrCachePSemaphores.size() < semaphoreCount)
+		    m_arrCachePSemaphores.resize(semaphoreCount);
+		m_arrSemaphores.resize(semaphoreCount);
+
+		uint32_t drawIndex = 0u;
+		for (uint32_t i = 0u; i < validVisualObjectCount; ++i)
+		{
+			auto pVisualObject = validVisualObjects[i];
+			auto modelMatrix = pVisualObject->getTransform()->getMatrixLocalToWorld();
+			auto mvMatrix = viewMatrix * modelMatrix;
+			auto mvpMatrix = projMatrix * mvMatrix;
+			auto pMesh = pVisualObject->getMesh();
+			auto pContentMesh = dynamic_cast<ContentMesh *>(pMesh.get());
+			auto subMeshCount = pContentMesh->getIndexData()->getSubIndexDataCount();
+			auto pMaterial = pVisualObject->getMaterial();
+			auto passCount = pMaterial->getPassCount();
+			for (uint32_t passIndex = 0u; passIndex < passCount; ++passIndex)
+			{
+				//update building in matrix variable.
+				auto pPass = pMaterial->getPassWithIndex(passIndex);
+
+				pPass->_setBuildInMatrixData(mvpMatrix, mvMatrix, modelMatrix);
+				pPass->apply();
+			}
+
+			for (uint32_t subMeshIndex = 0u; subMeshIndex < subMeshCount; ++subMeshIndex)
+			{
+				for (uint32_t passIndex = 0u; passIndex < passCount; ++passIndex)
+				{
+					std::shared_ptr<vk::Pipeline> pPipeline;
+					_createPipelineForRender(pPipeline, pMesh, pMaterial, subMeshIndex, passIndex);
+					_recordCommandBufferForRender(pPipeline, pMesh, pMaterial, subMeshIndex, passIndex);
+
+					//submit
+					std::shared_ptr<vk::Semaphore> pSemaphore = nullptr;
+					if (m_arrCachePSemaphores[semaphoreIndex] != nullptr)
+					{
+						pSemaphore = m_arrCachePSemaphores[semaphoreIndex];
+					}
+					else
+					{
+						vk::SemaphoreCreateInfo createInfo = {
+							vk::SemaphoreCreateFlags()
+						};
+						pSemaphore = fd::createSemaphore(pDevice, createInfo);
+						m_arrCachePSemaphores[semaphoreIndex] = pSemaphore;
+					}
+					m_arrSemaphores[semaphoreIndex] = *pSemaphore;
+
+					vk::SubmitInfo submitInfo = {
+						info.waitSemaphoreCount,              //waitSemaphoreCount
+						info.pWaitSemaphores,                 //pWaitSemaphores
+						waitStages,                           //pWaitDstStageMask
+						1u,                                   //commandBufferCount
+						m_pCommandBuffer.get(),               //pCommandBuffers
+						1u,                                   //signalSemaphoreCount
+						pSemaphore.get()                      //pSignalSemaphores
+					};
+
+					submitInfos[drawIndex] = submitInfo;
+					++drawIndex;
+					++semaphoreIndex;
+				}
+			}
+		}
+
+		LOG(plog::debug) << "Pre submit to grahics queue." << std::endl;
+		vk::Queue queue;
+		uint32_t queueIndex;
+		pApp->allocateGaphicsQueue(queueIndex, queue);
+		queue.submit(submitInfos, nullptr);
+		pApp->freeGraphicsQueue(queueIndex);
+		LOG(plog::debug) << "Post submit to grahics queue." << std::endl;
+
+		resultInfo.signalSemaphoreCount = static_cast<uint32_t>(m_arrSemaphores.size());
+		resultInfo.pSignalSemaphores = m_arrSemaphores.data();
+	}
+
+	void Renderer::_renderScene3(const Scene<SpaceType::SPACE_3> *pScene
+		, const Camera<SpaceType::SPACE_3> *pCamera
+	    , const RenderInfo &info
+	    , RenderResultInfo &resultInfo)
+	{
+		using SceneType = Scene<SpaceType::SPACE_3>;
+
+		auto queueTypeCount = static_cast<uint32_t>(RenderQueueType::RANGE_SIZE);
+		auto pDevice = pApp->getDevice();
+
+		auto projMatrix = pCamera->getProjMatrix();
+		auto viewMatrix = pCamera->getTransform()->getMatrixWorldToLocal();
+
+		uint32_t visualObjectCount = pScene->getVisualObjectCount();
+		
+		//----------Preparing render.
+
+		//Filter visualObject is out of camera with its bounds.
+		std::vector<std::shared_ptr<SceneType::VisualObjectType>> validVisualObjects(visualObjectCount); //allocate enough space for array to storage points.
+		uint32_t validVisualObjectCount(0u);
+		for (uint32_t i = 0; i < visualObjectCount; ++i)
+		{
+			auto pVisualObject = pScene->getVisualObjectWithIndex(i);
+			auto pMesh = pVisualObject->getMesh();
+			auto isHasBounds = dynamic_cast<SceneType::VisualObjectType::MeshDimType *>(pMesh.get())->getIsHasBounds();
+			if (isHasBounds == VG_FALSE)
+			{
+				validVisualObjects[validVisualObjectCount++] = pVisualObject;
+			}
+			else 
+			{
+			    auto bounds = dynamic_cast<SceneType::VisualObjectType::MeshDimType *>(pMesh.get())->getBounds();
+			    auto pTransform = pVisualObject->getTransform();
+			    if(pCamera->isInView(pTransform.get(), bounds) == VG_TRUE)
+			    {
+			    	validVisualObjects[validVisualObjectCount++] = pVisualObject;
+			    }
+			}
+		}
+
+		//Get queue count for each queue type.
+		std::vector<uint32_t> queueLengths(queueTypeCount, 0u);
+		for (uint32_t i = 0; i < validVisualObjectCount; ++i)
+		{
+			auto pVisualObject = validVisualObjects[i];
+			auto renderQueueType = tranMaterialShowTypeToRenderQueueType(pVisualObject->getMaterial()->getShowType());
+			++queueLengths[static_cast<size_t>(renderQueueType)];
+		}
+
+		std::vector<std::vector<std::shared_ptr<SceneType::VisualObjectType>>> queues(queueTypeCount);
+		//Resize queues and reset quue counts to zero for preparing next use.
+		for (uint32_t i = 0; i < queueTypeCount; ++i)
+		{
+			queues[i].resize(queueLengths[i], nullptr);
+			queueLengths[i] = 0u;
+		}
+
+		//Update queues to point to visual object.
+		for (uint32_t i = 0; i < validVisualObjectCount; ++i)
+		{
+			auto pVisualObject = validVisualObjects[i];
+			auto renderQueueType = tranMaterialShowTypeToRenderQueueType(pVisualObject->getMaterial()->getShowType());
+			queues[static_cast<size_t>(renderQueueType)][queueLengths[static_cast<size_t>(renderQueueType)]++] = pVisualObject;
+		}
+
+		//sort transparent queue.
+		std::sort(queues[static_cast<size_t>(RenderQueueType::TRANSPARENT)].begin(),
+			queues[static_cast<size_t>(RenderQueueType::TRANSPARENT)].end(),
+			[&viewMatrix, &projMatrix](std::shared_ptr<typename SceneType::ObjectType> pObject1, std::shared_ptr<typename SceneType::ObjectType> pObject2)
+	        {
+				auto modelMatrix1 = pObject1->getTransform()->getMatrixLocalToWorld();
+				auto mvMatrix1 = viewMatrix * modelMatrix1;
+				auto modelMatrix2 = pObject2->getTransform()->getMatrixLocalToWorld();
+				auto mvMatrix2 = viewMatrix * modelMatrix2;
+	        	//get position
+	        	auto pos1 = pObject1->getTransform()->getLocalPosition();
+	        	auto pos2 = pObject2->getTransform()->getLocalPosition();
+        
+	        	typedef SpaceTypeInfo<SpaceType::SPACE_3>::PointType PointType;
+	        	typedef SpaceTypeInfo<SpaceType::SPACE_3>::MatrixVectorType MatrixVectorType;
+	        	//transform point from model coordinate system to camera coordinate system.
+	        	pos1 = mvMatrix1 * MatrixVectorType(pos1, 1.0f);
+	        	pos2 = mvMatrix2 * MatrixVectorType(pos2, 1.0f);
+        
+	        	//it is smaller if its z is bigger than the other.
+	        	return static_cast<Bool32>(pos1.z > pos2.z);
+        
+	        });
+
+		//Caculate total draw count.
+		uint32_t drawCount = 0;
+		for (uint32_t typeIndex = 0u; typeIndex < queueTypeCount; ++typeIndex)
+		{
+			auto queueLength = queueLengths[typeIndex];
+			for (uint32_t objectIndex = 0u; objectIndex < queueLength; ++objectIndex)
+			{
+				auto pVisualObject = queues[typeIndex][objectIndex];
+				auto pMesh = pVisualObject->getMesh();
+				auto pContentMesh = dynamic_cast<ContentMesh *>(pMesh.get());
+				auto subMeshCount = pContentMesh->getIndexData()->getSubIndexDataCount();
+				auto pMaterial = pVisualObject->getMaterial();
+				auto passCount = pMaterial->getPassCount();
+				drawCount += subMeshCount * passCount;
+			}
+		}
+
+		//-----Doing render.
+		
+		vk::PipelineStageFlags waitStages[] = { vk::PipelineStageFlagBits::eColorAttachmentOutput };
+		std::vector<vk::SubmitInfo> submitInfos(drawCount);
+		uint32_t semaphoreCount = resultInfo.signalSemaphoreCount + drawCount;
+		uint32_t semaphoreIndex = resultInfo.signalSemaphoreCount;
+		if (m_arrCachePSemaphores.size() < semaphoreCount)
+		    m_arrCachePSemaphores.resize(semaphoreCount);
+		m_arrSemaphores.resize(semaphoreCount);
+
+		uint32_t drawIndex = 0;
+		for (uint32_t typeIndex = 0u; typeIndex < queueTypeCount; ++typeIndex)
+		{
+			auto queueLength = queueLengths[typeIndex];
+			for (uint32_t objectIndex = 0u; objectIndex < queueLength; ++objectIndex)
+			{
+				auto pVisualObject = queues[typeIndex][objectIndex];
+				auto modelMatrix = pVisualObject->getTransform()->getMatrixLocalToWorld();
+				auto mvMatrix = viewMatrix * modelMatrix;
+				auto mvpMatrix = projMatrix * mvMatrix;
+				auto pMesh = pVisualObject->getMesh();
+				auto pContentMesh = dynamic_cast<ContentMesh *>(pMesh.get());
+				auto subMeshCount = pContentMesh->getSubMeshCount();
+				auto pMaterial = pVisualObject->getMaterial();
+				auto passCount = pMaterial->getPassCount();
+
+				for (uint32_t passIndex = 0u; passIndex < passCount; ++passIndex)
+				{
+					//update building in matrix variable.
+					auto pPass = pMaterial->getPassWithIndex(passIndex);
+
+					pPass->_setBuildInMatrixData(mvpMatrix, mvMatrix, modelMatrix);
+
+					pPass->apply();
+				}
+
+				for (uint32_t subMeshIndex = 0u; subMeshIndex < subMeshCount; ++subMeshIndex)
+				{
+					for (uint32_t passIndex = 0u; passIndex < passCount; ++passIndex)
+					{
+						std::shared_ptr<vk::Pipeline> pPipeline;
+						_createPipelineForRender(pPipeline, pMesh, pMaterial, subMeshIndex, passIndex);
+						_recordCommandBufferForRender(pPipeline, pMesh, pMaterial, subMeshIndex, passIndex);
+
+						//submit
+						std::shared_ptr<vk::Semaphore> pSemaphore = nullptr;
+						if (m_arrCachePSemaphores[semaphoreIndex] != nullptr)
+						{
+							pSemaphore = m_arrCachePSemaphores[semaphoreIndex];
+						}
+						else
+						{
+							vk::SemaphoreCreateInfo createInfo = {
+								vk::SemaphoreCreateFlags()
+							};
+							pSemaphore = fd::createSemaphore(pDevice, createInfo);
+							m_arrCachePSemaphores[semaphoreIndex] = pSemaphore;
+						}
+						m_arrSemaphores[semaphoreIndex] = *pSemaphore;
+
+						vk::SubmitInfo submitInfo = {
+							info.waitSemaphoreCount,              //waitSemaphoreCount
+							info.pWaitSemaphores,                 //pWaitSemaphores
+							waitStages,                           //pWaitDstStageMask
+							1u,                                   //commandBufferCount
+							m_pCommandBuffer.get(),               //pCommandBuffers
+							1u,                                   //signalSemaphoreCount
+							pSemaphore.get()                      //pSignalSemaphores
+						};
+
+						submitInfos[drawIndex] = submitInfo;
+						++drawIndex;
+						++semaphoreIndex;
+					}
+				}
+			}
+		}
+
+		LOG(plog::debug) << "Pre submit to grahics queue." << std::endl;
+		vk::Queue queue;
+		uint32_t queueIndex;
+		pApp->allocateGaphicsQueue(queueIndex, queue);
+		queue.submit(submitInfos, nullptr);
+		pApp->freeGraphicsQueue(queueIndex);
+		LOG(plog::debug) << "Post submit to grahics queue." << std::endl;
+
+		resultInfo.signalSemaphoreCount = static_cast<uint32_t>(m_arrSemaphores.size());
+		resultInfo.pSignalSemaphores = m_arrSemaphores.data();
+	}
+
+	void fillValidVisualObjects(std::vector<std::shared_ptr<VisualObject<SpaceType::SPACE_2>>> &arrPVObjs,
+		uint32_t &PVObjIndex,
+		const Transform<SpaceType::SPACE_2> *pTransform,
+		const Scene<SpaceType::SPACE_2> *pScene,
+	    const Camera<SpaceType::SPACE_2> *pCamera)
+	{
+		std::shared_ptr<VisualObject<SpaceType::SPACE_2>> pVisualObjectOfChild;
+		uint32_t childCount = pTransform->getChildCount();
+		Transform<SpaceType::SPACE_2> *pChild;
+		for (uint32_t i = 0; i < childCount; ++i)
+		{
+			pChild = pTransform->getChildWithIndex(i);
+			//Children's visual object is placed ahead of own visual objects
+			fillValidVisualObjects(arrPVObjs, PVObjIndex, pChild, pScene, pCamera);
+			//Own visual object is placed behind children's visual object.
+			pVisualObjectOfChild = pScene->getVisualObjectWithTransform(pChild);
+			//Filter obj out of camera view.
+			auto pMeshOfChild = pVisualObjectOfChild->getMesh();
+			auto isHasBoundsOfChild = dynamic_cast<Mesh<MeshDimType::SPACE_2> *>(pMeshOfChild.get())->getIsHasBounds();
+			if (isHasBoundsOfChild == VG_FALSE) 
+			{
+				arrPVObjs[PVObjIndex++] = pVisualObjectOfChild;
+			}
+			else {
+			    auto boundsOfChild = dynamic_cast<Mesh<MeshDimType::SPACE_2> *>(pMeshOfChild.get())->getBounds();
+			    if (pCamera->isInView(pChild, boundsOfChild) == VG_TRUE)
+			    {
+			    	arrPVObjs[PVObjIndex++] = pVisualObjectOfChild;
+			    }
+			}
+		}
 	}
 }

@@ -7,11 +7,11 @@ namespace vg
 		, pRootTransformForCamera(new TransformType())
 		, pRootTransformForLight(new TransformType())
 	{
-
+		m_spaceType = SPACE_TYPE;
 	}
 
 	template <SpaceType SPACE_TYPE>
-	uint32_t Scene<SPACE_TYPE>::getVisualObjectCount()
+	uint32_t Scene<SPACE_TYPE>::getVisualObjectCount() const
 	{
 		return static_cast<uint32_t>(m_arrPVisualObjects.size());
 	}
@@ -58,7 +58,7 @@ namespace vg
 	}
 
 	template <SpaceType SPACE_TYPE>
-	uint32_t Scene<SPACE_TYPE>::getCameraCount()
+	uint32_t Scene<SPACE_TYPE>::getCameraCount() const
 	{
 		return static_cast<uint32_t>(m_arrPCameras.size());
 	}
@@ -115,7 +115,7 @@ namespace vg
 	}
 
 	template <SpaceType SPACE_TYPE>
-	uint32_t Scene<SPACE_TYPE>::getLightCount()
+	uint32_t Scene<SPACE_TYPE>::getLightCount() const
 	{
 		return static_cast<uint32_t>(m_arrPLights.size());
 	}

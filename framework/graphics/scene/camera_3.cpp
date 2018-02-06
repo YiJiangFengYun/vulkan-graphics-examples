@@ -72,12 +72,12 @@ namespace vg
 		m_zFar = zFar;
 	}
 
-	typename Camera3::TransformType::MatrixType Camera3::getProjMatrix()
+	typename Camera3::TransformType::MatrixType Camera3::getProjMatrix() const
 	{
 		return m_projMatrix;
 	}
 
-	Bool32 Camera3::isInView(Transform<SpaceType::SPACE_3> *pTransform, BoundsType bounds)
+	Bool32 Camera3::isInView(Transform<SpaceType::SPACE_3> *pTransform, BoundsType bounds) const
 	{
 		auto min = bounds.getMin();
 		auto max = bounds.getMax();

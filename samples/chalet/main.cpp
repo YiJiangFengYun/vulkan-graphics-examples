@@ -18,7 +18,7 @@ int main() {
 	vgf::moduleCreate();
 
 	chalet::App app;
-	app.init<chalet::Window>(WINDOW_WIDTH, WINDOW_HEIGHT, "chalet", vgf::Window::RenderType::RENDERER_3);
+	app.init<chalet::Window>(WINDOW_WIDTH, WINDOW_HEIGHT, "chalet");
 
 	LOG(plog::debug) << "Initialization completed." << std::endl;
 

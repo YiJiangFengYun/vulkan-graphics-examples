@@ -22,19 +22,19 @@ namespace vg
 	}
 
 	template <SpaceType SPACE_TYPE>
-	typename CameraOP<SPACE_TYPE>::TransformType::MatrixType CameraOP<SPACE_TYPE>::getProjMatrix()
+	typename CameraOP<SPACE_TYPE>::TransformType::MatrixType CameraOP<SPACE_TYPE>::getProjMatrix() const
 	{
 		return m_projMatrix;
 	}
 
 	template <SpaceType SPACE_TYPE>
-	typename CameraOP<SPACE_TYPE>::BoundsType CameraOP<SPACE_TYPE>::getViewBounds()
+	typename CameraOP<SPACE_TYPE>::BoundsType CameraOP<SPACE_TYPE>::getViewBounds() const
 	{
 		return m_viewBounds;
 	}
 
 	template <SpaceType SPACE_TYPE>
-	Bool32 CameraOP<SPACE_TYPE>::isInView(Transform<SPACE_TYPE> *pTransform, BoundsType bounds)
+	Bool32 CameraOP<SPACE_TYPE>::isInView(Transform<SPACE_TYPE> *pTransform, BoundsType bounds) const
 	{
 		auto min = bounds.getMin();
 		auto max = bounds.getMax();

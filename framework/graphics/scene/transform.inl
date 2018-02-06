@@ -20,7 +20,7 @@ namespace vg
 	}
 
 	template <SpaceType SPACE_TYPE>
-	uint32_t Transform<SPACE_TYPE>::getChildCount()
+	uint32_t Transform<SPACE_TYPE>::getChildCount() const
 	{
 		return static_cast<uint32_t>(m_arrPChildren.size());
 	}
@@ -37,7 +37,7 @@ namespace vg
 	}
 
 	template <SpaceType SPACE_TYPE>
-	typename Transform<SPACE_TYPE>::Type *Transform<SPACE_TYPE>::getChildWithIndex(uint32_t index)
+	typename Transform<SPACE_TYPE>::Type *Transform<SPACE_TYPE>::getChildWithIndex(uint32_t index) const
 	{
 		return m_arrPChildren[index];
 	}

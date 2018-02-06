@@ -25,28 +25,6 @@ namespace chalet
 		_createModel();
 		_createCamera();
 		_createScene();
-		_fillRenderer();
-	}
-
-	Window::Window(uint32_t width
-		, uint32_t height
-		, const char* title
-		, RenderType renderType
-	)
-		: vgf::Window(width
-			, height
-			, title
-			, renderType
-		)
-	{
-		_loadModel();
-		_createMesh();
-		_createTexture();
-		_createMaterial();
-		_createModel();
-		_createCamera();
-		_createScene();
-		_fillRenderer();
 	}
 
 	Window::Window(std::shared_ptr<GLFWwindow> pWindow
@@ -63,26 +41,6 @@ namespace chalet
 		_createModel();
 		_createCamera();
 		_createScene();
-		_fillRenderer();
-	}
-
-	Window::Window(RenderType renderType
-		, std::shared_ptr<GLFWwindow> pWindow
-		, std::shared_ptr<vk::SurfaceKHR> pSurface
-	)
-		: vgf::Window(renderType
-			, pWindow
-			, pSurface
-		)
-	{
-		_loadModel();
-		_createMesh();
-		_createTexture();
-		_createMaterial();
-		_createModel();
-		_createCamera();
-		_createScene();
-		_fillRenderer();
 	}
 
 	void Window::_loadModel()
@@ -209,26 +167,6 @@ namespace chalet
 		m_pScene->addVisualObject(m_pModel);
 	}
 
-	void Window::_fillRenderer()
-	{
-		for (auto& pRenderer : m_pRenderers)
-		{
-			switch (m_renderType)
-			{
-			case RenderType::RENDERER_2:
-			{
-				//dynamic_cast<kgs::Renderer2 *>(pRenderer.get())->reset(m_pScene, m_pCamera);
-				break;
-			}
-			case RenderType::RENDERER_3:
-			{
-				dynamic_cast<vg::Renderer3 *>(pRenderer.get())->reset(m_pScene, m_pCamera);
-				break;
-			}
-			}
-		}
-	}
-
 	void Window::_onPreReCreateSwapchain()
 	{
 
@@ -236,7 +174,6 @@ namespace chalet
 
 	void Window::_onPostReCreateSwapchain()
 	{
-		_fillRenderer();
 	}
 
 	void Window::_onPreUpdate()
@@ -274,5 +211,18 @@ namespace chalet
 	void Window::_onPostRender()
 	{
 
+	}
+
+	void Window::_renderWithRenderer(const std::shared_ptr<vg::Renderer> &pRenderer
+		    , const vg::Renderer::RenderInfo &info
+			, vg::Renderer::RenderResultInfo &resultInfo)
+	{
+		vg::Renderer::SceneAndCamera sceneAndCamera;
+		sceneAndCamera.pScene = m_pScene.get();
+		sceneAndCamera.pCamera = m_pCamera.get();
+		auto myInfo = info;
+		myInfo.countSceneAndCamera = 1u;
+		myInfo.pSceneAndCamera = &sceneAndCamera;
+		pRenderer->render(myInfo, resultInfo);
 	}
 }

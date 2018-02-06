@@ -15,8 +15,9 @@ namespace vg
 	{
 	public:
 		BaseScene();
+		SpaceType getSpaceType() const;
 	protected:
-
+	    SpaceType m_spaceType;
 	};
 
 	template <SpaceType SPACE_TYPE>
@@ -35,7 +36,7 @@ namespace vg
 
 		Scene();
 
-		uint32_t getVisualObjectCount();
+		uint32_t getVisualObjectCount() const;
 		const std::shared_ptr<VisualObjectType> &getVisualObjectWithIndex(uint32_t index) const;
 		const std::shared_ptr<VisualObjectType> &getVisualObjectWithTransform(std::shared_ptr<TransformType> pTransform) const;
 		const std::shared_ptr<VisualObjectType> &getVisualObjectWithTransform(TransformType *pTransform) const;
@@ -44,7 +45,7 @@ namespace vg
 			, const std::shared_ptr<VisualObjectType> pParent = nullptr);
 		void removeVisualObject(const std::shared_ptr<VisualObjectType> pTarget);
 
-		uint32_t getCameraCount();
+		uint32_t getCameraCount() const;
 		const std::shared_ptr<CameraType> &getCameraWithIndex(uint32_t index) const;
 		const std::shared_ptr<CameraType> &getCameraWithTransform(std::shared_ptr<TransformType> pTransform) const;
 		const std::shared_ptr<CameraType> &getCameraWithTransform(TransformType *pTransform) const;
@@ -53,7 +54,7 @@ namespace vg
 			, const std::shared_ptr<CameraType> pParent = nullptr);
 		void removeCamera(const std::shared_ptr<CameraType> pTarget);
 
-		uint32_t getLightCount();
+		uint32_t getLightCount() const;
 		const std::shared_ptr<LightType> &getLightWithIndex(uint32_t index) const;
 		const std::shared_ptr<LightType> &getLightWithTransform(std::shared_ptr<TransformType> pTransform) const;
 		const std::shared_ptr<LightType> &getLightWithTransform(TransformType *pTransform) const;

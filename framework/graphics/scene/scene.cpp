@@ -7,4 +7,10 @@ namespace vg
 	{
 
 	}
+
+    SpaceType BaseScene::getSpaceType() const
+	{
+		return m_spaceType;
+	}
+
 } //namespace kgs

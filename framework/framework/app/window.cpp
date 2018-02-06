@@ -39,23 +39,6 @@ namespace vgf {
 		, uint32_t height
 		, const char* title
 	)
-		: m_renderType(RenderType::BEGIN_RANGE)
-	{
-		_createWindow(width, height, title);
-		_createSurface();
-		//_allocatePresentQueue();
-		_createSwapchain();
-		_createSwapchainImageViews();
-		_createRenderers();
-		_createSemaphores();
-	}
-
-	Window::Window(uint32_t width
-		, uint32_t height
-		, const char* title
-		, RenderType renderType
-	)
-		: m_renderType(renderType)
 	{
 		_createWindow(width, height, title);
 		_createSurface();
@@ -69,26 +52,7 @@ namespace vgf {
 	Window::Window(std::shared_ptr<GLFWwindow> pWindow
 		, std::shared_ptr<vk::SurfaceKHR> pSurface
 	)
-		: m_renderType(RenderType::BEGIN_RANGE)
-		, m_pWindow(pWindow)
-		, m_pSurface(pSurface)
-	{
-
-		glfwSetWindowUserPointer(pWindow.get(), this);
-		glfwSetWindowSizeCallback(pWindow.get(), onWindowResized);
-		//_allocatePresentQueue();
-		_createSwapchain();
-		_createSwapchainImageViews();
-		_createRenderers();
-		_createSemaphores();
-	}
-
-	Window::Window(RenderType renderType
-		, std::shared_ptr<GLFWwindow> pWindow
-		, std::shared_ptr<vk::SurfaceKHR> pSurface
-	)
-		: m_renderType(renderType)
-		, m_pWindow(pWindow)
+		: m_pWindow(pWindow)
 		, m_pSurface(pSurface)
 	{
 
@@ -253,36 +217,15 @@ namespace vgf {
 
 	}
 
-	std::shared_ptr<vg::BaseRenderer> Window::_createRenderer(std::shared_ptr<vk::ImageView> pSwapchainImageView)
+	std::shared_ptr<vg::Renderer> Window::_createRenderer(std::shared_ptr<vk::ImageView> pSwapchainImageView)
 	{
-		switch (m_renderType)
-		{
-			case RenderType::RENDERER_2:
-			{
-				return std::shared_ptr<vg::BaseRenderer>(
-					new RenderTypeInfo<RenderType::RENDERER_2>::RendererType(pSwapchainImageView
+		return std::shared_ptr<vg::Renderer>(
+					new vg::Renderer(pSwapchainImageView
 						, m_swapchainImageFormat
 					    , m_swapchainExtent.width
 					    , m_swapchainExtent.height
 					)
 				);
-				break;
-			}
-			case RenderType::RENDERER_3:
-			{
-				return std::shared_ptr<vg::BaseRenderer>(
-					new RenderTypeInfo<RenderType::RENDERER_3>::RendererType(pSwapchainImageView
-						, m_swapchainImageFormat
-					    , m_swapchainExtent.width
-					    , m_swapchainExtent.height
-					)
-				);
-				break;
-			}
-			default:
-				throw std::runtime_error("Render type of window is invalid.");
-				break;
-		}
 	}
 			
 
@@ -346,14 +289,18 @@ namespace vgf {
 				throw std::runtime_error("Failed to acquire swap chain image");
 			}
 
-			vg::BaseRenderer::RenderInfo info;
+			vg::Renderer::RenderInfo info;
+			info.countSceneAndCamera = 0;
+			info.pSceneAndCamera = nullptr;
 			info.waitSemaphoreCount = 1u;
 			info.pWaitSemaphores = m_pImageAvailableSemaphore.get();
 
-			vg::BaseRenderer::RenderResultInfo resultInfo;
+			vg::Renderer::RenderResultInfo resultInfo;
+			resultInfo.isRendered = VG_FALSE;
 
-			m_pRenderers[imageIndex]->render(info, resultInfo);
+			_renderWithRenderer(m_pRenderers[imageIndex], info, resultInfo);
 
+			if (resultInfo.isRendered == VG_FALSE) throw std::runtime_error("No content was rendered.");
 			vk::PresentInfoKHR presentInfo = {
 				resultInfo.signalSemaphoreCount, //waitSemaphoreCount
 			    resultInfo.pSignalSemaphores,   //pWaitSemaphores

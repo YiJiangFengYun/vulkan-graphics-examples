@@ -9,7 +9,6 @@ namespace testTriangle_2d
 		: vgf::Window(width
 			, height
 			, title
-			, RenderType::RENDERER_2
 		)
 	{
 		_loadModel();
@@ -18,14 +17,12 @@ namespace testTriangle_2d
 		_createModel();
 		_createCamera();
 		_createScene();
-		_fillRenderer();
 	}
 
 	Window::Window(std::shared_ptr<GLFWwindow> pWindow
 		, std::shared_ptr<vk::SurfaceKHR> pSurface
 	)
-		: vgf::Window(RenderType::RENDERER_2
-			, pWindow
+		: vgf::Window(pWindow
 			, pSurface
 		)
 	{
@@ -35,7 +32,6 @@ namespace testTriangle_2d
 		_createModel();
 		_createCamera();
 		_createScene();
-		_fillRenderer();
 	}
 
 	void Window::_loadModel()
@@ -98,22 +94,6 @@ namespace testTriangle_2d
 		m_pScene->addVisualObject(m_pModel);
 	}
 
-	void Window::_fillRenderer()
-	{
-		for (auto& pRenderer : m_pRenderers)
-		{
-			switch (m_renderType)
-			{
-			case RenderType::RENDERER_2:
-			{
-				dynamic_cast<vg::Renderer2 *>(pRenderer.get())->reset(m_pScene, m_pCamera);
-				break;
-			}
-			}
-			pRenderer->setClearArea({ 0.0f, 0.0f, 1.0f, 0.5f });
-		}
-	}
-
 	void Window::_onPreReCreateSwapchain()
 	{
 
@@ -121,7 +101,6 @@ namespace testTriangle_2d
 
 	void Window::_onPostReCreateSwapchain()
 	{
-		_fillRenderer();
 	}
 
 	void Window::_onPreUpdate()
@@ -158,5 +137,18 @@ namespace testTriangle_2d
 	void Window::_onPostRender()
 	{
 
+	}
+
+	void Window::_renderWithRenderer(const std::shared_ptr<vg::Renderer> &pRenderer
+		    , const vg::Renderer::RenderInfo &info
+			, vg::Renderer::RenderResultInfo &resultInfo)
+	{
+		vg::Renderer::SceneAndCamera sceneAndCamera;
+		sceneAndCamera.pScene = m_pScene.get();
+		sceneAndCamera.pCamera = m_pCamera.get();
+		auto myInfo = info;
+		myInfo.countSceneAndCamera = 1u;
+		myInfo.pSceneAndCamera = &sceneAndCamera;
+		pRenderer->render(myInfo, resultInfo);
 	}
 }

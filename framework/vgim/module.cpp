@@ -1,9 +1,7 @@
 #include "vgim/module.hpp"
 
-namespace vgim {
-	void _createMaterial();
-    void _createMesh();
-    
+namespace vgim
+{
     DimType m_dimType;
 	static const uint32_t __glsl_shader_vert_spv[] =
     {
@@ -85,22 +83,12 @@ namespace vgim {
     
     std::shared_ptr<vg::SimpleMesh> m_pMesh;
 
-	void static moduleCreate(DimType dimensionType)
-	{
-		if (isInited == VG_TRUE) return;
-        m_dimType = dimensionType;
-		_createMaterial();
-		//Indicate module was initialized.
-		isInited = VG_IM_TRUE;
-	}
+    std::shared_ptr<vg::VisualObject2> m_pUIObject;
 
-	void moduleDestory()
-	{
+    std::shared_ptr<vg::CameraOP2> m_pCamera;
+    std::shared_ptr<vg::Scene2> m_pScene;
 
-		isInited = VG_IM_FALSE;
-	}
-
-	const std::shared_ptr<vg::Material> getMaterial()
+    const std::shared_ptr<vg::Material> getMaterial()
 	{
 		return m_pMaterial;
 	}
@@ -109,6 +97,57 @@ namespace vgim {
     {
         return m_pMesh;   
     }
+
+    const std::shared_ptr<vg::VisualObject2> getUIObject()
+    {
+        return m_pUIObject;
+    }
+
+    const std::shared_ptr<vg::CameraOP2> getCamera()
+    {
+        return m_pCamera;
+    }
+
+    const std::shared_ptr<vg::Scene2> getScene()
+    {
+        return m_pScene;
+    }
+
+    void _createMaterial();
+    void _destroyMaterial();
+    void _createMesh();
+    void _destroyMesh();
+    void _createUIObject();
+    void _destroyUIObject();
+    void _createCamera();
+    void _destroyCamera();
+    void _createScene();
+    void _destroyScene();
+
+	void static moduleCreate(DimType dimensionType)
+	{
+		if (isInited == VG_TRUE) return;
+        m_dimType = dimensionType;
+		_createMaterial();
+        _createMesh();
+        _createUIObject();
+        _createCamera();
+        _createScene();
+        
+		//Indicate module was initialized.
+		isInited = VG_IM_TRUE;
+	}
+
+	void moduleDestory()
+	{
+		isInited = VG_IM_FALSE;
+
+        _destroyScene();
+        _destroyCamera();      
+        _destroyUIObject();
+        _destroyMesh();
+        _destroyMaterial();
+	}
 
     void updateFromImGUI()
     {
@@ -164,48 +203,91 @@ namespace vgim {
 		m_pMaterial->apply();
 	}
 
-     void _createMesh()
-     {
-        if (m_dimType == DimType::SPACE_2) 
-        {
-           m_pMesh = static_cast<std::shared_ptr<vg::SimpleMesh>>(new vg::DimSimpleMesh2(vg::MemoryPropertyFlagBits::HOST_VISIBLE));
-        }
-        else
-        {
-           m_pMesh = static_cast<std::shared_ptr<vg::SimpleMesh>>(new vg::DimSimpleMesh3(vg::MemoryPropertyFlagBits::HOST_VISIBLE));            
-        }
+    void _destroyMaterial()
+    {
+        m_pMaterial = nullptr;
+        m_pPass = nullptr;
+        m_pShader = nullptr;
+    }
 
-        const auto& pVertexData = m_pMesh->getVertexData();
-        const auto& pIndexData = m_pMesh->getIndexData();
+    void _createMesh()
+    {
+       if (m_dimType == DimType::SPACE_2) 
+       {
+          m_pMesh = static_cast<std::shared_ptr<vg::SimpleMesh>>(new vg::DimSimpleMesh2(vg::MemoryPropertyFlagBits::HOST_VISIBLE));
+       }
+       else
+       {
+          m_pMesh = static_cast<std::shared_ptr<vg::SimpleMesh>>(new vg::DimSimpleMesh3(vg::MemoryPropertyFlagBits::HOST_VISIBLE));            
+       }
+       const auto& pVertexData = m_pMesh->getVertexData();
+       const auto& pIndexData = m_pMesh->getIndexData();
+       vk::VertexInputBindingDescription bindingDesc[1] = {};
+       bindingDesc[0].stride = sizeof(ImDrawVert);
+       bindingDesc[0].inputRate = vk::VertexInputRate::eVertex;
 
-        vk::VertexInputBindingDescription bindingDesc[1] = {};
-        bindingDesc[0].stride = sizeof(ImDrawVert);
-        bindingDesc[0].inputRate = vk::VertexInputRate::eVertex;
-    
-        vk::VertexInputAttributeDescription attributeDesc[3] = {};
-        attributeDesc[0].location = 0;
-        attributeDesc[0].binding = bindingDesc[0].binding;
-        attributeDesc[0].format = vk::Format::eR32G32Sfloat;
-        attributeDesc[0].offset = (size_t)(&((ImDrawVert*)0)->pos);
-        attributeDesc[1].location = 1;
-        attributeDesc[1].binding = bindingDesc[0].binding;
-        attributeDesc[1].format = vk::Format::eR32G32Sfloat;
-        attributeDesc[1].offset = (size_t)(&((ImDrawVert*)0)->uv);
-        attributeDesc[2].location = 2;
-        attributeDesc[2].binding = bindingDesc[0].binding;
-        attributeDesc[2].format = vk::Format::eR8G8B8A8Unorm;
-        attributeDesc[2].offset = (size_t)(&((ImDrawVert*)0)->col);
-    
-        vk::PipelineVertexInputStateCreateInfo vertexInfo = {};
-        vertexInfo.vertexBindingDescriptionCount = 1;
-        vertexInfo.pVertexBindingDescriptions = bindingDesc;
-        vertexInfo.vertexAttributeDescriptionCount = 3;
-        vertexInfo.pVertexAttributeDescriptions = attributeDesc;
-    
-        vk::PipelineInputAssemblyStateCreateInfo iaInfo = {};
-        iaInfo.topology = vk::PrimitiveTopology::eTriangleList;
+       vk::VertexInputAttributeDescription attributeDesc[3] = {};
+       attributeDesc[0].location = 0;
+       attributeDesc[0].binding = bindingDesc[0].binding;
+       attributeDesc[0].format = vk::Format::eR32G32Sfloat;
+       attributeDesc[0].offset = (size_t)(&((ImDrawVert*)0)->pos);
+       attributeDesc[1].location = 1;
+       attributeDesc[1].binding = bindingDesc[0].binding;
+       attributeDesc[1].format = vk::Format::eR32G32Sfloat;
+       attributeDesc[1].offset = (size_t)(&((ImDrawVert*)0)->uv);
+       attributeDesc[2].location = 2;
+       attributeDesc[2].binding = bindingDesc[0].binding;
+       attributeDesc[2].format = vk::Format::eR8G8B8A8Unorm;
+       attributeDesc[2].offset = (size_t)(&((ImDrawVert*)0)->col);
 
-        pVertexData->updateDesData(vertexInfo);
-        pIndexData->updateDesData(iaInfo);
-     }
+       vk::PipelineVertexInputStateCreateInfo vertexInfo = {};
+       vertexInfo.vertexBindingDescriptionCount = 1;
+       vertexInfo.pVertexBindingDescriptions = bindingDesc;
+       vertexInfo.vertexAttributeDescriptionCount = 3;
+       vertexInfo.pVertexAttributeDescriptions = attributeDesc;
+
+       vk::PipelineInputAssemblyStateCreateInfo iaInfo = {};
+       iaInfo.topology = vk::PrimitiveTopology::eTriangleList;
+       pVertexData->updateDesData(vertexInfo);
+       pIndexData->updateDesData(iaInfo);
+    }
+
+    void _destroyMesh()
+    {
+        m_pMesh = nullptr;
+    }
+
+    void _createUIObject()
+    {
+        m_pUIObject = std::shared_ptr<vg::VisualObject2>(new vg::VisualObject2());
+        m_pUIObject->setMesh(m_pMesh);
+        m_pUIObject->setMaterial(m_pMaterial);
+    }
+
+    void _destroyUIObject()
+    {
+        m_pUIObject = nullptr;
+    }
+
+    void _createCamera()
+    {
+        m_pCamera = std::shared_ptr<vg::CameraOP2>(new vg::CameraOP2());
+    }
+
+    void _destroyCamera()
+    {
+        m_pCamera = nullptr;
+    }
+
+    void _createScene()
+    {
+        m_pScene = std::shared_ptr<vg::Scene2>(new vg::Scene2());
+        m_pScene->addCamera(m_pCamera);
+        m_pScene->addVisualObject(m_pUIObject);
+    }
+
+    void _destroyScene()
+    {
+        m_pScene = nullptr;
+    }
 } //vgim

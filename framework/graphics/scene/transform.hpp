@@ -31,9 +31,9 @@ namespace vg
 		Transform();
 
 		//------------hierarchy-----------------------
-		uint32_t getChildCount();
+		uint32_t getChildCount() const;
 
-		Type *getChildWithIndex(uint32_t index);
+		Type *getChildWithIndex(uint32_t index) const;
 
 		typename std::vector<Type *>::const_iterator getChildPos(Type *child);
 

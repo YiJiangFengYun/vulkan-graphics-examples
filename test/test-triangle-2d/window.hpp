@@ -41,17 +41,20 @@ namespace testTriangle_2d
 		void _createModel();
 		void _createCamera();
 		void _createScene();
-		void _fillRenderer();
 
-		void _onPreReCreateSwapchain() override;
-		void _onPostReCreateSwapchain() override;
+		virtual void _onPreReCreateSwapchain() override;
+		virtual void _onPostReCreateSwapchain() override;
 
-		void _onPreUpdate() override;
-		void _update() override;
-		void _onPostUpdate() override;
+		virtual void _onPreUpdate() override;
+		virtual void _update() override;
+		virtual void _onPostUpdate() override;
 
-		void _onPreRender() override;
-		void _onPostRender() override;
+		virtual void _onPreRender() override;
+		virtual void _onPostRender() override;
+
+		virtual void _renderWithRenderer(const std::shared_ptr<vg::Renderer> &pRenderer
+		    , const vg::Renderer::RenderInfo &info
+			, vg::Renderer::RenderResultInfo &resultInfo) override;
 	};
 
 }

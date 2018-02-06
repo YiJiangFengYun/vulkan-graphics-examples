@@ -14,31 +14,40 @@
 
 namespace vg
 {
-	class BaseRenderer : public Base
+	
+	class Renderer : public Base
 	{
 	public:
 		static const vk::Format DEFAULT_DEPTH_STENCIL_FORMAT;
 
+		struct SceneAndCamera {
+			const BaseScene *pScene;
+			const BaseCamera *pCamera;
+		};
+
 		struct RenderInfo {
-			uint32_t                         waitSemaphoreCount;
-			const vk::Semaphore*             pWaitSemaphores;
+			const SceneAndCamera *pSceneAndCamera;
+			uint32_t countSceneAndCamera;
+			uint32_t waitSemaphoreCount;
+			const vk::Semaphore* pWaitSemaphores;
 		};
 
 		struct RenderResultInfo {
+			Bool32 isRendered;
 			uint32_t                         signalSemaphoreCount;
 			const vk::Semaphore*             pSignalSemaphores;
 		};
 
-		BaseRenderer(std::shared_ptr<vk::ImageView> pSwapchainImageView
+		Renderer(std::shared_ptr<vk::ImageView> pSwapchainImageView
 			, vk::Format swapchainImageFormat
 			, uint32_t swapchainImageWidth
 			, uint32_t swapchainImageHeight
 		);
 
-		BaseRenderer(std::shared_ptr<TextureColorAttachment> pColorAttachmentTex
+		Renderer(std::shared_ptr<TextureColorAttachment> pColorAttachmentTex
 		);
 
-		~BaseRenderer();
+		~Renderer();
 
 		Bool32 isValidForRender();
 
@@ -106,64 +115,20 @@ namespace vg
 			uint32_t subMeshIndex = 0u,
 			uint32_t passIndex = 0u);
 
-	private:
-		BaseRenderer() = delete;
-		inline void _init();
-	};
+	    void _renderScene2(const Scene<SpaceType::SPACE_2> *pScene
+		    , const Camera<SpaceType::SPACE_2> *pCamera
+	        , const RenderInfo &info
+	    	, RenderResultInfo &resultInfo);
 
-	template <SpaceType SPACE_TYPE>
-	class Renderer : public BaseRenderer
-	{
-	public:
-		typedef Scene<SPACE_TYPE> SceneType;
-		typedef Camera<SPACE_TYPE> CameraType;
-
-		Renderer(std::shared_ptr<vk::ImageView> pSwapchainImageView
-			, vk::Format swapchainImageFormat
-			, uint32_t swapchainImageWidth
-			, uint32_t swapchainImageHeight
-		);
-
-		Renderer(std::shared_ptr<vk::ImageView> pSwapchainImageView
-			, vk::Format swapchainImageFormat
-			, uint32_t swapchainImageWidth
-			, uint32_t swapchainImageHeight
-			, std::shared_ptr<SceneType> pScene
-			, std::shared_ptr<CameraType> pCamera
-		);
-
-		Renderer(std::shared_ptr<TextureColorAttachment> pColorAttachmentTex
-		);
-
-		Renderer(std::shared_ptr<TextureColorAttachment> pColorAttachmentTex
-			, std::shared_ptr<SceneType> pScene
-			, std::shared_ptr<CameraType> pCamera
-		);
-
-		void reset(std::shared_ptr<SceneType> pScene
-			, std::shared_ptr<CameraType> pCamera
-		);
-
-	protected:
-		//compositions
-
-		//aggregations
-		std::shared_ptr<SceneType> m_pScene;
-		std::shared_ptr<CameraType> m_pCamera;
-
-		Bool32 _isValidForRender() override;
-
-		void _render(const RenderInfo &info, RenderResultInfo &resultInfo) override;
-
-		inline virtual typename SpaceTypeInfo<SPACE_TYPE>::MatrixType _getMVPMatrix(std::shared_ptr<typename SceneType::ObjectType> pObject);
-
-		inline virtual typename SpaceTypeInfo<SPACE_TYPE>::MatrixType _getMVMatrix(std::shared_ptr<typename SceneType::ObjectType> pObject);
+		 void _renderScene3(const Scene<SpaceType::SPACE_3> *pScene
+		    , const Camera<SpaceType::SPACE_3> *pCamera
+	        , const RenderInfo &info
+	    	, RenderResultInfo &resultInfo);
 
 	private:
 		Renderer() = delete;
+		void _init();
 	};
 } //namespace kgs
-
-#include "graphics/renderer/renderer.inl"
 
 #endif // !VG_RENDERER_H

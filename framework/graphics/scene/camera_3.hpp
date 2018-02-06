@@ -25,8 +25,8 @@ namespace vg
 		float getZFar() const;
 		void setZFar(float zFar);
 
-		typename TransformType::MatrixType getProjMatrix() override;
-		Bool32 isInView(Transform<SpaceType::SPACE_3> *pTransform, BoundsType bounds) override;
+		typename TransformType::MatrixType getProjMatrix() const override;
+		Bool32 isInView(Transform<SpaceType::SPACE_3> *pTransform, BoundsType bounds) const override;
 	private:
 		float m_fovy, m_aspect, m_zNear, m_zFar;
 		TransformType::MatrixType m_projMatrix;

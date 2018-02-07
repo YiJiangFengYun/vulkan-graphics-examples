@@ -11,7 +11,8 @@ namespace vg {
      public:
         using PipelineStateID = uint32_t;
         struct SubIndexData {
-            vk::PipelineInputAssemblyStateCreateInfo inputAssemblyStateInfo;            
+            vk::PipelineInputAssemblyStateCreateInfo inputAssemblyStateInfo;
+            vk::IndexType indexType;            
             uint32_t indexCount;
             uint32_t bufferSize;
         };
@@ -39,6 +40,7 @@ namespace vg {
              , uint32_t size
              , Bool32 cacheMemory
              , const vk::PipelineInputAssemblyStateCreateInfo &inputAssemblyStateInfo
+             , vk::IndexType indexType
              );
         
         template<typename IndexType>
@@ -46,15 +48,18 @@ namespace vg {
             , const void *memory
             , Bool32 cacheMemory
             , const vk::PipelineInputAssemblyStateCreateInfo &inputAssemblyStateInfo
+            , vk::IndexType indexType            
             );
 
         void updateDesData(const std::vector<SubIndexData> subDatas);
-        void updateDesData(const vk::PipelineInputAssemblyStateCreateInfo &inputAssemblyStateInfo);
-        void updateDesData(uint32_t indexCount, uint32_t size, const vk::PipelineInputAssemblyStateCreateInfo &inputAssemblyStateInfo);
+        void updateDesData(const vk::PipelineInputAssemblyStateCreateInfo &inputAssemblyStateInfo
+            , vk::IndexType indexType);
+        void updateDesData(uint32_t indexCount, uint32_t size, 
+            const vk::PipelineInputAssemblyStateCreateInfo &inputAssemblyStateInfo, vk::IndexType indexType);
         template<typename IndexType>
-        void updateDesData(uint32_t indexCount, const vk::PipelineInputAssemblyStateCreateInfo &inputAssemblyStateInfo);
+        void updateDesData(uint32_t indexCount, const vk::PipelineInputAssemblyStateCreateInfo &inputAssemblyStateInfo, vk::IndexType indexType);
         template<typename IndexType>
-        void updateDesData(const vk::PipelineInputAssemblyStateCreateInfo &inputAssemblyStateInfo);
+        void updateDesData(const vk::PipelineInputAssemblyStateCreateInfo &inputAssemblyStateInfo, vk::IndexType indexType);
 
         void updateIndexCount(fd::ArrayProxy<uint32_t> indexCounts);
         void updateBufferSize(fd::ArrayProxy<uint32_t> bufferSizes);

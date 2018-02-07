@@ -5,23 +5,45 @@ namespace vg
             , const void *memory
             , Bool32 cacheMemory
             , const vk::PipelineInputAssemblyStateCreateInfo &inputAssemblyStateInfo
+            , vk::IndexType indexType
             )
     {
-        uint32_t size = indexCount * static_cast<uint32_t>(sizeof(IndexType));
-        init(indexCount, memory, size, cacheMemory, inputAssemblyStateInfo);
+        uint32_t size;
+        if (indexType == vk::IndexType::eUint16) {
+            size = 16u;
+        } else if (indexType == vk::IndexType::eUint32) {
+            size = 32u;
+        } else {
+            throw invalid_argument("Unkown Index Type!");
+        }
+        size = indexCount * size;
+        init(indexCount, memory, size, cacheMemory, inputAssemblyStateInfo, indexType);
     }
 
     template<typename IndexType>
-    void IndexData::updateDesData(uint32_t indexCount, const vk::PipelineInputAssemblyStateCreateInfo &inputAssemblyStateInfo)
+    void IndexData::updateDesData(uint32_t indexCount
+        , const vk::PipelineInputAssemblyStateCreateInfo &inputAssemblyStateInfo
+         , vk::IndexType indexType
+        )
     {
-        uint32_t size = indexCount * static_cast<uint32_t>(sizeof(IndexType));
-        updateDesData(indexCount, size, inputAssemblyStateInfo);
+        uint32_t size;
+        if (indexType == vk::IndexType::eUint16) {
+            size = 16u;
+        } else if (indexType == vk::IndexType::eUint32) {
+            size = 32u;
+        } else {
+            throw invalid_argument("Unkown Index Type!");
+        }
+        size = indexCount * size;
+        updateDesData(indexCount, size, inputAssemblyStateInfo, indexType);
     }
 
     template<typename IndexType>
-    void IndexData::updateDesData(const vk::PipelineInputAssemblyStateCreateInfo &inputAssemblyStateInfo)
+    void IndexData::updateDesData(const vk::PipelineInputAssemblyStateCreateInfo &inputAssemblyStateInfo
+        , vk::IndexType indexType
+        )
     {
-        updateDesData(inputAssemblyStateInfo);
+        updateDesData(inputAssemblyStateInfo, indexType);
     }
 
     template<typename IndexType>

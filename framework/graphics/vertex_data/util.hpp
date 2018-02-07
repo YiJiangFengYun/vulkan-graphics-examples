@@ -7,12 +7,11 @@
 
 namespace vg
 {
-    extern void vertexDataToCommandBuffer(const std::shared_ptr<VertexData> &pVertexData, vk::CommandBuffer &commandBuffer, uint32_t subIndex = 0);
+    extern void vertexDataToCommandBuffer(vk::CommandBuffer &commandBuffer, const std::shared_ptr<VertexData> &pVertexData, uint32_t subIndex = 0);
 
-    extern void indexDataToCommandBuffer(const std::shared_ptr<IndexData> &pIndexData, 
-        vk::CommandBuffer &commandBuffer, 
-        uint32_t subIndex = 0, 
-        vk::IndexType indexType = vk::IndexType::eUint32
+    extern void indexDataToCommandBuffer(vk::CommandBuffer &commandBuffer, 
+        const std::shared_ptr<IndexData> &pIndexData, 
+        uint32_t subIndex = 0
         );
 } //!vg
 

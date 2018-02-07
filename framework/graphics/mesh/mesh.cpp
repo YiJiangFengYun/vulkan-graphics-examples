@@ -333,6 +333,7 @@ namespace vg
 		for (uint32_t i = 0; i < subCount; ++i) {
 			const std::vector<uint32_t>& indices = m_usingSubMeshInfos[i].indices;
 			uint32_t subBufferSize = static_cast<uint32_t>(indices.size() * sizeof(uint32_t));
+			subDatas[i].indexType = vk::IndexType::eUint32;
 			subDatas[i].bufferSize = subBufferSize;
 			subDatas[i].indexCount = indices.size();
 			subDatas[i].inputAssemblyStateInfo.primitiveRestartEnable = VK_FALSE;

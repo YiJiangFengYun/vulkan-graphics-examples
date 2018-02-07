@@ -314,8 +314,8 @@ namespace vg
 		}
 		m_pCommandBuffer->bindDescriptorSets(vk::PipelineBindPoint::eGraphics, *pPipelineLayout, 0u, descriptorSets, nullptr);
 
-        vertexDataToCommandBuffer(pContentMesh->getVertexData(), *m_pCommandBuffer, 0);
-		indexDataToCommandBuffer(pContentMesh->getIndexData(), *m_pCommandBuffer, subMeshIndex);
+        vertexDataToCommandBuffer(*m_pCommandBuffer, pContentMesh->getVertexData(), 0);
+		indexDataToCommandBuffer(*m_pCommandBuffer, pContentMesh->getIndexData());
 		m_pCommandBuffer->drawIndexed(pContentMesh->getIndexData()->getSubIndexDatas()[subMeshIndex].indexCount, 1u, 0u, 0u, 0u);
 		//m_pCommandBuffer->draw(3, 1, 0, 0);
 

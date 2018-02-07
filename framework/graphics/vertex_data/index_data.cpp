@@ -120,9 +120,10 @@ namespace vg
              , uint32_t size
              , Bool32 cacheMemory
              , const vk::PipelineInputAssemblyStateCreateInfo &inputAssemblyStateInfo
+             , vk::IndexType indexType
              )
     {
-        updateDesData(indexCount, size, inputAssemblyStateInfo);
+        updateDesData(indexCount, size, inputAssemblyStateInfo, indexType);
         updateBuffer(memory, size, cacheMemory);
     }
 
@@ -135,9 +136,14 @@ namespace vg
         }
     }
 
-    void IndexData::updateDesData(uint32_t indexCount, uint32_t size, const vk::PipelineInputAssemblyStateCreateInfo &inputAssemblyStateInfo)
+    void IndexData::updateDesData(uint32_t indexCount
+        , uint32_t size
+        , const vk::PipelineInputAssemblyStateCreateInfo &inputAssemblyStateInfo
+        , vk::IndexType indexType
+        )
     {
         if (m_subDatas.size() != 1u ||
+            m_subDatas[0].indexType != indexType ||
             m_subDatas[0].bufferSize != size || 
             m_subDatas[0].indexCount != indexCount || 
             m_subDatas[0].inputAssemblyStateInfo != inputAssemblyStateInfo
@@ -147,16 +153,19 @@ namespace vg
             SubIndexData &subData = subDatas[0];
             subData.inputAssemblyStateInfo = inputAssemblyStateInfo;
             subData.inputAssemblyStateInfo.pNext = nullptr;
-    
+
+            subData.indexType = indexType;
             subData.indexCount = indexCount;
             subData.bufferSize = size;
             updateDesData(subDatas);
         }
     }
 
-    void IndexData::updateDesData(const vk::PipelineInputAssemblyStateCreateInfo &inputAssemblyStateInfo)
+    void IndexData::updateDesData(const vk::PipelineInputAssemblyStateCreateInfo &inputAssemblyStateInfo
+        , vk::IndexType indexType
+        )
     {
-        updateDesData(0u, 0u, inputAssemblyStateInfo);
+        updateDesData(0u, 0u, inputAssemblyStateInfo, indexType);
     }
 
     void IndexData::updateIndexCount(fd::ArrayProxy<uint32_t> indexCounts)
@@ -363,6 +372,7 @@ namespace vg
             if (subDatas1[i].bufferSize != subDatas2[i].bufferSize) return VG_FALSE;
             if (subDatas1[i].indexCount != subDatas2[i].indexCount) return VG_FALSE;
             if (subDatas1[i].inputAssemblyStateInfo != subDatas2[i].inputAssemblyStateInfo) return VG_FALSE;
+            if (subDatas1[i].indexType != subDatas2[i].indexType) return VG_FALSE;
         }
 
         return VG_TRUE;

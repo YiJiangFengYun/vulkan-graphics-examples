@@ -2,7 +2,7 @@
 
 namespace vg
 {
-    void vertexDataToCommandBuffer(const std::shared_ptr<VertexData> &pVertexData, vk::CommandBuffer &commandBuffer, uint32_t subIndex)
+    void vertexDataToCommandBuffer(vk::CommandBuffer &commandBuffer, const std::shared_ptr<VertexData> &pVertexData, uint32_t subIndex)
 	{
 		const auto &subVertexDatas = pVertexData->getSubVertexDatas();
         const auto &subVertexData = subVertexDatas[subIndex];
@@ -24,19 +24,17 @@ namespace vg
 		commandBuffer.bindVertexBuffers(0u, vertexBuffers, offsets);
 	}
 
-    void indexDataToCommandBuffer(const std::shared_ptr<IndexData> &pIndexData, 
-        vk::CommandBuffer &commandBuffer, 
-        uint32_t subIndex, 
-        vk::IndexType indexType
+    void indexDataToCommandBuffer(vk::CommandBuffer &commandBuffer, 
+        const std::shared_ptr<IndexData> &pIndexData, 
+        uint32_t subIndex
         )
     {
         uint32_t offset = 0u;
-        uint32_t index = 0u;
         auto subIndexDatas = pIndexData->getSubIndexDatas();
 		for (uint32_t i = 0; i < subIndex; ++i)
 		{
 			offset += subIndexDatas[i].bufferSize;
 		}
-		commandBuffer.bindIndexBuffer(*(pIndexData->getBuffer()), static_cast<vk::DeviceSize>(offset), vk::IndexType::eUint32);
+		commandBuffer.bindIndexBuffer(*(pIndexData->getBuffer()), static_cast<vk::DeviceSize>(offset), subIndexDatas[subIndex].indexType);
     }
 }

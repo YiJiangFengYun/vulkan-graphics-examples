@@ -13,15 +13,22 @@ namespace vg
 	public:
 		BaseVisualObject();
 
-		std::shared_ptr<Material> getMaterial();
+		const std::shared_ptr<Material> &getMaterial() const;
 
 		void setMaterial(std::shared_ptr<Material> pMaterial);
 
-		std::shared_ptr<BaseMesh> getMesh();
+		const std::shared_ptr<BaseMesh> &getMesh() const;
+
+		uint32_t getSubMeshOffset() const;
+		uint32_t getSubMeshCount() const;
+
+		void updateSubMeshInfo(uint32_t subMeshOffset, uint32_t subMeshCount);
 
 	protected:
 		std::shared_ptr<Material> m_pMaterial;
 		std::shared_ptr<BaseMesh> m_pMesh;
+		uint32_t m_subMeshOffset;
+		uint32_t m_subMeshCount;
 	};
 
 	template <SpaceType SPACE_TYPE>
@@ -41,6 +48,17 @@ namespace vg
 		void setMesh(std::shared_ptr<MeshDimType> pMesh)
 		{
 			m_pMesh = pMesh;
+			m_subMeshOffset = 0u;
+			m_subMeshCount = dynamic_cast<ContentMesh *>(pMesh.get())->getSubMeshCount();
+		}
+
+		void setMesh(std::shared_ptr<MeshDimType> pMesh
+		    , uint32_t subMeshOffset
+			, uint32_t subMeshCount)
+		{
+			m_pMesh = pMesh;
+			m_subMeshOffset = subMeshOffset;
+			m_subMeshCount = subMeshCount;
 		}
 	protected:
 		//aggregations

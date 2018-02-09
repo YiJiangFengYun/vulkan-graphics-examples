@@ -163,7 +163,7 @@ namespace vg
 	{
 		if (m_vertexCount == 0u)
 		{
-			m_bounds = {};
+			m_bounds = {PointType(0), PointType(0)};
 			return;
 		}
 

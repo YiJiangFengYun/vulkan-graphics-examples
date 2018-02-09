@@ -7,7 +7,7 @@ namespace vg
 
 	}
 
-	std::shared_ptr<Material> BaseVisualObject::getMaterial()
+	const std::shared_ptr<Material> &BaseVisualObject::getMaterial() const
 	{
 		return m_pMaterial;
 	}
@@ -17,8 +17,25 @@ namespace vg
 		m_pMaterial = pMaterial;
 	}
 
-	std::shared_ptr<BaseMesh> BaseVisualObject::getMesh()
+	const std::shared_ptr<BaseMesh> &BaseVisualObject::getMesh() const
 	{
 		return m_pMesh;
 	}
+
+	uint32_t BaseVisualObject::getSubMeshOffset() const
+	{
+		return m_subMeshOffset;
+	}
+		
+	uint32_t BaseVisualObject::getSubMeshCount() const
+	{
+		return m_subMeshCount;
+	}
+
+	void BaseVisualObject::updateSubMeshInfo(uint32_t subMeshOffset, uint32_t subMeshCount)
+	{
+		m_subMeshOffset = subMeshOffset;
+		m_subMeshCount = subMeshCount;
+	}
+
 } //namespace kgs

@@ -721,7 +721,8 @@ namespace vg
 				auto mvpMatrix = projMatrix * mvMatrix;
 				auto pMesh = pVisualObject->getMesh();
 				auto pContentMesh = dynamic_cast<ContentMesh *>(pMesh.get());
-				auto subMeshCount = pContentMesh->getSubMeshCount();
+				auto subMeshOffset = pVisualObject->getSubMeshOffset();
+				auto subMeshCount = pVisualObject->getSubMeshCount();
 				auto pMaterial = pVisualObject->getMaterial();
 				auto passCount = pMaterial->getPassCount();
 

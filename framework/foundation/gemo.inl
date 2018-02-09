@@ -117,6 +117,8 @@ namespace fd
 
 	template <typename VecType = glm::vec3>
 	Bounds<VecType>::Bounds()
+	    : m_min(0u)
+		, m_max(0u)
 	{
 		_updateSize();
 	}

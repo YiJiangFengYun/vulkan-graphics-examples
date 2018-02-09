@@ -6,6 +6,16 @@
 
 namespace vg 
 {
+    VertexData::SubVertexData::SubVertexData(uint32_t vertexCount
+        , uint32_t bufferSize
+        , vk::PipelineVertexInputStateCreateInfo vertexInputStateInfo)
+        : vertexCount(vertexCount)
+        , bufferSize(bufferSize)
+        , vertexInputStateInfo(vertexInputStateInfo)
+    {
+
+    }
+
     VertexData::VertexData()
         : Base(BaseType::VERTEX_DATA)
         , m_bufferMemoryPropertyFlags()
@@ -105,17 +115,6 @@ namespace vg
         return m_pipelineStateID;
     }
 
-    void VertexData::init(uint32_t vertexCount
-        , const void *memory
-        , uint32_t size
-        , Bool32 cacheMemory
-        , const vk::PipelineVertexInputStateCreateInfo &vertexInputStateInfo
-        )
-    {
-        updateDesData(vertexCount, size, vertexInputStateInfo);
-        updateBuffer(memory, size, cacheMemory);        
-    }
-
     void VertexData::init(const std::vector<VertexData::SubVertexData> subDatas
             , const void *memory
             , uint32_t size
@@ -125,42 +124,17 @@ namespace vg
         
         updateDesData(subDatas);
         updateBuffer(memory, size, cacheMemory);
-
     }
 
-    void VertexData::updateDesData(const vk::PipelineVertexInputStateCreateInfo &vertexInputStateInfo)
+    void VertexData::init(uint32_t vertexCount
+        , const void *memory
+        , uint32_t size
+        , Bool32 cacheMemory
+        , const vk::PipelineVertexInputStateCreateInfo &vertexInputStateInfo
+        )
     {
-        updateDesData(0u, 0u, vertexInputStateInfo);
-    }
-
-    void VertexData::updateDesData(uint32_t vertexCount, uint32_t size, const vk::PipelineVertexInputStateCreateInfo &vertexInputStateInfo)
-    {
-        if (m_subDatas.size() != 1u || _isEqual(m_subDatas[0].vertexInputStateInfo, vertexInputStateInfo) == VG_FALSE) {
-            std::vector<SubVertexData> subDatas(1);
-            SubVertexData &subData = subDatas[0];
-            //copy arguments.
-            uint32_t count = vertexInputStateInfo.vertexBindingDescriptionCount;
-            size_t size2 = count * sizeof(vk::VertexInputBindingDescription);
-            subData.bindingDescs.resize(count);
-            memcpy(subData.bindingDescs.data(), vertexInputStateInfo.pVertexBindingDescriptions, size2);
-    
-            count = vertexInputStateInfo.vertexAttributeDescriptionCount;
-		    size2 = count * sizeof(vk::VertexInputAttributeDescription);
-            subData.attrDescs.resize(count);
-            memcpy(subData.attrDescs.data(), vertexInputStateInfo.pVertexAttributeDescriptions, size2);
-    
-            //set vertex input state create info.
-            subData.vertexInputStateInfo = vertexInputStateInfo;
-            subData.vertexInputStateInfo.pNext = nullptr;
-            // subData.vertexInputStateInfo.vertexBindingDescriptionCount = vertexInputStateInfo.vertexBindingDescriptionCount;
-            subData.vertexInputStateInfo.pVertexBindingDescriptions = subData.bindingDescs.data();
-            // subData.vertexInputStateInfo.vertexAttributeDescriptionCount = vertexInputStateInfo.vertexAttributeDescriptionCount;
-            subData.vertexInputStateInfo.pVertexAttributeDescriptions = subData.attrDescs.data();
-            
-            subData.vertexCount = vertexCount;
-            subData.bufferSize = size;
-            updateDesData(subDatas);
-        }
+        updateDesData(vertexCount, size, vertexInputStateInfo);
+        updateBuffer(memory, size, cacheMemory);        
     }
 
     void VertexData::updateDesData(const std::vector<SubVertexData> subDatas)
@@ -175,6 +149,98 @@ namespace vg
 		    }
 
             _updatePipelineStateID();            
+        }
+    }
+
+    void VertexData::updateDesData(const vk::PipelineVertexInputStateCreateInfo &vertexInputStateInfo)
+    {
+        size_t size = m_subDatas.size();
+        if (size == 0u) {
+            size = 1u;
+            m_subDatas.resize(1u);
+        };
+        Bool32 isChange = VG_FALSE;
+        for (size_t i = 0u; i < size; ++i) 
+        {
+            SubVertexData &subData = m_subDatas[i];
+            if (_isEqual(m_subDatas[i].vertexInputStateInfo, vertexInputStateInfo) == VG_FALSE) {
+                //copy arguments.
+                uint32_t count = vertexInputStateInfo.vertexBindingDescriptionCount;
+                size_t size2 = count * sizeof(vk::VertexInputBindingDescription);
+                subData.bindingDescs.resize(count);
+                memcpy(subData.bindingDescs.data(), vertexInputStateInfo.pVertexBindingDescriptions, size2);
+        
+                count = vertexInputStateInfo.vertexAttributeDescriptionCount;
+		        size2 = count * sizeof(vk::VertexInputAttributeDescription);
+                subData.attrDescs.resize(count);
+                memcpy(subData.attrDescs.data(), vertexInputStateInfo.pVertexAttributeDescriptions, size2);
+        
+                //set vertex input state create info.
+                subData.vertexInputStateInfo = vertexInputStateInfo;
+                subData.vertexInputStateInfo.pNext = nullptr;
+                // subData.vertexInputStateInfo.vertexBindingDescriptionCount = vertexInputStateInfo.vertexBindingDescriptionCount;
+                subData.vertexInputStateInfo.pVertexBindingDescriptions = subData.bindingDescs.data();
+                // subData.vertexInputStateInfo.vertexAttributeDescriptionCount = vertexInputStateInfo.vertexAttributeDescriptionCount;
+                subData.vertexInputStateInfo.pVertexAttributeDescriptions = subData.attrDescs.data();
+                
+                isChange = VG_TRUE;            
+            }
+        }
+
+        if (isChange) {
+            _updatePipelineStateID();
+        }
+    }
+
+    void VertexData::updateDesData(uint32_t vertexCount, uint32_t bufferSize, const vk::PipelineVertexInputStateCreateInfo &vertexInputStateInfo)
+    {
+        size_t size = m_subDatas.size();
+        if (size == 0u) {
+            size = 1u;
+            m_subDatas.resize(1u);
+        };
+        Bool32 isChange = VG_FALSE;
+        for (size_t i = 0u; i < size; ++i) 
+        {
+            SubVertexData &subData = m_subDatas[i];
+            if (subData.vertexCount != vertexCount) 
+            {
+                subData.vertexCount = vertexCount;
+                isChange = VG_TRUE;                               
+            }
+
+            if (subData.bufferSize != bufferSize)
+            {
+                subData.bufferSize = bufferSize;
+                isChange = VG_TRUE;                                                            
+            }
+
+            if (_isEqual(m_subDatas[i].vertexInputStateInfo, vertexInputStateInfo) == VG_FALSE) {
+                //copy arguments.
+                uint32_t count = vertexInputStateInfo.vertexBindingDescriptionCount;
+                size_t size2 = count * sizeof(vk::VertexInputBindingDescription);
+                subData.bindingDescs.resize(count);
+                memcpy(subData.bindingDescs.data(), vertexInputStateInfo.pVertexBindingDescriptions, size2);
+        
+                count = vertexInputStateInfo.vertexAttributeDescriptionCount;
+		        size2 = count * sizeof(vk::VertexInputAttributeDescription);
+                subData.attrDescs.resize(count);
+                memcpy(subData.attrDescs.data(), vertexInputStateInfo.pVertexAttributeDescriptions, size2);
+        
+                //set vertex input state create info.
+                subData.vertexInputStateInfo = vertexInputStateInfo;
+                subData.vertexInputStateInfo.pNext = nullptr;
+                // subData.vertexInputStateInfo.vertexBindingDescriptionCount = vertexInputStateInfo.vertexBindingDescriptionCount;
+                subData.vertexInputStateInfo.pVertexBindingDescriptions = subData.bindingDescs.data();
+                // subData.vertexInputStateInfo.vertexAttributeDescriptionCount = vertexInputStateInfo.vertexAttributeDescriptionCount;
+                subData.vertexInputStateInfo.pVertexAttributeDescriptions = subData.attrDescs.data();
+                
+                isChange = VG_TRUE;            
+            }
+        }
+
+        if (isChange) {
+            _updatePipelineStateID();
         }
     }
 

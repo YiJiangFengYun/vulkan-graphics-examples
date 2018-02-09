@@ -11,10 +11,19 @@ namespace vg {
      public:
         using PipelineStateID = uint32_t;
         struct SubIndexData {
-            vk::PipelineInputAssemblyStateCreateInfo inputAssemblyStateInfo;
-            vk::IndexType indexType;            
+            vk::IndexType indexType;           
             uint32_t indexCount;
             uint32_t bufferSize;
+            vk::PipelineInputAssemblyStateCreateInfo inputAssemblyStateInfo;            
+            Bool32 hasClipRect;
+            fd::Rect2D clipRect;
+
+            SubIndexData(vk::IndexType indexType = vk::IndexType()
+                , uint32_t indexCount = 0u
+                , uint32_t bufferSize = 0u
+                , vk::PipelineInputAssemblyStateCreateInfo inputAssemblyStateInfo = vk::PipelineInputAssemblyStateCreateInfo()
+                , Bool32 hasClipRect = VG_FALSE
+                , fd::Rect2D clipRect = fd::Rect2D(0u, 0u, 0u, 0u));
         };
         uint32_t getSubIndexDataCount() const;
         const std::vector<SubIndexData> &getSubIndexDatas() const;
@@ -36,30 +45,17 @@ namespace vg {
             );
 
         void init(uint32_t indexCount
+             , vk::IndexType indexType             
              , const void *memory
              , uint32_t size
              , Bool32 cacheMemory
              , const vk::PipelineInputAssemblyStateCreateInfo &inputAssemblyStateInfo
-             , vk::IndexType indexType
              );
-        
-        template<typename IndexType>
-        void init(uint32_t indexCount
-            , const void *memory
-            , Bool32 cacheMemory
-            , const vk::PipelineInputAssemblyStateCreateInfo &inputAssemblyStateInfo
-            , vk::IndexType indexType            
-            );
 
         void updateDesData(const std::vector<SubIndexData> subDatas);
-        void updateDesData(const vk::PipelineInputAssemblyStateCreateInfo &inputAssemblyStateInfo
-            , vk::IndexType indexType);
-        void updateDesData(uint32_t indexCount, uint32_t size, 
-            const vk::PipelineInputAssemblyStateCreateInfo &inputAssemblyStateInfo, vk::IndexType indexType);
-        template<typename IndexType>
-        void updateDesData(uint32_t indexCount, const vk::PipelineInputAssemblyStateCreateInfo &inputAssemblyStateInfo, vk::IndexType indexType);
-        template<typename IndexType>
-        void updateDesData(const vk::PipelineInputAssemblyStateCreateInfo &inputAssemblyStateInfo, vk::IndexType indexType);
+        void updateDesData(vk::IndexType indexType, const vk::PipelineInputAssemblyStateCreateInfo &inputAssemblyStateInfo);
+        void updateDesData(uint32_t indexCount, vk::IndexType indexType,  uint32_t size, 
+            const vk::PipelineInputAssemblyStateCreateInfo &inputAssemblyStateInfo);
 
         void updateIndexCount(fd::ArrayProxy<uint32_t> indexCounts);
         void updateBufferSize(fd::ArrayProxy<uint32_t> bufferSizes);

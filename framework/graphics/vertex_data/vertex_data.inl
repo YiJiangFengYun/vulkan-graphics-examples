@@ -19,12 +19,6 @@ namespace vg
     }
 
     template<typename VertexType>
-    void VertexData::updateDesData(const vk::PipelineVertexInputStateCreateInfo &vertexInputStateInfo)
-    {
-        updateDesData(vertexInputStateInfo);
-    }
-
-    template<typename VertexType>
     VertexType VertexData::getVertex(uint32_t index) const
     {
 #ifdef DEBUG

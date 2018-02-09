@@ -6,6 +6,21 @@
 
 namespace vg
 {
+    IndexData::SubIndexData::SubIndexData(vk::IndexType indexType
+        , uint32_t indexCount
+        , uint32_t bufferSize
+        , vk::PipelineInputAssemblyStateCreateInfo inputAssemblyStateInfo
+        , Bool32 hasClipRect
+        , fd::Rect2D clipRect)
+        : indexType(indexType)
+        , indexCount(indexCount)
+        , bufferSize(bufferSize)
+        , inputAssemblyStateInfo(inputAssemblyStateInfo)
+        , hasClipRect(hasClipRect)
+        , clipRect(clipRect)
+    {
+
+    }
     IndexData::IndexData()
         : Base(BaseType::INDEX_DATA)
         , m_bufferMemoryPropertyFlags()
@@ -116,14 +131,14 @@ namespace vg
     }
 
     void IndexData::init(uint32_t indexCount
+             , vk::IndexType indexType    
              , const void *memory
              , uint32_t size
              , Bool32 cacheMemory
              , const vk::PipelineInputAssemblyStateCreateInfo &inputAssemblyStateInfo
-             , vk::IndexType indexType
              )
     {
-        updateDesData(indexCount, size, inputAssemblyStateInfo, indexType);
+        updateDesData(indexCount, indexType, size, inputAssemblyStateInfo);
         updateBuffer(memory, size, cacheMemory);
     }
 
@@ -137,35 +152,79 @@ namespace vg
     }
 
     void IndexData::updateDesData(uint32_t indexCount
-        , uint32_t size
+        , vk::IndexType indexType    
+        , uint32_t bufferSize
         , const vk::PipelineInputAssemblyStateCreateInfo &inputAssemblyStateInfo
-        , vk::IndexType indexType
         )
     {
-        if (m_subDatas.size() != 1u ||
-            m_subDatas[0].indexType != indexType ||
-            m_subDatas[0].bufferSize != size || 
-            m_subDatas[0].indexCount != indexCount || 
-            m_subDatas[0].inputAssemblyStateInfo != inputAssemblyStateInfo
-            )
+        size_t size = m_subDatas.size();
+        if (size == 0u) {
+            size = 1u;
+            m_subDatas.resize(1u);
+        };
+        Bool32 isChange = VG_FALSE;
+        for (size_t i = 0u; i < size; ++i) 
         {
-            std::vector<SubIndexData> subDatas(1);
-            SubIndexData &subData = subDatas[0];
-            subData.inputAssemblyStateInfo = inputAssemblyStateInfo;
-            subData.inputAssemblyStateInfo.pNext = nullptr;
+            SubIndexData &subData = m_subDatas[i];
+            if (subData.indexCount != indexCount) 
+            {
+                subData.indexCount = indexCount;
+                isChange = VG_TRUE;                               
+            }
 
-            subData.indexType = indexType;
-            subData.indexCount = indexCount;
-            subData.bufferSize = size;
-            updateDesData(subDatas);
+            if (subData.indexType != indexType)
+            {
+                subData.indexType = indexType;
+                isChange = VG_TRUE;
+            }
+
+            if (subData.bufferSize != bufferSize)
+            {
+                subData.bufferSize = bufferSize;
+                isChange = VG_TRUE;                                                            
+            }
+
+            if (m_subDatas[i].inputAssemblyStateInfo !=inputAssemblyStateInfo) {
+                subData.inputAssemblyStateInfo = inputAssemblyStateInfo;
+                subData.inputAssemblyStateInfo.pNext = nullptr;
+                isChange = VG_TRUE;            
+            }
+        }
+
+        if (isChange) {
+            _updatePipelineStateID();
         }
     }
 
-    void IndexData::updateDesData(const vk::PipelineInputAssemblyStateCreateInfo &inputAssemblyStateInfo
-        , vk::IndexType indexType
+    void IndexData::updateDesData(vk::IndexType indexType
+        ,const vk::PipelineInputAssemblyStateCreateInfo &inputAssemblyStateInfo
         )
     {
-        updateDesData(0u, 0u, inputAssemblyStateInfo, indexType);
+        size_t size = m_subDatas.size();
+        if (size == 0u) {
+            size = 1u;
+            m_subDatas.resize(1u);
+        };
+        Bool32 isChange = VG_FALSE;
+        for (size_t i = 0u; i < size; ++i) 
+        {
+            SubIndexData &subData = m_subDatas[i];
+            if (subData.indexType != indexType)
+            {
+                subData.indexType = indexType;
+                isChange = VG_TRUE;
+            }
+
+            if (m_subDatas[i].inputAssemblyStateInfo !=inputAssemblyStateInfo) {
+                subData.inputAssemblyStateInfo = inputAssemblyStateInfo;
+                subData.inputAssemblyStateInfo.pNext = nullptr;
+                isChange = VG_TRUE;            
+            }
+        }
+
+        if (isChange) {
+            _updatePipelineStateID();
+        }
     }
 
     void IndexData::updateIndexCount(fd::ArrayProxy<uint32_t> indexCounts)

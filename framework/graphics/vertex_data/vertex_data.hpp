@@ -12,11 +12,15 @@ namespace vg
     public:
         using PipelineStateID = uint32_t;
         struct SubVertexData {
+            uint32_t vertexCount;
+            uint32_t bufferSize;
             std::vector<vk::VertexInputBindingDescription> bindingDescs;
             std::vector<vk::VertexInputAttributeDescription> attrDescs;
             vk::PipelineVertexInputStateCreateInfo vertexInputStateInfo;
-            uint32_t vertexCount;
-            uint32_t bufferSize;
+
+            SubVertexData(uint32_t vertexCount = 0u
+                , uint32_t bufferSize = 0u
+                , vk::PipelineVertexInputStateCreateInfo vertexInputStateInfo = vk::PipelineVertexInputStateCreateInfo());
         };
         uint32_t getSubVertexDataCount() const;
         const std::vector<SubVertexData> &getSubVertexDatas() const;
@@ -59,9 +63,6 @@ namespace vg
 
         template<typename VertexType>
         void updateDesData(uint32_t vertexCount, const vk::PipelineVertexInputStateCreateInfo &vertexInputStateInfo);
-
-        template<typename VertexType>
-        void updateDesData(const vk::PipelineVertexInputStateCreateInfo &vertexInputStateInfo);
 
         void updateVertexCount(fd::ArrayProxy<uint32_t> vertexCounts);
         void updateBufferSize(fd::ArrayProxy<uint32_t> bufferSizes);

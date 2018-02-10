@@ -32,9 +32,9 @@ namespace fd
 
 		void setDirection(ValueType direction);
 
-		ValueType getInvDir() const;
+		ValueType getInvDir();
 
-		ValueType getSigns() const;
+		ValueType getSigns();
 
 		/*Returns a point at distance units along the ray.*/
 		ValueType getPoint(vec_value_type distance) const;

@@ -14,7 +14,8 @@ namespace vg {
             vk::IndexType indexType;           
             uint32_t indexCount;
             uint32_t bufferSize;
-            vk::PipelineInputAssemblyStateCreateInfo inputAssemblyStateInfo;            
+            vk::PipelineInputAssemblyStateCreateInfo inputAssemblyStateInfo;
+            uint32_t vertexDataIndex;
             Bool32 hasClipRect;
             fd::Rect2D clipRect;
 
@@ -22,6 +23,7 @@ namespace vg {
                 , uint32_t indexCount = 0u
                 , uint32_t bufferSize = 0u
                 , vk::PipelineInputAssemblyStateCreateInfo inputAssemblyStateInfo = vk::PipelineInputAssemblyStateCreateInfo()
+                , uint32_t vertexDataIndex = 0u
                 , Bool32 hasClipRect = VG_FALSE
                 , fd::Rect2D clipRect = fd::Rect2D(0u, 0u, 0u, 0u));
         };
@@ -57,9 +59,12 @@ namespace vg {
         void updateDesData(uint32_t indexCount, vk::IndexType indexType,  uint32_t size, 
             const vk::PipelineInputAssemblyStateCreateInfo &inputAssemblyStateInfo);
 
+        void updateSubDataCount(uint32_t count);
         void updateIndexCount(fd::ArrayProxy<uint32_t> indexCounts, uint32_t count, uint32_t offset = 0u);
         void updateBufferSize(fd::ArrayProxy<uint32_t> bufferSizes, uint32_t count, uint32_t offset = 0u);
+        void updateVertexDataIndex(fd::ArrayProxy<uint32_t> vertexDataIndices, uint32_t count, uint32_t offset = 0u);        
         void updateClipRect(fd::ArrayProxy<fd::Rect2D> rects, uint32_t count, uint32_t offset = 0u);
+        void updateStateInfo(fd::ArrayProxy<vk::PipelineInputAssemblyStateCreateInfo> stateInfos, uint32_t count, uint32_t offset = 0u);
 
         void updateBuffer(const void *memory, uint32_t size, Bool32 cacheMemory);
         void updateBuffer(fd::ArrayProxy<MemorySlice> memories

@@ -177,11 +177,11 @@ namespace vg
 		const fd::Rect2D &getScissor() const;
 		void setScissor(const fd::Rect2D &scissor);
 
-		const DepthStencilInfo &getDepthStencilStateInfo() const;
-		void setDepthStencilStateInfo(const DepthStencilInfo &value);
+		const vk::PipelineDepthStencilStateCreateInfo &getDepthStencilInfo() const;
+		void setDepthStencilInfo(const vk::PipelineDepthStencilStateCreateInfo &value);
 
-		const ColorBlendInfo &getColorBlendInfo() const;
-		void setColorBlendInfo(const ColorBlendInfo &value);
+		const vk::PipelineColorBlendStateCreateInfo &getColorBlendInfo() const;
+		void setColorBlendInfo(const vk::PipelineColorBlendStateCreateInfo &value);
 
 		const Bool32 IsHasSpecializationData(ShaderStageFlagBits shaderStage) const;
 		const Bool32 IsHasSpecializationData(vk::ShaderStageFlagBits shaderStage) const;
@@ -246,8 +246,8 @@ namespace vg
 		FrontFaceType m_frontFace;
 		fd::Viewport m_viewport;
 		fd::Rect2D m_scissor;
-		DepthStencilInfo m_depthStencilStateInfo;
-		ColorBlendInfo m_colorBlendInfo;
+		vk::PipelineDepthStencilStateCreateInfo m_depthStencilInfo;
+		vk::PipelineColorBlendStateCreateInfo m_colorBlendInfo;
 		//todo
 		//each stage may own a specilization constant data.
 		std::unordered_map<vk::ShaderStageFlagBits, std::shared_ptr<SpecializationData>> m_mapSpecilizationDatas;

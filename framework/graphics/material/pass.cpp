@@ -234,7 +234,7 @@ namespace vg
 		, m_frontFace(FrontFaceType::eCounterClockwise)
 		, m_viewport(0.0f, 0.0f, 1.0f, 1.0f, 0.0f, 1.0f)
 		, m_scissor(0.0f, 0.0f, 1.0f, 1.0f)
-		, m_depthStencilStateInfo()
+		, m_depthStencilInfo()
 		, m_colorBlendInfo()
 		, m_mapSpecilizationDatas()
 		, m_mapPushConstantRanges()
@@ -256,7 +256,7 @@ namespace vg
 		, m_frontFace(FrontFaceType::eCounterClockwise)
 		, m_viewport(0.0f, 0.0f, 1.0f, 1.0f, 0.0f, 1.0f)
 		, m_scissor(0.0f, 0.0f, 1.0f, 1.0f)
-		, m_depthStencilStateInfo()
+		, m_depthStencilInfo()
 		, m_colorBlendInfo()
 		, m_mapSpecilizationDatas()
 		, m_mapPushConstantRanges()
@@ -464,23 +464,23 @@ namespace vg
 		_updatePipelineStateID();
 	}
 
-	const DepthStencilInfo &Pass::getDepthStencilStateInfo() const
+	const vk::PipelineDepthStencilStateCreateInfo &Pass::getDepthStencilInfo() const
 	{
-		return m_depthStencilStateInfo;
+		return m_depthStencilInfo;
 	}
 
-	void Pass::setDepthStencilStateInfo(const DepthStencilInfo &value)
+	void Pass::setDepthStencilInfo(const vk::PipelineDepthStencilStateCreateInfo &value)
 	{
-		m_depthStencilStateInfo = value;
+		m_depthStencilInfo = value;
 		_updatePipelineStateID();
 	}
 
-	const ColorBlendInfo &Pass::getColorBlendInfo() const
+	const vk::PipelineColorBlendStateCreateInfo &Pass::getColorBlendInfo() const
 	{
 		return m_colorBlendInfo;
 	}
 
-	void Pass::setColorBlendInfo(const ColorBlendInfo &value)
+	void Pass::setColorBlendInfo(const vk::PipelineColorBlendStateCreateInfo &value)
 	{
 		m_colorBlendInfo = value;
 		_updatePipelineStateID();

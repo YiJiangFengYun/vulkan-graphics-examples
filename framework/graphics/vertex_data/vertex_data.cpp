@@ -230,9 +230,7 @@ namespace vg
                 //set vertex input state create info.
                 subData.vertexInputStateInfo = vertexInputStateInfo;
                 subData.vertexInputStateInfo.pNext = nullptr;
-                // subData.vertexInputStateInfo.vertexBindingDescriptionCount = vertexInputStateInfo.vertexBindingDescriptionCount;
                 subData.vertexInputStateInfo.pVertexBindingDescriptions = subData.bindingDescs.data();
-                // subData.vertexInputStateInfo.vertexAttributeDescriptionCount = vertexInputStateInfo.vertexAttributeDescriptionCount;
                 subData.vertexInputStateInfo.pVertexAttributeDescriptions = subData.attrDescs.data();
                 
                 isChange = VG_TRUE;            
@@ -242,6 +240,11 @@ namespace vg
         if (isChange) {
             _updatePipelineStateID();
         }
+    }
+
+    void  VertexData::updateSubDataCount(uint32_t count)
+    {
+        m_subDatas.resize(count);
     }
 
     void VertexData::updateVertexCount(fd::ArrayProxy<uint32_t> vertexCounts, uint32_t count, uint32_t offset)
@@ -260,6 +263,32 @@ namespace vg
             m_subDatas[offset].bufferSize = *(bufferSizes.data() + i);
             ++offset;
         }
+    }
+
+    void VertexData::updateStateInfo(fd::ArrayProxy<vk::PipelineVertexInputStateCreateInfo> stateInfos, uint32_t count, uint32_t offset)
+    {
+        for(uint32_t i = 0; i < count; ++i)
+        {
+            auto &subData = m_subDatas[offset];
+            auto &stateInfo = *(stateInfos.data() + i);
+            //copy arguments.
+            uint32_t count = stateInfo.vertexBindingDescriptionCount;
+            size_t size = count * sizeof(vk::VertexInputBindingDescription);
+            subData.bindingDescs.resize(count);
+            memcpy(subData.bindingDescs.data(), stateInfo.pVertexBindingDescriptions, size);
+    
+            count = stateInfo.vertexAttributeDescriptionCount;
+		    size = count * sizeof(vk::VertexInputAttributeDescription);
+            subData.attrDescs.resize(count);
+            memcpy(subData.attrDescs.data(), stateInfo.pVertexAttributeDescriptions, size);
+
+            subData.vertexInputStateInfo = stateInfo;
+            subData.vertexInputStateInfo.pNext = nullptr;
+            subData.vertexInputStateInfo.pVertexBindingDescriptions = subData.bindingDescs.data();
+            subData.vertexInputStateInfo.pVertexAttributeDescriptions = subData.attrDescs.data();
+            ++offset;
+        }
+        _updatePipelineStateID();
     }
 
     void VertexData::updateBuffer(const void *memory, uint32_t size, Bool32 cacheMemory)

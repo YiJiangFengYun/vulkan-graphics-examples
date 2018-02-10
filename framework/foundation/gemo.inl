@@ -67,14 +67,14 @@ namespace fd
 	}
 
 	template <typename VecType = glm::vec3>
-	typename Ray<VecType>::ValueType Ray<VecType>::getInvDir() const
+	typename Ray<VecType>::ValueType Ray<VecType>::getInvDir()
 	{
 		_updateCache();
 		return m_invDir;
 	}
 
 	template <typename VecType = glm::vec3>
-	typename Ray<VecType>::ValueType Ray<VecType>::getSigns() const
+	typename Ray<VecType>::ValueType Ray<VecType>::getSigns()
 	{
 		_updateCache();
 		return m_signs;

@@ -277,6 +277,8 @@ namespace vg
 
 		m_pCommandBuffer->setViewport(0, viewport);
 
+		const auto &pVertexData = pContentMesh->getVertexData();
+		const auto &subVertexDatas = pVertexData->getSubVertexDatas();
 		const auto &pIndexData = pContentMesh->getIndexData();
 		const auto &subIndexDatas = pIndexData->getSubIndexDatas();
 		const auto &subIndexData = subIndexDatas[subMeshIndex];
@@ -352,9 +354,22 @@ namespace vg
 		}
 		m_pCommandBuffer->bindDescriptorSets(vk::PipelineBindPoint::eGraphics, *pPipelineLayout, 0u, descriptorSets, nullptr);
 
-        vertexDataToCommandBuffer(*m_pCommandBuffer, pContentMesh->getVertexData(), 0);
-		indexDataToCommandBuffer(*m_pCommandBuffer, pContentMesh->getIndexData());
-		m_pCommandBuffer->drawIndexed(pContentMesh->getIndexData()->getSubIndexDatas()[subMeshIndex].indexCount, 1u, 0u, 0u, 0u);
+        vertexDataToCommandBuffer(*m_pCommandBuffer, pVertexData, subIndexData.vertexDataIndex);
+		indexDataToCommandBuffer(*m_pCommandBuffer, pIndexData);
+
+		uint32_t indexOffset = 0u;
+		for (uint32_t i = 0; i < subMeshIndex; ++i)
+		{
+			indexOffset += subIndexDatas[i].indexCount;
+		}
+
+		uint32_t vertexOffset = 0u;
+		for (uint32_t i = 0; i < subIndexData.vertexDataIndex; ++i)
+		{
+			vertexOffset += subVertexDatas[i].vertexCount;
+		}
+
+		m_pCommandBuffer->drawIndexed(subIndexData.indexCount, 1u, indexOffset, vertexOffset, 0u);
 		//m_pCommandBuffer->draw(3, 1, 0, 0);
 
 		m_pCommandBuffer->endRenderPass();

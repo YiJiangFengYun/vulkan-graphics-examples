@@ -10,12 +10,14 @@ namespace vg
         , uint32_t indexCount
         , uint32_t bufferSize
         , vk::PipelineInputAssemblyStateCreateInfo inputAssemblyStateInfo
+        , uint32_t vertexDataIndex 
         , Bool32 hasClipRect
         , fd::Rect2D clipRect)
         : indexType(indexType)
         , indexCount(indexCount)
         , bufferSize(bufferSize)
         , inputAssemblyStateInfo(inputAssemblyStateInfo)
+        , vertexDataIndex()
         , hasClipRect(hasClipRect)
         , clipRect(clipRect)
     {
@@ -227,6 +229,11 @@ namespace vg
         }
     }
 
+    void IndexData::updateSubDataCount(uint32_t count)
+    {
+        m_subDatas.resize(count);
+    }
+
     void IndexData::updateIndexCount(fd::ArrayProxy<uint32_t> indexCounts, uint32_t count, uint32_t offset)
     {
         for(uint32_t i = 0; i < count; ++i)
@@ -238,12 +245,21 @@ namespace vg
     
     void IndexData::updateBufferSize(fd::ArrayProxy<uint32_t> bufferSizes, uint32_t count, uint32_t offset)
     {
-        for(uint32_t i = 0; i < count; ++i)
+        for (uint32_t i = 0; i < count; ++i)
         {
             m_subDatas[offset].bufferSize = *(bufferSizes.data() + i);
             ++offset;
         }
     }
+
+    void IndexData::updateVertexDataIndex(fd::ArrayProxy<uint32_t> vertexDataIndices, uint32_t count, uint32_t offset)
+    {
+        for (uint32_t i = 0; i < count; ++i)
+        {
+            m_subDatas[offset].vertexDataIndex = *(vertexDataIndices.data() + i);
+            ++offset;
+        }
+    }  
 
     void IndexData::updateClipRect(fd::ArrayProxy<fd::Rect2D> rects, uint32_t count, uint32_t offset)
     {
@@ -253,6 +269,17 @@ namespace vg
             m_subDatas[offset].clipRect = *(rects.data() + i);
             ++offset;
         }
+    }
+
+    void IndexData::updateStateInfo(fd::ArrayProxy<vk::PipelineInputAssemblyStateCreateInfo> stateInfos, uint32_t count, uint32_t offset)
+    {
+        for(uint32_t i = 0; i < count; ++i)
+        {
+            m_subDatas[offset].inputAssemblyStateInfo = *(stateInfos.data() + i);
+            m_subDatas[offset].inputAssemblyStateInfo.pNext = nullptr;
+            ++offset;
+        }
+        _updatePipelineStateID();
     }
 
     void IndexData::updateBuffer(const void *memory, uint32_t size, Bool32 cacheMemory)

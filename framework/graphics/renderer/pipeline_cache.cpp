@@ -204,7 +204,7 @@ namespace vg
 		};
 		createInfo.pRasterizationState = &rasterizationStateCreateInfo;
 
-		auto depthStencilStateInfoOfPass = pPass->getDepthStencilStateInfo();
+		auto depthStencilStateInfoOfPass = pPass->getDepthStencilInfo();
 
 		//depth and stencil info.
 		createInfo.pDepthStencilState = &depthStencilStateInfoOfPass;

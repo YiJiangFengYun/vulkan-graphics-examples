@@ -130,11 +130,11 @@ namespace chalet
 		m_pPass = std::shared_ptr<vg::Pass>(new vg::Pass(m_pShader));
 		m_pPass->setCullMode(vg::CullModeFlagBits::eBack);
 		m_pPass->setFrontFace(vg::FrontFaceType::eClockwise);
-		vg::DepthStencilInfo depthStencilStateInfo;
+		vk::PipelineDepthStencilStateCreateInfo depthStencilStateInfo;
 		depthStencilStateInfo.depthTestEnable = VG_TRUE;
 		depthStencilStateInfo.depthWriteEnable = VG_TRUE;
 		depthStencilStateInfo.depthCompareOp = vk::CompareOp::eLess;
-		m_pPass->setDepthStencilStateInfo(depthStencilStateInfo);
+		m_pPass->setDepthStencilInfo(depthStencilStateInfo);
 		m_pMaterial = std::shared_ptr<vg::Material>(new vg::Material());
 		m_pMaterial->addPass(m_pPass);
 		m_pMaterial->setRenderPriority(0u);

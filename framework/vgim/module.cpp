@@ -2,7 +2,6 @@
 
 namespace vgim
 {
-    DimType m_dimType;
 	static const uint32_t __glsl_shader_vert_spv[] =
     {
         0x07230203,0x00010000,0x00080001,0x0000002e,0x00000000,0x00020011,0x00000001,0x0006000b,
@@ -81,7 +80,7 @@ namespace vgim
     std::shared_ptr<vg::Pass> m_pPass;
     std::shared_ptr<vg::Material> m_pMaterial;
     
-    std::shared_ptr<vg::SimpleMesh> m_pMesh;
+    std::shared_ptr<vg::DimSimpleMesh2> m_pMesh;
 
     std::shared_ptr<vg::VisualObject2> m_pUIObject;
 
@@ -124,10 +123,9 @@ namespace vgim
     void _createScene();
     void _destroyScene();
 
-	void static moduleCreate(DimType dimensionType)
+	void static moduleCreate()
 	{
 		if (isInited == VG_TRUE) return;
-        m_dimType = dimensionType;
 		_createMaterial();
         _createMesh();
         _createUIObject();
@@ -151,6 +149,7 @@ namespace vgim
 
     void updateFromImGUI()
     {
+        //update mesh
         auto drawData = ImGui::GetDrawData();
 		uint32_t vertexCount = drawData->TotalVtxCount;
         uint32_t indexCount = drawData->TotalIdxCount;
@@ -160,16 +159,29 @@ namespace vgim
         const auto& pVertexData = m_pMesh->getVertexData();
         const auto& pIndexData = m_pMesh->getIndexData();
 
-        pVertexData->updateVertexCount(vertexCount);
-        pVertexData->updateBufferSize(vertexSize);
-        pIndexData->updateIndexCount(indexCount);
-        pIndexData->updateBufferSize(indexSize);
-
         std::vector<vg::MemorySlice> vertexSlices(drawData->CmdListsCount);
         std::vector<vg::MemorySlice> indexSlices(drawData->CmdListsCount);
-        uint32_t vertexOffset;
-        uint32_t indexOffset;
-        for (int i = 0; i < drawData->CmdListsCount; ++i)
+
+        uint32_t vertexOffset = 0u;
+        uint32_t indexOffset = 0u;
+        uint32_t cmdListCount = drawData->CmdListsCount;
+        uint32_t vertexSubDataCount = cmdListCount;
+        uint32_t indexSubDataCount = 0u;                
+        for (uint32_t i = 0; i < cmdListCount; ++i)
+        {
+             const ImDrawList* cmdList = drawData->CmdLists[i];
+             indexSubDataCount += static_cast<uint32_t>(cmdList->CmdBuffer.Size);
+        }
+
+        std::vector<uint32_t> vertexCounts(vertexSubDataCount);
+        std::vector<uint32_t> vertexBufferSizes(vertexSubDataCount);
+        std::vector<uint32_t> indexCounts(indexSubDataCount);
+        std::vector<uint32_t> indexBufferSizes(indexSubDataCount);
+        std::vector<uint32_t> indexVertexDataIndices(indexSubDataCount);
+        std::vector<fd::Rect2D> indexRects(indexSubDataCount);
+        vertexSubDataCount = 0u;
+        indexSubDataCount = 0u;
+        for (uint32_t i = 0; i < cmdListCount; ++i)
         {
             const ImDrawList* cmdList = drawData->CmdLists[i];
             vertexSlices[i].offset = vertexOffset;
@@ -177,25 +189,101 @@ namespace vgim
             vertexSlices[i].pMemory = cmdList->VtxBuffer.Data;
 
             indexSlices[i].offset = indexOffset;
-            indexSlices[i].size = static_cast<uint32_t>(cmdList->IdxBuffer.Size) * static_cast<uint32_t>(sizeof(ImDrawVert));
+            indexSlices[i].size = static_cast<uint32_t>(cmdList->IdxBuffer.Size) * static_cast<uint32_t>(sizeof(ImDrawIdx));
             indexSlices[i].pMemory = cmdList->IdxBuffer.Data;
 
             vertexOffset += vertexSlices[i].size;
             indexOffset += vertexSlices[i].size;
+
+            vertexCounts[vertexSubDataCount] = static_cast<uint32_t>(cmdList->VtxBuffer.Size);
+            vertexBufferSizes[vertexSubDataCount] = vertexCounts[vertexSubDataCount] * static_cast<uint32_t>(sizeof(ImDrawVert));
+
+            uint32_t cmdCount = cmdList->CmdBuffer.Size;
+            for (uint32_t cmdI = 0; cmdI < cmdCount; ++cmdI)
+            {
+                const ImDrawCmd* pCmd = &cmdList->CmdBuffer[cmdI];
+
+                indexCounts[indexSubDataCount] = pCmd->ElemCount;
+                indexBufferSizes[indexSubDataCount] = pCmd->ElemCount * static_cast<uint32_t>(sizeof(ImDrawIdx));
+                indexVertexDataIndices[indexSubDataCount] = vertexSubDataCount;
+
+                fd::Rect2D rect;
+                rect.x = std::max(pCmd->ClipRect.x, 0.0f);
+                rect.y = std::max(pCmd->ClipRect.y, 0.0f);
+                rect.width = pCmd->ClipRect.z - pCmd->ClipRect.x;
+                rect.height = pCmd->ClipRect.w - pCmd->ClipRect.y;
+                indexRects[indexSubDataCount] = rect;
+                ++indexSubDataCount;
+            }
+            ++vertexSubDataCount;
         }
+
         pVertexData->updateBuffer(vertexSlices, vertexSize, VG_FALSE);
         pIndexData->updateBuffer(indexSlices, indexSize, VG_FALSE);
-        
+
+        pVertexData->updateSubDataCount(vertexSubDataCount);
+        pVertexData->updateVertexCount(vertexCounts, vertexSubDataCount);
+        pVertexData->updateBufferSize(vertexBufferSizes, vertexSubDataCount);
+
+        pIndexData->updateSubDataCount(indexSubDataCount);
+        pIndexData->updateIndexCount(indexCounts, indexSubDataCount);
+        pIndexData->updateBufferSize(indexBufferSizes, indexSubDataCount);
+        pIndexData->updateVertexDataIndex(indexVertexDataIndices, indexSubDataCount);
+        pIndexData->updateClipRect(indexRects, indexSubDataCount);
+
+        //update material
+        ImGuiIO& io = ImGui::GetIO();
+        float data[4];
+        data[0] = 2.0f / io.DisplaySize.x;
+        data[1] = 2.0f / io.DisplaySize.y;
+        data[2] = -1.0f;
+        data[3] = -1.0f;
+        m_pPass->setPushConstantUpdate("default", &data, static_cast<uint32_t>(sizeof(data)), 
+            vk::ShaderStageFlagBits::eVertex, 0u);
     }
 
 	void _createMaterial()
 	{
+        //shader
         m_pShader = std::shared_ptr<vg::Shader>(new vg::Shader(__glsl_shader_vert_spv, 
             static_cast<uint32_t>(sizeof(__glsl_shader_vert_spv) / sizeof(uint32_t)),
             __glsl_shader_frag_spv,
             static_cast<uint32_t>(sizeof(__glsl_shader_frag_spv) / sizeof(uint32_t))));
 		m_pPass = std::shared_ptr<vg::Pass>(new vg::Pass(m_pShader));
+
+        //push constant
         m_pPass->setPushConstantRange("default", vk::ShaderStageFlagBits::eVertex, static_cast<uint32_t>(sizeof(float) * 0), static_cast<uint32_t>(sizeof(float) * 4));
+
+        //color blend
+        uint32_t attachmentCount = 1u;
+        std::vector<vk::PipelineColorBlendAttachmentState> blendAttachmentStates(attachmentCount);
+        for (uint32_t i = 0; i < attachmentCount; ++i)
+        {
+            auto blendAttachmentState = blendAttachmentStates[i];
+            blendAttachmentState.blendEnable = VK_TRUE;
+            blendAttachmentState.colorWriteMask = vk::ColorComponentFlagBits::eR | 
+                vk::ColorComponentFlagBits::eG | 
+                vk::ColorComponentFlagBits::eB | 
+                vk::ColorComponentFlagBits::eA;
+            blendAttachmentState.srcColorBlendFactor = vk::BlendFactor::eSrcAlpha;
+            blendAttachmentState.dstColorBlendFactor = vk::BlendFactor::eOneMinusSrcAlpha;
+            blendAttachmentState.colorBlendOp = vk::BlendOp::eAdd;
+            blendAttachmentState.srcAlphaBlendFactor = vk::BlendFactor::eSrcAlpha;
+            blendAttachmentState.dstAlphaBlendFactor = vk::BlendFactor::eDstAlpha;
+            blendAttachmentState.alphaBlendOp = vk::BlendOp::eAdd;
+        }
+
+        vk::PipelineColorBlendStateCreateInfo colorBlendInfo;
+        colorBlendInfo.attachmentCount = blendAttachmentStates.size();
+        colorBlendInfo.pAttachments = blendAttachmentStates.data();
+        m_pPass->setColorBlendInfo(colorBlendInfo);
+
+        //depth stencil
+        vk::PipelineDepthStencilStateCreateInfo depthStencilInfo;
+        depthStencilInfo.depthTestEnable = VK_FALSE;
+        depthStencilInfo.depthWriteEnable = VK_FALSE;
+        m_pPass->setDepthStencilInfo(depthStencilInfo);
+
 		m_pMaterial = std::shared_ptr<vg::Material>(new vg::Material());
 		m_pMaterial->addPass(m_pPass);
 		m_pMaterial->setRenderPriority(0u);
@@ -212,14 +300,7 @@ namespace vgim
 
     void _createMesh()
     {
-       if (m_dimType == DimType::SPACE_2) 
-       {
-          m_pMesh = static_cast<std::shared_ptr<vg::SimpleMesh>>(new vg::DimSimpleMesh2(vg::MemoryPropertyFlagBits::HOST_VISIBLE));
-       }
-       else
-       {
-          m_pMesh = static_cast<std::shared_ptr<vg::SimpleMesh>>(new vg::DimSimpleMesh3(vg::MemoryPropertyFlagBits::HOST_VISIBLE));            
-       }
+       m_pMesh = static_cast<std::shared_ptr<vg::DimSimpleMesh2>>(new vg::DimSimpleMesh2(vg::MemoryPropertyFlagBits::HOST_VISIBLE));
        const auto& pVertexData = m_pMesh->getVertexData();
        const auto& pIndexData = m_pMesh->getIndexData();
        vk::VertexInputBindingDescription bindingDesc[1] = {};
@@ -249,7 +330,7 @@ namespace vgim
        vk::PipelineInputAssemblyStateCreateInfo iaInfo = {};
        iaInfo.topology = vk::PrimitiveTopology::eTriangleList;
        pVertexData->updateDesData(vertexInfo);
-       pIndexData->updateDesData(iaInfo);
+       pIndexData->updateDesData(vk::IndexType::eUint16, iaInfo);
     }
 
     void _destroyMesh()

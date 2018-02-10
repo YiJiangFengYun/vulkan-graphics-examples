@@ -227,21 +227,31 @@ namespace vg
         }
     }
 
-    void IndexData::updateIndexCount(fd::ArrayProxy<uint32_t> indexCounts)
+    void IndexData::updateIndexCount(fd::ArrayProxy<uint32_t> indexCounts, uint32_t count, uint32_t offset)
     {
-        uint32_t size = indexCounts.size();
-        for(uint32_t i = 0; i < size; ++i)
+        for(uint32_t i = 0; i < count; ++i)
         {
-            m_subDatas[i].indexCount = *(indexCounts.data() + i);
+            m_subDatas[offset].indexCount = *(indexCounts.data() + i);
+            ++offset;
         }
     }
     
-    void IndexData::updateBufferSize(fd::ArrayProxy<uint32_t> bufferSizes)
+    void IndexData::updateBufferSize(fd::ArrayProxy<uint32_t> bufferSizes, uint32_t count, uint32_t offset)
     {
-        uint32_t size = bufferSizes.size();
-        for(uint32_t i = 0; i < size; ++i)
+        for(uint32_t i = 0; i < count; ++i)
         {
-            m_subDatas[i].bufferSize = *(bufferSizes.data() + i);
+            m_subDatas[offset].bufferSize = *(bufferSizes.data() + i);
+            ++offset;
+        }
+    }
+
+    void IndexData::updateClipRect(fd::ArrayProxy<fd::Rect2D> rects, uint32_t count, uint32_t offset)
+    {
+        for (uint32_t i = 0; i < count; ++i)
+        {
+            m_subDatas[offset].hasClipRect = VG_TRUE;
+            m_subDatas[offset].clipRect = *(rects.data() + i);
+            ++offset;
         }
     }
 

@@ -244,21 +244,21 @@ namespace vg
         }
     }
 
-    void VertexData::updateVertexCount(fd::ArrayProxy<uint32_t> vertexCounts)
+    void VertexData::updateVertexCount(fd::ArrayProxy<uint32_t> vertexCounts, uint32_t count, uint32_t offset)
     {
-        uint32_t size = vertexCounts.size();
-        for(uint32_t i = 0; i < size; ++i)
+        for(uint32_t i = 0; i < count; ++i)
         {
-            m_subDatas[i].vertexCount = *(vertexCounts.data() + i);
+            m_subDatas[offset].vertexCount = *(vertexCounts.data() + i);
+            ++offset;
         }
     }
     
-    void VertexData::updateBufferSize(fd::ArrayProxy<uint32_t> bufferSizes)
+    void VertexData::updateBufferSize(fd::ArrayProxy<uint32_t> bufferSizes, uint32_t count, uint32_t offset)
     {
-        uint32_t size = bufferSizes.size();
-        for(uint32_t i = 0; i < size; ++i)
+        for(uint32_t i = 0; i < count; ++i)
         {
-            m_subDatas[i].bufferSize = *(bufferSizes.data() + i);
+            m_subDatas[offset].bufferSize = *(bufferSizes.data() + i);
+            ++offset;
         }
     }
 

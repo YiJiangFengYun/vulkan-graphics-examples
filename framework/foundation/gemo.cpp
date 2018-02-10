@@ -18,6 +18,28 @@ namespace fd
 	{
 	}
 
+	Viewport::Viewport(const Viewport &target)
+	    : x(target.x)
+		, y(target.y)
+		, width(target.width)
+		, height(target.height)
+		, minDepth(target.minDepth)
+		, maxDepth(target.maxDepth)
+	{
+
+	}
+
+	Viewport::Viewport(const Viewport &&target)
+	    : x(std::move(target.x))
+		, y(std::move(target.y))
+		, width(std::move(target.width))
+		, height(std::move(target.height))
+		, minDepth(std::move(target.minDepth))
+		, maxDepth(std::move(target.maxDepth))
+	{
+
+	}
+
 	Viewport& Viewport::setX(float x_)
 	{
 		x = x_;
@@ -54,6 +76,18 @@ namespace fd
 		return *this;
 	}
 
+	Viewport &Viewport::operator=(const Viewport &target)
+	{
+		x = target.x;
+		y = target.y;
+		width = target.width;
+		height = target.height;
+		minDepth = target.minDepth;
+		maxDepth = target.maxDepth;
+
+		return *this;
+	}
+
 	bool Viewport::operator==(Viewport const& rhs) const
 	{
 		return (x == rhs.x)
@@ -78,6 +112,24 @@ namespace fd
 	{
 	}
 
+	Rect2D::Rect2D(const Rect2D &target)
+	    : x(target.x)
+		, y(target.y)
+		, width(target.width)
+		, height(target.height)
+	{
+
+	}
+		
+	Rect2D::Rect2D(const Rect2D &&target)
+	    : x(std::move(target.x))
+		, y(std::move(target.y))
+		, width(std::move(target.width))
+		, height(std::move(target.height))
+	{
+
+	}
+
 	Rect2D& Rect2D::setX(float x_)
 	{
 		x = x_;
@@ -99,6 +151,16 @@ namespace fd
 	Rect2D& Rect2D::setHeight(float height_)
 	{
 		height = height_;
+		return *this;
+	}
+
+	Rect2D &Rect2D::operator=(const Rect2D &target)
+	{
+        x = target.x;
+		y = target.y;
+		width = target.width;
+		height = target.height;
+
 		return *this;
 	}
 

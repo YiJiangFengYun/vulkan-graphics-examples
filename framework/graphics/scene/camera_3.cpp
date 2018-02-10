@@ -77,7 +77,7 @@ namespace vg
 		return m_projMatrix;
 	}
 
-	Bool32 Camera3::isInView(Transform<SpaceType::SPACE_3> *pTransform, BoundsType bounds) const
+	Bool32 Camera3::isInView(Transform<SpaceType::SPACE_3> *pTransform, BoundsType bounds, fd::Rect2D *viewRect) const
 	{
 		auto min = bounds.getMin();
 		auto max = bounds.getMax();
@@ -140,12 +140,22 @@ namespace vg
 
 		fd::Bounds<PointType> boundsInView(minInView, maxInView);
 		fd::Bounds<PointType> boundsOfView(PointType(-1.0f, -1.0f, 0.0f), PointType(1.0f, 1.0f, 1.0f));
-
+		fd::Bounds<PointType> intersectionInView;		
 		Bool32 isInsideCameraView = VG_FALSE;
 		////check if it is inside camera view.
-		if (boundsOfView.isIntersects(boundsInView))
+		if (boundsOfView.intersects(boundsInView, &intersectionInView))
 		{
 			isInsideCameraView = VG_TRUE;
+		}
+
+		if (viewRect != nullptr)
+		{
+			auto min = intersectionInView.getMin();
+			auto size = intersectionInView.getSize();
+			(*viewRect).x = min.x;
+			(*viewRect).y = min.y;
+			(*viewRect).width = size.x;
+			(*viewRect).height = size.y;
 		}
 
 		return isInsideCameraView;

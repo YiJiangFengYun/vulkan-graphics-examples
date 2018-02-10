@@ -14,7 +14,7 @@ namespace vg
 		virtual void apply();
 		typename TransformType::MatrixType getProjMatrix() const override;
 		BoundsType getViewBounds() const;
-		Bool32 isInView(Transform<SPACE_TYPE> *pTransform, BoundsType bounds) const override;
+		Bool32 isInView(Transform<SPACE_TYPE> *pTransform, BoundsType bounds, fd::Rect2D *viewRect = nullptr) const override;
 	protected:
 		BoundsType m_viewBounds;
 		typename TransformType::MatrixType m_projMatrix;

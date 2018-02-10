@@ -64,8 +64,8 @@ namespace vg
         template<typename VertexType>
         void updateDesData(uint32_t vertexCount, const vk::PipelineVertexInputStateCreateInfo &vertexInputStateInfo);
 
-        void updateVertexCount(fd::ArrayProxy<uint32_t> vertexCounts);
-        void updateBufferSize(fd::ArrayProxy<uint32_t> bufferSizes);
+        void updateVertexCount(fd::ArrayProxy<uint32_t> vertexCounts, uint32_t count, uint32_t offset = 0u);
+        void updateBufferSize(fd::ArrayProxy<uint32_t> bufferSizes, uint32_t count, uint32_t offset = 0u);
 
         void updateBuffer(const void *memory
             , uint32_t size

@@ -57,8 +57,9 @@ namespace vg {
         void updateDesData(uint32_t indexCount, vk::IndexType indexType,  uint32_t size, 
             const vk::PipelineInputAssemblyStateCreateInfo &inputAssemblyStateInfo);
 
-        void updateIndexCount(fd::ArrayProxy<uint32_t> indexCounts);
-        void updateBufferSize(fd::ArrayProxy<uint32_t> bufferSizes);
+        void updateIndexCount(fd::ArrayProxy<uint32_t> indexCounts, uint32_t count, uint32_t offset = 0u);
+        void updateBufferSize(fd::ArrayProxy<uint32_t> bufferSizes, uint32_t count, uint32_t offset = 0u);
+        void updateClipRect(fd::ArrayProxy<fd::Rect2D> rects, uint32_t count, uint32_t offset = 0u);
 
         void updateBuffer(const void *memory, uint32_t size, Bool32 cacheMemory);
         void updateBuffer(fd::ArrayProxy<MemorySlice> memories

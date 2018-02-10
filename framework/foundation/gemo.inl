@@ -294,6 +294,39 @@ namespace fd
 	}
 
 	template <typename VecType = glm::vec3>
+	Bool32 Bounds<VecType>::intersects(Bounds<ValueType> bounds, Bounds<ValueType> *intersection) const
+	{
+		typename ValueType::length_type length = ValueType::length();
+		Bool32 isInter = FD_TRUE;
+		ValueType min;
+		ValueType max;
+		for (typename ValueType::length_type i = 0; i < length; ++i)
+		{
+			if (m_min[i] > bounds.m_max[i] || m_max[i] < bounds.m_min[i])
+			{
+			    isInter = FD_FALSE;
+				break;
+			}
+			else
+			{
+				if (intersection != nullptr)
+				{
+					min[i] = glm::max(m_min[i], bounds.m_min[i]);
+					max[i] = glm::min(m_max[i], bounds.m_max[i]);
+				}
+			}
+		}
+
+		if (intersection != nullptr)
+		{
+			intersection->setMinMax(min, max);
+		}
+
+
+        return isInter;
+	}
+
+	template <typename VecType = glm::vec3>
 	typename Bounds<VecType>::vec_value_type Bounds<VecType>::getSqrDistance(ValueType point) const
 	{
 		ValueType closestPoint = getClosestPoint(point);

@@ -100,6 +100,9 @@ namespace fd
 		/*Does another bounding box intersect with this bounding box?*/
 		Bool32 isIntersects(Bounds<ValueType> bounds) const;
 
+		/*Get bounds of intersection of this bounding box and target bounding box*/
+		Bool32 intersects(Bounds<ValueType> bounds, Bounds<ValueType> *intersection) const;
+
 		/*The smallest squared distance between the point and this bounding box.*/
 		vec_value_type getSqrDistance(ValueType point) const;
 
@@ -115,7 +118,9 @@ namespace fd
 	struct Viewport
 	{
 		Viewport(float x_ = 0, float y_ = 0, float width_ = 1, float height_ = 1, float minDepth_ = 0, float maxDepth_ = 1);
-
+		Viewport(const Viewport &target);		
+		Viewport(const Viewport &&target);		
+		
 		Viewport& setX(float x_);
 
 		Viewport& setY(float y_);
@@ -127,6 +132,8 @@ namespace fd
 		Viewport& setMinDepth(float minDepth_);
 
 		Viewport& setMaxDepth(float maxDepth_);
+
+		Viewport &operator=(const Viewport &target);
 
 		bool operator==(Viewport const& rhs) const;
 
@@ -144,6 +151,8 @@ namespace fd
 	struct Rect2D
 	{
 		Rect2D(float x_ = 0, float y_ = 0, float width_ = 1, float height_ = 1);
+		Rect2D(const Rect2D &target);		
+		Rect2D(const Rect2D &&target);		
 
 		Rect2D& setX(float x_);
 
@@ -153,6 +162,8 @@ namespace fd
 
 		Rect2D& setHeight(float height_);
 
+		Rect2D &operator=(const Rect2D &target);
+		
 		bool operator==(Rect2D const& rhs) const;
 
 		bool operator!=(Rect2D const& rhs) const;

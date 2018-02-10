@@ -277,14 +277,52 @@ namespace vg
 
 		m_pCommandBuffer->setViewport(0, viewport);
 
+		const auto &pIndexData = pContentMesh->getIndexData();
+		const auto &subIndexDatas = pIndexData->getSubIndexDatas();
+		const auto &subIndexData = subIndexDatas[subMeshIndex];
+		fd::Rect2D finalScissor(0.0f, 0.0f, 0.0f, 0.0f);
+		if (subIndexData.hasClipRect)
+		{
+		    auto clipRect = subIndexData.clipRect;
+			glm::vec2 minOfClipRect(clipRect.x, clipRect.y);
+			glm::vec2 maxOfclipRect(clipRect.x + clipRect.width, clipRect.y + clipRect.height);
+			//Transform range [-1, 1] to range [0, 1]
+			minOfClipRect.x = (minOfClipRect.x + 1.0f) / 2.0f;
+			minOfClipRect.y = (minOfClipRect.y + 1.0f) / 2.0f;
+			maxOfclipRect.x = (maxOfclipRect.x + 1.0f) / 2.0f;
+			maxOfclipRect.y = (maxOfclipRect.y + 1.0f) / 2.0f;
+
+			fd::Bounds<glm::vec2> boundsOfClipRect(minOfClipRect, maxOfclipRect);
+
+			glm::vec2 minOfScissorOfPass(scissorOfPass.x, scissorOfPass.y);
+			glm::vec2 maxOfScissorOfPass(scissorOfPass.x + scissorOfPass.width, scissorOfPass.y + scissorOfPass.height);
+
+			fd::Bounds<glm::vec2> boundsOfScissorOfPass(minOfScissorOfPass, maxOfScissorOfPass);
+
+			fd::Bounds<glm::vec2> intersection;
+			if (boundsOfScissorOfPass.intersects(boundsOfClipRect, &intersection))
+			{
+				auto min = intersection.getMin();
+				auto size = intersection.getSize();
+				finalScissor.x = min.x;
+				finalScissor.y = min.y;
+				finalScissor.width = size.x;
+				finalScissor.height = size.y;
+			}
+		}
+		else
+		{
+			finalScissor = scissorOfPass;
+		}
+
 		vk::Rect2D scissor = {
 			{                               //offset
-				static_cast<int32_t>(std::round(m_framebufferWidth * scissorOfPass.x)),    //x
-				static_cast<int32_t>(std::round(m_framebufferHeight * scissorOfPass.y))    //y
+				static_cast<int32_t>(std::round(m_framebufferWidth * finalScissor.x)),    //x
+				static_cast<int32_t>(std::round(m_framebufferHeight * finalScissor.y))    //y
 			},
 			{                               //extent
-				static_cast<uint32_t>(std::round(m_framebufferWidth * scissorOfPass.width)),   //width
-				static_cast<uint32_t>(std::round(m_framebufferHeight * scissorOfPass.height))  //height
+				static_cast<uint32_t>(std::round(m_framebufferWidth * finalScissor.width)),   //width
+				static_cast<uint32_t>(std::round(m_framebufferHeight * finalScissor.height))  //height
 			}
 		};
 
@@ -504,7 +542,7 @@ namespace vg
 			auto pVisualObject = validVisualObjects[i];
 			auto pMesh = pVisualObject->getMesh();
 			auto pContentMesh = dynamic_cast<ContentMesh *>(pMesh.get());
-			auto subMeshCount = pContentMesh->getIndexData()->getSubIndexDataCount();
+			auto subMeshCount = pVisualObject->getSubMeshCount();
 			auto pMaterial = pVisualObject->getMaterial();
 			auto passCount = pMaterial->getPassCount();
 			drawCount += subMeshCount * passCount;
@@ -528,7 +566,8 @@ namespace vg
 			auto mvpMatrix = projMatrix * mvMatrix;
 			auto pMesh = pVisualObject->getMesh();
 			auto pContentMesh = dynamic_cast<ContentMesh *>(pMesh.get());
-			auto subMeshCount = pContentMesh->getIndexData()->getSubIndexDataCount();
+			auto subMeshOffset = pVisualObject->getSubMeshOffset();
+			auto subMeshCount = pVisualObject->getSubMeshCount();
 			auto pMaterial = pVisualObject->getMaterial();
 			auto passCount = pMaterial->getPassCount();
 			for (uint32_t passIndex = 0u; passIndex < passCount; ++passIndex)
@@ -545,8 +584,8 @@ namespace vg
 				for (uint32_t passIndex = 0u; passIndex < passCount; ++passIndex)
 				{
 					std::shared_ptr<vk::Pipeline> pPipeline;
-					_createPipelineForRender(pPipeline, pMesh, pMaterial, subMeshIndex, passIndex);
-					_recordCommandBufferForRender(pPipeline, pMesh, pMaterial, subMeshIndex, passIndex);
+					_createPipelineForRender(pPipeline, pMesh, pMaterial, subMeshIndex + subMeshOffset, passIndex);
+					_recordCommandBufferForRender(pPipeline, pMesh, pMaterial, subMeshIndex + subMeshOffset, passIndex);
 
 					//submit
 					std::shared_ptr<vk::Semaphore> pSemaphore = nullptr;
@@ -626,10 +665,20 @@ namespace vg
 			{
 			    auto bounds = dynamic_cast<SceneType::VisualObjectType::MeshDimType *>(pMesh.get())->getBounds();
 			    auto pTransform = pVisualObject->getTransform();
-			    if(pCamera->isInView(pTransform.get(), bounds) == VG_TRUE)
+				fd::Rect2D clipRect;
+			    if(pCamera->isInView(pTransform.get(), bounds, &clipRect) == VG_TRUE)
 			    {
 			    	validVisualObjects[validVisualObjectCount++] = pVisualObject;
 			    }
+				const auto& pIndexData = dynamic_cast<ContentMesh *>(pMesh.get())->getIndexData();
+				uint32_t subMeshOffset = pVisualObject->getSubMeshOffset();
+				uint32_t subMeshCount = pVisualObject->getSubMeshCount();
+				std::vector<fd::Rect2D> rects(subMeshCount);
+				for (uint32_t i = 0; i < subMeshCount; ++i)
+				{
+					rects[i] = clipRect;
+				}
+				pIndexData->updateClipRect(rects, subMeshCount, subMeshOffset);
 			}
 		}
 
@@ -692,7 +741,7 @@ namespace vg
 				auto pVisualObject = queues[typeIndex][objectIndex];
 				auto pMesh = pVisualObject->getMesh();
 				auto pContentMesh = dynamic_cast<ContentMesh *>(pMesh.get());
-				auto subMeshCount = pContentMesh->getIndexData()->getSubIndexDataCount();
+				auto subMeshCount = pVisualObject->getSubMeshCount();
 				auto pMaterial = pVisualObject->getMaterial();
 				auto passCount = pMaterial->getPassCount();
 				drawCount += subMeshCount * passCount;
@@ -741,8 +790,8 @@ namespace vg
 					for (uint32_t passIndex = 0u; passIndex < passCount; ++passIndex)
 					{
 						std::shared_ptr<vk::Pipeline> pPipeline;
-						_createPipelineForRender(pPipeline, pMesh, pMaterial, subMeshIndex, passIndex);
-						_recordCommandBufferForRender(pPipeline, pMesh, pMaterial, subMeshIndex, passIndex);
+						_createPipelineForRender(pPipeline, pMesh, pMaterial, subMeshIndex + subMeshOffset, passIndex);
+						_recordCommandBufferForRender(pPipeline, pMesh, pMaterial, subMeshIndex + subMeshOffset, passIndex);
 
 						//submit
 						std::shared_ptr<vk::Semaphore> pSemaphore = nullptr;
@@ -815,10 +864,21 @@ namespace vg
 			}
 			else {
 			    auto boundsOfChild = dynamic_cast<Mesh<MeshDimType::SPACE_2> *>(pMeshOfChild.get())->getBounds();
-			    if (pCamera->isInView(pChild, boundsOfChild) == VG_TRUE)
+			    fd::Rect2D clipRect;				
+			    if (pCamera->isInView(pChild, boundsOfChild, &clipRect) == VG_TRUE)
 			    {
 			    	arrPVObjs[PVObjIndex++] = pVisualObjectOfChild;
 			    }
+				
+				const auto& pIndexData = dynamic_cast<ContentMesh *>(pMeshOfChild.get())->getIndexData();
+				uint32_t subMeshOffset = pVisualObjectOfChild->getSubMeshOffset();
+				uint32_t subMeshCount = pVisualObjectOfChild->getSubMeshCount();
+				std::vector<fd::Rect2D> rects(subMeshCount);
+				for (uint32_t i = 0; i < subMeshCount; ++i)
+				{
+					rects[i] = clipRect;
+				}
+				pIndexData->updateClipRect(rects, subMeshCount, subMeshOffset);
 			}
 		}
 	}

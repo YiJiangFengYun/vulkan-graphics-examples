@@ -75,6 +75,9 @@ namespace vgim
         0x00000007,0x0000001d,0x00000012,0x0000001c,0x0003003e,0x00000009,0x0000001d,0x000100fd,
         0x00010038
     };
+
+    uint32_t m_canvasWidth;
+    uint32_t m_canvasHeight;
 	
     std::shared_ptr<vg::Shader> m_pShader;
     std::shared_ptr<vg::Pass> m_pPass;
@@ -86,6 +89,16 @@ namespace vgim
 
     std::shared_ptr<vg::CameraOP2> m_pCamera;
     std::shared_ptr<vg::Scene2> m_pScene;
+
+    uint32_t getCanvasWidth()
+    {
+        return m_canvasWidth;
+    }
+
+    uint32_t getCanvasHeight()
+    {
+        return m_canvasHeight;
+    }
 
     const std::shared_ptr<vg::Material> getMaterial()
 	{
@@ -123,9 +136,11 @@ namespace vgim
     void _createScene();
     void _destroyScene();
 
-	void static moduleCreate()
+	void static moduleCreate(uint32_t canvasWidth, uint32_t canvasHeight)
 	{
 		if (isInited == VG_TRUE) return;
+        m_canvasWidth = canvasWidth;
+        m_canvasHeight = canvasHeight;
 		_createMaterial();
         _createMesh();
         _createUIObject();
@@ -146,6 +161,12 @@ namespace vgim
         _destroyMesh();
         _destroyMaterial();
 	}
+
+    void updateCanvasSize(uint32_t canvasWidth, uint32_t canvasHeight)
+    {
+        m_canvasWidth = canvasWidth;
+        m_canvasHeight = canvasHeight;
+    }
 
     void updateFromImGUI()
     {
@@ -208,10 +229,10 @@ namespace vgim
                 indexVertexDataIndices[indexSubDataCount] = vertexSubDataCount;
 
                 fd::Rect2D rect;
-                rect.x = std::max(pCmd->ClipRect.x, 0.0f);
-                rect.y = std::max(pCmd->ClipRect.y, 0.0f);
-                rect.width = pCmd->ClipRect.z - pCmd->ClipRect.x;
-                rect.height = pCmd->ClipRect.w - pCmd->ClipRect.y;
+                rect.x = std::max(pCmd->ClipRect.x, 0.0f) / m_canvasWidth;
+                rect.y = std::max(pCmd->ClipRect.y, 0.0f) / m_canvasHeight;
+                rect.width = (pCmd->ClipRect.z - pCmd->ClipRect.x) / m_canvasWidth;
+                rect.height = (pCmd->ClipRect.w - pCmd->ClipRect.y) / m_canvasHeight;
                 indexRects[indexSubDataCount] = rect;
                 ++indexSubDataCount;
             }
@@ -240,6 +261,14 @@ namespace vgim
         data[3] = -1.0f;
         m_pPass->setPushConstantUpdate("default", &data, static_cast<uint32_t>(sizeof(data)), 
             vk::ShaderStageFlagBits::eVertex, 0u);
+
+        fd::Viewport viewPort(0.0f, 0.0f, ImGui::GetIO().DisplaySize.x / static_cast<float>(m_canvasWidth), 
+            ImGui::GetIO().DisplaySize.y / static_cast<float>(m_canvasHeight), 0.0f, 1.0f);
+        m_pPass->setViewport(viewPort);
+
+        fd::Rect2D scissor(0.0f, 0.0f, ImGui::GetIO().DisplaySize.x / static_cast<float>(m_canvasWidth), 
+            ImGui::GetIO().DisplaySize.y / static_cast<float>(m_canvasHeight));
+        m_pPass->setScissor(scissor);
     }
 
 	void _createMaterial()

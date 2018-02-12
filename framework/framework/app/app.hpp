@@ -5,7 +5,6 @@
 #include <mutex>
 #include <string>
 #include "framework/global.hpp"
-#include <foundation/foundation.hpp>
 #include "framework/app/window.hpp"
 #include "framework/util/thread_master.hpp"
 

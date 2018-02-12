@@ -63,11 +63,6 @@ namespace vgf {
 		}
 	}
 
-	/*void AppBase::createSubWindow(uint32_t width, uint32_t height, const char *title)
-	{
-		_createSubWindow(width, height, title);
-	}*/
-
 	void App::_initEnv(uint32_t width
 		, uint32_t height
 		, const char *title
@@ -78,10 +73,16 @@ namespace vgf {
 		m_height = height;
 		m_title = title;
 
+		//----------------------------------------------------------------------
+		//Initialize glfw module.
 		glfwInit();
 
 		glfwWindowHint(GLFW_CLIENT_API, GLFW_NO_API);
 		glfwWindowHint(GLFW_RESIZABLE, GLFW_TRUE);
+
+		//----------------------------------------------------------------------
+		//----------------------------------------------------------------------
+		//Initialize vg module.				
 
 		uint32_t glfwExtensionCount;
 		const char** glfwExtensions;
@@ -107,6 +108,15 @@ namespace vgf {
 			, m_graphicsQueueCount
 			, m_presentQueuecount
 			, needPhysicalDeviceFeatures);
+
+		//----------------------------------------------------------------------
+		//----------------------------------------------------------------------
+		//Initialize vgim module
+#ifdef USE_IMGUI_BIND
+        vgim::moduleCreate(m_width, m_height);
+#endif USE_IMGUI_BIND
+		//----------------------------------------------------------------------				
+		
 	}
 
 	std::shared_ptr<GLFWwindow> App::_createGLFWWindow(uint32_t width, uint32_t height, const char* title)

@@ -90,6 +90,13 @@ namespace vgim
     std::shared_ptr<vg::CameraOP2> m_pCamera;
     std::shared_ptr<vg::Scene2> m_pScene;
 
+    Bool32 inited;
+
+    Bool32 getInited()
+    {
+        return inited;
+    }
+
     uint32_t getCanvasWidth()
     {
         return m_canvasWidth;
@@ -138,7 +145,7 @@ namespace vgim
 
 	void static moduleCreate(uint32_t canvasWidth, uint32_t canvasHeight)
 	{
-		if (isInited == VG_TRUE) return;
+		if (inited == VG_TRUE) return;
         m_canvasWidth = canvasWidth;
         m_canvasHeight = canvasHeight;
 		_createMaterial();
@@ -148,12 +155,12 @@ namespace vgim
         _createScene();
         
 		//Indicate module was initialized.
-		isInited = VG_IM_TRUE;
+		inited = VG_IM_TRUE;
 	}
 
 	void moduleDestory()
 	{
-		isInited = VG_IM_FALSE;
+		inited = VG_IM_FALSE;
 
         _destroyScene();
         _destroyCamera();      

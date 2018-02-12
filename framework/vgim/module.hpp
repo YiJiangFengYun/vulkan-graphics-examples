@@ -4,7 +4,7 @@
 #include "vgim/global.hpp"
 
 namespace vgim {
-	extern Bool32 isInited;
+	extern Bool32 getInited();
 	extern void moduleCreate(uint32_t canvasWidth, uint32_t canvasHeight);
 	extern void moduleDestory();
 	extern uint32_t getCanvasWidth();

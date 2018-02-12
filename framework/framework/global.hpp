@@ -9,6 +9,7 @@
 
 #include <foundation/foundation.hpp>
 #include <graphics/graphics.hpp>
+#include <vgim/vgim.hpp>
 
 #ifndef GLFW_INCLUDE_VULKAN
 #define GLFW_INCLUDE_VULKAN

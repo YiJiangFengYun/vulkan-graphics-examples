@@ -1,9 +1,9 @@
 #ifndef APP_H
 #define APP_H
 
-#include "framework/framework.hpp"
+#include "framework/app/app.hpp"
 
-namespace chalet
+namespace triangle
 {
 	class App : public vgf::App
 	{

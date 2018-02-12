@@ -23,3 +23,4 @@ set(SHADERS_OUTPUT_DIR "${RESOURCES_OUTPUT_DIR}/shaders")
 add_subdirectory(sampleslib)
 
 add_subdirectory(chalet)
+add_subdirectory(triangle)

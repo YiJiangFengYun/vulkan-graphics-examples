@@ -186,6 +186,7 @@ namespace vg
 		createInfo.pVertexInputState = &subVertexData.vertexInputStateInfo;
 		createInfo.pInputAssemblyState = &subIndexData.inputAssemblyStateInfo;
 
+        auto polygonMode = tranPolygonModeToVK(pPass->getPolygonMode());
         auto cullMode = tranCullModeFlagsToVK(pPass->getCullMode());
 		auto frontFace = tranFrontFaceTypeToVK(pPass->getFrontFace());
 		//Rasterization info.
@@ -193,7 +194,7 @@ namespace vg
 			vk::PipelineRasterizationStateCreateFlags(),  //flags
 			VK_FALSE,                                     //depthClampEnable
 			VK_FALSE,                                     //rasterizerDiscardEnable
-			vk::PolygonMode::eFill,                       //polygonMode
+			polygonMode,                                  //polygonMode
 			cullMode,                                     //cullMode
 			frontFace,                                    //frontFace
 			VK_FALSE,                                     //depthBiasEnable

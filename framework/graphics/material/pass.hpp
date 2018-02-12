@@ -165,6 +165,9 @@ namespace vg
         
 		PipelineStateID getPipelineStateID() const;
 
+		PolygonMode getPolygonMode() const;
+		void setPolygonMode(PolygonMode polygonMode);
+
 		CullModeFlags getCullMode() const;
 		void setCullMode(CullModeFlags cullMode);
 
@@ -242,6 +245,7 @@ namespace vg
 		Bool32 m_applied;
 
         PipelineStateID m_pipelineStateID;
+		PolygonMode m_polygonMode;
 		CullModeFlags m_cullMode;
 		FrontFaceType m_frontFace;
 		fd::Viewport m_viewport;

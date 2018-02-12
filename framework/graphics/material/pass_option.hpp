@@ -27,12 +27,22 @@ namespace vg
 
 	typedef fd::Flags<ShaderStageFlagBits> ShaderStageFlags;
 
+	enum class PolygonMode
+	{
+		FILL = VK_POLYGON_MODE_FILL,
+        LINE = VK_POLYGON_MODE_LINE,
+        POINT = VK_POLYGON_MODE_POINT,
+		BEGIN_RANGE = FILL,
+		END_RANGE = POINT,
+		RANGE_SIZE = (END_RANGE - BEGIN_RANGE + 1)
+	};
+
 	enum class CullModeFlagBits
 	{
-		eNone = 0u ,
-		eFront = 1u,
-		eBack = 2u,
-		eFrontAndBack = 3u
+		NONE = 0u ,
+		FRONT = 1u,
+		BACK = 2u,
+		FRONT_AND_BACK = 3u
 	};
 
 	const uint32_t CullModeFlagCount = 4u;
@@ -41,10 +51,10 @@ namespace vg
 
 	enum class FrontFaceType
 	{
-		eCounterClockwise = 0u,
-		eClockwise = 1u,
-		BEGIN_RANGE = eCounterClockwise,
-		END_RANGE = eClockwise,
+		COUNTER_CLOCKWISE = 0u,
+		CLOCKWISE = 1u,
+		BEGIN_RANGE = COUNTER_CLOCKWISE,
+		END_RANGE = CLOCKWISE,
 		RANGE_SIZE = (END_RANGE - BEGIN_RANGE + 1)
 	};
 
@@ -52,6 +62,34 @@ namespace vg
 	extern std::array<std::pair<ShaderStageFlagBits, vk::ShaderStageFlagBits>, static_cast<size_t>(ShaderStageFlagCount)> arrShaderStageFlagBitsToVK;
 	extern std::array<std::pair<CullModeFlagBits, vk::CullModeFlagBits>, static_cast<size_t>(CullModeFlagCount)> arrCullModeFlagBitsToVK;
 	extern std::array<std::pair<FrontFaceType, vk::FrontFace>, static_cast<size_t>(FrontFaceType::RANGE_SIZE)> arrFrontFaceTypeToVK;
+	extern std::array<std::pair<PolygonMode, vk::PolygonMode>, static_cast<size_t>(PolygonMode::RANGE_SIZE)> arrPolygonModeToVK;
+
+	inline vk::PolygonMode tranPolygonModeToVK(PolygonMode mode)
+	{
+		vk::PolygonMode vkMode;
+#ifdef DEBUG
+		Bool32 isHave = VG_FALSE;
+#endif // DEBUG
+		for (const auto& item2 : arrPolygonModeToVK)
+		{
+			if (item2.first == mode)
+			{
+				vkMode = item2.second;
+#ifdef DEBUG
+				isHave = VG_TRUE;
+#endif // DEBUG
+				break;
+			}
+		}
+
+#ifdef DEBUG
+		if (isHave == VG_FALSE)
+		{
+			throw std::runtime_error("Invalid polygon mode.");
+		}
+#endif // DEBUG
+		return vkMode;
+	}
 
 	inline vk::FrontFace tranFrontFaceTypeToVK(FrontFaceType type)
 	{
@@ -74,7 +112,7 @@ namespace vg
 #ifdef DEBUG
 		if (isHave == VG_FALSE)
 		{
-			throw std::runtime_error("Invalid descriptor type ");
+			throw std::runtime_error("Invalid front face type. ");
 		}
 #endif // DEBUG
 		return vkType;

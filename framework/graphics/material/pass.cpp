@@ -230,8 +230,9 @@ namespace vg
 		: Base(BaseType::PASS)
 		, m_pData(new MaterialData())
 		, m_applied(VG_FALSE)
-		, m_cullMode(CullModeFlagBits::eBack)
-		, m_frontFace(FrontFaceType::eCounterClockwise)
+		, m_polygonMode(PolygonMode::FILL)
+		, m_cullMode(CullModeFlagBits::BACK)
+		, m_frontFace(FrontFaceType::COUNTER_CLOCKWISE)
 		, m_viewport(0.0f, 0.0f, 1.0f, 1.0f, 0.0f, 1.0f)
 		, m_scissor(0.0f, 0.0f, 1.0f, 1.0f)
 		, m_depthStencilInfo()
@@ -252,8 +253,9 @@ namespace vg
 		, m_pData(new MaterialData())
 		, m_applied(VG_FALSE)
 		, m_pShader(pShader)
-		, m_cullMode(CullModeFlagBits::eBack)
-		, m_frontFace(FrontFaceType::eCounterClockwise)
+		, m_polygonMode(PolygonMode::FILL)
+		, m_cullMode(CullModeFlagBits::BACK)
+		, m_frontFace(FrontFaceType::COUNTER_CLOCKWISE)
 		, m_viewport(0.0f, 0.0f, 1.0f, 1.0f, 0.0f, 1.0f)
 		, m_scissor(0.0f, 0.0f, 1.0f, 1.0f)
 		, m_depthStencilInfo()
@@ -373,6 +375,17 @@ namespace vg
 			_applyBufferContent();
 			m_applied = VG_TRUE;
 		}
+	}
+
+	PolygonMode Pass::getPolygonMode() const
+	{
+		return m_polygonMode;
+	}
+
+	void Pass::setPolygonMode(PolygonMode polygonMode)
+	{
+		m_polygonMode = polygonMode;
+		_updatePipelineStateID();
 	}
 
 	CullModeFlags Pass::getCullMode() const

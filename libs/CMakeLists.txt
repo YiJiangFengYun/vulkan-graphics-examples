@@ -6,6 +6,9 @@ add_subdirectory(glfw)
 set(LIBRARIES ${LIBRARIES} glfw)
 
 # imgui generation
+include_directories(${IMGUI_DIR})
+# include_directories(${PROJECT_LIBS_DIR}) #to include imgui headers.
+
 set(LIBRARY_NAME "imgui")
 file(GLOB HEADERS ${IMGUI_DIR}/*.hpp ${IMGUI_DIR}/*.h)
 file(GLOB SOURCES ${IMGUI_DIR}/*.cpp)

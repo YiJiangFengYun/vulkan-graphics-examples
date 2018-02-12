@@ -11,7 +11,7 @@
 //#include <GLFW/glfw3.h>
 
 #include <graphics/graphics.hpp>
-#include <imgui/imgui.h>
+#include <imgui.h>
 
 #define VG_IM_FALSE VG_FALSE
 #define VG_IM_TRUE VG_TRUE

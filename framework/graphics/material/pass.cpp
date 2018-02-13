@@ -236,6 +236,7 @@ namespace vg
 		, m_viewport(0.0f, 0.0f, 1.0f, 1.0f, 0.0f, 1.0f)
 		, m_scissor(0.0f, 0.0f, 1.0f, 1.0f)
 		, m_depthStencilInfo()
+		, m_colorBlendAttachmentStates()
 		, m_colorBlendInfo()
 		, m_mapSpecilizationDatas()
 		, m_mapPushConstantRanges()
@@ -259,6 +260,7 @@ namespace vg
 		, m_viewport(0.0f, 0.0f, 1.0f, 1.0f, 0.0f, 1.0f)
 		, m_scissor(0.0f, 0.0f, 1.0f, 1.0f)
 		, m_depthStencilInfo()
+		, m_colorBlendAttachmentStates()
 		, m_colorBlendInfo()
 		, m_mapSpecilizationDatas()
 		, m_mapPushConstantRanges()
@@ -495,7 +497,14 @@ namespace vg
 
 	void Pass::setColorBlendInfo(const vk::PipelineColorBlendStateCreateInfo &value)
 	{
+		//copy arguments.
+        uint32_t count = value.attachmentCount;
+        size_t size = count * sizeof(vk::PipelineColorBlendAttachmentState);
+        m_colorBlendAttachmentStates.resize(count);
+        memcpy(m_colorBlendAttachmentStates.data(), value.pAttachments, size);
 		m_colorBlendInfo = value;
+		m_colorBlendInfo.pAttachments = m_colorBlendAttachmentStates.data();
+		m_colorBlendInfo.pNext = nullptr;
 		_updatePipelineStateID();
 	}
 

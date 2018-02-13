@@ -251,6 +251,7 @@ namespace vg
 		fd::Viewport m_viewport;
 		fd::Rect2D m_scissor;
 		vk::PipelineDepthStencilStateCreateInfo m_depthStencilInfo;
+		std::vector<vk::PipelineColorBlendAttachmentState> m_colorBlendAttachmentStates;
 		vk::PipelineColorBlendStateCreateInfo m_colorBlendInfo;
 		//todo
 		//each stage may own a specilization constant data.

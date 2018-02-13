@@ -22,7 +22,6 @@ namespace vg
 		m_aspect = aspect;
 		m_zNear = zNear;
 		m_zFar = zFar;
-		apply();
 	}
 
 	void Camera3::apply()
@@ -117,10 +116,27 @@ namespace vg
 		auto mvpMatrix = m_projMatrix * m_pTransform->getMatrixWorldToLocal() * pTransform->getMatrixLocalToWorld();
 
 		//transform point from model coordinate system to normalize device coordinate system.
+		const typename PointType::value_type epsilon = std::numeric_limits<typename PointType::value_type>::epsilon();
 		for (uint8_t i = 0; i < pointCount; ++i)
 		{
 			points[i] = mvpMatrix * points[i];
-			points[i] = points[i] / points[i].w;
+			if(glm::abs(points[i].w) > epsilon)
+			{
+				points[i] = points[i] / points[i].w;
+			}
+			else
+			{
+				typename PointType::length_type j;
+				for (j = 0; j < len; ++j) {
+					if (j < len - 1) {
+						//x y value is infinite.
+						points[i][j] = std::numeric_limits<typename PointType::value_type>::max();
+					} else {
+						// z value is zero.
+						points[i][j] = 0.0f;
+					}
+				}
+			}
 		}
 
 		PointType minInView;

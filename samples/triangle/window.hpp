@@ -34,7 +34,7 @@ namespace triangle
 		std::shared_ptr<vg::Pass> m_pPass;
 		std::shared_ptr<vg::Shader> m_pShader;
 
-
+		void _initZoom();
 		void _loadModel();
 		void _createMesh();
 		void _createMaterial();

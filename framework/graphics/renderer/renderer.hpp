@@ -84,7 +84,7 @@ namespace vg
 		std::shared_ptr<vk::CommandBuffer> m_pCommandBuffer;
 		PipelineCache m_pipelineCache;
 		
-		std::vector<std::shared_ptr<vk::Semaphore>> m_arrCachePSemaphores;
+		std::shared_ptr<vk::Semaphore> m_cachePSemaphore;
 		std::vector<vk::Semaphore> m_arrSemaphores;
 		//aggregations
 		//Renderer will use swapchain image when color attachment texture is null.
@@ -103,17 +103,22 @@ namespace vg
 		void _createFramebuffer();
 		void _createCommandPool();
 		void _createCommandBuffer();
+		void _createSemaphore();
 
-		void _createPipelineForRender(std::shared_ptr<vk::Pipeline> &pPipeline,
+		void _recordCommandBufferForBegin();
+
+		void _createPipelineForObj(std::shared_ptr<vk::Pipeline> &pPipeline,
 			std::shared_ptr<BaseMesh> pMesh,
 			std::shared_ptr<Material> pMaterial,
 			uint32_t subMeshIndex = 0u,
 			uint32_t passIndex = 0u);
-		void _recordCommandBufferForRender(std::shared_ptr<vk::Pipeline> pPipeline,
+		void _recordCommandBufferForObj(std::shared_ptr<vk::Pipeline> pPipeline,
 			std::shared_ptr<BaseMesh> pMesh,
 			std::shared_ptr<Material> pMaterial,
 			uint32_t subMeshIndex = 0u,
 			uint32_t passIndex = 0u);
+
+		void _recordCommandBufferForEnd();
 
 	    void _renderScene2(const Scene<SpaceType::SPACE_2> *pScene
 		    , const Camera<SpaceType::SPACE_2> *pCamera

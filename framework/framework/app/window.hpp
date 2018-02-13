@@ -52,6 +52,7 @@ namespace vgf
 		//uint32_t m_presentQueueIndex;
 		std::vector<std::shared_ptr<vg::Renderer>> m_pRenderers;
 		std::shared_ptr<vk::Semaphore> m_pImageAvailableSemaphore;
+		int32_t m_currImageIndex;
 
 		//std::mutex m_windowMutex;
 

@@ -41,6 +41,7 @@ namespace vgf {
 	    )
 		: m_width(width)
 		, m_height(height)
+		, m_currImageIndex(-1)
 	{
 		_createWindow(width, height, title);
 		_createSurface();
@@ -56,6 +57,7 @@ namespace vgf {
 	)
 		: m_pWindow(pWindow)
 		, m_pSurface(pSurface)
+		, m_currImageIndex(-1)
 	{
 		int32_t width;
 		int32_t height;
@@ -275,17 +277,17 @@ namespace vgf {
 
 	void Window::_render()
 	{
-		auto pDevice = vg::pApp->getDevice();
 		uint32_t imageIndex;
-		VkResult result = vkAcquireNextImageKHR(static_cast<VkDevice>(*pDevice)
-			, static_cast<VkSwapchainKHR>(*m_pSwapchain)
-			, std::numeric_limits<uint64_t>::max()
-			, static_cast<VkSemaphore>(*m_pImageAvailableSemaphore)
-			, VK_NULL_HANDLE
-			, &imageIndex);
-
-		if (m_pRenderers[imageIndex]->isValidForRender())
+		if (m_currImageIndex < 0)
 		{
+			auto pDevice = vg::pApp->getDevice();
+			VkResult result = vkAcquireNextImageKHR(static_cast<VkDevice>(*pDevice)
+				, static_cast<VkSwapchainKHR>(*m_pSwapchain)
+				, std::numeric_limits<uint64_t>::max()
+				, static_cast<VkSemaphore>(*m_pImageAvailableSemaphore)
+				, VK_NULL_HANDLE
+				, &imageIndex);
+
 			if (result == VK_ERROR_OUT_OF_DATE_KHR)
 			{
 				_doReCreateSwapchain();
@@ -294,7 +296,15 @@ namespace vgf {
 			{
 				throw std::runtime_error("Failed to acquire swap chain image");
 			}
+			m_currImageIndex = static_cast<int32_t>(imageIndex);
+		}
+		else 
+		{
+			imageIndex = m_currImageIndex;
+		}
 
+		if (m_pRenderers[imageIndex]->isValidForRender())
+		{
 			vg::Renderer::RenderInfo info;
 			info.sceneAndCameraCount = 0;
 			info.pSceneAndCamera = nullptr;
@@ -306,39 +316,43 @@ namespace vgf {
 
 			_renderWithRenderer(m_pRenderers[imageIndex], info, resultInfo);
 
-			if (resultInfo.isRendered == VG_FALSE) throw std::runtime_error("No content was rendered.");
-			vk::PresentInfoKHR presentInfo = {
-				resultInfo.signalSemaphoreCount, //waitSemaphoreCount
-			    resultInfo.pSignalSemaphores,   //pWaitSemaphores
-				1u,                                 //swapchainCount
-				m_pSwapchain.get(),                 //pSwapchains
-				&imageIndex,                        //pImageIndices
-				nullptr                             //pResults
-			};
-
-			vk::Queue queue;
-			uint32_t queueIndex;
-			vg::pApp->allocatePresentQueue(queueIndex, queue);
-			result = vkQueuePresentKHR(static_cast<VkQueue>(queue), reinterpret_cast<VkPresentInfoKHR *>(&presentInfo));
-			if (result == VK_ERROR_OUT_OF_DATE_KHR || result == VK_SUBOPTIMAL_KHR)
+			//if (resultInfo.isRendered == VG_FALSE) throw std::runtime_error("No content was rendered.");
+			if (resultInfo.isRendered)
 			{
-				_doReCreateSwapchain();
-			}
-			else if (result != VK_SUCCESS)
-			{
-				throw std::runtime_error("Failed to present swap chain image!");
-			}
+				vk::PresentInfoKHR presentInfo = {
+					resultInfo.signalSemaphoreCount, //waitSemaphoreCount
+					resultInfo.pSignalSemaphores,   //pWaitSemaphores
+					1u,                                 //swapchainCount
+					m_pSwapchain.get(),                 //pSwapchains
+					&imageIndex,                        //pImageIndices
+					nullptr                             //pResults
+				};
 
-			/**
-			If you run your application with validation layers enabled and you monitor the memory usage of your application,
-			you may notice that it is slowly growing. The reason for this is that the validation layer implementation expects
-			the application to explicitly synchronize with the GPU. Although this is technically not required, doing so once a
-			frame will not noticeably affect performance.
-			**/
+				vk::Queue queue;
+				uint32_t queueIndex;
+				vg::pApp->allocatePresentQueue(queueIndex, queue);
+				VkResult result = vkQueuePresentKHR(static_cast<VkQueue>(queue), reinterpret_cast<VkPresentInfoKHR *>(&presentInfo));
+				m_currImageIndex = -1;
+				if (result == VK_ERROR_OUT_OF_DATE_KHR || result == VK_SUBOPTIMAL_KHR)
+				{
+					_doReCreateSwapchain();
+				}
+				else if (result != VK_SUCCESS)
+				{
+					throw std::runtime_error("Failed to present swap chain image!");
+				}
+
+				/**
+				If you run your application with validation layers enabled and you monitor the memory usage of your application,
+				you may notice that it is slowly growing. The reason for this is that the validation layer implementation expects
+				the application to explicitly synchronize with the GPU. Although this is technically not required, doing so once a
+				frame will not noticeably affect performance.
+				**/
 #ifdef ENABLE_VALIDATION_LAYERS
-			vkQueueWaitIdle(static_cast<VkQueue>(queue));
+				vkQueueWaitIdle(static_cast<VkQueue>(queue));
 #endif //ENABLE_VALIDATION_LAYERS
-			vg::pApp->freePresentQueue(queueIndex);
+				vg::pApp->freePresentQueue(queueIndex);
+			}
 		}
 		else
 		{

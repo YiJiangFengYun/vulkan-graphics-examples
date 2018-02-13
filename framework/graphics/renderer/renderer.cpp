@@ -163,7 +163,6 @@ namespace vg
 		uint32_t count = info.sceneAndCameraCount;
 		for (uint32_t i = 0; i < count; ++i)
 		{
-			resultInfo.isRendered = VG_TRUE;
 			const auto &pScene = (*(info.pSceneAndCamera + i)).pScene;
 			const auto &pCamera = (*(info.pSceneAndCamera + i)).pCamera;
 
@@ -190,35 +189,8 @@ namespace vg
 		m_pipelineCache.end();
 	}
 
-	void Renderer::_createPipelineForRender(std::shared_ptr<vk::Pipeline> &pPipeline,
-		std::shared_ptr<BaseMesh> pMesh,
-		std::shared_ptr<Material> pMaterial,
-		uint32_t subMeshIndex,
-		uint32_t passIndex)
+	void Renderer::_recordCommandBufferForBegin()
 	{
-		ContentMesh * pContentMesh = dynamic_cast<ContentMesh *>(pMesh.get());
-		auto pPass = pMaterial->getPassWithIndex(passIndex);
-		PipelineCache::Info info(
-			*m_pRenderPass,
-			pPass,
-			pContentMesh->getVertexData(),
-			0u,
-			pContentMesh->getIndexData(),
-			subMeshIndex
-		);
-		pPipeline = m_pipelineCache.caching(info);
-	}
-
-	void Renderer::_recordCommandBufferForRender(std::shared_ptr<vk::Pipeline> pPipeline,
-		std::shared_ptr<BaseMesh> pMesh,
-		std::shared_ptr<Material> pMaterial,
-		uint32_t subMeshIndex,
-		uint32_t passIndex)
-	{
-		LOG(plog::debug) << "Pre begin command buffer for render." << std::endl;
-		ContentMesh * pContentMesh = dynamic_cast<ContentMesh *>(pMesh.get());
-		auto pPass = pMaterial->getPassWithIndex(passIndex);
-		
 		vk::CommandBufferBeginInfo beginInfo = {
 			vk::CommandBufferUsageFlagBits::eSimultaneousUse,  //flags
 			nullptr                                            //pInheritanceInfo
@@ -262,6 +234,36 @@ namespace vg
 		};
 
 		m_pCommandBuffer->beginRenderPass(renderPassBeginInfo, vk::SubpassContents::eInline);
+	}
+
+	void Renderer::_createPipelineForObj(std::shared_ptr<vk::Pipeline> &pPipeline,
+		std::shared_ptr<BaseMesh> pMesh,
+		std::shared_ptr<Material> pMaterial,
+		uint32_t subMeshIndex,
+		uint32_t passIndex)
+	{
+		ContentMesh * pContentMesh = dynamic_cast<ContentMesh *>(pMesh.get());
+		auto pPass = pMaterial->getPassWithIndex(passIndex);
+		PipelineCache::Info info(
+			*m_pRenderPass,
+			pPass,
+			pContentMesh->getVertexData(),
+			0u,
+			pContentMesh->getIndexData(),
+			subMeshIndex
+		);
+		pPipeline = m_pipelineCache.caching(info);
+	}
+
+	void Renderer::_recordCommandBufferForObj(std::shared_ptr<vk::Pipeline> pPipeline,
+		std::shared_ptr<BaseMesh> pMesh,
+		std::shared_ptr<Material> pMaterial,
+		uint32_t subMeshIndex,
+		uint32_t passIndex)
+	{
+		LOG(plog::debug) << "Pre begin command buffer for render." << std::endl;
+		ContentMesh * pContentMesh = dynamic_cast<ContentMesh *>(pMesh.get());
+		auto pPass = pMaterial->getPassWithIndex(passIndex);
         
         const auto& viewportOfPass = pPass->getViewport();
 		const auto& scissorOfPass = pPass->getScissor();
@@ -371,7 +373,10 @@ namespace vg
 
 		m_pCommandBuffer->drawIndexed(subIndexData.indexCount, 1u, indexOffset, vertexOffset, 0u);
 		//m_pCommandBuffer->draw(3, 1, 0, 0);
+	}
 
+	void Renderer::_recordCommandBufferForEnd()
+	{
 		m_pCommandBuffer->endRenderPass();
 
 		LOG(plog::debug) << "Pre end command buffer." << std::endl;
@@ -386,6 +391,16 @@ namespace vg
 		_createFramebuffer();
 		_createCommandPool();
 		_createCommandBuffer();
+		_createSemaphore();
+	}
+
+	void Renderer::_createSemaphore()
+	{
+		auto pDevice = pApp->getDevice();
+		vk::SemaphoreCreateInfo createInfo = {
+			vk::SemaphoreCreateFlags()
+		};
+		m_cachePSemaphore = fd::createSemaphore(pDevice, createInfo);
 	}
 
 	void Renderer::_createRenderPass()
@@ -531,8 +546,14 @@ namespace vg
 	    , const RenderInfo &info
 	    , RenderResultInfo &resultInfo)
 	{
+		resultInfo.isRendered = VG_TRUE;		
+
 		using SceneType = Scene<SpaceType::SPACE_2>;
 		auto pDevice = pApp->getDevice();
+
+		//command buffer begin
+		_recordCommandBufferForBegin();
+
 		auto projMatrix = pCamera->getProjMatrix();
 		auto viewMatrix = pCamera->getTransform()->getMatrixWorldToLocal();
 		uint32_t visualObjectCount = pScene->getVisualObjectCount();
@@ -565,12 +586,10 @@ namespace vg
 
 		//------Doing render.
 		vk::PipelineStageFlags waitStages[] = { vk::PipelineStageFlagBits::eColorAttachmentOutput };
-		std::vector<vk::SubmitInfo> submitInfos(drawCount);
-		uint32_t semaphoreCount = resultInfo.signalSemaphoreCount + drawCount;
+		uint32_t semaphoreCount = resultInfo.signalSemaphoreCount + 1u;
 		uint32_t semaphoreIndex = resultInfo.signalSemaphoreCount;
-		if (m_arrCachePSemaphores.size() < semaphoreCount)
-		    m_arrCachePSemaphores.resize(semaphoreCount);
 		m_arrSemaphores.resize(semaphoreCount);
+		m_arrSemaphores[semaphoreIndex] = *m_cachePSemaphore;		
 
 		uint32_t drawIndex = 0u;
 		for (uint32_t i = 0u; i < validVisualObjectCount; ++i)
@@ -599,50 +618,34 @@ namespace vg
 				for (uint32_t passIndex = 0u; passIndex < passCount; ++passIndex)
 				{
 					std::shared_ptr<vk::Pipeline> pPipeline;
-					_createPipelineForRender(pPipeline, pMesh, pMaterial, subMeshIndex + subMeshOffset, passIndex);
-					_recordCommandBufferForRender(pPipeline, pMesh, pMaterial, subMeshIndex + subMeshOffset, passIndex);
-
-					//submit
-					std::shared_ptr<vk::Semaphore> pSemaphore = nullptr;
-					if (m_arrCachePSemaphores[semaphoreIndex] != nullptr)
-					{
-						pSemaphore = m_arrCachePSemaphores[semaphoreIndex];
-					}
-					else
-					{
-						vk::SemaphoreCreateInfo createInfo = {
-							vk::SemaphoreCreateFlags()
-						};
-						pSemaphore = fd::createSemaphore(pDevice, createInfo);
-						m_arrCachePSemaphores[semaphoreIndex] = pSemaphore;
-					}
-					m_arrSemaphores[semaphoreIndex] = *pSemaphore;
-
-					vk::SubmitInfo submitInfo = {
-						info.waitSemaphoreCount,              //waitSemaphoreCount
-						info.pWaitSemaphores,                 //pWaitSemaphores
-						waitStages,                           //pWaitDstStageMask
-						1u,                                   //commandBufferCount
-						m_pCommandBuffer.get(),               //pCommandBuffers
-						1u,                                   //signalSemaphoreCount
-						pSemaphore.get()                      //pSignalSemaphores
-					};
-
-					submitInfos[drawIndex] = submitInfo;
+					_createPipelineForObj(pPipeline, pMesh, pMaterial, subMeshIndex + subMeshOffset, passIndex);
+					_recordCommandBufferForObj(pPipeline, pMesh, pMaterial, subMeshIndex + subMeshOffset, passIndex);
 					++drawIndex;
-					++semaphoreIndex;
 				}
 			}
 		}
+
+		//command buffer end
+		_recordCommandBufferForEnd();
+
+		//submit		
+		vk::SubmitInfo submitInfo = {
+			info.waitSemaphoreCount,              //waitSemaphoreCount
+			info.pWaitSemaphores,                 //pWaitSemaphores
+			waitStages,                           //pWaitDstStageMask
+			1u,                                   //commandBufferCount
+			m_pCommandBuffer.get(),               //pCommandBuffers
+			1u,                                   //signalSemaphoreCount
+			m_cachePSemaphore.get()                      //pSignalSemaphores
+		};
 
 		LOG(plog::debug) << "Pre submit to grahics queue." << std::endl;
 		vk::Queue queue;
 		uint32_t queueIndex;
 		pApp->allocateGaphicsQueue(queueIndex, queue);
-		queue.submit(submitInfos, nullptr);
+		queue.submit(submitInfo, nullptr);
 		pApp->freeGraphicsQueue(queueIndex);
 		LOG(plog::debug) << "Post submit to grahics queue." << std::endl;
-
 		resultInfo.signalSemaphoreCount = static_cast<uint32_t>(m_arrSemaphores.size());
 		resultInfo.pSignalSemaphores = m_arrSemaphores.data();
 	}
@@ -654,8 +657,13 @@ namespace vg
 	{
 		using SceneType = Scene<SpaceType::SPACE_3>;
 
+		resultInfo.isRendered = VG_TRUE;		
+
 		auto queueTypeCount = static_cast<uint32_t>(RenderQueueType::RANGE_SIZE);
 		auto pDevice = pApp->getDevice();
+
+		//command buffer begin
+		_recordCommandBufferForBegin();
 
 		auto projMatrix = pCamera->getProjMatrix();
 		auto viewMatrix = pCamera->getTransform()->getMatrixWorldToLocal();
@@ -766,12 +774,10 @@ namespace vg
 		//-----Doing render.
 		
 		vk::PipelineStageFlags waitStages[] = { vk::PipelineStageFlagBits::eColorAttachmentOutput };
-		std::vector<vk::SubmitInfo> submitInfos(drawCount);
-		uint32_t semaphoreCount = resultInfo.signalSemaphoreCount + drawCount;
+		uint32_t semaphoreCount = resultInfo.signalSemaphoreCount + 1u;
 		uint32_t semaphoreIndex = resultInfo.signalSemaphoreCount;
-		if (m_arrCachePSemaphores.size() < semaphoreCount)
-		    m_arrCachePSemaphores.resize(semaphoreCount);
 		m_arrSemaphores.resize(semaphoreCount);
+		m_arrSemaphores[semaphoreIndex] = *m_cachePSemaphore;	
 
 		uint32_t drawIndex = 0;
 		for (uint32_t typeIndex = 0u; typeIndex < queueTypeCount; ++typeIndex)
@@ -805,51 +811,35 @@ namespace vg
 					for (uint32_t passIndex = 0u; passIndex < passCount; ++passIndex)
 					{
 						std::shared_ptr<vk::Pipeline> pPipeline;
-						_createPipelineForRender(pPipeline, pMesh, pMaterial, subMeshIndex + subMeshOffset, passIndex);
-						_recordCommandBufferForRender(pPipeline, pMesh, pMaterial, subMeshIndex + subMeshOffset, passIndex);
-
-						//submit
-						std::shared_ptr<vk::Semaphore> pSemaphore = nullptr;
-						if (m_arrCachePSemaphores[semaphoreIndex] != nullptr)
-						{
-							pSemaphore = m_arrCachePSemaphores[semaphoreIndex];
-						}
-						else
-						{
-							vk::SemaphoreCreateInfo createInfo = {
-								vk::SemaphoreCreateFlags()
-							};
-							pSemaphore = fd::createSemaphore(pDevice, createInfo);
-							m_arrCachePSemaphores[semaphoreIndex] = pSemaphore;
-						}
-						m_arrSemaphores[semaphoreIndex] = *pSemaphore;
-
-						vk::SubmitInfo submitInfo = {
-							info.waitSemaphoreCount,              //waitSemaphoreCount
-							info.pWaitSemaphores,                 //pWaitSemaphores
-							waitStages,                           //pWaitDstStageMask
-							1u,                                   //commandBufferCount
-							m_pCommandBuffer.get(),               //pCommandBuffers
-							1u,                                   //signalSemaphoreCount
-							pSemaphore.get()                      //pSignalSemaphores
-						};
-
-						submitInfos[drawIndex] = submitInfo;
+						_createPipelineForObj(pPipeline, pMesh, pMaterial, subMeshIndex + subMeshOffset, passIndex);
+						_recordCommandBufferForObj(pPipeline, pMesh, pMaterial, subMeshIndex + subMeshOffset, passIndex);
 						++drawIndex;
-						++semaphoreIndex;
 					}
 				}
 			}
 		}
 
+		//command buffer end
+		_recordCommandBufferForEnd();
+
+		//submit
+		vk::SubmitInfo submitInfo = {
+			info.waitSemaphoreCount,              //waitSemaphoreCount
+			info.pWaitSemaphores,                 //pWaitSemaphores
+			waitStages,                           //pWaitDstStageMask
+			1u,                                   //commandBufferCount
+			m_pCommandBuffer.get(),               //pCommandBuffers
+			1u,                                   //signalSemaphoreCount
+			m_cachePSemaphore.get()               //pSignalSemaphores
+		};
+
 		LOG(plog::debug) << "Pre submit to grahics queue." << std::endl;
 		vk::Queue queue;
 		uint32_t queueIndex;
 		pApp->allocateGaphicsQueue(queueIndex, queue);
-		queue.submit(submitInfos, nullptr);
+		queue.submit(submitInfo, nullptr);
 		pApp->freeGraphicsQueue(queueIndex);
 		LOG(plog::debug) << "Post submit to grahics queue." << std::endl;
-
 		resultInfo.signalSemaphoreCount = static_cast<uint32_t>(m_arrSemaphores.size());
 		resultInfo.pSignalSemaphores = m_arrSemaphores.data();
 	}

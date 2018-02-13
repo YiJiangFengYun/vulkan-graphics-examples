@@ -24,8 +24,8 @@ namespace vgf {
 
 	App::~App()
 	{
-		m_pWindow = nullptr;
 		m_pSubWindows.resize(0);
+		m_pWindow = nullptr;
 
 		vg::moduleDestory();
 

@@ -3,6 +3,7 @@ set(FOLDER_NAME "framework")
 
 include_directories("${GLM_DIR}")
 include_directories("${PLOG_DIR}/include")
+include_directories("${IMGUI_DIR}") #to include imgui headers.
 
 add_subdirectory(foundation)
 add_subdirectory(graphics)

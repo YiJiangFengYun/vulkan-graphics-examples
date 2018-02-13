@@ -97,11 +97,11 @@ namespace triangle
 		colorBlendState.pAttachments = attachmentState;
 		m_pPass->setColorBlendInfo(colorBlendState);
 
-		vk::PipelineDepthStencilStateCreateInfo depthStencilState = {};
-		depthStencilState.depthTestEnable = VG_TRUE;
-		depthStencilState.depthWriteEnable = VG_TRUE;
-		depthStencilState.depthCompareOp = vk::CompareOp::eLessOrEqual;
-		m_pPass->setDepthStencilInfo(depthStencilState);
+		// vk::PipelineDepthStencilStateCreateInfo depthStencilState = {};
+		// depthStencilState.depthTestEnable = VG_TRUE;
+		// depthStencilState.depthWriteEnable = VG_TRUE;
+		// depthStencilState.depthCompareOp = vk::CompareOp::eLessOrEqual;
+		// m_pPass->setDepthStencilInfo(depthStencilState);
 
 		//material
 		m_pMaterial = std::shared_ptr<vg::Material>(new vg::Material());

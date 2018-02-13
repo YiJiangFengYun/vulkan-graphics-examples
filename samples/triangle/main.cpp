@@ -14,7 +14,7 @@ int main() {
 	vgf::moduleCreate();
 
 	triangle::App triangle;
-	triangle.init<triangle::Window>(WINDOW_WIDTH, WINDOW_HEIGHT, "test-triangle");
+	triangle.init<triangle::Window>(WINDOW_WIDTH, WINDOW_HEIGHT, "triangle");
 
 	LOG(plog::debug) << "Initialization completed." << std::endl;
 

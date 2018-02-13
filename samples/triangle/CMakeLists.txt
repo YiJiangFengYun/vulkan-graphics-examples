@@ -12,8 +12,9 @@ if(SOURCES)
     
     # copy resource files
     set(RESOURCES_OUTPUT_DIR "${CMAKE_CURRENT_BINARY_DIR}")
-    set(SHADERS_OUTPUT_DIR "${RESOURCES_OUTPUT_DIR}/shaders")
+    set(SHADERS_OUTPUT_DIR "${RESOURCES_OUTPUT_DIR}/shaders/${SHADER_NAME}")
     set(SHADER_NAME "triangle")
+    set(SHADERS_DIR "${SHADERS_DIR}/${SHADER_NAME}")
     file(GLOB 
          SHADERS 
          "${SHADERS_DIR}/${SHADER_NAME}.vert" 

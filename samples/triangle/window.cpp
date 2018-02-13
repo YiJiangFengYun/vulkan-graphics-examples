@@ -9,7 +9,9 @@ namespace triangle
 		: vgf::Window(width
 			, height
 			, title
-		)
+		    )
+		, m_zoom(0.0f)
+		, m_rotation(0.0f)
 	{
 		_loadModel();
 		_createMesh();
@@ -24,7 +26,9 @@ namespace triangle
 	)
 		: vgf::Window(pWindow
 			, pSurface
-		)
+		    )
+		, m_zoom(0.0f)
+		, m_rotation(0.0f)
 	{
 		_loadModel();
 		_createMesh();
@@ -36,9 +40,9 @@ namespace triangle
 
 	void Window::_loadModel()
 	{
-		m_tempPositions = { vg::Vector3(0.0f, -0.5f, 0.5f)
-		, vg::Vector3(-0.5f, 0.5f, 0.5f)
-		, vg::Vector3(0.5f, 0.5f, 0.5f)
+		m_tempPositions = { vg::Vector3(1.0f, 1.0f, 0.0f)
+		, vg::Vector3(-1.0f, 1.0f, 0.0f)
+		, vg::Vector3(0.0f, -1.0f, 0.0f)
 		};
 
 		m_tempColors = { vg::Color32(255, 0, 0, 255)
@@ -63,8 +67,32 @@ namespace triangle
 
 	void Window::_createMaterial()
 	{
-		m_pShader = std::shared_ptr<vg::Shader>(new vg::Shader("shaders/triangle.vert.spv", "shaders/triangle.frag.spv"));
+		//shader
+		m_pShader = std::shared_ptr<vg::Shader>(
+			new vg::Shader("shaders/triangle/triangle.vert.spv", "shaders/triangle/triangle.frag.spv")
+			);
+
+		//pass
 		m_pPass = std::shared_ptr<vg::Pass>(new vg::Pass(m_pShader));
+		m_pPass->setPolygonMode(vg::PolygonMode::FILL);
+		m_pPass->setCullMode(vg::CullModeFlagBits::NONE);
+		m_pPass->setFrontFace(vg::FrontFaceType::COUNTER_CLOCKWISE);
+
+		vk::PipelineColorBlendAttachmentState attachmentState[1] = {};
+		attachmentState[0].colorWriteMask = vk::ColorComponentFlags();
+		attachmentState[0].blendEnable = VG_FALSE;
+		vk::PipelineColorBlendStateCreateInfo colorBlendState = {};
+		colorBlendState.attachmentCount = 1;
+		colorBlendState.pAttachments = attachmentState;
+		m_pPass->setColorBlendInfo(colorBlendState);
+
+		vk::PipelineDepthStencilStateCreateInfo depthStencilState = {};
+		depthStencilState.depthTestEnable = VG_TRUE;
+		depthStencilState.depthWriteEnable = VG_TRUE;
+		depthStencilState.depthCompareOp = vk::CompareOp::eLessOrEqual;
+		m_pPass->setDepthStencilInfo(depthStencilState);
+
+		//material
 		m_pMaterial = std::shared_ptr<vg::Material>(new vg::Material());
 		m_pMaterial->addPass(m_pPass);
 		m_pMaterial->setRenderPriority(0u);
@@ -81,9 +109,8 @@ namespace triangle
 
 	void Window::_createCamera()
 	{
-		m_pCamera = std::shared_ptr<vg::CameraOP3>(new vg::CameraOP3());
-		m_pCamera->updateProj({{ -1.0f, -1.0f, 0.1f }, { 1.0f, 1.0f, 10.0f }});
-		m_pCamera->apply();
+		m_pCamera = std::shared_ptr<vg::Camera3>(new vg::Camera3());
+		_updateCamera();
 	}
 
 	void Window::_createScene()
@@ -91,6 +118,20 @@ namespace triangle
 		m_pScene = std::shared_ptr<vg::Scene3>(new vg::Scene3());
 		m_pScene->addCamera(m_pCamera);
 		m_pScene->addVisualObject(m_pModel);
+	}
+
+	void Window::_updateCamera()
+	{
+		m_pCamera->updateProj(glm::radians(60.0f), (float)m_width / (float)m_height, 0.1f, 256.0f);
+		auto &transform = m_pCamera->getTransform();
+		transform->setLocalPosition(glm::vec3(0.0f, 0.0f, m_zoom));
+		transform->setLocalRotation(m_rotation);
+		m_pCamera->apply();		
+	}	
+
+	void Window::_onResize()
+	{
+		_updateCamera();
 	}
 
 	void Window::_onPreReCreateSwapchain()
@@ -107,8 +148,9 @@ namespace triangle
 
 	}
 
-	void Window::_update()
+	void Window::_onUpdate()
 	{
+		_updateCamera();
 	}
 
 	void Window::_onPostUpdate()

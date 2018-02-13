@@ -38,7 +38,9 @@ namespace vgf {
 	Window::Window(uint32_t width
 		, uint32_t height
 		, const char* title
-	)
+	    )
+		: m_width(width)
+		, m_height(height)
 	{
 		_createWindow(width, height, title);
 		_createSurface();
@@ -55,7 +57,11 @@ namespace vgf {
 		: m_pWindow(pWindow)
 		, m_pSurface(pSurface)
 	{
-
+		int32_t width;
+		int32_t height;
+		glfwGetWindowSize(m_pWindow.get(), &width, &height);
+		m_width = static_cast<uint32_t>(width);
+		m_height = static_cast<uint32_t>(height);
 		glfwSetWindowUserPointer(pWindow.get(), this);
 		glfwSetWindowSizeCallback(pWindow.get(), onWindowResized);
 		//_allocatePresentQueue();
@@ -131,7 +137,7 @@ namespace vgf {
 		vg::SwapChainSupportDetails details = vg::SwapChainSupportDetails::querySwapChainSupport(*pPhysicalDevice, *m_pSurface);
 		vk::SurfaceFormatKHR surfaceFormat = details.chooseSurfaceFormat();
 		vk::PresentModeKHR presentMode = details.choosePresentMode();
-		int width, height;
+		int32_t width, height;
 		glfwGetWindowSize(m_pWindow.get(), &width, &height);
 		vk::Extent2D extent = details.chooseExtent(width, height);
 		
@@ -249,7 +255,7 @@ namespace vgf {
 	void Window::_doUpdate()
 	{
 		_onPreUpdate();
-		_update();
+		_onUpdate();
 		_onPostUpdate();
 	}
 
@@ -424,6 +430,9 @@ namespace vgf {
 		if (width == 0 || height == 0) return;
 		LOG(plog::debug) << "Context resize.";
 
+		m_width = width;
+		m_height = height;
+		_onResize();
 		//recreate.
 		_doReCreateSwapchain();
 	}

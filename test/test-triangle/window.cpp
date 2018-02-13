@@ -107,7 +107,7 @@ namespace testTriangle
 
 	}
 
-	void Window::_update()
+	void Window::_onUpdate()
 	{
 		/*static auto startTime = std::chrono::high_resolution_clock::now();
 

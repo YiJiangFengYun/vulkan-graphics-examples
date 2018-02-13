@@ -39,7 +39,8 @@ namespace vgf
 		Window(const Window&) = delete;
 
 		//--compositions
-		
+		uint32_t m_width;
+		uint32_t m_height;
 		std::shared_ptr<GLFWwindow> m_pWindow;
 		std::shared_ptr<vk::SurfaceKHR> m_pSurface;
 		std::shared_ptr<vk::SwapchainKHR> m_pSwapchain;
@@ -59,29 +60,15 @@ namespace vgf
 
 		//--aggregations
 
-		void _createWindow(uint32_t width, uint32_t height, const char* title);
-		void _createSurface();
-		//void _allocatePresentQueue();
-		void _createSwapchain();
-		void _createSwapchainImageViews();
-		void _createRenderers();
-		virtual std::shared_ptr<vg::Renderer> _createRenderer(std::shared_ptr<vk::ImageView> pSwapchainImageView);
-		void _createSemaphores();
+		
 
-		//void _freePresentQueue();
-
-
-		void _doUpdate();
-		void _doRender();
-
-		void _doReCreateSwapchain();
+		virtual void _onResize() = 0;
 
 		virtual void _onPreReCreateSwapchain() = 0;
-		virtual void _reCreateSwapchain();
 		virtual void _onPostReCreateSwapchain() = 0;
 
 		virtual void _onPreUpdate() = 0;
-		virtual void _update() = 0;
+		virtual void _onUpdate() = 0;
 		virtual void _onPostUpdate() = 0;
 
 		virtual void _onPreRender() = 0;
@@ -99,10 +86,30 @@ namespace vgf
 		std::shared_ptr<vk::ImageView> _createImageView(vk::Image image, vk::Format format, vk::ImageAspectFlags aspectFlags);
 		uint32_t _findMemoryType(uint32_t typeFilter, vk::MemoryPropertyFlags properties);
 
+	private:
+	    void _createWindow(uint32_t width, uint32_t height, const char* title);
+		void _createSurface();
+		//void _allocatePresentQueue();
+		void _createSwapchain();
+		void _createSwapchainImageViews();
+		void _createRenderers();
+		virtual std::shared_ptr<vg::Renderer> _createRenderer(std::shared_ptr<vk::ImageView> pSwapchainImageView);
+		void _createSemaphores();
+
+		//void _freePresentQueue();
+
+
+		void _doUpdate();
+		void _doRender();
+
+		void _doReCreateSwapchain();
+		void _reCreateSwapchain();
+
 		//event handlers
 		void _onWindowResized(int32_t width, int32_t height);
 
 		friend void onWindowResized(GLFWwindow *window, int32_t width, int32_t height);
+		
 	};
 }  //namespace gfw
 

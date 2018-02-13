@@ -46,7 +46,7 @@ namespace testTriangle_2d
 		virtual void _onPostReCreateSwapchain() override;
 
 		virtual void _onPreUpdate() override;
-		virtual void _update() override;
+		virtual void _onUpdate() override;
 		virtual void _onPostUpdate() override;
 
 		virtual void _onPreRender() override;

@@ -298,7 +298,7 @@ namespace vg
 		{
 			m_localPosMatrix[length - 1] += normalMatrix[i] * position[i];
 		}
-		m_localPosMatrix[length - 1] += normalMatrix[i];
+		//m_localPosMatrix[length - 1] += normalMatrix[i];
 		m_isChanged = VG_TRUE;
 	}
 

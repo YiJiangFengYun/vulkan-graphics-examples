@@ -13,6 +13,7 @@ namespace triangle
 		, m_zoom(0.0f)
 		, m_rotation(0.0f)
 	{
+		_initZoom();
 		_loadModel();
 		_createMesh();
 		_createMaterial();
@@ -30,12 +31,18 @@ namespace triangle
 		, m_zoom(0.0f)
 		, m_rotation(0.0f)
 	{
+		_initZoom();
 		_loadModel();
 		_createMesh();
 		_createMaterial();
 		_createModel();
 		_createCamera();
 		_createScene();
+	}
+
+	void Window::_initZoom()
+	{
+		m_zoom = -2.5f;
 	}
 
 	void Window::_loadModel()
@@ -74,12 +81,16 @@ namespace triangle
 
 		//pass
 		m_pPass = std::shared_ptr<vg::Pass>(new vg::Pass(m_pShader));
+		m_pPass->setMainColor(vg::Color(1.0f, 1.0f, 1.0f, 1.0f));
 		m_pPass->setPolygonMode(vg::PolygonMode::FILL);
 		m_pPass->setCullMode(vg::CullModeFlagBits::NONE);
 		m_pPass->setFrontFace(vg::FrontFaceType::COUNTER_CLOCKWISE);
 
 		vk::PipelineColorBlendAttachmentState attachmentState[1] = {};
-		attachmentState[0].colorWriteMask = vk::ColorComponentFlags();
+		attachmentState[0].colorWriteMask = vk::ColorComponentFlagBits::eR
+			| vk::ColorComponentFlagBits::eG
+			| vk::ColorComponentFlagBits::eB
+			| vk::ColorComponentFlagBits::eA;
 		attachmentState[0].blendEnable = VG_FALSE;
 		vk::PipelineColorBlendStateCreateInfo colorBlendState = {};
 		colorBlendState.attachmentCount = 1;

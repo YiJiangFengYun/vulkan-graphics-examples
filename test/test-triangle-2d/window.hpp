@@ -42,6 +42,7 @@ namespace testTriangle_2d
 		void _createCamera();
 		void _createScene();
 
+		virtual void _onResize() override;
 		virtual void _onPreReCreateSwapchain() override;
 		virtual void _onPostReCreateSwapchain() override;
 

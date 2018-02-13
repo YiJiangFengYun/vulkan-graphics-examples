@@ -128,8 +128,8 @@ namespace chalet
 	{
 		m_pShader = std::shared_ptr<vg::Shader>(new vg::Shader("shaders/chalet.vert.spv", "shaders/chalet.frag.spv"));
 		m_pPass = std::shared_ptr<vg::Pass>(new vg::Pass(m_pShader));
-		m_pPass->setCullMode(vg::CullModeFlagBits::eBack);
-		m_pPass->setFrontFace(vg::FrontFaceType::eClockwise);
+		m_pPass->setCullMode(vg::CullModeFlagBits::BACK);
+		m_pPass->setFrontFace(vg::FrontFaceType::CLOCKWISE);
 		vk::PipelineDepthStencilStateCreateInfo depthStencilStateInfo;
 		depthStencilStateInfo.depthTestEnable = VG_TRUE;
 		depthStencilStateInfo.depthWriteEnable = VG_TRUE;
@@ -165,6 +165,11 @@ namespace chalet
 		m_pScene = std::shared_ptr<vg::Scene3>(new vg::Scene3());
 		m_pScene->addCamera(m_pCamera);
 		m_pScene->addVisualObject(m_pModel);
+	}
+
+	void Window::_onResize()
+	{
+
 	}
 
 	void Window::_onPreReCreateSwapchain()

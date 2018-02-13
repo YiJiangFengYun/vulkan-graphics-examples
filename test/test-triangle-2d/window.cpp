@@ -94,6 +94,11 @@ namespace testTriangle_2d
 		m_pScene->addVisualObject(m_pModel);
 	}
 
+	void Window::_onResize()
+	{
+
+	}
+
 	void Window::_onPreReCreateSwapchain()
 	{
 

@@ -8,8 +8,8 @@
 #define TINYOBJLOADER_IMPLEMENTATION
 #include "sampleslib/tiny_obj_loader.h"
 
-const uint32_t WINDOW_WIDTH = 800;
-const uint32_t WINDOW_HEIGHT = 600;
+const uint32_t WINDOW_WIDTH = 1280;
+const uint32_t WINDOW_HEIGHT = 720;
 int main() {
 	vgf::moduleCreate();
 

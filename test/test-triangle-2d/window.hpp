@@ -5,7 +5,7 @@
 #include "testlib/tiny_obj_loader.h"
 #include "framework/framework.hpp"
 
-namespace testTriangle_2d
+namespace testTriangle2D
 {
 	class Window : public vgf::Window
 	{

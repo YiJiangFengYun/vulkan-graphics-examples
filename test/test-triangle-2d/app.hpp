@@ -3,7 +3,7 @@
 
 #include "framework/app/app.hpp"
 
-namespace testTriangle_2d
+namespace testTriangle2D
 {
 	class App : public vgf::App
 	{

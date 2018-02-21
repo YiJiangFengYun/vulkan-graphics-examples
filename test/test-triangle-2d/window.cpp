@@ -1,6 +1,6 @@
 #include "test-triangle-2d/window.hpp"
 
-namespace testTriangle_2d
+namespace testTriangle2D
 {
 	Window::Window(uint32_t width
 		, uint32_t height
@@ -65,7 +65,6 @@ namespace testTriangle_2d
 	{
 		m_pShader = std::shared_ptr<vg::Shader>(new vg::Shader("shaders/triangle-2d.vert.spv", "shaders/triangle-2d.frag.spv"));
 		m_pPass = std::shared_ptr<vg::Pass>(new vg::Pass(m_pShader));
-		m_pPass->setScissor({ 0.0f, 0.0f, 0.5f, 1.0f });
 		m_pMaterial = std::shared_ptr<vg::Material>(new vg::Material());
 		m_pMaterial->addPass(m_pPass);
 		m_pMaterial->setRenderPriority(0u);
@@ -115,18 +114,6 @@ namespace testTriangle_2d
 
 	void Window::_onUpdate()
 	{
-		static auto startTime = std::chrono::high_resolution_clock::now();
-
-		auto currentTime = std::chrono::high_resolution_clock::now();
-		auto duration = currentTime - startTime;
-		float time = std::chrono::duration_cast<std::chrono::milliseconds>(currentTime - startTime).count() / 1000.0f;
-		float strength = remainder(time, 1.0f) / 1.0f;
-		m_pPass->setMainColor(vg::Color(strength, strength, strength, 1.0f));
-
-		for (const auto& pRenderer : m_pRenderers)
-		{
-			pRenderer->setClearValueColor(vg::Color(strength, 0.0f, 0.0f, 0.0f));
-		}
 	}
 
 	void Window::_onPostUpdate()

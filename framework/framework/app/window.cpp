@@ -214,24 +214,42 @@ namespace vgf {
 		size_t num = m_swapchainImages.size();
 
 		//Clear references in m_pRenderers.
-		m_pRenderers.resize(0u);
-		m_pRenderers.resize(num, nullptr);
+		if(m_pRenderers.size() != num) m_pRenderers.resize(num);
 
 		//Create the renders of the specified type.
 		for (size_t i = 0; i < num; ++i)
 		{
-			m_pRenderers[i] = _createRenderer(m_pSwapchainImageViews[i]);
+			if (m_pRenderers[i] == nullptr) 
+			{
+				m_pRenderers[i] = _createRenderer(
+					m_pSwapchainImageViews[i],
+					m_swapchainImageFormat,
+					m_swapchainExtent.width,
+					m_swapchainExtent.height
+				);
+			}
+			else 
+			{
+				m_pRenderers[i]->reset(m_pSwapchainImageViews[i],
+					m_swapchainImageFormat,
+					m_swapchainExtent.width,
+					m_swapchainExtent.height);
+			}
 		}
 
 	}
 
-	std::shared_ptr<vg::Renderer> Window::_createRenderer(std::shared_ptr<vk::ImageView> pSwapchainImageView)
+	std::shared_ptr<vg::Renderer> Window::_createRenderer(std::shared_ptr<vk::ImageView> pSwapchainImageView
+		, vk::Format swapchainImageFormat
+		, uint32_t swapchainImageWidth
+		, uint32_t swapchainImageHeight
+	)
 	{
 		return std::shared_ptr<vg::Renderer>(
 					new vg::Renderer(pSwapchainImageView
-						, m_swapchainImageFormat
-					    , m_swapchainExtent.width
-					    , m_swapchainExtent.height
+						, swapchainImageFormat
+					    , swapchainImageWidth
+					    , swapchainImageHeight
 					)
 				);
 	}

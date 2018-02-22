@@ -49,6 +49,13 @@ namespace vg
 
 		~Renderer();
 
+		void reset(std::shared_ptr<vk::ImageView> pSwapchainImageView
+			, vk::Format swapchainImageFormat
+			, uint32_t swapchainImageWidth
+			, uint32_t swapchainImageHeight
+		);
+		void reset(std::shared_ptr<TextureColorAttachment> pColorAttachmentTex);
+
 		Bool32 isValidForRender() const;
 
 		void render(const RenderInfo &info, RenderResultInfo &resultInfo);
@@ -133,7 +140,6 @@ namespace vg
 
 	private:
 		Renderer() = delete;
-		void _init();
 	};
 } //namespace kgs
 

@@ -76,6 +76,11 @@ namespace vgf
 		virtual void _render();
 		virtual void _onPostRender() = 0;
 
+		virtual std::shared_ptr<vg::Renderer> _createRenderer(std::shared_ptr<vk::ImageView> pSwapchainImageView
+		    , vk::Format swapchainImageFormat
+			, uint32_t swapchainImageWidth
+			, uint32_t swapchainImageHeight
+		);
 		virtual void _renderWithRenderer(const std::shared_ptr<vg::Renderer> &pRenderer
 		    , const vg::Renderer::RenderInfo &info
 			, vg::Renderer::RenderResultInfo &resultInfo) = 0;
@@ -94,7 +99,6 @@ namespace vgf
 		void _createSwapchain();
 		void _createSwapchainImageViews();
 		void _createRenderers();
-		virtual std::shared_ptr<vg::Renderer> _createRenderer(std::shared_ptr<vk::ImageView> pSwapchainImageView);
 		void _createSemaphores();
 
 		//void _freePresentQueue();

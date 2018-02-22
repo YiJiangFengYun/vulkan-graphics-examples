@@ -30,7 +30,13 @@ namespace vg
 		, m_renderArea(0.0f, 0.0f, 1.0f, 1.0f)
 		, m_pipelineCache()
 	{
-		_init();
+		_createRenderPass();
+		_createDepthStencilTex();
+		_createFramebuffer();
+		_createCommandPool();
+		_createCommandBuffer();
+		_createSemaphore();
+		_createFence();
 	}
 
 	Renderer::Renderer(std::shared_ptr<TextureColorAttachment> pColorAttachmentTex)
@@ -46,12 +52,51 @@ namespace vg
 		, m_renderArea(0.0f, 0.0f, 1.0f, 1.0f)
 		, m_pipelineCache()
 	{
-		_init();
+		_createRenderPass();
+		_createDepthStencilTex();
+		_createFramebuffer();
+		_createCommandPool();
+		_createCommandBuffer();
+		_createSemaphore();
+		_createFence();
 	}
 
 	Renderer::~Renderer()
 	{
-		//_freeGraphicsQueue();
+	}
+
+	void Renderer::reset(std::shared_ptr<vk::ImageView> pSwapchainImageView
+		, vk::Format swapchainImageFormat
+		, uint32_t swapchainImageWidth
+		, uint32_t swapchainImageHeight
+	)
+	{
+		m_pSwapchainImageView = pSwapchainImageView;
+		m_swapchainImageFormat = swapchainImageFormat;
+		m_framebufferWidth = swapchainImageWidth;
+		m_framebufferHeight = swapchainImageHeight;
+		_createRenderPass();
+		_createDepthStencilTex();
+		_createFramebuffer();
+		_createCommandPool();
+		_createCommandBuffer();
+		_createSemaphore();
+		_createFence();
+	}
+	
+	void Renderer::reset(std::shared_ptr<TextureColorAttachment> pColorAttachmentTex)
+	{
+		m_pColorTexture = pColorAttachmentTex;
+		m_colorImageFormat = pColorAttachmentTex->_getVKFormat();
+		m_framebufferWidth = pColorAttachmentTex->getWidth();
+		m_framebufferHeight = pColorAttachmentTex->getHeight();
+		_createRenderPass();
+		_createDepthStencilTex();
+		_createFramebuffer();
+		_createCommandPool();
+		_createCommandBuffer();
+		_createSemaphore();
+		_createFence();
 	}
 
 	Bool32 Renderer::isValidForRender() const
@@ -238,10 +283,11 @@ namespace vg
 		LOG(plog::debug) << "Post begin command buffer for render." << std::endl;
 
 		vk::ClearValue clearValueColor = {
-			std::array<float, 4>{m_clearValueColor[0]
-					, m_clearValueColor[1]
-					, m_clearValueColor[2]
-					, m_clearValueColor[3]
+			std::array<float, 4>{
+			    m_clearValueColor[0], 
+				m_clearValueColor[1], 
+				m_clearValueColor[2], 
+				m_clearValueColor[3]
 			}
 		};
 		vk::ClearValue clearValueDepthStencil = {
@@ -422,19 +468,9 @@ namespace vg
 		LOG(plog::debug) << "Post end command buffer." << std::endl;
 	}
 
-	void Renderer::_init()
-	{
-		_createRenderPass();
-		_createDepthStencilTex();
-		_createFramebuffer();
-		_createCommandPool();
-		_createCommandBuffer();
-		_createSemaphore();
-		_createFence();
-	}
-
 	void Renderer::_createSemaphore()
 	{
+		if (m_cachePSemaphore != nullptr) return;
 		auto pDevice = pApp->getDevice();
 		vk::SemaphoreCreateInfo createInfo = {
 			vk::SemaphoreCreateFlags()
@@ -444,6 +480,7 @@ namespace vg
 
 	void Renderer::_createFence()
 	{
+		if (m_waitFence != nullptr) return;
 		auto pDevice = pApp->getDevice();
 		vk::FenceCreateInfo createInfo;
 		createInfo.flags = vk::FenceCreateFlagBits::eSignaled;
@@ -504,7 +541,7 @@ namespace vg
 		    {
 			    VK_SUBPASS_EXTERNAL,                                  //srcSubpass
 			    0,                                                    //dstSubpass
-			    vk::PipelineStageFlagBits::eBottomOfPipe,                //srcStageMask
+			    vk::PipelineStageFlagBits::eTopOfPipe,                //srcStageMask
 			    vk::PipelineStageFlagBits::eColorAttachmentOutput,    //dstStageMask
 			    vk::AccessFlagBits::eMemoryRead,                                    //srcAccessMask
 			    vk::AccessFlagBits::eColorAttachmentRead |
@@ -541,6 +578,10 @@ namespace vg
 
 	void Renderer::_createDepthStencilTex()
 	{
+		if (m_pDepthStencilTexture != nullptr && 
+			m_framebufferWidth == m_pDepthStencilTexture->getWidth() &&
+			m_framebufferHeight == m_pDepthStencilTexture->getHeight()) return;
+
 		m_pDepthStencilTexture = std::shared_ptr<TextureDepthStencilAttachment>(
 			new TextureDepthStencilAttachment(
 				TextureFormat::D32_SFLOAT_S8_UINT,
@@ -578,6 +619,7 @@ namespace vg
 
 	void Renderer::_createCommandPool()
 	{
+		if (m_pCommandPool != nullptr) return;
 		auto pDevice = pApp->getDevice();
 		auto graphicsFamily = pApp->getGraphicsFamily();
 		vk::CommandPoolCreateInfo createInfo = {
@@ -589,6 +631,7 @@ namespace vg
 
 	void Renderer::_createCommandBuffer()
 	{
+		if (m_pCommandBuffer != nullptr) return;
 		auto pCommandPool = m_pCommandPool;
 		vk::CommandBufferAllocateInfo allocateInfo = {
 			*pCommandPool,                             //commandPool

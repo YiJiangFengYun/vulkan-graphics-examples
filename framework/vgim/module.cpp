@@ -143,7 +143,7 @@ namespace vgim
     void _createScene();
     void _destroyScene();
 
-	void static moduleCreate(uint32_t canvasWidth, uint32_t canvasHeight)
+	void moduleCreate(uint32_t canvasWidth, uint32_t canvasHeight)
 	{
 		if (inited == VG_TRUE) return;
         m_canvasWidth = canvasWidth;

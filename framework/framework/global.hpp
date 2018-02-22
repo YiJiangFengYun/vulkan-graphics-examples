@@ -9,7 +9,12 @@
 
 #include <foundation/foundation.hpp>
 #include <graphics/graphics.hpp>
+
+#include <VGFConfig.hpp>
+
+#ifdef USE_IMGUI_BIND
 #include <vgim/vgim.hpp>
+#endif //USE_IMGUI_BIND
 
 #ifndef GLFW_INCLUDE_VULKAN
 #define GLFW_INCLUDE_VULKAN

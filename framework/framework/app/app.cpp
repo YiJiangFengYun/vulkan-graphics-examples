@@ -114,7 +114,7 @@ namespace vgf {
 		//Initialize vgim module
 #ifdef USE_IMGUI_BIND
         vgim::moduleCreate(m_width, m_height);
-#endif USE_IMGUI_BIND
+#endif //USE_IMGUI_BIND
 		//----------------------------------------------------------------------				
 		
 	}

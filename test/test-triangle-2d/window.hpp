@@ -51,6 +51,7 @@ namespace testTriangle2D
 		virtual void _onPostUpdate() override;
 
 		virtual void _onPreRender() override;
+		virtual void _onRender() override;
 		virtual void _onPostRender() override;
 
 		virtual void _renderWithRenderer(const std::shared_ptr<vg::Renderer> &pRenderer

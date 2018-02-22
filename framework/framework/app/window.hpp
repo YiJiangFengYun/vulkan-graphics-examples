@@ -61,8 +61,6 @@ namespace vgf
 
 		//--aggregations
 
-		
-
 		virtual void _onResize() = 0;
 
 		virtual void _onPreReCreateSwapchain() = 0;
@@ -73,7 +71,7 @@ namespace vgf
 		virtual void _onPostUpdate() = 0;
 
 		virtual void _onPreRender() = 0;
-		virtual void _render();
+		virtual void _onRender() = 0;
 		virtual void _onPostRender() = 0;
 
 		virtual std::shared_ptr<vg::Renderer> _createRenderer(std::shared_ptr<vk::ImageView> pSwapchainImageView
@@ -81,9 +79,10 @@ namespace vgf
 			, uint32_t swapchainImageWidth
 			, uint32_t swapchainImageHeight
 		);
+
 		virtual void _renderWithRenderer(const std::shared_ptr<vg::Renderer> &pRenderer
 		    , const vg::Renderer::RenderInfo &info
-			, vg::Renderer::RenderResultInfo &resultInfo) = 0;
+			, vg::Renderer::RenderResultInfo &resultInfo);
 
 		// tool methods
 		void _createImage(uint32_t width, uint32_t height, vk::Format format, vk::ImageTiling tiling,
@@ -95,13 +94,15 @@ namespace vgf
 	private:
 	    void _createWindow(uint32_t width, uint32_t height, const char* title);
 		void _createSurface();
-		//void _allocatePresentQueue();
 		void _createSwapchain();
 		void _createSwapchainImageViews();
 		void _createRenderers();
 		void _createSemaphores();
 
-		//void _freePresentQueue();
+#ifdef USE_IMGUI_BIND
+		Bool32 m_mousePressed[3];
+        void _initIMGUI();
+#endif //USE_IMGUI_BIND
 
 
 		void _doUpdate();

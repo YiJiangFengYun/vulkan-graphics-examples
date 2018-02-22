@@ -134,6 +134,11 @@ namespace testTriangle
 
 	}
 
+	void Window::_onRender()
+	{
+
+	}
+
 	void Window::_onPostRender()
 	{
 

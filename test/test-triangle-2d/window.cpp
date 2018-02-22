@@ -126,6 +126,11 @@ namespace testTriangle2D
 
 	}
 
+	void Window::_onRender()
+	{
+
+	}
+
 	void Window::_onPostRender()
 	{
 

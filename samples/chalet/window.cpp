@@ -213,6 +213,11 @@ namespace chalet
 
 	}
 
+	void Window::_onRender()
+	{
+
+	}
+
 	void Window::_onPostRender()
 	{
 

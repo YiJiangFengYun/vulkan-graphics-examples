@@ -45,7 +45,6 @@ namespace vgf {
 	{
 		_createWindow(width, height, title);
 		_createSurface();
-		//_allocatePresentQueue();
 		_createSwapchain();
 		_createSwapchainImageViews();
 		_createRenderers();
@@ -66,7 +65,6 @@ namespace vgf {
 		m_height = static_cast<uint32_t>(height);
 		glfwSetWindowUserPointer(pWindow.get(), this);
 		glfwSetWindowSizeCallback(pWindow.get(), onWindowResized);
-		//_allocatePresentQueue();
 		_createSwapchain();
 		_createSwapchainImageViews();
 		_createRenderers();
@@ -122,16 +120,6 @@ namespace vgf {
 		m_pSurface = createSurface(pInstance, m_pWindow);
 		LOG(plog::debug) << "Create successfully surface.";
 	}
-
-	/*void Window::_allocatePresentQueue()
-	{
-		kgs::pApp->allocatePresentQueue(m_presentQueueIndex, m_presentQueue);
-	}
-
-	void Window::_freePresentQueue()
-	{
-		kgs::pApp->freePresentQueue(m_presentQueueIndex);
-	}*/
 
 	void Window::_createSwapchain()
 	{
@@ -253,6 +241,29 @@ namespace vgf {
 					)
 				);
 	}
+
+	void Window::_renderWithRenderer(const std::shared_ptr<vg::Renderer> &pRenderer
+		    , const vg::Renderer::RenderInfo &info
+			, vg::Renderer::RenderResultInfo &resultInfo)
+	{
+#ifdef USE_IMGUI_BIND
+        vg::Renderer::SceneAndCamera sceneAndCamera;
+		sceneAndCamera.pScene = vgim::getScene().get();
+		sceneAndCamera.pCamera = vgim::getCamera().get();
+		auto addedInfo = info;
+		addedInfo.sceneAndCameraCount = info.sceneAndCameraCount + 1u;
+		std::vector<vg::Renderer::SceneAndCamera> sceneAndCameras(addedInfo.sceneAndCameraCount);
+		for (uint32_t i = 0; i < info.sceneAndCameraCount; ++i)
+		{
+			sceneAndCameras[i] = *(info.pSceneAndCamera + i);
+		}
+		sceneAndCameras[info.sceneAndCameraCount] = sceneAndCamera;
+		addedInfo.pSceneAndCamera = sceneAndCameras.data();
+        pRenderer->render(addedInfo, resultInfo);
+#else
+        pRenderer->render(info, resultInfo); 		
+#endif //USE_IMGUI_BIND
+	}
 			
 
 	void Window::_createSemaphores()
@@ -265,6 +276,83 @@ namespace vgf {
 		//m_pRenderFinishedSemaphore = fd::createSemaphore(m_pDevice, createInfo);
 	}
 
+#ifdef USE_IMGUI_BIND
+    void Window::_initIMGUI()
+	{
+		m_mousePressed[0] = VGF_FALSE;
+		m_mousePressed[1] = VGF_FALSE;
+		m_mousePressed[2] = VGF_FALSE;
+
+		ImGuiIO& io = ImGui::GetIO();
+
+		//init key map.
+		io.KeyMap[ImGuiKey_Tab] = GLFW_KEY_TAB;                         // Keyboard mapping. ImGui will use those indices to peek into the io.KeyDown[] array.
+        io.KeyMap[ImGuiKey_LeftArrow] = GLFW_KEY_LEFT;
+        io.KeyMap[ImGuiKey_RightArrow] = GLFW_KEY_RIGHT;
+        io.KeyMap[ImGuiKey_UpArrow] = GLFW_KEY_UP;
+        io.KeyMap[ImGuiKey_DownArrow] = GLFW_KEY_DOWN;
+        io.KeyMap[ImGuiKey_PageUp] = GLFW_KEY_PAGE_UP;
+        io.KeyMap[ImGuiKey_PageDown] = GLFW_KEY_PAGE_DOWN;
+        io.KeyMap[ImGuiKey_Home] = GLFW_KEY_HOME;
+        io.KeyMap[ImGuiKey_End] = GLFW_KEY_END;
+        io.KeyMap[ImGuiKey_Delete] = GLFW_KEY_DELETE;
+        io.KeyMap[ImGuiKey_Backspace] = GLFW_KEY_BACKSPACE;
+        io.KeyMap[ImGuiKey_Enter] = GLFW_KEY_ENTER;
+        io.KeyMap[ImGuiKey_Escape] = GLFW_KEY_ESCAPE;
+        io.KeyMap[ImGuiKey_A] = GLFW_KEY_A;
+        io.KeyMap[ImGuiKey_C] = GLFW_KEY_C;
+        io.KeyMap[ImGuiKey_V] = GLFW_KEY_V;
+        io.KeyMap[ImGuiKey_X] = GLFW_KEY_X;
+        io.KeyMap[ImGuiKey_Y] = GLFW_KEY_Y;
+        io.KeyMap[ImGuiKey_Z] = GLFW_KEY_Z;
+
+		//init feature functions.
+		io.ClipboardUserData = m_pWindow.get();		
+		io.RenderDrawListsFn = nullptr;
+		io.SetClipboardTextFn = [](void *userData, const char *text)
+		{
+			glfwSetClipboardString((GLFWwindow*)userData, text);
+		};
+		io.GetClipboardTextFn = [](void *userData)->const char * {
+			return glfwGetClipboardString((GLFWwindow *)userData);
+		};
+
+		//init call backs.
+		glfwSetMouseButtonCallback(m_pWindow.get(), [](GLFWwindow* glfwWindow, int button, int action, int /*mods*/) 
+		{
+			Window* const instance = (Window*)glfwGetWindowUserPointer(glfwWindow);
+			if (action == GLFW_PRESS && button >= 0 && button < 3)
+                instance->m_mousePressed[button] = VGF_TRUE;
+		});
+		glfwSetScrollCallback(m_pWindow.get(), [](GLFWwindow*, double xOffset, double yOffset)
+		{
+			ImGuiIO& io = ImGui::GetIO();
+			io.MouseWheel += (float)yOffset;
+		});
+		glfwSetKeyCallback(m_pWindow.get(), [](GLFWwindow*, int key, int, int action, int mods)
+		{
+			ImGuiIO& io = ImGui::GetIO();
+            if (action == GLFW_PRESS)
+                io.KeysDown[key] = true;
+            if (action == GLFW_RELEASE)
+                io.KeysDown[key] = false;
+        
+            (void)mods; // Modifiers are not reliable across systems
+            io.KeyCtrl = io.KeysDown[GLFW_KEY_LEFT_CONTROL] || io.KeysDown[GLFW_KEY_RIGHT_CONTROL];
+            io.KeyShift = io.KeysDown[GLFW_KEY_LEFT_SHIFT] || io.KeysDown[GLFW_KEY_RIGHT_SHIFT];
+            io.KeyAlt = io.KeysDown[GLFW_KEY_LEFT_ALT] || io.KeysDown[GLFW_KEY_RIGHT_ALT];
+            io.KeySuper = io.KeysDown[GLFW_KEY_LEFT_SUPER] || io.KeysDown[GLFW_KEY_RIGHT_SUPER];
+		});
+		glfwSetCharCallback(m_pWindow.get(), [](GLFWwindow*, unsigned int c)
+		{
+			ImGuiIO& io = ImGui::GetIO();
+            if (c > 0 && c < 0x10000)
+                io.AddInputCharacter((unsigned short)c);
+		});
+	}
+
+#endif //USE_IMGUI_BIND
+
 	void Window::_reCreateSwapchain()
 	{
 		_createSwapchain();
@@ -275,26 +363,19 @@ namespace vgf {
 	void Window::_doUpdate()
 	{
 		_onPreUpdate();
+#ifdef USE_IMGUI_BIND
+		vgim::updateCanvasSize(m_width, m_height);
+#endif
 		_onUpdate();
+#ifdef USE_IMGUI_BIND
+		vgim::updateFromImGUI();
+#endif
 		_onPostUpdate();
 	}
 
 	void Window::_doRender()
 	{
 		_onPreRender();
-		_render();
-		_onPostRender();
-	}
-
-	void Window::_doReCreateSwapchain()
-	{
-		_onPreReCreateSwapchain();
-		_reCreateSwapchain();
-		_onPostReCreateSwapchain();
-	}
-
-	void Window::_render()
-	{
 		uint32_t imageIndex;
 		if (m_currImageIndex < 0)
 		{
@@ -316,7 +397,7 @@ namespace vgf {
 			}
 			m_currImageIndex = static_cast<int32_t>(imageIndex);
 		}
-		else 
+		else
 		{
 			imageIndex = m_currImageIndex;
 		}
@@ -376,6 +457,15 @@ namespace vgf {
 		{
 			throw std::runtime_error("Renderer is invalid for render.");
 		}
+		_onRender();
+		_onPostRender();
+	}
+
+	void Window::_doReCreateSwapchain()
+	{
+		_onPreReCreateSwapchain();
+		_reCreateSwapchain();
+		_onPostReCreateSwapchain();
 	}
 
 	void Window::_createImage(uint32_t width, uint32_t height, vk::Format format, vk::ImageTiling tiling,

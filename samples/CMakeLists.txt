@@ -12,6 +12,9 @@ include_directories("${PROJECT_SAMPLES_DIR}")
 
 set(LIBRARIES ${LIBRARIES} foundation)
 set(LIBRARIES ${LIBRARIES} graphics)
+if (USE_IMGUI_BIND)
+    set(LIBRARIES ${LIBRARIES} vgim)    
+endif()
 set(LIBRARIES ${LIBRARIES} framework)
 
 

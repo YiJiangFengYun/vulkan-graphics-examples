@@ -191,6 +191,11 @@ namespace triangle
 
 	}
 
+	void Window::_onRender()
+	{
+
+	}
+
 	void Window::_onPostRender()
 	{
 
@@ -204,8 +209,14 @@ namespace triangle
 		sceneAndCamera.pScene = m_pScene.get();
 		sceneAndCamera.pCamera = m_pCamera.get();
 		auto myInfo = info;
-		myInfo.sceneAndCameraCount = 1u;
-		myInfo.pSceneAndCamera = &sceneAndCamera;
-		pRenderer->render(myInfo, resultInfo);
+		myInfo.sceneAndCameraCount = myInfo.sceneAndCameraCount + 1u;
+		std::vector<vg::Renderer::SceneAndCamera> sceneAndCameras(myInfo.sceneAndCameraCount);
+		for (uint32_t i = 0; i < info.sceneAndCameraCount; ++i)
+		{
+			sceneAndCameras[i] = *(info.pSceneAndCamera + i);
+		}
+		sceneAndCameras[info.sceneAndCameraCount] = sceneAndCamera;
+		myInfo.pSceneAndCamera = sceneAndCameras.data();
+		vgf::Window::_renderWithRenderer(pRenderer, myInfo, resultInfo);
 	}
 }

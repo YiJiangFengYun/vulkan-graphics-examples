@@ -218,4 +218,14 @@ namespace fd
 				pDevice->destroyPipelineCache(*p);
 		});
 	}
+
+	std::shared_ptr<vk::Fence> createFence(const std::shared_ptr<vk::Device> pDevice,
+		const vk::FenceCreateInfo &createInfo, vk::Optional<const vk::AllocationCallbacks> allocator)
+	{
+		auto fence = pDevice->createFence(createInfo);
+		return std::shared_ptr<vk::Fence>(new vk::Fence(fence),
+			[pDevice](vk::Fence *p) {
+			pDevice->destroyFence(*p);
+		});
+	}
 }

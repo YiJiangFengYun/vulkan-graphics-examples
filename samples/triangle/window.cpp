@@ -1,5 +1,7 @@
 #include "triangle/window.hpp"
 
+#include <iostream>
+
 namespace triangle
 {
 	Window::Window(uint32_t width
@@ -20,6 +22,7 @@ namespace triangle
 		_createModel();
 		_createCamera();
 		_createScene();
+		_initInputHanders();
 	}
 
 	Window::Window(std::shared_ptr<GLFWwindow> pWindow
@@ -38,11 +41,13 @@ namespace triangle
 		_createModel();
 		_createCamera();
 		_createScene();
+		_initInputHanders();
 	}
 
 	void Window::_initZoom()
 	{
 		m_zoom = -2.5f;
+		m_zoomSpeed = 0.5f;
 	}
 
 	void Window::_loadModel()
@@ -129,6 +134,17 @@ namespace triangle
 		m_pScene = std::shared_ptr<vg::Scene3>(new vg::Scene3());
 		m_pScene->addCamera(m_pCamera);
 		m_pScene->addVisualObject(m_pModel);
+	}
+
+	void Window::_initInputHanders()
+	{
+		glfwSetScrollCallback(m_pWindow.get(), [](GLFWwindow *window, double xOffset, double yOffset)
+		{
+			Window* const instance = (Window*)glfwGetWindowUserPointer(window);
+			instance->m_zoom += static_cast<float>(yOffset) * instance->m_zoomSpeed;
+			instance->m_zoom = std::min(-0.15f, std::max(-5.0f, instance->m_zoom));
+			std::cout << "Current zoom: " << instance->m_zoom << std::endl;
+		});
 	}
 
 	void Window::_updateCamera()

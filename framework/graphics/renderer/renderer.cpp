@@ -159,6 +159,9 @@ namespace vg
 	void Renderer::_render(const RenderInfo &info
 		, RenderResultInfo &resultInfo)
 	{
+		//command buffer begin
+		_recordCommandBufferForBegin();
+
 		resultInfo.signalSemaphoreCount = 0u;
 		uint32_t count = info.sceneAndCameraCount;
 		for (uint32_t i = 0; i < count; ++i)
@@ -182,6 +185,41 @@ namespace vg
 				//todo
 			}
 		}
+
+		//command buffer end
+		_recordCommandBufferForEnd();
+
+		auto pDevice = pApp->getDevice();
+		pDevice->waitForFences(*m_waitFence, VK_TRUE, std::numeric_limits<uint64_t>::max());
+		pDevice->resetFences(*m_waitFence);
+		
+
+		vk::PipelineStageFlags waitStages[] = { vk::PipelineStageFlagBits::eColorAttachmentOutput };		
+		//submit		
+		vk::SubmitInfo submitInfo = {
+			info.waitSemaphoreCount,              //waitSemaphoreCount
+			info.pWaitSemaphores,                 //pWaitSemaphores
+			waitStages,                           //pWaitDstStageMask
+			1u,                                   //commandBufferCount
+			m_pCommandBuffer.get(),               //pCommandBuffers
+			1u,                                   //signalSemaphoreCount
+			m_cachePSemaphore.get()                      //pSignalSemaphores
+		};
+
+		LOG(plog::debug) << "Pre submit to grahics queue." << std::endl;
+		vk::Queue queue;
+		uint32_t queueIndex;
+		pApp->allocateGaphicsQueue(queueIndex, queue);
+		queue.submit(submitInfo, *m_waitFence);
+		pApp->freeGraphicsQueue(queueIndex);
+		LOG(plog::debug) << "Post submit to grahics queue." << std::endl;
+
+		uint32_t semaphoreCount = resultInfo.signalSemaphoreCount + 1u;
+		uint32_t semaphoreIndex = resultInfo.signalSemaphoreCount;
+		m_arrSemaphores.resize(semaphoreCount);
+		m_arrSemaphores[semaphoreIndex] = *m_cachePSemaphore;
+		resultInfo.signalSemaphoreCount = static_cast<uint32_t>(m_arrSemaphores.size());
+		resultInfo.pSignalSemaphores = m_arrSemaphores.data();
 	}
 
 	void Renderer::_postRender()
@@ -392,6 +430,7 @@ namespace vg
 		_createCommandPool();
 		_createCommandBuffer();
 		_createSemaphore();
+		_createFence();
 	}
 
 	void Renderer::_createSemaphore()
@@ -401,6 +440,14 @@ namespace vg
 			vk::SemaphoreCreateFlags()
 		};
 		m_cachePSemaphore = fd::createSemaphore(pDevice, createInfo);
+	}
+
+	void Renderer::_createFence()
+	{
+		auto pDevice = pApp->getDevice();
+		vk::FenceCreateInfo createInfo;
+		createInfo.flags = vk::FenceCreateFlagBits::eSignaled;
+		m_waitFence = fd::createFence(pDevice, createInfo);
 	}
 
 	void Renderer::_createRenderPass()
@@ -551,9 +598,6 @@ namespace vg
 		using SceneType = Scene<SpaceType::SPACE_2>;
 		auto pDevice = pApp->getDevice();
 
-		//command buffer begin
-		_recordCommandBufferForBegin();
-
 		auto projMatrix = pCamera->getProjMatrix();
 		auto viewMatrix = pCamera->getTransform()->getMatrixWorldToLocal();
 		uint32_t visualObjectCount = pScene->getVisualObjectCount();
@@ -584,12 +628,7 @@ namespace vg
 			drawCount += subMeshCount * passCount;
 		}
 
-		//------Doing render.
-		vk::PipelineStageFlags waitStages[] = { vk::PipelineStageFlagBits::eColorAttachmentOutput };
-		uint32_t semaphoreCount = resultInfo.signalSemaphoreCount + 1u;
-		uint32_t semaphoreIndex = resultInfo.signalSemaphoreCount;
-		m_arrSemaphores.resize(semaphoreCount);
-		m_arrSemaphores[semaphoreIndex] = *m_cachePSemaphore;		
+		//------Doing render.		
 
 		uint32_t drawIndex = 0u;
 		for (uint32_t i = 0u; i < validVisualObjectCount; ++i)
@@ -624,30 +663,6 @@ namespace vg
 				}
 			}
 		}
-
-		//command buffer end
-		_recordCommandBufferForEnd();
-
-		//submit		
-		vk::SubmitInfo submitInfo = {
-			info.waitSemaphoreCount,              //waitSemaphoreCount
-			info.pWaitSemaphores,                 //pWaitSemaphores
-			waitStages,                           //pWaitDstStageMask
-			1u,                                   //commandBufferCount
-			m_pCommandBuffer.get(),               //pCommandBuffers
-			1u,                                   //signalSemaphoreCount
-			m_cachePSemaphore.get()                      //pSignalSemaphores
-		};
-
-		LOG(plog::debug) << "Pre submit to grahics queue." << std::endl;
-		vk::Queue queue;
-		uint32_t queueIndex;
-		pApp->allocateGaphicsQueue(queueIndex, queue);
-		queue.submit(submitInfo, nullptr);
-		pApp->freeGraphicsQueue(queueIndex);
-		LOG(plog::debug) << "Post submit to grahics queue." << std::endl;
-		resultInfo.signalSemaphoreCount = static_cast<uint32_t>(m_arrSemaphores.size());
-		resultInfo.pSignalSemaphores = m_arrSemaphores.data();
 	}
 
 	void Renderer::_renderScene3(const Scene<SpaceType::SPACE_3> *pScene
@@ -661,9 +676,6 @@ namespace vg
 
 		auto queueTypeCount = static_cast<uint32_t>(RenderQueueType::RANGE_SIZE);
 		auto pDevice = pApp->getDevice();
-
-		//command buffer begin
-		_recordCommandBufferForBegin();
 
 		auto projMatrix = pCamera->getProjMatrix();
 		auto viewMatrix = pCamera->getTransform()->getMatrixWorldToLocal();
@@ -771,14 +783,7 @@ namespace vg
 			}
 		}
 
-		//-----Doing render.
-		
-		vk::PipelineStageFlags waitStages[] = { vk::PipelineStageFlagBits::eColorAttachmentOutput };
-		uint32_t semaphoreCount = resultInfo.signalSemaphoreCount + 1u;
-		uint32_t semaphoreIndex = resultInfo.signalSemaphoreCount;
-		m_arrSemaphores.resize(semaphoreCount);
-		m_arrSemaphores[semaphoreIndex] = *m_cachePSemaphore;	
-
+		//-----Doing render
 		uint32_t drawIndex = 0;
 		for (uint32_t typeIndex = 0u; typeIndex < queueTypeCount; ++typeIndex)
 		{
@@ -818,30 +823,6 @@ namespace vg
 				}
 			}
 		}
-
-		//command buffer end
-		_recordCommandBufferForEnd();
-
-		//submit
-		vk::SubmitInfo submitInfo = {
-			info.waitSemaphoreCount,              //waitSemaphoreCount
-			info.pWaitSemaphores,                 //pWaitSemaphores
-			waitStages,                           //pWaitDstStageMask
-			1u,                                   //commandBufferCount
-			m_pCommandBuffer.get(),               //pCommandBuffers
-			1u,                                   //signalSemaphoreCount
-			m_cachePSemaphore.get()               //pSignalSemaphores
-		};
-
-		LOG(plog::debug) << "Pre submit to grahics queue." << std::endl;
-		vk::Queue queue;
-		uint32_t queueIndex;
-		pApp->allocateGaphicsQueue(queueIndex, queue);
-		queue.submit(submitInfo, nullptr);
-		pApp->freeGraphicsQueue(queueIndex);
-		LOG(plog::debug) << "Post submit to grahics queue." << std::endl;
-		resultInfo.signalSemaphoreCount = static_cast<uint32_t>(m_arrSemaphores.size());
-		resultInfo.pSignalSemaphores = m_arrSemaphores.data();
 	}
 
 	void fillValidVisualObjects(std::vector<std::shared_ptr<VisualObject<SpaceType::SPACE_2>>> &arrPVObjs,

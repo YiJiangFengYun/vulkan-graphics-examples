@@ -20,6 +20,7 @@ namespace triangle
 
 	private:
 	    float m_zoom;
+		float m_zoomSpeed;
 		glm::vec3 m_rotation;
 		std::vector<vg::Vector3> m_tempPositions;
 		std::vector<vg::Color32> m_tempColors;
@@ -41,6 +42,7 @@ namespace triangle
 		void _createModel();
 		void _createCamera();
 		void _createScene();
+		void _initInputHanders();
 
 		void _updateCamera();
 

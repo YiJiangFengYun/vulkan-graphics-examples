@@ -265,10 +265,10 @@ namespace vg
 
 		//cache
 		std::vector<vk::DescriptorSetLayoutBinding> m_lastBindings;
+		std::vector<vk::PushConstantRange> m_lastPushConstantRanges;
 
 		//aggregations
 		std::shared_ptr<Shader> m_pShader;
-		void _createDescriptorSetLayout();
 		void _createPipelineLayout();  
 		void _createUniformBuffer();
 		void _createDescriptorSet();

@@ -246,6 +246,7 @@ namespace vg
 		, m_buildInData()
 		, m_pipelineStateID()
 		, m_lastBindings()
+		, m_lastPushConstantRanges()
 	{
 	}
 
@@ -270,6 +271,7 @@ namespace vg
 		, m_buildInData()
 		, m_pipelineStateID()
 		, m_lastBindings()
+		, m_lastPushConstantRanges()
 	{
 
 	}
@@ -368,7 +370,6 @@ namespace vg
 	{
 		if (m_applied == VG_FALSE)
 		{
-			_createDescriptorSetLayout();
 			_createPipelineLayout();
 			_createUniformBuffer();
 			_createDescriptorSet();
@@ -659,7 +660,7 @@ namespace vg
 		return m_pDescriptorSet;
 	}
 
-	void Pass::_createDescriptorSetLayout()
+	void Pass::_createPipelineLayout()
 	{
 		std::vector<vk::DescriptorSetLayoutBinding> bindings(m_arrLayoutBindNames.size());
 		size_t index = 0;
@@ -674,49 +675,58 @@ namespace vg
 
 		}
 
-		if (m_lastBindings == bindings) return;
-
-		auto pDevice = pApp->getDevice();
-
-		//create descriptor set layout.
-	    if(bindings.size())
+		Bool32 bindingLayoutChanged = VG_FALSE;
+		if (m_lastBindings != bindings)
 		{
-			vk::DescriptorSetLayoutCreateInfo createInfo =
+			bindingLayoutChanged = VG_TRUE;
+		}
+
+		if (bindingLayoutChanged)
+		{
+			auto pDevice = pApp->getDevice();
+			//create descriptor set layout.
+			if (bindings.size())
 			{
-				vk::DescriptorSetLayoutCreateFlags(),
-				static_cast<uint32_t>(bindings.size()),
-				bindings.data()
+				vk::DescriptorSetLayoutCreateInfo createInfo =
+				{
+					vk::DescriptorSetLayoutCreateFlags(),
+					static_cast<uint32_t>(bindings.size()),
+					bindings.data()
+				};
+
+				m_pDescriptorSetLayout = fd::createDescriptorSetLayout(pDevice, createInfo);
+			}
+			else
+			{
+				m_pDescriptorSetLayout = nullptr;
+			}
+			m_lastBindings = bindings;
+		}
+
+		auto pushConstantRanges = getPushConstantRanges();
+		Bool32 pushConstantRangesChanged = VG_FALSE;
+		if (m_lastPushConstantRanges != pushConstantRanges) {
+			pushConstantRangesChanged = VG_TRUE;
+		}
+
+		if (bindingLayoutChanged || pushConstantRangesChanged)
+		{
+			auto pLayout = m_pDescriptorSetLayout;
+			uint32_t layoutCount = pLayout != nullptr ? 1 : 0;
+			auto pSetLayouts = pLayout != nullptr ? pLayout.get() : nullptr;
+
+			vk::PipelineLayoutCreateInfo pipelineLayoutCreateInfo = {
+				vk::PipelineLayoutCreateFlags(),             //flags
+				layoutCount,                                 //setLayoutCount
+				pSetLayouts,                                 //pSetLayouts
+				pushConstantRanges.size(),                   //pushConstantRangeCount
+				pushConstantRanges.data()                    //pPushConstantRanges
 			};
 
-			m_pDescriptorSetLayout = fd::createDescriptorSetLayout(pDevice, createInfo);
+			auto pDevice = pApp->getDevice();
+			m_pPipelineLayout = fd::createPipelineLayout(pDevice, pipelineLayoutCreateInfo);
+			_updatePipelineStateID();
 		}
-		else
-		{
-			m_pDescriptorSetLayout = nullptr;
-		}
-
-		m_lastBindings = bindings;
-		_updatePipelineStateID();
-	}
-
-	void Pass::_createPipelineLayout()
-	{
-		auto pLayout = m_pDescriptorSetLayout;
-		uint32_t layoutCount = pLayout != nullptr ? 1 : 0;
-		auto pSetLayouts = pLayout != nullptr ? pLayout.get() : nullptr;
-		
-		auto pushConstantRanges = getPushConstantRanges();
-
-		vk::PipelineLayoutCreateInfo pipelineLayoutCreateInfo = {
-			vk::PipelineLayoutCreateFlags(),             //flags
-			layoutCount,                                 //setLayoutCount
-			pSetLayouts,                                 //pSetLayouts
-			pushConstantRanges.size(),                   //pushConstantRangeCount
-			pushConstantRanges.data()                    //pPushConstantRanges
-		};
-
-		auto pDevice = pApp->getDevice();
-		m_pPipelineLayout = fd::createPipelineLayout(pDevice, pipelineLayoutCreateInfo);
 	}
 
 	void Pass::_createUniformBuffer()

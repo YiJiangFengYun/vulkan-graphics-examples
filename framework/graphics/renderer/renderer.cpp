@@ -499,14 +499,29 @@ namespace vg
 			nullptr                              //pPreserveAttachments
 		};
 
-		vk::SubpassDependency dependency = {
-			VK_SUBPASS_EXTERNAL,
-			0,
-			vk::PipelineStageFlagBits::eColorAttachmentOutput,
-			vk::PipelineStageFlagBits::eColorAttachmentOutput,
-			vk::AccessFlags(),
-			vk::AccessFlagBits::eColorAttachmentRead | vk::AccessFlagBits::eColorAttachmentWrite,
-			vk::DependencyFlags()
+		std::array<vk::SubpassDependency, 2> dependencies = { 
+			vk::SubpassDependency 
+		    {
+			    VK_SUBPASS_EXTERNAL,                                  //srcSubpass
+			    0,                                                    //dstSubpass
+			    vk::PipelineStageFlagBits::eBottomOfPipe,                //srcStageMask
+			    vk::PipelineStageFlagBits::eColorAttachmentOutput,    //dstStageMask
+			    vk::AccessFlagBits::eMemoryRead,                                    //srcAccessMask
+			    vk::AccessFlagBits::eColorAttachmentRead |
+				    vk::AccessFlagBits::eColorAttachmentWrite,        //dstAccessMask
+			    vk::DependencyFlagBits::eByRegion                     //dependencyFlags
+		    },
+			vk::SubpassDependency
+		    {
+			    0,                                                    //srcSubpass
+			    VK_SUBPASS_EXTERNAL,                                  //dstSubpass
+			    vk::PipelineStageFlagBits::eColorAttachmentOutput,    //srcStageMask
+			    vk::PipelineStageFlagBits::eBottomOfPipe,             //dstStageMask
+				vk::AccessFlagBits::eColorAttachmentRead |
+				    vk::AccessFlagBits::eColorAttachmentWrite,        //srcAccessMask
+			    vk::AccessFlagBits::eMemoryRead,                      //dstAccessMask
+			    vk::DependencyFlagBits::eByRegion                     //dependencyFlags
+		    }
 		};
 
 		std::array<vk::AttachmentDescription, 2> attachments = { colorAttachment, depthAttachment };
@@ -516,8 +531,8 @@ namespace vg
 			attachments.data(),
 			1u,
 			&subpass,
-			1u,
-			&dependency
+			static_cast<uint32_t>(dependencies.size()),
+			dependencies.data()
 		};
 
 		auto pDevice = pApp->getDevice();

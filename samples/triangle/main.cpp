@@ -12,7 +12,7 @@ const uint32_t WINDOW_WIDTH = 1280;
 const uint32_t WINDOW_HEIGHT = 720;
 int main() {
 	vgf::moduleCreate();
-
+	plog::get()->setMaxSeverity(plog::Severity::warning);
 	triangle::App triangle;
 	triangle.init<triangle::Window>(WINDOW_WIDTH, WINDOW_HEIGHT, "triangle");
 

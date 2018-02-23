@@ -881,9 +881,9 @@ namespace vg
 				std::shared_ptr<Texture> pTexture = getTexture(item.name);
 				if (pTexture != nullptr)
 				{
-					imageInfos[index].sampler = *pTexture->_getSampler();
-					imageInfos[index].imageView = *pTexture->_getImageView();
-					imageInfos[index].imageLayout = pTexture->_getImageLayout();
+					imageInfos[index].sampler = *pTexture->getSampler();
+					imageInfos[index].imageView = *pTexture->getImageView();
+					imageInfos[index].imageLayout = pTexture->getImageLayout();
 				}
 
 				writes[index].dstSet = *m_pDescriptorSet;

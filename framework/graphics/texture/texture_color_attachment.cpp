@@ -18,12 +18,12 @@ namespace vg
 	{
 	}
 
-	uint32_t TextureColorAttachment::getWidth()
+	uint32_t TextureColorAttachment::getWidth() const
 	{
 		return m_width;
 	}
 
-	uint32_t TextureColorAttachment::getHeight()
+	uint32_t TextureColorAttachment::getHeight() const
 	{
 		return m_height;
 	}

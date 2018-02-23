@@ -14,29 +14,39 @@ namespace vg
 	{
 	}
 
-	uint32_t Texture1D::getWidth()
+	uint32_t Texture1D::getWidth() const
 	{
 		return m_width;
 	}
 
-	std::vector<Color> Texture1D::getPixels(uint32_t mipLevel)
+	std::vector<Color> Texture1D::getPixels(uint32_t mipLevel) const
 	{
 		return _getPixels(0u, mipLevel);
 	}
 
-	std::vector<Color32> Texture1D::getPixels32(uint32_t mipLevel)
+	std::vector<Color32> Texture1D::getPixels32(uint32_t mipLevel) const
 	{
 		return _getPixels32(0u, mipLevel);
 	}
 
-	void Texture1D::setPixels(std::vector<Color> colors, uint32_t mipLevel)
+	void Texture1D::setPixels(const std::vector<Color> &colors, uint32_t mipLevel)
 	{
 		_setPixels(colors, 0u, mipLevel);
 	}
 
-	void Texture1D::setPixels32(std::vector<Color32> colors, uint32_t mipLevel)
+	void Texture1D::setPixels32(const std::vector<Color32> &colors, uint32_t mipLevel)
 	{
 		_setPixels32(colors, 0u, mipLevel);
+	}
+
+	void Texture1D::setPixels(const void* colors, uint32_t size, uint32_t mipLevel)
+	{
+		_setPixels(colors, size, 0u, mipLevel);
+	}
+
+	void Texture1D::setPixels32(const void* colors, uint32_t size, uint32_t mipLevel)
+	{
+		_setPixels32(colors, size, 0u, mipLevel);
 	}
 
 	void Texture1D::apply(Bool32 updateMipmaps, Bool32 makeUnreadable)

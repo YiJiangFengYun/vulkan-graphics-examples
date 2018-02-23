@@ -18,12 +18,12 @@ namespace vg
 	{
 	}
 
-	uint32_t TextureDepthStencilAttachment::getWidth()
+	uint32_t TextureDepthStencilAttachment::getWidth() const
 	{
 		return m_width;
 	}
 
-	uint32_t TextureDepthStencilAttachment::getHeight()
+	uint32_t TextureDepthStencilAttachment::getHeight() const
 	{
 		return m_height;
 	}

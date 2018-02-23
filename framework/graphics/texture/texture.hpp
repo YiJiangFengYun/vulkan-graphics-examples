@@ -15,24 +15,24 @@ namespace vg
 	public:
 		Texture(TextureFormat format, Bool32 mipMap);
 		~Texture();
-		float getAnisotropy();
+		float getAnisotropy() const;
 		void setAnisotropy(float value);
-		FilterMode getFilterMode();
+		FilterMode getFilterMode() const;
 		void setFilterMode(FilterMode value);
-		SamplerAddressMode getSamplerAddressMode();
+		SamplerAddressMode getSamplerAddressMode() const;
 		void setSamplerAddressMode(SamplerAddressMode value);
 
-		TextureType getType();
-		TextureFormat getFormat();
-		Bool32 getIsMipmap();
-		uint32_t getMipmapLevel();
+		TextureType getType() const;
+		TextureFormat getFormat() const;
+		Bool32 getIsMipmap() const;
+		uint32_t getMipmapLevel() const;
 
-		vk::Format _getVKFormat();
-		vk::ImageLayout _getImageLayout();
-		std::shared_ptr<vk::Image> _getImage();
-		std::shared_ptr<vk::DeviceMemory> _getImageMemory();
-		std::shared_ptr<vk::ImageView> _getImageView();
-		std::shared_ptr<vk::Sampler> _getSampler();
+		vk::Format getVKFormat() const;
+		vk::ImageLayout getImageLayout() const;
+		std::shared_ptr<vk::Image> getImage() const;
+		std::shared_ptr<vk::DeviceMemory> getImageMemory() const;
+		std::shared_ptr<vk::ImageView> getImageView() const;
+		std::shared_ptr<vk::Sampler> getSampler() const;
 	protected:
 		//--compositions
 		uint32_t m_width;
@@ -88,10 +88,12 @@ namespace vg
 		void _createImageView();
 		void _createSampler();
 
-		std::vector<Color> _getPixels(uint32_t layer, uint32_t mipLevel = 0);
-		std::vector<Color32> _getPixels32(uint32_t layer, uint32_t mipLevel = 0);
-		void _setPixels(std::vector<Color> colors, uint32_t layer, uint32_t mipLevel = 0);
-		void _setPixels32(std::vector<Color32> colors, uint32_t layer, uint32_t mipLevel = 0);
+		std::vector<Color> _getPixels(uint32_t layer, uint32_t mipLevel = 0) const;
+		std::vector<Color32> _getPixels32(uint32_t layer, uint32_t mipLevel = 0) const;
+		void _setPixels(const std::vector<Color> &colors, uint32_t layer, uint32_t mipLevel = 0);
+		void _setPixels(const void* colors, uint32_t size, uint32_t layer, uint32_t mipLevel = 0);
+		void _setPixels32(const std::vector<Color32> &colors, uint32_t layer, uint32_t mipLevel = 0);
+		void _setPixels32(const void* colors, uint32_t size, uint32_t layer, uint32_t mipLevel = 0);
 		void _apply(Bool32 updateMipmaps = VG_TRUE, Bool32 makeUnreadable = VG_FALSE);
 		void _applyWithGenMipMap();
 		void _applyDirect();

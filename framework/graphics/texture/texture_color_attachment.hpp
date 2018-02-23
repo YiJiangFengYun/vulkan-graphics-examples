@@ -10,8 +10,8 @@ namespace vg
 	public:
 		TextureColorAttachment(TextureFormat format, uint32_t width, uint32_t height);
 		~TextureColorAttachment();
-		uint32_t getWidth();
-		uint32_t getHeight();
+		uint32_t getWidth() const;
+		uint32_t getHeight() const;
 	private:
 		TextureColorAttachment() = delete;
 		inline void _init() override

@@ -27,7 +27,7 @@ namespace vg
 
 	}
 
-	float Texture::getAnisotropy()
+	float Texture::getAnisotropy() const
 	{
 		return m_anisotropy;
 	}
@@ -39,7 +39,7 @@ namespace vg
 		_createSampler();
 	}
 
-	FilterMode Texture::getFilterMode()
+	FilterMode Texture::getFilterMode() const
 	{
 		return m_filterMode;
 	}
@@ -51,7 +51,7 @@ namespace vg
 		_createSampler();
 	}
 
-	SamplerAddressMode Texture::getSamplerAddressMode()
+	SamplerAddressMode Texture::getSamplerAddressMode() const
 	{
 		return m_samplerAddressMode;
 	}
@@ -63,52 +63,52 @@ namespace vg
 		_createSampler();
 	}
 
-	TextureType Texture::getType()
+	TextureType Texture::getType() const
 	{
 		return m_type;
 	}
 
-	TextureFormat Texture::getFormat()
+	TextureFormat Texture::getFormat() const
 	{
 		return m_format;
 	}
 
-	Bool32 Texture::getIsMipmap()
+	Bool32 Texture::getIsMipmap() const
 	{
 		return m_mipMap;
 	}
 
-	uint32_t Texture::getMipmapLevel()
+	uint32_t Texture::getMipmapLevel() const
 	{
 		return m_mipMapLevels;
 	}
 
-	vk::Format Texture::_getVKFormat()
+	vk::Format Texture::getVKFormat() const
 	{
 		return m_vkFormat;
 	}
 
-	vk::ImageLayout Texture::_getImageLayout()
+	vk::ImageLayout Texture::getImageLayout() const
 	{
 		return m_vkImageLayout;
 	}
 
-	std::shared_ptr<vk::Image> Texture::_getImage()
+	std::shared_ptr<vk::Image> Texture::getImage() const
 	{
 		return m_pImage;
 	}
 
-	std::shared_ptr<vk::DeviceMemory> Texture::_getImageMemory()
+	std::shared_ptr<vk::DeviceMemory> Texture::getImageMemory() const
 	{
 		return m_pMemory;
 	}
 
-	std::shared_ptr<vk::ImageView> Texture::_getImageView()
+	std::shared_ptr<vk::ImageView> Texture::getImageView() const
 	{
 		return m_pImageView;
 	}
 
-	std::shared_ptr<vk::Sampler> Texture::_getSampler()
+	std::shared_ptr<vk::Sampler> Texture::getSampler() const
 	{
 		return m_pSampler;
 	}
@@ -453,7 +453,7 @@ namespace vg
 		m_pSampler = fd::createSampler(pDevice, createInfo);
 	}
 
-	std::vector<Color> Texture::_getPixels(uint32_t layer, uint32_t mipLevel)
+	std::vector<Color> Texture::_getPixels(uint32_t layer, uint32_t mipLevel) const
 	{
 		if (m_arrTempColors.size() <= mipLevel) return {};
 		size_t oneLayerCount = m_width * m_height * m_depth;
@@ -468,7 +468,7 @@ namespace vg
 		return result;
 	}
 
-	std::vector<Color32> Texture::_getPixels32(uint32_t layer, uint32_t mipLevel)
+	std::vector<Color32> Texture::_getPixels32(uint32_t layer, uint32_t mipLevel) const
 	{
 		if (m_arrTempColors.size() <= mipLevel) return {};
 		size_t oneLayerCount = m_width * m_height * m_depth;
@@ -482,7 +482,7 @@ namespace vg
 		return result;
 	}
 
-	void Texture::_setPixels(std::vector<Color> colors, uint32_t layer, uint32_t mipLevel)
+	void Texture::_setPixels(const std::vector<Color> &colors, uint32_t layer, uint32_t mipLevel)
 	{
 		_resizeColorsData(mipLevel);
 #ifdef DEBUG
@@ -492,7 +492,10 @@ namespace vg
 			return;
 		}
 #endif // DEBUG
-		size_t oneLayerSize = m_width * m_height * m_depth;
+        uint32_t width = caculateImageSizeWithMipmapLevel(m_width, mipLevel);
+		uint32_t height = caculateImageSizeWithMipmapLevel(m_height, mipLevel);
+		uint32_t depth = caculateImageSizeWithMipmapLevel(m_depth, mipLevel);
+		size_t oneLayerSize = width * height * depth;
 		size_t start = oneLayerSize * layer;
 		size_t size = oneLayerSize * m_arrayLayer;
 		size_t colorsSize = colors.size();
@@ -505,10 +508,24 @@ namespace vg
 			tempColor.g = std::round(tempColor.g);
 			tempColor.b = std::round(tempColor.b);
 			if (i < colorsSize)m_arrTempColors[mipLevel][j] = tempColor;
+			else break;
 		}
 	}
 
-	void Texture::_setPixels32(std::vector<Color32> colors, uint32_t layer, uint32_t mipLevel)
+	void Texture::_setPixels(const void* colors, uint32_t size, uint32_t layer, uint32_t mipLevel)
+	{
+        uint32_t width = caculateImageSizeWithMipmapLevel(m_width, mipLevel);
+		uint32_t height = caculateImageSizeWithMipmapLevel(m_height, mipLevel);
+		uint32_t depth = caculateImageSizeWithMipmapLevel(m_depth, mipLevel);
+		uint32_t validColorCount = width * height * depth;
+		uint32_t validSize = validColorCount * static_cast<uint32_t>(sizeof(Color));
+		validSize = std::min(validSize, size);			
+		std::vector<Color> tempColors(validColorCount);
+		memcpy(reinterpret_cast<void*>(tempColors.data()), colors, validSize);
+		_setPixels(tempColors, layer, mipLevel);
+	}
+
+	void Texture::_setPixels32(const std::vector<Color32> &colors, uint32_t layer, uint32_t mipLevel)
 	{
 		_resizeColorsData(mipLevel);
 #ifdef DEBUG
@@ -518,14 +535,31 @@ namespace vg
 			return;
 		}
 #endif // DEBUG
-		size_t oneLayerSize = m_width * m_height * m_depth;
+        uint32_t width = caculateImageSizeWithMipmapLevel(m_width, mipLevel);
+		uint32_t height = caculateImageSizeWithMipmapLevel(m_height, mipLevel);
+		uint32_t depth = caculateImageSizeWithMipmapLevel(m_depth, mipLevel);
+		size_t oneLayerSize = width * height * depth;
 		size_t start = oneLayerSize * layer;
 		size_t size = oneLayerSize * m_arrayLayer;
 		size_t colorsSize = colors.size();
 		for (size_t i = 0, j = start; i < oneLayerSize && j < size; ++i, ++j)
 		{
 			if (i < colorsSize)m_arrTempColors[mipLevel][j] = colors[i];
+			else break;
 		}
+	}
+
+	void Texture::_setPixels32(const void* colors, uint32_t size, uint32_t layer, uint32_t mipLevel)
+	{
+		uint32_t width = caculateImageSizeWithMipmapLevel(m_width, mipLevel);
+		uint32_t height = caculateImageSizeWithMipmapLevel(m_height, mipLevel);
+		uint32_t depth = caculateImageSizeWithMipmapLevel(m_depth, mipLevel);
+		uint32_t validColorCount = width * height * depth;
+		uint32_t validSize = validColorCount * static_cast<uint32_t>(sizeof(Color32));
+		validSize = std::min(validSize, size);
+		size_t oneLayerSize = validColorCount;
+		size_t start = oneLayerSize * layer;
+		memcpy(reinterpret_cast<void*>(m_arrTempColors[mipLevel].data() + start), colors, validSize);
 	}
 
 	void Texture::_apply(Bool32 updateMipmaps, Bool32 makeUnreadable)

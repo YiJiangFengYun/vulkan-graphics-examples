@@ -14,6 +14,8 @@ namespace vgim {
 	extern const std::shared_ptr<vg::VisualObject2> getUIObject();
 	extern const std::shared_ptr<vg::CameraOP2> getCamera();
 	extern const std::shared_ptr<vg::Scene2> getScene();
+	extern void setShaderPath(const std::string &vertShaderPath, const std::string &fragShaderPat);
+	extern void setShader(const std::shared_ptr<vg::Shader> pShader);
 	extern void updateCanvasSize(uint32_t canvasWidth, uint32_t canvasHeight);	
 	extern void updateFromImGUI();
 } //vgim

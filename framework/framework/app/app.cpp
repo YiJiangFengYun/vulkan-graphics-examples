@@ -24,6 +24,14 @@ namespace vgf {
 
 	App::~App()
 	{
+		//----------------------------------------------------------------------
+		//----------------------------------------------------------------------
+		//Initialize vgim module
+#ifdef USE_IMGUI_BIND
+		vgim::moduleDestory();
+#endif //USE_IMGUI_BIND
+		//-------------------------------------------------------------
+
 		m_pSubWindows.resize(0);
 		m_pWindow = nullptr;
 

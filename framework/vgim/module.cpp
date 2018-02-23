@@ -4,7 +4,10 @@ namespace vgim
 {
     uint32_t m_canvasWidth;
     uint32_t m_canvasHeight;
+
+    double m_time;
 	
+    std::shared_ptr<vg::Texture2D> m_pFontTexture;
     std::shared_ptr<vg::Shader> m_pShader;
     std::shared_ptr<vg::Pass> m_pPass;
     std::shared_ptr<vg::Material> m_pMaterial;
@@ -78,17 +81,21 @@ namespace vgim
     void _destroyCamera();
     void _createScene();
     void _destroyScene();
+    void _initImGui();
+    void _createFontTexture();
 
 	void moduleCreate(uint32_t canvasWidth, uint32_t canvasHeight)
 	{
 		if (inited == VG_IM_TRUE) return;
         m_canvasWidth = canvasWidth;
         m_canvasHeight = canvasHeight;
+        m_time = 0.0;
 		_createMaterial();
         _createMesh();
         _createUIObject();
         _createCamera();
         _createScene();
+        _initImGui();
         
 		//Indicate module was initialized.
 		inited = VG_IM_TRUE;
@@ -105,10 +112,36 @@ namespace vgim
         _destroyMaterial();
 	}
 
-    void updateCanvasSize(uint32_t canvasWidth, uint32_t canvasHeight)
+    void updateIMGUI(uint32_t canvasWidth
+        , uint32_t canvasHeight
+        , double currTime
+        , float mouseX
+        , float mouseY
+        , Bool32 mouseDown[3]
+        )
     {
         m_canvasWidth = canvasWidth;
         m_canvasHeight = canvasHeight;
+
+        // Dimensions
+        ImGuiIO& io = ImGui::GetIO();
+		io.DisplaySize = ImVec2(static_cast<float>(canvasWidth), static_cast<float>(canvasHeight));
+		io.FontGlobalScale = 1.0f;
+
+        //time
+        io.DeltaTime = static_cast<float>(currTime - m_time);
+        m_time = currTime;
+
+        //input
+        io.MousePos = ImVec2(mouseX, mouseY);
+
+        for (uint32_t i = 0; i < 3u; ++i) {
+            io.MouseDown[i] = mouseDown[i];            
+        }
+
+        // Start the frame. This call will update the io.WantCaptureMouse, io.WantCaptureKeyboard flag that you can use to dispatch inputs (or not) to your application.
+        ImGui::NewFrame();
+        ImGui::Render();
     }
 
     void updateFromImGUI()
@@ -342,4 +375,40 @@ namespace vgim
     {
         m_pScene = nullptr;
     }
+
+    void _initImGui()
+    {
+        ImGui::CreateContext();
+
+        //style
+        ImGui::StyleColorsDark();
+        // // Color scheme
+		// ImGuiStyle& style = ImGui::GetStyle();
+		// style.Colors[ImGuiCol_TitleBg] = ImVec4(1.0f, 0.0f, 0.0f, 1.0f);
+		// style.Colors[ImGuiCol_TitleBgActive] = ImVec4(1.0f, 0.0f, 0.0f, 1.0f);
+		// style.Colors[ImGuiCol_TitleBgCollapsed] = ImVec4(1.0f, 0.0f, 0.0f, 0.1f);
+		// style.Colors[ImGuiCol_MenuBarBg] = ImVec4(1.0f, 0.0f, 0.0f, 0.4f);
+		// style.Colors[ImGuiCol_Header] = ImVec4(0.8f, 0.0f, 0.0f, 0.4f);
+		// style.Colors[ImGuiCol_HeaderActive] = ImVec4(1.0f, 0.0f, 0.0f, 0.4f);
+		// style.Colors[ImGuiCol_HeaderHovered] = ImVec4(1.0f, 0.0f, 0.0f, 0.4f);
+		// style.Colors[ImGuiCol_CheckMark] = ImVec4(1.0f, 0.0f, 0.0f, 0.8f);
+    }
+
+    void _createFontTexture()
+    {
+        ImGuiIO& io = ImGui::GetIO();
+
+        unsigned char* pixels;
+        int32_t width, height;
+        io.Fonts->GetTexDataAsRGBA32(&pixels, &width, &height);
+        uint32_t size = static_cast<uint32_t>(width * height * 4 * sizeof(char));
+
+        m_pFontTexture = std::shared_ptr<vg::Texture2D>(new vg::Texture2D(vg::TextureFormat::R8G8B8A8_UNORM, 
+            VG_FALSE, width, height));
+        m_pFontTexture->setPixels32(reinterpret_cast<void *>(pixels), size);
+        
+        io.Fonts->TexID = reinterpret_cast<void *>(reinterpret_cast<intptr_t>(VkImage(*(m_pFontTexture->getImage()))));
+
+        m_pPass->setMainTexture(m_pFontTexture);
+    }    
 } //vgim

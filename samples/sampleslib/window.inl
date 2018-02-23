@@ -58,6 +58,12 @@ namespace sampleslib
 	}
 
 	template <vg::SpaceType SPACE_TYPE>
+	void Window<SPACE_TYPE>::_initUI()
+	{
+		vgim::setShaderPath("shaders/ui.vert.spv", "shaders/ui.vert.spv");
+	}
+
+	template <vg::SpaceType SPACE_TYPE>
 	void Window<SPACE_TYPE>::_initInputHanders()
 	{
 		glfwSetScrollCallback(m_pWindow.get(), [](GLFWwindow *window, double xOffset, double yOffset)

@@ -364,7 +364,39 @@ namespace vgf {
 	{
 		_onPreUpdate();
 #ifdef USE_IMGUI_BIND
-		vgim::updateCanvasSize(m_width, m_height);
+        //update im gui
+		float mouseX;
+		float mouseY;
+        // inputs
+        if (glfwGetWindowAttrib(m_pWindow.get(), GLFW_FOCUSED))
+        {
+            double tempX, tempY;
+            glfwGetCursorPos(m_pWindow.get(), &tempX, &tempY);
+			mouseX = static_cast<float>(tempX);
+			mouseY = static_cast<float>(tempY);
+        }
+        else
+        {
+			mouseX = std::numeric_limits<float>::lowest();
+			mouseY = std::numeric_limits<float>::lowest();
+        }
+
+		for (uint32_t i = 0u; i < 3u; ++i) {
+		   m_mousePressed[i] = m_mousePressed[i] || glfwGetMouseButton(m_pWindow.get(), i) != 0;
+		}
+
+		// Hide OS mouse cursor if ImGui is drawing it
+		ImGuiIO& io = ImGui::GetIO();
+        glfwSetInputMode(m_pWindow.get(), GLFW_CURSOR, io.MouseDrawCursor ? GLFW_CURSOR_HIDDEN : GLFW_CURSOR_NORMAL);
+
+		//time
+        double currentTime = glfwGetTime();
+		vgim::updateIMGUI(m_width, m_height, currentTime, mouseX, mouseY, m_mousePressed);
+		
+		for (uint32_t i = 0u; i < 3u; ++i) {
+		   m_mousePressed[i] = VGF_FALSE;
+		}
+
 #endif
 		_onUpdate();
 #ifdef USE_IMGUI_BIND

@@ -69,6 +69,7 @@ namespace sampleslib
 		void _initZoom();
 		void _createCamera();
 		void _createScene();
+		void _initUI();
 		void _initInputHanders();
 
 		void _updateCamera();

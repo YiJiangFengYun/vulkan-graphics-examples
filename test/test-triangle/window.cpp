@@ -6,7 +6,7 @@ namespace testTriangle
 		, uint32_t height
 		, const char* title
 	)
-		: vgf::Window(width
+		: testlib::Window<vg::SpaceType::SPACE_3>(width
 			, height
 			, title
 		)
@@ -15,14 +15,12 @@ namespace testTriangle
 		_createMesh();
 		_createMaterial();
 		_createModel();
-		_createCamera();
-		_createScene();
 	}
 
 	Window::Window(std::shared_ptr<GLFWwindow> pWindow
 		, std::shared_ptr<vk::SurfaceKHR> pSurface
 	)
-		: vgf::Window(pWindow
+		: testlib::Window<vg::SpaceType::SPACE_3>(pWindow
 			, pSurface
 		)
 	{
@@ -30,15 +28,13 @@ namespace testTriangle
 		_createMesh();
 		_createMaterial();
 		_createModel();
-		_createCamera();
-		_createScene();
 	}
 
 	void Window::_loadModel()
 	{
-		m_tempPositions = { vg::Vector3(0.0f, -0.5f, 0.5f)
-		, vg::Vector3(-0.5f, 0.5f, 0.5f)
-		, vg::Vector3(0.5f, 0.5f, 0.5f)
+		m_tempPositions = {vg::Vector3(0.5f, 0.5f, 0.5f)
+			, vg::Vector3(-0.5f, 0.5f, 0.5f)
+			, vg::Vector3(0.0f, -0.5f, 0.5f)
 		};
 
 		m_tempColors = { vg::Color32(255, 0, 0, 255)
@@ -77,83 +73,6 @@ namespace testTriangle
 		m_pModel = std::shared_ptr<vg::VisualObject3>(new vg::VisualObject3());
 		m_pModel->setMesh(m_pMesh);
 		m_pModel->setMaterial(m_pMaterial);
-	}
-
-	void Window::_createCamera()
-	{
-		m_pCamera = std::shared_ptr<vg::CameraOP3>(new vg::CameraOP3());
-		m_pCamera->updateProj({{ -1.0f, -1.0f, 0.1f }, { 1.0f, 1.0f, 10.0f }});
-		m_pCamera->apply();
-	}
-
-	void Window::_createScene()
-	{
-		m_pScene = std::shared_ptr<vg::Scene3>(new vg::Scene3());
-		m_pScene->addCamera(m_pCamera);
 		m_pScene->addVisualObject(m_pModel);
-	}
-
-	void Window::_onResize()
-	{
-
-	}
-
-	void Window::_onPreReCreateSwapchain()
-	{
-
-	}
-
-	void Window::_onPostReCreateSwapchain()
-	{
-	}
-
-	void Window::_onPreUpdate()
-	{
-
-	}
-
-	void Window::_onUpdate()
-	{
-		/*static auto startTime = std::chrono::high_resolution_clock::now();
-
-		auto currentTime = std::chrono::high_resolution_clock::now();
-		auto duration = currentTime - startTime;
-		float time = std::chrono::duration_cast<std::chrono::milliseconds>(currentTime - startTime).count() / 2000.0f;
-
-		auto pTransform = m_pModel->getTransform();
-		pTransform->setLocalRotation(glm::angleAxis(glm::radians(10.0f) * time, vg::Vector3(0.0f, 0.0f, 1.0f)));*/
-	}
-
-	void Window::_onPostUpdate()
-	{
-
-	}
-
-	void Window::_onPreRender()
-	{
-
-	}
-
-	void Window::_onRender()
-	{
-
-	}
-
-	void Window::_onPostRender()
-	{
-
-	}
-
-	void Window::_renderWithRenderer(const std::shared_ptr<vg::Renderer> &pRenderer
-		    , const vg::Renderer::RenderInfo &info
-			, vg::Renderer::RenderResultInfo &resultInfo)
-	{
-		vg::Renderer::SceneAndCamera sceneAndCamera;
-		sceneAndCamera.pScene = m_pScene.get();
-		sceneAndCamera.pCamera = m_pCamera.get();
-		auto myInfo = info;
-		myInfo.sceneAndCameraCount = 1u;
-		myInfo.pSceneAndCamera = &sceneAndCamera;
-		pRenderer->render(myInfo, resultInfo);
 	}
 }

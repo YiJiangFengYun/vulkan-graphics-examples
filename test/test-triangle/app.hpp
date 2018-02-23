@@ -1,11 +1,11 @@
 #ifndef APP_H
 #define APP_H
 
-#include "framework/app/app.hpp"
+#include "testlib/app.hpp"
 
 namespace testTriangle
 {
-	class App : public vgf::App
+	class App : public testlib::App
 	{
 	public:
 		App();

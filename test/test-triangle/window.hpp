@@ -1,13 +1,13 @@
 #ifndef WINDOW_H
 #define WINDOW_H
 
-#include "testlib/stb_image.h"
-#include "testlib/tiny_obj_loader.h"
-#include "framework/framework.hpp"
+#include <testlib/stb_image.h>
+#include <testlib/tiny_obj_loader.h>
+#include <testlib/window.hpp>
 
 namespace testTriangle
 {
-	class Window : public vgf::Window
+	class Window : public testlib::Window<vg::SpaceType::SPACE_3>
 	{
 	public:
 
@@ -25,9 +25,6 @@ namespace testTriangle
 		std::vector<vg::Color32> m_tempColors;
 		std::vector<uint32_t> m_tempIndices;
 
-
-		std::shared_ptr<vg::Scene3> m_pScene;
-		std::shared_ptr<vg::CameraOP3> m_pCamera;
 		std::shared_ptr<vg::VisualObject3> m_pModel;
 		std::shared_ptr<vg::DimSepMesh3> m_pMesh;
 		std::shared_ptr<vg::Material> m_pMaterial;
@@ -39,25 +36,6 @@ namespace testTriangle
 		void _createMesh();
 		void _createMaterial();
 		void _createModel();
-		void _createCamera();
-		void _createScene();
-
-		virtual void _onResize() override;
-
-		virtual void _onPreReCreateSwapchain() override;
-		virtual void _onPostReCreateSwapchain() override;
-
-		virtual void _onPreUpdate() override;
-		virtual void _onUpdate() override;
-		virtual void _onPostUpdate() override;
-
-		virtual void _onPreRender() override;
-		virtual void _onRender() override;
-	    virtual void _onPostRender() override;
-
-		virtual void _renderWithRenderer(const std::shared_ptr<vg::Renderer> &pRenderer
-		    , const vg::Renderer::RenderInfo &info
-			, vg::Renderer::RenderResultInfo &resultInfo) override;
 	};
 
 }

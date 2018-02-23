@@ -13,7 +13,7 @@ namespace chalet
 		, uint32_t height
 		, const char* title
 	)
-		: vgf::Window(width
+		: sampleslib::Window<vg::SpaceType::SPACE_3>(width
 			, height
 			, title
 		)
@@ -23,14 +23,12 @@ namespace chalet
 		_createTexture();
 		_createMaterial();
 		_createModel();
-		_createCamera();
-		_createScene();
 	}
 
 	Window::Window(std::shared_ptr<GLFWwindow> pWindow
 		, std::shared_ptr<vk::SurfaceKHR> pSurface
 	)
-		: vgf::Window(pWindow
+		: sampleslib::Window<vg::SpaceType::SPACE_3>(pWindow
 			, pSurface
 		)
 	{
@@ -39,8 +37,6 @@ namespace chalet
 		_createTexture();
 		_createMaterial();
 		_createModel();
-		_createCamera();
-		_createScene();
 	}
 
 	void Window::_loadModel()
@@ -148,42 +144,7 @@ namespace chalet
 		m_pModel = std::shared_ptr<vg::VisualObject3>(new vg::VisualObject3());
 		m_pModel->setMesh(m_pMesh);
 		m_pModel->setMaterial(m_pMaterial);
-	}
-
-	void Window::_createCamera()
-	{
-		m_pCamera = std::shared_ptr<vg::Camera3>(new vg::Camera3());
-		m_pCamera->setAspect(m_swapchainExtent.width / (float)(m_swapchainExtent.height));
-		m_pCamera->setFovY(glm::radians(45.0f));
-		m_pCamera->setZNear(0.1f);
-		m_pCamera->setZFar(10.0f);
-		m_pCamera->apply();
-	}
-
-	void Window::_createScene()
-	{
-		m_pScene = std::shared_ptr<vg::Scene3>(new vg::Scene3());
-		m_pScene->addCamera(m_pCamera);
 		m_pScene->addVisualObject(m_pModel);
-	}
-
-	void Window::_onResize()
-	{
-
-	}
-
-	void Window::_onPreReCreateSwapchain()
-	{
-
-	}
-
-	void Window::_onPostReCreateSwapchain()
-	{
-	}
-
-	void Window::_onPreUpdate()
-	{
-
 	}
 
 	void Window::_onUpdate()
@@ -201,38 +162,5 @@ namespace chalet
 		pTransform = m_pCamera->getTransform();
 		//pTransform->setLocalPosition(kgs::Vector3(2.0f, 2.0f, 2.0f));
 		pTransform->lookAt2(vg::Vector3(2.0f, 2.0f, 2.0f), vg::Vector3(0.0f, 0.0f, 0.0f), vg::Vector3(0.0f, 0.0f, 1.0f));
-	}
-
-	void Window::_onPostUpdate()
-	{
-
-	}
-
-	void Window::_onPreRender()
-	{
-
-	}
-
-	void Window::_onRender()
-	{
-
-	}
-
-	void Window::_onPostRender()
-	{
-
-	}
-
-	void Window::_renderWithRenderer(const std::shared_ptr<vg::Renderer> &pRenderer
-		    , const vg::Renderer::RenderInfo &info
-			, vg::Renderer::RenderResultInfo &resultInfo)
-	{
-		vg::Renderer::SceneAndCamera sceneAndCamera;
-		sceneAndCamera.pScene = m_pScene.get();
-		sceneAndCamera.pCamera = m_pCamera.get();
-		auto myInfo = info;
-		myInfo.sceneAndCameraCount = 1u;
-		myInfo.pSceneAndCamera = &sceneAndCamera;
-		pRenderer->render(myInfo, resultInfo);
 	}
 }

@@ -1,11 +1,11 @@
 #ifndef APP_H
 #define APP_H
 
-#include "framework/app/app.hpp"
+#include "sampleslib/app.hpp"
 
 namespace triangle
 {
-	class App : public vgf::App
+	class App : public sampleslib::App
 	{
 	public:
 		App();

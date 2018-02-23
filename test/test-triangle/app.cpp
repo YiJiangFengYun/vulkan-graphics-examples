@@ -3,7 +3,7 @@
 namespace testTriangle
 {
 	App::App():
-		vgf::App()
+		testlib::App()
 	{
 	}
 }

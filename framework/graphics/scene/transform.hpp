@@ -110,33 +110,33 @@ namespace vg
 		MatrixType m_localMatrix;
 		MatrixType m_localMatrixInverse;
 
-		inline void _setParentOnly(Type *pNewParent);
-		inline void _addChildOnly(Type *pNewChild);
-		inline void _addChildOnly(Type *pNewChild, 
-			typename std::vector<Type *>::const_iterator pos);
-		inline void _removeChildOnly(Type *pChild);
-		inline Bool32 _isChild(Type *pTransform);
+		void _setParentOnly(Type *pNewParent);
+		void _addChildOnly(Type *pNewChild);
+		void _addChildOnly(Type *pNewChild, 
+		    typename std::vector<Type *>::const_iterator pos);
+		void _removeChildOnly(Type *pChild);
+		Bool32 _isChild(Type *pTransform);
 
-		inline void _setLocalPositionOnly(PointType position);
-		inline void _setLocalScaleOnly(VectorType scale);
-		inline void _setLocalRotationOnly(RotationType rotation);
-		inline void _setLocalMatrixOnly(MatrixType matrix)
+		void _setLocalPositionOnly(PointType position);
+		void _setLocalScaleOnly(VectorType scale);
+		void _setLocalRotationOnly(RotationType rotation);
+		void _setLocalMatrixOnly(MatrixType matrix)
 		{
 			m_localMatrix = matrix;
 			m_localMatrixInverse = glm::inverse(m_localMatrix);
 		}
 
-		inline void _setLocalMatrixInverseOnly(MatrixType matrix)
+		void _setLocalMatrixInverseOnly(MatrixType matrix)
 		{
 			m_localMatrixInverse = matrix;
 			m_localMatrix = glm::inverse(m_localMatrixInverse);
 		}
 
-		inline MatrixType _getMatrixLocalToWorld(Bool32 includeSelf);
+		MatrixType _getMatrixLocalToWorld(Bool32 includeSelf);
 
-		inline MatrixType _getMatrixWorldToLocal(Bool32 includeSelf);
+		MatrixType _getMatrixWorldToLocal(Bool32 includeSelf);
 
-		inline void _reCalculateLocalMatrix();
+		void _reCalculateLocalMatrix();
 
 	};
 } //namespace kgs

@@ -6,7 +6,7 @@ namespace testTriangle2D
 		, uint32_t height
 		, const char* title
 	)
-		: vgf::Window(width
+		: testlib::Window<vg::SpaceType::SPACE_2>(width
 			, height
 			, title
 		)
@@ -15,14 +15,12 @@ namespace testTriangle2D
 		_createMesh();
 		_createMaterial();
 		_createModel();
-		_createCamera();
-		_createScene();
 	}
 
 	Window::Window(std::shared_ptr<GLFWwindow> pWindow
 		, std::shared_ptr<vk::SurfaceKHR> pSurface
 	)
-		: vgf::Window(pWindow
+		: testlib::Window<vg::SpaceType::SPACE_2>(pWindow
 			, pSurface
 		)
 	{
@@ -30,15 +28,13 @@ namespace testTriangle2D
 		_createMesh();
 		_createMaterial();
 		_createModel();
-		_createCamera();
-		_createScene();
 	}
 
 	void Window::_loadModel()
 	{
-		m_tempPositions = { vg::Vector2(0.0f, -0.5f)
-		, vg::Vector2(-0.5f, 0.5f)
-		, vg::Vector2(0.5f, 0.5f)
+		m_tempPositions = {vg::Vector2(0.5f, 0.5f)
+		    , vg::Vector2(-0.5f, 0.5f)
+		    , vg::Vector2(0.0f, -0.5f)
 		};
 
 		m_tempColors = { vg::Color32(255, 0, 0, 255)
@@ -65,6 +61,7 @@ namespace testTriangle2D
 	{
 		m_pShader = std::shared_ptr<vg::Shader>(new vg::Shader("shaders/triangle-2d.vert.spv", "shaders/triangle-2d.frag.spv"));
 		m_pPass = std::shared_ptr<vg::Pass>(new vg::Pass(m_pShader));
+		m_pPass->setCullMode(vg::CullModeFlagBits::NONE);
 		m_pMaterial = std::shared_ptr<vg::Material>(new vg::Material());
 		m_pMaterial->addPass(m_pPass);
 		m_pMaterial->setRenderPriority(0u);
@@ -77,75 +74,6 @@ namespace testTriangle2D
 		m_pModel = std::shared_ptr<vg::VisualObject2>(new vg::VisualObject2());
 		m_pModel->setMesh(m_pMesh);
 		m_pModel->setMaterial(m_pMaterial);
-	}
-
-	void Window::_createCamera()
-	{
-		m_pCamera = std::shared_ptr<vg::CameraOP2>(new vg::CameraOP2());
-		m_pCamera->updateProj({ {-1.0f, -1.0f}, {1.0f, 1.0f} });
-		m_pCamera->apply();
-	}
-
-	void Window::_createScene()
-	{
-		m_pScene = std::shared_ptr<vg::Scene2>(new vg::Scene2());
-		m_pScene->addCamera(m_pCamera);
 		m_pScene->addVisualObject(m_pModel);
-	}
-
-	void Window::_onResize()
-	{
-
-	}
-
-	void Window::_onPreReCreateSwapchain()
-	{
-
-	}
-
-	void Window::_onPostReCreateSwapchain()
-	{
-	}
-
-	void Window::_onPreUpdate()
-	{
-
-	}
-
-	void Window::_onUpdate()
-	{
-	}
-
-	void Window::_onPostUpdate()
-	{
-
-	}
-
-	void Window::_onPreRender()
-	{
-
-	}
-
-	void Window::_onRender()
-	{
-
-	}
-
-	void Window::_onPostRender()
-	{
-
-	}
-
-	void Window::_renderWithRenderer(const std::shared_ptr<vg::Renderer> &pRenderer
-		    , const vg::Renderer::RenderInfo &info
-			, vg::Renderer::RenderResultInfo &resultInfo)
-	{
-		vg::Renderer::SceneAndCamera sceneAndCamera;
-		sceneAndCamera.pScene = m_pScene.get();
-		sceneAndCamera.pCamera = m_pCamera.get();
-		auto myInfo = info;
-		myInfo.sceneAndCameraCount = 1u;
-		myInfo.pSceneAndCamera = &sceneAndCamera;
-		pRenderer->render(myInfo, resultInfo);
 	}
 }

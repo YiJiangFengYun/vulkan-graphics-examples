@@ -1,11 +1,11 @@
 #ifndef APP_H
 #define APP_H
 
-#include "framework/framework.hpp"
+#include "sampleslib/app.hpp"
 
 namespace chalet
 {
-	class App : public vgf::App
+	class App : public sampleslib::App
 	{
 	public:
 		App();

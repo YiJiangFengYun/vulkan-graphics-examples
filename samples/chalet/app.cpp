@@ -3,7 +3,7 @@
 namespace chalet
 {
 	App::App():
-		vgf::App()
+		sampleslib::App()
 	{
 	}
 }

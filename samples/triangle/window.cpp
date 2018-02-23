@@ -8,46 +8,28 @@ namespace triangle
 		, uint32_t height
 		, const char* title
 	)
-		: vgf::Window(width
+		: sampleslib::Window<vg::SpaceType::SPACE_3>(width
 			, height
 			, title
 		    )
-		, m_zoom(0.0f)
-		, m_rotation(0.0f)
 	{
-		_initZoom();
 		_loadModel();
 		_createMesh();
 		_createMaterial();
 		_createModel();
-		_createCamera();
-		_createScene();
-		_initInputHanders();
 	}
 
 	Window::Window(std::shared_ptr<GLFWwindow> pWindow
 		, std::shared_ptr<vk::SurfaceKHR> pSurface
 	)
-		: vgf::Window(pWindow
+		: sampleslib::Window<vg::SpaceType::SPACE_3>(pWindow
 			, pSurface
 		    )
-		, m_zoom(0.0f)
-		, m_rotation(0.0f)
 	{
-		_initZoom();
 		_loadModel();
 		_createMesh();
 		_createMaterial();
 		_createModel();
-		_createCamera();
-		_createScene();
-		_initInputHanders();
-	}
-
-	void Window::_initZoom()
-	{
-		m_zoom = -2.5f;
-		m_zoomSpeed = 0.5f;
 	}
 
 	void Window::_loadModel()
@@ -121,102 +103,6 @@ namespace triangle
 		m_pModel = std::shared_ptr<vg::VisualObject3>(new vg::VisualObject3());
 		m_pModel->setMesh(m_pMesh);
 		m_pModel->setMaterial(m_pMaterial);
-	}
-
-	void Window::_createCamera()
-	{
-		m_pCamera = std::shared_ptr<vg::Camera3>(new vg::Camera3());
-		_updateCamera();
-	}
-
-	void Window::_createScene()
-	{
-		m_pScene = std::shared_ptr<vg::Scene3>(new vg::Scene3());
-		m_pScene->addCamera(m_pCamera);
 		m_pScene->addVisualObject(m_pModel);
-	}
-
-	void Window::_initInputHanders()
-	{
-		glfwSetScrollCallback(m_pWindow.get(), [](GLFWwindow *window, double xOffset, double yOffset)
-		{
-			Window* const instance = (Window*)glfwGetWindowUserPointer(window);
-			instance->m_zoom += static_cast<float>(yOffset) * instance->m_zoomSpeed;
-			instance->m_zoom = std::min(-0.15f, std::max(-5.0f, instance->m_zoom));
-			std::cout << "Current zoom: " << instance->m_zoom << std::endl;
-		});
-	}
-
-	void Window::_updateCamera()
-	{
-		m_pCamera->updateProj(glm::radians(60.0f), (float)m_width / (float)m_height, 0.1f, 256.0f);
-		auto &transform = m_pCamera->getTransform();
-
-		transform->setLocalPosition(glm::vec3(0.0f, 0.0f, m_zoom));
-		transform->setLocalRotation(m_rotation);
-		m_pCamera->apply();		
-	}	
-
-	void Window::_onResize()
-	{
-		_updateCamera();
-	}
-
-	void Window::_onPreReCreateSwapchain()
-	{
-
-	}
-
-	void Window::_onPostReCreateSwapchain()
-	{
-	}
-
-	void Window::_onPreUpdate()
-	{
-
-	}
-
-	void Window::_onUpdate()
-	{
-		_updateCamera();
-	}
-
-	void Window::_onPostUpdate()
-	{
-
-	}
-
-	void Window::_onPreRender()
-	{
-
-	}
-
-	void Window::_onRender()
-	{
-
-	}
-
-	void Window::_onPostRender()
-	{
-
-	}
-
-	void Window::_renderWithRenderer(const std::shared_ptr<vg::Renderer> &pRenderer
-		    , const vg::Renderer::RenderInfo &info
-			, vg::Renderer::RenderResultInfo &resultInfo)
-	{
-		vg::Renderer::SceneAndCamera sceneAndCamera;
-		sceneAndCamera.pScene = m_pScene.get();
-		sceneAndCamera.pCamera = m_pCamera.get();
-		auto myInfo = info;
-		myInfo.sceneAndCameraCount = myInfo.sceneAndCameraCount + 1u;
-		std::vector<vg::Renderer::SceneAndCamera> sceneAndCameras(myInfo.sceneAndCameraCount);
-		for (uint32_t i = 0; i < info.sceneAndCameraCount; ++i)
-		{
-			sceneAndCameras[i] = *(info.pSceneAndCamera + i);
-		}
-		sceneAndCameras[info.sceneAndCameraCount] = sceneAndCamera;
-		myInfo.pSceneAndCamera = sceneAndCameras.data();
-		vgf::Window::_renderWithRenderer(pRenderer, myInfo, resultInfo);
 	}
 }

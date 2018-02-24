@@ -8,7 +8,8 @@ namespace triangle
 	class Window : public sampleslib::Window<vg::SpaceType::SPACE_3>
 	{
 	public:
-
+	    typedef  sampleslib::Window<vg::SpaceType::SPACE_3> ParentWindowType;
+		
 		Window(uint32_t width
 			, uint32_t height
 			, const char* title
@@ -34,6 +35,8 @@ namespace triangle
 		void _createMesh();
 		void _createMaterial();
 		void _createModel();
+
+		virtual void _onUpdate() override;
 	};
 
 }

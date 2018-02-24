@@ -234,7 +234,7 @@ namespace vg
     void IndexData::updateSubDataCount(uint32_t count)
     {
         m_subDatas.resize(count);
-        m_subDataCount = static_cast<uint32_t>(m_subDatas.size());      
+        m_subDataCount = count;      
     }
 
     void IndexData::updateIndexCount(fd::ArrayProxy<uint32_t> indexCounts, uint32_t count, uint32_t offset)

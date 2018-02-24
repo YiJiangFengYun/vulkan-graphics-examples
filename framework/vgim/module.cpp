@@ -241,14 +241,14 @@ namespace vgim
         pIndexData->updateClipRect(indexRects, indexSubDataCount);
 
         //update material
-        ImGuiIO& io = ImGui::GetIO();
-        float data[4];
-        data[0] = 2.0f / io.DisplaySize.x;
-        data[1] = 2.0f / io.DisplaySize.y;
-        data[2] = -1.0f;
-        data[3] = -1.0f;
-        m_pPass->setPushConstantUpdate("default", &data, static_cast<uint32_t>(sizeof(data)), 
-            vk::ShaderStageFlagBits::eVertex, 0u);
+        // ImGuiIO& io = ImGui::GetIO();
+        // float data[4];
+        // data[0] = 2.0f / io.DisplaySize.x;
+        // data[1] = 2.0f / io.DisplaySize.y;
+        // data[2] = -1.0f;
+        // data[3] = -1.0f;
+        // m_pPass->setPushConstantUpdate("default", &data, static_cast<uint32_t>(sizeof(data)), 
+        //     vk::ShaderStageFlagBits::eVertex, 0u);
 
         fd::Viewport viewPort(0.0f, 0.0f, ImGui::GetIO().DisplaySize.x / static_cast<float>(m_canvasWidth), 
             ImGui::GetIO().DisplaySize.y / static_cast<float>(m_canvasHeight), 0.0f, 1.0f);
@@ -265,15 +265,17 @@ namespace vgim
         m_pShader = std::shared_ptr<vg::Shader>(new vg::Shader());
 		m_pPass = std::shared_ptr<vg::Pass>(new vg::Pass(m_pShader));
 
+        // m_pPass->setCullMode(vg::CullModeFlagBits::NONE);
+
         //push constant
-        m_pPass->setPushConstantRange("default", vk::ShaderStageFlagBits::eVertex, static_cast<uint32_t>(sizeof(float) * 0), static_cast<uint32_t>(sizeof(float) * 4));
+        // m_pPass->setPushConstantRange("default", vk::ShaderStageFlagBits::eVertex, static_cast<uint32_t>(sizeof(float) * 0), static_cast<uint32_t>(sizeof(float) * 4));
 
         //color blend
         uint32_t attachmentCount = 1u;
         std::vector<vk::PipelineColorBlendAttachmentState> blendAttachmentStates(attachmentCount);
         for (uint32_t i = 0; i < attachmentCount; ++i)
         {
-            auto blendAttachmentState = blendAttachmentStates[i];
+            auto &blendAttachmentState = blendAttachmentStates[i];
             blendAttachmentState.blendEnable = VK_TRUE;
             blendAttachmentState.colorWriteMask = vk::ColorComponentFlagBits::eR | 
                 vk::ColorComponentFlagBits::eG | 

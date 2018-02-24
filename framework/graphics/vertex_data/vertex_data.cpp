@@ -158,6 +158,7 @@ namespace vg
         if (size == 0u) {
             size = 1u;
             m_subDatas.resize(1u);
+             m_subDataCount = size;
         };
         Bool32 isChange = VG_FALSE;
         for (size_t i = 0u; i < size; ++i) 
@@ -198,6 +199,7 @@ namespace vg
         if (size == 0u) {
             size = 1u;
             m_subDatas.resize(1u);
+             m_subDataCount = size;
         };
         Bool32 isChange = VG_FALSE;
         for (size_t i = 0u; i < size; ++i) 
@@ -245,6 +247,7 @@ namespace vg
     void  VertexData::updateSubDataCount(uint32_t count)
     {
         m_subDatas.resize(count);
+        m_subDataCount = count;
     }
 
     void VertexData::updateVertexCount(fd::ArrayProxy<uint32_t> vertexCounts, uint32_t count, uint32_t offset)

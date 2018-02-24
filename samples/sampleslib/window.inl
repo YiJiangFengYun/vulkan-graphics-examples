@@ -17,6 +17,7 @@ namespace sampleslib
 		_initZoom();
 		_createCamera();
 		_createScene();
+		_initUI();
 		_initInputHanders();
 	}
 
@@ -33,6 +34,7 @@ namespace sampleslib
 		_initZoom();
 		_createCamera();
 		_createScene();
+		_initUI();
 		_initInputHanders();
 	}
 
@@ -60,7 +62,7 @@ namespace sampleslib
 	template <vg::SpaceType SPACE_TYPE>
 	void Window<SPACE_TYPE>::_initUI()
 	{
-		vgim::setShaderPath("shaders/ui.vert.spv", "shaders/ui.vert.spv");
+		vgim::setShaderPath("shaders/ui.vert.spv", "shaders/ui.frag.spv");
 	}
 
 	template <vg::SpaceType SPACE_TYPE>
@@ -146,5 +148,7 @@ namespace sampleslib
 		sceneAndCameras[info.sceneAndCameraCount] = sceneAndCamera;
 		myInfo.pSceneAndCamera = sceneAndCameras.data();
 		vgf::Window::_renderWithRenderer(pRenderer, myInfo, resultInfo);
+
+		// vgf::Window::_renderWithRenderer(pRenderer, info, resultInfo);		
 	}
 }

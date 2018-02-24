@@ -12,7 +12,6 @@ if(SOURCES)
     
     # copy resource files
     set(RESOURCES_OUTPUT_DIR "${CMAKE_CURRENT_BINARY_DIR}")
-    set(SHADERS_OUTPUT_DIR "${RESOURCES_OUTPUT_DIR}/shaders/${SHADER_NAME}")
     set(SHADER_NAME "triangle")
     set(SHADERS_DIR "${SHADERS_DIR}/${SHADER_NAME}")
     file(GLOB 
@@ -25,7 +24,6 @@ if(SOURCES)
     
     foreach(SHADER ${SHADERS})
         set(SHADER_SPV "${SHADER}.spv")
-        string(REPLACE "${SHADERS_DIR}" "${SHADERS_OUTPUT_DIR}" SHADER_OUT "${SHADER_SPV}")
         if(WIN32)
             add_custom_command(TARGET "${EXE_NAME}" PRE_BUILD
                 COMMAND "${Vulkan_BIN_DIR}/glslangValidator.exe" "-V" "${SHADER}" "-o" "${SHADER_SPV}"

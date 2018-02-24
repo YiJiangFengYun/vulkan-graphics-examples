@@ -131,6 +131,12 @@ namespace vgim
 		io.DisplaySize = ImVec2(static_cast<float>(canvasWidth), static_cast<float>(canvasHeight));
 		io.FontGlobalScale = 1.0f;
 
+        //camera
+        auto &pCamera = m_pCamera;
+		pCamera->updateProj(fd::Bounds<glm::vec2>(glm::vec2(0.0f, 0.0f), 
+		    glm::vec2(static_cast<float>(canvasWidth), static_cast<float>(canvasHeight))));
+		pCamera->apply();
+
         //time
         io.DeltaTime = static_cast<float>(currTime - m_time);
         m_time = currTime;
@@ -209,6 +215,7 @@ namespace vgim
                 indexBufferSizes[indexSubDataCount] = pCmd->ElemCount * static_cast<uint32_t>(sizeof(ImDrawIdx));
                 indexVertexDataIndices[indexSubDataCount] = vertexSubDataCount;
 
+                //Calculate clip rectangle that is in valid range of ClipRect is [(0, 0), (1, 1)]
                 fd::Rect2D rect;
                 rect.x = std::max(pCmd->ClipRect.x, 0.0f) / m_canvasWidth;
                 rect.y = std::max(pCmd->ClipRect.y, 0.0f) / m_canvasHeight;

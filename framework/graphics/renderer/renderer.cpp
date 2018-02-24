@@ -374,11 +374,6 @@ namespace vg
 		    auto clipRect = subIndexData.clipRect;
 			glm::vec2 minOfClipRect(clipRect.x, clipRect.y);
 			glm::vec2 maxOfclipRect(clipRect.x + clipRect.width, clipRect.y + clipRect.height);
-			//Transform range [-1, 1] to range [0, 1]
-			minOfClipRect.x = (minOfClipRect.x + 1.0f) / 2.0f;
-			minOfClipRect.y = (minOfClipRect.y + 1.0f) / 2.0f;
-			maxOfclipRect.x = (maxOfclipRect.x + 1.0f) / 2.0f;
-			maxOfclipRect.y = (maxOfclipRect.y + 1.0f) / 2.0f;
 
 			fd::Bounds<glm::vec2> boundsOfClipRect(minOfClipRect, maxOfclipRect);
 
@@ -773,6 +768,11 @@ namespace vg
 			    {
 			    	validVisualObjects[validVisualObjectCount++] = pVisualObject;
 			    }
+				//Transform range [-1, 1] to range [0, 1]
+				clipRect.x = (clipRect.x + 1.0f) / 2.0f;
+				clipRect.y = (clipRect.y + 1.0f) / 2.0f;
+				clipRect.width = clipRect.width / 2.0f;
+				clipRect.height = clipRect.height / 2.0f;
 				const auto& pIndexData = dynamic_cast<ContentMesh *>(pMesh.get())->getIndexData();
 				uint32_t subMeshOffset = pVisualObject->getSubMeshOffset();
 				uint32_t subMeshCount = pVisualObject->getSubMeshCount();
@@ -933,6 +933,12 @@ namespace vg
 			    {
 			    	arrPVObjs[PVObjIndex++] = pVisualObjectOfChild;
 			    }
+
+				//Transform range [-1, 1] to range [0, 1]
+				clipRect.x = (clipRect.x + 1.0f) / 2.0f;
+				clipRect.y = (clipRect.y + 1.0f) / 2.0f;
+				clipRect.width = clipRect.width / 2.0f;
+				clipRect.height = clipRect.height / 2.0f;
 				
 				const auto& pIndexData = dynamic_cast<ContentMesh *>(pMeshOfChild.get())->getIndexData();
 				uint32_t subMeshOffset = pVisualObjectOfChild->getSubMeshOffset();

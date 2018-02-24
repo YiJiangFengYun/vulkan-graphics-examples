@@ -17,6 +17,7 @@ namespace vg {
             vk::PipelineInputAssemblyStateCreateInfo inputAssemblyStateInfo;
             uint32_t vertexDataIndex;
             Bool32 hasClipRect;
+            //Valid range of ClipRect is [(0, 0), (1, 1)]
             fd::Rect2D clipRect;
 
             SubIndexData(vk::IndexType indexType = vk::IndexType()

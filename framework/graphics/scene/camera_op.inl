@@ -95,34 +95,37 @@ namespace vg
 		}
 
 		fd::Bounds<PointType> boundsInView(minInView, maxInView);
+		
+		PointType minView;
+		PointType maxView;
+		for (typename PointType::length_type i = 0; i < len; ++i)
+		{
+			if (i == 2)
+			{
+				minView[i] = 0.0f;
+				maxView[i] = 1.0f;
+			}
+			else
+			{
+				minView[i] = -1.0f;
+				maxView[i] = 1.0f;
+			}
+		}
+
+		fd::Bounds<PointType> boundsOfView(minView, maxView);
+
 		fd::Bounds<PointType> intersectionInView;
 		Bool32 isInsideCameraView = VG_FALSE;
 		////check if it is inside camera view.
-		if (m_viewBounds.intersects(boundsInView, &intersectionInView))
+		if (boundsOfView.intersects(boundsInView, &intersectionInView))
 		{
 			isInsideCameraView = VG_TRUE;
 		}
 		
 		if (viewRect != nullptr)
 		{
-			//Result view rect should be in the range of [-1, 1] at x and y dimentions.
-			auto min = m_projMatrix * TransformType::MatrixVectorType(intersectionInView.getMin(), 1.0f);
-			auto max = m_projMatrix * TransformType::MatrixVectorType(intersectionInView.getMax(), 1.0f);
-			if (min.x > max.x)
-			{
-				float temp = min.x;
-				min.x = max.x;
-				max.x = temp;
-			}
-
-			if (min.y > max.y)
-			{
-				float temp = min.y;
-				min.y = max.y;
-				max.y = temp;
-			}
-
-			auto size = max - min;
+			auto min = intersectionInView.getMin();
+			auto size = intersectionInView.getSize();
 			(*viewRect).x = min.x;
 			(*viewRect).y = min.y;
 			(*viewRect).width = size.x;

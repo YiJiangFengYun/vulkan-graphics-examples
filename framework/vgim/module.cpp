@@ -379,6 +379,7 @@ namespace vgim
     void _createScene()
     {
         m_pScene = std::shared_ptr<vg::Scene2>(new vg::Scene2());
+        m_pScene->setIsRightHand(VG_TRUE);
         m_pScene->addCamera(m_pCamera);
         m_pScene->addVisualObject(m_pUIObject);
     }

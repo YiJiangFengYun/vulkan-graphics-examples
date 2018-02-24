@@ -654,6 +654,12 @@ namespace vg
 		auto pDevice = pApp->getDevice();
 
 		auto projMatrix = pCamera->getProjMatrix();
+
+		if (pScene->getIsRightHand() == VG_FALSE)
+		{
+			projMatrix[1][1] *= -1;
+		}
+		
 		auto viewMatrix = pCamera->getTransform()->getMatrixWorldToLocal();
 		uint32_t visualObjectCount = pScene->getVisualObjectCount();
 
@@ -743,6 +749,12 @@ namespace vg
 		auto pDevice = pApp->getDevice();
 
 		auto projMatrix = pCamera->getProjMatrix();
+
+		if (pScene->getIsRightHand() == VG_FALSE)
+		{
+			projMatrix[1][1] *= -1;
+		}
+
 		auto viewMatrix = pCamera->getTransform()->getMatrixWorldToLocal();
 
 		uint32_t visualObjectCount = pScene->getVisualObjectCount();

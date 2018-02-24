@@ -19,6 +19,6 @@ namespace vg
 			, -(max.y + min.y) / (max.y - min.y)
 			, -min.z / (max.z - min.z)
 		    , 1.0f };
-		m_projMatrix[1][1] *= -1;
+		// m_projMatrix[1][1] *= -1;
 	}
 } //namespace kgs

@@ -16,8 +16,13 @@ namespace vg
 	public:
 		BaseScene();
 		SpaceType getSpaceType() const;
+		Bool32 getIsRightHand() const;
+		Bool32 getIsLeftHand() const;
+		void setIsRightHand(Bool32 isRightHand);
+		void setIsLeftHand(Bool32 isLeftHand);
 	protected:
 	    SpaceType m_spaceType;
+		Bool32 m_isRightHand;
 	};
 
 	template <SpaceType SPACE_TYPE>

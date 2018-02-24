@@ -400,7 +400,7 @@ namespace vgf {
 #endif
 		_onUpdate();
 #ifdef USE_IMGUI_BIND
-		vgim::updateFromImGUI();
+		vgim::updateImGUIRender();
 #endif
 		_onPostUpdate();
 	}

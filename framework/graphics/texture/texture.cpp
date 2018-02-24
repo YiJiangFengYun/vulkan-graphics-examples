@@ -551,6 +551,14 @@ namespace vg
 
 	void Texture::_setPixels32(const void* colors, uint32_t size, uint32_t layer, uint32_t mipLevel)
 	{
+		_resizeColorsData(mipLevel);
+#ifdef DEBUG
+		if (layer >= m_arrayLayer)
+		{
+			LOG(plog::warning) << "Invalid layer.";
+			return;
+		}
+#endif // DEBUG
 		uint32_t width = caculateImageSizeWithMipmapLevel(m_width, mipLevel);
 		uint32_t height = caculateImageSizeWithMipmapLevel(m_height, mipLevel);
 		uint32_t depth = caculateImageSizeWithMipmapLevel(m_depth, mipLevel);

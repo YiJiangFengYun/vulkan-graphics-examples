@@ -5,13 +5,7 @@
 
 namespace vgim {
 	extern Bool32 getInited();
-	extern void updateIMGUI(uint32_t canvasWidth
-        , uint32_t canvasHeight
-        , double currTime
-        , float mouseX
-        , float mouseY
-		, Bool32 mouseDown[3]
-		);
+	extern void moduleCreate(uint32_t canvasWidth, uint32_t canvasHeight);
 	extern void moduleDestory();
 	extern uint32_t getCanvasWidth();
 	extern uint32_t getCanvasHeight();
@@ -22,7 +16,13 @@ namespace vgim {
 	extern const std::shared_ptr<vg::Scene2> getScene();
 	extern void setShaderPath(const std::string &vertShaderPath, const std::string &fragShaderPat);
 	extern void setShader(const std::shared_ptr<vg::Shader> pShader);
-	extern void updateIMGUI(uint32_t canvasWidth, uint32_t canvasHeight);	
-	extern void updateFromImGUI();
+	extern void updateIMGUI(uint32_t canvasWidth
+        , uint32_t canvasHeight
+        , double currTime
+        , float mouseX
+        , float mouseY
+		, Bool32 mouseDown[3]
+		);	
+	extern void updateImGUIRender();
 } //vgim
 #endif //VG_IM_MODULE_H

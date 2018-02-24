@@ -46,6 +46,7 @@ namespace vgf {
 
 		while (m_pWindow->windowShouldClose() == VGF_FALSE)
 		{
+			glfwPollEvents();			
 			//remove closed child(sub) windows.
 			m_pSubWindows.erase(std::remove_if(m_pSubWindows.begin(), m_pSubWindows.end(), [](const std::shared_ptr<Window>& item) {
 				return item->windowShouldClose();
@@ -67,7 +68,6 @@ namespace vgf {
 				pSubWindow->run();
 			};
 			vg::pApp->getDevice()->waitIdle();
-			glfwPollEvents();
 		}
 	}
 

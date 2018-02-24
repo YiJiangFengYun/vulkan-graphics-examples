@@ -312,21 +312,25 @@ namespace vg
             m_pMemory = nullptr;
             m_memorySize = 0;
         }
-        if (cacheMemory) {
-            if (m_pMemory == nullptr) {
-                m_pMemory = malloc(size);
-                m_memorySize = size;                
-            }
-            uint32_t count = memories.size();
-            uint32_t offset = 0;
-            uint32_t size = 0;
-            for (uint32_t i = 0; i < count; ++i) {
-                offset = (*(memories.data() + i)).offset;
-                size = (*(memories.data() + i)).size;
-                memcpy(((char*)m_pMemory + offset), (*(memories.data() + i)).pMemory, size);
-            }                     
-        }
-        _createBuffer(memories, size);
+
+		if (size)
+		{
+			if (cacheMemory) {
+				if (m_pMemory == nullptr) {
+					m_pMemory = malloc(size);
+					m_memorySize = size;
+				}
+				uint32_t count = memories.size();
+				uint32_t offset = 0;
+				uint32_t size = 0;
+				for (uint32_t i = 0; i < count; ++i) {
+					offset = (*(memories.data() + i)).offset;
+					size = (*(memories.data() + i)).size;
+					memcpy(((char*)m_pMemory + offset), (*(memories.data() + i)).pMemory, size);
+				}
+			}
+			_createBuffer(memories, size);
+		}
     }
 
     Bool32 VertexData::_isDeviceMemoryLocal() const
@@ -375,7 +379,10 @@ namespace vg
                 ranges[i].offset = offset;
                 ranges[i].size = size;
             }
-            pDevice->flushMappedMemoryRanges(ranges);
+            if (count)
+            {
+                pDevice->flushMappedMemoryRanges(ranges);                
+            }
 		    pDevice->unmapMemory(*pStagingBufferMemory);
     
 		    //create vertex buffer
@@ -452,8 +459,11 @@ namespace vg
                 ranges[i].offset = offset;
                 ranges[i].size = size;
             }
-		    auto pDevice = pApp->getDevice();            
-            pDevice->flushMappedMemoryRanges(ranges);
+		    auto pDevice = pApp->getDevice();
+            if (count)
+            {
+                pDevice->flushMappedMemoryRanges(ranges);                
+            }         
         }
 		
     }

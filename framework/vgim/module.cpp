@@ -83,6 +83,7 @@ namespace vgim
     void _destroyScene();
     void _initImGui();
     void _createFontTexture();
+    void _destroyFontTexture();
 
 	void moduleCreate(uint32_t canvasWidth, uint32_t canvasHeight)
 	{
@@ -96,6 +97,7 @@ namespace vgim
         _createCamera();
         _createScene();
         _initImGui();
+        _createFontTexture();
         
 		//Indicate module was initialized.
 		inited = VG_IM_TRUE;
@@ -105,6 +107,7 @@ namespace vgim
 	{
 		inited = VG_IM_FALSE;
 
+        _destroyFontTexture();
         _destroyScene();
         _destroyCamera();      
         _destroyUIObject();
@@ -141,11 +144,11 @@ namespace vgim
 
         // Start the frame. This call will update the io.WantCaptureMouse, io.WantCaptureKeyboard flag that you can use to dispatch inputs (or not) to your application.
         ImGui::NewFrame();
-        ImGui::Render();
     }
 
-    void updateFromImGUI()
+    void updateImGUIRender()
     {
+        ImGui::Render();        
         //update mesh
         auto drawData = ImGui::GetDrawData();
 		if (drawData == nullptr) return;
@@ -407,8 +410,16 @@ namespace vgim
             VG_FALSE, width, height));
         m_pFontTexture->setPixels32(reinterpret_cast<void *>(pixels), size);
         
-        io.Fonts->TexID = reinterpret_cast<void *>(reinterpret_cast<intptr_t>(VkImage(*(m_pFontTexture->getImage()))));
+        io.Fonts->TexID = reinterpret_cast<void *>(VkImage(*(m_pFontTexture->getImage())));
 
         m_pPass->setMainTexture(m_pFontTexture);
-    }    
+    }
+
+    void _destroyFontTexture()
+    {
+        ImGuiIO& io = ImGui::GetIO();
+        io.Fonts->TexID = reinterpret_cast<void *>(0);        
+        m_pPass->setMainTexture(nullptr);        
+        m_pFontTexture = nullptr;
+    }  
 } //vgim

@@ -1,8 +1,13 @@
 set_property(GLOBAL PROPERTY USE_FOLDERS ON)
 set(FOLDER_NAME "libs")
 
+# Overriding some glfw default options.
+SET(GLFW_BUILD_EXAMPLES OFF CACHE BOOL "Build the GLFW example programs")
+SET(GLFW_BUILD_TESTS OFF CACHE BOOL "Build the GLFW test programs")
+SET(GLFW_BUILD_DOCS OFF CACHE BOOL "Build the GLFW documentation")
 # glfw generation
 add_subdirectory(glfw)
+
 set(LIBRARIES ${LIBRARIES} glfw)
 
 # imgui generation

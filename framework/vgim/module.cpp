@@ -265,7 +265,7 @@ namespace vgim
         m_pShader = std::shared_ptr<vg::Shader>(new vg::Shader());
 		m_pPass = std::shared_ptr<vg::Pass>(new vg::Pass(m_pShader));
 
-        // m_pPass->setCullMode(vg::CullModeFlagBits::NONE);
+        m_pPass->setFrontFace(vg::FrontFaceType::CLOCKWISE);
 
         //push constant
         // m_pPass->setPushConstantRange("default", vk::ShaderStageFlagBits::eVertex, static_cast<uint32_t>(sizeof(float) * 0), static_cast<uint32_t>(sizeof(float) * 4));

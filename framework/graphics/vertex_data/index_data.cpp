@@ -163,6 +163,7 @@ namespace vg
         if (size == 0u) {
             size = 1u;
             m_subDatas.resize(1u);
+            m_subDataCount = static_cast<uint32_t>(size);
         };
         Bool32 isChange = VG_FALSE;
         for (size_t i = 0u; i < size; ++i) 
@@ -206,6 +207,7 @@ namespace vg
         if (size == 0u) {
             size = 1u;
             m_subDatas.resize(1u);
+            m_subDataCount = static_cast<uint32_t>(size);            
         };
         Bool32 isChange = VG_FALSE;
         for (size_t i = 0u; i < size; ++i) 
@@ -232,6 +234,7 @@ namespace vg
     void IndexData::updateSubDataCount(uint32_t count)
     {
         m_subDatas.resize(count);
+        m_subDataCount = static_cast<uint32_t>(m_subDatas.size());      
     }
 
     void IndexData::updateIndexCount(fd::ArrayProxy<uint32_t> indexCounts, uint32_t count, uint32_t offset)

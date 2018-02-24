@@ -714,10 +714,20 @@ namespace vg
 			{
 				for (uint32_t passIndex = 0u; passIndex < passCount; ++passIndex)
 				{
-					std::shared_ptr<vk::Pipeline> pPipeline;
-					_createPipelineForObj(pPipeline, pMesh, pMaterial, subMeshIndex + subMeshOffset, passIndex);
-					_recordCommandBufferForObj(pPipeline, pMesh, pMaterial, subMeshIndex + subMeshOffset, passIndex);
-					++drawIndex;
+					auto pPass = pMaterial->getPassWithIndex(passIndex);
+					auto pShader = pPass->getShader();
+					auto stageInfos = pShader->getShaderStageInfos();
+					if (stageInfos.size() != 0)
+					{
+						std::shared_ptr<vk::Pipeline> pPipeline;
+						_createPipelineForObj(pPipeline, pMesh, pMaterial, subMeshIndex + subMeshOffset, passIndex);
+						_recordCommandBufferForObj(pPipeline, pMesh, pMaterial, subMeshIndex + subMeshOffset, passIndex);
+						++drawIndex;
+					}
+					else
+					{
+						LOG(plog::warning) << "No one valid shader module for pass. Pass ID: " << pPass->getID() << std::endl;
+					}
 				}
 			}
 		}
@@ -873,10 +883,20 @@ namespace vg
 				{
 					for (uint32_t passIndex = 0u; passIndex < passCount; ++passIndex)
 					{
-						std::shared_ptr<vk::Pipeline> pPipeline;
-						_createPipelineForObj(pPipeline, pMesh, pMaterial, subMeshIndex + subMeshOffset, passIndex);
-						_recordCommandBufferForObj(pPipeline, pMesh, pMaterial, subMeshIndex + subMeshOffset, passIndex);
-						++drawIndex;
+						auto pPass = pMaterial->getPassWithIndex(passIndex);
+						auto pShader = pPass->getShader();
+						auto stageInfos = pShader->getShaderStageInfos();
+						if (stageInfos.size() != 0)
+						{
+							std::shared_ptr<vk::Pipeline> pPipeline;
+							_createPipelineForObj(pPipeline, pMesh, pMaterial, subMeshIndex + subMeshOffset, passIndex);
+							_recordCommandBufferForObj(pPipeline, pMesh, pMaterial, subMeshIndex + subMeshOffset, passIndex);
+							++drawIndex;
+						}
+						else
+						{
+							LOG(plog::warning) << "No one valid shader module for pass. Pass ID: " << pPass->getID() << std::endl;
+						}
 					}
 				}
 			}

@@ -3,6 +3,10 @@
 namespace vg
 {
 	BaseVisualObject::BaseVisualObject()
+	    : m_pMaterial()
+		, m_pMesh()
+		, m_subMeshOffset(0u)
+		, m_subMeshCount(-1)
 	{
 
 	}
@@ -29,13 +33,17 @@ namespace vg
 		
 	uint32_t BaseVisualObject::getSubMeshCount() const
 	{
-		return m_subMeshCount;
+		if (m_subMeshCount < 0) {
+		    return dynamic_cast<ContentMesh *>(m_pMesh.get())->getSubMeshCount();
+		} else {
+            return m_subMeshCount;
+		}
 	}
 
 	void BaseVisualObject::updateSubMeshInfo(uint32_t subMeshOffset, uint32_t subMeshCount)
 	{
 		m_subMeshOffset = subMeshOffset;
-		m_subMeshCount = subMeshCount;
+		m_subMeshCount = static_cast<int32_t>(subMeshCount);
 	}
 
 } //namespace kgs

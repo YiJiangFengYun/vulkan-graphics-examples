@@ -67,23 +67,35 @@ namespace vg
 
 	std::vector<vk::PipelineShaderStageCreateInfo> Shader::getShaderStageInfos() const
 	{
-		std::vector<vk::PipelineShaderStageCreateInfo> shaderStages = {
-			{
-			    vk::PipelineShaderStageCreateFlags(),
-			    vk::ShaderStageFlagBits::eVertex,
-			    *m_pVertShaderModule,
-			    "main"
-		    },
-			{
-				vk::PipelineShaderStageCreateFlags(),
-			    vk::ShaderStageFlagBits::eFragment,
-			    *m_pFragShaderModule,
-			    "main"
-			}
-		};
+		uint32_t count = 0u;
+		if (m_pVertShaderModule != nullptr)
+		{
+			++count;
+		}
+		if (m_pFragShaderModule != nullptr)
+		{
+			++count;
+		}
 
+		std::vector<vk::PipelineShaderStageCreateInfo> shaderStages(count);
+		count = 0u;
+		if (m_pVertShaderModule != nullptr)
+		{
+			shaderStages[count].flags = vk::PipelineShaderStageCreateFlags();
+			shaderStages[count].stage = vk::ShaderStageFlagBits::eVertex;
+			shaderStages[count].module = *m_pVertShaderModule;
+			shaderStages[count].pName = "main";
+			++count;
+		}
+		if (m_pFragShaderModule != nullptr)
+		{
+			shaderStages[count].flags = vk::PipelineShaderStageCreateFlags();
+			shaderStages[count].stage = vk::ShaderStageFlagBits::eFragment;
+			shaderStages[count].module = *m_pFragShaderModule;
+			shaderStages[count].pName = "main";
+			++count;
+		}
 		return shaderStages;
-
 	}
 
 	std::shared_ptr<vk::ShaderModule> Shader::_createShaderModule(const std::vector<char>& code)

@@ -28,7 +28,7 @@ namespace vg
 		std::shared_ptr<Material> m_pMaterial;
 		std::shared_ptr<BaseMesh> m_pMesh;
 		uint32_t m_subMeshOffset;
-		uint32_t m_subMeshCount;
+		int32_t m_subMeshCount;
 	};
 
 	template <SpaceType SPACE_TYPE>
@@ -49,7 +49,7 @@ namespace vg
 		{
 			m_pMesh = pMesh;
 			m_subMeshOffset = 0u;
-			m_subMeshCount = dynamic_cast<ContentMesh *>(pMesh.get())->getSubMeshCount();
+			m_subMeshCount = -1;
 		}
 
 		void setMesh(std::shared_ptr<MeshDimType> pMesh

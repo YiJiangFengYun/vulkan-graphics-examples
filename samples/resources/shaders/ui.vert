@@ -24,10 +24,24 @@ out gl_PerVertex
 	vec4 gl_Position;   
 };
 
+vec3 positions[3] = vec3[](
+    vec3(0.0, -0.5, 0.0),
+    vec3(0.5, 0.5, 0.0),
+    vec3(-0.5, 0.5, 0.0)
+);
+
+vec4 colors[3] = vec4[](
+    vec4(1.0, 1.0, 0.0, 1.0),
+    vec4(1.0, 1.0, 0.0, 1.0),
+    vec4(0.0, 0.0, 1.0, 1.0)
+);
+
 void main() 
 {
 	outUV = inUV;
     outColor = _buildIn.mainColor * inColor;
+    // outColor = colors[gl_VertexIndex % 3];
 	gl_Position = _buildIn.matrixObjectToNDC * vec4(inPos, 0.0, 1.0);
 	// gl_Position = vec4(inPos * pushConstants.scale + pushConstants.translate, 0.0, 1.0);
+    // gl_Position = vec4(positions[gl_VertexIndex % 3], 1.0);
 }

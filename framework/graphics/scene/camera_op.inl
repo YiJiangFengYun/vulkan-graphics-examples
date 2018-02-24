@@ -18,7 +18,6 @@ namespace vg
 	void CameraOP<SPACE_TYPE>::updateProj(BoundsType viewBounds)
 	{
 		m_viewBounds = viewBounds;
-		apply();
 	}
 
 	template <SpaceType SPACE_TYPE>

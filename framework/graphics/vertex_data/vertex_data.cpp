@@ -157,8 +157,12 @@ namespace vg
         size_t size = m_subDatas.size();
         if (size == 0u) {
             size = 1u;
-            m_subDatas.resize(1u);
-             m_subDataCount = size;
+			auto &subDatas = m_subDatas;
+            subDatas.resize(1u);
+            m_subDataCount = size;
+			auto &inputInfo = subDatas[0].vertexInputStateInfo;
+			inputInfo.pVertexBindingDescriptions = subDatas[0].bindingDescs.data();
+			inputInfo.pVertexAttributeDescriptions = subDatas[0].attrDescs.data();
         };
         Bool32 isChange = VG_FALSE;
         for (size_t i = 0u; i < size; ++i) 
@@ -198,8 +202,12 @@ namespace vg
         size_t size = m_subDatas.size();
         if (size == 0u) {
             size = 1u;
-            m_subDatas.resize(1u);
-             m_subDataCount = size;
+			auto &subDatas = m_subDatas;
+            subDatas.resize(1u);
+            m_subDataCount = size;
+			auto &inputInfo = subDatas[0].vertexInputStateInfo;
+			inputInfo.pVertexBindingDescriptions = subDatas[0].bindingDescs.data();
+			inputInfo.pVertexAttributeDescriptions = subDatas[0].attrDescs.data();
         };
         Bool32 isChange = VG_FALSE;
         for (size_t i = 0u; i < size; ++i) 
@@ -246,8 +254,15 @@ namespace vg
 
     void  VertexData::updateSubDataCount(uint32_t count)
     {
-        m_subDatas.resize(count);
+		auto &subDatas = m_subDatas;
+        subDatas.resize(count);
         m_subDataCount = count;
+		for (uint32_t i = 0; i < count; ++i)
+		{
+			auto &inputInfo = subDatas[i].vertexInputStateInfo;
+			inputInfo.pVertexBindingDescriptions = subDatas[i].bindingDescs.data();
+			inputInfo.pVertexAttributeDescriptions = subDatas[i].attrDescs.data();
+		}
     }
 
     void VertexData::updateVertexCount(fd::ArrayProxy<uint32_t> vertexCounts, uint32_t count, uint32_t offset)

@@ -361,7 +361,6 @@ namespace vg
 			throw std::runtime_error("Failed to find a suitable GPU!");
 		}
 
-		const auto& deviceExtensions = deviceExtensionNames;
 		std::sort(physicalDevices.begin(), physicalDevices.end(),
 			[&](const vk::PhysicalDevice& physicalDevice1, const vk::PhysicalDevice& physicalDevice2) {
 			int32_t result = 0;

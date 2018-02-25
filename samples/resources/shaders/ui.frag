@@ -13,4 +13,5 @@ void main()
 {
 	outColor = inColor * texture(texSampler, inUV);
 	// outColor = inColor;
+	// outColor = vec4(1.0, 1.0, 1.0, 0.3);
 }

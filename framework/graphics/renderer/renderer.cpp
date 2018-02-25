@@ -438,19 +438,19 @@ namespace vg
 		m_pCommandBuffer->bindDescriptorSets(vk::PipelineBindPoint::eGraphics, *pPipelineLayout, 0u, descriptorSets, nullptr);
 
         vertexDataToCommandBuffer(*m_pCommandBuffer, pVertexData, subIndexData.vertexDataIndex);
-		indexDataToCommandBuffer(*m_pCommandBuffer, pIndexData);
+		indexDataToCommandBuffer(*m_pCommandBuffer, pIndexData, subMeshIndex);
 
 		uint32_t indexOffset = 0u;
-		for (uint32_t i = 0; i < subMeshIndex; ++i)
-		{
-			indexOffset += subIndexDatas[i].indexCount;
-		}
+		// for (uint32_t i = 0; i < subMeshIndex; ++i)
+		// {
+		// 	indexOffset += subIndexDatas[i].indexCount;
+		// }
 
 		uint32_t vertexOffset = 0u;
-		for (uint32_t i = 0; i < subIndexData.vertexDataIndex; ++i)
-		{
-			vertexOffset += subVertexDatas[i].vertexCount;
-		}
+		// for (uint32_t i = 0; i < subIndexData.vertexDataIndex; ++i)
+		// {
+		// 	vertexOffset += subVertexDatas[i].vertexCount;
+		// }
 
 		m_pCommandBuffer->drawIndexed(subIndexData.indexCount, 1u, indexOffset, vertexOffset, 0u);
 		//m_pCommandBuffer->draw(3, 1, 0, 0);

@@ -30,7 +30,7 @@ namespace vg
         )
     {
         uint32_t offset = 0u;
-        auto subIndexDatas = pIndexData->getSubIndexDatas();
+        const auto &subIndexDatas = pIndexData->getSubIndexDatas();
 		for (uint32_t i = 0; i < subIndex; ++i)
 		{
 			offset += subIndexDatas[i].bufferSize;

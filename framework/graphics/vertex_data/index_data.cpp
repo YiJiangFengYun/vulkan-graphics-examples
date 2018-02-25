@@ -45,7 +45,7 @@ namespace vg
 
     IndexData::IndexData(MemoryPropertyFlags bufferMemoryPropertyFlags)
         : Base(BaseType::INDEX_DATA)
-        , m_bufferMemoryPropertyFlags()
+        , m_bufferMemoryPropertyFlags(bufferMemoryPropertyFlags)
         , m_subDatas()
         , m_subDataCount()
         , m_bufferSize()

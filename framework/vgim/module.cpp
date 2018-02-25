@@ -171,8 +171,6 @@ namespace vgim
         std::vector<vg::MemorySlice> vertexSlices(cmdListCount);
         std::vector<vg::MemorySlice> indexSlices(cmdListCount);
 
-        uint32_t vertexOffset = 0u;
-        uint32_t indexOffset = 0u;
         uint32_t vertexSubDataCount = cmdListCount;
         uint32_t indexSubDataCount = 0u;                
         for (uint32_t i = 0; i < cmdListCount; ++i)
@@ -189,6 +187,8 @@ namespace vgim
         std::vector<fd::Rect2D> indexRects(indexSubDataCount);
         vertexSubDataCount = 0u;
         indexSubDataCount = 0u;
+        uint32_t vertexOffset = 0u;
+        uint32_t indexOffset = 0u;
         for (uint32_t i = 0; i < cmdListCount; ++i)
         {
             const ImDrawList* cmdList = drawData->CmdLists[i];
@@ -201,7 +201,7 @@ namespace vgim
             indexSlices[i].pMemory = cmdList->IdxBuffer.Data;
 
             vertexOffset += vertexSlices[i].size;
-            indexOffset += vertexSlices[i].size;
+            indexOffset += indexSlices[i].size;
 
             vertexCounts[vertexSubDataCount] = static_cast<uint32_t>(cmdList->VtxBuffer.Size);
             vertexBufferSizes[vertexSubDataCount] = vertexCounts[vertexSubDataCount] * static_cast<uint32_t>(sizeof(ImDrawVert));
@@ -231,10 +231,14 @@ namespace vgim
         pIndexData->updateBuffer(indexSlices, indexSize, VG_FALSE);
 
         pVertexData->updateSubDataCount(vertexSubDataCount);
+		const auto &firstSubVertexData = pVertexData->getSubVertexDatas()[0];
+		pVertexData->updateDesData(firstSubVertexData.vertexInputStateInfo);
         pVertexData->updateVertexCount(vertexCounts, vertexSubDataCount);
         pVertexData->updateBufferSize(vertexBufferSizes, vertexSubDataCount);
 
         pIndexData->updateSubDataCount(indexSubDataCount);
+		const auto &firstSubIndexData = pIndexData->getSubIndexDatas()[0];
+		pIndexData->updateDesData(firstSubIndexData.indexType, firstSubIndexData.inputAssemblyStateInfo);
         pIndexData->updateIndexCount(indexCounts, indexSubDataCount);
         pIndexData->updateBufferSize(indexBufferSizes, indexSubDataCount);
         pIndexData->updateVertexDataIndex(indexVertexDataIndices, indexSubDataCount);

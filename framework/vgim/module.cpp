@@ -231,19 +231,24 @@ namespace vgim
         pIndexData->updateBuffer(indexSlices, indexSize, VG_FALSE);
 
         pVertexData->updateSubDataCount(vertexSubDataCount);
-		const auto &firstSubVertexData = pVertexData->getSubVertexDatas()[0];
-		pVertexData->updateDesData(firstSubVertexData.vertexInputStateInfo);
-        pVertexData->updateVertexCount(vertexCounts, vertexSubDataCount);
-        pVertexData->updateBufferSize(vertexBufferSizes, vertexSubDataCount);
+		if (vertexSubDataCount)
+		{
+			const auto &firstSubVertexData = pVertexData->getSubVertexDatas()[0];
+			pVertexData->updateDesData(firstSubVertexData.vertexInputStateInfo);
+			pVertexData->updateVertexCount(vertexCounts, vertexSubDataCount);
+			pVertexData->updateBufferSize(vertexBufferSizes, vertexSubDataCount);
+		}
 
         pIndexData->updateSubDataCount(indexSubDataCount);
-		const auto &firstSubIndexData = pIndexData->getSubIndexDatas()[0];
-		pIndexData->updateDesData(firstSubIndexData.indexType, firstSubIndexData.inputAssemblyStateInfo);
-        pIndexData->updateIndexCount(indexCounts, indexSubDataCount);
-        pIndexData->updateBufferSize(indexBufferSizes, indexSubDataCount);
-        pIndexData->updateVertexDataIndex(indexVertexDataIndices, indexSubDataCount);
-        pIndexData->updateClipRect(indexRects, indexSubDataCount);
-
+		if (indexSubDataCount)
+		{
+			const auto &firstSubIndexData = pIndexData->getSubIndexDatas()[0];
+			pIndexData->updateDesData(firstSubIndexData.indexType, firstSubIndexData.inputAssemblyStateInfo);
+			pIndexData->updateIndexCount(indexCounts, indexSubDataCount);
+			pIndexData->updateBufferSize(indexBufferSizes, indexSubDataCount);
+			pIndexData->updateVertexDataIndex(indexVertexDataIndices, indexSubDataCount);
+			pIndexData->updateClipRect(indexRects, indexSubDataCount);
+		}
         //update material
         // ImGuiIO& io = ImGui::GetIO();
         // float data[4];

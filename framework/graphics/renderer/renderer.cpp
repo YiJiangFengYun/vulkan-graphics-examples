@@ -236,7 +236,7 @@ namespace vg
 		//command buffer end
 		_recordCommandBufferForEnd();
 
-		auto pDevice = pApp->getDevice();
+		const auto &pDevice = pApp->getDevice();
 		pDevice->waitForFences(*m_waitFence, VK_TRUE, std::numeric_limits<uint64_t>::max());
 		pDevice->resetFences(*m_waitFence);
 		
@@ -468,7 +468,7 @@ namespace vg
 	void Renderer::_createSemaphore()
 	{
 		if (m_cachePSemaphore != nullptr) return;
-		auto pDevice = pApp->getDevice();
+		const auto &pDevice = pApp->getDevice();
 		vk::SemaphoreCreateInfo createInfo = {
 			vk::SemaphoreCreateFlags()
 		};
@@ -478,7 +478,7 @@ namespace vg
 	void Renderer::_createFence()
 	{
 		if (m_waitFence != nullptr) return;
-		auto pDevice = pApp->getDevice();
+		const auto &pDevice = pApp->getDevice();
 		vk::FenceCreateInfo createInfo;
 		createInfo.flags = vk::FenceCreateFlagBits::eSignaled;
 		m_waitFence = fd::createFence(pDevice, createInfo);
@@ -569,7 +569,7 @@ namespace vg
 			dependencies.data()
 		};
 
-		auto pDevice = pApp->getDevice();
+		const auto &pDevice = pApp->getDevice();
 		m_pRenderPass = fd::createRenderPass(pDevice, createInfo);
 	}
 
@@ -610,15 +610,15 @@ namespace vg
 			1u                                              //layers
 		};
 
-		auto pDevice = pApp->getDevice();
+		const auto &pDevice = pApp->getDevice();
 		m_pFrameBuffer = fd::createFrameBuffer(pDevice, createInfo);
 	}
 
 	void Renderer::_createCommandPool()
 	{
 		if (m_pCommandPool != nullptr) return;
-		auto pDevice = pApp->getDevice();
-		auto graphicsFamily = pApp->getGraphicsFamily();
+		const auto &pDevice = pApp->getDevice();
+		const auto &graphicsFamily = pApp->getGraphicsFamily();
 		vk::CommandPoolCreateInfo createInfo = {
 			vk::CommandPoolCreateFlagBits::eResetCommandBuffer,
 			graphicsFamily
@@ -636,7 +636,7 @@ namespace vg
 			1u                                         //commandBufferCount
 		};
 
-		auto pDevice = pApp->getDevice();
+		const auto &pDevice = pApp->getDevice();
 
 		LOG(plog::debug) << "Pre allocate command buffer from pool." << std::endl;
 		m_pCommandBuffer = fd::allocateCommandBuffer(pDevice, pCommandPool, allocateInfo);
@@ -651,7 +651,7 @@ namespace vg
 		resultInfo.isRendered = VG_TRUE;		
 
 		using SceneType = Scene<SpaceType::SPACE_2>;
-		auto pDevice = pApp->getDevice();
+		const auto &pDevice = pApp->getDevice();
 
 		auto projMatrix = pCamera->getProjMatrix();
 
@@ -746,7 +746,7 @@ namespace vg
 		resultInfo.isRendered = VG_TRUE;		
 
 		auto queueTypeCount = static_cast<uint32_t>(RenderQueueType::RANGE_SIZE);
-		auto pDevice = pApp->getDevice();
+		const auto &pDevice = pApp->getDevice();
 
 		auto projMatrix = pCamera->getProjMatrix();
 

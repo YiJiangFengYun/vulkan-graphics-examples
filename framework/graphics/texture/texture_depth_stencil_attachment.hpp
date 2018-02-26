@@ -29,8 +29,8 @@ namespace vg
 		inline void _checkDepthFormat()
 		{
 			_updateVkFormat();
-			auto pPhysicalDevice = pApp->getPhysicalDevice();
-			auto props = pPhysicalDevice->getFormatProperties(m_vkFormat);
+			const auto &pPhysicalDevice = pApp->getPhysicalDevice();
+			const auto &props = pPhysicalDevice->getFormatProperties(m_vkFormat);
 			if ((props.optimalTilingFeatures & vk::FormatFeatureFlagBits::eDepthStencilAttachment) !=
 				vk::FormatFeatureFlagBits::eDepthStencilAttachment)
 			{

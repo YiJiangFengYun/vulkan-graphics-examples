@@ -116,14 +116,14 @@ namespace vgf {
 
 	void Window::_createSurface()
 	{
-		auto pInstance = vg::pApp->getVKInstance();
+		const auto &pInstance = vg::pApp->getVKInstance();
 		m_pSurface = createSurface(pInstance, m_pWindow);
 		LOG(plog::debug) << "Create successfully surface.";
 	}
 
 	void Window::_createSwapchain()
 	{
-		auto pPhysicalDevice = vg::pApp->getPhysicalDevice();
+		const auto &pPhysicalDevice = vg::pApp->getPhysicalDevice();
 		vg::SwapChainSupportDetails details = vg::SwapChainSupportDetails::querySwapChainSupport(*pPhysicalDevice, *m_pSurface);
 		vk::SurfaceFormatKHR surfaceFormat = details.chooseSurfaceFormat();
 		vk::PresentModeKHR presentMode = details.choosePresentMode();
@@ -177,7 +177,7 @@ namespace vgf {
 			createInfo.pQueueFamilyIndices = queueFamilyIndices.data();
 		}
 
-		auto pDevice = vg::pApp->getDevice();
+		const auto &pDevice = vg::pApp->getDevice();
 		m_pSwapchain = fd::createSwapchainKHR(pDevice, createInfo);
 		LOG(plog::debug) << "Create successfully swapchain.";
 
@@ -271,7 +271,7 @@ namespace vgf {
 		vk::SemaphoreCreateInfo createInfo = {
 			vk::SemaphoreCreateFlags()
 		};
-		auto pDevice = vg::pApp->getDevice();
+		const auto &pDevice = vg::pApp->getDevice();
 		m_pImageAvailableSemaphore = fd::createSemaphore(pDevice, createInfo);
 		//m_pRenderFinishedSemaphore = fd::createSemaphore(m_pDevice, createInfo);
 	}
@@ -411,7 +411,7 @@ namespace vgf {
 		uint32_t imageIndex;
 		if (m_currImageIndex < 0)
 		{
-			auto pDevice = vg::pApp->getDevice();
+			const auto &pDevice = vg::pApp->getDevice();
 			VkResult result = vkAcquireNextImageKHR(static_cast<VkDevice>(*pDevice)
 				, static_cast<VkSwapchainKHR>(*m_pSwapchain)
 				, std::numeric_limits<uint64_t>::max()
@@ -524,10 +524,10 @@ namespace vgf {
 			vk::ImageLayout::eUndefined
 		};
 
-		auto pDevice = vg::pApp->getDevice();
+		const auto &pDevice = vg::pApp->getDevice();
 		pImage = fd::createImage(pDevice, createInfo);
 
-		auto memRequirements = pDevice->getImageMemoryRequirements(*pImage);
+		const auto &memRequirements = pDevice->getImageMemoryRequirements(*pImage);
 
 		vk::MemoryAllocateInfo allocInfo = {
 			memRequirements.size,
@@ -559,13 +559,13 @@ namespace vgf {
 				1u
 			}
 		};
-		auto pDevice = vg::pApp->getDevice();
+		const auto &pDevice = vg::pApp->getDevice();
 		return fd::createImageView(pDevice, createInfo);
 	}
 
 	uint32_t Window::_findMemoryType(uint32_t typeFilter, vk::MemoryPropertyFlags properties)
 	{
-		auto pPhysicalDevice = vg::pApp->getPhysicalDevice();
+		const auto &pPhysicalDevice = vg::pApp->getPhysicalDevice();
 		vk::PhysicalDeviceMemoryProperties memProperties = pPhysicalDevice->getMemoryProperties();
 		for (uint32_t i = 0; i < memProperties.memoryTypeCount; ++i)
 		{

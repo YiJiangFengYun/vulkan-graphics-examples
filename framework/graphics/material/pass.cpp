@@ -209,9 +209,9 @@ namespace vg
 			bufferSize = 0u;
 			return;
 		}
-		auto pPhysicalDevice = pApp->getPhysicalDevice();
-		auto properties = pPhysicalDevice->getProperties();
-		auto minOffsetAlignment = static_cast<float>(properties.limits.minUniformBufferOffsetAlignment);
+		const auto &pPhysicalDevice = pApp->getPhysicalDevice();
+		const auto &properties = pPhysicalDevice->getProperties();
+		const auto &minOffsetAlignment = static_cast<float>(properties.limits.minUniformBufferOffsetAlignment);
 		size = pMaterialData->getDataBaseSize(name) * descriptorCount;
 		bufferSize = static_cast<uint32_t>(std::ceil(size / minOffsetAlignment) * minOffsetAlignment);
 	}
@@ -683,7 +683,7 @@ namespace vg
 
 		if (bindingLayoutChanged)
 		{
-			auto pDevice = pApp->getDevice();
+			const auto &pDevice = pApp->getDevice();
 			//create descriptor set layout.
 			if (bindings.size())
 			{
@@ -723,7 +723,7 @@ namespace vg
 				pushConstantRanges.data()                    //pPushConstantRanges
 			};
 
-			auto pDevice = pApp->getDevice();
+			const auto &pDevice = pApp->getDevice();
 			m_pPipelineLayout = fd::createPipelineLayout(pDevice, pipelineLayoutCreateInfo);
 			_updatePipelineStateID();
 		}
@@ -763,7 +763,7 @@ namespace vg
 			mapTypeCounts[vkDescriptorType] += item.descriptorCount; //??? + 1.
 		}
 
-		auto pDevice = pApp->getDevice();
+		const auto &pDevice = pApp->getDevice();
 		//create descriptor pool.
 		{
 			std::vector<vk::DescriptorPoolSize> poolSizeInfos(mapTypeCounts.size());
@@ -847,7 +847,7 @@ namespace vg
 
 		if (writes.size())
 		{
-			auto pDevice = pApp->getDevice();
+			const auto &pDevice = pApp->getDevice();
 			pDevice->updateDescriptorSets(writes, nullptr);
 		}
 	}
@@ -896,7 +896,7 @@ namespace vg
 			}
 		}
 
-		auto pDevice = pApp->getDevice();
+		const auto &pDevice = pApp->getDevice();
 		pDevice->updateDescriptorSets(writes, nullptr);
 	}
 
@@ -935,7 +935,7 @@ namespace vg
 			}
 			//sync buffer data.
 			void *data;
-			auto pDevice = pApp->getDevice();
+			const auto &pDevice = pApp->getDevice();
 			pDevice->mapMemory(*m_pUniformBufferMemory, 0, static_cast<vk::DeviceSize>(totalSize), vk::MemoryMapFlags(), &data);
 			for (int32_t i = 0; i < uniformBufferCount; ++i)
 			{
@@ -954,7 +954,7 @@ namespace vg
 			vk::SharingMode::eExclusive
 		};
 
-		auto pDevice = pApp->getDevice();
+		const auto &pDevice = pApp->getDevice();
 		pBuffer = fd::createBuffer(pDevice, createInfo);
 
 		vk::MemoryRequirements memReqs = pDevice->getBufferMemoryRequirements(*pBuffer);

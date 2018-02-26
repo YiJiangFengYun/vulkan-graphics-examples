@@ -341,10 +341,10 @@ namespace vg
 			imageLayout
 		};
 
-		auto pDevice = pApp->getDevice();
+		const auto &pDevice = pApp->getDevice();
 		m_pImage = fd::createImage(pDevice, createInfo);
 
-		auto memRequirements = pDevice->getImageMemoryRequirements(*m_pImage);
+		const auto &memRequirements = pDevice->getImageMemoryRequirements(*m_pImage);
 
 		vk::MemoryAllocateInfo allocInfo = {
 			memRequirements.size,
@@ -423,7 +423,7 @@ namespace vg
 			}
 		};
 
-		auto pDevice = pApp->getDevice();
+		const auto &pDevice = pApp->getDevice();
 		m_pImageView = fd::createImageView(pDevice, createInfo);
 	}
 
@@ -449,7 +449,7 @@ namespace vg
 			VkBool32(VK_FALSE)                       //unnormalizedCoordinates
 		};
 
-		auto pDevice = pApp->getDevice();
+		const auto &pDevice = pApp->getDevice();
 		m_pSampler = fd::createSampler(pDevice, createInfo);
 	}
 
@@ -589,7 +589,7 @@ namespace vg
 
 	void Texture::_applyWithGenMipMap()
 	{
-		auto pDevice = pApp->getDevice();
+		const auto &pDevice = pApp->getDevice();
 		auto pCommandBuffer = beginSingleTimeCommands();
 		//create first level image data using staging buffer.
 		if (m_arrTempColors.size() == 0)
@@ -620,8 +620,8 @@ namespace vg
 
 #ifdef DEBUG
 		//check format.
-		auto pPhysicalDevice = pApp->getPhysicalDevice();
-		auto formatProperties = pPhysicalDevice->getFormatProperties(m_vkFormat);
+		const auto &pPhysicalDevice = pApp->getPhysicalDevice();
+		const auto &formatProperties = pPhysicalDevice->getFormatProperties(m_vkFormat);
 		if ((formatProperties.optimalTilingFeatures & vk::FormatFeatureFlagBits::eBlitSrc) == vk::FormatFeatureFlags())
 		{
 			throw std::runtime_error("The texture format don't support for blit source, mip-chain generation requires it.");
@@ -684,7 +684,7 @@ namespace vg
 			throw std::runtime_error("Pixels data is not enough to create mipmap texture.");
 		}
 
-		auto pDevice = pApp->getDevice();
+		const auto &pDevice = pApp->getDevice();
 
 		//create image data using staging buffer mipmap level by mipmap level.
 		for (uint32_t i = 0; i < m_mipMapLevels; ++i)
@@ -742,7 +742,7 @@ namespace vg
 			vk::SharingMode::eExclusive
 		};
 
-		auto pDevice = pApp->getDevice();
+		const auto &pDevice = pApp->getDevice();
 		pBuffer = fd::createBuffer(pDevice, createInfo);
 
 		vk::MemoryRequirements memReqs = pDevice->getBufferMemoryRequirements(*pBuffer);

@@ -45,7 +45,7 @@ namespace vg
 			throw std::runtime_error("Validation layers requested is not available!");
 		}
 #endif // ENABLE_VALIDATION_LAYERS
-		vk::ApplicationInfo appInfo = { m_appName.data(), m_appVersion, m_engineName, m_engineVersion, VK_API_VERSION };
+		vk::ApplicationInfo appInfo = { m_appName.data(), m_appVersion, m_engineName.data(), m_engineVersion, VK_API_VERSION };
 
 		//query application required extensions.
 		auto requiredExtensions = _getRequiredExtensions();
@@ -110,42 +110,62 @@ namespace vg
 		_createCommandPool();
 	}
 
-	std::shared_ptr<vk::Instance> Application::getVKInstance()
+	std::string Application::getAppName() const
+	{
+		return m_appName;
+	}
+		
+	uint32_t Application::getAppVersion() const
+	{
+		return m_appVersion;
+	}
+
+	std::string Application::getEngineName() const
+	{
+		return m_engineName;
+	}
+		
+	uint32_t Application::getEngineVersion() const
+	{
+		return m_engineVersion;
+	}
+
+	const std::shared_ptr<vk::Instance> &Application::getVKInstance() const
 	{
 		return m_pInstance;
 	}
 
-	std::shared_ptr<vk::PhysicalDevice> Application::getPhysicalDevice()
+	const std::shared_ptr<vk::PhysicalDevice> &Application::getPhysicalDevice() const
 	{
 		return m_pPhysicalDevice;
 	}
 
-	std::shared_ptr<vk::Device> Application::getDevice()
+	const std::shared_ptr<vk::Device> &Application::getDevice() const
 	{
 		return m_pDevice;
 	}
 
-	uint32_t Application::getGraphicsFamily()
+	uint32_t Application::getGraphicsFamily() const
 	{
 		return m_graphicsFamily;
 	}
 
-	uint32_t Application::getPresentFamily()
+	uint32_t Application::getPresentFamily() const
 	{
 		return m_presentFamily;
 	}
 
-	std::shared_ptr<QueueMaster> Application::getQueueMaster()
+	const std::shared_ptr<QueueMaster> &Application::getQueueMaster() const
 	{
 		return m_pQueueMaster;
 	}
 
-	std::shared_ptr<vk::CommandPool> Application::getCommandPoolForTransientBuffer()
+	const std::shared_ptr<vk::CommandPool> &Application::getCommandPoolForTransientBuffer() const
 	{
 		return m_pCommandPoolForTransientBuffer;
 	}
 
-	std::shared_ptr<vk::CommandPool> Application::getCommandPoolForResetBuffer()
+	const std::shared_ptr<vk::CommandPool> &Application::getCommandPoolForResetBuffer() const
 	{
 		return m_pCommandPoolForResetBuffer;
 	}

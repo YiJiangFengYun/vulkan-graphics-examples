@@ -41,14 +41,20 @@ namespace vg
 			);
 
 		//gettor methods
-		std::shared_ptr<vk::Instance> getVKInstance();
-		std::shared_ptr<vk::PhysicalDevice> getPhysicalDevice();
-		std::shared_ptr<vk::Device> getDevice();
-		uint32_t getGraphicsFamily();
-		uint32_t getPresentFamily();
-		std::shared_ptr<QueueMaster> getQueueMaster();
-		std::shared_ptr<vk::CommandPool> getCommandPoolForTransientBuffer();
-		std::shared_ptr<vk::CommandPool> getCommandPoolForResetBuffer();
+
+        std::string getAppName() const;
+		uint32_t getAppVersion() const;
+		std::string getEngineName() const;
+		uint32_t getEngineVersion() const;
+
+		const std::shared_ptr<vk::Instance> &getVKInstance() const;
+		const std::shared_ptr<vk::PhysicalDevice> &getPhysicalDevice() const;
+		const std::shared_ptr<vk::Device> &getDevice() const;
+		uint32_t getGraphicsFamily() const;
+		uint32_t getPresentFamily() const;
+		const std::shared_ptr<QueueMaster> &getQueueMaster() const;
+		const std::shared_ptr<vk::CommandPool> &getCommandPoolForTransientBuffer() const;
+		const std::shared_ptr<vk::CommandPool> &getCommandPoolForResetBuffer() const;
 
 		void allocateGaphicsQueue(uint32_t &queueIndex, Queue &queue);
 		void allocatePresentQueue(uint32_t &queueIndex, Queue &queue);
@@ -60,7 +66,7 @@ namespace vg
 
 		std::string m_appName;
 		uint32_t m_appVersion;
-		const char* m_engineName;
+		std::string m_engineName;
 		uint32_t m_engineVersion;
 		std::shared_ptr<vk::Instance> m_pInstance;
 		std::shared_ptr<vk::PhysicalDevice> m_pPhysicalDevice;

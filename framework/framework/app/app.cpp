@@ -134,7 +134,7 @@ namespace vgf {
 
 	std::shared_ptr<vk::SurfaceKHR> App::_createVKSurface(std::shared_ptr<GLFWwindow> pWindow)
 	{
-		auto pInstance = vg::pApp->getVKInstance();
+		const auto &pInstance = vg::pApp->getVKInstance();
 		return createSurface(pInstance, pWindow);
 	}
 }

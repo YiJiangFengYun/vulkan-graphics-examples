@@ -100,7 +100,7 @@ namespace vg
 
 	std::shared_ptr<vk::ShaderModule> Shader::_createShaderModule(const std::vector<char>& code)
 	{
-		auto device = pApp->getDevice();
+		const auto &device = pApp->getDevice();
 
 		std::vector<uint32_t> codeAligned((code.size() - 1) / sizeof(uint32_t) + 1);
 		memcpy(codeAligned.data(), code.data(), code.size());
@@ -116,7 +116,7 @@ namespace vg
 
 	std::shared_ptr<vk::ShaderModule> Shader::_createShaderModule(const void* code, uint32_t size)
 	{
-		auto device = pApp->getDevice();
+		const auto &device = pApp->getDevice();
 
 		std::vector<uint32_t> codeAligned((size - 1) / sizeof(uint32_t) + 1);
 		memcpy(codeAligned.data(), code, size);
@@ -132,7 +132,7 @@ namespace vg
 
 	std::shared_ptr<vk::ShaderModule> Shader::_createShaderModule(const uint32_t* code, uint32_t size)
 	{
-		auto device = pApp->getDevice();
+		const auto &device = pApp->getDevice();
 
 		vk::ShaderModuleCreateInfo createInfo = {
 			vk::ShaderModuleCreateFlags(),

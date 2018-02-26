@@ -104,6 +104,41 @@ namespace sampleslib
 	void Window<SPACE_TYPE>::_onUpdate()
 	{
 		_updateCamera();
+		ImGui::SetNextWindowPos(ImVec2(10, 10));
+	    ImGui::SetNextWindowSize(ImVec2(0, 0));
+	    ImGui::Begin("Device Info", nullptr, ImGuiWindowFlags_AlwaysAutoResize | ImGuiWindowFlags_NoResize | ImGuiWindowFlags_NoMove);
+		const auto &physicalDevice = vg::pApp->getPhysicalDevice();
+		const auto &deviceProperties = physicalDevice->getProperties();
+	    ImGui::Text("Device Name: %s", deviceProperties.deviceName);
+
+		auto pos = ImGui::GetWindowPos();
+		auto size = ImGui::GetWindowSize();
+		ImGui::End();
+		ImGui::SetNextWindowPos(ImVec2(pos.x, pos.y + size.y + 10));
+	    ImGui::SetNextWindowSize(ImVec2(0, 0));
+	    ImGui::Begin("App Info", nullptr, ImGuiWindowFlags_AlwaysAutoResize | ImGuiWindowFlags_NoResize | ImGuiWindowFlags_NoMove);
+		const auto &appName = vg::pApp->getAppName();
+		ImGui::Text("App Name: %s", appName);
+		const auto &appVersion = vg::pApp->getAppVersion();
+		uint32_t appVersionMajor = VG_GET_VERSION_MAJOR(appVersion);
+		uint32_t appVersionMinor = VG_GET_VERSION_MINOR(appVersion);
+		uint32_t appVersionPatch = VG_GET_VERSION_PATCH(appVersion);
+		ImGui::Text("App Version: %d.%d.%d", appVersionMajor, appVersionMinor, appVersionPatch);
+		std::string vgfVesion = VGF_VERSION;
+		std::string vgfVesionMajor = VGF_VERSION_MAJOR;
+		std::string vgfVesionMinor = VGF_VERSION_MINOR;
+		std::string vgfVesionPatch = VGF_VERSION_PATCH;
+		std::string vgfVesionExtra = VGF_VERSION_EXTRA;
+		std::string vgfVesionFull = VGF_VERSION_FULL;
+		ImGui::Text("Framework Version: %s", VGF_VERSION_FULL);
+		const auto &engineName = vg::pApp->getEngineName();
+		ImGui::Text("Engine Name: %s", engineName);
+		const auto &engineVersion = vg::pApp->getEngineVersion();
+		uint32_t engineVersionMajor = VG_GET_VERSION_MAJOR(engineVersion);
+		uint32_t engineVersionMinor = VG_GET_VERSION_MINOR(engineVersion);
+		uint32_t engineVersionPatch = VG_GET_VERSION_PATCH(engineVersion);
+		ImGui::Text("Engine Version: %d.%d.%d", engineVersionMajor, engineVersionMinor, engineVersionPatch);
+		ImGui::End();
 	}
 
 	template <vg::SpaceType SPACE_TYPE>
@@ -151,4 +186,4 @@ namespace sampleslib
 
 		// vgf::Window::_renderWithRenderer(pRenderer, info, resultInfo);		
 	}
-}
+} //sampleslib

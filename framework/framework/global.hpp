@@ -10,7 +10,7 @@
 #include <foundation/foundation.hpp>
 #include <graphics/graphics.hpp>
 
-#include <VGFConfig.hpp>
+#include <framework/config.hpp>
 
 #ifdef USE_IMGUI_BIND
 #include <vgim/vgim.hpp>

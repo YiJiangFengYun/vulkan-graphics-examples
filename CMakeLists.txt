@@ -25,11 +25,6 @@ endif()
 option(USE_D2D_WSI "Build the project using Direct to Display swapchain" OFF)
 option(USE_WAYLAND_WSI "Build the project using Wayland swapchain" OFF)
 
-configure_file(
-	"${PROJECT_SOURCE_DIR}/VGFConfig.hpp.in"
-	"${PROJECT_BINARY_DIR}/VGFConfig.hpp"
-)
-
 set(PROJECT_DIR ${PROJECT_SOURCE_DIR})
 set(PROJECT_FRAMEWORK_DIR ${PROJECT_DIR}/framework)
 set(PROJECT_BIN_DIR ${PROJECT_DIR}/doc)
@@ -154,8 +149,9 @@ endif()
 
 
 # add the binary tree to the search path for include files
-# so that we will find VGFConfig.h
-include_directories("${PROJECT_BINARY_DIR}")
+# so that we will find config header files.
+set(PROJECT_CONFIG_HEADER_DIR "${PROJECT_BINARY_DIR}/config_headers")
+include_directories("${PROJECT_CONFIG_HEADER_DIR}")
 
 # global third party library include and link directories
 # include_directories("${LIBUV_DIR}/include")

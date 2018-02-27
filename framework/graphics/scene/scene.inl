@@ -254,17 +254,19 @@ namespace vg
 
 		//reconstruct hierarchy.
 		//connect between children and parent of target.
-		auto pTranform = pTarget->getTransform();
-		auto pParent = pTranform->getParent();
-		auto pos = pParent->getChildPos(pTranform.get());
+		auto pTransform = pTarget->getTransform();
+		auto pParent = pTransform->getParent();
+		auto pos = pParent->getChildPos(pTransform.get());
 		//copy chilren refs;
-		auto children = pTranform->getChildren();
+		auto children = pTransform->getChildren();
 		//first remove all chilren of target.
-		pTranform->detachChildren();
+		pTransform->detachChildren();
 		//insert to pos of parent before target
 		for (const auto& child : children)
 		{
 			pParent->addChild(child, pos);
 		}
+
+		pTransform->setParent(nullptr);
 	}
 } //namespace kgs

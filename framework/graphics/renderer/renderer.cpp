@@ -787,6 +787,12 @@ namespace vg
 				clipRect.y = (clipRect.y + 1.0f) / 2.0f;
 				clipRect.width = clipRect.width / 2.0f;
 				clipRect.height = clipRect.height / 2.0f;
+
+				if (pScene->getIsRightHand() == VG_FALSE)
+		        {
+		        	clipRect.y = 1.0f - clipRect.y - clipRect.height;
+		        }
+
 				const auto& pIndexData = dynamic_cast<ContentMesh *>(pMesh.get())->getIndexData();
 				uint32_t subMeshOffset = pVisualObject->getSubMeshOffset();
 				uint32_t subMeshCount = pVisualObject->getSubMeshCount();
@@ -953,7 +959,10 @@ namespace vg
 				clipRect.y = (clipRect.y + 1.0f) / 2.0f;
 				clipRect.width = clipRect.width / 2.0f;
 				clipRect.height = clipRect.height / 2.0f;
-				
+				if (pScene->getIsRightHand() == VG_FALSE)
+		        {
+		        	clipRect.y = 1.0f - clipRect.y - clipRect.height;
+		        }
 				const auto& pIndexData = dynamic_cast<ContentMesh *>(pMeshOfChild.get())->getIndexData();
 				uint32_t subMeshOffset = pVisualObjectOfChild->getSubMeshOffset();
 				uint32_t subMeshCount = pVisualObjectOfChild->getSubMeshCount();

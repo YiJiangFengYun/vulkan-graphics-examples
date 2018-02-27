@@ -16,7 +16,7 @@ if(SOURCES)
     install (FILES ${HEADERS} DESTINATION include)
 
     # Compile common shaders
-    set(COMMON_SHADER_NAMES "ui")
+    set(COMMON_SHADER_NAMES ${COMMON_SHADER_NAMES} "ui")
     if(COMMON_SHADER_NAMES)
         foreach(SHADER_NAME ${COMMON_SHADER_NAMES})
             file(GLOB 

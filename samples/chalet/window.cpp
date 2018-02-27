@@ -23,6 +23,9 @@ namespace chalet
 		_createTexture();
 		_createMaterial();
 		_createModel();
+		_createMeshOfBounds();
+		_createMaterialOfBounds();
+		_createModelOfBounds();
 	}
 
 	Window::Window(std::shared_ptr<GLFWwindow> pWindow
@@ -37,6 +40,9 @@ namespace chalet
 		_createTexture();
 		_createMaterial();
 		_createModel();
+		_createMeshOfBounds();
+		_createMaterialOfBounds();
+		_createModelOfBounds();
 	}
 
 	void Window::_loadModel()
@@ -147,8 +153,101 @@ namespace chalet
 		m_pScene->addVisualObject(m_pModel);
 	}
 
+	void Window::_createMeshOfBounds()
+	{
+        const auto &bounds = m_pMesh->getBounds();
+		auto min = bounds.getMin();
+		auto max = bounds.getMax();
+		uint32_t len = static_cast<uint32_t>(vg::Vector3::length());
+		uint32_t pointCount = static_cast<uint32_t>(std::pow(2u, len));
+		std::vector<vg::Vector3> points(pointCount);
+		std::vector<vg::Color32> colors(pointCount, vg::Color32(255, 255, 255, 255));
+		uint32_t pointIndex = 0u;
+		std::vector<vg::Bool32> places(len);
+		for (uint32_t i = 0; i <= len; ++i)
+		{
+			std::fill(places.begin(), places.end(), VG_FALSE);
+			std::fill(places.begin(), places.begin() + i, VG_TRUE);
+			do
+			{
+				uint32_t j;
+				for (j = 0; j < len; ++j)
+				{
+					if (places[j] == VG_TRUE)
+					{
+						points[pointIndex][j] = min[j];
+					}
+					else
+					{
+						points[pointIndex][j] = max[j];
+					}
+				}
+				++pointIndex;
+			} while (std::prev_permutation(places.begin(), places.end()));
+		}
+
+        //Calculate the indices of the mesh of the bounds.
+        uint32_t needSameDimCount = len - 1u;
+		std::vector<uint32_t> indices(2u * len * static_cast<uint32_t>(std::pow(2u, len - 1u)));
+		uint32_t indexOfIndices = 0u;
+		for (uint32_t i = 0; i < pointCount; ++i)
+		{
+			for (uint32_t j = i + 1; j < pointCount; ++j)
+			{
+		        uint32_t sameDimCount = 0u;
+				for (uint32_t d = 0; d < len; ++d)
+				{
+					if (points[i][d] == points[j][d])
+					{
+						++sameDimCount;
+					}
+				}
+
+				if (sameDimCount == needSameDimCount)
+				{
+					indices[indexOfIndices] = i;
+					++indexOfIndices;
+					indices[indexOfIndices] = j;
+					++indexOfIndices;
+				}
+			}
+		}
+
+        m_pMeshOfBounds = static_cast<std::shared_ptr<vg::DimSepMesh3>>(new vg::DimSepMesh3());
+		m_pMeshOfBounds->setVertexCount(pointCount);
+		m_pMeshOfBounds->setPositions(points);
+		m_pMeshOfBounds->setColors(colors);
+		m_pMeshOfBounds->setIndices(indices, vg::PrimitiveTopology::LINE_LIST, 0u);
+		m_pMeshOfBounds->apply(VG_TRUE);
+	}
+		
+	void Window::_createMaterialOfBounds()
+	{
+		m_pShaderOfBounds = std::shared_ptr<vg::Shader>(new vg::Shader("shaders/only_color.vert.spv", "shaders/only_color.frag.spv"));
+		m_pPassOfBounds = std::shared_ptr<vg::Pass>(new vg::Pass(m_pShaderOfBounds));
+		m_pPassOfBounds->setCullMode(vg::CullModeFlagBits::NONE);
+		vk::PipelineDepthStencilStateCreateInfo depthStencilStateInfo;
+		depthStencilStateInfo.depthTestEnable = VG_FALSE;
+		depthStencilStateInfo.depthWriteEnable = VG_FALSE;
+		depthStencilStateInfo.depthCompareOp = vk::CompareOp::eNever;
+		m_pPassOfBounds->setDepthStencilInfo(depthStencilStateInfo);
+		m_pMaterialOfBounds = std::shared_ptr<vg::Material>(new vg::Material());
+		m_pMaterialOfBounds->addPass(m_pPassOfBounds);
+		m_pMaterialOfBounds->setRenderPriority(0u);
+		m_pMaterialOfBounds->setRenderQueueType(vg::MaterialShowType::OPAQUE);
+	}
+
+	void Window::_createModelOfBounds()
+	{
+		m_pModelOfBounds = std::shared_ptr<vg::VisualObject3>(new vg::VisualObject3());
+		m_pModelOfBounds->setMesh(m_pMeshOfBounds);
+		m_pModelOfBounds->setMaterial(m_pMaterialOfBounds);
+		m_pScene->addVisualObject(m_pModelOfBounds);
+	}
+
 	void Window::_onUpdate()
 	{
+		ParentWindowType::_onUpdate();
 		static auto startTime = std::chrono::high_resolution_clock::now();
 
 		auto currentTime = std::chrono::high_resolution_clock::now();
@@ -156,8 +255,9 @@ namespace chalet
 		float time = std::chrono::duration_cast<std::chrono::milliseconds>(currentTime - startTime).count() / 1000.0f;
 
 		auto pTransform = m_pModel->getTransform();
-		//pTransform->rotateAround(kgs::Vector3(0.0f), kgs::Vector3(0.0f, 0.0f, 1.0f), glm::radians(90.0f) * time, kgs::Vector3(1.0f));
+		auto pTransformOfBounds = m_pModelOfBounds->getTransform();
 		pTransform->setLocalRotation(glm::angleAxis(glm::radians(90.0f) * time, vg::Vector3(0.0f, 0.0f, 1.0f)));
+		pTransformOfBounds->setLocalRotation(glm::angleAxis(glm::radians(90.0f) * time, vg::Vector3(0.0f, 0.0f, 1.0f)));
 
 		pTransform = m_pCamera->getTransform();
 		//pTransform->setLocalPosition(kgs::Vector3(2.0f, 2.0f, 2.0f));

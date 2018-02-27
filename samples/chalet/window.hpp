@@ -10,6 +10,7 @@ namespace chalet
 	class Window : public sampleslib::Window<vg::SpaceType::SPACE_3>
 	{
 	public:
+		typedef  sampleslib::Window<vg::SpaceType::SPACE_3> ParentWindowType;
 		struct Vertex
 		{
 			glm::vec3 pos;
@@ -42,12 +43,21 @@ namespace chalet
 		std::shared_ptr<vg::Shader> m_pShader;
 		std::shared_ptr<vg::Texture2D> m_pTexture;
 
+		std::shared_ptr<vg::VisualObject3> m_pModelOfBounds;
+		std::shared_ptr<vg::DimSepMesh3> m_pMeshOfBounds;
+		std::shared_ptr<vg::Material> m_pMaterialOfBounds;
+		std::shared_ptr<vg::Pass> m_pPassOfBounds;
+		std::shared_ptr<vg::Shader> m_pShaderOfBounds;
+
 
 		void _loadModel();
 		void _createMesh();
 		void _createTexture();
 		void _createMaterial();
 		void _createModel();
+		void _createMeshOfBounds();
+		void _createMaterialOfBounds();
+		void _createModelOfBounds();
 
 		virtual void _onUpdate() override;
 	};

@@ -109,17 +109,5 @@ namespace triangle
 	void Window::_onUpdate()
 	{
 		ParentWindowType::_onUpdate();
-		ImGui::PushStyleVar(ImGuiStyleVar_WindowRounding, 0);
-	    ImGui::SetNextWindowPos(ImVec2(10, 10));
-	    ImGui::SetNextWindowSize(ImVec2(0, 0), ImGuiSetCond_FirstUseEver);
-	    ImGui::Begin("Triangle", nullptr, ImGuiWindowFlags_AlwaysAutoResize | ImGuiWindowFlags_NoResize | ImGuiWindowFlags_NoMove);
-	    // ImGui::TextUnformatted(deviceProperties.deviceName);
-	    // ImGui::Text("ms/frame", "test");
-		if (ImGui::CollapsingHeader("Triangle", ImGuiTreeNodeFlags_DefaultOpen))
-		{
-
-		}
-		ImGui::End();
-		ImGui::PopStyleVar();
 	}
 }

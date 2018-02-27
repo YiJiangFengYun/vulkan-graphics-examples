@@ -34,8 +34,9 @@ namespace vg
 
 		struct RenderResultInfo {
 			Bool32 isRendered;
-			uint32_t                         signalSemaphoreCount;
-			const vk::Semaphore*             pSignalSemaphores;
+			uint32_t signalSemaphoreCount;
+			const vk::Semaphore* pSignalSemaphores;
+			uint32_t drawCount;
 		};
 
 		Renderer(std::shared_ptr<vk::ImageView> pSwapchainImageView
@@ -90,7 +91,7 @@ namespace vg
 		std::shared_ptr<vk::CommandPool> m_pCommandPool;
 		std::shared_ptr<vk::CommandBuffer> m_pCommandBuffer;
 		PipelineCache m_pipelineCache;
-		std::shared_ptr<vk::Fence> m_waitFence;
+		//std::shared_ptr<vk::Fence> m_waitFence;
 		std::shared_ptr<vk::Semaphore> m_cachePSemaphore;
 		std::vector<vk::Semaphore> m_arrSemaphores;
 		//aggregations
@@ -111,7 +112,7 @@ namespace vg
 		void _createCommandPool();
 		void _createCommandBuffer();
 		void _createSemaphore();
-		void _createFence();
+		//void _createFence();
 
 		void _recordCommandBufferForBegin();
 

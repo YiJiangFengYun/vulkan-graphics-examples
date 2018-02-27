@@ -13,6 +13,16 @@ namespace sampleslib
 		    )
 		, m_zoom(0.0f)
 		, m_rotation()
+		, m_startTimeFrame()
+		, m_endTimeFrame()
+		, m_isPause(false)
+		, m_frameTimer(0.0f)
+		, m_passedTime(0.0f)
+		, m_timerSpeedFactor(1.0f)
+		, m_fpsTimer(0u)		
+		, m_frameCounter(0u)
+		, m_lastFPS(0u)
+		, m_lastDrawCount(0u)
 	{
 		_initZoom();
 		_createCamera();
@@ -30,6 +40,16 @@ namespace sampleslib
 		    )
 		, m_zoom(0.0f)
 		, m_rotation()
+		, m_startTimeFrame()
+		, m_endTimeFrame()
+		, m_isPause(false)
+		, m_frameTimer(0.0f)
+		, m_passedTime(0.0f)
+		, m_timerSpeedFactor(1.0f)
+		, m_fpsTimer(0u)
+		, m_frameCounter(0u)
+		, m_lastFPS(0u)
+		, m_lastDrawCount(0u)		
 	{
 		_initZoom();
 		_createCamera();
@@ -97,7 +117,7 @@ namespace sampleslib
 	template <vg::SpaceType SPACE_TYPE>
 	void Window<SPACE_TYPE>::_onPreUpdate()
 	{
-
+		m_startTimeFrame = std::chrono::high_resolution_clock::now();
 	}
 
 	template <vg::SpaceType SPACE_TYPE>
@@ -118,7 +138,7 @@ namespace sampleslib
 	    ImGui::SetNextWindowSize(ImVec2(0, 0));
 	    ImGui::Begin("App Info", nullptr, ImGuiWindowFlags_AlwaysAutoResize | ImGuiWindowFlags_NoResize | ImGuiWindowFlags_NoMove);
 		const auto &appName = vg::pApp->getAppName();
-		ImGui::Text("App Name: %s", appName);
+		ImGui::Text("App Name: %s", appName.c_str());
 		const auto &appVersion = vg::pApp->getAppVersion();
 		uint32_t appVersionMajor = VG_GET_VERSION_MAJOR(appVersion);
 		uint32_t appVersionMinor = VG_GET_VERSION_MINOR(appVersion);
@@ -132,12 +152,14 @@ namespace sampleslib
 		std::string vgfVesionFull = VGF_VERSION_FULL;
 		ImGui::Text("Framework Version: %s", VGF_VERSION_FULL);
 		const auto &engineName = vg::pApp->getEngineName();
-		ImGui::Text("Engine Name: %s", engineName);
+		ImGui::Text("Engine Name: %s", engineName.c_str());
 		const auto &engineVersion = vg::pApp->getEngineVersion();
 		uint32_t engineVersionMajor = VG_GET_VERSION_MAJOR(engineVersion);
 		uint32_t engineVersionMinor = VG_GET_VERSION_MINOR(engineVersion);
 		uint32_t engineVersionPatch = VG_GET_VERSION_PATCH(engineVersion);
 		ImGui::Text("Engine Version: %d.%d.%d", engineVersionMajor, engineVersionMinor, engineVersionPatch);
+		ImGui::Text("%.2f ms/frame (%.1d fps)", m_lastFPS == 0u ? 0.0f : (1000.0f / static_cast<float>(m_lastFPS)), m_lastFPS);
+		ImGui::Text("Draw Count: %d", m_lastDrawCount);
 		ImGui::End();
 	}
 
@@ -162,7 +184,21 @@ namespace sampleslib
 	template <vg::SpaceType SPACE_TYPE>
 	void Window<SPACE_TYPE>::_onPostRender()
 	{
-
+		auto now = std::chrono::high_resolution_clock::now();
+		m_endTimeFrame = now;
+		auto diff = std::chrono::duration_cast<std::chrono::milliseconds>(now - m_startTimeFrame).count();
+		m_frameTimer = diff  / 1000.0f;
+		if (m_isPause == false) {
+		    m_passedTime += m_frameTimer * m_timerSpeedFactor;
+		}
+		m_fpsTimer += static_cast<uint32_t>(diff);
+		++m_frameCounter;
+		if (m_fpsTimer > 1000u)
+		{
+			m_lastFPS = static_cast<uint32_t>(static_cast<float>(m_frameCounter) * (1000.0f / m_fpsTimer));
+			m_fpsTimer = 0u;
+			m_frameCounter = 0u;
+		}
 	}
 
 	template <vg::SpaceType SPACE_TYPE>
@@ -183,7 +219,7 @@ namespace sampleslib
 		sceneAndCameras[info.sceneAndCameraCount] = sceneAndCamera;
 		myInfo.pSceneAndCamera = sceneAndCameras.data();
 		vgf::Window::_renderWithRenderer(pRenderer, myInfo, resultInfo);
-
+		m_lastDrawCount = resultInfo.drawCount;
 		// vgf::Window::_renderWithRenderer(pRenderer, info, resultInfo);		
 	}
 } //sampleslib

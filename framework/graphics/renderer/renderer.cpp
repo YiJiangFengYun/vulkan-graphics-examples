@@ -38,7 +38,7 @@ namespace vg
 		_createCommandPool();
 		_createCommandBuffer();
 		_createSemaphore();
-		_createFence();
+		//_createFence();
 	}
 
 	Renderer::Renderer(std::shared_ptr<TextureColorAttachment> pColorAttachmentTex)
@@ -60,7 +60,7 @@ namespace vg
 		_createCommandPool();
 		_createCommandBuffer();
 		_createSemaphore();
-		_createFence();
+		//_createFence();
 	}
 
 	Renderer::~Renderer()
@@ -83,7 +83,7 @@ namespace vg
 		_createCommandPool();
 		_createCommandBuffer();
 		_createSemaphore();
-		_createFence();
+		//_createFence();
 	}
 	
 	void Renderer::reset(std::shared_ptr<TextureColorAttachment> pColorAttachmentTex)
@@ -98,7 +98,7 @@ namespace vg
 		_createCommandPool();
 		_createCommandBuffer();
 		_createSemaphore();
-		_createFence();
+		//_createFence();
 	}
 
 	Bool32 Renderer::isValidForRender() const
@@ -210,6 +210,7 @@ namespace vg
 		_recordCommandBufferForBegin();
 
 		resultInfo.signalSemaphoreCount = 0u;
+		resultInfo.drawCount = 0u;
 		uint32_t count = info.sceneAndCameraCount;
 		for (uint32_t i = 0; i < count; ++i)
 		{
@@ -236,9 +237,9 @@ namespace vg
 		//command buffer end
 		_recordCommandBufferForEnd();
 
-		const auto &pDevice = pApp->getDevice();
+		/*const auto &pDevice = pApp->getDevice();
 		pDevice->waitForFences(*m_waitFence, VK_TRUE, std::numeric_limits<uint64_t>::max());
-		pDevice->resetFences(*m_waitFence);
+		pDevice->resetFences(*m_waitFence);*/
 		
 
 		vk::PipelineStageFlags waitStages[] = { vk::PipelineStageFlagBits::eColorAttachmentOutput };		
@@ -257,7 +258,8 @@ namespace vg
 		vk::Queue queue;
 		uint32_t queueIndex;
 		pApp->allocateGaphicsQueue(queueIndex, queue);
-		queue.submit(submitInfo, *m_waitFence);
+		queue.submit(submitInfo, nullptr);
+		//queue.submit(submitInfo, *m_waitFence);
 		pApp->freeGraphicsQueue(queueIndex);
 		LOG(plog::debug) << "Post submit to grahics queue." << std::endl;
 
@@ -475,14 +477,14 @@ namespace vg
 		m_cachePSemaphore = fd::createSemaphore(pDevice, createInfo);
 	}
 
-	void Renderer::_createFence()
+	/*void Renderer::_createFence()
 	{
 		if (m_waitFence != nullptr) return;
 		const auto &pDevice = pApp->getDevice();
 		vk::FenceCreateInfo createInfo;
 		createInfo.flags = vk::FenceCreateFlagBits::eSignaled;
 		m_waitFence = fd::createFence(pDevice, createInfo);
-	}
+	}*/
 
 	void Renderer::_createRenderPass()
 	{
@@ -689,6 +691,8 @@ namespace vg
 			drawCount += subMeshCount * passCount;
 		}
 
+		resultInfo.drawCount += drawCount;
+
 		//------Doing render.		
 
 		uint32_t drawIndex = 0u;
@@ -870,6 +874,8 @@ namespace vg
 				drawCount += subMeshCount * passCount;
 			}
 		}
+
+		resultInfo.drawCount += drawCount;
 
 		//-----Doing render
 		uint32_t drawIndex = 0;

@@ -15,7 +15,7 @@ include_directories("${IMGUI_DIR}")
 set(LIBRARY_NAME "framework")
 file(GLOB_RECURSE HEADERS *.hpp *.inl)
 file(GLOB_RECURSE SOURCES *.cpp)
-set(SOURCES ${SOURCES} "${PROJECT_CONFIG_HEADER_DIR}/framework/config.hpp")
+set(HEADERS ${HEADERS} "${PROJECT_CONFIG_HEADER_DIR}/framework/config.hpp")
 add_library(${LIBRARY_NAME} STATIC ${HEADERS} ${SOURCES})
 set_property(TARGET ${LIBRARY_NAME} PROPERTY FOLDER ${FOLDER_NAME})
 

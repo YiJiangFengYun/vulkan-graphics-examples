@@ -14,6 +14,8 @@
 #define ENABLE_VALIDATION_LAYERS
 #endif // DEBUG
 
+#include <graphics/config.hpp>
+
 #include <cstdint>
 #include <foundation/foundation.hpp>
 #include "graphics/base.hpp"

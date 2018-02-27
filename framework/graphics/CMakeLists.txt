@@ -1,12 +1,19 @@
+option(VG_LOG_COST_TIME "Logging cost time info for the important step." ON)
 
 # add the binary tree directory to the search path for include files
 # include_directories( ${CMAKE_CURRENT_BINARY_DIR} )
+
+configure_file(
+	"${CMAKE_CURRENT_SOURCE_DIR}/config.hpp.in"
+	"${PROJECT_CONFIG_HEADER_DIR}/graphics/config.hpp"
+)
 
 include_directories("${PROJECT_FRAMEWORK_DIR}")
 
 set(LIBRARY_NAME "graphics")
 file(GLOB_RECURSE HEADERS *.hpp *.inl)
 file(GLOB_RECURSE SOURCES *.cpp)
+set(HEADERS ${HEADERS} "${PROJECT_CONFIG_HEADER_DIR}/framework/config.hpp")
 add_library(${LIBRARY_NAME} STATIC ${HEADERS} ${SOURCES})
 set_property(TARGET ${LIBRARY_NAME} PROPERTY FOLDER ${FOLDER_NAME})
 

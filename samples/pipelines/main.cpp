@@ -1,6 +1,6 @@
 #include <framework/framework.hpp>
-#include "triangle/window.hpp"
-#include "triangle/app.hpp"
+#include "pipelines/window.hpp"
+#include "pipelines/app.hpp"
 
 //Main.obj will contain implementions of stb_image and tiny_obj_loader.
 #define STB_IMAGE_IMPLEMENTATION
@@ -14,7 +14,7 @@ int main() {
 	vgf::moduleCreate();
 	plog::get()->setMaxSeverity(plog::Severity::warning);
 	App app;
-	app.init<Window>(WINDOW_WIDTH, WINDOW_HEIGHT, "triangle");
+	app.init<Window>(WINDOW_WIDTH, WINDOW_HEIGHT, "pipelines");
 
 	LOG(plog::debug) << "Initialization completed." << std::endl;
 

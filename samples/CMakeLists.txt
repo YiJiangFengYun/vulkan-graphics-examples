@@ -25,3 +25,4 @@ add_subdirectory(sampleslib)
 
 add_subdirectory(chalet)
 add_subdirectory(triangle)
+add_subdirectory(pipelines)

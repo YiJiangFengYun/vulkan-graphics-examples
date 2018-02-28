@@ -1,6 +1,6 @@
 # add the binary tree directory to the search path for include files
 # include_directories( ${CMAKE_CURRENT_BINARY_DIR} )
-set(EXE_NAME "triangle")
+set(EXE_NAME "pipelines")
 file(GLOB_RECURSE HEADERS *.hpp *.inl)
 file(GLOB_RECURSE SOURCES *.cpp)
 
@@ -10,8 +10,10 @@ if(SOURCES)
     set_property(TARGET ${EXE_NAME} PROPERTY FOLDER ${FOLDER_NAME})
         
     # Compile shaders
-    set(COMMON_SHADER_NAMES ${COMMON_SHADER_NAMES} "triangle")
-    set(SHADERS_DIR "${SHADERS_DIR}/${EXE_NAME}")
+    set(COMMON_SHADER_NAMES ${COMMON_SHADER_NAMES} "phong")
+    set(COMMON_SHADER_NAMES ${COMMON_SHADER_NAMES} "toon")
+    set(COMMON_SHADER_NAMES ${COMMON_SHADER_NAMES} "wireframe")
+    set(SHADERS_DIR "${SHADERS_DIR}/${EXE_NAME}")    
     if(COMMON_SHADER_NAMES)
         foreach(SHADER_NAME ${COMMON_SHADER_NAMES})
             file(GLOB 

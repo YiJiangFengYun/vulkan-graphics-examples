@@ -1,4 +1,4 @@
-#include "triangle/window.hpp"
+#include "pipelines/window.hpp"
 
 #include <iostream>
 

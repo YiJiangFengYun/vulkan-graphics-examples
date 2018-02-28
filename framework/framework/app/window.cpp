@@ -126,7 +126,11 @@ namespace vgf {
 		const auto &pPhysicalDevice = vg::pApp->getPhysicalDevice();
 		vg::SwapChainSupportDetails details = vg::SwapChainSupportDetails::querySwapChainSupport(*pPhysicalDevice, *m_pSurface);
 		vk::SurfaceFormatKHR surfaceFormat = details.chooseSurfaceFormat();
-		vk::PresentModeKHR presentMode = details.choosePresentMode();
+		Bool32 vsync = VG_TRUE;
+#ifdef DEBUG
+        vsync = VG_FALSE;
+#endif //DEBUG
+		vk::PresentModeKHR presentMode = details.choosePresentMode(vsync);
 		int32_t width, height;
 		glfwGetWindowSize(m_pWindow.get(), &width, &height);
 		vk::Extent2D extent = details.chooseExtent(width, height);

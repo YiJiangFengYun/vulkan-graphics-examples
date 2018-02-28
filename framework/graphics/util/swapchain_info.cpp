@@ -29,13 +29,28 @@ namespace vg
 		return this->formats[0];
 	}
 
-	vk::PresentModeKHR SwapChainSupportDetails::choosePresentMode()
+	vk::PresentModeKHR SwapChainSupportDetails::choosePresentMode(Bool32 vsync)
 	{
-		std::unordered_map<vk::PresentModeKHR, uint32_t> presentModeAndCores = {
-			{ vk::PresentModeKHR::eMailbox, 0 },
-			{ vk::PresentModeKHR::eFifo, 1 },
-			{ vk::PresentModeKHR::eImmediate, 2 }
-		};
+		std::unordered_map<vk::PresentModeKHR, uint32_t> presentModeAndCores;
+		if (vsync)
+		{
+		    presentModeAndCores = {
+		    	{ vk::PresentModeKHR::eMailbox, 0 },
+		    	{ vk::PresentModeKHR::eFifo, 1 },
+		    	{ vk::PresentModeKHR::eImmediate, 2 }
+		    };
+		}
+		else
+		{
+			// If v-sync is not requested, try to find a mailbox mode
+		    // It's the lowest latency non-tearing present mode available
+			// if it isn't supported, selecting preferentially immediate mode.
+			presentModeAndCores = {
+		    	{ vk::PresentModeKHR::eMailbox, 0 },
+		    	{ vk::PresentModeKHR::eImmediate, 1 },
+		    	{ vk::PresentModeKHR::eFifo, 2 }			
+		    };
+		}
 
 		vk::PresentModeKHR currPresentMode = vk::PresentModeKHR::eImmediate;
 		uint32_t currCore = presentModeAndCores[currPresentMode];

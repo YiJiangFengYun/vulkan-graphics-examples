@@ -12,7 +12,7 @@ namespace vg
 		std::vector<vk::PresentModeKHR> presentModes;
 		SwapChainSupportDetails static querySwapChainSupport(const vk::PhysicalDevice& physicalDevice, const vk::SurfaceKHR& surface);
 		vk::SurfaceFormatKHR chooseSurfaceFormat();
-		vk::PresentModeKHR choosePresentMode();
+		vk::PresentModeKHR choosePresentMode(Bool32 vsync = VG_TRUE);
 		vk::Extent2D chooseExtent(int width, int height);
 	};
 } //namespace kgs

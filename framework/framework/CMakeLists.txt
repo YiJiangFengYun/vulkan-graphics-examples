@@ -1,3 +1,9 @@
+set(VGF_VERSION_MAJOR "0")
+set(VGF_VERSION_MINOR "0")
+set(VGF_VERSION_PATCH "1")
+set(VGF_VERSION_EXTRA "")
+set(VGF_VERSION "${VGF_VERSION_MAJOR}.${VGF_VERSION_MINOR}")
+set(VGF_VERSION_FULL "${VGF_VERSION}.${VGF_VERSION_PATCH}${VGF_VERSION_EXTRA}")
 
 # add the binary tree directory to the search path for include files
 # include_directories( ${CMAKE_CURRENT_BINARY_DIR} )

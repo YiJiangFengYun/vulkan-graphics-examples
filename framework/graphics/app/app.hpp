@@ -10,7 +10,6 @@
 #include "graphics/util/util.hpp"
 
 #define VG_ENGINE_NAME "iridescent cloud"
-#define VG_ENGINE_VERSION VK_MAKE_VERSION(0, 0, 1)
 #define VG_VK_API_VERSION VK_API_VERSION_1_0
 #define VG_GET_VERSION_MAJOR(version) VK_VERSION_MAJOR(version)
 #define VG_GET_VERSION_MINOR(version) VK_VERSION_MINOR(version)

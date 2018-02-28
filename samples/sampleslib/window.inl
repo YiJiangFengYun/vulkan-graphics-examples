@@ -154,10 +154,13 @@ namespace sampleslib
 		const auto &engineName = vg::pApp->getEngineName();
 		ImGui::Text("Engine Name: %s", engineName.c_str());
 		const auto &engineVersion = vg::pApp->getEngineVersion();
-		uint32_t engineVersionMajor = VG_GET_VERSION_MAJOR(engineVersion);
-		uint32_t engineVersionMinor = VG_GET_VERSION_MINOR(engineVersion);
-		uint32_t engineVersionPatch = VG_GET_VERSION_PATCH(engineVersion);
-		ImGui::Text("Engine Version: %d.%d.%d", engineVersionMajor, engineVersionMinor, engineVersionPatch);
+		std::string vgVesion = VG_VERSION;
+		std::string vgVesionMajor = VG_VERSION_MAJOR;
+		std::string vgVesionMinor = VG_VERSION_MINOR;
+		std::string vgVesionPatch = VG_VERSION_PATCH;
+		std::string vgVesionExtra = VG_VERSION_EXTRA;
+		std::string vgVesionFull = VG_VERSION_FULL;
+		ImGui::Text("Engine Version: %d.%d.%d", vgVesionMajor, vgVesionMinor, vgVesionPatch);
 		ImGui::Text("%.2f ms/frame (%.1d fps)", m_lastFPS == 0u ? 0.0f : (1000.0f / static_cast<float>(m_lastFPS)), m_lastFPS);
 		ImGui::Text("Draw Count: %d", m_lastDrawCount);
 		ImGui::End();

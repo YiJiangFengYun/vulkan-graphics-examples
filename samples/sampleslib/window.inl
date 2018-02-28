@@ -160,7 +160,7 @@ namespace sampleslib
 		std::string vgVesionPatch = VG_VERSION_PATCH;
 		std::string vgVesionExtra = VG_VERSION_EXTRA;
 		std::string vgVesionFull = VG_VERSION_FULL;
-		ImGui::Text("Engine Version: %d.%d.%d", vgVesionMajor, vgVesionMinor, vgVesionPatch);
+		ImGui::Text("Engine Version: %s", VG_VERSION_FULL);
 		ImGui::Text("%.2f ms/frame (%.1d fps)", m_lastFPS == 0u ? 0.0f : (1000.0f / static_cast<float>(m_lastFPS)), m_lastFPS);
 		ImGui::Text("Draw Count: %d", m_lastDrawCount);
 		ImGui::End();

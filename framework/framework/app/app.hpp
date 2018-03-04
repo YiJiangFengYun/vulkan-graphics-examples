@@ -21,7 +21,12 @@ namespace vgf
 		~App();
 		void virtual run();
 		template<typename MainWindow_T>
-		void init(uint32_t width, uint32_t height, const char *title);
+		void init(uint32_t width
+		    , uint32_t height
+			, const char *title
+			, vg::PhysicalDeviceFeatures requiredPhysicalDeviceFeatures = vg::PhysicalDeviceFeatures()
+			, vg::PhysicalDeviceFeaturePriorities optionalPhysicalDeviceFeatures = vg::PhysicalDeviceFeaturePriorities()
+			);
 
 		template<typename Window_T>
 		void createSubWindow(uint32_t width, uint32_t height, const char *title);
@@ -45,7 +50,10 @@ namespace vgf
 			, uint32_t height
 			, const char *title
 			, std::shared_ptr<GLFWwindow> &pResultGLFWWindow
-			, std::shared_ptr<vk::SurfaceKHR> &pResultSurface);
+			, std::shared_ptr<vk::SurfaceKHR> &pResultSurface
+			, vg::PhysicalDeviceFeatures requiredPhysicalDeviceFeatures
+			, vg::PhysicalDeviceFeaturePriorities optionalPhysicalDeviceFeatures
+			);
 
 		template <typename MainWindow_T>
 		void _createWindow(std::shared_ptr<GLFWwindow> pWindow, std::shared_ptr<vk::SurfaceKHR> pSurface);

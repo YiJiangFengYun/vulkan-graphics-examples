@@ -29,6 +29,11 @@ namespace vg
 
 	bool checkDeviceExtensionSupport(const PhysicalDevice& physicalDevice, std::vector<const char*> deviceExtensionNames);
 
+	uint32_t countPhysicalDeviceScore(const PhysicalDevice& physicalDevice, const PhysicalDeviceFeaturePriorities &featurePriorities);
+	void getRequiredPhysicalDeviceFeaturesFromOptioal(const PhysicalDevice& physicalDevice, 
+	    const PhysicalDeviceFeaturePriorities &optionalPhysicalDeviceFeatures,
+		PhysicalDeviceFeatures &resultFeatures);
+
 	class Application : public Base
 	{
 	public:
@@ -39,7 +44,8 @@ namespace vg
 		void initOther(std::shared_ptr<Surface> pSurface
 			, uint32_t graphicsQueueCount
 			, uint32_t presentQueueCount
-			, PhysicalDeviceFeatures needPhysicalDeviceFeatures
+			, PhysicalDeviceFeatures requiredPhysicalDeviceFeatures
+			, PhysicalDeviceFeaturePriorities optionalPhysicalDeviceFeatures
 			);
 
 		//gettor methods
@@ -71,6 +77,7 @@ namespace vg
 		std::string m_engineName;
 		uint32_t m_engineVersion;
 		std::shared_ptr<vk::Instance> m_pInstance;
+		vk::PhysicalDeviceFeatures m_physicalDeviceFeatures;
 		std::shared_ptr<vk::PhysicalDevice> m_pPhysicalDevice;
 		std::shared_ptr<vk::Device> m_pDevice;
 		uint32_t m_graphicsFamily;
@@ -102,16 +109,18 @@ namespace vg
 #endif // DEBUG
 		std::vector<const char*> _getRequiredExtensions();
 		void _pickPhysicalDevice(std::shared_ptr<vk::SurfaceKHR> psurface
-			, vk::PhysicalDeviceFeatures needPhysicalDeviceFeatures
+			, PhysicalDeviceFeatures requiredPhysicalDeviceFeatures
+			, PhysicalDeviceFeaturePriorities optionalPhysicalDeviceFeatures
 		);
 		void _createLogicDevice(std::shared_ptr<vk::SurfaceKHR> pSurface
 			, uint32_t graphicsQueueCount
 			, uint32_t presentQueueCount
-			, vk::PhysicalDeviceFeatures needPhysicalDeviceFeatures
 		);
 		void _createCommandPool();
 	};
 
 } //namespace kgs
+
+#include "graphics/app/app.inl"
 
 #endif // !VG_APP_H

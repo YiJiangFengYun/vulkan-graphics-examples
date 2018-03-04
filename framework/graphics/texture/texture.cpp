@@ -439,8 +439,8 @@ namespace vg
 			m_vkSamplerAddressMode,                  //addressModeV
 			m_vkSamplerAddressMode,                  //addressModeW
 			0.0f,                                    //mipLodBias
-			m_anisotropy == 0.0f ? VkBool32(VK_FALSE) : VkBool32(VK_TRUE),      //anisotropyEnable
-			m_anisotropy,                            //maxAnisotropy
+			m_anisotropy <= 0.0f ? VkBool32(VK_FALSE) : VkBool32(VK_TRUE),      //anisotropyEnable
+			m_anisotropy <= 0.0f ? 1.0f : m_anisotropy,                            //maxAnisotropy
 			VkBool32(VK_FALSE),                      //compareEnable
 			vk::CompareOp::eNever,                   //compareOp
 			0.0f,                                    //minLod

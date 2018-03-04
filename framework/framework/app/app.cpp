@@ -75,7 +75,10 @@ namespace vgf {
 		, uint32_t height
 		, const char *title
 		, std::shared_ptr<GLFWwindow> &pResultGLFWWindow
-	    , std::shared_ptr<vk::SurfaceKHR> &pResultSurface)
+	    , std::shared_ptr<vk::SurfaceKHR> &pResultSurface
+		, vg::PhysicalDeviceFeatures requiredPhysicalDeviceFeatures
+		, vg::PhysicalDeviceFeaturePriorities optionalPhysicalDeviceFeatures
+		)
 	{
 		m_width = width;
 		m_height = height;
@@ -109,13 +112,12 @@ namespace vgf {
 		pResultGLFWWindow = _createGLFWWindow(m_width, m_height, m_title);
 		pResultSurface = _createVKSurface(pResultGLFWWindow);
 
-		vk::PhysicalDeviceFeatures needPhysicalDeviceFeatures;
-		needPhysicalDeviceFeatures.geometryShader = VK_TRUE;
-		needPhysicalDeviceFeatures.samplerAnisotropy = VK_TRUE;
 		vg::moduleCreateOther(pResultSurface
 			, m_graphicsQueueCount
 			, m_presentQueuecount
-			, needPhysicalDeviceFeatures);
+			, requiredPhysicalDeviceFeatures
+			, optionalPhysicalDeviceFeatures
+			);
 
 		//----------------------------------------------------------------------
 		//----------------------------------------------------------------------

@@ -14,7 +14,8 @@ namespace vg
 	extern void moduleCreateOther(std::shared_ptr<vk::SurfaceKHR> pSurface
 		, uint32_t graphicsQueueCount
 		, uint32_t presentQueueCount
-		, vk::PhysicalDeviceFeatures needPhysicalDeviceFeatures
+		, vg::PhysicalDeviceFeatures requiredPhysicalDeviceFeatures
+		, vg::PhysicalDeviceFeaturePriorities optionalPhysicalDeviceFeatures
 	);
 	extern void moduleDestory();
 } //namespace kgs

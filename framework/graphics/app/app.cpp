@@ -16,6 +16,54 @@ namespace vg
 		return requiredExtensionNames.empty();
 	}
 
+	uint32_t countPhysicalDeviceScore(const PhysicalDevice& physicalDevice, const PhysicalDeviceFeaturePriorities &featurePriorities)
+	{
+		auto features = physicalDevice.getFeatures();
+		uint32_t sizeOfStruct = static_cast<uint32_t>(sizeof(features));
+		uint32_t sizeOfItem1 = static_cast<uint32_t>(sizeof(vk::Bool32));
+		uint32_t sizeOfItem2 = static_cast<uint32_t>(sizeof(uint32_t));
+		uint32_t countOfItem = sizeOfStruct / sizeOfItem1;
+		uint32_t score = 0u;
+		for (uint32_t i = 0; i < countOfItem; ++i)
+		{
+			vk::Bool32 valueOfItem1;
+			memcpy(&valueOfItem1, reinterpret_cast<char *>(&features) + sizeOfItem1 * i, sizeof(vk::Bool32));
+			if (valueOfItem1)
+			{
+				uint32_t valueOfItem2;
+			    memcpy(&valueOfItem2, reinterpret_cast<const char *>(&featurePriorities) + sizeOfItem2 * i, sizeof(uint32_t));
+				score += valueOfItem2;
+			}
+		}
+		return score;
+	}
+
+	void getRequiredPhysicalDeviceFeaturesFromOptioal(const PhysicalDevice& physicalDevice, 
+	    const PhysicalDeviceFeaturePriorities &optionalPhysicalDeviceFeatures,
+		PhysicalDeviceFeatures &resultFeatures)
+	{
+		auto features = physicalDevice.getFeatures();
+		uint32_t sizeOfStruct = static_cast<uint32_t>(sizeof(features));
+		uint32_t sizeOfItem1 = static_cast<uint32_t>(sizeof(vk::Bool32));
+		uint32_t sizeOfItem2 = static_cast<uint32_t>(sizeof(uint32_t));
+		uint32_t countOfItem = sizeOfStruct / sizeOfItem1;
+		vk::Bool32 open = VK_TRUE;
+		for (uint32_t i = 0; i < countOfItem; ++i)
+		{
+			vk::Bool32 valueOfItem1;
+			memcpy(&valueOfItem1, reinterpret_cast<char *>(&features) + sizeOfItem1 * i, sizeof(vk::Bool32));
+			if (valueOfItem1)
+			{
+				uint32_t valueOfItem2;
+			    memcpy(&valueOfItem2, reinterpret_cast<const char *>(&optionalPhysicalDeviceFeatures) + sizeOfItem2 * i, sizeof(uint32_t));
+				if (valueOfItem2)
+				{
+					memcpy(reinterpret_cast<char *>(&resultFeatures) + sizeOfItem1 * i, &open, sizeof(vk::Bool32));
+				}
+			}
+		}
+	}
+
 	Application::Application(std::string name, uint32_t version)
 		: Base(BaseType::APP)
 		, m_appName(name)
@@ -98,14 +146,14 @@ namespace vg
 	void Application::initOther(std::shared_ptr<vk::SurfaceKHR> pSurface
 		, uint32_t graphicsQueueCount
 		, uint32_t presentQueueCount
-		, vk::PhysicalDeviceFeatures needPhysicalDeviceFeatures
+		, PhysicalDeviceFeatures requiredPhysicalDeviceFeatures
+		, PhysicalDeviceFeaturePriorities optionalPhysicalDeviceFeatures
 	)
 	{
-		_pickPhysicalDevice(pSurface, needPhysicalDeviceFeatures);
+		_pickPhysicalDevice(pSurface, requiredPhysicalDeviceFeatures, optionalPhysicalDeviceFeatures);
 		_createLogicDevice(pSurface
 			, graphicsQueueCount
 			, presentQueueCount
-			, needPhysicalDeviceFeatures
 		);
 		_createCommandPool();
 	}
@@ -320,7 +368,8 @@ namespace vg
 #endif // DEBUG
 
 	void Application::_pickPhysicalDevice(std::shared_ptr<vk::SurfaceKHR> pSurface
-		, vk::PhysicalDeviceFeatures needPhysicalDeviceFeatures
+		, PhysicalDeviceFeatures requiredPhysicalDeviceFeatures
+		, PhysicalDeviceFeaturePriorities optionalPhysicalDeviceFeatures
 	)
 	{
 		auto physicalDevices = m_pInstance->enumeratePhysicalDevices();
@@ -339,7 +388,7 @@ namespace vg
 				//const vk::PhysicalDeviceProperties deviceProperties = physicalDevice.getProperties();
 				const vk::PhysicalDeviceFeatures deviceFeatures = physicalDevice.getFeatures();
 				//Application can't function without need features.
-				if (isContainStruct(deviceFeatures, needPhysicalDeviceFeatures) == VG_FALSE)
+				if (isContainStruct(deviceFeatures, requiredPhysicalDeviceFeatures) == VG_FALSE)
 				{
 					return VG_FALSE;
 				}
@@ -381,6 +430,8 @@ namespace vg
 			throw std::runtime_error("Failed to find a suitable GPU!");
 		}
 
+		m_physicalDeviceFeatures = requiredPhysicalDeviceFeatures;
+
 		std::sort(physicalDevices.begin(), physicalDevices.end(),
 			[&](const vk::PhysicalDevice& physicalDevice1, const vk::PhysicalDevice& physicalDevice2) {
 			int32_t result = 0;
@@ -388,6 +439,15 @@ namespace vg
 			const vk::PhysicalDeviceProperties deviceProperties2 = physicalDevice2.getProperties();
 			const vk::PhysicalDeviceFeatures deviceFeatures1 = physicalDevice1.getFeatures();
 			const vk::PhysicalDeviceFeatures deviceFeatures2 = physicalDevice2.getFeatures();
+
+			if (result)
+			{
+			    //Calculate score of the physical device features.
+			    uint32_t score1 = countPhysicalDeviceScore(physicalDevice1, optionalPhysicalDeviceFeatures);
+			    uint32_t score2 = countPhysicalDeviceScore(physicalDevice2, optionalPhysicalDeviceFeatures);
+				result = score1 - score2;
+			}
+
 			if (result == 0)
 			{
 				int32_t value1 = static_cast<int32_t>(deviceProperties1.deviceType == vk::PhysicalDeviceType::eDiscreteGpu);
@@ -402,13 +462,13 @@ namespace vg
 		});
 
 		m_pPhysicalDevice = std::shared_ptr<vk::PhysicalDevice>(new vk::PhysicalDevice(*physicalDevices.cbegin()));
+		getRequiredPhysicalDeviceFeaturesFromOptioal(*m_pPhysicalDevice, optionalPhysicalDeviceFeatures, m_physicalDeviceFeatures);
 		LOG(plog::debug) << "Pick successfully physical device.";
 	}
 
 	void Application::_createLogicDevice(std::shared_ptr<vk::SurfaceKHR> pSurface
 		, uint32_t graphicsQueueCount
 		, uint32_t presentQueueCount
-		, vk::PhysicalDeviceFeatures needPhysicalDeviceFeatures
 	)
 	{
 		UsedQueueFamily usedQueueFamily = UsedQueueFamily::findQueueFamilies(*m_pPhysicalDevice, *pSurface);
@@ -460,7 +520,7 @@ namespace vg
 			nullptr,                                                     //ppEnabledLayerNames
 			static_cast<uint32_t>(deviceExtensionNames.size()),          //enabledExtensionCount
 			deviceExtensionNames.data(),                                 //ppEnabledExtensionNames
-			&needPhysicalDeviceFeatures                                  //pEnabledFeatures
+			&m_physicalDeviceFeatures                                    //pEnabledFeatures
 		};
 
 #ifdef ENABLE_VALIDATION_LAYERS

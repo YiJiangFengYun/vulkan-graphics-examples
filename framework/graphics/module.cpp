@@ -15,13 +15,16 @@ namespace vg
 	void moduleCreateOther(std::shared_ptr<vk::SurfaceKHR> pSurface
 		, uint32_t graphicsQueueCount
 		, uint32_t presentQueueCount
-		, vk::PhysicalDeviceFeatures needPhysicalDeviceFeatures
+		, vg::PhysicalDeviceFeatures requiredPhysicalDeviceFeatures
+		, vg::PhysicalDeviceFeaturePriorities optionalPhysicalDeviceFeatures
 	)
 	{
 		pApp->initOther(pSurface
 			, graphicsQueueCount
 			, presentQueueCount
-			, needPhysicalDeviceFeatures);
+			, requiredPhysicalDeviceFeatures
+			, optionalPhysicalDeviceFeatures
+			);
 		isInited = VG_TRUE;
 	}
 

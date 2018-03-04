@@ -23,7 +23,7 @@
 
 namespace vgf
 { 
-	typedef uint32_t Bool32;
+	using Bool32 = uint32_t;
 	extern Bool32 isInited;
 	extern void moduleCreate();
 	extern void moduleDestroy();

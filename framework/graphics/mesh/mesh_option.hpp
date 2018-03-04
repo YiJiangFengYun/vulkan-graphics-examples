@@ -20,7 +20,7 @@ namespace vg
 	template<MeshDimType type>
 	struct MeshTypeInfo
 	{
-		typedef void PointType;
+		using PointType = void;
 	};
 
 	template<MeshDimType type>
@@ -108,13 +108,13 @@ namespace vg
 	template<>
 	struct MeshTypeInfo<MeshDimType::SPACE_2>
 	{
-		typedef Vector2 PointType;
+		using PointType = Vector2;
 	};
 
 	template<>
 	struct MeshTypeInfo<MeshDimType::SPACE_3>
 	{
-		typedef Vector3 PointType;
+		using PointType = Vector3;
 	};
 
 	// Using struct declaration type specialization, so these members can't be used to indicate innter type of class when declarated.

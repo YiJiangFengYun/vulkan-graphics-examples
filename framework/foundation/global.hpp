@@ -22,7 +22,7 @@
 
 namespace fd
 {
-	typedef uint32_t Bool32;
+	using Bool32 = uint32_t;
 
 	extern Bool32 isInited;
 	extern void moduleCreate();

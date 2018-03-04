@@ -51,18 +51,18 @@ namespace vg
 	{
 		size_t size = sizeof(T);
 		size_t index = 0;
-		typedef uint8_t sep_type;
-		size_t size2 = sizeof(sep_type);
+		using SepType = uint8_t;
+		size_t size2 = sizeof(SepType);
 		size_t sep = size / size2;
 		Bool32 isContain = VG_TRUE;
 		for (size_t i = 0; i < sep; ++i)
 		{
-			sep_type copy1 = 0;
-			sep_type copy2 = 0;
+			SepType copy1 = 0;
+			SepType copy2 = 0;
 			uint8_t *src1 = static_cast<uint8_t *>(static_cast<void *>(&parent)) + index;
 			uint8_t *src2 = static_cast<uint8_t *>(static_cast<void *>(&child)) + index;
-			memcpy(&copy1, src1, sizeof(sep_type));
-			memcpy(&copy2, src2, sizeof(sep_type));
+			memcpy(&copy1, src1, sizeof(SepType));
+			memcpy(&copy2, src2, sizeof(SepType));
 			if ((copy1 & copy2) != copy2)
 			{
 				isContain = VG_FALSE;

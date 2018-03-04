@@ -39,7 +39,7 @@ namespace vg
 	class Mesh : public DimensionMesh
 	{
     public:
-	    typedef typename MeshTypeInfo<meshDimType>::PointType PointType;
+	    using PointType = typename MeshTypeInfo<meshDimType>::PointType;
 
 		Mesh();
 
@@ -201,8 +201,8 @@ namespace vg
 	{
 	public:
 	    static const MeshData::DataType ARRAY_DATA_TYPE = MeshConstInfo<meshDimType>::ARRAY_TYPE;
-		typedef typename MeshData::DataTypeInfo<ARRAY_DATA_TYPE>::BaseType BaseValueType;
-		typedef typename MeshData::DataTypeInfo<ARRAY_DATA_TYPE>::ValueType ArrayValueType;
+		using BaseValueType = typename MeshData::DataTypeInfo<ARRAY_DATA_TYPE>::BaseType;
+		using ArrayValueType = typename MeshData::DataTypeInfo<ARRAY_DATA_TYPE>::ValueType;
 
 		DimSepMesh();
 		DimSepMesh(MemoryPropertyFlags bufferMemoryPropertyFlags);

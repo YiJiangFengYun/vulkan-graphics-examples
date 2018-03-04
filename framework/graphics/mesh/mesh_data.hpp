@@ -46,56 +46,56 @@ namespace vg
 		template <DataType type>
 		struct DataTypeInfo
 		{
-			typedef void ValueType;
-			typedef void BaseType;
+			using ValueType = void;
+			using BaseType = void ;
 			const vk::Format static BASE_FORMAT = vk::Format::eUndefined;
 		};
 
 		template<>
 		struct DataTypeInfo<DataType::FLOAT_ARRAY>
 		{
-			typedef std::vector<float> ValueType;
-			typedef float BaseType;
+			using ValueType = std::vector<float>;
+			using BaseType = float;
 			const vk::Format static BASE_FORMAT = vk::Format::eR32Sfloat;
 		};
 
 		template<>
 		struct DataTypeInfo<DataType::INT_ARRAY>
 		{
-			typedef std::vector<int32_t> ValueType;
-			typedef int32_t  BaseType;
+			using ValueType = std::vector<int32_t>;
+			using BaseType = int32_t;
 			const vk::Format static BASE_FORMAT = vk::Format::eR32Sint;
 		};
 
 		template<>
 		struct DataTypeInfo<DataType::VECTOR_2_ARRAY>
 		{
-			typedef std::vector<Vector2> ValueType;
-			typedef Vector2 BaseType;
+			using ValueType = std::vector<Vector2>;
+			using BaseType = Vector2;
 			const vk::Format static BASE_FORMAT = vk::Format::eR32G32Sfloat;
 		};
 
 		template<>
 		struct DataTypeInfo<DataType::VECTOR_3_ARRAY>
 		{
-			typedef std::vector<Vector3> ValueType;
-			typedef Vector3 BaseType;
+			using ValueType = std::vector<Vector3>;
+			using BaseType = Vector3;
 			const vk::Format static BASE_FORMAT = vk::Format::eR32G32B32Sfloat;
 		};
 
 		template<>
 		struct DataTypeInfo<DataType::VECTOR_4_ARRAY>
 		{
-			typedef std::vector<Vector4> ValueType;
-			typedef Vector4 BaseType;
+			using ValueType = std::vector<Vector4>;
+			using BaseType = Vector4;
 			const vk::Format static BASE_FORMAT = vk::Format::eR32G32B32A32Sfloat;
 		};
 
 		template<>
 		struct DataTypeInfo<DataType::COLOR_32_ARRAY>
 		{
-			typedef std::vector<Color32> ValueType;
-			typedef Color32 BaseType;
+			using ValueType = std::vector<Color32>;
+			using BaseType = Color32;
 			const vk::Format static BASE_FORMAT = vk::Format::eR8G8B8A8Unorm;
 		};
 

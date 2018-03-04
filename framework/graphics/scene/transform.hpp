@@ -21,12 +21,12 @@ namespace vg
 	class Transform : public BaseTransform
 	{
 	public:
-		typedef Transform<SPACE_TYPE> Type;
-		typedef typename SpaceTypeInfo<SPACE_TYPE>::VectorType VectorType;
-		typedef typename SpaceTypeInfo<SPACE_TYPE>::PointType PointType;
-		typedef typename SpaceTypeInfo<SPACE_TYPE>::MatrixVectorType MatrixVectorType;
-		typedef typename SpaceTypeInfo<SPACE_TYPE>::MatrixType MatrixType;
-		typedef typename SpaceTypeInfo<SPACE_TYPE>::RotationType RotationType;
+		using Type = Transform<SPACE_TYPE>;
+		using VectorType = typename SpaceTypeInfo<SPACE_TYPE>::VectorType;
+		using PointType = typename SpaceTypeInfo<SPACE_TYPE>::PointType;
+		using MatrixVectorType = typename SpaceTypeInfo<SPACE_TYPE>::MatrixVectorType;
+		using MatrixType = typename SpaceTypeInfo<SPACE_TYPE>::MatrixType;
+		using RotationType = typename SpaceTypeInfo<SPACE_TYPE>::RotationType;
 
 		Transform();
 

@@ -847,8 +847,8 @@ namespace vg
 	        	auto pos1 = pObject1->getTransform()->getLocalPosition();
 	        	auto pos2 = pObject2->getTransform()->getLocalPosition();
         
-	        	typedef SpaceTypeInfo<SpaceType::SPACE_3>::PointType PointType;
-	        	typedef SpaceTypeInfo<SpaceType::SPACE_3>::MatrixVectorType MatrixVectorType;
+	        	using PointType = SpaceTypeInfo<SpaceType::SPACE_3>::PointType;
+	        	using MatrixVectorType = SpaceTypeInfo<SpaceType::SPACE_3>::MatrixVectorType;
 	        	//transform point from model coordinate system to camera coordinate system.
 	        	pos1 = mvMatrix1 * MatrixVectorType(pos1, 1.0f);
 	        	pos2 = mvMatrix2 * MatrixVectorType(pos2, 1.0f);

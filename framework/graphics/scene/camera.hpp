@@ -17,7 +17,7 @@ namespace vg
 	class Camera : public BaseCamera, public Object<SPACE_TYPE>
 	{
 	public:
-		typedef fd::Bounds<typename SpaceTypeInfo<SPACE_TYPE>::PointType> BoundsType;
+		using BoundsType = fd::Bounds<typename SpaceTypeInfo<SPACE_TYPE>::PointType>;
 		Camera()
 			: BaseCamera()
 			, Object<SPACE_TYPE>()

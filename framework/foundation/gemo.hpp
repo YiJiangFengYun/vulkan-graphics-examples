@@ -12,9 +12,9 @@ namespace fd
 	class Ray
 	{
 	public:
-		typedef VecType ValueType;
-		typedef typename ValueType::length_type length_type;
-		typedef typename ValueType::value_type vec_value_type;
+		using ValueType = VecType;
+		using LengthType = typename ValueType::length_type;
+		using VecValueType = typename ValueType::value_type;
 
 		Ray();
 
@@ -37,7 +37,7 @@ namespace fd
 		ValueType getSigns();
 
 		/*Returns a point at distance units along the ray.*/
-		ValueType getPoint(vec_value_type distance) const;
+		ValueType getPoint(VecValueType distance) const;
 
 
 	private:
@@ -56,9 +56,9 @@ namespace fd
 	class Bounds
 	{
 	public:
-		typedef VecType ValueType;
-		typedef typename ValueType::length_type length_type;
-		typedef typename ValueType::value_type vec_value_type;
+		using ValueType = VecType;
+		using LengthType = typename ValueType::length_type;
+		using VecValueType = typename ValueType::value_type;
 		Bounds();
 
 		~Bounds();		
@@ -90,12 +90,12 @@ namespace fd
 		Bool32 isContains(ValueType point) const;
 
 		/*Expand the bounds by increasing its size by amount along each side.*/
-		void expand(vec_value_type amount);
+		void expand(VecValueType amount);
 
 		/*Does ray intersect this bounding box?
           if true, return the distance to the ray's origin will be returned,
           or else return number -1.*/
-		vec_value_type intersectRay(Ray<ValueType> ray, Bool32 isOnlyForward = true) const;
+		VecValueType intersectRay(Ray<ValueType> ray, Bool32 isOnlyForward = true) const;
 
 		/*Does another bounding box intersect with this bounding box?*/
 		Bool32 isIntersects(Bounds<ValueType> bounds) const;
@@ -104,7 +104,7 @@ namespace fd
 		Bool32 intersects(Bounds<ValueType> bounds, Bounds<ValueType> *intersection) const;
 
 		/*The smallest squared distance between the point and this bounding box.*/
-		vec_value_type getSqrDistance(ValueType point) const;
+		VecValueType getSqrDistance(ValueType point) const;
 
 	private:
 		ValueType m_min;

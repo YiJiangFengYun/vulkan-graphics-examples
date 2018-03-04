@@ -19,11 +19,11 @@ namespace vg
 	struct SpaceTypeInfo
 	{
 		static const MeshDimType MESH_DIM_TYPE;
-		typedef void VectorType;
-		typedef void PointType;
-		typedef void MatrixVectorType;
-		typedef void MatrixType;
-		typedef void RotationType;
+		using VectorType = void;
+		using PointType = void;
+		using MatrixVectorType = void;
+		using MatrixType = void;
+		using RotationType = void;
 	};
 
 	template<SpaceType type>
@@ -36,22 +36,22 @@ namespace vg
 	struct SpaceTypeInfo<SpaceType::SPACE_2>
 	{
 		static const MeshDimType MESH_DIM_TYPE = MeshDimType::SPACE_2;
-		typedef Vector2 VectorType;
-		typedef Vector2 PointType;
-		typedef Vector3 MatrixVectorType;
-		typedef Matrix3x3 MatrixType;
-		typedef float RotationType;
+		using VectorType = Vector2;
+		using PointType = Vector2;
+		using MatrixVectorType = Vector3;
+		using MatrixType = Matrix3x3;
+		using RotationType = float;
 	};
 
 	template<>
 	struct SpaceTypeInfo<SpaceType::SPACE_3>
 	{
 		static const MeshDimType MESH_DIM_TYPE = MeshDimType::SPACE_3;
-		typedef Vector3 VectorType;
-		typedef Vector3 PointType;
-		typedef Vector4 MatrixVectorType;
-		typedef Matrix4x4 MatrixType;
-		typedef Quaternion RotationType;
+		using VectorType = Vector3;
+		using PointType = Vector3;
+		using MatrixVectorType = Vector4;
+		using MatrixType = Matrix4x4;
+		using RotationType = Quaternion;
 	};
 
 	template<>

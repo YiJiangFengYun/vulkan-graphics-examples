@@ -37,8 +37,8 @@ namespace vg
 	{
 		auto min = bounds.getMin();
 		auto max = bounds.getMax();
-		typedef typename SpaceTypeInfo<SPACE_TYPE>::PointType PointType;
-		typedef typename SpaceTypeInfo<SPACE_TYPE>::MatrixVectorType MatrixVectorType;
+		using PointType = typename SpaceTypeInfo<SPACE_TYPE>::PointType;
+		using MatrixVectorType = typename SpaceTypeInfo<SPACE_TYPE>::MatrixVectorType;
 		typename PointType::length_type len = PointType::length();
 
 		//use permutation combination algorithm to get all points of bounds.

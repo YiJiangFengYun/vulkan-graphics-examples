@@ -35,7 +35,7 @@ namespace vg
 	class VisualObject : public BaseVisualObject, public Object<SPACE_TYPE>
 	{
 	public:
-		typedef Mesh<SpaceTypeInfo<SPACE_TYPE>::MESH_DIM_TYPE> MeshDimType;
+		using MeshDimType = Mesh<SpaceTypeInfo<SPACE_TYPE>::MESH_DIM_TYPE>;
 
 		VisualObject()
 			: BaseVisualObject()

@@ -13,7 +13,7 @@ namespace fd
 		, m_isUpdateCache(FD_TRUE)
 	{
 #ifdef DEBUG
-		vec_value_type distSqr = glm::dot(direction, direction);
+		VecValueType distSqr = glm::dot(direction, direction);
 		if (distSqr == 0)
 			throw std::invalid_argument("Invalid direction, direction length is 0.");
 #endif // DEBUG
@@ -81,7 +81,7 @@ namespace fd
 	}
 
 	template <typename VecType = glm::vec3>
-	typename Ray<VecType>::ValueType Ray<VecType>::getPoint(vec_value_type distance) const
+	typename Ray<VecType>::ValueType Ray<VecType>::getPoint(VecValueType distance) const
 	{
 		ValueType direction = m_direction;
 		glm::normalize(direction);
@@ -96,9 +96,9 @@ namespace fd
 		if (m_isUpdateCache)
 		{
 			m_isUpdateCache = FD_FALSE;
-			const vec_value_type Epsilon = std::numeric_limits<vec_value_type>::epsilon();
-			length_type length = ValueType::length();
-			for (length_type i = 0; i < length; ++i)
+			const VecValueType Epsilon = std::numeric_limits<VecValueType>::epsilon();
+			LengthType length = ValueType::length();
+			for (LengthType i = 0; i < length; ++i)
 			{
 				if(glm::abs(m_direction[i]) < Epsilon)
 				{
@@ -109,8 +109,8 @@ namespace fd
 				m_invDir[i] = 1 / m_direction[i];
 				//negative is 0 and positive is 1, it is better to be used as array index.
 				m_signs[i] = m_direction[i] < 0 ? 
-					static_cast<typename vec_value_type>(-1) : 
-					static_cast<typename vec_value_type>(1);
+					static_cast<typename VecValueType>(-1) :
+					static_cast<typename VecValueType>(1);
 			}
 		}
 	}
@@ -175,8 +175,8 @@ namespace fd
 	void Bounds<VecType>::setSize(ValueType size)
 	{
 #ifdef DEBUG
-		length_type length = ValueType::length();
-		for (length_type i = 0; i < length; ++i)
+		LengthType length = ValueType::length();
+		for (LengthType i = 0; i < length; ++i)
 		{
 			if (size[i] < 0)throw std::invalid_argument("Invalid size of Bounds");
 		}
@@ -188,9 +188,9 @@ namespace fd
 	template <typename VecType = glm::vec3>
 	typename Bounds<VecType>::ValueType Bounds<VecType>::getClosestPoint(ValueType point) const
 	{
-		length_type length = ValueType::length();
+		LengthType length = ValueType::length();
 		ValueType result;
-		for (length_type i = 0; i < length; ++i)
+		for (LengthType i = 0; i < length; ++i)
 		{
 			if (point[i] < m_min[i]) result[i] = m_min[i];
 			else if (point[i] < m_max[i]) result[i] = point[i];
@@ -202,8 +202,8 @@ namespace fd
 	template <typename VecType = glm::vec3>
 	Bool32 Bounds<VecType>::isContains(ValueType point) const
 	{
-		length_type length = ValueType::length();
-		for (length_type i = 0; i < length; ++i)
+		LengthType length = ValueType::length();
+		for (LengthType i = 0; i < length; ++i)
 		{
 			if (point[i] < m_min[i] || point[i] > m_max[i])
 				return false;
@@ -212,11 +212,11 @@ namespace fd
 	}
 
 	template <typename VecType = glm::vec3>
-	void Bounds<VecType>::expand(vec_value_type amount)
+	void Bounds<VecType>::expand(VecValueType amount)
 	{
-		vec_value_type halt = amount / 2;
-		length_type length = ValueType::length();
-		for (length_type i = 0; i < length; ++i)
+		VecValueType halt = amount / 2;
+		LengthType length = ValueType::length();
+		for (LengthType i = 0; i < length; ++i)
 		{
 			m_min[i] -= halt;
 			m_max[i] += halt;
@@ -225,7 +225,7 @@ namespace fd
 	}
 
 	template <typename VecType = glm::vec3>
-	typename Bounds<VecType>::vec_value_type Bounds<VecType>::intersectRay(Ray<ValueType> ray, Bool32 isOnlyForward) const
+	typename Bounds<VecType>::VecValueType Bounds<VecType>::intersectRay(Ray<ValueType> ray, Bool32 isOnlyForward) const
 	{
 
 		////reference:
@@ -237,14 +237,14 @@ namespace fd
 
 		ValueType minMax[2] = { m_min, m_max };
 
-		const length_type length = ValueType::length();
-		const vec_value_type Epsilon = std::numeric_limits<vec_value_type>::epsilon();
-		length_type i = 0;
-		vec_value_type min = std::numeric_limits<vec_value_type>::lowest();
-		vec_value_type max = std::numeric_limits<vec_value_type>::max();
-		vec_value_type tMin;
-		vec_value_type tMax;
-		for (length_type i = 0; i < length; ++i)
+		const LengthType length = ValueType::length();
+		const VecValueType Epsilon = std::numeric_limits<VecValueType>::epsilon();
+		LengthType i = 0;
+		VecValueType min = std::numeric_limits<VecValueType>::lowest();
+		VecValueType max = std::numeric_limits<VecValueType>::max();
+		VecValueType tMin;
+		VecValueType tMax;
+		for (LengthType i = 0; i < length; ++i)
 		{
 			if (signs[i] == 0) {
 				if (origin[i] < minMax[0][i] || origin[i] > minMax[1][i]) return -1;
@@ -267,7 +267,7 @@ namespace fd
 		}
 
 		//calculate distance.
-		vec_value_type d;
+		VecValueType d;
 		if (tMin < 0)
 		{
 			d = tMax;
@@ -284,8 +284,8 @@ namespace fd
 	template <typename VecType = glm::vec3>
 	Bool32 Bounds<VecType>::isIntersects(Bounds<ValueType> bounds) const
 	{
-		typename ValueType::length_type length = ValueType::length();
-		for (typename ValueType::length_type i = 0; i < length; ++i)
+		LengthType length = ValueType::length();
+		for (LengthType i = 0; i < length; ++i)
 		{
 			if (m_min[i] > bounds.m_max[i] || m_max[i] < bounds.m_min[i])
 				return false;
@@ -296,11 +296,11 @@ namespace fd
 	template <typename VecType = glm::vec3>
 	Bool32 Bounds<VecType>::intersects(Bounds<ValueType> bounds, Bounds<ValueType> *intersection) const
 	{
-		typename ValueType::length_type length = ValueType::length();
+		LengthType length = ValueType::length();
 		Bool32 isInter = FD_TRUE;
 		ValueType min;
 		ValueType max;
-		for (typename ValueType::length_type i = 0; i < length; ++i)
+		for (LengthType i = 0; i < length; ++i)
 		{
 			if (m_min[i] > bounds.m_max[i] || m_max[i] < bounds.m_min[i])
 			{
@@ -327,7 +327,7 @@ namespace fd
 	}
 
 	template <typename VecType = glm::vec3>
-	typename Bounds<VecType>::vec_value_type Bounds<VecType>::getSqrDistance(ValueType point) const
+	typename Bounds<VecType>::VecValueType Bounds<VecType>::getSqrDistance(ValueType point) const
 	{
 		ValueType closestPoint = getClosestPoint(point);
 		closestPoint -= point;
@@ -337,13 +337,13 @@ namespace fd
 	template <typename VecType = glm::vec3>
 	void Bounds<VecType>::_updateSize()
 	{
-		length_type length = ValueType::length();
-		for (length_type i = 0; i < length; ++i)
+		LengthType length = ValueType::length();
+		for (LengthType i = 0; i < length; ++i)
 		{
 			m_size[i] = m_max[i] - m_min[i];
 		}
 #ifdef DEBUG
-		for (length_type i = 0; i < length; ++i)
+		for (LengthType i = 0; i < length; ++i)
 		{
 			if (m_size[i] < 0)
 				throw std::invalid_argument("Invalid size of Bounds");
@@ -354,8 +354,8 @@ namespace fd
 	template <typename VecType = glm::vec3>
 	void Bounds<VecType>::_updateMax()
 	{
-		length_type length = ValueType::length();
-		for (length_type i = 0; i < length; ++i)
+		LengthType length = ValueType::length();
+		for (LengthType i = 0; i < length; ++i)
 		{
 			m_max[i] = m_min[i] + m_size[i];
 		}

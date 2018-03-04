@@ -29,11 +29,11 @@ namespace vg
 	class Scene : public BaseScene
 	{
 	public:
-		typedef Object<SPACE_TYPE> ObjectType;
-		typedef VisualObject<SPACE_TYPE> VisualObjectType;
-		typedef Camera<SPACE_TYPE> CameraType;
-		typedef Light<SPACE_TYPE> LightType;
-		typedef Transform<SPACE_TYPE> TransformType;
+		using ObjectType = Object<SPACE_TYPE>;
+		using VisualObjectType = VisualObject<SPACE_TYPE>;
+		using CameraType = Camera<SPACE_TYPE>;
+		using LightType = Light<SPACE_TYPE>;
+		using TransformType = Transform<SPACE_TYPE>;
 
 		const std::shared_ptr<TransformType> pRootTransformForVisualObject;
 		const std::shared_ptr<TransformType> pRootTransformForCamera;

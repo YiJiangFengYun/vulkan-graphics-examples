@@ -31,7 +31,7 @@ namespace vg
 	class Object : public BaseObject
 	{
 	public:
-		typedef typename SpaceTransformTypeInfo<SPACE_TYPE>::TransformType TransformType;
+		using TransformType = typename SpaceTransformTypeInfo<SPACE_TYPE>::TransformType;
 
 		Object()
 			: BaseObject()

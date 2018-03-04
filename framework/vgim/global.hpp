@@ -17,7 +17,6 @@
 #define VG_IM_TRUE VG_TRUE
 
 namespace vgim {
-	typedef vg::Bool32 Bool32;
-	// typedef 
+	using Bool32 = vg::Bool32;
 } //vgim
 #endif //VG_IM_GLOBAL_H

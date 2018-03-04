@@ -10,19 +10,19 @@ namespace vg
 	template<SpaceType type>
 	struct SpaceTransformTypeInfo
 	{
-		typedef void TransformType;
+		using TransformType = void;
 	};
 
 	template<>
 	struct SpaceTransformTypeInfo<SpaceType::SPACE_2>
 	{
-		typedef Transform2 TransformType;
+		using TransformType = Transform2;
 	};
 
 	template<>
 	struct SpaceTransformTypeInfo<SpaceType::SPACE_3>
 	{
-		typedef Transform3 TransformType;
+		using TransformType = Transform3;
 	};
 } //namespace kgs
 

@@ -22,7 +22,7 @@ namespace vg
 		TRANSFORM
 	};
 
-	typedef uint32_t InstanceID;
+	using InstanceID = uint32_t;
 	class Base
 	{
 	public:

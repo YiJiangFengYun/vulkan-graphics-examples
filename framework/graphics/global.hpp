@@ -23,25 +23,25 @@
 
 namespace vg
 {
-	typedef uint32_t Bool32;
-	typedef unsigned char Byte;
-	typedef glm::vec2 Vector2;
-	typedef glm::vec3 Vector3;
-	typedef glm::vec4 Vector4;
-	typedef glm::mat2x2 Matrix2x2;
-	typedef glm::mat3x3 Matrix3x3;
-	typedef glm::mat4x4 Matrix4x4;
-	typedef glm::tvec4<float> Color;
-	typedef glm::tvec4<Byte> Color32;
-	typedef fd::Bounds<glm::vec2> Bound2;
-	typedef fd::Bounds<glm::vec3> Bound3;
-	typedef glm::quat Quaternion;
+	using Bool32 = uint32_t;
+	using Byte = unsigned char;
+	using Vector2 = glm::vec2;
+	using Vector3 = glm::vec3;
+	using Vector4 = glm::vec4;
+	using Matrix2x2 = glm::mat2x2;
+	using Matrix3x3 = glm::mat3x3;
+	using Matrix4x4 = glm::mat4x4;
+	using Color = glm::tvec4<float>;
+	using Color32 = glm::tvec4<Byte>;
+	using Bound2 = fd::Bounds<glm::vec2>;
+	using Bound3 = fd::Bounds<glm::vec3>;
+	using Quaternion = glm::quat;
 
 
-	typedef vk::PhysicalDevice PhysicalDevice;
-	typedef vk::PhysicalDeviceFeatures PhysicalDeviceFeatures;
-	typedef vk::Queue Queue;
-	typedef vk::SurfaceKHR Surface;
+	using PhysicalDevice = vk::PhysicalDevice;
+	using PhysicalDeviceFeatures = vk::PhysicalDeviceFeatures;
+	using Queue = vk::Queue;
+	using Surface = vk::SurfaceKHR;
 
 	extern const Color COLOR_ZERO;
 	extern const Color COLOR_WHITE;

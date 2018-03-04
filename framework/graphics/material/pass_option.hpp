@@ -25,7 +25,7 @@ namespace vg
 
 	const uint32_t ShaderStageFlagCount = 2u;
 
-	typedef fd::Flags<ShaderStageFlagBits> ShaderStageFlags;
+	using ShaderStageFlags = fd::Flags<ShaderStageFlagBits>;
 
 	enum class PolygonMode
 	{
@@ -47,7 +47,7 @@ namespace vg
 
 	const uint32_t CullModeFlagCount = 4u;
 
-	typedef fd::Flags<CullModeFlagBits> CullModeFlags;
+	using CullModeFlags = fd::Flags<CullModeFlagBits>;
 
 	enum class FrontFaceType
 	{

@@ -175,7 +175,7 @@ namespace sampleslib
 	template <vg::SpaceType SPACE_TYPE>
 	void Window<SPACE_TYPE>::_onPreRender()
 	{
-
+		m_lastDrawCount = 0u;		
 	}
 
 	template <vg::SpaceType SPACE_TYPE>
@@ -222,7 +222,6 @@ namespace sampleslib
 		sceneAndCameras[info.sceneAndCameraCount] = sceneAndCamera;
 		myInfo.pSceneAndCamera = sceneAndCameras.data();
 		vgf::Window::_renderWithRenderer(pRenderer, myInfo, resultInfo);
-		m_lastDrawCount = resultInfo.drawCount;
-		// vgf::Window::_renderWithRenderer(pRenderer, info, resultInfo);		
+		m_lastDrawCount += resultInfo.drawCount;
 	}
 } //sampleslib

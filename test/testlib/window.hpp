@@ -8,31 +8,31 @@ namespace testlib
 	template<vg::SpaceType type>
 	struct SpaceObjectInfo
 	{
-		typedef void SceneType;
-		typedef void CameraType;
+		using SceneType = void;
+		using CameraType = void;
 	};
 
 	template<>
 	struct SpaceObjectInfo<vg::SpaceType::SPACE_2>
 	{
-		typedef vg::Scene2 SceneType;
-		typedef vg::CameraOP2 CameraType;
+		using SceneType = vg::Scene2;
+		using CameraType = vg::CameraOP2;
 	};
 
 	template<>
 	struct SpaceObjectInfo<vg::SpaceType::SPACE_3>
 	{
-		typedef vg::Scene3 SceneType;
-		typedef vg::Camera3 CameraType;
+		using SceneType = vg::Scene3;
+		using CameraType = vg::Camera3;
 	};
 
 	template <vg::SpaceType SPACE_TYPE>
 	class Window : public vgf::Window
 	{
 	public:
-	    typedef typename vg::SpaceTypeInfo<SPACE_TYPE>::RotationType RotationType;
-	    typedef typename SpaceObjectInfo<SPACE_TYPE>::SceneType SceneType;
-	    typedef typename SpaceObjectInfo<SPACE_TYPE>::CameraType CameraType;
+	    using RotationType = typename vg::SpaceTypeInfo<SPACE_TYPE>::RotationType;
+	    using SceneType = typename SpaceObjectInfo<SPACE_TYPE>::SceneType;
+	    using CameraType = typename SpaceObjectInfo<SPACE_TYPE>::CameraType;
 
 		Window(uint32_t width
 			, uint32_t height

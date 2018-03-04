@@ -1,3 +1,0 @@
-1. Multiply windows.
-2. Multiply graphics thread, most of all is to each window.
-3. Allocate all resource (memory) at once.

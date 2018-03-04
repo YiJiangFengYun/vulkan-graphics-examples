@@ -87,7 +87,6 @@ namespace vg
 		std::shared_ptr<vk::RenderPass> m_pRenderPass;
 		std::shared_ptr<TextureDepthStencilAttachment> m_pDepthStencilTexture;
 		std::shared_ptr<vk::Framebuffer> m_pFrameBuffer;
-		//Command pool for render safe in multiply threads.
 		std::shared_ptr<vk::CommandPool> m_pCommandPool;
 		std::shared_ptr<vk::CommandBuffer> m_pCommandBuffer;
 		PipelineCache m_pipelineCache;

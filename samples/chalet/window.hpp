@@ -10,7 +10,7 @@ namespace chalet
 	class Window : public sampleslib::Window<vg::SpaceType::SPACE_3>
 	{
 	public:
-		typedef  sampleslib::Window<vg::SpaceType::SPACE_3> ParentWindowType;
+		using ParentWindowType = sampleslib::Window<vg::SpaceType::SPACE_3>;
 		struct Vertex
 		{
 			glm::vec3 pos;

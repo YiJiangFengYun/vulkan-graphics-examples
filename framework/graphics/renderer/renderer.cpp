@@ -439,6 +439,9 @@ namespace vg
 		}
 		m_pCommandBuffer->bindDescriptorSets(vk::PipelineBindPoint::eGraphics, *pPipelineLayout, 0u, descriptorSets, nullptr);
 
+		//dynamic line width
+		m_pCommandBuffer->setLineWidth(pPass->getLineWidth());
+
         vertexDataToCommandBuffer(*m_pCommandBuffer, pVertexData, subIndexData.vertexDataIndex);
 		indexDataToCommandBuffer(*m_pCommandBuffer, pIndexData, subMeshIndex);
 

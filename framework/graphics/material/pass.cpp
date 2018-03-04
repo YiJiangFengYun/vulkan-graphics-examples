@@ -233,6 +233,7 @@ namespace vg
 		, m_polygonMode(PolygonMode::FILL)
 		, m_cullMode(CullModeFlagBits::BACK)
 		, m_frontFace(FrontFaceType::COUNTER_CLOCKWISE)
+		, m_lineWidth(1.0f)
 		, m_viewport(0.0f, 0.0f, 1.0f, 1.0f, 0.0f, 1.0f)
 		, m_scissor(0.0f, 0.0f, 1.0f, 1.0f)
 		, m_depthStencilInfo()
@@ -258,6 +259,7 @@ namespace vg
 		, m_polygonMode(PolygonMode::FILL)
 		, m_cullMode(CullModeFlagBits::BACK)
 		, m_frontFace(FrontFaceType::COUNTER_CLOCKWISE)
+		, m_lineWidth(1.0f)
 		, m_viewport(0.0f, 0.0f, 1.0f, 1.0f, 0.0f, 1.0f)
 		, m_scissor(0.0f, 0.0f, 1.0f, 1.0f)
 		, m_depthStencilInfo()
@@ -411,6 +413,16 @@ namespace vg
 	{
 		m_frontFace = frontFace;
 		_updatePipelineStateID();
+	}
+
+	float Pass::getLineWidth() const
+	{
+		return m_lineWidth;
+	}
+
+	void Pass::setLineWidth(float lineWidth)
+	{
+		m_lineWidth = lineWidth;
 	}
 
 	const fd::Viewport &Pass::getViewport() const

@@ -57,6 +57,7 @@ namespace vg
 
 		const std::shared_ptr<vk::Instance> &getVKInstance() const;
 		const std::shared_ptr<vk::PhysicalDevice> &getPhysicalDevice() const;
+		const vk::PhysicalDeviceFeatures &getPhysicalDeviceFeatures() const;
 		const std::shared_ptr<vk::Device> &getDevice() const;
 		uint32_t getGraphicsFamily() const;
 		uint32_t getPresentFamily() const;

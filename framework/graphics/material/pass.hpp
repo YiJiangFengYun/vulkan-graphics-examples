@@ -174,6 +174,9 @@ namespace vg
 		FrontFaceType getFrontFace() const;
 		void setFrontFace(FrontFaceType frontFace);
 
+		float getLineWidth() const;
+		void setLineWidth(float lineWidth);
+
 		const fd::Viewport &getViewport() const;
 		void setViewport(const fd::Viewport &viewport);
 
@@ -253,6 +256,7 @@ namespace vg
 		vk::PipelineDepthStencilStateCreateInfo m_depthStencilInfo;
 		std::vector<vk::PipelineColorBlendAttachmentState> m_colorBlendAttachmentStates;
 		vk::PipelineColorBlendStateCreateInfo m_colorBlendInfo;
+		float m_lineWidth;
 		//todo
 		//each stage may own a specilization constant data.
 		std::unordered_map<vk::ShaderStageFlagBits, std::shared_ptr<SpecializationData>> m_mapSpecilizationDatas;

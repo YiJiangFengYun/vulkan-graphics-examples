@@ -188,6 +188,11 @@ namespace vg
 		return m_pPhysicalDevice;
 	}
 
+	const vk::PhysicalDeviceFeatures &Application::getPhysicalDeviceFeatures() const
+	{
+		return m_physicalDeviceFeatures;
+	}
+
 	const std::shared_ptr<vk::Device> &Application::getDevice() const
 	{
 		return m_pDevice;

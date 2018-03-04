@@ -189,6 +189,7 @@ namespace vg
         auto polygonMode = tranPolygonModeToVK(pPass->getPolygonMode());
         auto cullMode = tranCullModeFlagsToVK(pPass->getCullMode());
 		auto frontFace = tranFrontFaceTypeToVK(pPass->getFrontFace());
+        auto lineWidth = pPass->getLineWidth();
 		//Rasterization info.
 		vk::PipelineRasterizationStateCreateInfo rasterizationStateCreateInfo = {
 			vk::PipelineRasterizationStateCreateFlags(),  //flags
@@ -201,7 +202,7 @@ namespace vg
 			0.0f,                                         //depthBiasConstantFactor
 			0.0f,                                         //depthBiasClamp
 			0.0f,                                         //depthBiasSlopeFactor
-			1.0f                                          //lineWidth
+			lineWidth                                     //lineWidth
 		};
 		createInfo.pRasterizationState = &rasterizationStateCreateInfo;
 
@@ -268,7 +269,8 @@ namespace vg
 
 		std::vector<vk::DynamicState> dynamicStates = {
 			vk::DynamicState::eViewport,
-			vk::DynamicState::eScissor
+			vk::DynamicState::eScissor,
+            vk::DynamicState::eLineWidth
 		};
 
 		vk::PipelineDynamicStateCreateInfo dynamicStateCreateInfo = {

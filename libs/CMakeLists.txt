@@ -7,8 +7,11 @@ SET(GLFW_BUILD_TESTS OFF CACHE BOOL "Build the GLFW test programs")
 SET(GLFW_BUILD_DOCS OFF CACHE BOOL "Build the GLFW documentation")
 # glfw generation
 add_subdirectory(glfw)
-
 set(LIBRARIES ${LIBRARIES} glfw)
+
+# glm generation
+add_subdirectory(glm)
+set(LIBRARIES ${LIBRARIES} glm)
 
 # imgui generation
 set(LIBRARY_NAME "imgui")

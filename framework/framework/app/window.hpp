@@ -4,10 +4,6 @@
 #include <memory>
 #include <vector>
 #include <mutex>
-#include <foundation/foundation.hpp>
-#include <GLFW/glfw3.h>
-#include <vulkan/vulkan.hpp>
-#include <graphics/graphics.hpp>
 #include "framework/global.hpp"
 
 namespace vgf

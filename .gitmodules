@@ -16,3 +16,6 @@
 [submodule "test/libs/assimp"]
 	path = test/libs/assimp
 	url = https://github.com/assimp/assimp.git
+[submodule "libs/glm"]
+	path = libs/glm
+	url = https://github.com/g-truc/glm.git

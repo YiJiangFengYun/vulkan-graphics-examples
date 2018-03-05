@@ -14,6 +14,8 @@ if (USE_IMGUI_BIND)
 endif()
 set(LIBRARIES ${LIBRARIES} framework)
 
+add_subdirectory(libs)
+include_directories("libs/assimp/include")
 
 set(RESOURCES_DIR "${CMAKE_CURRENT_SOURCE_DIR}/resources")
 set(SHADERS_DIR "${RESOURCES_DIR}/shaders")

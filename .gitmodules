@@ -13,3 +13,9 @@
 [submodule "libs/glfw"]
 	path = libs/glfw
 	url = https://github.com/glfw/glfw.git
+[submodule "samples/libs/assimp"]
+	path = samples/libs/assimp
+	url = https://github.com/assimp/assimp.git
+[submodule "test/libs/assimp"]
+	path = test/libs/assimp
+	url = https://github.com/assimp/assimp.git

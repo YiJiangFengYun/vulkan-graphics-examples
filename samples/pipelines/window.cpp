@@ -12,6 +12,7 @@ Window::Window(uint32_t width
 		, title
 	    )
 {
+	_init();
 	_loadModel();
 	_createMesh();
 	_createMaterial();
@@ -24,11 +25,20 @@ Window::Window(std::shared_ptr<GLFWwindow> pWindow
 		, pSurface
 	    )
 {
+	_init();
 	_loadModel();
 	_createMesh();
 	_createMaterial();
 	_createModel();
 }
+
+void Window::_init()
+{
+	m_zoom = -10.5f;
+	/// Build a quaternion from euler angles (pitch, yaw, roll), in radians.
+	m_rotation = vg::Quaternion(vg::Vector3(glm::radians(-25.0f), glm::radians(15.0f), glm::radians(0.0f)));
+}
+
 void Window::_loadModel()
 {
 	m_tempPositions = { vg::Vector3(1.0f, 1.0f, 0.0f)
@@ -54,46 +64,68 @@ void Window::_createMesh()
 }
 void Window::_createMaterial()
 {
-	//shader
-	m_pShader = std::shared_ptr<vg::Shader>(
-		new vg::Shader("shaders/triangle/triangle.vert.spv", "shaders/triangle/triangle.frag.spv")
-		);
-	//pass
-	m_pPass = std::shared_ptr<vg::Pass>(new vg::Pass(m_pShader));
-	m_pPass->setMainColor(vg::Color(1.0f, 1.0f, 1.0f, 1.0f));
-	m_pPass->setPolygonMode(vg::PolygonMode::FILL);
-	m_pPass->setCullMode(vg::CullModeFlagBits::NONE);
-	m_pPass->setFrontFace(vg::FrontFaceType::COUNTER_CLOCKWISE);
-	vk::PipelineColorBlendAttachmentState attachmentState[1] = {};
-	attachmentState[0].colorWriteMask = vk::ColorComponentFlagBits::eR
-		| vk::ColorComponentFlagBits::eG
-		| vk::ColorComponentFlagBits::eB
-		| vk::ColorComponentFlagBits::eA;
-	attachmentState[0].blendEnable = VG_FALSE;
-	vk::PipelineColorBlendStateCreateInfo colorBlendState = {};
-	colorBlendState.attachmentCount = 1;
-	colorBlendState.pAttachments = attachmentState;
-	m_pPass->setColorBlendInfo(colorBlendState);
-	vk::PipelineDepthStencilStateCreateInfo depthStencilState = {};
-	depthStencilState.depthTestEnable = VG_TRUE;
-	depthStencilState.depthWriteEnable = VG_TRUE;
-	depthStencilState.depthCompareOp = vk::CompareOp::eLessOrEqual;
-	m_pPass->setDepthStencilInfo(depthStencilState);
-	//material
-	m_pMaterial = std::shared_ptr<vg::Material>(new vg::Material());
-	m_pMaterial->addPass(m_pPass);
-	m_pMaterial->setRenderPriority(0u);
-	m_pMaterial->setRenderQueueType(vg::MaterialShowType::OPAQUE);
-	m_pMaterial->apply();
+	std::string vertShaderPaths[SCENE_COUNT] = {
+		"shaders/pipelines/phong.vert.spv",
+		"shaders/pipelines/toon.vert.spv",
+		"shaders/pipelines/wireframe.vert.spv"
+	};
+
+	std::string fragShaderPaths[SCENE_COUNT] = {
+		"shaders/pipelines/phong.frag.spv",
+		"shaders/pipelines/toon.frag.spv",
+		"shaders/pipelines/wireframe.frag.spv"
+	};
+
+	auto& pShaders = m_pShaders;
+	auto& pPasses = m_pPasses;
+	auto& pMaterials = m_pMaterials;
+	auto& pApp = vg::pApp;
+	for (uint32_t i = 0; i < SCENE_COUNT; ++i)
+	{
+		//shader
+	    pShaders[i] = std::shared_ptr<vg::Shader>(
+	    	new vg::Shader(vertShaderPaths[i], fragShaderPaths[i])
+	    	);
+	    //pass
+	    pPasses[i] = std::shared_ptr<vg::Pass>(new vg::Pass(pShaders[i]));
+		pPasses[i]->setViewport(fd::Viewport(0.0f, 0.0f, static_cast<float>(i / SCENE_COUNT), 1.0f));
+		if (i == 1u && pApp->getPhysicalDeviceFeatures().wideLines)
+		{
+			pPasses[i]->setLineWidth(2.0f);
+		}
+
+	    //material
+	    pMaterials[i] = std::shared_ptr<vg::Material>(new vg::Material());
+	    pMaterials[i]->addPass(pPasses[i]);
+	    pMaterials[i]->setRenderQueueType(vg::MaterialShowType::OPAQUE);
+	    pMaterials[i]->apply();
+	}
+
 }
 void Window::_createModel()
 {
 	m_pModel = std::shared_ptr<vg::VisualObject3>(new vg::VisualObject3());
 	m_pModel->setMesh(m_pMesh);
-	m_pModel->setMaterial(m_pMaterial);
 	m_pScene->addVisualObject(m_pModel);
 }
 void Window::_onUpdate()
 {
 	ParentWindowType::_onUpdate();
+}
+
+void Window::_renderWithRenderer(const std::shared_ptr<vg::Renderer> &pRenderer
+		    , const vg::Renderer::RenderInfo &info
+			, vg::Renderer::RenderResultInfo &resultInfo)
+{
+	auto &pModel = m_pModel;
+	auto &pApp = vg::pApp;
+	for (uint32_t i = 0; i < SCENE_COUNT; ++i)
+	{
+		pModel->setMaterial(m_pMaterials[i]);
+		if (i != 2u || pApp->getPhysicalDeviceFeatures().fillModeNonSolid)
+		{
+	        ParentWindowType::_renderWithRenderer(pRenderer, info, resultInfo);
+		}
+	}
+	
 }

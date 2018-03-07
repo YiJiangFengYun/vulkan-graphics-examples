@@ -5,7 +5,7 @@ namespace vg
 	BaseVisualObject::BaseVisualObject()
 	    : m_pMaterial()
 		, m_pMesh()
-		, m_subMeshOffset(0u)
+		, m_subMeshOffset(-1)
 		, m_subMeshCount(-1)
 	{
 
@@ -28,7 +28,11 @@ namespace vg
 
 	uint32_t BaseVisualObject::getSubMeshOffset() const
 	{
-		return m_subMeshOffset;
+		if (m_subMeshOffset < 0) {
+            return dynamic_cast<ContentMesh *>(m_pMesh.get())->getSubMeshOffset();
+		} else {
+		    return m_subMeshOffset;
+		}
 	}
 		
 	uint32_t BaseVisualObject::getSubMeshCount() const

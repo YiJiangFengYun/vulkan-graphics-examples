@@ -21,4 +21,25 @@ namespace vg
 		: DimSimpleMesh<MeshDimType::SPACE_3>(bufferMemoryPropertyFlags)
 	{
 	}
+
+	DimSharedContentMesh3::DimSharedContentMesh3()
+	    : DimSharedContentMesh<MeshDimType::SPACE_3>()
+    {
+
+	}
+	
+	DimSharedContentMesh3::DimSharedContentMesh3(std::shared_ptr<VertexData> pVertexData
+		    , std::shared_ptr<IndexData> pIndexData
+			, uint32_t subIndexDataOffset
+			, uint32_t subIndexDataCount
+			)
+			: DimSharedContentMesh<MeshDimType::SPACE_3>(
+				pVertexData,
+				pIndexData,
+				subIndexDataOffset,
+				subIndexDataCount
+			)
+	{
+
+	}
 } //namespace kgs

@@ -10,7 +10,7 @@ namespace vgim {
 	extern uint32_t getCanvasWidth();
 	extern uint32_t getCanvasHeight();
 	extern const std::shared_ptr<vg::Material> getMaterial();
-	extern const std::shared_ptr<vg::SimpleMesh> getMesh();
+	extern const std::shared_ptr<vg::DimSimpleMesh2> getMesh();
 	extern const std::shared_ptr<vg::VisualObject2> getUIObject();
 	extern const std::shared_ptr<vg::CameraOP2> getCamera();
 	extern const std::shared_ptr<vg::Scene2> getScene();

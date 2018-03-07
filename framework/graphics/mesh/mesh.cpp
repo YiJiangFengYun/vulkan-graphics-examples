@@ -22,16 +22,14 @@ namespace vg
 
 	}
 
-	ContentMesh::ContentMesh(MemoryPropertyFlags bufferMemoryPropertyFlags)
-	    : m_pVertexData(new VertexData(bufferMemoryPropertyFlags))
-		, m_pIndexData(new IndexData(bufferMemoryPropertyFlags))
+	ContentMesh::~ContentMesh()
 	{
 
 	}
 
-	ContentMesh::~ContentMesh()
+	uint32_t ContentMesh::getSubMeshOffset() const
 	{
-
+		return 0u;
 	}
 
 	uint32_t ContentMesh::getSubMeshCount() const
@@ -48,6 +46,76 @@ namespace vg
 	{
 		return m_pIndexData;
 	}
+
+	
+
+	InternalContentMesh::InternalContentMesh()
+	    : ContentMesh()
+	{
+		m_pVertexData = std::shared_ptr<VertexData>(new VertexData());
+		m_pIndexData = std::shared_ptr<IndexData>(new IndexData());
+	}
+
+	InternalContentMesh::InternalContentMesh(MemoryPropertyFlags bufferMemoryPropertyFlags)
+	    : ContentMesh()
+	{
+		m_pVertexData = std::shared_ptr<VertexData>(new VertexData(bufferMemoryPropertyFlags));
+		m_pIndexData = std::shared_ptr<IndexData>(new IndexData(bufferMemoryPropertyFlags));
+	}
+
+
+	ExternalContentMesh::ExternalContentMesh()
+	    : ContentMesh()
+		, m_subIndexDataOffset(0u)
+		, m_subIndexDataCount(0u)
+	{
+
+	}
+
+	ExternalContentMesh::ExternalContentMesh(
+		std::shared_ptr<VertexData> pVertexData
+		    , std::shared_ptr<IndexData> pIndexData
+			, uint32_t subIndexDataOffset
+			, uint32_t subIndexDataCount
+	)
+	    : ContentMesh()
+		, m_subIndexDataOffset(subIndexDataOffset)
+		, m_subIndexDataCount(subIndexDataCount)
+	{
+		m_pVertexData = pVertexData;
+		m_pIndexData = pIndexData;
+	}
+
+	uint32_t ExternalContentMesh::getSubMeshOffset() const
+	{
+		return m_subIndexDataOffset;
+	}
+
+	uint32_t ExternalContentMesh::getSubMeshCount() const
+	{
+		return m_subIndexDataCount;
+	}
+
+	uint32_t ExternalContentMesh::getSubIndexDataOffset() const
+    {
+		return m_subIndexDataOffset;
+	}
+
+	void ExternalContentMesh::setSubIndexDataOffset(uint32_t offset)
+	{
+		m_subIndexDataOffset = offset;
+	}
+
+	uint32_t ExternalContentMesh::getSubIndexDaTaCount() const
+	{
+		return m_subIndexDataCount;
+	}
+
+	void ExternalContentMesh::setSubIndexDataCount(uint32_t count)
+	{
+		m_subIndexDataCount = count;
+	}
+
 
 	SepMesh::LayoutBindingInfo::LayoutBindingInfo()
 	{
@@ -100,7 +168,7 @@ namespace vg
 	}
 
 	SepMesh::SepMesh()
-		: ContentMesh()
+		: InternalContentMesh()
 		, m_multipliedColor(COLOR_WHITE) //default multiplied color should be (1, 1, 1, 1)
 		, m_applied(VG_FALSE)
 	{
@@ -109,7 +177,7 @@ namespace vg
 	}
 
 	SepMesh::SepMesh(MemoryPropertyFlags bufferMemoryPropertyFlags)
-		: ContentMesh(bufferMemoryPropertyFlags)
+		: InternalContentMesh(bufferMemoryPropertyFlags)
 		, m_multipliedColor(COLOR_WHITE) //default multiplied color should be (1, 1, 1, 1)
 		, m_applied(VG_FALSE)
 	{
@@ -354,17 +422,5 @@ namespace vg
 		m_pIndexData->init(subDatas, stagingMemory, indexBufferSize, VG_FALSE);
 
 		free(stagingMemory);
-	}
-
-	SimpleMesh::SimpleMesh()
-	    : ContentMesh()
-	{
-		
-	}
-
-	SimpleMesh::SimpleMesh(MemoryPropertyFlags bufferMemoryPropertyFlags)
-	    : ContentMesh(bufferMemoryPropertyFlags)
-	{
-		
 	}
 }

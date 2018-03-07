@@ -45,11 +45,13 @@ namespace vg
 
 		MeshDimType getMeshDimType() const;
 
-        virtual Bool32 getIsHasBounds() = 0;
+        virtual Bool32 getIsHasBounds() const;
 		/*The bounding volume of the mesh*/
-		virtual fd::Bounds<PointType> getBounds() = 0;
+		virtual fd::Bounds<PointType> getBounds() const;
 	protected:
 		MeshDimType m_meshDimType;
+		Bool32 m_hasBounds;
+		fd::Bounds<PointType> m_bounds;		
 	};
 	
 
@@ -57,18 +59,53 @@ namespace vg
 	{
 	public:
         ContentMesh();
-        ContentMesh(MemoryPropertyFlags bufferMemoryPropertyFlags);
 		virtual ~ContentMesh();
 		const std::shared_ptr<VertexData> &getVertexData() const;
 		const std::shared_ptr<IndexData> &getIndexData() const;
+		virtual uint32_t getSubMeshOffset() const;
 		virtual uint32_t getSubMeshCount() const;
 	protected:
         std::shared_ptr<VertexData> m_pVertexData;
 		std::shared_ptr<IndexData> m_pIndexData;
 	};
+
+	class InternalContentMesh : public ContentMesh
+	{
+	public:
+	    InternalContentMesh();
+        InternalContentMesh(MemoryPropertyFlags bufferMemoryPropertyFlags);	    
+	protected:
+
+
+	private:
+
+	};
+
+	class ExternalContentMesh : public ContentMesh
+	{
+	public:
+	    ExternalContentMesh();
+	    ExternalContentMesh(std::shared_ptr<VertexData> pVertexData
+		    , std::shared_ptr<IndexData> pIndexData
+			, uint32_t subIndexDataOffset
+			, uint32_t subIndexDataCount
+			);
+
+		uint32_t getSubIndexDataOffset() const;
+		void setSubIndexDataOffset(uint32_t offset);
+		virtual uint32_t getSubMeshOffset() const override;
+		virtual uint32_t getSubMeshCount() const override;
+		uint32_t getSubIndexDaTaCount() const;
+		void setSubIndexDataCount(uint32_t count);
+	protected:
+	    uint32_t m_subIndexDataOffset;
+		uint32_t m_subIndexDataCount;
+	private:
+
+	};
     
 	//This mesh class for separation atrtribute layout of vertex and sub mesh feature.
-	class SepMesh : public ContentMesh
+	class SepMesh : public InternalContentMesh
 	{
 	public:
 		struct LayoutBindingInfo
@@ -103,7 +140,7 @@ namespace vg
 		SepMesh();
 		SepMesh(MemoryPropertyFlags bufferMemoryPropertyFlags);
 
-		~SepMesh();
+		virtual ~SepMesh();
 
 		uint32_t getVertexCount() const;
 
@@ -115,7 +152,7 @@ namespace vg
 		void setColors(const std::vector<Color32> &colors);
 
 		//index
-		uint32_t getSubMeshCount() const;
+		virtual uint32_t getSubMeshCount() const override;
 
 		void setSubMeshCount(uint32_t value);
 
@@ -226,36 +263,35 @@ namespace vg
 
 		virtual void apply(Bool32 makeUnreadable) override;
 
-        virtual Bool32 getIsHasBounds() override;
-
-		/*The bounding volume of the mesh*/
-		virtual fd::Bounds<PointType> getBounds() override;
-
 	private:
-		
-		fd::Bounds<PointType> m_bounds;
-
 		inline void _updateBounds();
 	};
 
-	class SimpleMesh : public ContentMesh
-	{
-	public:
-	    SimpleMesh();
-	    SimpleMesh(MemoryPropertyFlags bufferMemoryPropertyFlags);
-	protected:
-	};
-
 	template <MeshDimType meshDimType>
-	class DimSimpleMesh : public SimpleMesh, public Mesh<meshDimType>
+	class DimSimpleMesh : public InternalContentMesh, public Mesh<meshDimType>
 	{
 	public: 
         DimSimpleMesh();
         DimSimpleMesh(MemoryPropertyFlags bufferMemoryPropertyFlags);
-	    virtual Bool32 getIsHasBounds() override;
-		/*The bounding volume of the mesh*/
-		fd::Bounds<PointType> getBounds() override;
+		void setIsHasBounds(Bool32 isHasBounds);
+		void setBounds(fd::Bounds<PointType> bounds);
 	private:
+	};
+
+	template <MeshDimType meshDimType>
+	class DimSharedContentMesh : public ExternalContentMesh, public Mesh<meshDimType>
+	{
+	public:
+	    DimSharedContentMesh();
+	    DimSharedContentMesh(std::shared_ptr<VertexData> pVertexData
+		    , std::shared_ptr<IndexData> pIndexData
+			, uint32_t subIndexDataOffset
+			, uint32_t subIndexDataCount
+			);
+		void setIsHasBounds(Bool32 isHasBounds);
+		void setBounds(fd::Bounds<PointType> bounds);
+	private:
+
 	};
 }
 

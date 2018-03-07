@@ -41,7 +41,7 @@ namespace vgim
 		return m_pMaterial;
 	}
 
-    const std::shared_ptr<vg::SimpleMesh> getMesh()
+    const std::shared_ptr<vg::DimSimpleMesh2> getMesh()
     {
         return m_pMesh;   
     }

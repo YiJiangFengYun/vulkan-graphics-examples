@@ -27,7 +27,7 @@ namespace vg
 	protected:
 		std::shared_ptr<Material> m_pMaterial;
 		std::shared_ptr<BaseMesh> m_pMesh;
-		uint32_t m_subMeshOffset;
+		int32_t m_subMeshOffset;
 		int32_t m_subMeshCount;
 	};
 
@@ -48,7 +48,7 @@ namespace vg
 		void setMesh(std::shared_ptr<MeshDimType> pMesh)
 		{
 			m_pMesh = pMesh;
-			m_subMeshOffset = 0u;
+			m_subMeshOffset = -1;
 			m_subMeshCount = -1;
 		}
 

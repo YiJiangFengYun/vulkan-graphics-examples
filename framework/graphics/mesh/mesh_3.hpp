@@ -20,6 +20,19 @@ namespace vg
 	private:
 
 	};
+
+	class DimSharedContentMesh3 : public DimSharedContentMesh<MeshDimType::SPACE_3>
+	{
+	public:
+		DimSharedContentMesh3();
+		DimSharedContentMesh3(std::shared_ptr<VertexData> pVertexData
+		    , std::shared_ptr<IndexData> pIndexData
+			, uint32_t subIndexDataOffset
+			, uint32_t subIndexDataCount
+			);
+	private:
+
+	};
 }
 
 #endif //VG_MESH_2_H

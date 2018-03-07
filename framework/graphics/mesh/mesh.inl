@@ -4,6 +4,8 @@ namespace vg
 	Mesh<meshDimType>::Mesh()
 		: DimensionMesh()
 		, m_meshDimType(meshDimType)
+		, m_hasBounds(VG_FALSE)
+		, m_bounds()
 	{
 	}
 
@@ -11,6 +13,18 @@ namespace vg
 	MeshDimType Mesh<meshDimType>::getMeshDimType() const
 	{
 		return m_meshDimType;
+	}
+
+	template<MeshDimType meshDimType>
+	Bool32 Mesh<meshDimType>::getIsHasBounds() const
+	{
+		return m_hasBounds;
+	}
+
+	template<MeshDimType meshDimType>
+	fd::Bounds<typename Mesh<meshDimType>::PointType> Mesh<meshDimType>::getBounds() const
+	{
+		return m_bounds;
 	}
 
 	template<UVType uvType, UVIndex uvIndex>
@@ -86,6 +100,7 @@ namespace vg
 		: SepMesh()
 		, Mesh<meshDimType>()
 	{
+		m_hasBounds = VG_TRUE;
 	}
 
 	template <MeshDimType meshDimType>
@@ -93,6 +108,7 @@ namespace vg
 		: SepMesh(bufferMemoryPropertyFlags)
 		, Mesh<meshDimType>()
 	{
+		m_hasBounds = VG_TRUE;
 	}
 
 	template <MeshDimType meshDimType>
@@ -137,18 +153,6 @@ namespace vg
 		_setData<DimSepMesh<meshDimType>::ARRAY_DATA_TYPE>(VG_VERTEX_TANGENT_NAME, tangents, VG_VERTEX_BINDING_PRIORITY_TANGENT);
 	}
 
-    template <MeshDimType meshDimType>
-	Bool32 DimSepMesh<meshDimType>::getIsHasBounds()
-	{
-		return VG_TRUE;
-	}
-
-	template <MeshDimType meshDimType>
-	fd::Bounds<typename DimSepMesh<meshDimType>::PointType> DimSepMesh<meshDimType>::getBounds()
-	{
-		return m_bounds;
-	}
-
 	template <MeshDimType meshDimType>
 	void DimSepMesh<meshDimType>::apply(Bool32 makeUnreadable)
 	{
@@ -187,7 +191,7 @@ namespace vg
 
     template <MeshDimType meshDimType>
 	DimSimpleMesh<meshDimType>::DimSimpleMesh()
-	    : SimpleMesh()
+	    : InternalContentMesh()
 		, Mesh<meshDimType>()
 	{
 
@@ -195,21 +199,51 @@ namespace vg
 
 	template <MeshDimType meshDimType>
 	DimSimpleMesh<meshDimType>::DimSimpleMesh(MemoryPropertyFlags bufferMemoryPropertyFlags)
-	    : SimpleMesh(bufferMemoryPropertyFlags)
+	    : InternalContentMesh(bufferMemoryPropertyFlags)
 		, Mesh<meshDimType>()
 	{
 
 	}
 
-    template <MeshDimType meshDimType>
-	Bool32 DimSimpleMesh<meshDimType>::getIsHasBounds()
-	{
-		return VG_FALSE;
-	}
-    
 	template <MeshDimType meshDimType>
-	fd::Bounds<typename DimSimpleMesh<meshDimType>::PointType> DimSimpleMesh<meshDimType>::getBounds()
+	void DimSimpleMesh<meshDimType>::setIsHasBounds(Bool32 isHasBounds)
 	{
-		throw std::runtime_error("Don't own a bounds but call its getBounds() method.");
+		m_hasBounds = isHasBounds;
+	}
+
+    template <MeshDimType meshDimType>
+	void DimSimpleMesh<meshDimType>::setBounds(fd::Bounds<PointType> bounds)
+	{
+		m_bounds = bounds;
+	}
+
+    template <MeshDimType meshDimType>
+	DimSharedContentMesh<meshDimType>::DimSharedContentMesh()
+	    : ExternalContentMesh()
+		, Mesh<meshDimType>()
+	{
+
+	}
+
+	template <MeshDimType meshDimType>
+	DimSharedContentMesh<meshDimType>::DimSharedContentMesh(std::shared_ptr<VertexData> pVertexData
+		    , std::shared_ptr<IndexData> pIndexData
+			, uint32_t subIndexDataOffset
+			, uint32_t subIndexDataCount
+			)
+	{
+
+	}
+
+	template <MeshDimType meshDimType>
+	void DimSharedContentMesh<meshDimType>::setIsHasBounds(Bool32 isHasBounds)
+	{
+		m_hasBounds = isHasBounds;
+	}
+
+    template <MeshDimType meshDimType>
+	void DimSharedContentMesh<meshDimType>::setBounds(fd::Bounds<PointType> bounds)
+	{
+		m_bounds = bounds;
 	}
 } //namespace kgs

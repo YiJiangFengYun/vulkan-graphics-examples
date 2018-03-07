@@ -246,6 +246,11 @@ namespace vgf {
 				);
 	}
 
+	void Window::_renderBeginWithRenderer(const std::shared_ptr<vg::Renderer> &pRenderer)
+	{
+		pRenderer->renderBegin();
+	}
+
 	void Window::_renderWithRenderer(const std::shared_ptr<vg::Renderer> &pRenderer
 		    , const vg::Renderer::RenderInfo &info
 			, vg::Renderer::RenderResultInfo &resultInfo)
@@ -267,6 +272,12 @@ namespace vgf {
 #else
         pRenderer->render(info, resultInfo); 		
 #endif //USE_IMGUI_BIND
+	}
+
+	void Window::_renderEndWithRenderer(const std::shared_ptr<vg::Renderer> &pRenderer
+		    , const vg::Renderer::RenderInfo &info)
+	{
+		pRenderer->renderEnd(info);
 	}
 			
 
@@ -449,8 +460,9 @@ namespace vgf {
 			vg::Renderer::RenderResultInfo resultInfo;
 			resultInfo.isRendered = VG_FALSE;
 
+			_renderBeginWithRenderer(m_pRenderers[imageIndex]);
 			_renderWithRenderer(m_pRenderers[imageIndex], info, resultInfo);
-
+			_renderEndWithRenderer(m_pRenderers[imageIndex], info);
 			//if (resultInfo.isRendered == VG_FALSE) throw std::runtime_error("No content was rendered.");
 			if (resultInfo.isRendered)
 			{

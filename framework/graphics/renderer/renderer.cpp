@@ -106,11 +106,23 @@ namespace vg
 		return _isValidForRender();
 	}
 
+	void Renderer::renderBegin()
+	{
+		_preRender();
+		_renderBegin();
+	}
+
 	void Renderer::render(const RenderInfo &info, 
 		RenderResultInfo &resultInfo)
 	{
-		_preRender();
+		
 		_render(info, resultInfo);
+		
+	}
+
+	void Renderer::renderEnd(const RenderInfo &info)
+	{
+		_renderEnd(info);
 		_postRender();
 	}
 
@@ -203,11 +215,16 @@ namespace vg
 		m_pipelineCache.start();
 	}
 
-	void Renderer::_render(const RenderInfo &info
-		, RenderResultInfo &resultInfo)
+	void Renderer::_renderBegin()
 	{
 		//command buffer begin
 		_recordCommandBufferForBegin();
+	}
+
+	void Renderer::_render(const RenderInfo &info
+		, RenderResultInfo &resultInfo)
+	{
+		
 
 		resultInfo.signalSemaphoreCount = 0u;
 		resultInfo.drawCount = 0u;
@@ -234,6 +251,16 @@ namespace vg
 			}
 		}
 
+		uint32_t semaphoreCount = resultInfo.signalSemaphoreCount + 1u;
+		uint32_t semaphoreIndex = resultInfo.signalSemaphoreCount;
+		m_arrSemaphores.resize(semaphoreCount);
+		m_arrSemaphores[semaphoreIndex] = *m_cachePSemaphore;
+		resultInfo.signalSemaphoreCount = static_cast<uint32_t>(m_arrSemaphores.size());
+		resultInfo.pSignalSemaphores = m_arrSemaphores.data();
+	}
+
+	void Renderer::_renderEnd(const RenderInfo &info)
+	{
 		//command buffer end
 		_recordCommandBufferForEnd();
 
@@ -262,13 +289,6 @@ namespace vg
 		//queue.submit(submitInfo, *m_waitFence);
 		pApp->freeGraphicsQueue(queueIndex);
 		LOG(plog::debug) << "Post submit to grahics queue." << std::endl;
-
-		uint32_t semaphoreCount = resultInfo.signalSemaphoreCount + 1u;
-		uint32_t semaphoreIndex = resultInfo.signalSemaphoreCount;
-		m_arrSemaphores.resize(semaphoreCount);
-		m_arrSemaphores[semaphoreIndex] = *m_cachePSemaphore;
-		resultInfo.signalSemaphoreCount = static_cast<uint32_t>(m_arrSemaphores.size());
-		resultInfo.pSignalSemaphores = m_arrSemaphores.data();
 	}
 
 	void Renderer::_postRender()

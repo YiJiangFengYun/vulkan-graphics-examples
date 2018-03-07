@@ -16,8 +16,8 @@ namespace vg
 	}
 
 	ContentMesh::ContentMesh()
-	    : m_pVertexData(new VertexData())
-		, m_pIndexData(new IndexData())
+	    : m_pVertexData(nullptr)
+		, m_pIndexData(nullptr)
 	{
 
 	}

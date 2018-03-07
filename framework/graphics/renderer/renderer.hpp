@@ -59,7 +59,9 @@ namespace vg
 
 		Bool32 isValidForRender() const;
 
+		void renderBegin();
 		void render(const RenderInfo &info, RenderResultInfo &resultInfo);
+		void renderEnd(const RenderInfo &info);
 
 		uint32_t getFramebufferWidth() const ;
 		uint32_t getFramebufferHeight() const;
@@ -101,7 +103,9 @@ namespace vg
 		std::shared_ptr<TextureColorAttachment> m_pColorTexture;
 
 		virtual void _preRender();
+		virtual void _renderBegin();
 		virtual void _render(const RenderInfo &info, RenderResultInfo &resultInfo);
+		virtual void _renderEnd(const RenderInfo &info);
 		virtual void _postRender();
 		virtual Bool32 _isValidForRender() const;
 

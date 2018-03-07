@@ -76,9 +76,12 @@ namespace vgf
 			, uint32_t swapchainImageHeight
 		);
 
+		virtual void _renderBeginWithRenderer(const std::shared_ptr<vg::Renderer> &pRenderer);
 		virtual void _renderWithRenderer(const std::shared_ptr<vg::Renderer> &pRenderer
 		    , const vg::Renderer::RenderInfo &info
 			, vg::Renderer::RenderResultInfo &resultInfo);
+		virtual void _renderEndWithRenderer(const std::shared_ptr<vg::Renderer> &pRenderer
+		    , const vg::Renderer::RenderInfo &info);
 
 		// tool methods
 		void _createImage(uint32_t width, uint32_t height, vk::Format format, vk::ImageTiling tiling,

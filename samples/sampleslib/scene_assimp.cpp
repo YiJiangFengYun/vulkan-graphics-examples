@@ -13,6 +13,7 @@ namespace sampleslib
                 , vg::Vector3 offset
                 , vg::Vector3 scale
                 , vg::Vector2 uvScale
+                , vg::Bool32 isCreateObject
                 )
     {
         this->fileName = fileName;
@@ -21,10 +22,12 @@ namespace sampleslib
         this->offset = offset;
         this->scale = scale;
         this->uvScale = uvScale;
+        this->isCreateObject = isCreateObject;
     }
 
     AssimpScene::AssimpScene()
         : m_pMeshes()
+        , m_pObjects()
         , m_pSharedVertexData(new vg::VertexData())
 		, m_pSharedIndexData(new vg::IndexData())
 	{
@@ -33,6 +36,7 @@ namespace sampleslib
 
     AssimpScene::AssimpScene(const CreateInfo &createInfo)
         : m_pMeshes()
+        , m_pObjects()
         , m_pSharedVertexData(new vg::VertexData())
 		, m_pSharedIndexData(new vg::IndexData())
     {
@@ -46,6 +50,11 @@ namespace sampleslib
     const std::vector<std::shared_ptr<vg::DimSharedContentMesh3>> AssimpScene::getMeshes() const
     {
         return m_pMeshes;
+    }
+
+    const std::vector<std::shared_ptr<vg::VisualObject3>> AssimpScene::getObjects() const
+    {
+        return m_pObjects;
     }
 
     void AssimpScene::_init(const CreateInfo &createInfo)
@@ -310,9 +319,30 @@ namespace sampleslib
                 for (uint32_t i = 0; i < meshCount; ++i)
                 {
                     auto &pMesh = pMeshes[i];
+					pMesh = std::shared_ptr<vg::DimSharedContentMesh3>(new vg::DimSharedContentMesh3());
                     pMesh->init(pSharedVertexData, pSharedIndexData, i, 1u);
                     pMesh->setIsHasBounds(VG_TRUE);
                     pMesh->setBounds(boundses[i]);
+                }
+            }
+
+            {
+                //Filling the visual object.
+                if (createInfo.isCreateObject)
+                {
+                    auto &pObjects = m_pObjects;
+                    auto &pMeshes = m_pMeshes;
+                    pObjects.resize(meshCount);
+
+                    for (uint32_t i = 0; i < meshCount; ++i)
+                    {
+						pObjects[i] = std::shared_ptr<vg::VisualObject3>(new vg::VisualObject3());
+                        pObjects[i]->setMesh(pMeshes[i]);
+                    }
+                }
+                else
+                {
+                    m_pObjects.resize(0);
                 }
             }
     

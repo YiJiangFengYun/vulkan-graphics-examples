@@ -11,12 +11,15 @@ Window::Window(uint32_t width
 		, height
 		, title
 	    )
+	, m_assimpScene()
+	, m_pShaders()
+	, m_pPasses()
+	, m_pMaterials()
 {
 	_init();
-	_loadModel();
-	_createMesh();
+	_loadAssimpScene();
 	_createMaterial();
-	_createModel();
+	_fillScene();
 }
 Window::Window(std::shared_ptr<GLFWwindow> pWindow
 	, std::shared_ptr<vk::SurfaceKHR> pSurface
@@ -24,12 +27,15 @@ Window::Window(std::shared_ptr<GLFWwindow> pWindow
 	: sampleslib::Window<vg::SpaceType::SPACE_3>(pWindow
 		, pSurface
 	    )
+	, m_assimpScene()
+	, m_pShaders()
+	, m_pPasses()
+	, m_pMaterials()
 {
 	_init();
-	_loadModel();
-	_createMesh();
+	_loadAssimpScene();	
 	_createMaterial();
-	_createModel();
+	_fillScene();
 }
 
 void Window::_init()
@@ -39,29 +45,23 @@ void Window::_init()
 	m_rotation = vg::Quaternion(vg::Vector3(glm::radians(-25.0f), glm::radians(15.0f), glm::radians(0.0f)));
 }
 
-void Window::_loadModel()
+void Window::_loadAssimpScene()
 {
-	m_tempPositions = { vg::Vector3(1.0f, 1.0f, 0.0f)
-	, vg::Vector3(-1.0f, 1.0f, 0.0f)
-	, vg::Vector3(0.0f, -1.0f, 0.0f)
+	const uint32_t layoutCount = 4u;
+	sampleslib::AssimpScene::VertexLayoutComponent layouts[layoutCount] = {
+		sampleslib::AssimpScene::VertexLayoutComponent::VERTEX_COMPONENT_POSITION,
+		sampleslib::AssimpScene::VertexLayoutComponent::VERTEX_COMPONENT_NORMAL,
+		sampleslib::AssimpScene::VertexLayoutComponent::VERTEX_COMPONENT_UV,
+		sampleslib::AssimpScene::VertexLayoutComponent::VERTEX_COMPONENT_COLOR	    				
 	};
-	m_tempColors = { vg::Color32(255, 0, 0, 255)
-	, vg::Color32(0, 255, 0, 255)
-	, vg::Color32(0, 0, 255, 255)
-	};
-	m_tempIndices = {
-		0, 1, 2
-	};
+	sampleslib::AssimpScene::CreateInfo createInfo;
+	createInfo.fileName = "models/treasure_smooth.dae";
+	createInfo.isCreateObject = VG_TRUE;
+	createInfo.layoutComponentCount = layoutCount;
+	createInfo.pLayoutComponent = layouts;
+	m_assimpScene.init(createInfo);
 }
-void Window::_createMesh()
-{
-	m_pMesh = static_cast<std::shared_ptr<vg::DimSepMesh3>>(new vg::DimSepMesh3());
-	m_pMesh->setVertexCount(static_cast<uint32_t>(m_tempPositions.size()));
-	m_pMesh->setPositions(m_tempPositions);
-	m_pMesh->setColors(m_tempColors);
-	m_pMesh->setIndices(m_tempIndices, vg::PrimitiveTopology::TRIANGLE_LIST, 0u);
-	m_pMesh->apply(VG_TRUE);
-}
+
 void Window::_createMaterial()
 {
 	std::string vertShaderPaths[SCENE_COUNT] = {
@@ -88,7 +88,15 @@ void Window::_createMaterial()
 	    	);
 	    //pass
 	    pPasses[i] = std::shared_ptr<vg::Pass>(new vg::Pass(pShaders[i]));
-		pPasses[i]->setViewport(fd::Viewport(0.0f, 0.0f, static_cast<float>(i / SCENE_COUNT), 1.0f));
+		pPasses[i]->setViewport(fd::Viewport(0.0f, 
+		    static_cast<float>(i) / static_cast<float>(SCENE_COUNT),
+			1.0f / 3.0f,
+			1.0f));
+		vk::PipelineDepthStencilStateCreateInfo depthStencilState = {};
+	    depthStencilState.depthTestEnable = VG_TRUE;
+	    depthStencilState.depthWriteEnable = VG_TRUE;
+	    depthStencilState.depthCompareOp = vk::CompareOp::eLessOrEqual;
+	    pPasses[i]->setDepthStencilInfo(depthStencilState);
 		if (i == 1u && pApp->getPhysicalDeviceFeatures().wideLines)
 		{
 			pPasses[i]->setLineWidth(2.0f);
@@ -102,30 +110,75 @@ void Window::_createMaterial()
 	}
 
 }
-void Window::_createModel()
+void Window::_fillScene()
 {
-	m_pModel = std::shared_ptr<vg::VisualObject3>(new vg::VisualObject3());
-	m_pModel->setMesh(m_pMesh);
-	m_pScene->addVisualObject(m_pModel);
+	const auto &objects = m_assimpScene.getObjects();
+	for (const auto &object : objects)
+	{
+	    m_pScene->addVisualObject(object);		
+	}
 }
+
+void Window::_setMaterialToObjects(std::shared_ptr<vg::Material> pMaterial)
+{
+	const auto &objects = m_assimpScene.getObjects();
+	for (const auto &object : objects)
+	{
+	    object->setMaterial(pMaterial);
+	}
+}
+
 void Window::_onUpdate()
 {
 	ParentWindowType::_onUpdate();
+	const auto &pApp = vg::pApp;
+	if (pApp->getPhysicalDeviceFeatures().fillModeNonSolid == VK_FALSE)
+	{
+	    auto pos = ImGui::GetWindowPos();
+	    auto size = ImGui::GetWindowSize();
+	    ImGui::SetNextWindowPos(ImVec2(pos.x, pos.y + size.y + 10));
+	    ImGui::SetNextWindowSize(ImVec2(0, 0));
+	    ImGui::Begin("Extra Info", nullptr, ImGuiWindowFlags_AlwaysAutoResize | ImGuiWindowFlags_NoResize | ImGuiWindowFlags_NoMove);
+	    ImGui::TextUnformatted("Non solid fill modes not supported!");
+	    ImGui::End();
+	}
 }
 
 void Window::_renderWithRenderer(const std::shared_ptr<vg::Renderer> &pRenderer
 		    , const vg::Renderer::RenderInfo &info
 			, vg::Renderer::RenderResultInfo &resultInfo)
 {
-	auto &pModel = m_pModel;
-	auto &pApp = vg::pApp;
-	for (uint32_t i = 0; i < SCENE_COUNT; ++i)
-	{
-		pModel->setMaterial(m_pMaterials[i]);
-		if (i != 2u || pApp->getPhysicalDeviceFeatures().fillModeNonSolid)
-		{
-	        ParentWindowType::_renderWithRenderer(pRenderer, info, resultInfo);
-		}
-	}
+	_setMaterialToObjects(m_pMaterials[0]);
+	ParentWindowType::_renderWithRenderer(pRenderer, info, resultInfo);
+
+	// const auto &pApp = vg::pApp;
+	// for (uint32_t i = 0u; i < SCENE_COUNT; ++i)
+	// {
+	// 	_setMaterialToObjects(m_pMaterials[i]);
+	// 	if (i != 2u || pApp->getPhysicalDeviceFeatures().fillModeNonSolid)
+	// 	{
+	//         vg::Renderer::SceneAndCamera sceneAndCamera;
+	// 	    sceneAndCamera.pScene = m_pScene.get();
+	// 	    sceneAndCamera.pCamera = m_pCamera.get();
+	// 	    auto addedInfo = info;
+	// 	    addedInfo.sceneAndCameraCount = 1u;
+	// 	    addedInfo.pSceneAndCamera = &sceneAndCamera;
+	// 		if (i != 2u)
+	// 		{
+    //             pRenderer->render(addedInfo, resultInfo);
+	// 		}
+	// 		else
+	// 		{
+	// 			ParentWindowType::_renderWithRenderer(pRenderer, info, resultInfo);
+	// 		}
+	// 	}
+	// 	else if (i == 2u)
+	// 	{
+	// 		ParentWindowType::_renderWithRenderer(pRenderer, info, resultInfo);
+	// 	}
+	// }
+	
+	
+	m_lastDrawCount += resultInfo.drawCount;	
 	
 }

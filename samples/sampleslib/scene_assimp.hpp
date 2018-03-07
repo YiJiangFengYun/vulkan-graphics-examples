@@ -27,12 +27,14 @@ namespace sampleslib
             vg::Vector3 offset;
             vg::Vector3 scale;
             vg::Vector2 uvScale;
+            vg::Bool32 isCreateObject;
             CreateInfo(const char* fileName = nullptr
                 , uint32_t layoutComponentCount = 0u
                 , const VertexLayoutComponent *pLayoutComponent = nullptr
                 , vg::Vector3 offset = vg::Vector3(0.0f)
-                , vg::Vector3 scale = vg::Vector3(0.0f)
-                , vg::Vector2 uvScale = vg::Vector2(0.0f)
+                , vg::Vector3 scale = vg::Vector3(1.0f)
+                , vg::Vector2 uvScale = vg::Vector2(1.0f)
+                , vg::Bool32 isCreateObject = VG_FALSE
                 );
         };
 
@@ -40,11 +42,13 @@ namespace sampleslib
         AssimpScene(const CreateInfo &createInfo);
         void init(const CreateInfo &createInfo);
         const std::vector<std::shared_ptr<vg::DimSharedContentMesh3>> getMeshes() const;
+        const std::vector<std::shared_ptr<vg::VisualObject3>> getObjects() const;
     protected:
         void _init(const CreateInfo &createInfo);
         std::shared_ptr<vg::VertexData> m_pSharedVertexData;
 		std::shared_ptr<vg::IndexData> m_pSharedIndexData;
-        std::vector<std::shared_ptr<vg::DimSharedContentMesh3>> m_pMeshes; 
+        std::vector<std::shared_ptr<vg::DimSharedContentMesh3>> m_pMeshes;
+        std::vector<std::shared_ptr<vg::VisualObject3>> m_pObjects;
     private:
 
     };

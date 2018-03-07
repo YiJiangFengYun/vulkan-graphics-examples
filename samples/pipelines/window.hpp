@@ -2,6 +2,7 @@
 #define WINDOW_H
 
 #include "sampleslib/window.hpp"
+#include "sampleslib/scene_assimp.hpp"
 
 #define SCENE_COUNT 3u
 class Window : public sampleslib::Window<vg::SpaceType::SPACE_3>
@@ -17,19 +18,17 @@ public:
 		, std::shared_ptr<vk::SurfaceKHR> pSurface
 	);
 private:
-	std::vector<vg::Vector3> m_tempPositions;
-	std::vector<vg::Color32> m_tempColors;
-	std::vector<uint32_t> m_tempIndices;
-	std::shared_ptr<vg::VisualObject3> m_pModel;
-	std::shared_ptr<vg::DimSepMesh3> m_pMesh;
-	std::shared_ptr<vg::Material> m_pMaterials[SCENE_COUNT];
-	std::shared_ptr<vg::Pass> m_pPasses[SCENE_COUNT];
-	std::shared_ptr<vg::Shader> m_pShaders[SCENE_COUNT];
+    sampleslib::AssimpScene m_assimpScene;
+	std::array<std::shared_ptr<vg::Shader>, SCENE_COUNT> m_pShaders;
+	std::array<std::shared_ptr<vg::Pass>, SCENE_COUNT> m_pPasses;
+	std::array<std::shared_ptr<vg::Material>, SCENE_COUNT> m_pMaterials;
 	void _init();
-	void _loadModel();
-	void _createMesh();
+	void _loadAssimpScene();
 	void _createMaterial();
-	void _createModel();
+	void _fillScene();
+
+    void _setMaterialToObjects(std::shared_ptr<vg::Material> pMaterial);
+
 	virtual void _onUpdate() override;
 	virtual void _renderWithRenderer(const std::shared_ptr<vg::Renderer> &pRenderer
 		    , const vg::Renderer::RenderInfo &info

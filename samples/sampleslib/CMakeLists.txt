@@ -7,9 +7,11 @@ file(GLOB_RECURSE HEADERS *.hpp *.h *.inl)
 file(GLOB_RECURSE SOURCES *.cpp)
 
 if(SOURCES)
+    include_directories(${INCLUDE_DIRS})
     add_library(${LIBRARY_NAME} STATIC ${HEADERS} ${SOURCES})
     set_property(TARGET ${LIBRARY_NAME} PROPERTY FOLDER ${FOLDER_NAME})
-    set(LIBRARIES ${LIBRARIES} ${LIBRARY_NAME} PARENT_SCOPE)    
+    set(LIBRARIES ${LIBRARIES} ${LIBRARY_NAME})
+    set(LIBRARIES ${LIBRARIES} PARENT_SCOPE) 
 
     # install
     install (TARGETS ${LIBRARY_NAME} DESTINATION bin)

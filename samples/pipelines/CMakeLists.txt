@@ -5,6 +5,7 @@ file(GLOB_RECURSE HEADERS *.hpp *.inl)
 file(GLOB_RECURSE SOURCES *.cpp)
 
 if(SOURCES)
+    include_directories(${INCLUDE_DIRS})
     add_executable(${EXE_NAME} ${HEADERS} ${SOURCES})
     target_link_libraries(${EXE_NAME} ${LIBRARIES})
     set_property(TARGET ${EXE_NAME} PROPERTY FOLDER ${FOLDER_NAME})

@@ -86,6 +86,18 @@ namespace vg
 		m_pIndexData = pIndexData;
 	}
 
+	void ExternalContentMesh::init(std::shared_ptr<VertexData> pVertexData
+		    , std::shared_ptr<IndexData> pIndexData
+			, uint32_t subIndexDataOffset
+			, uint32_t subIndexDataCount
+			)
+	{
+		m_pVertexData = pVertexData;
+		m_pIndexData = pIndexData;
+		m_subIndexDataOffset = subIndexDataOffset;
+		m_subIndexDataCount = subIndexDataCount;
+	}
+
 	uint32_t ExternalContentMesh::getSubMeshOffset() const
 	{
 		return m_subIndexDataOffset;

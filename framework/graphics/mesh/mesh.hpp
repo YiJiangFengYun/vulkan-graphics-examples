@@ -73,7 +73,7 @@ namespace vg
 	{
 	public:
 	    InternalContentMesh();
-        InternalContentMesh(MemoryPropertyFlags bufferMemoryPropertyFlags);	    
+        InternalContentMesh(MemoryPropertyFlags bufferMemoryPropertyFlags);
 	protected:
 
 
@@ -91,10 +91,16 @@ namespace vg
 			, uint32_t subIndexDataCount
 			);
 
-		uint32_t getSubIndexDataOffset() const;
-		void setSubIndexDataOffset(uint32_t offset);
+	    void init(std::shared_ptr<VertexData> pVertexData
+		    , std::shared_ptr<IndexData> pIndexData
+			, uint32_t subIndexDataOffset
+			, uint32_t subIndexDataCount
+			);
+
 		virtual uint32_t getSubMeshOffset() const override;
 		virtual uint32_t getSubMeshCount() const override;
+		uint32_t getSubIndexDataOffset() const;
+		void setSubIndexDataOffset(uint32_t offset);
 		uint32_t getSubIndexDaTaCount() const;
 		void setSubIndexDataCount(uint32_t count);
 	protected:

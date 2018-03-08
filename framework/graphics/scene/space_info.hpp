@@ -24,6 +24,7 @@ namespace vg
 		using MatrixVectorType = void;
 		using MatrixType = void;
 		using RotationType = void;
+		using RotationDimType = void;
 	};
 
 	template<SpaceType type>
@@ -41,6 +42,7 @@ namespace vg
 		using MatrixVectorType = Vector3;
 		using MatrixType = Matrix3x3;
 		using RotationType = float;
+		using RotationDimType = float;
 	};
 
 	template<>
@@ -52,6 +54,7 @@ namespace vg
 		using MatrixVectorType = Vector4;
 		using MatrixType = Matrix4x4;
 		using RotationType = Quaternion;
+		using RotationDimType = Vector3;
 	};
 
 	template<>

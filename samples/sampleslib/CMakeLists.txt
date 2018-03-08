@@ -19,6 +19,7 @@ if(SOURCES)
 
     # Compile common shaders
     set(COMMON_SHADER_NAMES ${COMMON_SHADER_NAMES} "ui")
+    set(COMMON_SHADER_NAMES ${COMMON_SHADER_NAMES} "test")
     if(COMMON_SHADER_NAMES)
         foreach(SHADER_NAME ${COMMON_SHADER_NAMES})
             file(GLOB 

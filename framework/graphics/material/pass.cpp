@@ -448,12 +448,12 @@ namespace vg
 
 		if (viewport.x < 0)
 			throw std::invalid_argument("the x of viewport is smaller than 0!");
-		else if (viewport.x > viewport.width)
-			throw std::invalid_argument("The x of viewport is bigger than the width of viewport!");
+		else if (viewport.x + viewport.width > 1)
+			throw std::invalid_argument("The max x of viewport is bigger than 1!");
 		if (viewport.y < 0)
 			throw std::invalid_argument("the y of viewport is smaller than 0!");
-		else if(viewport.y > viewport.height)
-			throw std::invalid_argument("The y of viewport is bigger than the height of viewport!");
+		else if(viewport.y + viewport.height > 1)
+			throw std::invalid_argument("The max y of viewport is bigger than 1!");
 		if(viewport.minDepth < 0)
 			throw std::invalid_argument("the minDepth of viewport is smaller than 0!");
 		else if(viewport.minDepth > viewport.maxDepth)

@@ -175,6 +175,7 @@ namespace sampleslib
                     vertexCounts[i] = vertexCount;
 
                     uint32_t vertexBufferSize = vertexSize * vertexCount;
+					uint32_t indexCount = 0u;
                     uint32_t indexBufferSize = 0u;          
                     for (uint32_t j = 0; j < vertexCount; ++j)
                     {
@@ -276,9 +277,12 @@ namespace sampleslib
                         indexBuffer.push_back(face.mIndices[0]);
                         indexBuffer.push_back(face.mIndices[1]);
                         indexBuffer.push_back(face.mIndices[2]);
-                        indexBufferSize += 3u * 32u;
+                        indexCount += 3u;
                     }
 
+                    indexBufferSize = indexCount * 32u;
+
+                    indexCounts[i] = indexCount;
                     indexBufferSizes[i] = indexBufferSize;
                     indexVertexDataIndices[i] = i;
                 }

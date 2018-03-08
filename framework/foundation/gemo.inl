@@ -298,8 +298,8 @@ namespace fd
 	{
 		LengthType length = ValueType::length();
 		Bool32 isInter = FD_TRUE;
-		ValueType min;
-		ValueType max;
+		ValueType min(0.0f);
+		ValueType max(0.0f);
 		for (LengthType i = 0; i < length; ++i)
 		{
 			if (m_min[i] > bounds.m_max[i] || m_max[i] < bounds.m_min[i])

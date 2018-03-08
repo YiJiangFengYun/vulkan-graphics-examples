@@ -424,12 +424,14 @@ namespace vg
 
 		vk::Rect2D scissor = {
 			{                               //offset
-				static_cast<int32_t>(std::round(m_framebufferWidth * finalScissor.x)),    //x
-				static_cast<int32_t>(std::round(m_framebufferHeight * finalScissor.y))    //y
+				static_cast<int32_t>(std::round(m_framebufferWidth * viewportOfPass.x + 
+				    m_framebufferWidth * viewportOfPass.width * finalScissor.x)),    //x
+				static_cast<int32_t>(std::round(m_framebufferHeight * viewportOfPass.y + 
+				    m_framebufferHeight * viewportOfPass.height * finalScissor.y))    //y
 			},
 			{                               //extent
-				static_cast<uint32_t>(std::round(m_framebufferWidth * finalScissor.width)),   //width
-				static_cast<uint32_t>(std::round(m_framebufferHeight * finalScissor.height))  //height
+				static_cast<uint32_t>(std::round(m_framebufferWidth * viewportOfPass.width * finalScissor.width)),   //width
+				static_cast<uint32_t>(std::round(m_framebufferHeight * viewportOfPass.height * finalScissor.height))  //height
 			}
 		};
 

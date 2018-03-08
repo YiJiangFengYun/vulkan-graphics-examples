@@ -22,6 +22,10 @@ private:
 	std::array<std::shared_ptr<vg::Shader>, SCENE_COUNT> m_pShaders;
 	std::array<std::shared_ptr<vg::Pass>, SCENE_COUNT> m_pPasses;
 	std::array<std::shared_ptr<vg::Material>, SCENE_COUNT> m_pMaterials;
+	struct LightInfo 
+	{
+		vg::Vector4 lightPos;
+	} m_lightInfo;
 	void _init();
 	void _loadAssimpScene();
 	void _createMaterial();

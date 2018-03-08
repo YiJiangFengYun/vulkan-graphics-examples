@@ -13,8 +13,9 @@ namespace sampleslib
 		m_pCamera->updateProj(glm::radians(60.0f), (float)m_width / (float)m_height, 0.1f, 256.0f);
 		auto &transform = m_pCamera->getTransform();
 
+		vg::Quaternion r = glm::rotate(vg::Quaternion(), m_rotation);
 		transform->setLocalPosition(glm::vec3(0.0f, 0.0f, m_zoom));
-		transform->setLocalRotation(m_rotation);
+		transform->setLocalRotation(r);
 		m_pCamera->apply();		
 	}
 

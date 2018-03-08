@@ -31,6 +31,7 @@ namespace sampleslib
 	{
 	public:
 	    using RotationType = typename vg::SpaceTypeInfo<SPACE_TYPE>::RotationType;
+		using RotationDimType = typename vg::SpaceTypeInfo<SPACE_TYPE>::RotationDimType;
 	    using SceneType = typename SpaceObjectInfo<SPACE_TYPE>::SceneType;
 	    using CameraType = typename SpaceObjectInfo<SPACE_TYPE>::CameraType;
 		using TimePointType = typename std::chrono::time_point<std::chrono::steady_clock>;
@@ -46,7 +47,8 @@ namespace sampleslib
 	protected:
 		float m_zoom;
 		float m_zoomSpeed;
-		RotationType m_rotation;
+		RotationDimType m_rotation;
+		float m_rotationSpeed;
 
 		TimePointType m_startTimeFrame;
 		TimePointType m_endTimeFrame;
@@ -68,6 +70,13 @@ namespace sampleslib
 		uint32_t m_frameCounter;
 		uint32_t m_lastFPS;
 		uint32_t m_lastDrawCount;
+        
+		struct  {
+		    vgf::Bool32 left = VGF_FALSE;
+		    vgf::Bool32 right = VGF_FALSE;
+		    vgf::Bool32 middle = VGF_FALSE;
+	    } m_mouseButtons;
+		double m_mousePos[2];
 
 		std::shared_ptr<SceneType> m_pScene;
 		std::shared_ptr<CameraType> m_pCamera;
@@ -88,7 +97,7 @@ namespace sampleslib
 			, const vg::Renderer::RenderInfo &info
 			, vg::Renderer::RenderResultInfo &resultInfo) override;
 	private:
-		void _initZoom();
+		void _initState();
 		void _createCamera();
 		void _createScene();
 		void _initUI();

@@ -12,7 +12,11 @@ namespace sampleslib
 			, title
 		    )
 		, m_zoom(0.0f)
+		, m_zoomSpeed(0.0)
 		, m_rotation()
+		, m_rotationSpeed(0.0)
+		, m_mouseButtons()
+		, m_mousePos()
 		, m_startTimeFrame()
 		, m_endTimeFrame()
 		, m_isPause(false)
@@ -24,7 +28,7 @@ namespace sampleslib
 		, m_lastFPS(0u)
 		, m_lastDrawCount(0u)
 	{
-		_initZoom();
+		_initState();
 		_createCamera();
 		_createScene();
 		_initUI();
@@ -40,6 +44,9 @@ namespace sampleslib
 		    )
 		, m_zoom(0.0f)
 		, m_rotation()
+		, m_rotationSpeed(0.0)
+		, m_mouseButtons()
+		, m_mousePos()
 		, m_startTimeFrame()
 		, m_endTimeFrame()
 		, m_isPause(false)
@@ -51,7 +58,7 @@ namespace sampleslib
 		, m_lastFPS(0u)
 		, m_lastDrawCount(0u)		
 	{
-		_initZoom();
+		_initState();
 		_createCamera();
 		_createScene();
 		_initUI();
@@ -59,10 +66,11 @@ namespace sampleslib
 	}
 
 	template <vg::SpaceType SPACE_TYPE>
-	void Window<SPACE_TYPE>::_initZoom()
+	void Window<SPACE_TYPE>::_initState()
 	{
 		m_zoom = -2.5f;
-		m_zoomSpeed = 0.5f;
+		m_zoomSpeed = 0.1f;
+		m_rotationSpeed = 0.05f;
 	}
 
 	template <vg::SpaceType SPACE_TYPE>
@@ -92,8 +100,39 @@ namespace sampleslib
 		{
 			Window* const instance = (Window*)glfwGetWindowUserPointer(window);
 			instance->m_zoom += static_cast<float>(yOffset) * instance->m_zoomSpeed;
-			instance->m_zoom = std::min(-0.15f, std::max(-5.0f, instance->m_zoom));
+			instance->m_zoom = std::min(-0.15f, std::max(-25.0f, instance->m_zoom));
 			std::cout << "Current zoom: " << instance->m_zoom << std::endl;
+		});
+
+		glfwSetMouseButtonCallback(m_pWindow.get(), [](GLFWwindow* glfwWindow, int button, int action, int /*mods*/) 
+		{
+			Window* const instance = (Window*)glfwGetWindowUserPointer(glfwWindow);
+			if (action == GLFW_PRESS && button >= 0 && button < 3)
+			{
+				const vgf::Bool32 VALUE = VGF_TRUE;
+				memcpy(reinterpret_cast<vgf::Bool32 *>(&(instance->m_mouseButtons)) + button,
+					&VALUE, sizeof(vgf::Bool32));
+			}
+			if (instance->m_mouseButtons.left) 
+			{
+				glfwGetCursorPos(glfwWindow, instance->m_mousePos, instance->m_mousePos + 1);
+			}
+		});
+
+		glfwSetCursorPosCallback(m_pWindow.get(), [](GLFWwindow *glfwWindow, double xPos, double yPos)
+		{
+			Window* const instance = (Window*)glfwGetWindowUserPointer(glfwWindow);
+			auto &lastPos = instance->m_mousePos;
+			float dx = static_cast<float>(xPos - lastPos[0]);
+			float dy = static_cast<float>(yPos - lastPos[1]);
+
+			if (instance->m_mouseButtons.left) {
+			    instance->m_rotation.x += dy * instance->m_rotationSpeed;
+		        instance->m_rotation.y += dx * instance->m_rotationSpeed;
+			}
+
+			lastPos[0] = xPos;
+			lastPos[1] = yPos;
 		});
 	}	
 
@@ -124,6 +163,13 @@ namespace sampleslib
 	void Window<SPACE_TYPE>::_onUpdate()
 	{
 		_updateCamera();
+
+		for (uint32_t i = 0u; i < 3u; ++i) {
+			vgf::Bool32 value = glfwGetMouseButton(m_pWindow.get(), i) != 0;
+			memcpy(reinterpret_cast<vgf::Bool32 *>(&m_mouseButtons) + i,
+				&value, sizeof(vgf::Bool32));
+		}
+
 		ImGui::SetNextWindowPos(ImVec2(10, 10));
 	    ImGui::SetNextWindowSize(ImVec2(0, 0));
 	    ImGui::Begin("Device Info", nullptr, ImGuiWindowFlags_AlwaysAutoResize | ImGuiWindowFlags_NoResize | ImGuiWindowFlags_NoMove);

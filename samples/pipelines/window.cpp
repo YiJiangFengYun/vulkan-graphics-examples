@@ -42,7 +42,9 @@ void Window::_init()
 {
 	m_zoom = -10.5f;
 	/// Build a quaternion from euler angles (pitch, yaw, roll), in radians.
-	m_rotation = vg::Quaternion(vg::Vector3(glm::radians(-25.0f), glm::radians(15.0f), glm::radians(0.0f)));
+	m_rotation = glm::rotate(vg::Quaternion(), vg::Vector3(glm::radians(0.0f), glm::radians(0.0f), glm::radians(0.0f)));
+
+	m_lightInfo.lightPos = vg::Vector4(0.0f, -2.0f, 1.0f, 1.0f);
 }
 
 void Window::_loadAssimpScene()
@@ -89,7 +91,7 @@ void Window::_createMaterial()
 	    //pass
 	    pPasses[i] = std::shared_ptr<vg::Pass>(new vg::Pass(pShaders[i]));
 		pPasses[i]->setCullMode(vg::CullModeFlagBits::BACK);
-		pPasses[i]->setFrontFace(vg::FrontFaceType::COUNTER_CLOCKWISE);
+		pPasses[i]->setFrontFace(vg::FrontFaceType::CLOCKWISE);
 		pPasses[i]->setViewport(fd::Viewport(static_cast<float>(i) / static_cast<float>(SCENE_COUNT),
 		    0.0f,
 			1.0f / 3.0f,
@@ -103,6 +105,9 @@ void Window::_createMaterial()
 		{
 			pPasses[i]->setLineWidth(2.0f);
 		}
+
+		pPasses[i]->setDataValue("light_info", m_lightInfo, 2u);
+		pPasses[i]->apply();
 
 	    //material
 	    pMaterials[i] = std::shared_ptr<vg::Material>(new vg::Material());

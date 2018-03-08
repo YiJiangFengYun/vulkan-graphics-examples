@@ -88,8 +88,10 @@ void Window::_createMaterial()
 	    	);
 	    //pass
 	    pPasses[i] = std::shared_ptr<vg::Pass>(new vg::Pass(pShaders[i]));
-		pPasses[i]->setViewport(fd::Viewport(0.0f, 
-		    static_cast<float>(i) / static_cast<float>(SCENE_COUNT),
+		pPasses[i]->setCullMode(vg::CullModeFlagBits::BACK);
+		pPasses[i]->setFrontFace(vg::FrontFaceType::COUNTER_CLOCKWISE);
+		pPasses[i]->setViewport(fd::Viewport(static_cast<float>(i) / static_cast<float>(SCENE_COUNT),
+		    0.0f,
 			1.0f / 3.0f,
 			1.0f));
 		vk::PipelineDepthStencilStateCreateInfo depthStencilState = {};
@@ -105,6 +107,7 @@ void Window::_createMaterial()
 	    //material
 	    pMaterials[i] = std::shared_ptr<vg::Material>(new vg::Material());
 	    pMaterials[i]->addPass(pPasses[i]);
+		pMaterials[i]->setRenderPriority(0u);
 	    pMaterials[i]->setRenderQueueType(vg::MaterialShowType::OPAQUE);
 	    pMaterials[i]->apply();
 	}
@@ -148,35 +151,32 @@ void Window::_renderWithRenderer(const std::shared_ptr<vg::Renderer> &pRenderer
 		    , const vg::Renderer::RenderInfo &info
 			, vg::Renderer::RenderResultInfo &resultInfo)
 {
-	_setMaterialToObjects(m_pMaterials[0]);
-	ParentWindowType::_renderWithRenderer(pRenderer, info, resultInfo);
-
-	// const auto &pApp = vg::pApp;
-	// for (uint32_t i = 0u; i < SCENE_COUNT; ++i)
-	// {
-	// 	_setMaterialToObjects(m_pMaterials[i]);
-	// 	if (i != 2u || pApp->getPhysicalDeviceFeatures().fillModeNonSolid)
-	// 	{
-	//         vg::Renderer::SceneAndCamera sceneAndCamera;
-	// 	    sceneAndCamera.pScene = m_pScene.get();
-	// 	    sceneAndCamera.pCamera = m_pCamera.get();
-	// 	    auto addedInfo = info;
-	// 	    addedInfo.sceneAndCameraCount = 1u;
-	// 	    addedInfo.pSceneAndCamera = &sceneAndCamera;
-	// 		if (i != 2u)
-	// 		{
-    //             pRenderer->render(addedInfo, resultInfo);
-	// 		}
-	// 		else
-	// 		{
-	// 			ParentWindowType::_renderWithRenderer(pRenderer, info, resultInfo);
-	// 		}
-	// 	}
-	// 	else if (i == 2u)
-	// 	{
-	// 		ParentWindowType::_renderWithRenderer(pRenderer, info, resultInfo);
-	// 	}
-	// }
+	 const auto &pApp = vg::pApp;
+	 for (uint32_t i = 0u; i < SCENE_COUNT; ++i)
+	 {
+	 	_setMaterialToObjects(m_pMaterials[i]);
+	 	if (i != 2u || pApp->getPhysicalDeviceFeatures().fillModeNonSolid)
+	 	{
+	 		if (i != 2u)
+	 		{
+				vg::Renderer::SceneAndCamera sceneAndCamera;
+				sceneAndCamera.pScene = m_pScene.get();
+				sceneAndCamera.pCamera = m_pCamera.get();
+				auto addedInfo = info;
+				addedInfo.sceneAndCameraCount = 1u;
+				addedInfo.pSceneAndCamera = &sceneAndCamera;
+                pRenderer->render(addedInfo, resultInfo);
+	 		}
+	 		else
+	 		{
+	 			ParentWindowType::_renderWithRenderer(pRenderer, info, resultInfo);
+	 		}
+	 	}
+	 	else if (i == 2u)
+	 	{
+	 		ParentWindowType::_renderWithRenderer(pRenderer, info, resultInfo);
+	 	}
+	 }
 	
 	
 	m_lastDrawCount += resultInfo.drawCount;	

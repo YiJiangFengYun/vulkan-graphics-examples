@@ -70,6 +70,8 @@ namespace sampleslib
 		uint32_t m_frameCounter;
 		uint32_t m_lastFPS;
 		uint32_t m_lastDrawCount;
+
+		float m_cameraAspect;
         
 		struct  {
 		    vgf::Bool32 left = VGF_FALSE;

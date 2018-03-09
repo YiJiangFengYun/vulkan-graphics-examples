@@ -10,7 +10,7 @@ namespace sampleslib
     template <>
 	void Window<vg::SpaceType::SPACE_3>::_updateCamera()
 	{
-		m_pCamera->updateProj(glm::radians(60.0f), (float)m_width / (float)m_height, 0.1f, 256.0f);
+		m_pCamera->updateProj(glm::radians(60.0f), m_cameraAspect, 0.1f, 256.0f);
 		auto &transform = m_pCamera->getTransform();
 
 		vg::Quaternion r = glm::rotate(vg::Quaternion(), m_rotation);

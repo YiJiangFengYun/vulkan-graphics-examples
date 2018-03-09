@@ -15,6 +15,7 @@ namespace sampleslib
 		, m_zoomSpeed(0.0)
 		, m_rotation()
 		, m_rotationSpeed(0.0)
+		, m_cameraAspect(1.0f)
 		, m_mouseButtons()
 		, m_mousePos()
 		, m_startTimeFrame()
@@ -41,10 +42,11 @@ namespace sampleslib
 	)
 		: vgf::Window(pWindow
 			, pSurface
-		    )
+		)
 		, m_zoom(0.0f)
 		, m_rotation()
 		, m_rotationSpeed(0.0)
+		, m_cameraAspect(1.0f)
 		, m_mouseButtons()
 		, m_mousePos()
 		, m_startTimeFrame()
@@ -71,6 +73,7 @@ namespace sampleslib
 		m_zoom = -2.5f;
 		m_zoomSpeed = 0.1f;
 		m_rotationSpeed = 0.05f;
+		m_cameraAspect = (float)m_width / (float)m_height;
 	}
 
 	template <vg::SpaceType SPACE_TYPE>

@@ -40,11 +40,12 @@ Window::Window(std::shared_ptr<GLFWwindow> pWindow
 
 void Window::_init()
 {
+	m_cameraAspect = (float)m_width / 3.0f / (float)m_height;
 	m_zoom = -10.5f;
 	/// Build a quaternion from euler angles (pitch, yaw, roll), in radians.
-	m_rotation = glm::rotate(vg::Quaternion(), vg::Vector3(glm::radians(0.0f), glm::radians(0.0f), glm::radians(0.0f)));
+	m_rotation = vg::Vector3(glm::radians(25.0f), glm::radians(15.0f), glm::radians(0.0f));
 
-	m_lightInfo.lightPos = vg::Vector4(0.0f, -2.0f, 1.0f, 1.0f);
+	m_lightInfo.lightPos = vg::Vector4(0.0f, 2.0f, -1.0f, 1.0f);
 }
 
 void Window::_loadAssimpScene()
@@ -61,6 +62,7 @@ void Window::_loadAssimpScene()
 	createInfo.isCreateObject = VG_TRUE;
 	createInfo.layoutComponentCount = layoutCount;
 	createInfo.pLayoutComponent = layouts;
+	createInfo.offset = vg::Vector3(3.0f, -6.0f, 0.0f);
 	m_assimpScene.init(createInfo);
 }
 
@@ -93,9 +95,9 @@ void Window::_createMaterial()
 		pPasses[i]->setCullMode(vg::CullModeFlagBits::BACK);
 		pPasses[i]->setFrontFace(vg::FrontFaceType::CLOCKWISE);
 		pPasses[i]->setViewport(fd::Viewport(static_cast<float>(i) / static_cast<float>(SCENE_COUNT),
-		    0.0f,
-			1.0f / 3.0f,
-			1.0f));
+		     0.0f,
+		 	1.0f / 3.0f,
+		 	1.0f));
 		vk::PipelineDepthStencilStateCreateInfo depthStencilState = {};
 	    depthStencilState.depthTestEnable = VG_TRUE;
 	    depthStencilState.depthWriteEnable = VG_TRUE;
@@ -104,6 +106,11 @@ void Window::_createMaterial()
 		if (i == 1u && pApp->getPhysicalDeviceFeatures().wideLines)
 		{
 			pPasses[i]->setLineWidth(2.0f);
+		}
+
+		if (i == 2u)
+		{
+			pPasses[i]->setPolygonMode(vg::PolygonMode::LINE);
 		}
 
 		pPasses[i]->setDataValue("light_info", m_lightInfo, 2u);
@@ -125,6 +132,9 @@ void Window::_fillScene()
 	{
 	    m_pScene->addVisualObject(object);		
 	}
+
+	/*auto &pTransform = m_pScene->pRootTransformForVisualObject;
+	pTransform->setLocalPosition(vg::Vector3(0, -2.0f, 0));*/
 }
 
 void Window::_setMaterialToObjects(std::shared_ptr<vg::Material> pMaterial)
@@ -156,32 +166,35 @@ void Window::_renderWithRenderer(const std::shared_ptr<vg::Renderer> &pRenderer
 		    , const vg::Renderer::RenderInfo &info
 			, vg::Renderer::RenderResultInfo &resultInfo)
 {
-	 const auto &pApp = vg::pApp;
-	 for (uint32_t i = 0u; i < SCENE_COUNT; ++i)
-	 {
-	 	_setMaterialToObjects(m_pMaterials[i]);
-	 	if (i != 2u || pApp->getPhysicalDeviceFeatures().fillModeNonSolid)
-	 	{
-	 		if (i != 2u)
-	 		{
-				vg::Renderer::SceneAndCamera sceneAndCamera;
-				sceneAndCamera.pScene = m_pScene.get();
-				sceneAndCamera.pCamera = m_pCamera.get();
-				auto addedInfo = info;
-				addedInfo.sceneAndCameraCount = 1u;
-				addedInfo.pSceneAndCamera = &sceneAndCamera;
-                pRenderer->render(addedInfo, resultInfo);
-	 		}
-	 		else
-	 		{
-	 			ParentWindowType::_renderWithRenderer(pRenderer, info, resultInfo);
-	 		}
-	 	}
-	 	else if (i == 2u)
-	 	{
-	 		ParentWindowType::_renderWithRenderer(pRenderer, info, resultInfo);
-	 	}
-	 }
+
+    // _setMaterialToObjects(m_pMaterials[0]);
+	// ParentWindowType::_renderWithRenderer(pRenderer, info, resultInfo);
+	const auto &pApp = vg::pApp;
+	for (uint32_t i = 0u; i < SCENE_COUNT; ++i)
+	{
+		_setMaterialToObjects(m_pMaterials[i]);
+		if (i != 2u || pApp->getPhysicalDeviceFeatures().fillModeNonSolid)
+		{
+			if (i != 2u)
+			{
+			vg::Renderer::SceneAndCamera sceneAndCamera;
+			sceneAndCamera.pScene = m_pScene.get();
+			sceneAndCamera.pCamera = m_pCamera.get();
+			auto addedInfo = info;
+			addedInfo.sceneAndCameraCount = 1u;
+			addedInfo.pSceneAndCamera = &sceneAndCamera;
+               pRenderer->render(addedInfo, resultInfo);
+			}
+			else
+			{
+				ParentWindowType::_renderWithRenderer(pRenderer, info, resultInfo);
+			}
+		}
+		else if (i == 2u)
+		{
+			ParentWindowType::_renderWithRenderer(pRenderer, info, resultInfo);
+		}
+	}
 	
 	
 	m_lastDrawCount += resultInfo.drawCount;	

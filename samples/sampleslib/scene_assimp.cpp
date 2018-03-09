@@ -14,15 +14,17 @@ namespace sampleslib
                 , vg::Vector3 scale
                 , vg::Vector2 uvScale
                 , vg::Bool32 isCreateObject
+                , vgf::Bool32 isRightHand
                 )
+                : fileName(fileName)
+                , layoutComponentCount(layoutComponentCount)
+                , pLayoutComponent(pLayoutComponent)
+                , offset(offset)
+                , scale(scale)
+                , uvScale(uvScale)
+                , isCreateObject(isCreateObject)
+                , isRightHand(isRightHand)
     {
-        this->fileName = fileName;
-        this->layoutComponentCount = layoutComponentCount;
-        this->pLayoutComponent = pLayoutComponent;
-        this->offset = offset;
-        this->scale = scale;
-        this->uvScale = uvScale;
-        this->isCreateObject = isCreateObject;
     }
 
     AssimpScene::AssimpScene()
@@ -188,15 +190,33 @@ namespace sampleslib
                         uint32_t componentCount = createInfo.layoutComponentCount;
                         const VertexLayoutComponent *pComponent = createInfo.pLayoutComponent;
                         uint32_t componentIndex;
+                        int32_t yDelta = createInfo.isRightHand ? 1 : -1; //If it is right hand, y will be inversed.
                         for (componentIndex = 0u; componentIndex < componentCount; ++componentIndex)
                         {
 							switch (*(pComponent + componentIndex))
 							{
 							case VertexLayoutComponent::VERTEX_COMPONENT_POSITION:
 							{
-								float x = pPos->x * scale.x + offset.x;
-								float y = pPos->y * scale.y + offset.y;
-								float z = pPos->z * scale.z + offset.z;
+                                float x = pPos->x;
+                                float y;
+                                float z = pPos->z;
+                                if (! createInfo.isRightHand) {
+                                    y = - pPos->y;
+                                    vg::Vector4 temp(x, y, z, 1.0f);
+                                    vg::Quaternion tempQ(vg::Vector3(glm::radians(180.0f), glm::radians(0.0f), glm::radians(0.0f)));
+                                    temp = tempQ * temp;
+                                    x = temp.x;
+                                    y = temp.y;
+                                    z = temp.z;
+                                }
+                                else 
+                                {
+								    y = pPos->y;
+                                }
+
+								x = x * scale.x + offset.x;
+								y = y * scale.y + offset.y;
+								z = z * scale.z + offset.z;
 								vertexBuffer.push_back(x);
 								vertexBuffer.push_back(y);
 								vertexBuffer.push_back(z);
@@ -214,9 +234,24 @@ namespace sampleslib
 							}
 							case VertexLayoutComponent::VERTEX_COMPONENT_NORMAL:
 							{
-								vertexBuffer.push_back(pNormal->x);
-								vertexBuffer.push_back(pNormal->y);
-								vertexBuffer.push_back(pNormal->z);
+								float x = pNormal->x;
+								float y;
+								float z = pNormal->z;
+								if (! createInfo.isRightHand) {
+									y = - pNormal->y;
+									vg::Vector4 temp(x, y, z, 1.0f);
+									vg::Quaternion tempQ(vg::Vector3(glm::radians(180.0f), glm::radians(0.0f), glm::radians(0.0f)));
+									temp = tempQ * temp;
+									x = temp.x;
+									y = temp.y;
+									z = temp.z;
+								}
+								else {
+									y = pNormal->y;
+								}
+								vertexBuffer.push_back(x);
+								vertexBuffer.push_back(y);
+								vertexBuffer.push_back(z);
 								break;
 							}
 							case VertexLayoutComponent::VERTEX_COMPONENT_UV:
@@ -235,14 +270,14 @@ namespace sampleslib
 							case VertexLayoutComponent::VERTEX_COMPONENT_TANGENT:
 							{
 								vertexBuffer.push_back(pTangent->x);
-								vertexBuffer.push_back(pTangent->y);
+								vertexBuffer.push_back(yDelta * pTangent->y);
 								vertexBuffer.push_back(pTangent->z);
 								break;
 							}
 							case VertexLayoutComponent::VERTEX_COMPONENT_BITANGENT:
 							{
 								vertexBuffer.push_back(pBitangent->x);
-								vertexBuffer.push_back(pBitangent->y);
+								vertexBuffer.push_back(yDelta * pBitangent->y);
 								vertexBuffer.push_back(pBitangent->z);
 								break;
 							}
@@ -280,7 +315,7 @@ namespace sampleslib
                         indexCount += 3u;
                     }
 
-                    indexBufferSize = indexCount * 32u;
+                    indexBufferSize = indexCount * 4u;
 
                     indexCounts[i] = indexCount;
                     indexBufferSizes[i] = indexBufferSize;

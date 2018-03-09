@@ -14,6 +14,10 @@
 
 #define GLM_FORCE_RADIANS
 #define GLM_FORCE_DEPTH_ZERO_TO_ONE
+/**
+ * Using glm left handed means to use positive z at camera projectition, 
+ * otherwise using glm right handed means to use nagetive z. 
+ **/
 #define GLM_FORCE_LEFT_HANDED
 #define GLM_ENABLE_EXPERIMENTAL
 #include <glm/glm.hpp>

@@ -105,25 +105,20 @@ namespace chalet
 	{
 		int texWidth, texHeight, texChannels;
 		stbi_uc* pixels = stbi_load(TEXTURE_PATH, &texWidth, &texHeight, &texChannels, STBI_rgb_alpha);
-		VkDeviceSize imageSize = texWidth * texHeight * 4;
+		uint32_t imageSize = texWidth * texHeight * 4;
 
 		if (!pixels) {
 			throw std::runtime_error("Failed to load texture image!");
 		}
 
-		uint32_t colorCount = texWidth * texHeight;
-		std::vector<vg::Color32> colors(colorCount);
-		for (uint32_t i = 0; i < colorCount; ++i)
-		{
-			colors[i].r = pixels[i * 4 + 0];
-			colors[i].g = pixels[i * 4 + 1];
-			colors[i].b = pixels[i * 4 + 2];
-			colors[i].a = pixels[i * 4 + 3];
-		}
-
 		m_pTexture = std::shared_ptr<vg::Texture2D>(new vg::Texture2D(vg::TextureFormat::R8G8B8A8_UNORM, VG_FALSE, texWidth, texHeight));
-		m_pTexture->setPixels32(colors);
-		m_pTexture->apply(VG_FALSE, VG_TRUE);
+		vg::TextureDataLayout layoutInfo;
+		layoutInfo.components.resize(1u);
+		layoutInfo.components[0].mipLevel = 0u;
+		layoutInfo.components[0].layerCount = 1u;
+		layoutInfo.components[0].baseArrayLayer = 0u;
+		layoutInfo.components[0].size = imageSize;
+		m_pTexture->applyData(layoutInfo, reinterpret_cast<void *>(pixels), imageSize);
 	}
 
 	void Window::_createMaterial()

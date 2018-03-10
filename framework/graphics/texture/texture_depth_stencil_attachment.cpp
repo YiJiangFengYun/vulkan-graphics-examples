@@ -27,4 +27,28 @@ namespace vg
 	{
 		return m_height;
 	}
+
+	void TextureDepthStencilAttachment::_init()
+	{
+		_checkDepthFormat();
+		Texture::_init();
+		//Transform Image layout to final layout.
+		auto pCommandBuffer = beginSingleTimeCommands();
+		_tranImageLayout(pCommandBuffer, *m_pImage, m_currVkImageLayout, m_vkImageLayout,
+			0, m_mipMapLevels, 0, m_arrayLayer);
+		endSingleTimeCommands(pCommandBuffer);
+		m_currVkImageLayout = m_vkImageLayout;
+	}
+
+	void TextureDepthStencilAttachment::_checkDepthFormat()
+	{
+		_updateVkFormat();
+		const auto &pPhysicalDevice = pApp->getPhysicalDevice();
+		const auto &props = pPhysicalDevice->getFormatProperties(m_vkFormat);
+		if ((props.optimalTilingFeatures & vk::FormatFeatureFlagBits::eDepthStencilAttachment) !=
+			vk::FormatFeatureFlagBits::eDepthStencilAttachment)
+		{
+			throw std::runtime_error("Depth format is not supported!");
+		}
+	}
 } //namespace kgs

@@ -14,29 +14,8 @@ namespace vg
 		uint32_t getHeight() const;
 	private:
 		TextureDepthStencilAttachment() = delete;
-		inline void _init() override
-		{
-			_checkDepthFormat();
-			Texture::_init();
-			//Transform Image layout to final layout.
-			auto pCommandBuffer = beginSingleTimeCommands();
-			_tranImageLayout(pCommandBuffer, *m_pImage, m_currVkImageLayout, m_vkImageLayout,
-				0, m_mipMapLevels, 0, m_arrayLayer);
-			endSingleTimeCommands(pCommandBuffer);
-			m_currVkImageLayout = m_vkImageLayout;
-		}
-
-		inline void _checkDepthFormat()
-		{
-			_updateVkFormat();
-			const auto &pPhysicalDevice = pApp->getPhysicalDevice();
-			const auto &props = pPhysicalDevice->getFormatProperties(m_vkFormat);
-			if ((props.optimalTilingFeatures & vk::FormatFeatureFlagBits::eDepthStencilAttachment) !=
-				vk::FormatFeatureFlagBits::eDepthStencilAttachment)
-			{
-				throw std::runtime_error("Depth format is not supported!");
-			}
-		}
+		virtual void _init() override;
+		void _checkDepthFormat();
 	};
 } //namespace kgs
 

@@ -4,6 +4,46 @@ namespace vg
 {
 	inline uint32_t caculateImageSizeWithMipmapLevel(uint32_t size, uint32_t mipmapLevel);
 
+	TextureDataLayout::Component::Component()
+		: mipLevel(0u)
+		, baseArrayLayer(0u)
+		, layerCount(0u)
+		, size(0u)
+		, hasImageExtent(VG_FALSE)
+		, width(0u)
+		, height(0u)
+		, depth(0u)
+	{
+
+	}
+
+	TextureDataLayout::Component::Component(uint32_t mipLevel
+		, uint32_t baseArrayLayer
+		, uint32_t layerCount
+		, uint32_t size
+		, Bool32 hasImageExtent
+		, uint32_t width
+		, uint32_t height
+		, uint32_t depth
+	)
+		: mipLevel(mipLevel)
+		, baseArrayLayer(baseArrayLayer)
+		, layerCount(layerCount)
+		, size(size)
+		, hasImageExtent(hasImageExtent)
+		, width(width)
+		, height(height)
+		, depth(depth)
+	{
+
+	}
+
+	TextureDataLayout::TextureDataLayout()
+		: components()
+	{
+
+	}
+
 	Texture::Texture(TextureFormat format, Bool32 mipMap)
 		: Base(BaseType::TEXTURE)
 		, m_format(format)
@@ -18,13 +58,18 @@ namespace vg
 		, m_vkImageUsageFlags(vk::ImageUsageFlagBits::eTransferDst | vk::ImageUsageFlagBits::eSampled) //default image usage is for sampled texture.
 		, m_vkImageLayout(vk::ImageLayout::eShaderReadOnlyOptimal) //default image layout is for sampled texture.
 		, m_vkImageAspectFlags(vk::ImageAspectFlagBits::eColor) //default image aspect is for sampled texture.
+		, m_pMemory(nullptr)
+		, m_memorySize(0u)
 	{
 
 	}
 
 	Texture::~Texture()
 	{
-
+		if (m_pMemory != nullptr)
+		{
+			free(m_pMemory);
+		}
 	}
 
 	float Texture::getAnisotropy() const
@@ -78,9 +123,14 @@ namespace vg
 		return m_mipMap;
 	}
 
-	uint32_t Texture::getMipmapLevel() const
+	uint32_t Texture::getMipmapLevels() const
 	{
 		return m_mipMapLevels;
+	}
+
+	uint32_t Texture::getArrayLayerCount() const
+	{
+		return m_arrayLayer;
 	}
 
 	vk::Format Texture::getVKFormat() const
@@ -100,7 +150,7 @@ namespace vg
 
 	std::shared_ptr<vk::DeviceMemory> Texture::getImageMemory() const
 	{
-		return m_pMemory;
+		return m_pImageMemory;
 	}
 
 	std::shared_ptr<vk::ImageView> Texture::getImageView() const
@@ -111,6 +161,18 @@ namespace vg
 	std::shared_ptr<vk::Sampler> Texture::getSampler() const
 	{
 		return m_pSampler;
+	}
+
+	void Texture::_init()
+	{
+		_updateMipMapLevels();
+		_updateArrayLayer();
+		_updateVkFormat();
+		_updateVkFilter();
+		_updateVkSamplerAddressMode();
+		_createImage();
+		_createImageView();
+		_createSampler();
 	}
 
 	void Texture::_updateMipMapLevels()
@@ -351,9 +413,9 @@ namespace vg
 			vg::findMemoryType(pApp->getPhysicalDevice(), memRequirements.memoryTypeBits, vk::MemoryPropertyFlagBits::eDeviceLocal)
 		};
 
-		m_pMemory = fd::allocateMemory(pDevice, allocInfo);
+		m_pImageMemory = fd::allocateMemory(pDevice, allocInfo);
 
-		pDevice->bindImageMemory(*m_pImage, *m_pMemory, vk::DeviceSize(0));
+		pDevice->bindImageMemory(*m_pImage, *m_pImageMemory, vk::DeviceSize(0));
 
 		m_currVkImageLayout = imageLayout;
 	}
@@ -453,283 +515,169 @@ namespace vg
 		m_pSampler = fd::createSampler(pDevice, createInfo);
 	}
 
-	std::vector<Color> Texture::_getPixels(uint32_t layer, uint32_t mipLevel) const
+	void Texture::_applyData(TextureDataLayout layoutInfo
+		, const void *memory
+		, uint32_t size
+		, Bool32 cacheMemory
+		, Bool32 createMipmaps)
 	{
-		if (m_arrTempColors.size() <= mipLevel) return {};
-		size_t oneLayerCount = m_width * m_height * m_depth;
-		size_t start = oneLayerCount * layer;
-		size_t size = m_arrTempColors[mipLevel].size();
-		std::vector<Color> result(oneLayerCount);
-		for (size_t i = start, j = 0; i < size && j < oneLayerCount; ++i, ++j)
+		if (cacheMemory)
 		{
-			result[j] = m_arrTempColors[mipLevel][i];
-			result[j] /= 255.0f;
-		}
-		return result;
-	}
-
-	std::vector<Color32> Texture::_getPixels32(uint32_t layer, uint32_t mipLevel) const
-	{
-		if (m_arrTempColors.size() <= mipLevel) return {};
-		size_t oneLayerCount = m_width * m_height * m_depth;
-		size_t start = oneLayerCount * layer;
-		size_t size = m_arrTempColors[mipLevel].size();
-		std::vector<Color32> result(oneLayerCount);
-		for (size_t i = start, j = 0; i < size && j < oneLayerCount; ++i, ++j)
-		{
-			result[j] = m_arrTempColors[mipLevel][i];
-		}
-		return result;
-	}
-
-	void Texture::_setPixels(const std::vector<Color> &colors, uint32_t layer, uint32_t mipLevel)
-	{
-		_resizeColorsData(mipLevel);
-#ifdef DEBUG
-		if (layer >= m_arrayLayer)
-		{
-			LOG(plog::warning) << "Invalid layer.";
-			return;
-		}
-#endif // DEBUG
-        uint32_t width = caculateImageSizeWithMipmapLevel(m_width, mipLevel);
-		uint32_t height = caculateImageSizeWithMipmapLevel(m_height, mipLevel);
-		uint32_t depth = caculateImageSizeWithMipmapLevel(m_depth, mipLevel);
-		size_t oneLayerSize = width * height * depth;
-		size_t start = oneLayerSize * layer;
-		size_t size = oneLayerSize * m_arrayLayer;
-		size_t colorsSize = colors.size();
-		for (size_t i = 0, j = start; i < oneLayerSize && j < size; ++i, ++j)
-		{
-			auto tempColor = colors[i];
-			tempColor *= 255.0f;
-			tempColor.a = std::round(tempColor.a);
-			tempColor.r = std::round(tempColor.r);
-			tempColor.g = std::round(tempColor.g);
-			tempColor.b = std::round(tempColor.b);
-			if (i < colorsSize)m_arrTempColors[mipLevel][j] = tempColor;
-			else break;
-		}
-	}
-
-	void Texture::_setPixels(const void* colors, uint32_t size, uint32_t layer, uint32_t mipLevel)
-	{
-        uint32_t width = caculateImageSizeWithMipmapLevel(m_width, mipLevel);
-		uint32_t height = caculateImageSizeWithMipmapLevel(m_height, mipLevel);
-		uint32_t depth = caculateImageSizeWithMipmapLevel(m_depth, mipLevel);
-		uint32_t validColorCount = width * height * depth;
-		uint32_t validSize = validColorCount * static_cast<uint32_t>(sizeof(Color));
-		validSize = std::min(validSize, size);			
-		std::vector<Color> tempColors(validColorCount);
-		memcpy(reinterpret_cast<void*>(tempColors.data()), colors, validSize);
-		_setPixels(tempColors, layer, mipLevel);
-	}
-
-	void Texture::_setPixels32(const std::vector<Color32> &colors, uint32_t layer, uint32_t mipLevel)
-	{
-		_resizeColorsData(mipLevel);
-#ifdef DEBUG
-		if (layer >= m_arrayLayer)
-		{
-			LOG(plog::warning) << "Invalid layer.";
-			return;
-		}
-#endif // DEBUG
-        uint32_t width = caculateImageSizeWithMipmapLevel(m_width, mipLevel);
-		uint32_t height = caculateImageSizeWithMipmapLevel(m_height, mipLevel);
-		uint32_t depth = caculateImageSizeWithMipmapLevel(m_depth, mipLevel);
-		size_t oneLayerSize = width * height * depth;
-		size_t start = oneLayerSize * layer;
-		size_t size = oneLayerSize * m_arrayLayer;
-		size_t colorsSize = colors.size();
-		for (size_t i = 0, j = start; i < oneLayerSize && j < size; ++i, ++j)
-		{
-			if (i < colorsSize)m_arrTempColors[mipLevel][j] = colors[i];
-			else break;
-		}
-	}
-
-	void Texture::_setPixels32(const void* colors, uint32_t size, uint32_t layer, uint32_t mipLevel)
-	{
-		_resizeColorsData(mipLevel);
-#ifdef DEBUG
-		if (layer >= m_arrayLayer)
-		{
-			LOG(plog::warning) << "Invalid layer.";
-			return;
-		}
-#endif // DEBUG
-		uint32_t width = caculateImageSizeWithMipmapLevel(m_width, mipLevel);
-		uint32_t height = caculateImageSizeWithMipmapLevel(m_height, mipLevel);
-		uint32_t depth = caculateImageSizeWithMipmapLevel(m_depth, mipLevel);
-		uint32_t validColorCount = width * height * depth;
-		uint32_t validSize = validColorCount * static_cast<uint32_t>(sizeof(Color32));
-		validSize = std::min(validSize, size);
-		size_t oneLayerSize = validColorCount;
-		size_t start = oneLayerSize * layer;
-		memcpy(reinterpret_cast<void*>(m_arrTempColors[mipLevel].data() + start), colors, validSize);
-	}
-
-	void Texture::_apply(Bool32 updateMipmaps, Bool32 makeUnreadable)
-	{
-		if (updateMipmaps)
-		{
-			_applyWithGenMipMap();
-		}
-		else
-		{
-			_applyDirect();
-		}
-		if (makeUnreadable)
-		{
-			//clear really colors data with reallocate.
-			std::vector<std::vector<Color32>>().swap(m_arrTempColors);
-		}
-	}
-
-	void Texture::_applyWithGenMipMap()
-	{
-		const auto &pDevice = pApp->getDevice();
-		auto pCommandBuffer = beginSingleTimeCommands();
-		//create first level image data using staging buffer.
-		if (m_arrTempColors.size() == 0)
-		{
-			LOG(plog::warning) << "Texture data is empty at mipmap level 0.";
-			return;
+			m_dataLayout = layoutInfo;
 		}
 
-		//create staging buffer.
-		uint32_t imageSize = (m_width * m_height * m_depth * m_arrayLayer) * sizeof(Color32);
-		std::shared_ptr<vk::Buffer> pStagingBuffer;
-		std::shared_ptr<vk::DeviceMemory> pStagingBufferMemory;
-		_createBuffer(imageSize, vk::BufferUsageFlagBits::eTransferSrc,
-			vk::MemoryPropertyFlagBits::eHostVisible | vk::MemoryPropertyFlagBits::eHostCoherent,
-			pStagingBuffer, pStagingBufferMemory);
-
-		void *data = pDevice->mapMemory(*pStagingBufferMemory, 0, imageSize);
-		memcpy(data, m_arrTempColors[0].data(), static_cast<size_t>(imageSize));
-		pDevice->unmapMemory(*pStagingBufferMemory);
-
-		//transfer image from initial current image layout to dst layout.
-		//here use undefined layout not to use curr layout of image, it can clear image old data.
-		_tranImageLayout(pCommandBuffer, *m_pImage, m_currVkImageLayout, vk::ImageLayout::eTransferDstOptimal,
-			0, 1, 0, m_arrayLayer);
-
-		//copy the first mip of the chain.
-		_copyBufferToImage(pCommandBuffer, *pStagingBuffer, *m_pImage, m_width, m_height, m_depth, 0, 0, m_arrayLayer);
-
-#ifdef DEBUG
-		//check format.
-		const auto &pPhysicalDevice = pApp->getPhysicalDevice();
-		const auto &formatProperties = pPhysicalDevice->getFormatProperties(m_vkFormat);
-		if ((formatProperties.optimalTilingFeatures & vk::FormatFeatureFlagBits::eBlitSrc) == vk::FormatFeatureFlags())
-		{
-			throw std::runtime_error("The texture format don't support for blit source, mip-chain generation requires it.");
-		}
-		if ((formatProperties.optimalTilingFeatures & vk::FormatFeatureFlagBits::eBlitDst) == vk::FormatFeatureFlags())
-		{
-			throw std::runtime_error("The texture format don't support for blit destination, mip-chain generation requires it.");
-		}
-#endif // DEBUG
-
-		//transition first mip level to transfer source for read during blit.
-		_tranImageLayout(pCommandBuffer, *m_pImage, vk::ImageLayout::eTransferDstOptimal, vk::ImageLayout::eTransferSrcOptimal, 0, 1, 0, m_arrayLayer);
-
-		for (uint32_t i = 1; i < m_mipMapLevels; ++i)
-		{
-			vk::ImageBlit blit;
-			blit.srcSubresource.aspectMask = m_vkImageAspectFlags;
-			blit.srcSubresource.baseArrayLayer = 0;
-			blit.srcSubresource.layerCount = m_arrayLayer;
-			blit.srcSubresource.mipLevel = i - 1;
-			blit.dstSubresource.aspectMask = m_vkImageAspectFlags;
-			blit.dstSubresource.baseArrayLayer = 0;
-			blit.dstSubresource.layerCount = m_arrayLayer;
-			blit.dstSubresource.mipLevel = i;
-
-			// each mipmap is the size divided by two
-			blit.srcOffsets[1] = vk::Offset3D(caculateImageSizeWithMipmapLevel(m_width, i - 1),
-				caculateImageSizeWithMipmapLevel(m_height, i - 1),
-				caculateImageSizeWithMipmapLevel(m_depth, i - 1));
-
-			blit.dstOffsets[1] = vk::Offset3D(caculateImageSizeWithMipmapLevel(m_width, i),
-				caculateImageSizeWithMipmapLevel(m_height, i),
-				caculateImageSizeWithMipmapLevel(m_depth, i));
-
-			// transferDst go to transferSrc because this mipmap will be the source for the next iteration (the next level)
-			_tranImageLayout(pCommandBuffer, *m_pImage, vk::ImageLayout::eUndefined, vk::ImageLayout::eTransferDstOptimal,
-				i, 1, 0, m_arrayLayer);
-
-			pCommandBuffer->blitImage(*m_pImage, vk::ImageLayout::eTransferSrcOptimal,
-				*m_pImage, vk::ImageLayout::eTransferDstOptimal, blit,
-				vk::Filter::eLinear);
-
-			_tranImageLayout(pCommandBuffer, *m_pImage, vk::ImageLayout::eTransferDstOptimal, vk::ImageLayout::eTransferSrcOptimal,
-				i, 1, 0, m_arrayLayer);
+		if (m_pMemory != nullptr && (m_memorySize < size || ! cacheMemory)) {
+			free(m_pMemory);
+			m_pMemory = nullptr;
+			m_memorySize = 0;
 		}
 
-		//transfer all level and all layer to shader read layout.
-		_tranImageLayout(pCommandBuffer, *m_pImage, vk::ImageLayout::eTransferSrcOptimal, m_vkImageLayout,
-			0, m_mipMapLevels, 0, m_arrayLayer);
-
-		endSingleTimeCommands(pCommandBuffer);
-
-		m_currVkImageLayout = m_vkImageLayout;
-	}
-
-	void Texture::_applyDirect()
-	{
-		if (m_arrTempColors.size() < m_mipMapLevels)
+		if (size)
 		{
-			throw std::runtime_error("Pixels data is not enough to create mipmap texture.");
-		}
+			if (cacheMemory) 
+			{
+				if (m_pMemory == nullptr)
+				{
+					m_pMemory = malloc(size);
+					m_memorySize = size;
+				}
+				memcpy(m_pMemory, memory, size);
+				m_realSize = size;
+			}
+			const auto &pDevice = pApp->getDevice();
 
-		const auto &pDevice = pApp->getDevice();
-
-		//create image data using staging buffer mipmap level by mipmap level.
-		for (uint32_t i = 0; i < m_mipMapLevels; ++i)
-		{
-			auto pCommandBuffer = beginSingleTimeCommands();
 			//create staging buffer.
-			uint32_t imageSize = static_cast<uint32_t>(m_arrTempColors[i].size() * sizeof(Color32));
 			std::shared_ptr<vk::Buffer> pStagingBuffer;
 			std::shared_ptr<vk::DeviceMemory> pStagingBufferMemory;
-			_createBuffer(imageSize, vk::BufferUsageFlagBits::eTransferSrc,
+			_createBuffer(size, vk::BufferUsageFlagBits::eTransferSrc,
 				vk::MemoryPropertyFlagBits::eHostVisible | vk::MemoryPropertyFlagBits::eHostCoherent,
 				pStagingBuffer, pStagingBufferMemory);
 
-			void *data = pDevice->mapMemory(*pStagingBufferMemory, 0, imageSize);
-			memcpy(data, m_arrTempColors[i].data(), static_cast<size_t>(imageSize));
+			void *data = pDevice->mapMemory(*pStagingBufferMemory, 0, size);
+			memcpy(data, memory, static_cast<size_t>(size));
 			pDevice->unmapMemory(*pStagingBufferMemory);
+			auto pCommandBuffer = beginSingleTimeCommands();
+			if (createMipmaps)
+			{
+				//transfer image from initial current image layout to dst layout.
+				//here use undefined layout not to use curr layout of image, it can clear image old data.
+				_tranImageLayout(pCommandBuffer, *m_pImage, m_currVkImageLayout, vk::ImageLayout::eTransferDstOptimal,
+					0, 1, 0, m_arrayLayer);
 
-			//transfer image from initial current image layout to dst layout.
-			//here use undefined layout not to use curr layout of image, it can clear image old data.
-			_tranImageLayout(pCommandBuffer, *m_pImage, m_currVkImageLayout, vk::ImageLayout::eTransferDstOptimal,
-				i, 1, 0, m_arrayLayer);
+				//copy the first mip of the chain.
+				_copyBufferToImage(pCommandBuffer, *pStagingBuffer, *m_pImage, m_width, m_height, m_depth, 0, 0, m_arrayLayer);
 
-			uint32_t width = caculateImageSizeWithMipmapLevel(m_width, i);
-			uint32_t height = caculateImageSizeWithMipmapLevel(m_height, i);
-			uint32_t depth = caculateImageSizeWithMipmapLevel(m_depth, i);
-			_copyBufferToImage(pCommandBuffer, *pStagingBuffer, *m_pImage, width, height, depth, i, 0, m_arrayLayer);
+#ifdef DEBUG
+				//check format.
+				const auto &pPhysicalDevice = pApp->getPhysicalDevice();
+				const auto &formatProperties = pPhysicalDevice->getFormatProperties(m_vkFormat);
+				if ((formatProperties.optimalTilingFeatures & vk::FormatFeatureFlagBits::eBlitSrc) == vk::FormatFeatureFlags())
+				{
+					throw std::runtime_error("The texture format don't support for blit source, mip-chain generation requires it.");
+				}
+				if ((formatProperties.optimalTilingFeatures & vk::FormatFeatureFlagBits::eBlitDst) == vk::FormatFeatureFlags())
+				{
+					throw std::runtime_error("The texture format don't support for blit destination, mip-chain generation requires it.");
+				}
+#endif // DEBUG
 
-			//transfer all layer to shader read layout.
-			_tranImageLayout(pCommandBuffer, *m_pImage, vk::ImageLayout::eTransferDstOptimal, m_vkImageLayout,
-				i, 1, 0, m_arrayLayer);
+				//transition first mip level to transfer source for read during blit.
+				_tranImageLayout(pCommandBuffer, *m_pImage, vk::ImageLayout::eTransferDstOptimal, vk::ImageLayout::eTransferSrcOptimal, 0, 1, 0, m_arrayLayer);
+
+				for (uint32_t i = 1; i < m_mipMapLevels; ++i)
+				{
+					vk::ImageBlit blit;
+					blit.srcSubresource.aspectMask = m_vkImageAspectFlags;
+					blit.srcSubresource.baseArrayLayer = 0;
+					blit.srcSubresource.layerCount = m_arrayLayer;
+					blit.srcSubresource.mipLevel = i - 1;
+					blit.dstSubresource.aspectMask = m_vkImageAspectFlags;
+					blit.dstSubresource.baseArrayLayer = 0;
+					blit.dstSubresource.layerCount = m_arrayLayer;
+					blit.dstSubresource.mipLevel = i;
+
+					// each mipmap is the size divided by two
+					blit.srcOffsets[1] = vk::Offset3D(caculateImageSizeWithMipmapLevel(m_width, i - 1),
+						caculateImageSizeWithMipmapLevel(m_height, i - 1),
+						caculateImageSizeWithMipmapLevel(m_depth, i - 1));
+
+					blit.dstOffsets[1] = vk::Offset3D(caculateImageSizeWithMipmapLevel(m_width, i),
+						caculateImageSizeWithMipmapLevel(m_height, i),
+						caculateImageSizeWithMipmapLevel(m_depth, i));
+
+					// transferDst go to transferSrc because this mipmap will be the source for the next iteration (the next level)
+					_tranImageLayout(pCommandBuffer, *m_pImage, vk::ImageLayout::eUndefined, vk::ImageLayout::eTransferDstOptimal,
+						i, 1, 0, m_arrayLayer);
+
+					pCommandBuffer->blitImage(*m_pImage, vk::ImageLayout::eTransferSrcOptimal,
+						*m_pImage, vk::ImageLayout::eTransferDstOptimal, blit,
+						vk::Filter::eLinear);
+
+					_tranImageLayout(pCommandBuffer, *m_pImage, vk::ImageLayout::eTransferDstOptimal, vk::ImageLayout::eTransferSrcOptimal,
+						i, 1, 0, m_arrayLayer);
+				}
+
+				//transfer all level and all layer to shader read layout.
+				_tranImageLayout(pCommandBuffer, *m_pImage, vk::ImageLayout::eTransferSrcOptimal, m_vkImageLayout,
+					0, m_mipMapLevels, 0, m_arrayLayer);
+			}
+			else
+			{
+				const auto &components = layoutInfo.components;
+				uint32_t componentCount = static_cast<uint32_t>(components.size());
+				std::vector<vk::BufferImageCopy> bufferCopyRegions(componentCount);
+				uint32_t offset = 0u;
+				for (uint32_t i = 0u; i < componentCount; ++i)
+				{
+					uint32_t width;
+					uint32_t height;
+					uint32_t depth;
+					if (components[i].hasImageExtent)
+					{
+						width = components[i].width;
+						height = components[i].height;
+						depth = components[i].depth;
+					}
+					else
+					{
+						width = caculateImageSizeWithMipmapLevel(m_width, components[i].mipLevel);
+						height = caculateImageSizeWithMipmapLevel(m_height, components[i].mipLevel);
+						depth = caculateImageSizeWithMipmapLevel(m_depth, components[i].mipLevel);
+					}
+					vk::ImageSubresourceLayers subresourceLayers = {
+						m_vkImageAspectFlags,              //aspectMask
+						components[i].mipLevel,            //mipLevel
+						components[i].baseArrayLayer,      //baseArrayLayer
+						components[i].layerCount           //layerCount
+					};
+					vk::BufferImageCopy copyInfo = { 
+						offset,                                 //bufferOffset
+						0,                                      //bufferRowLength
+						0,                                      //bufferImageHeight
+						subresourceLayers,                      //imageSubresource
+						vk::Offset3D(0, 0, 0),                  //imageOffset
+						vk::Extent3D(width, height, depth)      //imageExtent
+					};
+
+					bufferCopyRegions[i] = copyInfo;
+					offset += components[i].size;
+				}
+				//transfer image from initial current image layout to dst layout.
+				//here use undefined layout not to use curr layout of image, it can clear image old data.
+				_tranImageLayout(pCommandBuffer, *m_pImage, m_currVkImageLayout, vk::ImageLayout::eTransferDstOptimal,
+					0, m_mipMapLevels, 0, m_arrayLayer);
+				
+				pCommandBuffer->copyBufferToImage(*pStagingBuffer, *m_pImage, vk::ImageLayout::eTransferDstOptimal, bufferCopyRegions);
+
+				//transfer to shader read layout.
+				_tranImageLayout(pCommandBuffer, *m_pImage, vk::ImageLayout::eTransferDstOptimal, m_vkImageLayout,
+					0, m_mipMapLevels, 0, m_arrayLayer);
+
+			}
 
 			endSingleTimeCommands(pCommandBuffer);
+			m_currVkImageLayout = m_vkImageLayout;
 		}
-
-		m_currVkImageLayout = m_vkImageLayout;
-	}
-
-	void Texture::_resizeColorsData(uint32_t mipLevel)
-	{
-		uint32_t width = caculateImageSizeWithMipmapLevel(m_width, mipLevel);
-		uint32_t height = caculateImageSizeWithMipmapLevel(m_height, mipLevel);
-		uint32_t depth = caculateImageSizeWithMipmapLevel(m_depth, mipLevel);
-		size_t size = width * height * depth * m_arrayLayer;
-		if (m_arrTempColors.size() < mipLevel + 1)m_arrTempColors.resize(mipLevel + 1);
-		m_arrTempColors[mipLevel].resize(size);
 	}
 
 	void Texture::_createBuffer(vk::DeviceSize size, vk::BufferUsageFlags usage, vk::MemoryPropertyFlags properties,
@@ -827,6 +775,11 @@ namespace vg
 			barrier);
 	}
 
+	inline uint32_t caculateImageSizeWithMipmapLevel(uint32_t size, uint32_t mipmapLevel)
+	{
+		return std::max(1u, size >> mipmapLevel);
+	}
+
 	void Texture::_copyBufferToImage(std::shared_ptr<vk::CommandBuffer> pCommandBuffer, vk::Buffer buffer, vk::Image image,
 		uint32_t width, uint32_t height, uint32_t depth, uint32_t mipLevel,
 		uint32_t baseArrayLayer, uint32_t layerCount)
@@ -838,10 +791,5 @@ namespace vg
 		};
 
 		pCommandBuffer->copyBufferToImage(buffer, image, vk::ImageLayout::eTransferDstOptimal, copyInfo);
-	}
-
-	inline uint32_t caculateImageSizeWithMipmapLevel(uint32_t size, uint32_t mipmapLevel)
-	{
-		return std::max(1u, size >> mipmapLevel);
 	}
 }

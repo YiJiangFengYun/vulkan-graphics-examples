@@ -427,8 +427,13 @@ namespace vgim
 
         m_pFontTexture = std::shared_ptr<vg::Texture2D>(new vg::Texture2D(vg::TextureFormat::R8G8B8A8_UNORM, 
             VG_FALSE, width, height));
-        m_pFontTexture->setPixels32(reinterpret_cast<void *>(pixels), size);
-        m_pFontTexture->apply(VG_FALSE, VG_TRUE);
+		vg::TextureDataLayout layoutInfo;
+		layoutInfo.components.resize(1u);
+		layoutInfo.components[0].mipLevel = 0u;
+		layoutInfo.components[0].layerCount = 1u;
+		layoutInfo.components[0].baseArrayLayer = 0u;
+		layoutInfo.components[0].size = size;
+		m_pFontTexture->applyData(layoutInfo, reinterpret_cast<void *>(pixels), size);
         
         io.Fonts->TexID = reinterpret_cast<void *>(VkImage(*(m_pFontTexture->getImage())));
 

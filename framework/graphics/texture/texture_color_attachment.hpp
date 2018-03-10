@@ -14,16 +14,7 @@ namespace vg
 		uint32_t getHeight() const;
 	private:
 		TextureColorAttachment() = delete;
-		inline void _init() override
-		{
-			Texture::_init();
-			//Transform Image layout to final layout.
-			auto pCommandBuffer = beginSingleTimeCommands();
-			_tranImageLayout(pCommandBuffer, *m_pImage, m_currVkImageLayout, m_vkImageLayout,
-				0, m_mipMapLevels, 0, m_arrayLayer);
-			endSingleTimeCommands(pCommandBuffer);
-			m_currVkImageLayout = m_vkImageLayout;
-		}
+		virtual void _init() override;
 	};
 } //namespace kgs
 

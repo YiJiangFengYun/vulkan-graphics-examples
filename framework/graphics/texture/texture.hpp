@@ -10,6 +10,33 @@
 
 namespace vg
 {
+	struct TextureDataLayout
+	{
+		struct Component {
+			uint32_t mipLevel;
+			uint32_t baseArrayLayer;
+			uint32_t layerCount;
+			uint32_t size;
+			Bool32 hasImageExtent = VG_FALSE;
+			uint32_t width = 0u;
+			uint32_t height = 0u;
+			uint32_t depth = 0u;
+			Component();
+			Component(uint32_t mipLevel
+				, uint32_t baseArrayLayer
+				, uint32_t layerCount
+				, uint32_t size
+				, Bool32 hasImageExtent
+				, uint32_t width
+				, uint32_t height
+				, uint32_t depth
+			);
+		};
+		std::vector<Component> components;
+
+		TextureDataLayout();
+	};
+
 	class Texture : public Base
 	{
 	public:
@@ -25,7 +52,8 @@ namespace vg
 		TextureType getType() const;
 		TextureFormat getFormat() const;
 		Bool32 getIsMipmap() const;
-		uint32_t getMipmapLevel() const;
+		uint32_t getMipmapLevels() const;
+		uint32_t getArrayLayerCount() const;
 
 		vk::Format getVKFormat() const;
 		vk::ImageLayout getImageLayout() const;
@@ -57,27 +85,20 @@ namespace vg
 		vk::SamplerMipmapMode m_vkSamplerMipmapMode;
 		vk::SamplerAddressMode m_vkSamplerAddressMode;
 
-		//temp
-	    std::vector<std::vector<Color32>> m_arrTempColors;
+		//optional storage
+		TextureDataLayout m_dataLayout;
+		void *m_pMemory;
+		uint32_t m_memorySize;
+		uint32_t m_realSize;
 
 		//--aggregations
 
 		std::shared_ptr<vk::Image> m_pImage;
-		std::shared_ptr<vk::DeviceMemory> m_pMemory;
+		std::shared_ptr<vk::DeviceMemory> m_pImageMemory;
 		std::shared_ptr<vk::ImageView> m_pImageView;
 		std::shared_ptr<vk::Sampler> m_pSampler;
 		
-		inline virtual void _init()
-		{
-			_updateMipMapLevels();
-			_updateArrayLayer();
-			_updateVkFormat();
-			_updateVkFilter();
-			_updateVkSamplerAddressMode();
-			_createImage();
-			_createImageView();
-			_createSampler();
-		}
+		virtual void _init();
 
 		void _updateMipMapLevels();
 		void _updateArrayLayer();
@@ -88,15 +109,11 @@ namespace vg
 		void _createImageView();
 		void _createSampler();
 
-		std::vector<Color> _getPixels(uint32_t layer, uint32_t mipLevel = 0) const;
-		std::vector<Color32> _getPixels32(uint32_t layer, uint32_t mipLevel = 0) const;
-		void _setPixels(const std::vector<Color> &colors, uint32_t layer, uint32_t mipLevel = 0);
-		void _setPixels(const void* colors, uint32_t size, uint32_t layer, uint32_t mipLevel = 0);
-		void _setPixels32(const std::vector<Color32> &colors, uint32_t layer, uint32_t mipLevel = 0);
-		void _setPixels32(const void* colors, uint32_t size, uint32_t layer, uint32_t mipLevel = 0);
-		void _apply(Bool32 updateMipmaps = VG_TRUE, Bool32 makeUnreadable = VG_FALSE);
-		void _applyWithGenMipMap();
-		void _applyDirect();
+		void _applyData(TextureDataLayout layoutInfo
+			, const void *memory
+			, uint32_t size
+			, Bool32 cacheMemory = VG_FALSE
+		    , Bool32 createMipmaps = VG_FALSE);
 
 		void _createBuffer(vk::DeviceSize size, vk::BufferUsageFlags usage, vk::MemoryPropertyFlags properties,
 			std::shared_ptr<vk::Buffer>& pBuffer, std::shared_ptr<vk::DeviceMemory>& pBufferMemory);
@@ -107,7 +124,6 @@ namespace vg
 		void _copyBufferToImage(std::shared_ptr<vk::CommandBuffer> pCommandBuffer, vk::Buffer buffer, vk::Image image,
 			uint32_t width, uint32_t height, uint32_t depth, uint32_t mipLevel,
 			uint32_t baseArrayLayer, uint32_t layerCount);
-		void _resizeColorsData(uint32_t mipLevel);
 	};
 }
 

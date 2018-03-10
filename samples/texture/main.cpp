@@ -4,8 +4,8 @@
 #define STB_IMAGE_IMPLEMENTATION
 #include "sampleslib/stb_image.h"
 
-#include "pipelines/window.hpp"
-#include "pipelines/app.hpp"
+#include "texture/window.hpp"
+#include "texture/app.hpp"
 
 const uint32_t WINDOW_WIDTH = 1280;
 const uint32_t WINDOW_HEIGHT = 720;
@@ -16,11 +16,10 @@ int main() {
 	vg::PhysicalDeviceFeatures requiredFeatures;
 
     vg::PhysicalDeviceFeaturePriorities optionalFeatures;
-	optionalFeatures.fillModeNonSolid = 1u;
-	optionalFeatures.wideLines = 1u;
+	optionalFeatures.samplerAnisotropy = 1u;
 
 	App app;
-	app.init<Window>(WINDOW_WIDTH, WINDOW_HEIGHT, "pipelines", requiredFeatures, optionalFeatures);
+	app.init<Window>(WINDOW_WIDTH, WINDOW_HEIGHT, "texture", requiredFeatures, optionalFeatures);
 
 	LOG(plog::debug) << "Initialization completed." << std::endl;
 

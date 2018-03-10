@@ -62,7 +62,7 @@ void Window::_loadAssimpScene()
 	createInfo.isCreateObject = VG_TRUE;
 	createInfo.layoutComponentCount = layoutCount;
 	createInfo.pLayoutComponent = layouts;
-	createInfo.offset = vg::Vector3(3.0f, -6.0f, 0.0f);
+	createInfo.offset = vg::Vector3(3.0f, -6.0f, -1.0f);
 	m_assimpScene.init(createInfo);
 }
 
@@ -96,7 +96,7 @@ void Window::_createMaterial()
 		pPasses[i]->setFrontFace(vg::FrontFaceType::CLOCKWISE);
 		pPasses[i]->setViewport(fd::Viewport(static_cast<float>(i) / static_cast<float>(SCENE_COUNT),
 		     0.0f,
-		 	1.0f / 3.0f,
+		 	1.0f / static_cast<float>(SCENE_COUNT),
 		 	1.0f));
 		vk::PipelineDepthStencilStateCreateInfo depthStencilState = {};
 	    depthStencilState.depthTestEnable = VG_TRUE;
@@ -132,9 +132,6 @@ void Window::_fillScene()
 	{
 	    m_pScene->addVisualObject(object);		
 	}
-
-	/*auto &pTransform = m_pScene->pRootTransformForVisualObject;
-	pTransform->setLocalPosition(vg::Vector3(0, -2.0f, 0));*/
 }
 
 void Window::_setMaterialToObjects(std::shared_ptr<vg::Material> pMaterial)

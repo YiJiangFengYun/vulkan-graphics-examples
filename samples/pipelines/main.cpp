@@ -1,9 +1,5 @@
 #include <framework/framework.hpp>
 
-//Main.obj will contain implementions of stb_image.
-#define STB_IMAGE_IMPLEMENTATION
-#include "sampleslib/stb_image.h"
-
 #include "pipelines/window.hpp"
 #include "pipelines/app.hpp"
 

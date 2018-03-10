@@ -5,12 +5,6 @@
 #include "test-triangle-2d/app.hpp"
 #include "graphics/global.hpp"
 
-//Main.obj will contain implementions of stb_image and tiny_obj_loader.
-#define STB_IMAGE_IMPLEMENTATION
-#include "testlib/stb_image.h"
-#define TINYOBJLOADER_IMPLEMENTATION
-#include "testlib/tiny_obj_loader.h"
-
 const uint32_t WINDOW_WIDTH = 800;
 const uint32_t WINDOW_HEIGHT = 600;
 int main() {

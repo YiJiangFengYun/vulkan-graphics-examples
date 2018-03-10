@@ -1,8 +1,6 @@
 #ifndef WINDOW_H
 #define WINDOW_H
 
-#include <testlib/stb_image.h>
-#include <testlib/tiny_obj_loader.h>
 #include <testlib/window.hpp>
 
 namespace testTriangle

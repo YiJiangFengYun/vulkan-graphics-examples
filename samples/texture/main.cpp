@@ -2,7 +2,7 @@
 
 //Main.obj will contain implementions of stb_image.
 #define STB_IMAGE_IMPLEMENTATION
-#include "sampleslib/stb_image.h"
+#include "stb/stb_image.h"
 
 #include "texture/window.hpp"
 #include "texture/app.hpp"

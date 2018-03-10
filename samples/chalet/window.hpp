@@ -1,7 +1,7 @@
 #ifndef WINDOW_H
 #define WINDOW_H
 
-#include <sampleslib/stb_image.h>
+#include <stb/stb_image.h>
 #include <sampleslib/tiny_obj_loader.h>
 #include <sampleslib/window.hpp>
 

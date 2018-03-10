@@ -17,3 +17,22 @@ file(GLOB HEADERS "${IMGUI_DIR}/imgui/*.hpp" "${IMGUI_DIR}/imgui/*.h")
 file(GLOB SOURCES "${IMGUI_DIR}/imgui/*.cpp")
 add_library(${LIBRARY_NAME} STATIC ${HEADERS} ${SOURCES})
 set_property(TARGET ${LIBRARY_NAME} PROPERTY FOLDER ${FOLDER_NAME})
+
+# stb generetion
+set(LIBRARY_NAME "stb")
+file(GLOB HEADERS "stb/stb/*.hpp" "stb/stb/*.h")
+file(GLOB SOURCES "stb/stb/*.cpp")
+if(SOURCES)
+    add_library(${LIBRARY_NAME} STATIC ${HEADERS} ${SOURCES})
+    set_property(TARGET ${LIBRARY_NAME} PROPERTY FOLDER ${FOLDER_NAME})
+endif(SOURCES)
+
+#gli generation
+#Because gli project cmake is imperfect, so we don't use its original git repository and cmake system.
+set(LIBRARY_NAME "gli")
+file(GLOB HEADERS "gli/gli/*.hpp" "gli/gli/*.h")
+file(GLOB SOURCES "gli/gli/*.cpp")
+if(SOURCES)
+    add_library(${LIBRARY_NAME} STATIC ${HEADERS} ${SOURCES})
+    set_property(TARGET ${LIBRARY_NAME} PROPERTY FOLDER ${FOLDER_NAME})
+endif(SOURCES)

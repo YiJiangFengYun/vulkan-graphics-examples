@@ -1,11 +1,22 @@
 set_property(GLOBAL PROPERTY USE_FOLDERS ON)
 set(FOLDER_NAME "framework")
 
+# glm dependency
 set(INCLUDE_DIRS ${INCLUDE_DIRS} ${GLM_DIR})
 set(LIBRARIES ${LIBRARIES} glm)
+# plog dependency
 set(INCLUDE_DIRS ${INCLUDE_DIRS} "${PLOG_DIR}/include")
-set(INCLUDE_DIRS ${INCLUDE_DIRS} ${IMGUI_DIR}) #to include imgui headers.
-set(LIBRARIES ${LIBRARIES} imgui)
+# stb dependency
+set(INCLUDE_DIRS ${INCLUDE_DIRS} "${STB_DIR}")
+# gli dependency
+set(INCLUDE_DIRS ${INCLUDE_DIRS} "${GLI_DIR}")
+
+# imgui dependency
+if(USE_IMGUI_BIND)
+    set(INCLUDE_DIRS ${INCLUDE_DIRS} ${IMGUI_DIR}) #to include imgui headers.
+    set(LIBRARIES ${LIBRARIES} imgui)
+endif(USE_IMGUI_BIND)
+# framework include.
 set(INCLUDE_DIRS ${INCLUDE_DIRS} ${PROJECT_FRAMEWORK_DIR})
 
 add_subdirectory(foundation)

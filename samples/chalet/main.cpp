@@ -7,7 +7,7 @@
 
 //Main.obj will contain implementions of stb_image and tiny_obj_loader.
 #define STB_IMAGE_IMPLEMENTATION
-#include "sampleslib/stb_image.h"
+#include "stb/stb_image.h"
 #define TINYOBJLOADER_IMPLEMENTATION
 #include "sampleslib/tiny_obj_loader.h"
 

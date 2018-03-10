@@ -301,7 +301,7 @@ namespace vg
     {
         //Caching memory when memory is device local.
         cacheMemory = cacheMemory && _isDeviceMemoryLocal();
-        if (m_pMemory != nullptr && (m_memorySize != size || ! cacheMemory)) {
+        if (m_pMemory != nullptr && (m_memorySize < size || ! cacheMemory)) {
             free(m_pMemory);
             m_pMemory = nullptr;
             m_memorySize = 0;

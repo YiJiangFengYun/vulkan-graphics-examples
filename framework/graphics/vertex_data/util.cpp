@@ -6,15 +6,16 @@ namespace vg
 	{
 		const auto &subVertexDatas = pVertexData->getSubVertexDatas();
         const auto &subVertexData = subVertexDatas[subIndex];
-        const auto &bindingDescs = subVertexData.bindingDescs;
-        std::vector<vk::Buffer> vertexBuffers(bindingDescs.size());
-		std::vector<vk::DeviceSize> offsets(bindingDescs.size());
+		uint32_t bindingDescCount = subVertexData.vertexInputStateInfo.vertexBindingDescriptionCount;
+        const auto &bindingDescs = subVertexData.vertexInputStateInfo.pVertexBindingDescriptions;
+        std::vector<vk::Buffer> vertexBuffers(bindingDescCount);
+		std::vector<vk::DeviceSize> offsets(bindingDescCount);
         uint32_t offset = 0u;        
         for (uint32_t i = 0; i < subIndex; ++i) {
             offset += subVertexDatas[i].bufferSize;
         }
 
-        uint32_t count = static_cast<uint32_t>(bindingDescs.size());
+        uint32_t count = static_cast<uint32_t>(bindingDescCount);
         for (uint32_t i = 0; i < count; ++i) {
             vertexBuffers[i] = *(pVertexData->getBuffer());
             offsets[i] = offset;

@@ -123,13 +123,13 @@ namespace vg
     }
 
     void IndexData::init(uint32_t subDataCount
-            , const SubIndexData *pSubData
+            , const SubIndexData *pSubDatas
             , const void *memory
             , uint32_t size
             , Bool32 cacheMemory
         )
     {
-        updateDesData(subDataCount, pSubData);
+        updateDesData(subDataCount, pSubDatas);
         updateBuffer(memory, size, cacheMemory);
     }
 
@@ -145,15 +145,15 @@ namespace vg
         updateBuffer(memory, size, cacheMemory);
     }
 
-    void IndexData::updateDesData(uint32_t subDataCount, const SubIndexData *pSubData)
+    void IndexData::updateDesData(uint32_t subDataCount, const SubIndexData *pSubDatas)
     {
         if (_isEqual(m_subDataCount,
                 m_subDatas.data(),
                 subDataCount,
-                pSubData) == VG_FALSE) {
+                pSubDatas) == VG_FALSE) {
             m_subDataCount = subDataCount;
             m_subDatas.resize(subDataCount);
-            memcpy(m_subDatas.data(), pSubData, sizeof(SubIndexData) * subDataCount);
+            memcpy(m_subDatas.data(), pSubDatas, sizeof(SubIndexData) * subDataCount);
             _updatePipelineStateID();            
         }
     }
@@ -476,15 +476,15 @@ namespace vg
 		}
 	}
 
-    Bool32 IndexData::_isEqual(uint32_t subDataCount1, const SubIndexData *pSubData1, 
-            uint32_t subDataCount2, const SubIndexData *pSubData2)
+    Bool32 IndexData::_isEqual(uint32_t subDataCount1, const SubIndexData *pSubDatas1, 
+            uint32_t subDataCount2, const SubIndexData *pSubDatas2)
     {
         if (subDataCount1 != subDataCount2) return VG_FALSE;
 
         size_t count = subDataCount1;
         for (size_t i = 0; i < count; ++i) {
-            const auto subData1 = *(pSubData1 + i);
-            const auto subData2 = *(pSubData2 + i);
+            const auto subData1 = *(pSubDatas1 + i);
+            const auto subData2 = *(pSubDatas2 + i);
             if (subData1.bufferSize != subData2.bufferSize) return VG_FALSE;
             if (subData1.indexCount != subData2.indexCount) return VG_FALSE;
             if (subData1.inputAssemblyStateInfo != subData2.inputAssemblyStateInfo) return VG_FALSE;

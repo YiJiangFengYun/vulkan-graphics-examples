@@ -42,7 +42,7 @@ namespace vg {
         ~IndexData();
 
         void init(uint32_t subDataCount
-            , const SubIndexData *pSubData
+            , const SubIndexData *pSubDatas
             , const void *memory
             , uint32_t size
             , Bool32 cacheMemory
@@ -56,7 +56,7 @@ namespace vg {
              , const vk::PipelineInputAssemblyStateCreateInfo &inputAssemblyStateInfo
              );
 
-        void updateDesData(uint32_t subDataCount, const SubIndexData *pSubData);
+        void updateDesData(uint32_t subDataCount, const SubIndexData *pSubDatas);
         void updateDesData(vk::IndexType indexType, const vk::PipelineInputAssemblyStateCreateInfo &inputAssemblyStateInfo);
         void updateDesData(uint32_t indexCount, vk::IndexType indexType,  uint32_t size, 
             const vk::PipelineInputAssemblyStateCreateInfo &inputAssemblyStateInfo);
@@ -97,8 +97,8 @@ namespace vg {
         Bool32 _isDeviceMemoryLocal() const;
         void _createBuffer(fd::ArrayProxy<MemorySlice> memories, uint32_t memorySize);
         void _updatePipelineStateID();
-        Bool32 _isEqual(uint32_t subDataCount1, const SubIndexData *pSubData1, 
-            uint32_t subDataCount2, const SubIndexData *pSubData2);
+        Bool32 _isEqual(uint32_t subDataCount1, const SubIndexData *pSubDatas1, 
+            uint32_t subDataCount2, const SubIndexData *pSubDatas2);
      };
 } //!vg
 #include "graphics/vertex_data/index_data.inl"

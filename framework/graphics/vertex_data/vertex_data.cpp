@@ -16,6 +16,13 @@ namespace vg
 
     }
 
+	VertexData::_SubVertexData::_SubVertexData()
+        : bindingDescs()
+        , attrDescs()
+    {
+
+    }
+
     VertexData::VertexData()
         : Base(BaseType::VERTEX_DATA)
         , m_bufferMemoryPropertyFlags()
@@ -115,14 +122,15 @@ namespace vg
         return m_pipelineStateID;
     }
 
-    void VertexData::init(const std::vector<VertexData::SubVertexData> subDatas
+    void VertexData::init(uint32_t subDataCount, 
+            const SubVertexData *pSubDatas
             , const void *memory
             , uint32_t size
             , Bool32 cacheMemory
             )
     {
         
-        updateDesData(subDatas);
+        updateDesData(subDataCount, pSubDatas);
         updateBuffer(memory, size, cacheMemory);
     }
 
@@ -137,17 +145,31 @@ namespace vg
         updateBuffer(memory, size, cacheMemory);        
     }
 
-    void VertexData::updateDesData(const std::vector<SubVertexData> subDatas)
+    void VertexData::updateDesData(uint32_t subDataCount, const SubVertexData *pSubDatas)
     {
-        if (_isEqual(m_subDatas, subDatas) == VG_FALSE) {
-            m_subDataCount = static_cast<uint32_t>(subDatas.size());
-            m_subDatas = subDatas;
-		    for (auto& subData : m_subDatas) 
-		    {
-		    	subData.vertexInputStateInfo.pVertexBindingDescriptions = subData.bindingDescs.data();
-		    	subData.vertexInputStateInfo.pVertexAttributeDescriptions = subData.attrDescs.data();
-		    }
+        if (_isEqual(m_subDataCount, m_subDatas.data(), 
+                subDataCount, pSubDatas) == VG_FALSE) {
+            m_subDataCount = subDataCount;
+            m_subDatas.resize(subDataCount);
+            memcpy(m_subDatas.data(), pSubDatas, sizeof(SubVertexData) * subDataCount);
+            m__subDatas.resize(subDataCount);
+            for (uint32_t i = 0; i < subDataCount; ++i)
+            {
+                auto &bindingDescs = m__subDatas[i].bindingDescs;
+                auto vertexInputStateInfo = (*(pSubDatas + i)).vertexInputStateInfo;
+				bindingDescs.resize(vertexInputStateInfo.vertexBindingDescriptionCount);
+                memcpy(bindingDescs.data(), vertexInputStateInfo.pVertexBindingDescriptions,
+                    sizeof(vk::VertexInputBindingDescription) * vertexInputStateInfo.vertexBindingDescriptionCount);
+                auto &attrDescs = m__subDatas[i].attrDescs;
+                attrDescs.resize(vertexInputStateInfo.vertexAttributeDescriptionCount);
+                memcpy(attrDescs.data(), vertexInputStateInfo.pVertexAttributeDescriptions,
+                    sizeof(vk::VertexInputAttributeDescription) * vertexInputStateInfo.vertexAttributeDescriptionCount);
 
+                m_subDatas[i].vertexInputStateInfo.pVertexBindingDescriptions = bindingDescs.data();
+                m_subDatas[i].vertexInputStateInfo.pVertexAttributeDescriptions = attrDescs.data();
+
+            }
+		    
             _updatePipelineStateID();            
         }
     }
@@ -156,37 +178,30 @@ namespace vg
     {
         size_t size = m_subDatas.size();
         if (size == 0u) {
-            size = 1u;
-			auto &subDatas = m_subDatas;
-            subDatas.resize(1u);
-            m_subDataCount = size;
-			auto &inputInfo = subDatas[0].vertexInputStateInfo;
-			inputInfo.pVertexBindingDescriptions = subDatas[0].bindingDescs.data();
-			inputInfo.pVertexAttributeDescriptions = subDatas[0].attrDescs.data();
+			m_subDatas.resize(1u);
+			m__subDatas.resize(1u);
+			size = 1u;
         };
         Bool32 isChange = VG_FALSE;
         for (size_t i = 0u; i < size; ++i) 
         {
             SubVertexData &subData = m_subDatas[i];
-            if (_isEqual(m_subDatas[i].vertexInputStateInfo, vertexInputStateInfo) == VG_FALSE) {
-                //copy arguments.
-                uint32_t count = vertexInputStateInfo.vertexBindingDescriptionCount;
-                size_t size2 = count * sizeof(vk::VertexInputBindingDescription);
-                subData.bindingDescs.resize(count);
-                memcpy(subData.bindingDescs.data(), vertexInputStateInfo.pVertexBindingDescriptions, size2);
-        
-                count = vertexInputStateInfo.vertexAttributeDescriptionCount;
-		        size2 = count * sizeof(vk::VertexInputAttributeDescription);
-                subData.attrDescs.resize(count);
-                memcpy(subData.attrDescs.data(), vertexInputStateInfo.pVertexAttributeDescriptions, size2);
-        
+            _SubVertexData &_subData = m__subDatas[i];
+            if (_isEqual(subData.vertexInputStateInfo, vertexInputStateInfo) == VG_FALSE) {
+                auto &bindingDescs = _subData.bindingDescs;
+				bindingDescs.resize(vertexInputStateInfo.vertexBindingDescriptionCount);
+                memcpy(bindingDescs.data(), vertexInputStateInfo.pVertexBindingDescriptions,
+                    sizeof(vk::VertexInputBindingDescription) * vertexInputStateInfo.vertexBindingDescriptionCount);
+                auto &attrDescs = _subData.attrDescs;
+                attrDescs.resize(vertexInputStateInfo.vertexAttributeDescriptionCount);
+                memcpy(attrDescs.data(), vertexInputStateInfo.pVertexAttributeDescriptions,
+                    sizeof(vk::VertexInputAttributeDescription) * vertexInputStateInfo.vertexAttributeDescriptionCount);
+
                 //set vertex input state create info.
                 subData.vertexInputStateInfo = vertexInputStateInfo;
                 subData.vertexInputStateInfo.pNext = nullptr;
-                // subData.vertexInputStateInfo.vertexBindingDescriptionCount = vertexInputStateInfo.vertexBindingDescriptionCount;
-                subData.vertexInputStateInfo.pVertexBindingDescriptions = subData.bindingDescs.data();
-                // subData.vertexInputStateInfo.vertexAttributeDescriptionCount = vertexInputStateInfo.vertexAttributeDescriptionCount;
-                subData.vertexInputStateInfo.pVertexAttributeDescriptions = subData.attrDescs.data();
+                subData.vertexInputStateInfo.pVertexBindingDescriptions = bindingDescs.data();
+                subData.vertexInputStateInfo.pVertexAttributeDescriptions = attrDescs.data();
                 
                 isChange = VG_TRUE;            
             }
@@ -201,13 +216,9 @@ namespace vg
     {
         size_t size = m_subDatas.size();
         if (size == 0u) {
-            size = 1u;
-			auto &subDatas = m_subDatas;
-            subDatas.resize(1u);
-            m_subDataCount = size;
-			auto &inputInfo = subDatas[0].vertexInputStateInfo;
-			inputInfo.pVertexBindingDescriptions = subDatas[0].bindingDescs.data();
-			inputInfo.pVertexAttributeDescriptions = subDatas[0].attrDescs.data();
+			m_subDatas.resize(1u);
+			m__subDatas.resize(1u);
+			size = 1u;
         };
         Bool32 isChange = VG_FALSE;
         for (size_t i = 0u; i < size; ++i) 
@@ -225,23 +236,22 @@ namespace vg
                 isChange = VG_TRUE;                                                            
             }
 
-            if (_isEqual(m_subDatas[i].vertexInputStateInfo, vertexInputStateInfo) == VG_FALSE) {
-                //copy arguments.
-                uint32_t count = vertexInputStateInfo.vertexBindingDescriptionCount;
-                size_t size2 = count * sizeof(vk::VertexInputBindingDescription);
-                subData.bindingDescs.resize(count);
-                memcpy(subData.bindingDescs.data(), vertexInputStateInfo.pVertexBindingDescriptions, size2);
-        
-                count = vertexInputStateInfo.vertexAttributeDescriptionCount;
-		        size2 = count * sizeof(vk::VertexInputAttributeDescription);
-                subData.attrDescs.resize(count);
-                memcpy(subData.attrDescs.data(), vertexInputStateInfo.pVertexAttributeDescriptions, size2);
-        
+            _SubVertexData &_subData = m__subDatas[i];
+            if (_isEqual(subData.vertexInputStateInfo, vertexInputStateInfo) == VG_FALSE) {
+                auto &bindingDescs = _subData.bindingDescs;
+				bindingDescs.resize(vertexInputStateInfo.vertexBindingDescriptionCount);
+                memcpy(bindingDescs.data(), vertexInputStateInfo.pVertexBindingDescriptions,
+                    sizeof(vk::VertexInputBindingDescription) * vertexInputStateInfo.vertexBindingDescriptionCount);
+                auto &attrDescs = _subData.attrDescs;
+                attrDescs.resize(vertexInputStateInfo.vertexAttributeDescriptionCount);
+                memcpy(attrDescs.data(), vertexInputStateInfo.pVertexAttributeDescriptions,
+                    sizeof(vk::VertexInputAttributeDescription) * vertexInputStateInfo.vertexAttributeDescriptionCount);
+
                 //set vertex input state create info.
                 subData.vertexInputStateInfo = vertexInputStateInfo;
                 subData.vertexInputStateInfo.pNext = nullptr;
-                subData.vertexInputStateInfo.pVertexBindingDescriptions = subData.bindingDescs.data();
-                subData.vertexInputStateInfo.pVertexAttributeDescriptions = subData.attrDescs.data();
+                subData.vertexInputStateInfo.pVertexBindingDescriptions = bindingDescs.data();
+                subData.vertexInputStateInfo.pVertexAttributeDescriptions = attrDescs.data();
                 
                 isChange = VG_TRUE;            
             }
@@ -254,14 +264,14 @@ namespace vg
 
     void  VertexData::updateSubDataCount(uint32_t count)
     {
-		auto &subDatas = m_subDatas;
-        subDatas.resize(count);
+        m_subDatas.resize(count);
+        m__subDatas.resize(count);
         m_subDataCount = count;
 		for (uint32_t i = 0; i < count; ++i)
 		{
-			auto &inputInfo = subDatas[i].vertexInputStateInfo;
-			inputInfo.pVertexBindingDescriptions = subDatas[i].bindingDescs.data();
-			inputInfo.pVertexAttributeDescriptions = subDatas[i].attrDescs.data();
+			auto &inputInfo = m_subDatas[i].vertexInputStateInfo;
+			inputInfo.pVertexBindingDescriptions = m__subDatas[i].bindingDescs.data();
+			inputInfo.pVertexAttributeDescriptions = m__subDatas[i].attrDescs.data();
 		}
     }
 
@@ -289,21 +299,21 @@ namespace vg
         {
             auto &subData = m_subDatas[offset];
             auto &stateInfo = *(stateInfos.data() + i);
-            //copy arguments.
-            uint32_t count = stateInfo.vertexBindingDescriptionCount;
-            size_t size = count * sizeof(vk::VertexInputBindingDescription);
-            subData.bindingDescs.resize(count);
-            memcpy(subData.bindingDescs.data(), stateInfo.pVertexBindingDescriptions, size);
-    
-            count = stateInfo.vertexAttributeDescriptionCount;
-		    size = count * sizeof(vk::VertexInputAttributeDescription);
-            subData.attrDescs.resize(count);
-            memcpy(subData.attrDescs.data(), stateInfo.pVertexAttributeDescriptions, size);
-
+            auto &_subData = m__subDatas[offset];
+            auto &bindingDescs = _subData.bindingDescs;
+			bindingDescs.resize(stateInfo.vertexBindingDescriptionCount);
+            memcpy(bindingDescs.data(), stateInfo.pVertexBindingDescriptions,
+                sizeof(vk::VertexInputBindingDescription) * stateInfo.vertexBindingDescriptionCount);
+            auto &attrDescs = _subData.attrDescs;
+            attrDescs.resize(stateInfo.vertexAttributeDescriptionCount);
+            memcpy(attrDescs.data(), stateInfo.pVertexAttributeDescriptions,
+                sizeof(vk::VertexInputAttributeDescription) * stateInfo.vertexAttributeDescriptionCount);
+            //set vertex input state create info.
             subData.vertexInputStateInfo = stateInfo;
             subData.vertexInputStateInfo.pNext = nullptr;
-            subData.vertexInputStateInfo.pVertexBindingDescriptions = subData.bindingDescs.data();
-            subData.vertexInputStateInfo.pVertexAttributeDescriptions = subData.attrDescs.data();
+            subData.vertexInputStateInfo.pVertexBindingDescriptions = bindingDescs.data();
+            subData.vertexInputStateInfo.pVertexAttributeDescriptions = attrDescs.data();
+
             ++offset;
         }
         _updatePipelineStateID();
@@ -495,18 +505,20 @@ namespace vg
 		}
 	}
 
-    Bool32 VertexData::_isEqual(const std::vector<VertexData::SubVertexData> &subDatas1, 
-        const std::vector<VertexData::SubVertexData> &subDatas2)
+    Bool32 VertexData::_isEqual(uint32_t subDataCount1, const SubVertexData *pSubDatas1, 
+            uint32_t subDataCount2, const SubVertexData *pSubDatas2)
     {
-        if (subDatas1.size() != subDatas2.size()) return VG_FALSE;
+        if (subDataCount1 != subDataCount2) return VG_FALSE;
 
-        size_t count = subDatas1.size();
+        size_t count = subDataCount1;
 
         for (size_t i = 0; i < count; ++i)
         {
-            if (subDatas1[i].bufferSize != subDatas2[i].bufferSize) return VG_FALSE;
-            if (subDatas1[i].vertexCount != subDatas2[i].vertexCount) return VG_FALSE;
-            if (_isEqual(subDatas1[i].vertexInputStateInfo, subDatas2[i].vertexInputStateInfo) == VG_FALSE) return VG_FALSE;
+            const auto subData1 = *(pSubDatas1 + i);
+            const auto subData2 = *(pSubDatas2 + i);
+            if (subData1.bufferSize != subData2.bufferSize) return VG_FALSE;
+            if (subData1.vertexCount != subData2.vertexCount) return VG_FALSE;
+            if (_isEqual(subData1.vertexInputStateInfo, subData2.vertexInputStateInfo) == VG_FALSE) return VG_FALSE;
         }
     
 

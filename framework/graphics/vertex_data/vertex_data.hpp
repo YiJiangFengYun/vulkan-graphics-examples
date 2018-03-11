@@ -14,8 +14,6 @@ namespace vg
         struct SubVertexData {
             uint32_t vertexCount;
             uint32_t bufferSize;
-            std::vector<vk::VertexInputBindingDescription> bindingDescs;
-            std::vector<vk::VertexInputAttributeDescription> attrDescs;
             vk::PipelineVertexInputStateCreateInfo vertexInputStateInfo;
 
             SubVertexData(uint32_t vertexCount = 0u
@@ -36,17 +34,18 @@ namespace vg
 
         ~VertexData();
 
+        void init(uint32_t subDataCount, 
+            const SubVertexData *pSubDatas
+            , const void *memory
+            , uint32_t size
+            , Bool32 cacheMemory
+            );
+
         void init(uint32_t vertexCount
             , const void *memory
             , uint32_t size
             , Bool32 cacheMemory
             , const vk::PipelineVertexInputStateCreateInfo &vertexInputStateInfo 
-            );
-
-        void init(const std::vector<SubVertexData> subDatas
-            , const void *memory
-            , uint32_t size
-            , Bool32 cacheMemory
             );
         
         template<typename VertexType>
@@ -56,11 +55,9 @@ namespace vg
             , const vk::PipelineVertexInputStateCreateInfo &vertexInputStateInfo
             );
 
+        void updateDesData(uint32_t subDataCount, const SubVertexData *pSubDatas);        
         void updateDesData(const vk::PipelineVertexInputStateCreateInfo &vertexInputStateInfo);
         void updateDesData(uint32_t vertexCount, uint32_t size, const vk::PipelineVertexInputStateCreateInfo &vertexInputStateInfo);
-
-        void updateDesData(const std::vector<SubVertexData> subDatas);
-
         template<typename VertexType>
         void updateDesData(uint32_t vertexCount, const vk::PipelineVertexInputStateCreateInfo &vertexInputStateInfo);
 
@@ -87,9 +84,15 @@ namespace vg
         
         PipelineStateID getPipelineStateID() const;
     private:
+        struct _SubVertexData {
+            std::vector<vk::VertexInputBindingDescription> bindingDescs;
+            std::vector<vk::VertexInputAttributeDescription> attrDescs;
+            _SubVertexData();
+        };
         MemoryPropertyFlags m_bufferMemoryPropertyFlags;
         PipelineStateID m_pipelineStateID;
         std::vector<SubVertexData> m_subDatas;
+        std::vector<_SubVertexData> m__subDatas;
         uint32_t m_subDataCount;
         uint32_t m_bufferSize;
         std::shared_ptr<vk::Buffer> m_pBuffer;
@@ -102,8 +105,8 @@ namespace vg
         Bool32 _isDeviceMemoryLocal() const;
         void _createBuffer(fd::ArrayProxy<MemorySlice> memories, uint32_t memorySize);
         void _updatePipelineStateID();
-        Bool32 _isEqual(const std::vector<VertexData::SubVertexData> &subDatas1, 
-            const std::vector<VertexData::SubVertexData> &subDatas2);
+        Bool32 _isEqual(uint32_t subDataCount1, const SubVertexData *pSubDatas1, 
+            uint32_t subDataCount2, const SubVertexData *pSubDatas2);
         Bool32 _isEqual(const vk::PipelineVertexInputStateCreateInfo &vertexInputStateInfo1, 
             const vk::PipelineVertexInputStateCreateInfo &vertexInputStateInfo2);
     };

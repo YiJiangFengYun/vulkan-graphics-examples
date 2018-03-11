@@ -20,7 +20,7 @@ namespace vg
 		return m_width;
 	}
 
-	void TextureCube::applyData(TextureDataLayout layoutInfo
+	void TextureCube::applyData(const TextureDataLayout &layoutInfo
 			, const void *memory
 			, uint32_t size
 			, Bool32 cacheMemory

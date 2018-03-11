@@ -113,11 +113,13 @@ namespace chalet
 
 		m_pTexture = std::shared_ptr<vg::Texture2D>(new vg::Texture2D(vg::TextureFormat::R8G8B8A8_UNORM, VG_FALSE, texWidth, texHeight));
 		vg::TextureDataLayout layoutInfo;
-		layoutInfo.components.resize(1u);
-		layoutInfo.components[0].mipLevel = 0u;
-		layoutInfo.components[0].layerCount = 1u;
-		layoutInfo.components[0].baseArrayLayer = 0u;
-		layoutInfo.components[0].size = imageSize;
+		vg::TextureDataLayout::Component component;
+		component.mipLevel = 0u;
+		component.layerCount = 1u;
+		component.baseArrayLayer = 0u;
+		component.size = imageSize;
+		layoutInfo.componentCount = 1u;
+		layoutInfo.pComponent = &component;
 		m_pTexture->applyData(layoutInfo, reinterpret_cast<void *>(pixels), imageSize);
 	}
 

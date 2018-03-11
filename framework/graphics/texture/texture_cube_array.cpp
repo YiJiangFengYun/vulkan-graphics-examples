@@ -26,7 +26,7 @@ namespace vg
 		return m_arrayLength;
 	}
 
-	void TextureCubeArray::applyData(TextureDataLayout layoutInfo
+	void TextureCubeArray::applyData(const TextureDataLayout &layoutInfo
 			, const void *memory
 			, uint32_t size
 			, Bool32 cacheMemory

@@ -13,7 +13,7 @@ namespace vg
 		uint32_t getWidth() const;
 		uint32_t getHeight() const;
 		uint32_t getDepth() const;
-		void applyData(TextureDataLayout layoutInfo
+		void applyData(const TextureDataLayout &layoutInfo
 			, const void *memory
 			, uint32_t size
 			, Bool32 cacheMemory = VG_FALSE

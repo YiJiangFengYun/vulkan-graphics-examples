@@ -31,7 +31,7 @@ namespace vg
 		return m_arrayLength;
 	}
 
-	void Texture2DArray::applyData(TextureDataLayout layoutInfo
+	void Texture2DArray::applyData(const TextureDataLayout &layoutInfo
 			, const void *memory
 			, uint32_t size
 			, Bool32 cacheMemory

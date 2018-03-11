@@ -19,7 +19,7 @@ namespace vg
 		return m_width;
 	}
 
-	void Texture1D::applyData(TextureDataLayout layoutInfo
+	void Texture1D::applyData(const TextureDataLayout &layoutInfo
 			, const void *memory
 			, uint32_t size
 			, Bool32 cacheMemory

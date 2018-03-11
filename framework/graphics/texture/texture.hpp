@@ -32,7 +32,8 @@ namespace vg
 				, uint32_t depth
 			);
 		};
-		std::vector<Component> components;
+		uint32_t componentCount;
+		Component *pComponent;
 
 		TextureDataLayout();
 	};
@@ -87,6 +88,7 @@ namespace vg
 
 		//optional storage
 		TextureDataLayout m_dataLayout;
+		std::vector<TextureDataLayout::Component> m_components;
 		void *m_pMemory;
 		uint32_t m_memorySize;
 		uint32_t m_realSize;
@@ -109,7 +111,7 @@ namespace vg
 		void _createImageView();
 		void _createSampler();
 
-		void _applyData(TextureDataLayout layoutInfo
+		void _applyData(const TextureDataLayout &layoutInfo
 			, const void *memory
 			, uint32_t size
 			, Bool32 cacheMemory = VG_FALSE

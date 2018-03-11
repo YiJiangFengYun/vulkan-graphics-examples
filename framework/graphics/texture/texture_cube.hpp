@@ -11,7 +11,7 @@ namespace vg
 		TextureCube(TextureFormat format, Bool32 mipmap, uint32_t size);
 		~TextureCube();
 		uint32_t getSize() const;
-		void applyData(TextureDataLayout layoutInfo
+		void applyData(const TextureDataLayout &layoutInfo
 			, const void *memory
 			, uint32_t size
 			, Bool32 cacheMemory = VG_FALSE

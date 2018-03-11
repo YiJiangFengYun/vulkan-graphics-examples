@@ -39,7 +39,8 @@ namespace vg
 	}
 
 	TextureDataLayout::TextureDataLayout()
-		: components()
+		: componentCount(0u)
+		, pComponent(nullptr)
 	{
 
 	}
@@ -58,6 +59,8 @@ namespace vg
 		, m_vkImageUsageFlags(vk::ImageUsageFlagBits::eTransferDst | vk::ImageUsageFlagBits::eSampled) //default image usage is for sampled texture.
 		, m_vkImageLayout(vk::ImageLayout::eShaderReadOnlyOptimal) //default image layout is for sampled texture.
 		, m_vkImageAspectFlags(vk::ImageAspectFlagBits::eColor) //default image aspect is for sampled texture.
+		, m_dataLayout()
+		, m_components()
 		, m_pMemory(nullptr)
 		, m_memorySize(0u)
 	{
@@ -515,7 +518,7 @@ namespace vg
 		m_pSampler = fd::createSampler(pDevice, createInfo);
 	}
 
-	void Texture::_applyData(TextureDataLayout layoutInfo
+	void Texture::_applyData(const TextureDataLayout &layoutInfo
 		, const void *memory
 		, uint32_t size
 		, Bool32 cacheMemory
@@ -523,7 +526,11 @@ namespace vg
 	{
 		if (cacheMemory)
 		{
+			m_components.resize(layoutInfo.componentCount);
+			memcpy(m_components.data(), layoutInfo.pComponent,
+				sizeof(TextureDataLayout::Component) * layoutInfo.componentCount);
 			m_dataLayout = layoutInfo;
+			m_dataLayout.pComponent = m_components.data();
 		}
 
 		if (m_pMemory != nullptr && (m_memorySize < size || ! cacheMemory)) {
@@ -623,8 +630,8 @@ namespace vg
 			}
 			else
 			{
-				const auto &components = layoutInfo.components;
-				uint32_t componentCount = static_cast<uint32_t>(components.size());
+				const auto pComponent = layoutInfo.pComponent;
+				const auto componentCount = layoutInfo.componentCount;
 				std::vector<vk::BufferImageCopy> bufferCopyRegions(componentCount);
 				uint32_t offset = 0u;
 				for (uint32_t i = 0u; i < componentCount; ++i)
@@ -632,23 +639,24 @@ namespace vg
 					uint32_t width;
 					uint32_t height;
 					uint32_t depth;
-					if (components[i].hasImageExtent)
+					const auto component = *(layoutInfo.pComponent + i);
+					if (component.hasImageExtent)
 					{
-						width = components[i].width;
-						height = components[i].height;
-						depth = components[i].depth;
+						width = component.width;
+						height = component.height;
+						depth = component.depth;
 					}
 					else
 					{
-						width = caculateImageSizeWithMipmapLevel(m_width, components[i].mipLevel);
-						height = caculateImageSizeWithMipmapLevel(m_height, components[i].mipLevel);
-						depth = caculateImageSizeWithMipmapLevel(m_depth, components[i].mipLevel);
+						width = caculateImageSizeWithMipmapLevel(m_width, component.mipLevel);
+						height = caculateImageSizeWithMipmapLevel(m_height, component.mipLevel);
+						depth = caculateImageSizeWithMipmapLevel(m_depth, component.mipLevel);
 					}
 					vk::ImageSubresourceLayers subresourceLayers = {
 						m_vkImageAspectFlags,              //aspectMask
-						components[i].mipLevel,            //mipLevel
-						components[i].baseArrayLayer,      //baseArrayLayer
-						components[i].layerCount           //layerCount
+						component.mipLevel,            //mipLevel
+						component.baseArrayLayer,      //baseArrayLayer
+						component.layerCount           //layerCount
 					};
 					vk::BufferImageCopy copyInfo = { 
 						offset,                                 //bufferOffset
@@ -660,7 +668,7 @@ namespace vg
 					};
 
 					bufferCopyRegions[i] = copyInfo;
-					offset += components[i].size;
+					offset += component.size;
 				}
 				//transfer image from initial current image layout to dst layout.
 				//here use undefined layout not to use curr layout of image, it can clear image old data.

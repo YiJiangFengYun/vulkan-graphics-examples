@@ -11,7 +11,7 @@ namespace vg
 		Texture1D(TextureFormat format, Bool32 mipmap, uint32_t width);
 		~Texture1D();
 		uint32_t getWidth() const;
-		void applyData(TextureDataLayout layoutInfo
+		void applyData(const TextureDataLayout &layoutInfo
 			, const void *memory
 			, uint32_t size
 			, Bool32 cacheMemory = VG_FALSE

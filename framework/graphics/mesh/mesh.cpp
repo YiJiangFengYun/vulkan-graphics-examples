@@ -431,7 +431,7 @@ namespace vg
 			offset += static_cast<uint32_t>(size);
 		}
 
-		m_pIndexData->init(subDatas, stagingMemory, indexBufferSize, VG_FALSE);
+		m_pIndexData->init(subCount, subDatas.data(), stagingMemory, indexBufferSize, VG_FALSE);
 
 		free(stagingMemory);
 	}

@@ -29,7 +29,7 @@ namespace vg
 		static const MeshData::DataType ARRAY_TYPE;
 	};
 
-	enum class UVType
+	enum class TextureCoordinateType
 	{
 		FLOAT,
 		VECTOR_2,
@@ -39,23 +39,23 @@ namespace vg
 		RANGE_SIZE = (END_RANGE - BEGIN_RANGE + 1)
 	};
 
-	template<UVType type>
-	struct UVConstInfo
+	template<TextureCoordinateType type>
+	struct TextureCoordinateConstInfo
 	{
 		static const MeshData::DataType BASE_TYPE;
 		static const MeshData::DataType ARRAY_TYPE;
 	};
 
-	enum class UVIndex
+	enum class TextureCoordinateIndex
 	{
-		UV_0,
-		UV_1,
-		UV_2,
-		UV_3
+		TextureCoordinate_0,
+		TextureCoordinate_1,
+		TextureCoordinate_2,
+		TextureCoordinate_3
 	};
 
-	template<UVIndex index>
-	struct UVIndexInfo
+	template<TextureCoordinateIndex index>
+	struct TextureCoordinateIndexInfo
 	{
 		static const std::string VERTEX_NAME;
 		static const std::uint32_t VERTEX_BINDING_PRIORITY;
@@ -132,61 +132,46 @@ namespace vg
 	};
 
 	template<>
-	struct UVConstInfo<UVType::FLOAT>
+	struct TextureCoordinateConstInfo<TextureCoordinateType::FLOAT>
 	{
 		static const MeshData::DataType ARRAY_TYPE = MeshData::DataType::FLOAT_ARRAY;
 	};
 
 	template<>
-	struct UVConstInfo<UVType::VECTOR_2>
+	struct TextureCoordinateConstInfo<TextureCoordinateType::VECTOR_2>
 	{
 		static const MeshData::DataType ARRAY_TYPE = MeshData::DataType::VECTOR_2_ARRAY;
 	};
 
 	template<>
-	struct UVConstInfo<UVType::VECTOR_3>
+	struct TextureCoordinateConstInfo<TextureCoordinateType::VECTOR_3>
 	{
 		static const MeshData::DataType ARRAY_TYPE = MeshData::DataType::VECTOR_3_ARRAY;
 	};
 
-	/*template<>
-	const MeshData::DataType MeshConstInfo<MeshType::SPACE_2>::ARRAY_TYPE = MeshData::DataType::VECTOR_2_ARRAY;
+	template<>
+	const std::string TextureCoordinateIndexInfo<TextureCoordinateIndex::TextureCoordinate_0>::VERTEX_NAME = VG_VERTEX_TextureCoordinate0_NAME;
 
 	template<>
-	const MeshData::DataType MeshConstInfo<MeshType::SPACE_3>::ARRAY_TYPE = MeshData::DataType::VECTOR_3_ARRAY;
+	const std::uint32_t TextureCoordinateIndexInfo<TextureCoordinateIndex::TextureCoordinate_0>::VERTEX_BINDING_PRIORITY = VG_VERTEX_BINDING_PRIORITY_TextureCoordinate0;
 
 	template<>
-	const MeshData::DataType UVConstInfo<UVType::FLOAT>::ARRAY_TYPE = MeshData::DataType::FLOAT_ARRAY;
+	const std::string TextureCoordinateIndexInfo<TextureCoordinateIndex::TextureCoordinate_1>::VERTEX_NAME = VG_VERTEX_TextureCoordinate1_NAME;
 
 	template<>
-	const MeshData::DataType UVConstInfo<UVType::VECTOR_2>::ARRAY_TYPE = MeshData::DataType::VECTOR_2_ARRAY;
+	const std::uint32_t TextureCoordinateIndexInfo<TextureCoordinateIndex::TextureCoordinate_1>::VERTEX_BINDING_PRIORITY = VG_VERTEX_BINDING_PRIORITY_TextureCoordinate1;
 
 	template<>
-	const MeshData::DataType UVConstInfo<UVType::VECTOR_3>::ARRAY_TYPE = MeshData::DataType::VECTOR_3_ARRAY;*/
+	const std::string TextureCoordinateIndexInfo<TextureCoordinateIndex::TextureCoordinate_2>::VERTEX_NAME = VG_VERTEX_TextureCoordinate2_NAME;
 
 	template<>
-	const std::string UVIndexInfo<UVIndex::UV_0>::VERTEX_NAME = VG_VERTEX_UV0_NAME;
+	const std::uint32_t TextureCoordinateIndexInfo<TextureCoordinateIndex::TextureCoordinate_2>::VERTEX_BINDING_PRIORITY = VG_VERTEX_BINDING_PRIORITY_TextureCoordinate2;
 
 	template<>
-	const std::uint32_t UVIndexInfo<UVIndex::UV_0>::VERTEX_BINDING_PRIORITY = VG_VERTEX_BINDING_PRIORITY_UV0;
+	const std::string TextureCoordinateIndexInfo<TextureCoordinateIndex::TextureCoordinate_3>::VERTEX_NAME = VG_VERTEX_TextureCoordinate3_NAME;
 
 	template<>
-	const std::string UVIndexInfo<UVIndex::UV_1>::VERTEX_NAME = VG_VERTEX_UV1_NAME;
-
-	template<>
-	const std::uint32_t UVIndexInfo<UVIndex::UV_1>::VERTEX_BINDING_PRIORITY = VG_VERTEX_BINDING_PRIORITY_UV1;
-
-	template<>
-	const std::string UVIndexInfo<UVIndex::UV_2>::VERTEX_NAME = VG_VERTEX_UV2_NAME;
-
-	template<>
-	const std::uint32_t UVIndexInfo<UVIndex::UV_2>::VERTEX_BINDING_PRIORITY = VG_VERTEX_BINDING_PRIORITY_UV2;
-
-	template<>
-	const std::string UVIndexInfo<UVIndex::UV_3>::VERTEX_NAME = VG_VERTEX_UV3_NAME;
-
-	template<>
-	const std::uint32_t UVIndexInfo<UVIndex::UV_3>::VERTEX_BINDING_PRIORITY = VG_VERTEX_BINDING_PRIORITY_UV3;
+	const std::uint32_t TextureCoordinateIndexInfo<TextureCoordinateIndex::TextureCoordinate_3>::VERTEX_BINDING_PRIORITY = VG_VERTEX_BINDING_PRIORITY_TextureCoordinate3;
 } //namespace kgs
 
 #endif // !VG_MESH_OPTION_H

@@ -96,7 +96,7 @@ namespace chalet
 		m_pMesh = static_cast<std::shared_ptr<vg::DimSepMesh3>>(new vg::DimSepMesh3());
 		m_pMesh->setVertexCount(static_cast<uint32_t>(m_tempPositions.size()));
 		m_pMesh->setPositions(m_tempPositions);
-		m_pMesh->setUVs<vg::UVType::VECTOR_2, vg::UVIndex::UV_0>(m_tempTexCoords);
+		m_pMesh->setTextureCoordinates<vg::TextureCoordinateType::VECTOR_2, vg::TextureCoordinateIndex::TextureCoordinate_0>(m_tempTexCoords);
 		m_pMesh->setIndices(m_tempIndices, vg::PrimitiveTopology::TRIANGLE_LIST, 0u);
 		m_pMesh->apply(VG_TRUE);
 	}

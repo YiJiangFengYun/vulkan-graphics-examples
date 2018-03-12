@@ -186,12 +186,12 @@ namespace vg
 
 		virtual void apply(Bool32 makeUnreadable);
 
-		//uv
-		template<UVType uvType, UVIndex uvIndex>
-		const typename MeshData::DataTypeInfo<UVConstInfo<uvType>::ARRAY_TYPE>::ValueType &getUVs() const;
+		//texture coordinate
+		template<TextureCoordinateType textureCoordinateType, TextureCoordinateIndex textureCoordinateIndex>
+		const typename MeshData::DataTypeInfo<TextureCoordinateConstInfo<textureCoordinateType>::ARRAY_TYPE>::ValueType &getTextureCoordinates() const;
 
-		template<UVType uvType, UVIndex uvIndex>
-		void setUVs(const typename MeshData::DataTypeInfo<UVConstInfo<uvType>::ARRAY_TYPE>::ValueType &uvs);
+		template<TextureCoordinateType textureCoordinateType, TextureCoordinateIndex textureCoordinateIndex>
+		void setTextureCoordinates(const typename MeshData::DataTypeInfo<TextureCoordinateConstInfo<textureCoordinateType>::ARRAY_TYPE>::ValueType &textureCoordinates);
 
 		template<MeshData::DataType dataType>
 		const typename MeshData::DataTypeInfo<dataType>::ValueType &getData(std::string name) const;

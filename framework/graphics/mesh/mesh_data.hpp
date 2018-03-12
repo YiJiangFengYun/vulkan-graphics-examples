@@ -11,19 +11,19 @@
 #define VG_VERTEX_COLOR_NAME "_Color"
 #define VG_VERTEX_NORMAL_NAME "_Normal"
 #define VG_VERTEX_TANGENT_NAME "_Tangent"
-#define VG_VERTEX_UV0_NAME "_UV_0"
-#define VG_VERTEX_UV1_NAME "_UV_1"
-#define VG_VERTEX_UV2_NAME "_UV_2"
-#define VG_VERTEX_UV3_NAME "_UV_3"
+#define VG_VERTEX_TextureCoordinate0_NAME "_TexCoord_0"
+#define VG_VERTEX_TextureCoordinate1_NAME "_TexCoord_1"
+#define VG_VERTEX_TextureCoordinate2_NAME "_TexCoord_2"
+#define VG_VERTEX_TextureCoordinate3_NAME "_TexCoord_3"
 
 #define VG_VERTEX_BINDING_PRIORITY_POSITION 0u
 #define VG_VERTEX_BINDING_PRIORITY_COLOR 1u
 #define VG_VERTEX_BINDING_PRIORITY_NORMAL 2u
 #define VG_VERTEX_BINDING_PRIORITY_TANGENT 3u
-#define VG_VERTEX_BINDING_PRIORITY_UV0 4u
-#define VG_VERTEX_BINDING_PRIORITY_UV1 5u
-#define VG_VERTEX_BINDING_PRIORITY_UV2 6u
-#define VG_VERTEX_BINDING_PRIORITY_UV3 7u
+#define VG_VERTEX_BINDING_PRIORITY_TextureCoordinate0 4u
+#define VG_VERTEX_BINDING_PRIORITY_TextureCoordinate1 5u
+#define VG_VERTEX_BINDING_PRIORITY_TextureCoordinate2 6u
+#define VG_VERTEX_BINDING_PRIORITY_TextureCoordinate3 7u
 #define VG_VERTEX_BINDING_PRIORITY_OTHER_MIN 8u
 
 namespace vg

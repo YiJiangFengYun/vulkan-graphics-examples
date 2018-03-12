@@ -27,16 +27,16 @@ namespace vg
 		return m_bounds;
 	}
 
-	template<UVType uvType, UVIndex uvIndex>
-	const typename MeshData::DataTypeInfo<UVConstInfo<uvType>::ARRAY_TYPE>::ValueType &SepMesh::getUVs() const
+	template<TextureCoordinateType textureCoordinateType, TextureCoordinateIndex textureCoordinateIndex>
+	const typename MeshData::DataTypeInfo<TextureCoordinateConstInfo<textureCoordinateType>::ARRAY_TYPE>::ValueType &SepMesh::getTextureCoordinates() const
 	{
-		return _getData<UVConstInfo<uvType>::ARRAY_TYPE>(UVIndexInfo<uvIndex>::VERTEX_NAME);
+		return _getData<TextureCoordinateConstInfo<textureCoordinateType>::ARRAY_TYPE>(TextureCoordinateIndexInfo<textureCoordinateIndex>::VERTEX_NAME);
 	}
 
-	template<UVType uvType, UVIndex uvIndex>
-	void SepMesh::setUVs(const typename MeshData::DataTypeInfo<UVConstInfo<uvType>::ARRAY_TYPE>::ValueType &uvs)
+	template<TextureCoordinateType textureCoordinateType, TextureCoordinateIndex textureCoordinateIndex>
+	void SepMesh::setTextureCoordinates(const typename MeshData::DataTypeInfo<TextureCoordinateConstInfo<textureCoordinateType>::ARRAY_TYPE>::ValueType &textureCoordinates)
 	{
-		_setData<UVConstInfo<uvType>::ARRAY_TYPE>(UVIndexInfo<uvIndex>::VERTEX_NAME, uvs, UVIndexInfo<uvIndex>::VERTEX_BINDING_PRIORITY);
+		_setData<TextureCoordinateConstInfo<textureCoordinateType>::ARRAY_TYPE>(TextureCoordinateIndexInfo<textureCoordinateIndex>::VERTEX_NAME, textureCoordinates, TextureCoordinateIndexInfo<textureCoordinateIndex>::VERTEX_BINDING_PRIORITY);
 	}
 
 	template<MeshData::DataType dataType>

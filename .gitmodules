@@ -22,3 +22,6 @@
 [submodule "libs/stb/stb"]
 	path = libs/stb/stb
 	url = https://github.com/nothings/stb.git
+[submodule "libs/gli"]
+	path = libs/gli
+	url = https://github.com/g-truc/gli.git

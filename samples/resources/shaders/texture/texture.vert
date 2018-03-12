@@ -4,8 +4,8 @@
 #extension GL_ARB_shading_language_420pack : enable
 
 layout (location = 0) in vec3 inPos;
-layout (location = 1) in vec2 inUV;
-layout (location = 2) in vec3 inNormal;
+layout (location = 1) in vec3 inNormal;
+layout (location = 2) in vec2 inUV;
 
 layout(binding = 0) uniform BuildIn {
     mat4 matrixObjectToNDC;
@@ -15,7 +15,7 @@ layout(binding = 0) uniform BuildIn {
 } _buildIn;
 
 layout(binding = 2) uniform OtherInfo {
-	vec3 viewPos;
+	vec4 viewPos;
 	float lodBias;
 } otherInfo;
 
@@ -41,7 +41,7 @@ void main()
 
 	outNormal = mat3(_buildIn.matrixObjectToWorld) * inNormal;
 	vec3 lightPos = vec3(0.0);
-	vec3 lPos = mat3(_buildIn.matrixObjectToWorld * vec4(lightPos.xyz, 1.0));
+	vec3 lPos = lightPos;
     outLightVec = lPos - worldPos.xyz;
     outViewVec = otherInfo.viewPos.xyz - worldPos.xyz;		
 }

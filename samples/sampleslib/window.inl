@@ -212,7 +212,11 @@ namespace sampleslib
 		ImGui::Text("Engine Version: %s", VG_VERSION_FULL);
 		ImGui::Text("%.2f ms/frame (%.1d fps)", m_lastFPS == 0u ? 0.0f : (1000.0f / static_cast<float>(m_lastFPS)), m_lastFPS);
 		ImGui::Text("Draw Count: %d", m_lastDrawCount);
+		pos = ImGui::GetWindowPos();
+		size = ImGui::GetWindowSize();
 		ImGui::End();
+		m_lastWinPos = pos;
+		m_lastWinSize = size;
 	}
 
 	template <vg::SpaceType SPACE_TYPE>

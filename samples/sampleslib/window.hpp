@@ -71,6 +71,9 @@ namespace sampleslib
 		uint32_t m_lastFPS;
 		uint32_t m_lastDrawCount;
 
+		ImVec2 m_lastWinPos;
+		ImVec2 m_lastWinSize;
+
 		float m_cameraAspect;
         
 		struct  {

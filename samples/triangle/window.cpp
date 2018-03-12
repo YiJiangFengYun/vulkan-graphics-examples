@@ -93,6 +93,7 @@ void Window::_createModel()
 	m_pModel->setMaterial(m_pMaterial);
 	m_pScene->addVisualObject(m_pModel);
 }
+
 void Window::_onUpdate()
 {
 	ParentWindowType::_onUpdate();

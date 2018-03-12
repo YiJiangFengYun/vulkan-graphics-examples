@@ -18,22 +18,29 @@ public:
 		, std::shared_ptr<vk::SurfaceKHR> pSurface
 	);
 private:
-    sampleslib::AssimpScene m_assimpScene;
-	std::shared_ptr<vg::Texture> m_pTexture;
+    std::vector<vg::Vector3> m_tempPositions;
+	std::vector<vg::Vector2> m_tempTexCoords;
+	std::vector<vg::Vector3> m_tempNormals;
+	std::vector<uint32_t> m_tempIndices;
+	std::shared_ptr<vg::VisualObject3> m_pModel;
+	std::shared_ptr<vg::DimSepMesh3> m_pMesh;
+	std::shared_ptr<vg::Texture2D> m_pTexture;
 	std::shared_ptr<vg::Shader> m_pShader;
-	std::shared_ptr<vg::Pass> m_pPasse;
+	std::shared_ptr<vg::Pass> m_pPass;
 	std::shared_ptr<vg::Material> m_pMaterial;
 	struct OtherInfo 
 	{
-		vg::Vector3 viewPos;
+		vg::Vector4 viewPos;
 	    float lodBias;
-		OtherInfo(vg::Vector3 viewPos = vg::Vector3(), float lodBias = 0.0f);
+		OtherInfo();
+		OtherInfo(vg::Vector4 viewPos, float lodBias);
 	} m_otherInfo;
 	void _init();
-	void _loadAssimpScene();
+	void _loadModel();
+	void _createMesh();
 	void _createTexture();
 	void _createMaterial();
-	void _fillScene();
+	void _createModel();
 
 	virtual void _onUpdate() override;
 	virtual void _renderWithRenderer(const std::shared_ptr<vg::Renderer> &pRenderer

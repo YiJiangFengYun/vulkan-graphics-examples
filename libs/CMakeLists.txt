@@ -28,7 +28,7 @@ if(SOURCES)
 endif(SOURCES)
 
 #gli generation
-#Because gli project cmake is imperfect, so we don't use its original git repository and cmake system.
+#Because gli project cmake is imperfect, so we don't use its cmake system.
 set(LIBRARY_NAME "gli")
 file(GLOB HEADERS "gli/gli/*.hpp" "gli/gli/*.h")
 file(GLOB SOURCES "gli/gli/*.cpp")

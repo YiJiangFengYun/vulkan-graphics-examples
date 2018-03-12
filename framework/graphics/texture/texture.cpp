@@ -505,11 +505,11 @@ namespace vg
 			m_vkSamplerAddressMode,                  //addressModeW
 			0.0f,                                    //mipLodBias
 			m_anisotropy <= 0.0f ? VkBool32(VK_FALSE) : VkBool32(VK_TRUE),      //anisotropyEnable
-			m_anisotropy <= 0.0f ? 1.0f : m_anisotropy,                            //maxAnisotropy
+			m_anisotropy <= 0.0f ? 1.0f : m_anisotropy, //maxAnisotropy
 			VkBool32(VK_FALSE),                      //compareEnable
 			vk::CompareOp::eNever,                   //compareOp
 			0.0f,                                    //minLod
-			0.0f,                                    //maxLod
+			m_mipMap ? m_mipMapLevels : 0.0f,        //maxLod
 			vk::BorderColor::eFloatTransparentBlack, //borderColor
 			VkBool32(VK_FALSE)                       //unnormalizedCoordinates
 		};

@@ -54,7 +54,7 @@ namespace testlib
 	void Window<SPACE_TYPE>::_createScene()
 	{
 		m_pScene = std::shared_ptr<SceneType>(new SceneType());
-		m_pScene->addCamera(m_pCamera);
+		m_pScene->addCamera(m_pCamera.get());
 	}
 
 	template <vg::SpaceType SPACE_TYPE>

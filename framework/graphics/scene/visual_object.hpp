@@ -13,11 +13,11 @@ namespace vg
 	public:
 		BaseVisualObject();
 
-		const std::shared_ptr<Material> &getMaterial() const;
+		Material *getMaterial() const;
 
-		void setMaterial(std::shared_ptr<Material> pMaterial);
+		void setMaterial(Material *pMaterial);
 
-		const std::shared_ptr<BaseMesh> &getMesh() const;
+		BaseMesh *getMesh() const;
 
 		uint32_t getSubMeshOffset() const;
 		uint32_t getSubMeshCount() const;
@@ -25,8 +25,8 @@ namespace vg
 		void updateSubMeshInfo(uint32_t subMeshOffset, uint32_t subMeshCount);
 
 	protected:
-		std::shared_ptr<Material> m_pMaterial;
-		std::shared_ptr<BaseMesh> m_pMesh;
+		Material *m_pMaterial;
+		BaseMesh *m_pMesh;
 		int32_t m_subMeshOffset;
 		int32_t m_subMeshCount;
 	};
@@ -45,14 +45,14 @@ namespace vg
 
 		}
 
-		void setMesh(std::shared_ptr<MeshDimType> pMesh)
+		void setMesh(MeshDimType *pMesh)
 		{
 			m_pMesh = pMesh;
 			m_subMeshOffset = -1;
 			m_subMeshCount = -1;
 		}
 
-		void setMesh(std::shared_ptr<MeshDimType> pMesh
+		void setMesh(MeshDimType *pMesh
 		    , uint32_t subMeshOffset
 			, uint32_t subMeshCount)
 		{

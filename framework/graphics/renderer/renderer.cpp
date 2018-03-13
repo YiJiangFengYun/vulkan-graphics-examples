@@ -4,7 +4,7 @@
 
 namespace vg
 {
-	void fillValidVisualObjects(std::vector<std::shared_ptr<VisualObject<SpaceType::SPACE_2>>> &arrPVObjs,
+	void fillValidVisualObjects(std::vector<VisualObject<SpaceType::SPACE_2> *> &arrPVObjs,
 		uint32_t &PVObjIndex,
 		const Transform<SpaceType::SPACE_2> *pTransform,
 		const Scene<SpaceType::SPACE_2> *pScene,
@@ -345,12 +345,12 @@ namespace vg
 	}
 
 	void Renderer::_createPipelineForObj(std::shared_ptr<vk::Pipeline> &pPipeline,
-		std::shared_ptr<BaseMesh> pMesh,
-		std::shared_ptr<Material> pMaterial,
+		BaseMesh *pMesh,
+		Material *pMaterial,
 		uint32_t subMeshIndex,
 		uint32_t passIndex)
 	{
-		ContentMesh * pContentMesh = dynamic_cast<ContentMesh *>(pMesh.get());
+		ContentMesh * pContentMesh = dynamic_cast<ContentMesh *>(pMesh);
 		auto pPass = pMaterial->getPassWithIndex(passIndex);
 		PipelineCache::Info info(
 			*m_pRenderPass,
@@ -364,13 +364,13 @@ namespace vg
 	}
 
 	void Renderer::_recordCommandBufferForObj(std::shared_ptr<vk::Pipeline> pPipeline,
-		std::shared_ptr<BaseMesh> pMesh,
-		std::shared_ptr<Material> pMaterial,
+		BaseMesh *pMesh,
+		Material *pMaterial,
 		uint32_t subMeshIndex,
 		uint32_t passIndex)
 	{
 		LOG(plog::debug) << "Pre begin command buffer for render." << std::endl;
-		ContentMesh * pContentMesh = dynamic_cast<ContentMesh *>(pMesh.get());
+		ContentMesh * pContentMesh = dynamic_cast<ContentMesh *>(pMesh);
 		auto pPass = pMaterial->getPassWithIndex(passIndex);
         
         const auto& viewportOfPass = pPass->getViewport();
@@ -692,13 +692,12 @@ namespace vg
 
 		//flat visual objects and filter them that is out of camera with its bounds.
 		//allocate enough space for array to storage points.
-		std::vector<std::shared_ptr<SceneType::VisualObjectType>> validVisualObjects(visualObjectCount);
+		std::vector<SceneType::VisualObjectType *> validVisualObjects(visualObjectCount);
 		uint32_t validVisualObjectCount(0u);
-		auto pRoot = pScene->pRootTransformForVisualObject;
-		auto pTransform = pRoot;
+		auto pRoot = pScene->pRootTransform;
 		fillValidVisualObjects(validVisualObjects
 			, validVisualObjectCount
-			, pTransform.get()
+			, pRoot.get()
 			, pScene
 			, pCamera
 		);
@@ -709,7 +708,7 @@ namespace vg
 		{
 			auto pVisualObject = validVisualObjects[i];
 			auto pMesh = pVisualObject->getMesh();
-			auto pContentMesh = dynamic_cast<ContentMesh *>(pMesh.get());
+			auto pContentMesh = dynamic_cast<ContentMesh *>(pMesh);
 			auto subMeshCount = pVisualObject->getSubMeshCount();
 			auto pMaterial = pVisualObject->getMaterial();
 			auto passCount = pMaterial->getPassCount();
@@ -728,7 +727,7 @@ namespace vg
 			auto mvMatrix = viewMatrix * modelMatrix;
 			auto mvpMatrix = projMatrix * mvMatrix;
 			auto pMesh = pVisualObject->getMesh();
-			auto pContentMesh = dynamic_cast<ContentMesh *>(pMesh.get());
+			auto pContentMesh = dynamic_cast<ContentMesh *>(pMesh);
 			auto subMeshOffset = pVisualObject->getSubMeshOffset();
 			auto subMeshCount = pVisualObject->getSubMeshCount();
 			auto pMaterial = pVisualObject->getMaterial();
@@ -791,23 +790,23 @@ namespace vg
 		//----------Preparing render.
 
 		//Filter visualObject is out of camera with its bounds.
-		std::vector<std::shared_ptr<SceneType::VisualObjectType>> validVisualObjects(visualObjectCount); //allocate enough space for array to storage points.
+		std::vector<SceneType::VisualObjectType *> validVisualObjects(visualObjectCount); //allocate enough space for array to storage points.
 		uint32_t validVisualObjectCount(0u);
 		for (uint32_t i = 0; i < visualObjectCount; ++i)
 		{
 			auto pVisualObject = pScene->getVisualObjectWithIndex(i);
 			auto pMesh = pVisualObject->getMesh();
-			auto isHasBounds = dynamic_cast<SceneType::VisualObjectType::MeshDimType *>(pMesh.get())->getIsHasBounds();
+			auto isHasBounds = dynamic_cast<SceneType::VisualObjectType::MeshDimType *>(pMesh)->getIsHasBounds();
 			if (isHasBounds == VG_FALSE)
 			{
 				validVisualObjects[validVisualObjectCount++] = pVisualObject;
 			}
 			else 
 			{
-			    auto bounds = dynamic_cast<SceneType::VisualObjectType::MeshDimType *>(pMesh.get())->getBounds();
+			    auto bounds = dynamic_cast<SceneType::VisualObjectType::MeshDimType *>(pMesh)->getBounds();
 			    auto pTransform = pVisualObject->getTransform();
 				fd::Rect2D clipRect;
-			    if(pCamera->isInView(pTransform.get(), bounds, &clipRect) == VG_TRUE)
+			    if(pCamera->isInView(pTransform, bounds, &clipRect) == VG_TRUE)
 			    {
 			    	validVisualObjects[validVisualObjectCount++] = pVisualObject;
 			    }
@@ -822,7 +821,7 @@ namespace vg
 		        	clipRect.y = 1.0f - clipRect.y - clipRect.height;
 		        }
 
-				const auto& pIndexData = dynamic_cast<ContentMesh *>(pMesh.get())->getIndexData();
+				const auto& pIndexData = dynamic_cast<ContentMesh *>(pMesh)->getIndexData();
 				uint32_t subMeshOffset = pVisualObject->getSubMeshOffset();
 				uint32_t subMeshCount = pVisualObject->getSubMeshCount();
 				std::vector<fd::Rect2D> rects(subMeshCount);
@@ -843,7 +842,7 @@ namespace vg
 			++queueLengths[static_cast<size_t>(renderQueueType)];
 		}
 
-		std::vector<std::vector<std::shared_ptr<SceneType::VisualObjectType>>> queues(queueTypeCount);
+		std::vector<std::vector<SceneType::VisualObjectType *>> queues(queueTypeCount);
 		//Resize queues and reset quue counts to zero for preparing next use.
 		for (uint32_t i = 0; i < queueTypeCount; ++i)
 		{
@@ -862,7 +861,7 @@ namespace vg
 		//sort transparent queue.
 		std::sort(queues[static_cast<size_t>(RenderQueueType::TRANSPARENT)].begin(),
 			queues[static_cast<size_t>(RenderQueueType::TRANSPARENT)].end(),
-			[&viewMatrix, &projMatrix](std::shared_ptr<typename SceneType::ObjectType> pObject1, std::shared_ptr<typename SceneType::ObjectType> pObject2)
+			[&viewMatrix, &projMatrix](typename SceneType::ObjectType *pObject1, typename SceneType::ObjectType *pObject2)
 	        {
 				auto modelMatrix1 = pObject1->getTransform()->getMatrixLocalToWorld();
 				auto mvMatrix1 = viewMatrix * modelMatrix1;
@@ -892,7 +891,7 @@ namespace vg
 			{
 				auto pVisualObject = queues[typeIndex][objectIndex];
 				auto pMesh = pVisualObject->getMesh();
-				auto pContentMesh = dynamic_cast<ContentMesh *>(pMesh.get());
+				auto pContentMesh = dynamic_cast<ContentMesh *>(pMesh);
 				auto subMeshCount = pVisualObject->getSubMeshCount();
 				auto pMaterial = pVisualObject->getMaterial();
 				auto passCount = pMaterial->getPassCount();
@@ -914,7 +913,7 @@ namespace vg
 				auto mvMatrix = viewMatrix * modelMatrix;
 				auto mvpMatrix = projMatrix * mvMatrix;
 				auto pMesh = pVisualObject->getMesh();
-				auto pContentMesh = dynamic_cast<ContentMesh *>(pMesh.get());
+				auto pContentMesh = dynamic_cast<ContentMesh *>(pMesh);
 				auto subMeshOffset = pVisualObject->getSubMeshOffset();
 				auto subMeshCount = pVisualObject->getSubMeshCount();
 				auto pMaterial = pVisualObject->getMaterial();
@@ -954,13 +953,13 @@ namespace vg
 		}
 	}
 
-	void fillValidVisualObjects(std::vector<std::shared_ptr<VisualObject<SpaceType::SPACE_2>>> &arrPVObjs,
+	void fillValidVisualObjects(std::vector<VisualObject<SpaceType::SPACE_2> *> &arrPVObjs,
 		uint32_t &PVObjIndex,
 		const Transform<SpaceType::SPACE_2> *pTransform,
 		const Scene<SpaceType::SPACE_2> *pScene,
 	    const Camera<SpaceType::SPACE_2> *pCamera)
 	{
-		std::shared_ptr<VisualObject<SpaceType::SPACE_2>> pVisualObjectOfChild;
+		VisualObject<SpaceType::SPACE_2> *pVisualObjectOfChild;
 		uint32_t childCount = pTransform->getChildCount();
 		Transform<SpaceType::SPACE_2> *pChild;
 		for (uint32_t i = 0; i < childCount; ++i)
@@ -970,15 +969,16 @@ namespace vg
 			fillValidVisualObjects(arrPVObjs, PVObjIndex, pChild, pScene, pCamera);
 			//Own visual object is placed behind children's visual object.
 			pVisualObjectOfChild = pScene->getVisualObjectWithTransform(pChild);
+			if (pVisualObjectOfChild == nullptr) continue;
 			//Filter obj out of camera view.
 			auto pMeshOfChild = pVisualObjectOfChild->getMesh();
-			auto isHasBoundsOfChild = dynamic_cast<Mesh<MeshDimType::SPACE_2> *>(pMeshOfChild.get())->getIsHasBounds();
+			auto isHasBoundsOfChild = dynamic_cast<Mesh<MeshDimType::SPACE_2> *>(pMeshOfChild)->getIsHasBounds();
 			if (isHasBoundsOfChild == VG_FALSE) 
 			{
 				arrPVObjs[PVObjIndex++] = pVisualObjectOfChild;
 			}
 			else {
-			    auto boundsOfChild = dynamic_cast<Mesh<MeshDimType::SPACE_2> *>(pMeshOfChild.get())->getBounds();
+			    auto boundsOfChild = dynamic_cast<Mesh<MeshDimType::SPACE_2> *>(pMeshOfChild)->getBounds();
 			    fd::Rect2D clipRect;				
 			    if (pCamera->isInView(pChild, boundsOfChild, &clipRect) == VG_TRUE)
 			    {
@@ -994,7 +994,7 @@ namespace vg
 		        {
 		        	clipRect.y = 1.0f - clipRect.y - clipRect.height;
 		        }
-				const auto& pIndexData = dynamic_cast<ContentMesh *>(pMeshOfChild.get())->getIndexData();
+				const auto& pIndexData = dynamic_cast<ContentMesh *>(pMeshOfChild)->getIndexData();
 				uint32_t subMeshOffset = pVisualObjectOfChild->getSubMeshOffset();
 				uint32_t subMeshCount = pVisualObjectOfChild->getSubMeshCount();
 				std::vector<fd::Rect2D> rects(subMeshCount);

@@ -75,9 +75,9 @@ namespace vg
         return m_subDataCount;
     }
 
-    const std::vector<IndexData::SubIndexData> &IndexData::getSubIndexDatas() const
+    const IndexData::SubIndexData *IndexData::getSubIndexDatas() const
     {
-        return m_subDatas;
+        return m_subDatas.data();
     }
 
     uint32_t IndexData::getBufferSize() const
@@ -85,9 +85,9 @@ namespace vg
         return m_bufferSize;
     }
 
-    std::shared_ptr<vk::Buffer> IndexData::getBuffer() const
+    const vk::Buffer *IndexData::getBuffer() const
     {
-        return m_pBuffer;
+        return m_pBuffer.get();
     }
 
     uint32_t IndexData::getBufferMemorySize() const
@@ -95,9 +95,9 @@ namespace vg
         return m_bufferMemorySize;
     }
 
-    std::shared_ptr<vk::DeviceMemory> IndexData::getBufferMemory() const
+    const vk::DeviceMemory *IndexData::getBufferMemory() const
     {
-        return m_pBufferMemory;
+        return m_pBufferMemory.get();
     }
 
     uint32_t IndexData::getMemorySize() const

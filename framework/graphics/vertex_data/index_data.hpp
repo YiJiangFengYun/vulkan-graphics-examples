@@ -29,11 +29,11 @@ namespace vg {
                 , fd::Rect2D clipRect = fd::Rect2D(0u, 0u, 0u, 0u));
         };
         uint32_t getSubIndexDataCount() const;
-        const std::vector<SubIndexData> &getSubIndexDatas() const;
+        const SubIndexData *getSubIndexDatas() const;
         uint32_t getBufferSize() const;
-        std::shared_ptr<vk::Buffer> getBuffer() const;
+        const vk::Buffer *getBuffer() const;
         uint32_t getBufferMemorySize() const;
-        std::shared_ptr<vk::DeviceMemory> getBufferMemory() const;
+        const vk::DeviceMemory *getBufferMemory() const;
         uint32_t getMemorySize() const;
         const void *getMemory() const;
 

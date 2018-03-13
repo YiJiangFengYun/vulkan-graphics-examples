@@ -28,8 +28,8 @@ namespace vg
 	public:
 		Base(BaseType baseType);
 		virtual ~Base();
-		BaseType getBaseType();
-		InstanceID getID();
+		BaseType getBaseType() const;
+		InstanceID getID() const;
 	protected:
 		BaseType m_baseType;
 		InstanceID m_id;

@@ -11,17 +11,17 @@ namespace vg
 
 	}
 
-	const std::shared_ptr<Material> &BaseVisualObject::getMaterial() const
+	Material *BaseVisualObject::getMaterial() const
 	{
 		return m_pMaterial;
 	}
 
-	void BaseVisualObject::setMaterial(std::shared_ptr<Material> pMaterial)
+	void BaseVisualObject::setMaterial(Material *pMaterial)
 	{
 		m_pMaterial = pMaterial;
 	}
 
-	const std::shared_ptr<BaseMesh> &BaseVisualObject::getMesh() const
+	BaseMesh *BaseVisualObject::getMesh() const
 	{
 		return m_pMesh;
 	}
@@ -29,7 +29,7 @@ namespace vg
 	uint32_t BaseVisualObject::getSubMeshOffset() const
 	{
 		if (m_subMeshOffset < 0) {
-            return dynamic_cast<ContentMesh *>(m_pMesh.get())->getSubMeshOffset();
+            return dynamic_cast<const ContentMesh *>(m_pMesh)->getSubMeshOffset();
 		} else {
 		    return m_subMeshOffset;
 		}
@@ -38,7 +38,7 @@ namespace vg
 	uint32_t BaseVisualObject::getSubMeshCount() const
 	{
 		if (m_subMeshCount < 0) {
-		    return dynamic_cast<ContentMesh *>(m_pMesh.get())->getSubMeshCount();
+		    return dynamic_cast<const ContentMesh *>(m_pMesh)->getSubMeshCount();
 		} else {
             return m_subMeshCount;
 		}

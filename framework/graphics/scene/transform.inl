@@ -28,7 +28,7 @@ namespace vg
 	template <SpaceType SPACE_TYPE>
 	void Transform<SPACE_TYPE>::detachChildren()
 	{
-		for (const auto& item : m_arrPChildren)
+		for (auto item : m_arrPChildren)
 		{
 			item->_setParentOnly(nullptr);
 		}
@@ -43,7 +43,7 @@ namespace vg
 	}
 
 	template <SpaceType SPACE_TYPE>
-	typename std::vector<typename Transform<SPACE_TYPE>::Type *>::const_iterator Transform<SPACE_TYPE>::getChildPos(Type *child)
+	typename std::vector<typename Transform<SPACE_TYPE>::Type *>::const_iterator Transform<SPACE_TYPE>::getChildPos(const Type *child) const
 	{
 #ifdef DEBUG
 		if (isChild(child)) throw std::invalid_argument("The target is not a child of the tranform.");
@@ -52,13 +52,13 @@ namespace vg
 	}
 
 	template <SpaceType SPACE_TYPE>
-	const std::vector<typename Transform<SPACE_TYPE>::Type *> &Transform<SPACE_TYPE>::getChildren()
+	const std::vector<typename Transform<SPACE_TYPE>::Type *> &Transform<SPACE_TYPE>::getChildren() const
 	{
 		return m_arrPChildren;
 	}
 
 	template <SpaceType SPACE_TYPE>
-	Bool32 Transform<SPACE_TYPE>::isChild(Type *pTransform)
+	Bool32 Transform<SPACE_TYPE>::isChild(const Type *pTransform) const
 	{
 		return _isChild(pTransform);
 	}
@@ -89,7 +89,7 @@ namespace vg
 	}
 
 	template <SpaceType SPACE_TYPE>
-	typename Transform<SPACE_TYPE>::Type *Transform<SPACE_TYPE>::getParent()
+	typename Transform<SPACE_TYPE>::Type *Transform<SPACE_TYPE>::getParent() const
 	{
 		return m_pParent;
 	}
@@ -116,7 +116,7 @@ namespace vg
 	}
 
 	template <SpaceType SPACE_TYPE>
-	typename Transform<SPACE_TYPE>::Type *Transform<SPACE_TYPE>::getRoot()
+	typename Transform<SPACE_TYPE>::Type *Transform<SPACE_TYPE>::getRoot() const
 	{
 		if (m_pParent == nullptr)
 		{
@@ -134,13 +134,13 @@ namespace vg
 	}
 
 	template <SpaceType SPACE_TYPE>
-	Bool32 Transform<SPACE_TYPE>::getIsChanged()
+	Bool32 Transform<SPACE_TYPE>::getIsChanged() const
 	{
 		return m_isChanged;
 	}
 
 	template <SpaceType SPACE_TYPE>
-	typename Transform<SPACE_TYPE>::PointType Transform<SPACE_TYPE>::getLocalPosition()
+	typename Transform<SPACE_TYPE>::PointType Transform<SPACE_TYPE>::getLocalPosition() const
 	{
 		return m_localPosition;
 	}
@@ -153,13 +153,13 @@ namespace vg
 	}
 
 	template <SpaceType SPACE_TYPE>
-	typename Transform<SPACE_TYPE>::PointType Transform<SPACE_TYPE>::getPosition()
+	typename Transform<SPACE_TYPE>::PointType Transform<SPACE_TYPE>::getPosition() const
 	{
 		return _getMatrixLocalToWorld(VG_FALSE) * MatrixVectorType(m_localPosition, 0.0);
 	}
 
 	template <SpaceType SPACE_TYPE>
-	typename Transform<SPACE_TYPE>::RotationType Transform<SPACE_TYPE>::getLocalRotation()
+	typename Transform<SPACE_TYPE>::RotationType Transform<SPACE_TYPE>::getLocalRotation() const
 	{
 		return m_localPosition;
 	}
@@ -172,7 +172,7 @@ namespace vg
 	}
 
 	template <SpaceType SPACE_TYPE>
-	typename Transform<SPACE_TYPE>::RotationType Transform<SPACE_TYPE>::getRotation()
+	typename Transform<SPACE_TYPE>::RotationType Transform<SPACE_TYPE>::getRotation() const
 	{
 		RotationType rotation = m_localRotation;
 		Type *curr = m_pParent;
@@ -185,7 +185,7 @@ namespace vg
 	}
 
 	template <SpaceType SPACE_TYPE>
-	typename Transform<SPACE_TYPE>::VectorType Transform<SPACE_TYPE>::getLocalScale()
+	typename Transform<SPACE_TYPE>::VectorType Transform<SPACE_TYPE>::getLocalScale() const
 	{
 		return m_localScale;
 	}
@@ -198,7 +198,7 @@ namespace vg
 	}
 
 	template <SpaceType SPACE_TYPE>
-	typename Transform<SPACE_TYPE>::VectorType Transform<SPACE_TYPE>::getScale()
+	typename Transform<SPACE_TYPE>::VectorType Transform<SPACE_TYPE>::getScale() const
 	{
 		VectorType scale = m_localScale;
 		auto curr = m_pParent;
@@ -211,37 +211,37 @@ namespace vg
 	}
 
 	template <SpaceType SPACE_TYPE>
-	typename Transform<SPACE_TYPE>::VectorType Transform<SPACE_TYPE>::transformVectorToWorld(VectorType vector)
+	typename Transform<SPACE_TYPE>::VectorType Transform<SPACE_TYPE>::transformVectorToWorld(VectorType vector) const
 	{
 		return VectorType(_getMatrixLocalToWorld() * MatrixVectorType(vector, 0.0f));
 	}
 
 	template <SpaceType SPACE_TYPE>
-	typename Transform<SPACE_TYPE>::VectorType Transform<SPACE_TYPE>::transformVectorToLocal(VectorType vector)
+	typename Transform<SPACE_TYPE>::VectorType Transform<SPACE_TYPE>::transformVectorToLocal(VectorType vector) const
 	{
 		return VectorType(_getMatrixWorldToLocal() * MatrixVectorType(vector, 0.0f));
 	}
 
 	template <SpaceType SPACE_TYPE>
-	typename Transform<SPACE_TYPE>::PointType Transform<SPACE_TYPE>::transformPointToWorld(PointType point)
+	typename Transform<SPACE_TYPE>::PointType Transform<SPACE_TYPE>::transformPointToWorld(PointType point) const
 	{
 		return _getMatrixLocalToWorld() * MatrixVectorType(point, 1.0f);
 	}
 
 	template <SpaceType SPACE_TYPE>
-	typename Transform<SPACE_TYPE>::PointType Transform<SPACE_TYPE>::transformPointToLocal(PointType point)
+	typename Transform<SPACE_TYPE>::PointType Transform<SPACE_TYPE>::transformPointToLocal(PointType point) const
 	{
 		return _getMatrixWorldToLocal() * MatrixVectorType(point, 1.0f);
 	}
 
 	template <SpaceType SPACE_TYPE>
-	typename Transform<SPACE_TYPE>::MatrixType Transform<SPACE_TYPE>::getMatrixLocalToWorld()
+	typename Transform<SPACE_TYPE>::MatrixType Transform<SPACE_TYPE>::getMatrixLocalToWorld() const
 	{
 		return _getMatrixLocalToWorld(VG_TRUE);
 	}
 
 	template <SpaceType SPACE_TYPE>
-	typename Transform<SPACE_TYPE>::MatrixType Transform<SPACE_TYPE>::getMatrixWorldToLocal()
+	typename Transform<SPACE_TYPE>::MatrixType Transform<SPACE_TYPE>::getMatrixWorldToLocal() const
 	{
 		return _getMatrixWorldToLocal(VG_TRUE);
 	}
@@ -281,7 +281,7 @@ namespace vg
 	}
 
 	template <SpaceType SPACE_TYPE>
-	inline Bool32 Transform<SPACE_TYPE>::_isChild(Type *pTransform)
+	inline Bool32 Transform<SPACE_TYPE>::_isChild(const Type *pTransform) const
 	{
 		return m_mapPChildren.find(pTransform->getID()) != m_mapPChildren.cend();
 	}
@@ -320,7 +320,7 @@ namespace vg
 	}
 
 	template <SpaceType SPACE_TYPE>
-	typename Transform<SPACE_TYPE>::MatrixType Transform<SPACE_TYPE>::_getMatrixLocalToWorld(Bool32 includeSelf)
+	typename Transform<SPACE_TYPE>::MatrixType Transform<SPACE_TYPE>::_getMatrixLocalToWorld(Bool32 includeSelf) const
 	{
 		MatrixType matrix(1.0f); //identity matrix;
 		if (includeSelf)
@@ -337,7 +337,7 @@ namespace vg
 	}
 
 	template <SpaceType SPACE_TYPE>
-	typename Transform<SPACE_TYPE>::MatrixType Transform<SPACE_TYPE>::_getMatrixWorldToLocal(Bool32 includeSelf)
+	typename Transform<SPACE_TYPE>::MatrixType Transform<SPACE_TYPE>::_getMatrixWorldToLocal(Bool32 includeSelf) const
 	{
 		MatrixType matrix = _getMatrixLocalToWorld(includeSelf);
 		matrix = glm::inverse(matrix);

@@ -89,9 +89,9 @@ void Window::_createMaterial()
 void Window::_createModel()
 {
 	m_pModel = std::shared_ptr<vg::VisualObject3>(new vg::VisualObject3());
-	m_pModel->setMesh(m_pMesh);
-	m_pModel->setMaterial(m_pMaterial);
-	m_pScene->addVisualObject(m_pModel);
+	m_pModel->setMesh(m_pMesh.get());
+	m_pModel->setMaterial(m_pMaterial.get());
+	m_pScene->addVisualObject(m_pModel.get());
 }
 
 void Window::_onUpdate()

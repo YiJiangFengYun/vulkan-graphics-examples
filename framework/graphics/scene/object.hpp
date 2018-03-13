@@ -40,9 +40,9 @@ namespace vg
 
 		}
 
-		const std::shared_ptr<TransformType> getTransform() const
+		TransformType *getTransform() const
 		{
-			return m_pTransform;
+			return m_pTransform.get();
 		}
 
 	protected:

@@ -11,11 +11,11 @@ namespace sampleslib
 	void Window<vg::SpaceType::SPACE_3>::_updateCamera()
 	{
 		m_pCamera->updateProj(glm::radians(60.0f), m_cameraAspect, 0.1f, 256.0f);
-		auto &transform = m_pCamera->getTransform();
+		auto pTransform = m_pCamera->getTransform();
 
 		vg::Quaternion r = glm::rotate(vg::Quaternion(), m_rotation);
-		transform->setLocalPosition(glm::vec3(0.0f, 0.0f, m_zoom));
-		transform->setLocalRotation(r);
+		pTransform->setLocalPosition(glm::vec3(0.0f, 0.0f, m_zoom));
+		pTransform->setLocalRotation(r);
 		m_pCamera->apply();		
 	}
 
@@ -24,9 +24,9 @@ namespace sampleslib
 	{
 		m_pCamera->updateProj(fd::Bounds<glm::vec2>(glm::vec2(-1.0f, -1.0f), 
 		    glm::vec2(1.0f, 1.0f)));
-		auto &transform = m_pCamera->getTransform();
+		auto pTransform = m_pCamera->getTransform();
 
-		transform->setLocalRotation(m_rotation);
+		pTransform->setLocalRotation(m_rotation);
 		m_pCamera->apply();		
 	}
 }

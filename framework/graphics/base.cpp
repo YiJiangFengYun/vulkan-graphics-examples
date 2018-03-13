@@ -15,12 +15,12 @@ namespace vg
 		
 	}
 
-	BaseType Base::getBaseType()
+	BaseType Base::getBaseType() const
 	{
 		return m_baseType;
 	}
 
-	uint32_t Base::getID()
+	uint32_t Base::getID() const
 	{
 		return m_id;
 	}

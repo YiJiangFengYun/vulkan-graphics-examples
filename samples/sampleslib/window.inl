@@ -87,7 +87,7 @@ namespace sampleslib
 	void Window<SPACE_TYPE>::_createScene()
 	{
 		m_pScene = std::shared_ptr<SceneType>(new SceneType());
-		m_pScene->addCamera(m_pCamera);
+		m_pScene->addCamera(m_pCamera.get());
 	}
 
 	template <vg::SpaceType SPACE_TYPE>
@@ -139,6 +139,14 @@ namespace sampleslib
 			if (instance->m_mouseButtons.left) {
 			    instance->m_rotation.x += dy * instance->m_rotationSpeed;
 		        instance->m_rotation.y += dx * instance->m_rotationSpeed;
+			}
+
+			if (instance->m_mouseButtons.right) {
+				// auto &pScene = instance->m_pScene;
+				// auto localRotation = pScene->pRootTransformForVisualObject->getLocalRotation();
+			    // vg::Quaternion change = vg::Quaternion(dy * instance->m_rotationSpeed, dx * instance->m_rotationSpeed, 0.0f);
+				// localRotation = change * localRotation;
+				// pScene->pRootTransformForVisualObject->setLocalRotation(localRotation);
 			}
 		});
 	}	

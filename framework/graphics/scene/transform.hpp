@@ -35,44 +35,44 @@ namespace vg
 
 		Type *getChildWithIndex(uint32_t index) const;
 
-		typename std::vector<Type *>::const_iterator getChildPos(Type *child);
+		typename std::vector<Type *>::const_iterator getChildPos(const Type *child) const;
 
-		const std::vector<Type *> &getChildren();
+		const std::vector<Type *> &getChildren() const;
 
 		void detachChildren();
 
-		Bool32 isChild(Type *pTransform);
+		Bool32 isChild(const Type *pTransform) const;
 
 		void addChild(Type *pNewChild);
 		void addChild(Type *pNewChild, typename std::vector<Type *>::const_iterator pos);
 		void removeChild(Type *pChild);
 
-		Type *getParent();
+		Type *getParent() const;
 
 		void setParent(Type *pParent);
 
-		Type *getRoot();
+		Type *getRoot() const;
 
 		//------------state-----------------------
-		Bool32 getIsChanged();
+		Bool32 getIsChanged() const;
 
-		PointType getLocalPosition();
+		PointType getLocalPosition() const;
 
 		void setLocalPosition(PointType position);
 
-		PointType getPosition();
+		PointType getPosition() const;
 
-		RotationType getLocalRotation();
+		RotationType getLocalRotation() const;
 
 		void setLocalRotation(RotationType rotation);
 
-		RotationType getRotation();
+		RotationType getRotation() const;
 
-		VectorType getLocalScale();
+		VectorType getLocalScale() const;
 
 		void setLocalScale(VectorType scale);
 
-		VectorType getScale();
+		VectorType getScale() const;
 
 		void setLocalMatrix(MatrixType matrix);
 		void setLocalMatrixInverse(MatrixType matrix);
@@ -84,17 +84,17 @@ namespace vg
 
 		//-------------------------transform tool-------------------------------------
 
-		VectorType transformVectorToWorld(VectorType vector);
+		VectorType transformVectorToWorld(VectorType vector) const;
 
-		VectorType transformVectorToLocal(VectorType vector);
+		VectorType transformVectorToLocal(VectorType vector) const;
 
-		PointType transformPointToWorld(PointType point);
+		PointType transformPointToWorld(PointType point) const;
 
-		PointType transformPointToLocal(PointType point);
+		PointType transformPointToLocal(PointType point) const;
 
-		MatrixType getMatrixLocalToWorld();
+		MatrixType getMatrixLocalToWorld() const;
 
-		MatrixType getMatrixWorldToLocal();
+		MatrixType getMatrixWorldToLocal() const;
 
 	protected:
 		Type *m_pParent;
@@ -112,10 +112,9 @@ namespace vg
 
 		void _setParentOnly(Type *pNewParent);
 		void _addChildOnly(Type *pNewChild);
-		void _addChildOnly(Type *pNewChild, 
-		    typename std::vector<Type *>::const_iterator pos);
+		void _addChildOnly(Type *pNewChild, typename std::vector<Type *>::const_iterator pos);
 		void _removeChildOnly(Type *pChild);
-		Bool32 _isChild(Type *pTransform);
+		Bool32 _isChild(const Type *pTransform) const;
 
 		void _setLocalPositionOnly(PointType position);
 		void _setLocalScaleOnly(VectorType scale);
@@ -132,9 +131,9 @@ namespace vg
 			m_localMatrix = glm::inverse(m_localMatrixInverse);
 		}
 
-		MatrixType _getMatrixLocalToWorld(Bool32 includeSelf);
+		MatrixType _getMatrixLocalToWorld(Bool32 includeSelf) const;
 
-		MatrixType _getMatrixWorldToLocal(Bool32 includeSelf);
+		MatrixType _getMatrixWorldToLocal(Bool32 includeSelf) const;
 
 		void _reCalculateLocalMatrix();
 

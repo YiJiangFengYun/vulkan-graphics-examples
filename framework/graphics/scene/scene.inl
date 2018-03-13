@@ -3,9 +3,7 @@ namespace vg
 	template <SpaceType SPACE_TYPE>
 	Scene<SPACE_TYPE>::Scene()
 		: BaseScene()
-		, pRootTransformForVisualObject(new TransformType())
-		, pRootTransformForCamera(new TransformType())
-		, pRootTransformForLight(new TransformType())
+		, pRootTransform(new TransformType())
 	{
 		m_spaceType = SPACE_TYPE;
 	}
@@ -17,42 +15,33 @@ namespace vg
 	}
 
 	template <SpaceType SPACE_TYPE>
-	const std::shared_ptr<typename Scene<SPACE_TYPE>::VisualObjectType> &Scene<SPACE_TYPE>::getVisualObjectWithIndex(uint32_t index) const
+	typename Scene<SPACE_TYPE>::VisualObjectType *Scene<SPACE_TYPE>::getVisualObjectWithIndex(uint32_t index) const
 	{
 		return m_arrPVisualObjects[index];
 	}
 
 	template <SpaceType SPACE_TYPE>
-	const std::shared_ptr<typename Scene<SPACE_TYPE>::VisualObjectType> &Scene<SPACE_TYPE>::getVisualObjectWithTransform(std::shared_ptr<TransformType> pTransform) const
+	typename Scene<SPACE_TYPE>::VisualObjectType *Scene<SPACE_TYPE>::getVisualObjectWithTransform(const TransformType *pTransform) const
 	{
 		auto iterator = m_mapTransformIdToVisualObjects.find(pTransform->getID());
-		if (iterator == m_mapTransformIdToVisualObjects.cend())throw std::runtime_error("Visual Object don't exist!");
+		if (iterator == m_mapTransformIdToVisualObjects.cend()) return nullptr;
 		return iterator->second;
 	}
 
 	template <SpaceType SPACE_TYPE>
-	const std::shared_ptr<typename Scene<SPACE_TYPE>::VisualObjectType> &Scene<SPACE_TYPE>::getVisualObjectWithTransform(TransformType *pTransform) const
-	{
-		auto iterator = m_mapTransformIdToVisualObjects.find(pTransform->getID());
-		if (iterator == m_mapTransformIdToVisualObjects.cend())throw std::runtime_error("Visual Object don't exist!");
-		return iterator->second;
-	}
-
-	template <SpaceType SPACE_TYPE>
-	Bool32 Scene<SPACE_TYPE>::isHasVisualObject(const std::shared_ptr<VisualObjectType> pTarget) const
+	Bool32 Scene<SPACE_TYPE>::isHasVisualObject(const VisualObjectType *pTarget) const
 	{
 		return _isHasObject(pTarget, m_mapPVisualObjects);
 	}
 
 	template <SpaceType SPACE_TYPE>
-	void Scene<SPACE_TYPE>::addVisualObject(const std::shared_ptr<VisualObjectType> pTarget
-		, const std::shared_ptr<VisualObjectType> pParent)
+	void Scene<SPACE_TYPE>::addVisualObject(VisualObjectType *pTarget, VisualObjectType *pParent)
 	{
 		_addVisualObject(pTarget, pParent);
 	}
 
 	template <SpaceType SPACE_TYPE>
-	void Scene<SPACE_TYPE>::removeVisualObject(const std::shared_ptr<VisualObjectType> pTarget)
+	void Scene<SPACE_TYPE>::removeVisualObject(VisualObjectType *pTarget)
 	{
 		_removeVisualObject(pTarget);
 	}
@@ -64,13 +53,13 @@ namespace vg
 	}
 
 	template <SpaceType SPACE_TYPE>
-	const std::shared_ptr<typename Scene<SPACE_TYPE>::CameraType> &Scene<SPACE_TYPE>::getCameraWithIndex(uint32_t index) const
+	typename Scene<SPACE_TYPE>::CameraType *Scene<SPACE_TYPE>::getCameraWithIndex(uint32_t index) const
 	{
 		return m_arrPCameras[index];
 	}
 
 	template <SpaceType SPACE_TYPE>
-	const std::shared_ptr<typename Scene<SPACE_TYPE>::CameraType> &Scene<SPACE_TYPE>::getCameraWithTransform(std::shared_ptr<TransformType> pTransform) const
+	typename Scene<SPACE_TYPE>::CameraType *Scene<SPACE_TYPE>::getCameraWithTransform(const TransformType *pTransform) const
 	{
 		auto iterator = m_mapTransformIdToCameras.find(pTransform->getID());
 		if (iterator == m_mapTransformIdToCameras.cend())throw std::runtime_error("Camera don't exist!");
@@ -78,34 +67,25 @@ namespace vg
 	}
 
 	template <SpaceType SPACE_TYPE>
-	const std::shared_ptr<typename Scene<SPACE_TYPE>::CameraType> &Scene<SPACE_TYPE>::getCameraWithTransform(TransformType *pTransform) const
-	{
-		auto iterator = m_mapTransformIdToCameras.find(pTransform->getID());
-		if (iterator == m_mapTransformIdToCameras.cend())throw std::runtime_error("Camera don't exist!");
-		return iterator->second;
-	}
-
-	template <SpaceType SPACE_TYPE>
-	Bool32 Scene<SPACE_TYPE>::isHasCamera(const std::shared_ptr<CameraType> pTarget) const
+	Bool32 Scene<SPACE_TYPE>::isHasCamera(const CameraType *pTarget) const
 	{
 		return _isHasObject(pTarget, m_mapPCameras);
 	}
 
 	template <SpaceType SPACE_TYPE>
-	void Scene<SPACE_TYPE>::addCamera(const std::shared_ptr<CameraType> pTarget
-		, const std::shared_ptr<CameraType> pParent)
+	void Scene<SPACE_TYPE>::addCamera(CameraType *pTarget, CameraType *pParent)
 	{
 		_addObject(pTarget
 			, m_arrPCameras
 			, m_mapPCameras
 			, m_mapTransformIdToCameras
-			, pRootTransformForCamera
+			, pRootTransform.get()
 			, pParent
 		);
 	}
 
 	template <SpaceType SPACE_TYPE>
-	void Scene<SPACE_TYPE>::removeCamera(const std::shared_ptr<CameraType> pTarget)
+	void Scene<SPACE_TYPE>::removeCamera(CameraType *pTarget)
 	{
 		_removeObject(pTarget
 			, m_arrPCameras
@@ -121,13 +101,13 @@ namespace vg
 	}
 
 	template <SpaceType SPACE_TYPE>
-	const std::shared_ptr<typename Scene<SPACE_TYPE>::LightType> &Scene<SPACE_TYPE>::getLightWithIndex(uint32_t index) const
+	typename Scene<SPACE_TYPE>::LightType *Scene<SPACE_TYPE>::getLightWithIndex(uint32_t index) const
 	{
 		return m_arrPLights[index];
 	}
 
 	template <SpaceType SPACE_TYPE>
-	const std::shared_ptr<typename Scene<SPACE_TYPE>::LightType> &Scene<SPACE_TYPE>::getLightWithTransform(std::shared_ptr<TransformType> pTransform) const
+	typename Scene<SPACE_TYPE>::LightType *Scene<SPACE_TYPE>::getLightWithTransform(const TransformType *pTransform) const
 	{
 		auto iterator = m_mapTransformIdToLights.find(pTransform->getID());
 		if (iterator == m_mapTransformIdToLights.cend())throw std::runtime_error("Light don't exist!");
@@ -135,34 +115,25 @@ namespace vg
 	}
 
 	template <SpaceType SPACE_TYPE>
-	const std::shared_ptr<typename Scene<SPACE_TYPE>::LightType> &Scene<SPACE_TYPE>::getLightWithTransform(TransformType *pTransform) const
-	{
-		auto iterator = m_mapTransformIdToLights.find(pTransform->getID());
-		if (iterator == m_mapTransformIdToLights.cend())throw std::runtime_error("Light don't exist!");
-		return iterator->second;
-	}
-
-	template <SpaceType SPACE_TYPE>
-	Bool32 Scene<SPACE_TYPE>::isHasLight(const std::shared_ptr<LightType> pTarget) const
+	Bool32 Scene<SPACE_TYPE>::isHasLight(const LightType *pTarget) const
 	{
 		return _isHasObject(pTarget, m_mapPCameras);
 	}
 
 	template <SpaceType SPACE_TYPE>
-	void Scene<SPACE_TYPE>::addLight(const std::shared_ptr<LightType> pTarget
-		, const std::shared_ptr<LightType> pParent)
+	void Scene<SPACE_TYPE>::addLight(LightType *pTarget, LightType *pParent)
 	{
 		_addObject(pTarget
 			, m_arrPLights
 			, m_mapPLights
 			, m_mapTransformIdToLights
-			, pRootTransformForLight
+			, pRootTransform.get()
 			, pParent
 		);
 	}
 
 	template <SpaceType SPACE_TYPE>
-	void Scene<SPACE_TYPE>::removeLight(const std::shared_ptr<LightType> pTarget)
+	void Scene<SPACE_TYPE>::removeLight(LightType *pTarget)
 	{
 		_removeObject(pTarget
 			, m_arrPLights
@@ -172,20 +143,20 @@ namespace vg
 	}
 
 	template <SpaceType SPACE_TYPE>
-	void Scene<SPACE_TYPE>::_addVisualObject(const std::shared_ptr<VisualObjectType> pTarget
-		, const std::shared_ptr<VisualObjectType> pParent)
+	void Scene<SPACE_TYPE>::_addVisualObject(VisualObjectType *pTarget
+		, VisualObjectType *pParent)
 	{
 		_addObject(pTarget
 			, m_arrPVisualObjects
 			, m_mapPVisualObjects
 			, m_mapTransformIdToVisualObjects
-			, pRootTransformForVisualObject
+			, pRootTransform.get()
 			, pParent
 		);
 	}
 
 	template <SpaceType SPACE_TYPE>
-	void Scene<SPACE_TYPE>::_removeVisualObject(const std::shared_ptr<VisualObjectType> pTarget)
+	void Scene<SPACE_TYPE>::_removeVisualObject(VisualObjectType *pTarget)
 	{
 		_removeObject(pTarget
 			, m_arrPVisualObjects
@@ -196,20 +167,19 @@ namespace vg
 
 	template <SpaceType SPACE_TYPE>
 	template <typename T>
-	Bool32 Scene<SPACE_TYPE>::_isHasObject(const std::shared_ptr<T> &pTarget
-		, const std::unordered_map<InstanceID, std::shared_ptr<T>> &map) const
+	Bool32 Scene<SPACE_TYPE>::_isHasObject(const T *pTarget, const std::unordered_map<InstanceID, T *> &map) const
 	{
 		return map.find(pTarget->getID()) != map.cend();
 	}
 
 	template <SpaceType SPACE_TYPE>
 	template <typename T>
-	void Scene<SPACE_TYPE>::_addObject(const std::shared_ptr<T> &pTarget
-		, std::vector<std::shared_ptr<T>> &arr
-		, std::unordered_map<InstanceID, std::shared_ptr<T>> &map
-		, std::unordered_map<InstanceID, std::shared_ptr<T>> &mapTransformToObjs
-		, const std::shared_ptr<TransformType> &root
-		, const std::shared_ptr<T> &pParent
+	void Scene<SPACE_TYPE>::_addObject(T *pTarget
+		, std::vector<T *> &arr
+		, std::unordered_map<InstanceID, T *> &map
+		, std::unordered_map<InstanceID, T *> &mapTransformToObjs
+		, TransformType *root
+		, T *pParent
 	)
 	{
 
@@ -227,21 +197,21 @@ namespace vg
 		//construct hierarchy data.
 		if (pParent != nullptr)
 		{
-			pTarget->getTransform()->setParent(dynamic_cast<TransformType *>(pParent->getTransform().get()));
+			pTarget->getTransform()->setParent(dynamic_cast<TransformType *>(pParent->getTransform()));
 		}
 		else
 		{
-			pTarget->getTransform()->setParent(root.get());
+			pTarget->getTransform()->setParent(root);
 		}
 
 	}
 
 	template <SpaceType SPACE_TYPE>
 	template <typename T>
-	void Scene<SPACE_TYPE>::_removeObject(const std::shared_ptr<T> &pTarget
-		, std::vector<std::shared_ptr<T>> &arr
-		, std::unordered_map<InstanceID, std::shared_ptr<T>> &map
-		, std::unordered_map<InstanceID, std::shared_ptr<T>> &mapTransformToObjs
+	void Scene<SPACE_TYPE>::_removeObject(T *pTarget
+		, std::vector<T *> &arr
+		, std::unordered_map<InstanceID, T *> &map
+		, std::unordered_map<InstanceID, T *> &mapTransformToObjs
 	)
 	{
 		if (_isHasObject(pTarget, map) == VG_FALSE) return;
@@ -256,13 +226,13 @@ namespace vg
 		//connect between children and parent of target.
 		auto pTransform = pTarget->getTransform();
 		auto pParent = pTransform->getParent();
-		auto pos = pParent->getChildPos(pTransform.get());
+		auto pos = pParent->getChildPos(pTransform);
 		//copy chilren refs;
 		auto children = pTransform->getChildren();
 		//first remove all chilren of target.
 		pTransform->detachChildren();
 		//insert to pos of parent before target
-		for (const auto& child : children)
+		for (auto child : children)
 		{
 			pParent->addChild(child, pos);
 		}

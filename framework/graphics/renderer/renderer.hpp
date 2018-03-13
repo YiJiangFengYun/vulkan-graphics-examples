@@ -120,13 +120,14 @@ namespace vg
 		void _recordCommandBufferForBegin();
 
 		void _createPipelineForObj(std::shared_ptr<vk::Pipeline> &pPipeline,
-			std::shared_ptr<BaseMesh> pMesh,
-			std::shared_ptr<Material> pMaterial,
+			BaseMesh *pMesh,
+			Material *pMaterial,
 			uint32_t subMeshIndex = 0u,
 			uint32_t passIndex = 0u);
+
 		void _recordCommandBufferForObj(std::shared_ptr<vk::Pipeline> pPipeline,
-			std::shared_ptr<BaseMesh> pMesh,
-			std::shared_ptr<Material> pMaterial,
+			BaseMesh *pMesh,
+			Material *pMaterial,
 			uint32_t subMeshIndex = 0u,
 			uint32_t passIndex = 0u);
 

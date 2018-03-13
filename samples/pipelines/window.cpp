@@ -130,7 +130,7 @@ void Window::_fillScene()
 	const auto &objects = m_assimpScene.getObjects();
 	for (const auto &object : objects)
 	{
-	    m_pScene->addVisualObject(object);		
+	    m_pScene->addVisualObject(object.get());		
 	}
 }
 
@@ -139,7 +139,7 @@ void Window::_setMaterialToObjects(std::shared_ptr<vg::Material> pMaterial)
 	const auto &objects = m_assimpScene.getObjects();
 	for (const auto &object : objects)
 	{
-	    object->setMaterial(pMaterial);
+	    object->setMaterial(pMaterial.get());
 	}
 }
 
@@ -174,13 +174,13 @@ void Window::_renderWithRenderer(const std::shared_ptr<vg::Renderer> &pRenderer
 		{
 			if (i != 2u)
 			{
-			vg::Renderer::SceneAndCamera sceneAndCamera;
-			sceneAndCamera.pScene = m_pScene.get();
-			sceneAndCamera.pCamera = m_pCamera.get();
-			auto addedInfo = info;
-			addedInfo.sceneAndCameraCount = 1u;
-			addedInfo.pSceneAndCamera = &sceneAndCamera;
-               pRenderer->render(addedInfo, resultInfo);
+			    vg::Renderer::SceneAndCamera sceneAndCamera;
+			    sceneAndCamera.pScene = m_pScene.get();
+			    sceneAndCamera.pCamera = m_pCamera.get();
+			    auto addedInfo = info;
+			    addedInfo.sceneAndCameraCount = 1u;
+			    addedInfo.pSceneAndCamera = &sceneAndCamera;
+                pRenderer->render(addedInfo, resultInfo);
 			}
 			else
 			{

@@ -366,8 +366,8 @@ namespace vgim
     void _createUIObject()
     {
         m_pUIObject = std::shared_ptr<vg::VisualObject2>(new vg::VisualObject2());
-        m_pUIObject->setMesh(m_pMesh);
-        m_pUIObject->setMaterial(m_pMaterial);
+        m_pUIObject->setMesh(m_pMesh.get());
+        m_pUIObject->setMaterial(m_pMaterial.get());
     }
 
     void _destroyUIObject()
@@ -389,8 +389,8 @@ namespace vgim
     {
         m_pScene = std::shared_ptr<vg::Scene2>(new vg::Scene2());
         m_pScene->setIsRightHand(VG_TRUE);
-        m_pScene->addCamera(m_pCamera);
-        m_pScene->addVisualObject(m_pUIObject);
+        m_pScene->addCamera(m_pCamera.get());
+        m_pScene->addVisualObject(m_pUIObject.get());
     }
 
     void _destroyScene()

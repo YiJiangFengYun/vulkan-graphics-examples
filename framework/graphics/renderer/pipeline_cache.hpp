@@ -23,10 +23,10 @@ namespace vg {
     public:
         struct Info {
             vk::RenderPass renderPass;
-            std::shared_ptr<Pass> pPass;
-            std::shared_ptr<VertexData> pVertexData;
+            Pass *pPass;
+            VertexData *pVertexData;
             uint32_t vertexSubIndex;
-            std::shared_ptr<IndexData> pIndexData;
+            IndexData *pIndexData;
             uint32_t indexSubIndex;
 
             Info();
@@ -37,10 +37,10 @@ namespace vg {
 	        bool operator!=(const Info &) const;
     
             Info(vk::RenderPass renderPass
-                , std::shared_ptr<Pass> pPass
-                , std::shared_ptr<VertexData> pVertexData
+                , Pass *pPass
+                , VertexData *pVertexData
                 , uint32_t vertexSubIndex
-                , std::shared_ptr<IndexData> pIndexData
+                , IndexData *pIndexData
                 , uint32_t indexSubIndex
                 );
             

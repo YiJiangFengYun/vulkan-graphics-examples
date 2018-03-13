@@ -59,7 +59,7 @@ void Window::_createMaterial()
 		new vg::Shader("shaders/triangle/triangle.vert.spv", "shaders/triangle/triangle.frag.spv")
 		);
 	//pass
-	m_pPass = std::shared_ptr<vg::Pass>(new vg::Pass(m_pShader));
+	m_pPass = std::shared_ptr<vg::Pass>(new vg::Pass(m_pShader.get()));
 	m_pPass->setMainColor(vg::Color(1.0f, 1.0f, 1.0f, 1.0f));
 	m_pPass->setPolygonMode(vg::PolygonMode::FILL);
 	m_pPass->setCullMode(vg::CullModeFlagBits::NONE);
@@ -81,7 +81,7 @@ void Window::_createMaterial()
 	m_pPass->setDepthStencilInfo(depthStencilState);
 	//material
 	m_pMaterial = std::shared_ptr<vg::Material>(new vg::Material());
-	m_pMaterial->addPass(m_pPass);
+	m_pMaterial->addPass(m_pPass.get());
 	m_pMaterial->setRenderPriority(0u);
 	m_pMaterial->setRenderQueueType(vg::MaterialShowType::OPAQUE);
 	m_pMaterial->apply();

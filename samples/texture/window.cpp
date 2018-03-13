@@ -168,7 +168,7 @@ void Window::_createMaterial()
 		// new vg::Shader("shaders/test.vert.spv", "shaders/test.frag.spv")
 		);
 	//pass
-	pPass = std::shared_ptr<vg::Pass>(new vg::Pass(pShader));
+	pPass = std::shared_ptr<vg::Pass>(new vg::Pass(pShader.get()));
 	pPass->setCullMode(vg::CullModeFlagBits::FRONT);
 	pPass->setFrontFace(vg::FrontFaceType::CLOCKWISE);
 	vk::PipelineDepthStencilStateCreateInfo depthStencilState = {};
@@ -176,12 +176,12 @@ void Window::_createMaterial()
 	depthStencilState.depthWriteEnable = VG_TRUE;
 	depthStencilState.depthCompareOp = vk::CompareOp::eLessOrEqual;
 	pPass->setDepthStencilInfo(depthStencilState);
-	pPass->setMainTexture(m_pTexture);
+	pPass->setMainTexture(m_pTexture.get());
 	pPass->setDataValue("other_info", m_otherInfo, 2u);
 	pPass->apply();
 	//material
 	pMaterial = std::shared_ptr<vg::Material>(new vg::Material());
-	pMaterial->addPass(pPass);
+	pMaterial->addPass(pPass.get());
 	pMaterial->setRenderPriority(0u);
 	pMaterial->setRenderQueueType(vg::MaterialShowType::OPAQUE);
 	pMaterial->apply();

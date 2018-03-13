@@ -68,10 +68,10 @@ namespace vg
 		std::unordered_map<std::string, std::vector<Byte>> mapDatas;
 		std::unordered_map<std::string, uint32_t> mapDataCounts;
 		std::vector<std::string> arrTexNames;
-		std::unordered_map<std::string, std::shared_ptr<Texture>> mapTextures;
+		std::unordered_map<std::string, const Texture *> mapTextures;
 
-		const std::shared_ptr<Texture> &getTexture(std::string name) const;
-		void setTexture(std::string name, const std::shared_ptr<Texture> &pTex);
+		const Texture *getTexture(std::string name) const;
+		void setTexture(std::string name, const Texture *pTex);
 
 		template <typename T>
 		T getDataValue(const std::string name) const;

@@ -16,24 +16,24 @@ namespace vg
 		return static_cast<uint32_t>(m_arrPasses.size());
 	}
 
-	const std::shared_ptr<Pass>& Material::getPassWithIndex(uint32_t index) const
+	Pass *Material::getPassWithIndex(uint32_t index) const
 	{
 		return m_arrPasses[index];
 	}
 
-	Bool32 Material::isHas(const std::shared_ptr<Pass>& pass) const
+	Bool32 Material::isHas(const Pass *pass) const
 	{
 		return m_mapPasses.find(pass->getID()) != m_mapPasses.cend();
 	}
 
-	void Material::addPass(const std::shared_ptr<Pass>& pPass)
+	void Material::addPass(Pass *pPass)
 	{
 		if (isHas(pPass)) return;
 		m_arrPasses.push_back(pPass);
 		m_mapPasses[pPass->getID()] = pPass;
 	}
 
-	void Material::removePass(const std::shared_ptr<Pass>& pPass)
+	void Material::removePass(Pass *pPass)
 	{
 		if (isHas(pPass) == VG_FALSE) return;
 		std::remove(m_arrPasses.begin(), m_arrPasses.end(), pPass);

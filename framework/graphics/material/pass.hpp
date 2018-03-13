@@ -82,21 +82,21 @@ namespace vg
 		{
 			std::string name;
 			Bool32 isTexture;
-			std::uint32_t binding;
+			uint32_t binding;
 			DescriptorType descriptorType;
-			std::uint32_t descriptorCount;
+			uint32_t descriptorCount;
 			ShaderStageFlags stageFlags;
 
-			std::uint32_t size;
-			std::uint32_t bufferSize;
+			uint32_t size;
+			uint32_t bufferSize;
 
 			LayoutBindingInfo();
 
 			LayoutBindingInfo(std::string name
 				, Bool32 isTexture
-				, std::uint32_t binding
+				, uint32_t binding
 				, DescriptorType descriptorType
-				, std::uint32_t descriptorCount
+				, uint32_t descriptorCount
 				, ShaderStageFlags stageFlags
 			);
 
@@ -108,20 +108,20 @@ namespace vg
 
 			Bool32 operator ==(const LayoutBindingInfo& target) const;
 
-			void updateSize(const std::shared_ptr<MaterialData> &pMaterialData);
+			void updateSize(const MaterialData *pMaterialData);
 		};
 
 		Pass();
-		Pass(std::shared_ptr<Shader> pShader);
+		Pass(Shader *pShader);
 		~Pass();
 
-		std::shared_ptr<Shader> getShader();
-		void setShader(std::shared_ptr<Shader> pShader);
+		Shader *getShader() const;
+		void setShader(Shader *pShader);
 
-		const std::shared_ptr<Texture> &getTexture(std::string name) const;
+		const Texture *getTexture(std::string name) const;
 
 		void setTexture(std::string name
-			, const std::shared_ptr<Texture> &pTex
+			, const Texture *pTex
 			, uint32_t binding = VG_M_OTHER_MIN_BINDING
 			, DescriptorType descriptorType = DescriptorType::UNIFORM_BUFFER
 			, ShaderStageFlags stageFlags = ShaderStageFlagBits::VERTEX
@@ -149,8 +149,8 @@ namespace vg
 			, ShaderStageFlags stageFlags = ShaderStageFlagBits::VERTEX
 		);
 
-		const std::shared_ptr<Texture> &getMainTexture() const;
-		void setMainTexture(const std::shared_ptr<Texture> value);
+		const Texture *getMainTexture() const;
+		void setMainTexture(const Texture *value);
 
 		Color getMainColor() const;
 		void setMainColor(Color color);
@@ -192,8 +192,8 @@ namespace vg
 		const Bool32 IsHasSpecializationData(ShaderStageFlagBits shaderStage) const;
 		const Bool32 IsHasSpecializationData(vk::ShaderStageFlagBits shaderStage) const;
 
-		const std::shared_ptr<SpecializationData> &getSpecializationData(ShaderStageFlagBits shaderStage) const;
-		const std::shared_ptr<SpecializationData> &getSpecializationData(vk::ShaderStageFlagBits shaderStage) const;
+		const SpecializationData *getSpecializationData(ShaderStageFlagBits shaderStage) const;
+		const SpecializationData *getSpecializationData(vk::ShaderStageFlagBits shaderStage) const;
 
 		const std::unordered_map<vk::ShaderStageFlagBits, std::shared_ptr<Pass::SpecializationData>> &getSpecilizationDatas() const;
 		std::vector<vk::PushConstantRange> getPushConstantRanges() const;
@@ -226,13 +226,12 @@ namespace vg
 			, vk::ShaderStageFlags stageFlags 
 			, uint32_t offset);
 
-		const std::shared_ptr<Shader> & getShader() const;
-		const std::shared_ptr<vk::Buffer> &getUniformBuffer() const;
-		const std::shared_ptr<vk::DeviceMemory> &getUniformBufferMemory() const;
-		const std::shared_ptr<vk::DescriptorSetLayout> &getDescriptorSetLayout() const;
-		const std::shared_ptr<vk::DescriptorPool> &getDescriptorPool() const;
-		const std::shared_ptr<vk::DescriptorSet> &getDescriptorSet() const;
-		const std::shared_ptr<vk::PipelineLayout> &getPipelineLayout() const;  
+		const vk::Buffer *getUniformBuffer() const;
+		const vk::DeviceMemory *getUniformBufferMemory() const;
+		const vk::DescriptorSetLayout *getDescriptorSetLayout() const;
+		const vk::DescriptorPool *getDescriptorPool() const;
+		const vk::DescriptorSet *getDescriptorSet() const;
+		const vk::PipelineLayout *getPipelineLayout() const;  
 	private:
 		//compositons
 		std::shared_ptr<MaterialData> m_pData;
@@ -272,7 +271,7 @@ namespace vg
 		std::vector<vk::PushConstantRange> m_lastPushConstantRanges;
 
 		//aggregations
-		std::shared_ptr<Shader> m_pShader;
+		Shader *m_pShader;
 		void _createPipelineLayout();  
 		void _createUniformBuffer();
 		void _createDescriptorSet();

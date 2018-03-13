@@ -36,29 +36,29 @@ namespace vgim
         return m_canvasHeight;
     }
 
-    const std::shared_ptr<vg::Material> getMaterial()
+    const vg::Material *getMaterial()
 	{
-		return m_pMaterial;
+		return m_pMaterial.get();
 	}
 
-    const std::shared_ptr<vg::DimSimpleMesh2> getMesh()
+    const vg::DimSimpleMesh2 *getMesh()
     {
-        return m_pMesh;   
+        return m_pMesh.get();   
     }
 
-    const std::shared_ptr<vg::VisualObject2> getUIObject()
+    const vg::VisualObject2 *getUIObject()
     {
-        return m_pUIObject;
+        return m_pUIObject.get();
     }
 
-    const std::shared_ptr<vg::CameraOP2> getCamera()
+    const vg::CameraOP2 *getCamera()
     {
-        return m_pCamera;
+        return m_pCamera.get();
     }
 
-    const std::shared_ptr<vg::Scene2> getScene()
+    const vg::Scene2 *getScene()
     {
-        return m_pScene;
+        return m_pScene.get();
     }
 
 	void setShaderPath(const std::string &vertShaderPath, const std::string &fragShaderPath)
@@ -66,7 +66,7 @@ namespace vgim
 		m_pShader->load(vertShaderPath, fragShaderPath);
 	}
 
-	void setShader(const std::shared_ptr<vg::Shader> pShader)
+	void setShader(vg::Shader *pShader)
 	{
 		m_pPass->setShader(pShader);
 	}
@@ -272,7 +272,7 @@ namespace vgim
 	{
         //shader
         m_pShader = std::shared_ptr<vg::Shader>(new vg::Shader());
-		m_pPass = std::shared_ptr<vg::Pass>(new vg::Pass(m_pShader));
+		m_pPass = std::shared_ptr<vg::Pass>(new vg::Pass(m_pShader.get()));
 
         m_pPass->setFrontFace(vg::FrontFaceType::CLOCKWISE);
 
@@ -310,7 +310,7 @@ namespace vgim
         m_pPass->setDepthStencilInfo(depthStencilInfo);
 
 		m_pMaterial = std::shared_ptr<vg::Material>(new vg::Material());
-		m_pMaterial->addPass(m_pPass);
+		m_pMaterial->addPass(m_pPass.get());
 		m_pMaterial->setRenderPriority(0u);
 		m_pMaterial->setRenderQueueType(vg::MaterialShowType::TRANSPARENT);
 		m_pMaterial->apply();
@@ -439,7 +439,7 @@ namespace vgim
         
         io.Fonts->TexID = reinterpret_cast<void *>(VkImage(*(m_pFontTexture->getImage())));
 
-        m_pPass->setMainTexture(m_pFontTexture);
+        m_pPass->setMainTexture(m_pFontTexture.get());
     }
 
     void _destroyFontTexture()

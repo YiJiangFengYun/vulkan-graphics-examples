@@ -55,14 +55,14 @@ namespace vg
 		m_pFragShaderModule = _createShaderModule(codeFragShader, sizeFragShader);
 	}
 
-	std::shared_ptr<vk::ShaderModule> Shader::getVertShaderModule()
+	const vk::ShaderModule *Shader::getVertShaderModule() const
 	{
-		return m_pVertShaderModule;
+		return m_pVertShaderModule.get();
 	}
 
-	std::shared_ptr<vk::ShaderModule> Shader::getFragShaderModule()
+	const vk::ShaderModule *Shader::getFragShaderModule() const
 	{
-		return m_pFragShaderModule;
+		return m_pFragShaderModule.get();
 	}
 
 	std::vector<vk::PipelineShaderStageCreateInfo> Shader::getShaderStageInfos() const

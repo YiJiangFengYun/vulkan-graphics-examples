@@ -91,7 +91,7 @@ void Window::_createMaterial()
 	    	new vg::Shader(vertShaderPaths[i], fragShaderPaths[i])
 	    	);
 	    //pass
-	    pPasses[i] = std::shared_ptr<vg::Pass>(new vg::Pass(pShaders[i]));
+	    pPasses[i] = std::shared_ptr<vg::Pass>(new vg::Pass(pShaders[i].get()));
 		pPasses[i]->setCullMode(vg::CullModeFlagBits::BACK);
 		pPasses[i]->setFrontFace(vg::FrontFaceType::CLOCKWISE);
 		pPasses[i]->setViewport(fd::Viewport(static_cast<float>(i) / static_cast<float>(SCENE_COUNT),
@@ -118,7 +118,7 @@ void Window::_createMaterial()
 
 	    //material
 	    pMaterials[i] = std::shared_ptr<vg::Material>(new vg::Material());
-	    pMaterials[i]->addPass(pPasses[i]);
+	    pMaterials[i]->addPass(pPasses[i].get());
 		pMaterials[i]->setRenderPriority(0u);
 	    pMaterials[i]->setRenderQueueType(vg::MaterialShowType::OPAQUE);
 	    pMaterials[i]->apply();

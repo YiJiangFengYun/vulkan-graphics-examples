@@ -17,10 +17,10 @@ namespace vg
 		~Material();
 
 		uint32_t getPassCount();
-		const std::shared_ptr<Pass>& getPassWithIndex(uint32_t index) const;
-		Bool32 isHas(const std::shared_ptr<Pass>& pPass) const;
-		void addPass(const std::shared_ptr<Pass>& pPass);
-		void removePass(const std::shared_ptr<Pass>& pPass);
+		Pass *getPassWithIndex(uint32_t index) const;
+		Bool32 isHas(const Pass *pPass) const;
+		void addPass(Pass *pPass);
+		void removePass(Pass *pPass);
 		MaterialShowType getShowType();
 		void setRenderQueueType(MaterialShowType type);
 		uint32_t getRenderPriority();
@@ -35,8 +35,8 @@ namespace vg
 		//--compositions
 
 		//--aggregations
-		std::vector<std::shared_ptr<Pass>> m_arrPasses;
-		std::unordered_map<InstanceID, std::shared_ptr<Pass>> m_mapPasses;
+		std::vector<Pass *> m_arrPasses;
+		std::unordered_map<InstanceID, Pass *> m_mapPasses;
 		//--aggregations
 
 		//tool methods

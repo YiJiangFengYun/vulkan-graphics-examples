@@ -64,7 +64,7 @@ namespace vg
 			descriptorCount,
 			stageFlags
 		);
-		info.updateSize(m_pData);
+		info.updateSize(m_pData.get());
 		setValue(name, info, m_mapLayoutBinds, m_arrLayoutBindNames);
 		m_applied = VG_FALSE;
 	}

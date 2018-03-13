@@ -24,10 +24,10 @@ namespace vg
 		void load(const void *codeVertShader, uint32_t sizeVertShader, const void *codeFragShader, uint32_t sizeFragShader);
 		void load(const uint32_t *codeVertShader, uint32_t sizeVertShader, const uint32_t *codeFragShader, uint32_t sizeFragShader);
 
-		std::shared_ptr<vk::ShaderModule> getVertShaderModule();
-		std::shared_ptr<vk::ShaderModule> getFragShaderModule();
+		const vk::ShaderModule *getVertShaderModule() const;
+		const vk::ShaderModule *getFragShaderModule() const;
 
-		std::vector<vk::PipelineShaderStageCreateInfo> getShaderStageInfos() const;
+	    std::vector<vk::PipelineShaderStageCreateInfo> getShaderStageInfos() const;
 
 	private:
 		//compositions

@@ -257,8 +257,8 @@ namespace vgf {
 	{
 #ifdef USE_IMGUI_BIND
         vg::Renderer::SceneAndCamera sceneAndCamera;
-		sceneAndCamera.pScene = vgim::getScene().get();
-		sceneAndCamera.pCamera = vgim::getCamera().get();
+		sceneAndCamera.pScene = vgim::getScene();
+		sceneAndCamera.pCamera = vgim::getCamera();
 		auto addedInfo = info;
 		addedInfo.sceneAndCameraCount = info.sceneAndCameraCount + 1u;
 		std::vector<vg::Renderer::SceneAndCamera> sceneAndCameras(addedInfo.sceneAndCameraCount);

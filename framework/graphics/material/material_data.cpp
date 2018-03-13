@@ -41,12 +41,12 @@ namespace vg
 
 	}
 
-	const std::shared_ptr<Texture> &MaterialData::getTexture(std::string name) const
+	const Texture *MaterialData::getTexture(std::string name) const
 	{
 		return getValue(name, mapTextures);
 	}
 
-	void MaterialData::setTexture(std::string name, const std::shared_ptr<Texture> &pTex)
+	void MaterialData::setTexture(std::string name, const Texture *pTex)
 	{
 		setValue(name, pTex, mapTextures, arrTexNames);
 	}

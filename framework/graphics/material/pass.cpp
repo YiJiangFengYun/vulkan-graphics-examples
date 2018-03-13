@@ -147,9 +147,9 @@ namespace vg
 
 	Pass::LayoutBindingInfo::LayoutBindingInfo(std::string name
 		, Bool32 isTexture
-		, std::uint32_t binding
+		, uint32_t binding
 		, DescriptorType descriptorType
-		, std::uint32_t descriptorCount
+		, uint32_t descriptorCount
 		, ShaderStageFlags stageFlags
 	) 
 		: name(name)
@@ -201,7 +201,7 @@ namespace vg
 
 	}
 
-	void Pass::LayoutBindingInfo::updateSize(const std::shared_ptr<MaterialData> &pMaterialData)
+	void Pass::LayoutBindingInfo::updateSize(const MaterialData *pMaterialData)
 	{
 		if (isTexture)
 		{
@@ -251,7 +251,7 @@ namespace vg
 	{
 	}
 
-	Pass::Pass(std::shared_ptr<Shader> pShader)
+	Pass::Pass(Shader *pShader)
 		: Base(BaseType::PASS)
 		, m_pData(new MaterialData())
 		, m_applied(VG_FALSE)
@@ -283,23 +283,23 @@ namespace vg
 	{
 	}
 
-	std::shared_ptr<Shader> Pass::getShader()
+	Shader *Pass::getShader() const
 	{
 		return m_pShader;
 	}
 
-	void Pass::setShader(std::shared_ptr<Shader> pShader)
+	void Pass::setShader(Shader *pShader)
 	{
 		m_pShader = pShader;
 		_updatePipelineStateID();
 	}
 
-	const std::shared_ptr<Texture> &Pass::getTexture(std::string name) const
+	const Texture *Pass::getTexture(std::string name) const
 	{
 		return m_pData->getTexture(name);
 	}
 	void Pass::setTexture(std::string name
-		, const std::shared_ptr<Texture> &pTex
+		, const Texture *pTex
 		, uint32_t binding
 		, DescriptorType descriptorType
 		, ShaderStageFlags stageFlags
@@ -316,17 +316,17 @@ namespace vg
 			descriptorCount,
 			stageFlags
 		);
-		info.updateSize(m_pData);
+		info.updateSize(m_pData.get());
 		setValue(name, info, m_mapLayoutBinds, m_arrLayoutBindNames);
 		m_applied = VG_FALSE;
 	}
 
-	const std::shared_ptr<Texture> &Pass::getMainTexture() const
+	const Texture *Pass::getMainTexture() const
 	{
 		return getTexture(VG_M_MAIN_TEXTURE_NAME);
 	}
 
-	void Pass::setMainTexture(const std::shared_ptr<Texture> value)
+	void Pass::setMainTexture(const Texture *value)
 	{
 		setTexture(VG_M_MAIN_TEXTURE_NAME, value, VG_M_MAIN_TEXTURE_BINDING,
 			DescriptorType::COMBINED_IMAGE_SAMPLER, ShaderStageFlagBits::FRAGMENT);
@@ -534,7 +534,7 @@ namespace vg
 		return map.count(shaderStage) != 0;
 	}
 
-	const std::shared_ptr<Pass::SpecializationData> &Pass::getSpecializationData(ShaderStageFlagBits shaderStage) const
+	const Pass::SpecializationData *Pass::getSpecializationData(ShaderStageFlagBits shaderStage) const
 	{
 		auto vkStage = tranShaderStageFlagBitToVK(shaderStage);
 		const auto& map = m_mapSpecilizationDatas;
@@ -545,11 +545,11 @@ namespace vg
 		}
 		else
 		{
-			return iterator->second;
+			return iterator->second.get();
 		}
 	}
 
-	const std::shared_ptr<Pass::SpecializationData> &Pass::getSpecializationData(vk::ShaderStageFlagBits shaderStage) const
+	const Pass::SpecializationData *Pass::getSpecializationData(vk::ShaderStageFlagBits shaderStage) const
 	{
 		const auto& map = m_mapSpecilizationDatas;
 		const auto& iterator = map.find(shaderStage);
@@ -559,7 +559,7 @@ namespace vg
 		}
 		else
 		{
-			return iterator->second;
+			return iterator->second.get();
 		}
 	}
 
@@ -636,40 +636,34 @@ namespace vg
 		setValue(name, pPushConstantUpdate, m_mapPPushConstantUpdates, m_arrPushConstantUpdateNames);
 	}
 
-
-	const std::shared_ptr<Shader> &Pass::getShader() const
+	const vk::Buffer *Pass::getUniformBuffer() const
 	{
-		return m_pShader;
+		return m_pUniformBuffer.get();
 	}
 
-	const std::shared_ptr<vk::Buffer> &Pass::getUniformBuffer() const
+	const vk::DeviceMemory *Pass::getUniformBufferMemory() const
 	{
-		return m_pUniformBuffer;
+		return m_pUniformBufferMemory.get();
 	}
 
-	const std::shared_ptr<vk::DeviceMemory> &Pass::getUniformBufferMemory() const
+	const vk::DescriptorSetLayout *Pass::getDescriptorSetLayout() const
 	{
-		return m_pUniformBufferMemory;
+		return m_pDescriptorSetLayout.get();
 	}
 
-	const std::shared_ptr<vk::DescriptorSetLayout> &Pass::getDescriptorSetLayout() const
+	const vk::PipelineLayout *Pass::getPipelineLayout() const
 	{
-		return m_pDescriptorSetLayout;
+		return m_pPipelineLayout.get();
 	}
 
-	const std::shared_ptr<vk::PipelineLayout> &Pass::getPipelineLayout() const
+	const vk::DescriptorPool *Pass::getDescriptorPool() const
 	{
-		return m_pPipelineLayout;
+		return m_pDescriptorPool.get();
 	}
 
-	const std::shared_ptr<vk::DescriptorPool> &Pass::getDescriptorPool() const
+	const vk::DescriptorSet *Pass::getDescriptorSet() const
 	{
-		return m_pDescriptorPool;
-	}
-
-	const std::shared_ptr<vk::DescriptorSet> &Pass::getDescriptorSet() const
-	{
-		return m_pDescriptorSet;
+		return m_pDescriptorSet.get();
 	}
 
 	void Pass::_createPipelineLayout()
@@ -890,7 +884,7 @@ namespace vg
 				if (item.descriptorCount != 1u)
 					throw std::runtime_error("The descriptor count of binding shoubld be 1 when its type is COMBINED_IMAGE_SAMPLER");
 #endif // DEBUG
-				std::shared_ptr<Texture> pTexture = getTexture(item.name);
+				const Texture * pTexture = getTexture(item.name);
 				if (pTexture != nullptr)
 				{
 					imageInfos[index].sampler = *pTexture->getSampler();

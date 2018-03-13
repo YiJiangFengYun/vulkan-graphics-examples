@@ -142,7 +142,7 @@ void Window::_createTexture()
 	textureLayout.pComponent = components.data();
 	m_pTexture->applyData(textureLayout, gliTex2D.data(), gliTex2D.size());
 
-	m_pTexture->setFilterMode(vg::FilterMode::LINEAR);
+	m_pTexture->setFilterMode(vg::FilterMode::TRILINEAR);
 	m_pTexture->setSamplerAddressMode(vg::SamplerAddressMode::REPEAT);
 
 	auto &pApp = vg::pApp;

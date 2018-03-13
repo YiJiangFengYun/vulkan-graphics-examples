@@ -95,6 +95,7 @@ namespace vg
 	void Texture::setFilterMode(FilterMode value)
 	{
 		m_filterMode = value;
+		_updateVkFilter();
 		//Need to receate sampler when chaning filterMode.
 		_createSampler();
 	}
@@ -107,6 +108,7 @@ namespace vg
 	void Texture::setSamplerAddressMode(SamplerAddressMode value)
 	{
 		m_samplerAddressMode = value;
+		_updateVkSamplerAddressMode();
 		//Need to receate sampler when chaning sampler address mode.
 		_createSampler();
 	}

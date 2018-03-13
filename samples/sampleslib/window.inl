@@ -124,18 +124,22 @@ namespace sampleslib
 
 		glfwSetCursorPosCallback(m_pWindow.get(), [](GLFWwindow *glfwWindow, double xPos, double yPos)
 		{
+			bool handledByIM = false;
+			ImGuiIO& io = ImGui::GetIO();
+		    handledByIM = io.WantCaptureMouse;
 			Window* const instance = (Window*)glfwGetWindowUserPointer(glfwWindow);
 			auto &lastPos = instance->m_mousePos;
 			float dx = static_cast<float>(xPos - lastPos[0]);
 			float dy = static_cast<float>(yPos - lastPos[1]);
 
+			lastPos[0] = xPos;
+			lastPos[1] = yPos;
+
+            if (handledByIM) return;
 			if (instance->m_mouseButtons.left) {
 			    instance->m_rotation.x += dy * instance->m_rotationSpeed;
 		        instance->m_rotation.y += dx * instance->m_rotationSpeed;
 			}
-
-			lastPos[0] = xPos;
-			lastPos[1] = yPos;
 		});
 	}	
 

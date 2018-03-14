@@ -35,10 +35,10 @@ namespace vg
 		using LightType = Light<SPACE_TYPE>;
 		using TransformType = Transform<SPACE_TYPE>;
 
-		// const std::shared_ptr<TransformType> pRootTransformForVisualObject;
-		// const std::shared_ptr<TransformType> pRootTransformForCamera;
-		// const std::shared_ptr<TransformType> pRootTransformForLight;
-		const std::shared_ptr<TransformType> pRootTransform;
+		const std::shared_ptr<TransformType> pRootTransformForVisualObject;
+		const std::shared_ptr<TransformType> pRootTransformForCamera;
+		const std::shared_ptr<TransformType> pRootTransformForLight;
+		// const std::shared_ptr<TransformType> pRootTransform;
 
 
 		Scene();

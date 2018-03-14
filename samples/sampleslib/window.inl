@@ -146,7 +146,6 @@ namespace sampleslib
 				auto pRootTransform = pScene->pRootTransformForVisualObject;
 				auto localRotation = pRootTransform->getLocalRotation();
 				vg::Vector3 angle = vg::Vector3(dy * instance->m_rotationSpeed, dx * instance->m_rotationSpeed, 0.0f);
-				//LOG(plog::debug) << "Scene rotate angle, x: " << angle.x << " y: " << angle.y << " z: " << angle.z << std::endl;
 			    vg::Quaternion change = vg::Quaternion(angle);
 				localRotation = change * localRotation;
 				pRootTransform->setLocalRotation(localRotation);

@@ -161,7 +161,7 @@ namespace vg
 	template <SpaceType SPACE_TYPE>
 	typename Transform<SPACE_TYPE>::RotationType Transform<SPACE_TYPE>::getLocalRotation() const
 	{
-		return m_localPosition;
+		return m_localRotation;
 	}
 
 	template <SpaceType SPACE_TYPE>

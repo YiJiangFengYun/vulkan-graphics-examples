@@ -15,6 +15,7 @@ add_subdirectory(chalet)
 add_subdirectory(triangle)
 add_subdirectory(pipelines)
 add_subdirectory(texture)
+add_subdirectory(cubemaps)
 
 # sampler include directories and libraries is used by itself
 # set(INCLUDE_DIRS ${INCLUDE_DIRS} PARENT_SCOPE)

@@ -21,11 +21,11 @@ namespace vg
                 , vk::PipelineVertexInputStateCreateInfo vertexInputStateInfo = vk::PipelineVertexInputStateCreateInfo());
         };
         uint32_t getSubVertexDataCount() const;
-        const std::vector<SubVertexData> &getSubVertexDatas() const;
+        const SubVertexData *getSubVertexDatas() const;
         uint32_t getBuffersize() const;
-        std::shared_ptr<vk::Buffer> getBuffer() const;
+        const vk::Buffer *getBuffer() const;
         uint32_t getBufferMemorySize() const;
-        std::shared_ptr<vk::DeviceMemory> getBufferMemory() const;
+        const vk::DeviceMemory *getBufferMemory() const;
         uint32_t getMemorySize() const;
         const void *getMemory() const;
 

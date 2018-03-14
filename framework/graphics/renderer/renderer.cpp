@@ -360,9 +360,9 @@ namespace vg
 		PipelineCache::Info info(
 			*m_pRenderPass,
 			pPass,
-			pContentMesh->getVertexData().get(),
+			pContentMesh->getVertexData(),
 			0u,
-			pContentMesh->getIndexData().get(),
+			pContentMesh->getIndexData(),
 			subMeshIndex
 		);
 		pPipeline = m_pipelineCache.caching(info);

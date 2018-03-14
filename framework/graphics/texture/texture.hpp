@@ -58,10 +58,10 @@ namespace vg
 
 		vk::Format getVKFormat() const;
 		vk::ImageLayout getImageLayout() const;
-		std::shared_ptr<vk::Image> getImage() const;
-		std::shared_ptr<vk::DeviceMemory> getImageMemory() const;
-		std::shared_ptr<vk::ImageView> getImageView() const;
-		std::shared_ptr<vk::Sampler> getSampler() const;
+		vk::Image* getImage() const;
+		vk::DeviceMemory *getImageMemory() const;
+		vk::ImageView *getImageView() const;
+		vk::Sampler *getSampler() const;
 	protected:
 		//--compositions
 		uint32_t m_width;
@@ -119,11 +119,11 @@ namespace vg
 
 		void _createBuffer(vk::DeviceSize size, vk::BufferUsageFlags usage, vk::MemoryPropertyFlags properties,
 			std::shared_ptr<vk::Buffer>& pBuffer, std::shared_ptr<vk::DeviceMemory>& pBufferMemory);
-		void _tranImageLayout(std::shared_ptr<vk::CommandBuffer> pCommandBuffer, vk::Image image,
+		void _tranImageLayout(std::shared_ptr<vk::CommandBuffer> &pCommandBuffer, vk::Image image,
 			vk::ImageLayout oldLayout, vk::ImageLayout newLayout,
 			uint32_t baseMipLevel, uint32_t levelCount,
 			uint32_t baseArrayLayer, uint32_t layerCount);
-		void _copyBufferToImage(std::shared_ptr<vk::CommandBuffer> pCommandBuffer, vk::Buffer buffer, vk::Image image,
+		void _copyBufferToImage(std::shared_ptr<vk::CommandBuffer> &pCommandBuffer, vk::Buffer buffer, vk::Image image,
 			uint32_t width, uint32_t height, uint32_t depth, uint32_t mipLevel,
 			uint32_t baseArrayLayer, uint32_t layerCount);
 	};

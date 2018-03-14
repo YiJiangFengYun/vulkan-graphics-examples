@@ -2,7 +2,7 @@
 
 namespace vg
 {
-    void vertexDataToCommandBuffer(vk::CommandBuffer &commandBuffer, const std::shared_ptr<VertexData> &pVertexData, uint32_t subIndex)
+    void vertexDataToCommandBuffer(vk::CommandBuffer &commandBuffer, const VertexData *pVertexData, uint32_t subIndex)
 	{
 		const auto &subVertexDatas = pVertexData->getSubVertexDatas();
         const auto &subVertexData = subVertexDatas[subIndex];
@@ -26,7 +26,7 @@ namespace vg
 	}
 
     void indexDataToCommandBuffer(vk::CommandBuffer &commandBuffer, 
-        const std::shared_ptr<IndexData> &pIndexData, 
+        const IndexData *pIndexData, 
         uint32_t subIndex
         )
     {

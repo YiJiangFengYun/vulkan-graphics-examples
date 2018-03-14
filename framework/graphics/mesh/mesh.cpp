@@ -37,14 +37,14 @@ namespace vg
 		return m_pIndexData->getSubIndexDataCount();
 	}
 
-	const std::shared_ptr<VertexData> &ContentMesh::getVertexData() const
+	VertexData *ContentMesh::getVertexData() const
 	{
-		return m_pVertexData;
+		return m_pVertexData.get();
 	}
 
-	const std::shared_ptr<IndexData> &ContentMesh::getIndexData() const
+	IndexData *ContentMesh::getIndexData() const
 	{
-		return m_pIndexData;
+		return m_pIndexData.get();
 	}
 
 	

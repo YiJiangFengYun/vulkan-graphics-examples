@@ -60,8 +60,8 @@ namespace vg
 	public:
         ContentMesh();
 		virtual ~ContentMesh();
-		const std::shared_ptr<VertexData> &getVertexData() const;
-		const std::shared_ptr<IndexData> &getIndexData() const;
+	    VertexData *getVertexData() const;
+		IndexData *getIndexData() const;
 		virtual uint32_t getSubMeshOffset() const;
 		virtual uint32_t getSubMeshCount() const;
 	protected:

@@ -148,24 +148,24 @@ namespace vg
 		return m_vkImageLayout;
 	}
 
-	std::shared_ptr<vk::Image> Texture::getImage() const
+	vk::Image *Texture::getImage() const
 	{
-		return m_pImage;
+		return m_pImage.get();
 	}
 
-	std::shared_ptr<vk::DeviceMemory> Texture::getImageMemory() const
+	vk::DeviceMemory *Texture::getImageMemory() const
 	{
-		return m_pImageMemory;
+		return m_pImageMemory.get();
 	}
 
-	std::shared_ptr<vk::ImageView> Texture::getImageView() const
+	vk::ImageView *Texture::getImageView() const
 	{
-		return m_pImageView;
+		return m_pImageView.get();
 	}
 
-	std::shared_ptr<vk::Sampler> Texture::getSampler() const
+	vk::Sampler *Texture::getSampler() const
 	{
-		return m_pSampler;
+		return m_pSampler.get();
 	}
 
 	void Texture::_init()
@@ -714,7 +714,7 @@ namespace vg
 		pDevice->bindBufferMemory(*pBuffer, *pBufferMemory, 0);
 	}
 
-	void  Texture::_tranImageLayout(std::shared_ptr<vk::CommandBuffer> pCommandBuffer, vk::Image image,
+	void  Texture::_tranImageLayout(std::shared_ptr<vk::CommandBuffer> &pCommandBuffer, vk::Image image,
 		vk::ImageLayout oldLayout, vk::ImageLayout newLayout,
 		uint32_t baseMipLevel, uint32_t levelCount,
 		uint32_t baseArrayLayer, uint32_t layerCount)
@@ -790,7 +790,7 @@ namespace vg
 		return std::max(1u, size >> mipmapLevel);
 	}
 
-	void Texture::_copyBufferToImage(std::shared_ptr<vk::CommandBuffer> pCommandBuffer, vk::Buffer buffer, vk::Image image,
+	void Texture::_copyBufferToImage(std::shared_ptr<vk::CommandBuffer> &pCommandBuffer, vk::Buffer buffer, vk::Image image,
 		uint32_t width, uint32_t height, uint32_t depth, uint32_t mipLevel,
 		uint32_t baseArrayLayer, uint32_t layerCount)
 	{

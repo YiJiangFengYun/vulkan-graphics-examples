@@ -75,9 +75,9 @@ namespace vg
         return m_subDataCount;
     }
     
-    const std::vector<VertexData::SubVertexData> &VertexData::getSubVertexDatas() const
+    const VertexData::SubVertexData *VertexData::getSubVertexDatas() const
     {
-        return m_subDatas;
+        return m_subDatas.data();
     }
 
     uint32_t VertexData::getBuffersize() const
@@ -85,9 +85,9 @@ namespace vg
         return m_bufferSize;
     }
 
-    std::shared_ptr<vk::Buffer> VertexData::getBuffer() const
+    const vk::Buffer *VertexData::getBuffer() const
     {
-        return m_pBuffer;
+        return m_pBuffer.get();
     }
 
     uint32_t VertexData::getBufferMemorySize() const
@@ -95,9 +95,9 @@ namespace vg
         return m_bufferMemorySize;
     }
 
-    std::shared_ptr<vk::DeviceMemory> VertexData::getBufferMemory() const
+    const vk::DeviceMemory *VertexData::getBufferMemory() const
     {
-        return m_pBufferMemory;
+        return m_pBufferMemory.get();
     }
 
     uint32_t VertexData::getMemorySize() const

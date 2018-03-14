@@ -1,6 +1,11 @@
 set_property(GLOBAL PROPERTY USE_FOLDERS ON)
 set(FOLDER_NAME "framework")
 
+set(FD_PLOG_ID 1)
+set(VG_PLOG_ID 2)
+set(VGF_PLOG_ID 3)
+set(VGIM_PLOG_ID 4)
+
 # glm dependency
 set(INCLUDE_DIRS ${INCLUDE_DIRS} ${GLM_DIR})
 set(LIBRARIES ${LIBRARIES} glm)

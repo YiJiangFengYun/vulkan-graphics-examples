@@ -8,6 +8,7 @@ namespace vg
 {
 	extern Bool32 isInited;
 	extern std::shared_ptr<Application> pApp;
+	extern void moduleCreate(plog::Severity severity, plog::IAppender *appender = nullptr);
 	extern void moduleCreateVkinstance(std::string name
 		, uint32_t version
 		, std::vector<const char*> vkExtensions);
@@ -18,6 +19,7 @@ namespace vg
 		, vg::PhysicalDeviceFeaturePriorities optionalPhysicalDeviceFeatures
 	);
 	extern void moduleDestory();
+	extern void setLogSeverity(plog::Severity severity);
 } //namespace kgs
 
 #endif // !VG_MODULE_H

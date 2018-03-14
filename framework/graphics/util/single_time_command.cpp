@@ -12,9 +12,9 @@ namespace vg
 			uint32_t(1)
 		};
 
-		LOG(plog::debug) << "Pre allocate command buffer from pool." << std::endl;
+		VG_LOG(plog::debug) << "Pre allocate command buffer from pool." << std::endl;
 		auto pCommandBuffer = fd::allocateCommandBuffer(pDevice, pCommandPool, allocateInfo);
-		LOG(plog::debug) << "Post allocate command buffer from pool." << std::endl;
+		VG_LOG(plog::debug) << "Post allocate command buffer from pool." << std::endl;
 
 		vk::CommandBufferBeginInfo beginInfo = {
 			vk::CommandBufferUsageFlags(vk::CommandBufferUsageFlagBits::eOneTimeSubmit)

@@ -142,11 +142,16 @@ namespace sampleslib
 			}
 
 			if (instance->m_mouseButtons.right) {
-				// auto &pScene = instance->m_pScene;
-				// auto localRotation = pScene->pRootTransformForVisualObject->getLocalRotation();
-			    // vg::Quaternion change = vg::Quaternion(dy * instance->m_rotationSpeed, dx * instance->m_rotationSpeed, 0.0f);
-				// localRotation = change * localRotation;
-				// pScene->pRootTransformForVisualObject->setLocalRotation(localRotation);
+				auto &pScene = instance->m_pScene;
+				auto pRootTransform = pScene->pRootTransformForVisualObject;
+				auto localRotation = pRootTransform->getLocalRotation();
+				vg::Vector3 angle = vg::Vector3(dy * instance->m_rotationSpeed, dx * instance->m_rotationSpeed, 0.0f);
+				//LOG(plog::debug) << "Scene rotate angle, x: " << angle.x << " y: " << angle.y << " z: " << angle.z << std::endl;
+			    vg::Quaternion change = vg::Quaternion(angle);
+				localRotation = change * localRotation;
+				pRootTransform->setLocalRotation(localRotation);
+				pRootTransform = pScene->pRootTransformForLight;
+				pRootTransform->setLocalRotation(localRotation);
 			}
 		});
 	}	

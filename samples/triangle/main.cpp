@@ -5,8 +5,10 @@
 const uint32_t WINDOW_WIDTH = 1280;
 const uint32_t WINDOW_HEIGHT = 720;
 int main() {
-	vgf::moduleCreate();
-	plog::get()->setMaxSeverity(plog::Severity::warning);
+	vgf::moduleCreate(plog::debug);
+	static plog::DebugOutputAppender<plog::TxtFormatter> debugOutputAppender;
+	plog::init(plog::debug, &debugOutputAppender);
+
 	App app;
 	app.init<Window>(WINDOW_WIDTH, WINDOW_HEIGHT, "triangle");
 

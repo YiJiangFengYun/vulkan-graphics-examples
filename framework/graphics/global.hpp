@@ -18,6 +18,11 @@
 
 #include <cstdint>
 #include <foundation/foundation.hpp>
+
+#define VG_PLOG_ID _VG_PLOG_ID
+#define VG_LOG(severity) LOG_(VG_PLOG_ID, severity)
+#define VG_IF_LOG(severity) IF_LOG_(VG_PLOG_ID, severity)
+
 #include "graphics/base.hpp"
 
 

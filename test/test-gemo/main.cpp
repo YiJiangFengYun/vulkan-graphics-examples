@@ -27,7 +27,9 @@ void testBounds(fd::Bounds<glm::vec3> bounds, fd::Ray<glm::vec3> ray)
 
 int main()
 {
-	fd::moduleCreate();
+	fd::moduleCreate(plog::debug);
+	static plog::DebugOutputAppender<plog::TxtFormatter> debugOutputAppender;
+	plog::init(plog::debug, &debugOutputAppender);
 
 	{
 		fd::Bounds<glm::vec3> bounds(glm::vec3(0, 0, 0), glm::vec3(10, 10, 10));

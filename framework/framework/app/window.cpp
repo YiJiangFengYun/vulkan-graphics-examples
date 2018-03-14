@@ -77,7 +77,7 @@ namespace vgf {
 
 	void Window::run()
 	{
-		LOG(plog::debug) << "Window run" << std::endl;
+		VGF_LOG(plog::debug) << "Window run" << std::endl;
 		_doUpdate();
 		_doRender();
 	}
@@ -117,7 +117,7 @@ namespace vgf {
 	{
 		auto pInstance = vg::pApp->getVKInstance();
 		m_pSurface = createSurface(pInstance, m_pWindow.get());
-		LOG(plog::debug) << "Create successfully surface.";
+		VGF_LOG(plog::debug) << "Create successfully surface.";
 	}
 
 	void Window::_createSwapchain()
@@ -134,7 +134,7 @@ namespace vgf {
 		glfwGetWindowSize(m_pWindow.get(), &width, &height);
 		vk::Extent2D extent = details.chooseExtent(width, height);
 		
-		//LOG(plog::debug) << "Swapchain surface format: " << surfaceFormat.format
+		//VGF_LOG(plog::debug) << "Swapchain surface format: " << surfaceFormat.format
 
 		uint32_t minImageCount = details.capabilities.minImageCount + 1;
 		if (details.capabilities.maxImageCount > 0 && minImageCount > details.capabilities.maxImageCount)
@@ -182,7 +182,7 @@ namespace vgf {
 
 		auto pDevice = vg::pApp->getDevice();
 		m_pSwapchain = fd::createSwapchainKHR(pDevice, createInfo);
-		LOG(plog::debug) << "Create successfully swapchain.";
+		VGF_LOG(plog::debug) << "Create successfully swapchain.";
 
 		m_swapchainImages = pDevice->getSwapchainImagesKHR(*m_pSwapchain);
 		m_swapchainImageFormat = surfaceFormat.format;
@@ -597,7 +597,7 @@ namespace vgf {
 	void Window::_onWindowResized(int32_t width, int32_t height)
 	{
 		if (width == 0 || height == 0) return;
-		LOG(plog::debug) << "Context resize.";
+		VGF_LOG(plog::debug) << "Context resize.";
 
 		m_width = width;
 		m_height = height;

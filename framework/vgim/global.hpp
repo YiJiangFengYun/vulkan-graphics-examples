@@ -5,6 +5,12 @@
 #define DEBUG
 #endif // _DEBUG
 
+#include <vgim/config.hpp>
+
+#define VGIM_PLOG_ID _VGIM_PLOG_ID
+#define VGIM_LOG(severity) LOG_(VGIM_PLOG_ID, severity)
+#define VGIM_IF_LOG(severity) IF_LOG_(VGIM_PLOG_ID, severity)
+
 #ifndef GLFW_INCLUDE_VULKAN
 #define GLFW_INCLUDE_VULKAN
 #endif // !GLFW_INCLUDE_VULKAN

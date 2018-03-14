@@ -8,7 +8,7 @@ namespace vgf
 		, vg::PhysicalDeviceFeaturePriorities optionalPhysicalDeviceFeatures
 		)
 	{
-		LOG(plog::debug) << "Application initialization.";
+		VGF_LOG(plog::debug) << "Application initialization.";
 		std::shared_ptr<GLFWwindow> pResultGLFWWindow;
 		std::shared_ptr<vk::SurfaceKHR> pResultSurface;
 		_initEnv(width, 
@@ -20,7 +20,7 @@ namespace vgf
 			optionalPhysicalDeviceFeatures
 			);
 		_createWindow<MainWindow_T>(pResultGLFWWindow, pResultSurface);
-		LOG(plog::debug) << "Application initialization complete.";
+		VGF_LOG(plog::debug) << "Application initialization complete.";
 	}
 
 	template<typename Window_T>

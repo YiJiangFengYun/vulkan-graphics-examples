@@ -20,6 +20,7 @@ namespace vgim
     std::shared_ptr<vg::Scene2> m_pScene;
 
     Bool32 inited;
+    Bool32 isCreatedCanvas;
 
     Bool32 getInited()
     {
@@ -85,9 +86,36 @@ namespace vgim
     void _createFontTexture();
     void _destroyFontTexture();
 
-	void moduleCreate(uint32_t canvasWidth, uint32_t canvasHeight)
+	void moduleCreate(plog::Severity severity, plog::IAppender *appender)
 	{
 		if (inited == VG_IM_TRUE) return;
+        plog::IAppender *callerAppender = appender;
+		if (appender == nullptr) {
+		    //init default log to write to the windows debug output
+			static plog::DebugOutputAppender<plog::TxtFormatter> debugOutputAppender;
+			appender = &debugOutputAppender;
+		}
+		plog::init<VGIM_PLOG_ID>(severity, appender);
+        vg::moduleCreate(severity, callerAppender);
+		//Indicate module was initialized.
+		inited = VG_IM_TRUE;
+	}
+
+	void moduleDestory()
+	{
+		inited = VG_IM_FALSE;
+        isCreatedCanvas = VG_IM_FALSE;
+        _destroyFontTexture();
+        _destroyScene();
+        _destroyCamera();      
+        _destroyUIObject();
+        _destroyMesh();
+        _destroyMaterial();
+	}
+
+    void moduleCreateCanvas(uint32_t canvasWidth, uint32_t canvasHeight)
+    {
+        if (isCreatedCanvas == VG_IM_TRUE) return;
         m_canvasWidth = canvasWidth;
         m_canvasHeight = canvasHeight;
         m_time = 0.0;
@@ -98,21 +126,12 @@ namespace vgim
         _createScene();
         _initImGui();
         _createFontTexture();
-        
-		//Indicate module was initialized.
-		inited = VG_IM_TRUE;
-	}
+        isCreatedCanvas = VG_IM_TRUE;
+    }
 
-	void moduleDestory()
+    void setLogSeverity(plog::Severity severity)
 	{
-		inited = VG_IM_FALSE;
-
-        _destroyFontTexture();
-        _destroyScene();
-        _destroyCamera();      
-        _destroyUIObject();
-        _destroyMesh();
-        _destroyMaterial();
+		plog::get<VGIM_PLOG_ID>()->setMaxSeverity(severity);
 	}
 
     void updateIMGUI(uint32_t canvasWidth

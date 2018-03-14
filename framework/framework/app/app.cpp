@@ -104,7 +104,6 @@ namespace vgf {
 		{
 			vkExtensions[i] = glfwExtensions[i];
 		}
-
 		vg::moduleCreateVkinstance("vulkan graphics"
 			, VK_MAKE_VERSION(1, 0, 0)
 		    , vkExtensions);
@@ -123,7 +122,7 @@ namespace vgf {
 		//----------------------------------------------------------------------
 		//Initialize vgim module
 #ifdef USE_IMGUI_BIND
-        vgim::moduleCreate(m_width, m_height);
+        vgim::moduleCreateCanvas(m_width, m_height);
 #endif //USE_IMGUI_BIND
 		//----------------------------------------------------------------------				
 		

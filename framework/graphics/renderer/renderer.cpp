@@ -286,14 +286,14 @@ namespace vg
 			m_cachePSemaphore.get()                      //pSignalSemaphores
 		};
 
-		LOG(plog::debug) << "Pre submit to grahics queue." << std::endl;
+		VG_LOG(plog::debug) << "Pre submit to grahics queue." << std::endl;
 		vk::Queue queue;
 		uint32_t queueIndex;
 		pApp->allocateGaphicsQueue(queueIndex, queue);
 		queue.submit(submitInfo, nullptr);
 		//queue.submit(submitInfo, *m_waitFence);
 		pApp->freeGraphicsQueue(queueIndex);
-		LOG(plog::debug) << "Post submit to grahics queue." << std::endl;
+		VG_LOG(plog::debug) << "Post submit to grahics queue." << std::endl;
 	}
 
 	void Renderer::_postRender()
@@ -309,7 +309,7 @@ namespace vg
 		};
 
 		m_pCommandBuffer->begin(beginInfo);
-		LOG(plog::debug) << "Post begin command buffer for render." << std::endl;
+		VG_LOG(plog::debug) << "Post begin command buffer for render." << std::endl;
 
 		vk::ClearValue clearValueColor = {
 			std::array<float, 4>{
@@ -374,7 +374,7 @@ namespace vg
 		uint32_t subMeshIndex,
 		uint32_t passIndex)
 	{
-		LOG(plog::debug) << "Pre begin command buffer for render." << std::endl;
+		VG_LOG(plog::debug) << "Pre begin command buffer for render." << std::endl;
 		ContentMesh * pContentMesh = dynamic_cast<ContentMesh *>(pMesh);
 		auto pPass = pMaterial->getPassWithIndex(passIndex);
         
@@ -492,9 +492,9 @@ namespace vg
 	{
 		m_pCommandBuffer->endRenderPass();
 
-		LOG(plog::debug) << "Pre end command buffer." << std::endl;
+		VG_LOG(plog::debug) << "Pre end command buffer." << std::endl;
 		m_pCommandBuffer->end();
-		LOG(plog::debug) << "Post end command buffer." << std::endl;
+		VG_LOG(plog::debug) << "Post end command buffer." << std::endl;
 	}
 
 	void Renderer::_createSemaphore()
@@ -670,9 +670,9 @@ namespace vg
 
 		auto pDevice = pApp->getDevice();
 
-		LOG(plog::debug) << "Pre allocate command buffer from pool." << std::endl;
+		VG_LOG(plog::debug) << "Pre allocate command buffer from pool." << std::endl;
 		m_pCommandBuffer = fd::allocateCommandBuffer(pDevice, pCommandPool.get(), allocateInfo);
-		LOG(plog::debug) << "Post allocate command buffer from pool." << std::endl;
+		VG_LOG(plog::debug) << "Post allocate command buffer from pool." << std::endl;
 	}
 
 	void Renderer::_renderScene2(const Scene<SpaceType::SPACE_2> *pScene
@@ -762,7 +762,7 @@ namespace vg
 					}
 					else
 					{
-						LOG(plog::warning) << "No one valid shader module for pass. Pass ID: " << pPass->getID() << std::endl;
+						VG_LOG(plog::warning) << "No one valid shader module for pass. Pass ID: " << pPass->getID() << std::endl;
 					}
 				}
 			}
@@ -950,7 +950,7 @@ namespace vg
 						}
 						else
 						{
-							LOG(plog::warning) << "No one valid shader module for pass. Pass ID: " << pPass->getID() << std::endl;
+							VG_LOG(plog::warning) << "No one valid shader module for pass. Pass ID: " << pPass->getID() << std::endl;
 						}
 					}
 				}

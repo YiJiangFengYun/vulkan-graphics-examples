@@ -10,7 +10,13 @@
 
 #define NOMINMAX
 
+#include <foundation/config.hpp>
+
 #include <plog/Log.h>
+#include <plog/Appenders/DebugOutputAppender.h>
+#define FD_PLOG_ID _FD_PLOG_ID
+#define FD_LOG(severity) LOG_(FD_PLOG_ID, severity)
+#define FD_IF_LOG(severity) IF_LOG_(FD_PLOG_ID, severity)
 
 #define GLM_FORCE_RADIANS
 #define GLM_FORCE_DEPTH_ZERO_TO_ONE
@@ -30,8 +36,9 @@ namespace fd
 	using Bool32 = uint32_t;
 
 	extern Bool32 isInited;
-	extern void moduleCreate();
+	extern void moduleCreate(plog::Severity severity, plog::IAppender *appender = nullptr);
 	extern void moduleDestroy();
+	extern void setLogSeverity(plog::Severity severity);
 }
 
 #endif // !FD_GLOBAL_H

@@ -12,6 +12,10 @@
 
 #include <framework/config.hpp>
 
+#define VGF_PLOG_ID _VGF_PLOG_ID
+#define VGF_LOG(severity) LOG_(VGF_PLOG_ID, severity)
+#define VGF_IF_LOG(severity) IF_LOG_(VGF_PLOG_ID, severity)
+
 #ifdef USE_IMGUI_BIND
 #include <vgim/vgim.hpp>
 #endif //USE_IMGUI_BIND
@@ -24,9 +28,6 @@
 namespace vgf
 { 
 	using Bool32 = uint32_t;
-	extern Bool32 isInited;
-	extern void moduleCreate();
-	extern void moduleDestroy();
 }
 
 #endif // !VGF_GLOBAL_H

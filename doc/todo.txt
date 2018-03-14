@@ -1,3 +1,6 @@
 1.The Module of new own model format and The tool application transfer the new model format to the standardised model
 format (COLLADA).
-2.Param data of API methods use pure pointer.
+
+2.Multiply logger for different modules.
+3.Adding logger severity checker to minimize performance penalty of log.
+4.Streaming log message from library to final application binary.

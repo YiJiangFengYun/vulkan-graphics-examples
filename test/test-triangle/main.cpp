@@ -8,7 +8,9 @@
 const uint32_t WINDOW_WIDTH = 800;
 const uint32_t WINDOW_HEIGHT = 600;
 int main() {
-	vgf::moduleCreate();
+	vgf::moduleCreate(plog::debug);
+	static plog::DebugOutputAppender<plog::TxtFormatter> debugOutputAppender;
+	plog::init(plog::debug, &debugOutputAppender);
 
 	testTriangle::App testTriangle;
 	testTriangle.init<testTriangle::Window>(WINDOW_WIDTH, WINDOW_HEIGHT, "test-triangle");

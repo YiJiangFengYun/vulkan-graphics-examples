@@ -2,6 +2,7 @@
 #define VGF_FRAMEWORK_H
 
 #include "framework/global.hpp"
+#include "framework/module.hpp"
 #include "framework/app/app.hpp"
 #include "framework/app/window.hpp"
 

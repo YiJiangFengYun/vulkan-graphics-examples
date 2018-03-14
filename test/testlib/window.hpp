@@ -62,7 +62,7 @@ namespace testlib
 		virtual void _onRender() override;
 		virtual void _onPostRender() override;
 
-		virtual void _renderWithRenderer(const std::shared_ptr<vg::Renderer> &pRenderer
+		virtual void _renderWithRenderer(vg::Renderer *pRenderer
 			, const vg::Renderer::RenderInfo &info
 			, vg::Renderer::RenderResultInfo &resultInfo) override;
 	private:

@@ -380,8 +380,8 @@ namespace vg
 		    	vk::SharingMode::eExclusive
 		    };
     
-		    const auto &pPhysicalDevice = pApp->getPhysicalDevice();
-		    const auto &pDevice = pApp->getDevice();
+		    auto pPhysicalDevice = pApp->getPhysicalDevice();
+		    auto pDevice = pApp->getDevice();
 		    auto pStagingBuffer = fd::createBuffer(pDevice, createInfo);
             vk::MemoryRequirements memReqs = pDevice->getBufferMemoryRequirements(*pStagingBuffer);
 		    vk::MemoryAllocateInfo allocateInfo = {
@@ -460,8 +460,8 @@ namespace vg
 		        	vk::SharingMode::eExclusive
 		        };
         
-		        const auto &pPhysicalDevice = pApp->getPhysicalDevice();
-		        const auto &pDevice = pApp->getDevice();
+		        auto pPhysicalDevice = pApp->getPhysicalDevice();
+		        auto pDevice = pApp->getDevice();
 		        m_pBuffer = fd::createBuffer(pDevice, createInfo);
                 vk::MemoryRequirements memReqs = pDevice->getBufferMemoryRequirements(*m_pBuffer);
 		        vk::MemoryAllocateInfo allocateInfo = {

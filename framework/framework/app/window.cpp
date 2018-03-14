@@ -18,12 +18,11 @@ namespace vgf {
 		);
 	}
 
-	std::shared_ptr<vk::SurfaceKHR> createSurface(std::shared_ptr<vk::Instance> pInstance,
-		std::shared_ptr<GLFWwindow> pWindow)
+	std::shared_ptr<vk::SurfaceKHR> createSurface(vk::Instance *pInstance, GLFWwindow *pWindow)
 	{
 		VkSurfaceKHR surface;
 		auto result = static_cast<vk::Result> (glfwCreateWindowSurface(static_cast<VkInstance>(*pInstance),
-			pWindow.get(), nullptr, &surface));
+			pWindow, nullptr, &surface));
 		if (result != vk::Result::eSuccess)
 		{
 			throw std::system_error(result, "gfw::Context::_createSurface");
@@ -101,9 +100,9 @@ namespace vgf {
 		//}
 	}
 
-	std::shared_ptr<GLFWwindow> Window::getGLFWWindow() const
+	GLFWwindow *Window::getGLFWWindow() const
 	{
-		return m_pWindow;
+		return m_pWindow.get();
 	}
 
 	void Window::_createWindow(uint32_t width, uint32_t height, const char* title)
@@ -116,8 +115,8 @@ namespace vgf {
 
 	void Window::_createSurface()
 	{
-		const auto &pInstance = vg::pApp->getVKInstance();
-		m_pSurface = createSurface(pInstance, m_pWindow);
+		auto pInstance = vg::pApp->getVKInstance();
+		m_pSurface = createSurface(pInstance, m_pWindow.get());
 		LOG(plog::debug) << "Create successfully surface.";
 	}
 
@@ -181,7 +180,7 @@ namespace vgf {
 			createInfo.pQueueFamilyIndices = queueFamilyIndices.data();
 		}
 
-		const auto &pDevice = vg::pApp->getDevice();
+		auto pDevice = vg::pApp->getDevice();
 		m_pSwapchain = fd::createSwapchainKHR(pDevice, createInfo);
 		LOG(plog::debug) << "Create successfully swapchain.";
 
@@ -214,7 +213,7 @@ namespace vgf {
 			if (m_pRenderers[i] == nullptr) 
 			{
 				m_pRenderers[i] = _createRenderer(
-					m_pSwapchainImageViews[i],
+					m_pSwapchainImageViews[i].get(),
 					m_swapchainImageFormat,
 					m_swapchainExtent.width,
 					m_swapchainExtent.height
@@ -222,7 +221,7 @@ namespace vgf {
 			}
 			else 
 			{
-				m_pRenderers[i]->reset(m_pSwapchainImageViews[i],
+				m_pRenderers[i]->reset(m_pSwapchainImageViews[i].get(),
 					m_swapchainImageFormat,
 					m_swapchainExtent.width,
 					m_swapchainExtent.height);
@@ -231,7 +230,7 @@ namespace vgf {
 
 	}
 
-	std::shared_ptr<vg::Renderer> Window::_createRenderer(std::shared_ptr<vk::ImageView> pSwapchainImageView
+	std::shared_ptr<vg::Renderer> Window::_createRenderer(vk::ImageView *pSwapchainImageView
 		, vk::Format swapchainImageFormat
 		, uint32_t swapchainImageWidth
 		, uint32_t swapchainImageHeight
@@ -246,12 +245,12 @@ namespace vgf {
 				);
 	}
 
-	void Window::_renderBeginWithRenderer(const std::shared_ptr<vg::Renderer> &pRenderer)
+	void Window::_renderBeginWithRenderer(vg::Renderer *pRenderer)
 	{
 		pRenderer->renderBegin();
 	}
 
-	void Window::_renderWithRenderer(const std::shared_ptr<vg::Renderer> &pRenderer
+	void Window::_renderWithRenderer(vg::Renderer *pRenderer
 		    , const vg::Renderer::RenderInfo &info
 			, vg::Renderer::RenderResultInfo &resultInfo)
 	{
@@ -274,7 +273,7 @@ namespace vgf {
 #endif //USE_IMGUI_BIND
 	}
 
-	void Window::_renderEndWithRenderer(const std::shared_ptr<vg::Renderer> &pRenderer
+	void Window::_renderEndWithRenderer(vg::Renderer *pRenderer
 		    , const vg::Renderer::RenderInfo &info)
 	{
 		pRenderer->renderEnd(info);
@@ -286,7 +285,7 @@ namespace vgf {
 		vk::SemaphoreCreateInfo createInfo = {
 			vk::SemaphoreCreateFlags()
 		};
-		const auto &pDevice = vg::pApp->getDevice();
+		auto pDevice = vg::pApp->getDevice();
 		m_pImageAvailableSemaphore = fd::createSemaphore(pDevice, createInfo);
 		//m_pRenderFinishedSemaphore = fd::createSemaphore(m_pDevice, createInfo);
 	}
@@ -426,7 +425,7 @@ namespace vgf {
 		uint32_t imageIndex;
 		if (m_currImageIndex < 0)
 		{
-			const auto &pDevice = vg::pApp->getDevice();
+			auto pDevice = vg::pApp->getDevice();
 			VkResult result = vkAcquireNextImageKHR(static_cast<VkDevice>(*pDevice)
 				, static_cast<VkSwapchainKHR>(*m_pSwapchain)
 				, std::numeric_limits<uint64_t>::max()
@@ -460,9 +459,9 @@ namespace vgf {
 			vg::Renderer::RenderResultInfo resultInfo;
 			resultInfo.isRendered = VG_FALSE;
 
-			_renderBeginWithRenderer(m_pRenderers[imageIndex]);
-			_renderWithRenderer(m_pRenderers[imageIndex], info, resultInfo);
-			_renderEndWithRenderer(m_pRenderers[imageIndex], info);
+			_renderBeginWithRenderer(m_pRenderers[imageIndex].get());
+			_renderWithRenderer(m_pRenderers[imageIndex].get(), info, resultInfo);
+			_renderEndWithRenderer(m_pRenderers[imageIndex].get(), info);
 			//if (resultInfo.isRendered == VG_FALSE) throw std::runtime_error("No content was rendered.");
 			if (resultInfo.isRendered)
 			{
@@ -540,7 +539,7 @@ namespace vgf {
 			vk::ImageLayout::eUndefined
 		};
 
-		const auto &pDevice = vg::pApp->getDevice();
+		auto pDevice = vg::pApp->getDevice();
 		pImage = fd::createImage(pDevice, createInfo);
 
 		const auto &memRequirements = pDevice->getImageMemoryRequirements(*pImage);
@@ -575,7 +574,7 @@ namespace vgf {
 				1u
 			}
 		};
-		const auto &pDevice = vg::pApp->getDevice();
+		auto pDevice = vg::pApp->getDevice();
 		return fd::createImageView(pDevice, createInfo);
 	}
 

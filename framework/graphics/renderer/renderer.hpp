@@ -39,23 +39,23 @@ namespace vg
 			uint32_t drawCount;
 		};
 
-		Renderer(std::shared_ptr<vk::ImageView> pSwapchainImageView
+		Renderer(vk::ImageView *pSwapchainImageView
 			, vk::Format swapchainImageFormat
 			, uint32_t swapchainImageWidth
 			, uint32_t swapchainImageHeight
 		);
 
-		Renderer(std::shared_ptr<TextureColorAttachment> pColorAttachmentTex
+		Renderer(TextureColorAttachment *pColorAttachmentTex
 		);
 
 		~Renderer();
 
-		void reset(std::shared_ptr<vk::ImageView> pSwapchainImageView
+		void reset(vk::ImageView *pSwapchainImageView
 			, vk::Format swapchainImageFormat
 			, uint32_t swapchainImageWidth
 			, uint32_t swapchainImageHeight
 		);
-		void reset(std::shared_ptr<TextureColorAttachment> pColorAttachmentTex);
+		void reset(TextureColorAttachment *pColorAttachmentTex);
 
 		Bool32 isValidForRender() const;
 
@@ -97,10 +97,10 @@ namespace vg
 		std::vector<vk::Semaphore> m_arrSemaphores;
 		//aggregations
 		//Renderer will use swapchain image when color attachment texture is null.
-		std::shared_ptr<vk::ImageView> m_pSwapchainImageView;
+		vk::ImageView *m_pSwapchainImageView;
 		vk::Format m_swapchainImageFormat;
 		//Renderer will render to color texture when it is not null.
-		std::shared_ptr<TextureColorAttachment> m_pColorTexture;
+		TextureColorAttachment *m_pColorTexture;
 
 		virtual void _preRender();
 		virtual void _renderBegin();

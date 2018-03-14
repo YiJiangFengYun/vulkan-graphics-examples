@@ -146,8 +146,8 @@ void Window::_createTexture()
 	m_pTexture->setSamplerAddressMode(vg::SamplerAddressMode::REPEAT);
 
 	auto &pApp = vg::pApp;
-	auto &pDevice = pApp->getDevice();
-	auto &pPhysicalDevice = pApp->getPhysicalDevice();
+	auto pDevice = pApp->getDevice();
+	auto pPhysicalDevice = pApp->getPhysicalDevice();
 	if (pApp->getPhysicalDeviceFeatures().samplerAnisotropy)
 	{
 		auto anisotropy = pPhysicalDevice->getProperties().limits.maxSamplerAnisotropy;
@@ -213,7 +213,7 @@ void Window::_onUpdate()
 	ImGui::End();
 }
 
-void Window::_renderWithRenderer(const std::shared_ptr<vg::Renderer> &pRenderer
+void Window::_renderWithRenderer(vg::Renderer *pRenderer
 		    , const vg::Renderer::RenderInfo &info
 			, vg::Renderer::RenderResultInfo &resultInfo)
 {

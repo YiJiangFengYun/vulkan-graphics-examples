@@ -143,7 +143,7 @@ namespace vg
 #endif // DEBUG
 	}
 
-	void Application::initOther(std::shared_ptr<vk::SurfaceKHR> pSurface
+	void Application::initOther(const vk::SurfaceKHR *pSurface
 		, uint32_t graphicsQueueCount
 		, uint32_t presentQueueCount
 		, PhysicalDeviceFeatures requiredPhysicalDeviceFeatures
@@ -178,14 +178,14 @@ namespace vg
 		return m_engineVersion;
 	}
 
-	const std::shared_ptr<vk::Instance> &Application::getVKInstance() const
+	vk::Instance *Application::getVKInstance() const
 	{
-		return m_pInstance;
+		return m_pInstance.get();
 	}
 
-	const std::shared_ptr<vk::PhysicalDevice> &Application::getPhysicalDevice() const
+	vk::PhysicalDevice *Application::getPhysicalDevice() const
 	{
-		return m_pPhysicalDevice;
+		return m_pPhysicalDevice.get();
 	}
 
 	const vk::PhysicalDeviceFeatures &Application::getPhysicalDeviceFeatures() const
@@ -193,9 +193,9 @@ namespace vg
 		return m_physicalDeviceFeatures;
 	}
 
-	const std::shared_ptr<vk::Device> &Application::getDevice() const
+	vk::Device *Application::getDevice() const
 	{
-		return m_pDevice;
+		return m_pDevice.get();
 	}
 
 	uint32_t Application::getGraphicsFamily() const
@@ -208,19 +208,19 @@ namespace vg
 		return m_presentFamily;
 	}
 
-	const std::shared_ptr<QueueMaster> &Application::getQueueMaster() const
+	QueueMaster *Application::getQueueMaster() const
 	{
-		return m_pQueueMaster;
+		return m_pQueueMaster.get();
 	}
 
-	const std::shared_ptr<vk::CommandPool> &Application::getCommandPoolForTransientBuffer() const
+	vk::CommandPool *Application::getCommandPoolForTransientBuffer() const
 	{
-		return m_pCommandPoolForTransientBuffer;
+		return m_pCommandPoolForTransientBuffer.get();
 	}
 
-	const std::shared_ptr<vk::CommandPool> &Application::getCommandPoolForResetBuffer() const
+	vk::CommandPool *Application::getCommandPoolForResetBuffer() const
 	{
-		return m_pCommandPoolForResetBuffer;
+		return m_pCommandPoolForResetBuffer.get();
 	}
 
 	void Application::allocateGaphicsQueue(uint32_t &queueIndex, vk::Queue &queue)
@@ -372,7 +372,7 @@ namespace vg
 	}
 #endif // DEBUG
 
-	void Application::_pickPhysicalDevice(std::shared_ptr<vk::SurfaceKHR> pSurface
+	void Application::_pickPhysicalDevice(const vk::SurfaceKHR *pSurface
 		, PhysicalDeviceFeatures requiredPhysicalDeviceFeatures
 		, PhysicalDeviceFeaturePriorities optionalPhysicalDeviceFeatures
 	)
@@ -471,7 +471,7 @@ namespace vg
 		LOG(plog::debug) << "Pick successfully physical device.";
 	}
 
-	void Application::_createLogicDevice(std::shared_ptr<vk::SurfaceKHR> pSurface
+	void Application::_createLogicDevice(const vk::SurfaceKHR *pSurface
 		, uint32_t graphicsQueueCount
 		, uint32_t presentQueueCount
 	)
@@ -533,7 +533,7 @@ namespace vg
 		createInfo.ppEnabledLayerNames = validationlayers.data();
 #endif // ENABLE_VALIDATION_LAYERS
 
-		m_pDevice = fd::createDevice(m_pPhysicalDevice, createInfo);
+		m_pDevice = fd::createDevice(m_pPhysicalDevice.get(), createInfo);
 		m_pQueueMaster = std::shared_ptr<QueueMaster>(new QueueMaster(m_pDevice
 			, mapFamilyAndQueueCounts
 		));
@@ -547,12 +547,12 @@ namespace vg
 			vk::CommandPoolCreateFlagBits::eTransient,
 			m_graphicsFamily
 		};
-		m_pCommandPoolForTransientBuffer = fd::createCommandPool(m_pDevice, createInfoForTransientBuffer);
+		m_pCommandPoolForTransientBuffer = fd::createCommandPool(m_pDevice.get(), createInfoForTransientBuffer);
 
 		vk::CommandPoolCreateInfo createInfoForResetBuffer = {
 			vk::CommandPoolCreateFlagBits::eResetCommandBuffer,
 			m_graphicsFamily
 		};
-		m_pCommandPoolForResetBuffer = fd::createCommandPool(m_pDevice, createInfoForResetBuffer);
+		m_pCommandPoolForResetBuffer = fd::createCommandPool(m_pDevice.get(), createInfoForResetBuffer);
 	}
 } //namespace kgs

@@ -123,7 +123,7 @@ namespace testlib
 	}
 
 	template <vg::SpaceType SPACE_TYPE>
-	void Window<SPACE_TYPE>::_renderWithRenderer(const std::shared_ptr<vg::Renderer> &pRenderer
+	void Window<SPACE_TYPE>::_renderWithRenderer(vg::Renderer *pRenderer
 		    , const vg::Renderer::RenderInfo &info
 			, vg::Renderer::RenderResultInfo &resultInfo)
 	{

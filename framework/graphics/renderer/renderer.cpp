@@ -14,7 +14,7 @@ namespace vg
 
 	const vk::Format Renderer::DEFAULT_DEPTH_STENCIL_FORMAT(vk::Format::eD32SfloatS8Uint);
 
-	Renderer::Renderer(std::shared_ptr<vk::ImageView> pSwapchainImageView
+	Renderer::Renderer(vk::ImageView *pSwapchainImageView
 		, vk::Format swapchainImageFormat
 		, uint32_t swapchainImageWidth
 		, uint32_t swapchainImageHeight
@@ -22,6 +22,7 @@ namespace vg
 		: Base(BaseType::RENDERER)
 		, m_pSwapchainImageView(pSwapchainImageView)
 		, m_swapchainImageFormat(swapchainImageFormat)
+		, m_pColorTexture(nullptr)
 		, m_colorImageFormat(swapchainImageFormat)
 		, m_depthStencilImageFormat(DEFAULT_DEPTH_STENCIL_FORMAT)
 		, m_framebufferWidth(swapchainImageWidth)
@@ -41,8 +42,10 @@ namespace vg
 		//_createFence();
 	}
 
-	Renderer::Renderer(std::shared_ptr<TextureColorAttachment> pColorAttachmentTex)
+	Renderer::Renderer(TextureColorAttachment *pColorAttachmentTex)
 		: Base(BaseType::RENDERER)
+		, m_pSwapchainImageView(nullptr)
+		, m_swapchainImageFormat()
 		, m_pColorTexture(pColorAttachmentTex)
 		, m_colorImageFormat(pColorAttachmentTex->getVKFormat())
 		, m_depthStencilImageFormat(DEFAULT_DEPTH_STENCIL_FORMAT)
@@ -67,7 +70,7 @@ namespace vg
 	{
 	}
 
-	void Renderer::reset(std::shared_ptr<vk::ImageView> pSwapchainImageView
+	void Renderer::reset(vk::ImageView *pSwapchainImageView
 		, vk::Format swapchainImageFormat
 		, uint32_t swapchainImageWidth
 		, uint32_t swapchainImageHeight
@@ -75,6 +78,7 @@ namespace vg
 	{
 		m_pSwapchainImageView = pSwapchainImageView;
 		m_swapchainImageFormat = swapchainImageFormat;
+		m_pColorTexture = nullptr;
 		m_framebufferWidth = swapchainImageWidth;
 		m_framebufferHeight = swapchainImageHeight;
 		_createRenderPass();
@@ -86,8 +90,9 @@ namespace vg
 		//_createFence();
 	}
 	
-	void Renderer::reset(std::shared_ptr<TextureColorAttachment> pColorAttachmentTex)
+	void Renderer::reset(TextureColorAttachment *pColorAttachmentTex)
 	{
+		m_pSwapchainImageView = nullptr;
 		m_pColorTexture = pColorAttachmentTex;
 		m_colorImageFormat = pColorAttachmentTex->getVKFormat();
 		m_framebufferWidth = pColorAttachmentTex->getWidth();
@@ -264,7 +269,7 @@ namespace vg
 		//command buffer end
 		_recordCommandBufferForEnd();
 
-		/*const auto &pDevice = pApp->getDevice();
+		/*auto pDevice = pApp->getDevice();
 		pDevice->waitForFences(*m_waitFence, VK_TRUE, std::numeric_limits<uint64_t>::max());
 		pDevice->resetFences(*m_waitFence);*/
 		
@@ -495,7 +500,7 @@ namespace vg
 	void Renderer::_createSemaphore()
 	{
 		if (m_cachePSemaphore != nullptr) return;
-		const auto &pDevice = pApp->getDevice();
+		auto pDevice = pApp->getDevice();
 		vk::SemaphoreCreateInfo createInfo = {
 			vk::SemaphoreCreateFlags()
 		};
@@ -505,7 +510,7 @@ namespace vg
 	/*void Renderer::_createFence()
 	{
 		if (m_waitFence != nullptr) return;
-		const auto &pDevice = pApp->getDevice();
+		auto pDevice = pApp->getDevice();
 		vk::FenceCreateInfo createInfo;
 		createInfo.flags = vk::FenceCreateFlagBits::eSignaled;
 		m_waitFence = fd::createFence(pDevice, createInfo);
@@ -596,7 +601,7 @@ namespace vg
 			dependencies.data()
 		};
 
-		const auto &pDevice = pApp->getDevice();
+		auto pDevice = pApp->getDevice();
 		m_pRenderPass = fd::createRenderPass(pDevice, createInfo);
 	}
 
@@ -637,15 +642,15 @@ namespace vg
 			1u                                              //layers
 		};
 
-		const auto &pDevice = pApp->getDevice();
+		auto pDevice = pApp->getDevice();
 		m_pFrameBuffer = fd::createFrameBuffer(pDevice, createInfo);
 	}
 
 	void Renderer::_createCommandPool()
 	{
 		if (m_pCommandPool != nullptr) return;
-		const auto &pDevice = pApp->getDevice();
-		const auto &graphicsFamily = pApp->getGraphicsFamily();
+		auto pDevice = pApp->getDevice();
+		auto graphicsFamily = pApp->getGraphicsFamily();
 		vk::CommandPoolCreateInfo createInfo = {
 			vk::CommandPoolCreateFlagBits::eResetCommandBuffer,
 			graphicsFamily
@@ -663,10 +668,10 @@ namespace vg
 			1u                                         //commandBufferCount
 		};
 
-		const auto &pDevice = pApp->getDevice();
+		auto pDevice = pApp->getDevice();
 
 		LOG(plog::debug) << "Pre allocate command buffer from pool." << std::endl;
-		m_pCommandBuffer = fd::allocateCommandBuffer(pDevice, pCommandPool, allocateInfo);
+		m_pCommandBuffer = fd::allocateCommandBuffer(pDevice, pCommandPool.get(), allocateInfo);
 		LOG(plog::debug) << "Post allocate command buffer from pool." << std::endl;
 	}
 
@@ -678,7 +683,7 @@ namespace vg
 		resultInfo.isRendered = VG_TRUE;		
 
 		using SceneType = Scene<SpaceType::SPACE_2>;
-		const auto &pDevice = pApp->getDevice();
+		auto pDevice = pApp->getDevice();
 
 		auto projMatrix = pCamera->getProjMatrix();
 
@@ -774,7 +779,7 @@ namespace vg
 		resultInfo.isRendered = VG_TRUE;		
 
 		auto queueTypeCount = static_cast<uint32_t>(RenderQueueType::RANGE_SIZE);
-		const auto &pDevice = pApp->getDevice();
+		auto pDevice = pApp->getDevice();
 
 		auto projMatrix = pCamera->getProjMatrix();
 

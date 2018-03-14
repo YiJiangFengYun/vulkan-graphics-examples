@@ -159,7 +159,7 @@ void Window::_onUpdate()
 	}
 }
 
-void Window::_renderWithRenderer(const std::shared_ptr<vg::Renderer> &pRenderer
+void Window::_renderWithRenderer(vg::Renderer *pRenderer
 		    , const vg::Renderer::RenderInfo &info
 			, vg::Renderer::RenderResultInfo &resultInfo)
 {

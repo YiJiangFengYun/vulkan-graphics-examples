@@ -11,8 +11,7 @@ namespace vgf
 
 	extern std::shared_ptr<GLFWwindow> createGLFWWindow(uint32_t width, uint32_t height, const char* title);
 
-	extern std::shared_ptr<vk::SurfaceKHR> createSurface(std::shared_ptr<vk::Instance> pInstance,
-		std::shared_ptr<GLFWwindow> pWindow);
+	extern std::shared_ptr<vk::SurfaceKHR> createSurface(vk::Instance *pInstance, GLFWwindow *pWindow);
 
 	class Window
 	{
@@ -30,7 +29,7 @@ namespace vgf
 		void run();
 		void Window::windowSetShouldClose(Bool32 value);
 		vgf::Bool32 windowShouldClose();
-		std::shared_ptr<GLFWwindow> getGLFWWindow() const;
+		GLFWwindow *getGLFWWindow() const;
 	protected:
 		Window(const Window&) = delete;
 
@@ -70,17 +69,17 @@ namespace vgf
 		virtual void _onRender() = 0;
 		virtual void _onPostRender() = 0;
 
-		virtual std::shared_ptr<vg::Renderer> _createRenderer(std::shared_ptr<vk::ImageView> pSwapchainImageView
+		virtual std::shared_ptr<vg::Renderer> _createRenderer(vk::ImageView *pSwapchainImageView
 		    , vk::Format swapchainImageFormat
 			, uint32_t swapchainImageWidth
 			, uint32_t swapchainImageHeight
 		);
 
-		virtual void _renderBeginWithRenderer(const std::shared_ptr<vg::Renderer> &pRenderer);
-		virtual void _renderWithRenderer(const std::shared_ptr<vg::Renderer> &pRenderer
+		virtual void _renderBeginWithRenderer(vg::Renderer *pRenderer);
+		virtual void _renderWithRenderer(vg::Renderer *pRenderer
 		    , const vg::Renderer::RenderInfo &info
 			, vg::Renderer::RenderResultInfo &resultInfo);
-		virtual void _renderEndWithRenderer(const std::shared_ptr<vg::Renderer> &pRenderer
+		virtual void _renderEndWithRenderer(vg::Renderer *pRenderer
 		    , const vg::Renderer::RenderInfo &info);
 
 		// tool methods

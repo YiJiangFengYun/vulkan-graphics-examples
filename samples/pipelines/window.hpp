@@ -34,7 +34,7 @@ private:
     void _setMaterialToObjects(std::shared_ptr<vg::Material> pMaterial);
 
 	virtual void _onUpdate() override;
-	virtual void _renderWithRenderer(const std::shared_ptr<vg::Renderer> &pRenderer
+	virtual void _renderWithRenderer(vg::Renderer *pRenderer
 		    , const vg::Renderer::RenderInfo &info
 			, vg::Renderer::RenderResultInfo &resultInfo) override;
 };

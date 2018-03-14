@@ -60,7 +60,7 @@ namespace vgf
 
 		//tool methods.
 		std::shared_ptr<GLFWwindow> _createGLFWWindow(uint32_t width, uint32_t height, const char* title);
-		std::shared_ptr<vk::SurfaceKHR> _createVKSurface(std::shared_ptr<GLFWwindow> pWindow);
+		std::shared_ptr<vk::SurfaceKHR> _createVKSurface(GLFWwindow *pWindow);
 	};
 }
 

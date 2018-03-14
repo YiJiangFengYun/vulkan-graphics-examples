@@ -287,7 +287,7 @@ namespace vg
 		createInfo.basePipelineHandle = nullptr;
 		createInfo.basePipelineIndex = -1;
         
-		const auto &pDevice = pApp->getDevice();
+		auto pDevice = pApp->getDevice();
 		auto pPipeline = fd::createGraphicsPipeline(pDevice, *m_pPipelineCache, createInfo);
 
         return pPipeline;

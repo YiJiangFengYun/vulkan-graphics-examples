@@ -41,7 +41,7 @@ namespace vg
 		~Application();
 
 		void initCreateVkInstance(std::vector<const char*> extensions);
-		void initOther(std::shared_ptr<Surface> pSurface
+		void initOther(const Surface *pSurface
 			, uint32_t graphicsQueueCount
 			, uint32_t presentQueueCount
 			, PhysicalDeviceFeatures requiredPhysicalDeviceFeatures
@@ -55,15 +55,15 @@ namespace vg
 		std::string getEngineName() const;
 		uint32_t getEngineVersion() const;
 
-		const std::shared_ptr<vk::Instance> &getVKInstance() const;
-		const std::shared_ptr<vk::PhysicalDevice> &getPhysicalDevice() const;
+		vk::Instance *getVKInstance() const;
+		vk::PhysicalDevice *getPhysicalDevice() const;
 		const vk::PhysicalDeviceFeatures &getPhysicalDeviceFeatures() const;
-		const std::shared_ptr<vk::Device> &getDevice() const;
+		vk::Device *getDevice() const;
 		uint32_t getGraphicsFamily() const;
 		uint32_t getPresentFamily() const;
-		const std::shared_ptr<QueueMaster> &getQueueMaster() const;
-		const std::shared_ptr<vk::CommandPool> &getCommandPoolForTransientBuffer() const;
-		const std::shared_ptr<vk::CommandPool> &getCommandPoolForResetBuffer() const;
+		QueueMaster *getQueueMaster() const;
+		vk::CommandPool *getCommandPoolForTransientBuffer() const;
+		vk::CommandPool *getCommandPoolForResetBuffer() const;
 
 		void allocateGaphicsQueue(uint32_t &queueIndex, Queue &queue);
 		void allocatePresentQueue(uint32_t &queueIndex, Queue &queue);
@@ -109,11 +109,11 @@ namespace vg
 			void* userData);
 #endif // DEBUG
 		std::vector<const char*> _getRequiredExtensions();
-		void _pickPhysicalDevice(std::shared_ptr<vk::SurfaceKHR> psurface
+		void _pickPhysicalDevice(const vk::SurfaceKHR *pSurface
 			, PhysicalDeviceFeatures requiredPhysicalDeviceFeatures
 			, PhysicalDeviceFeaturePriorities optionalPhysicalDeviceFeatures
 		);
-		void _createLogicDevice(std::shared_ptr<vk::SurfaceKHR> pSurface
+		void _createLogicDevice(const vk::SurfaceKHR *pSurface
 			, uint32_t graphicsQueueCount
 			, uint32_t presentQueueCount
 		);

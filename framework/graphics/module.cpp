@@ -19,7 +19,7 @@ namespace vg
 		, vg::PhysicalDeviceFeaturePriorities optionalPhysicalDeviceFeatures
 	)
 	{
-		pApp->initOther(pSurface
+		pApp->initOther(pSurface.get()
 			, graphicsQueueCount
 			, presentQueueCount
 			, requiredPhysicalDeviceFeatures

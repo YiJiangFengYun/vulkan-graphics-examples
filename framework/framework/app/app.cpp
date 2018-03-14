@@ -110,7 +110,7 @@ namespace vgf {
 		    , vkExtensions);
 
 		pResultGLFWWindow = _createGLFWWindow(m_width, m_height, m_title);
-		pResultSurface = _createVKSurface(pResultGLFWWindow);
+		pResultSurface = _createVKSurface(pResultGLFWWindow.get());
 
 		vg::moduleCreateOther(pResultSurface
 			, m_graphicsQueueCount
@@ -134,9 +134,9 @@ namespace vgf {
 		return createGLFWWindow(width, height, title);
 	}
 
-	std::shared_ptr<vk::SurfaceKHR> App::_createVKSurface(std::shared_ptr<GLFWwindow> pWindow)
+	std::shared_ptr<vk::SurfaceKHR> App::_createVKSurface(GLFWwindow *pWindow)
 	{
-		const auto &pInstance = vg::pApp->getVKInstance();
+		auto pInstance = vg::pApp->getVKInstance();
 		return createSurface(pInstance, pWindow);
 	}
 }

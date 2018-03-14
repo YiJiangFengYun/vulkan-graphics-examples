@@ -408,7 +408,7 @@ namespace vg
 			imageLayout
 		};
 
-		const auto &pDevice = pApp->getDevice();
+		auto pDevice = pApp->getDevice();
 		m_pImage = fd::createImage(pDevice, createInfo);
 
 		const auto &memRequirements = pDevice->getImageMemoryRequirements(*m_pImage);
@@ -490,7 +490,7 @@ namespace vg
 			}
 		};
 
-		const auto &pDevice = pApp->getDevice();
+		auto pDevice = pApp->getDevice();
 		m_pImageView = fd::createImageView(pDevice, createInfo);
 	}
 
@@ -516,7 +516,7 @@ namespace vg
 			VkBool32(VK_FALSE)                       //unnormalizedCoordinates
 		};
 
-		const auto &pDevice = pApp->getDevice();
+		auto pDevice = pApp->getDevice();
 		m_pSampler = fd::createSampler(pDevice, createInfo);
 	}
 
@@ -553,7 +553,7 @@ namespace vg
 				memcpy(m_pMemory, memory, size);
 				m_realSize = size;
 			}
-			const auto &pDevice = pApp->getDevice();
+			auto pDevice = pApp->getDevice();
 
 			//create staging buffer.
 			std::shared_ptr<vk::Buffer> pStagingBuffer;
@@ -700,7 +700,7 @@ namespace vg
 			vk::SharingMode::eExclusive
 		};
 
-		const auto &pDevice = pApp->getDevice();
+		auto pDevice = pApp->getDevice();
 		pBuffer = fd::createBuffer(pDevice, createInfo);
 
 		vk::MemoryRequirements memReqs = pDevice->getBufferMemoryRequirements(*pBuffer);

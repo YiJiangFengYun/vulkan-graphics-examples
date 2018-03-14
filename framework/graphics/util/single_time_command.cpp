@@ -4,8 +4,8 @@
 namespace vg
 {
 	std::shared_ptr<vk::CommandBuffer> beginSingleTimeCommands() {
-		const auto &pDevice = pApp->getDevice();
-		const auto &pCommandPool = pApp->getCommandPoolForTransientBuffer();
+		auto pDevice = pApp->getDevice();
+		auto pCommandPool = pApp->getCommandPoolForTransientBuffer();
 		vk::CommandBufferAllocateInfo allocateInfo = {
 			*pCommandPool,
 			vk::CommandBufferLevel::ePrimary,
@@ -25,11 +25,11 @@ namespace vg
 	}
 
 	void endSingleTimeCommands(const std::shared_ptr<vk::CommandBuffer> &pCommandBuffer) {
-		const auto &pDevice = pApp->getDevice();
+		auto pDevice = pApp->getDevice();
 		vk::Queue queue;
 		uint32_t queueIndex;
 		pApp->allocateGaphicsQueue(queueIndex, queue);
-		const auto &commandPool = pApp->getCommandPoolForTransientBuffer();
+		auto commandPool = pApp->getCommandPoolForTransientBuffer();
 		pCommandBuffer->end();
 		vk::SubmitInfo submitInfo = { 0, nullptr, nullptr, 1, pCommandBuffer.get(), 0, nullptr };
 		queue.submit(submitInfo, nullptr);

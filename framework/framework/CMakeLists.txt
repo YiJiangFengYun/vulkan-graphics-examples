@@ -13,9 +13,6 @@ configure_file(
 	"${PROJECT_CONFIG_HEADER_DIR}/framework/config.hpp"
 )
 
-set(INCLUDE_DIRS ${INCLUDE_DIRS} "${GLFW_DIR}/include")
-set(LIBRARIES ${LIBRARIES} glfw)
-
 set(LIBRARY_NAME "framework")
 file(GLOB_RECURSE HEADERS *.hpp *.inl)
 file(GLOB_RECURSE SOURCES *.cpp)

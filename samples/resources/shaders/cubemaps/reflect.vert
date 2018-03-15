@@ -6,12 +6,17 @@
 layout (location = 0) in vec3 inPos;
 layout (location = 1) in vec3 inNormal;
 
-layout (binding = 0) uniform UBO 
-{
-	mat4 projection;
-	mat4 model;
+layout(binding = 0) uniform BuildIn {
+    mat4 matrixObjectToNDC;
+	vec4 mainColor;
+	mat4 matrixObjectToView;
+	mat4 matrixObjectToWorld;
+} _buildIn;
+
+layout(binding = 2) uniform OtherInfo {
 	float lodBias;
-} ubo;
+} otherInfo;
+
 
 layout (location = 0) out vec3 outPos;
 layout (location = 1) out vec3 outNormal;
@@ -27,13 +32,13 @@ out gl_PerVertex
 
 void main() 
 {
-	gl_Position = ubo.projection * ubo.model * vec4(inPos.xyz, 1.0);
+	gl_Position = _buildIn.matrixObjectToNDC * vec4(inPos.xyz, 1.0);
 	
-	outPos = vec3(ubo.model * vec4(inPos, 1.0));
-	outNormal = mat3(ubo.model) * inNormal;	
-	outLodBias = ubo.lodBias;
+	outPos = vec3(_buildIn.matrixObjectToView * vec4(inPos, 1.0));
+	outNormal = mat3(_buildIn.matrixObjectToView) * inNormal;	
+	outLodBias = otherInfo.lodBias;
 	
-	outInvModelView = inverse(ubo.model);
+	outInvModelView = inverse(_buildIn.matrixObjectToView);
 
 	vec3 lightPos = vec3(0.0f, -5.0f, 5.0f);
 	outLightVec = lightPos.xyz - outPos.xyz;

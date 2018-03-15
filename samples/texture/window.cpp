@@ -131,7 +131,7 @@ void Window::_createTexture()
 	{
 		components[i].mipLevel = i;
 		components[i].baseArrayLayer = 0u;
-		components[i].layerCount = m_pTexture->getArrayLayerCount();
+		components[i].layerCount = 1u;
 		components[i].size = gliTex2D[i].size();
 		components[i].hasImageExtent = VG_TRUE;
 		components[i].width = gliTex2D[i].extent().x;

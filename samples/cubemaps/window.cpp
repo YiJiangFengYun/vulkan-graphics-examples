@@ -4,15 +4,13 @@
 #include <gli/gli.hpp>
 
 Window::OtherInfo::OtherInfo()
-    : viewPos(vg::Vector4())
-	, lodBias(0.0f)
+    : lodBias(0.0f)
 {
 
 }
 
-Window::OtherInfo::OtherInfo(vg::Vector4 viewPos, float lodBias)
-    : viewPos(viewPos)
-	, lodBias(lodBias)
+Window::OtherInfo::OtherInfo(float lodBias)
+    : lodBias(lodBias)
 {
 
 }
@@ -25,23 +23,24 @@ Window::Window(uint32_t width
 		, height
 		, title
 	    )
-	, m_tempPositions()
-	, m_tempTexCoords()
-	, m_tempNormals()
-	, m_tempIndices()
-	, m_pModel()
-	, m_pMesh()
-	, m_pTexture()
-	, m_pShader()
-	, m_pPass()
-	, m_pMaterial()
+	, m_displaySkybox(true)
+	, m_skyBoxObject()
+	, m_objects()
+	, m_objectIndex(0)
+	, m_arrObjectNames()
+	, m_pCubeMapTex()
+	, m_pShaderSkybox()
+	, m_pPassSkybox()
+	, m_pMaterialSkybox()
+	, m_pShaderReflect()
+	, m_pPassReflect()
+	, m_pMaterialReflect()
 {
 	_init();
-	_loadModel();
-	_createMesh();
 	_createTexture();
 	_createMaterial();
 	_createModel();
+	_initScene();
 }
 
 Window::Window(std::shared_ptr<GLFWwindow> pWindow
@@ -50,165 +49,225 @@ Window::Window(std::shared_ptr<GLFWwindow> pWindow
 	: sampleslib::Window<vg::SpaceType::SPACE_3>(pWindow
 		, pSurface
 	    )
-	, m_tempPositions()
-	, m_tempTexCoords()
-	, m_tempNormals()
-	, m_tempIndices()
-	, m_pModel()
-	, m_pMesh()
-	, m_pTexture()
-	, m_pShader()
-	, m_pPass()
-	, m_pMaterial()
+	, m_displaySkybox(true)
+	, m_skyBoxObject()
+	, m_objects()
+	, m_objectIndex(0)
+	, m_arrObjectNames()
+	, m_pCubeMapTex()
+	, m_pShaderSkybox()
+	, m_pPassSkybox()
+	, m_pMaterialSkybox()
+	, m_pShaderReflect()
+	, m_pPassReflect()
+	, m_pMaterialReflect()
 {
 	_init();
-	_loadModel();
-	_createMesh();
 	_createTexture();
 	_createMaterial();
-	_createModel();	
+	_createModel();
+	_initScene();
 }
 
 void Window::_init()
 {
-	m_zoom = -2.5f;
+	m_zoom = -4.0f;
+	m_rotationSpeed = 0.25f;
 	/// Build a quaternion from euler angles (pitch, yaw, roll), in radians.
-	m_rotation = vg::Vector3(glm::radians(0.0f), glm::radians(15.0f), glm::radians(0.0f));
-}
-
-void Window::_loadModel()
-{
-	m_tempPositions = { vg::Vector3(1.0f, 1.0f, 1.0f)
-	    , vg::Vector3(-1.0f, 1.0f, 1.0f)
-	    , vg::Vector3(-1.0f, -1.0f, 1.0f)
-	    , vg::Vector3(1.0f, -1.0f, 1.0f)
-	};
-	m_tempTexCoords = { vg::Vector2(1.0f, 1.0f)
-	    , vg::Vector2(0.0f, 1.0f)
-	    , vg::Vector2(0.0f, 0.0f)
-	    , vg::Vector2(1.0f, 0.0f)
-	};
-	m_tempNormals = {vg::Vector3(0.0f, 0.0f, -1.0f)
-	    , vg::Vector3(0.0f, 0.0f, -1.0f)
-	    , vg::Vector3(0.0f, 0.0f, -1.0f)
-	    , vg::Vector3(0.0f, 0.0f, -1.0f)
-	};
-	m_tempIndices = {
-		0, 1, 2, 2, 3, 0
-	};
-}
-
-void Window::_createMesh()
-{
-	m_pMesh = static_cast<std::shared_ptr<vg::DimSepMesh3>>(new vg::DimSepMesh3());
-	m_pMesh->setVertexCount(static_cast<uint32_t>(m_tempPositions.size()));
-	m_pMesh->setPositions(m_tempPositions);
-	m_pMesh->setNormals(m_tempNormals);
-	m_pMesh->setTextureCoordinates<vg::TextureCoordinateType::VECTOR_2, vg::TextureCoordinateIndex::TextureCoordinate_0>(m_tempTexCoords);
-	m_pMesh->setIndices(m_tempIndices, vg::PrimitiveTopology::TRIANGLE_LIST, 0u);
-	m_pMesh->apply(VG_TRUE);
+	m_rotation = vg::Vector3(glm::radians(-7.25f), glm::radians(-120.0f), glm::radians(0.0f));
 }
 
 void Window::_createTexture()
 {
 	//load texture
-	std::string fileName = "textures/metalplate01_rgba.ktx";
-	vg::TextureFormat format = vg::TextureFormat::R8G8B8A8_UNORM;
-	gli::texture2d gliTex2D(gli::load(fileName));
+	auto &pApp = vg::pApp;
+	auto deviceFeatures = pApp->getPhysicalDeviceFeatures();
+	std::string fileName;
+	vk::Format format;
+	if (deviceFeatures.textureCompressionBC) 
+	{
+		fileName = "textures/cubemap_yokohama_bc3_unorm.ktx";
+		format = vk::Format::eBc2UnormBlock;
+	}
+	else if (deviceFeatures.textureCompressionASTC_LDR)
+	{
+		fileName = "textures/cubemap_yokohama_astc_8x8_unorm.ktx";
+		format = vk::Format::eAstc8x8UnormBlock;
+	}
+	else if (deviceFeatures.textureCompressionETC2)
+	{
+		fileName = "textures/cubemap_yokohama_etc2_unorm.ktx";
+		format = vk::Format::eEtc2R8G8B8UnormBlock;
+	}
+	else
+	{
+		throw std::runtime_error("Device does not support any compressed texture format!");
+	}
+
+	gli::texture_cube gliTex2D(gli::load(fileName));
 	if (gliTex2D.empty()) {
 		throw std::runtime_error("The texture do't exist! path: " + fileName);
 	}
 
-	auto pTex = new vg::Texture2D(format, VG_TRUE, 
+	auto pTex = new vg::TextureCube(format, VG_TRUE, 
 		gliTex2D[0].extent().x, 
 		gliTex2D[0].extent().y
 	);
-	m_pTexture = std::shared_ptr<vg::Texture2D>(pTex);
+	m_pCubeMapTex = std::shared_ptr<vg::TextureCube>(pTex);
 	uint32_t mipLevels = static_cast<uint32_t>(gliTex2D.levels());
+	uint32_t faces = static_cast<uint32_t>(gliTex2D.faces());
+	uint32_t count = mipLevels * faces;
 	vg::TextureDataLayout textureLayout;
-	std::vector<vg::TextureDataLayout::Component> components(mipLevels);
-	for (uint32_t i = 0; i < mipLevels; ++i)
-	{
-		components[i].mipLevel = i;
-		components[i].baseArrayLayer = 0u;
-		components[i].layerCount = m_pTexture->getArrayLayerCount();
-		components[i].size = gliTex2D[i].size();
-		components[i].hasImageExtent = VG_TRUE;
-		components[i].width = gliTex2D[i].extent().x;
-		components[i].height = gliTex2D[i].extent().y;
-		components[i].depth = 1u;
+	std::vector<vg::TextureDataLayout::Component> components(count);
+	for (uint32_t face = 0; face < faces; ++face) {
+		for (uint32_t level = 0; level < mipLevels; ++level) {
+			uint32_t index = face * mipLevels + level;
+			components[index].mipLevel = level;
+		    components[index].baseArrayLayer = face;
+		    components[index].layerCount = 1u;
+		    components[index].size = gliTex2D[face][level].size();
+		    components[index].hasImageExtent = VG_TRUE;
+		    components[index].width = gliTex2D[face][level].extent().x;
+		    components[index].height = gliTex2D[face][level].extent().y;
+		    components[index].depth = 1u;
+		}
 	}
 	textureLayout.componentCount = components.size();
 	textureLayout.pComponent = components.data();
-	m_pTexture->applyData(textureLayout, gliTex2D.data(), gliTex2D.size());
+	m_pCubeMapTex->applyData(textureLayout, gliTex2D.data(), gliTex2D.size());
 
-	m_pTexture->setFilterMode(vg::FilterMode::TRILINEAR);
-	m_pTexture->setSamplerAddressMode(vg::SamplerAddressMode::REPEAT);
+	m_pCubeMapTex->setFilterMode(vg::FilterMode::TRILINEAR);
+	m_pCubeMapTex->setSamplerAddressMode(vg::SamplerAddressMode::REPEAT);
 
-	auto &pApp = vg::pApp;
 	auto pDevice = pApp->getDevice();
 	auto pPhysicalDevice = pApp->getPhysicalDevice();
 	if (pApp->getPhysicalDeviceFeatures().samplerAnisotropy)
 	{
 		auto anisotropy = pPhysicalDevice->getProperties().limits.maxSamplerAnisotropy;
-		m_pTexture->setAnisotropy(anisotropy);
+		m_pCubeMapTex->setAnisotropy(anisotropy);
 	}
 }
 
 void Window::_createMaterial()
 {
-
-	auto & pShader = m_pShader;
-	auto & pPass = m_pPass;
-	auto & pMaterial = m_pMaterial;
 	auto & pApp = vg::pApp;
-	//shader
-	pShader = std::shared_ptr<vg::Shader>(
-		new vg::Shader("shaders/texture/texture.vert.spv", "shaders/texture/texture.frag.spv")
-		// new vg::Shader("shaders/test.vert.spv", "shaders/test.frag.spv")
-		);
-	//pass
-	pPass = std::shared_ptr<vg::Pass>(new vg::Pass(pShader.get()));
-	pPass->setCullMode(vg::CullModeFlagBits::FRONT);
-	pPass->setFrontFace(vg::FrontFaceType::CLOCKWISE);
-	vk::PipelineDepthStencilStateCreateInfo depthStencilState = {};
-	depthStencilState.depthTestEnable = VG_TRUE;
-	depthStencilState.depthWriteEnable = VG_TRUE;
-	depthStencilState.depthCompareOp = vk::CompareOp::eLessOrEqual;
-	pPass->setDepthStencilInfo(depthStencilState);
-	pPass->setMainTexture(m_pTexture.get());
-	pPass->setDataValue("other_info", m_otherInfo, 2u);
-	pPass->apply();
-	//material
-	pMaterial = std::shared_ptr<vg::Material>(new vg::Material());
-	pMaterial->addPass(pPass.get());
-	pMaterial->setRenderPriority(0u);
-	pMaterial->setRenderQueueType(vg::MaterialShowType::OPAQUE);
-	pMaterial->apply();
-
+    {
+        auto & pShader = m_pShaderSkybox;
+	    auto & pPass = m_pPassSkybox;
+	    auto & pMaterial = m_pMaterialSkybox;
+	    //shader
+	    pShader = std::shared_ptr<vg::Shader>(
+	    	new vg::Shader("shaders/cubemaps/skybox.vert.spv", "shaders/cubemaps/skybox.frag.spv")
+	    	// new vg::Shader("shaders/test.vert.spv", "shaders/test.frag.spv")
+	    	);
+	    //pass
+	    pPass = std::shared_ptr<vg::Pass>(new vg::Pass(pShader.get()));
+	    pPass->setCullMode(vg::CullModeFlagBits::FRONT);
+	    pPass->setFrontFace(vg::FrontFaceType::COUNTER_CLOCKWISE);
+	    pPass->setMainTexture(m_pCubeMapTex.get());
+	    pPass->apply();
+	    //material
+	    pMaterial = std::shared_ptr<vg::Material>(new vg::Material());
+	    pMaterial->addPass(pPass.get());
+	    pMaterial->setRenderPriority(0u);
+	    pMaterial->setRenderQueueType(vg::MaterialShowType::OPAQUE);
+	    pMaterial->apply();
+	}
+	
+	{
+		auto & pShader = m_pShaderReflect;
+	    auto & pPass = m_pPassReflect;
+	    auto & pMaterial = m_pMaterialReflect;
+	    //shader
+	    pShader = std::shared_ptr<vg::Shader>(
+	    	new vg::Shader("shaders/cubemaps/reflect.vert.spv", "shaders/cubemaps/reflect.frag.spv")
+	    	// new vg::Shader("shaders/test.vert.spv", "shaders/test.frag.spv")
+	    	);
+	    //pass
+	    pPass = std::shared_ptr<vg::Pass>(new vg::Pass(pShader.get()));
+	    pPass->setCullMode(vg::CullModeFlagBits::BACK);
+	    pPass->setFrontFace(vg::FrontFaceType::COUNTER_CLOCKWISE);
+		vk::PipelineDepthStencilStateCreateInfo depthStencilState = {};
+	    depthStencilState.depthTestEnable = VG_TRUE;
+	    depthStencilState.depthWriteEnable = VG_TRUE;
+	    depthStencilState.depthCompareOp = vk::CompareOp::eLessOrEqual;
+	    pPass->setDepthStencilInfo(depthStencilState);
+	    pPass->setMainTexture(m_pCubeMapTex.get());
+	    pPass->setDataValue("other_info", m_otherInfo, 2u);	
+	    pPass->apply();
+	    //material
+	    pMaterial = std::shared_ptr<vg::Material>(new vg::Material());
+	    pMaterial->addPass(pPass.get());
+	    pMaterial->setRenderPriority(0u);
+	    pMaterial->setRenderQueueType(vg::MaterialShowType::OPAQUE);
+	    pMaterial->apply();
+	}
 }
 
 void Window::_createModel()
 {
-	m_pModel = std::shared_ptr<vg::VisualObject3>(new vg::VisualObject3());
-	m_pModel->setMesh(m_pMesh.get());
-	m_pModel->setMaterial(m_pMaterial.get());
-	m_pScene->addVisualObject(m_pModel.get());
+	const uint32_t layoutCount = 3u;
+	sampleslib::AssimpScene::VertexLayoutComponent layouts[layoutCount] = {
+		sampleslib::AssimpScene::VertexLayoutComponent::VERTEX_COMPONENT_POSITION,
+		sampleslib::AssimpScene::VertexLayoutComponent::VERTEX_COMPONENT_NORMAL,
+		sampleslib::AssimpScene::VertexLayoutComponent::VERTEX_COMPONENT_UV,
+	};
+	//Sky box
+	sampleslib::AssimpScene::CreateInfo createInfo;
+	createInfo.fileName = "models/cube.obj";
+	createInfo.isCreateObject = VG_TRUE;
+	createInfo.layoutComponentCount = layoutCount;
+	createInfo.pLayoutComponent = layouts;
+	createInfo.offset = vg::Vector3(0.0f, 0.0f, 0.0f);
+	createInfo.scale = vg::Vector3(0.05f);
+	m_skyBoxObject.init(createInfo);
+
+	//Other objects.
+	std::vector<std::string> fileNames = { "models/sphere.obj", "models/teapot.dae", "models/torusknot.obj", "models/venus.fbx" };
+	m_arrObjectNames = { "Sphere", "Teapot", "Torusknot", "Venus" };
+	m_objects.resize(fileNames.size());
+	size_t count = fileNames.size();
+	for (size_t i = 0; i < count; ++i)
+	{
+		createInfo.fileName = fileNames[i].c_str();
+		createInfo.scale = vg::Vector3(0.05f * (fileNames[i] == "models/venus.fbx" ? 3.0f : 1.0f));
+		m_objects[i].init(createInfo);
+	}
+}
+
+void Window::_initScene()
+{
+	{
+		auto &objects = m_skyBoxObject.getObjects();
+		for (auto &object : objects)
+		{
+			object->setMaterial(m_pMaterialSkybox.get());
+			m_pScene->addVisualObject(object.get());
+		}
+	}
+	{
+		auto &objectScene = m_objects[m_objectIndex];
+		auto &objects = objectScene.getObjects();
+		for (auto &object : objects)
+		{
+			object->setMaterial(m_pMaterialReflect.get());
+			m_pScene->addVisualObject(object.get());
+		}
+	}
 }
 
 void Window::_onUpdate()
 {
 	ParentWindowType::_onUpdate();
-	m_otherInfo.viewPos = vg::Vector4(0.0f, 0.0f, m_zoom, 1.0f);
 
 	auto pos = m_lastWinPos;
 	auto size = m_lastWinSize;
 	ImGui::SetNextWindowPos(ImVec2(pos.x, pos.y + size.y + 10));
 	ImGui::SetNextWindowSize(ImVec2(0, 0));
 	ImGui::Begin("Settings", nullptr, ImGuiWindowFlags_AlwaysAutoResize | ImGuiWindowFlags_NoResize | ImGuiWindowFlags_NoMove);
-	if (ImGui::SliderFloat("LOD bias", &m_otherInfo.lodBias, 0.0f, (float)m_pTexture->getMipmapLevels())) {
-		m_pPass->setDataValue("other_info", m_otherInfo, 2u);
-	    m_pPass->apply();
+	if (ImGui::SliderFloat("LOD bias", &m_otherInfo.lodBias, 0.0f, (float)m_pCubeMapTex->getMipmapLevels())) {
+		m_pPassReflect->setDataValue("other_info", m_otherInfo, 2u);
+		m_pPassReflect->apply();
 	}
 	ImGui::End();
 }

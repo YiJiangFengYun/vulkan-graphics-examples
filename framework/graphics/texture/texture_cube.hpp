@@ -8,9 +8,10 @@ namespace vg
 	class TextureCube : public Texture
 	{
 	public:
-		TextureCube(vk::Format format, Bool32 mipmap, uint32_t size);
+		TextureCube(vk::Format format, Bool32 mipmap, uint32_t width, uint32_t height);
 		~TextureCube();
-		uint32_t getSize() const;
+		uint32_t getWidth() const;
+		uint32_t getHeight() const;
 		void applyData(const TextureDataLayout &layoutInfo
 			, const void *memory
 			, uint32_t size

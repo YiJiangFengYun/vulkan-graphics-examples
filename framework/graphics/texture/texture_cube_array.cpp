@@ -2,12 +2,12 @@
 
 namespace vg
 {
-	TextureCubeArray::TextureCubeArray(vk::Format format, Bool32 mipMap, uint32_t size, uint32_t arraylength)
+	TextureCubeArray::TextureCubeArray(vk::Format format, Bool32 mipMap, uint32_t width, uint32_t height, uint32_t arraylength)
 		:Texture(format, mipMap)
 	{
 		m_type = TextureType::CUBE_ARRARY;
-		m_width = size;
-		m_height = size;
+		m_width = width;
+		m_height = height;
 		m_arrayLength = arraylength;
 		_init();
 	}

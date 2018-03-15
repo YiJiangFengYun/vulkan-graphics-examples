@@ -57,7 +57,7 @@ namespace vg
 
 		vk::Instance *getVKInstance() const;
 		vk::PhysicalDevice *getPhysicalDevice() const;
-		const vk::PhysicalDeviceFeatures &getPhysicalDeviceFeatures() const;
+		vk::PhysicalDeviceFeatures &getPhysicalDeviceFeatures() const;
 		vk::Device *getDevice() const;
 		uint32_t getGraphicsFamily() const;
 		uint32_t getPresentFamily() const;

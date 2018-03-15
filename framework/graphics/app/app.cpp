@@ -188,9 +188,9 @@ namespace vg
 		return m_pPhysicalDevice.get();
 	}
 
-	const vk::PhysicalDeviceFeatures &Application::getPhysicalDeviceFeatures() const
+	vk::PhysicalDeviceFeatures &Application::getPhysicalDeviceFeatures() const
 	{
-		return m_physicalDeviceFeatures;
+		return m_pPhysicalDevice->getFeatures();
 	}
 
 	vk::Device *Application::getDevice() const

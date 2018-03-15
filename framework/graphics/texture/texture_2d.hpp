@@ -8,7 +8,7 @@ namespace vg
 	class Texture2D : public Texture
 	{
 	public:
-		Texture2D(TextureFormat format, Bool32 mipmap, uint32_t width, uint32_t height);
+		Texture2D(vk::Format format, Bool32 mipmap, uint32_t width, uint32_t height);
 		~Texture2D();
 		uint32_t getWidth() const;
 		uint32_t getHeight() const;

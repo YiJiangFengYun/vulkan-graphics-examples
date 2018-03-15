@@ -2,7 +2,7 @@
 
 namespace vg
 {
-	Texture2DArray::Texture2DArray(TextureFormat format, Bool32 mipMap, uint32_t width, uint32_t height, uint32_t arraylength)
+	Texture2DArray::Texture2DArray(vk::Format format, Bool32 mipMap, uint32_t width, uint32_t height, uint32_t arraylength)
 		:Texture(format, mipMap)
 	{
 		m_type = TextureType::TEX_2D_ARRAY;

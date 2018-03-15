@@ -2,7 +2,7 @@
 
 namespace vg
 {
-	TextureCube::TextureCube(TextureFormat format, Bool32 mipMap, uint32_t size)
+	TextureCube::TextureCube(vk::Format format, Bool32 mipMap, uint32_t size)
 		:Texture(format, mipMap)
 	{
 		m_type = TextureType::CUBE;

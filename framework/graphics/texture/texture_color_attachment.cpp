@@ -2,7 +2,7 @@
 
 namespace vg
 {
-	TextureColorAttachment::TextureColorAttachment(TextureFormat format, uint32_t width, uint32_t height)
+	TextureColorAttachment::TextureColorAttachment(vk::Format format, uint32_t width, uint32_t height)
 		:Texture(format, VG_FALSE)
 	{
 		m_type = TextureType::COLOR_ATTACHMENT;

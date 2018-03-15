@@ -41,7 +41,7 @@ namespace vg
 	class Texture : public Base
 	{
 	public:
-		Texture(TextureFormat format, Bool32 mipMap);
+		Texture(vk::Format format, Bool32 mipMap);
 		~Texture();
 		float getAnisotropy() const;
 		void setAnisotropy(float value);
@@ -51,7 +51,7 @@ namespace vg
 		void setSamplerAddressMode(SamplerAddressMode value);
 
 		TextureType getType() const;
-		TextureFormat getFormat() const;
+		vk::Format getFormat() const;
 		Bool32 getIsMipmap() const;
 		uint32_t getMipmapLevels() const;
 		uint32_t getArrayLayerCount() const;
@@ -69,7 +69,7 @@ namespace vg
 		uint32_t m_depth;
 		uint32_t m_arrayLength;
 		TextureType m_type;
-		TextureFormat m_format;
+		vk::Format m_format;
 		FilterMode m_filterMode;
 		float m_anisotropy;
 		Bool32 m_mipMap;

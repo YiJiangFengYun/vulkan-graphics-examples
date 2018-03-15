@@ -113,7 +113,7 @@ void Window::_createTexture()
 {
 	//load texture
 	std::string fileName = "textures/metalplate01_rgba.ktx";
-	vg::TextureFormat format = vg::TextureFormat::R8G8B8A8_UNORM;
+	auto format = vk::Format::eR8G8B8A8Unorm;
 	gli::texture2d gliTex2D(gli::load(fileName));
 	if (gliTex2D.empty()) {
 		throw std::runtime_error("The texture do't exist! path: " + fileName);

@@ -24,15 +24,6 @@ namespace vg
 		RANGE_SIZE = (END_RANGE - BEGIN_RANGE + 1)
 	};
 
-	enum class TextureFormat
-	{
-		R8G8B8A8_UNORM,
-		D32_SFLOAT_S8_UINT,
-		BEGIN_RANGE = R8G8B8A8_UNORM,
-		END_RANGE = D32_SFLOAT_S8_UINT,
-		RANGE_SIZE = (END_RANGE - BEGIN_RANGE + 1)
-	};
-
 	enum class FilterMode
 	{
 		NEAREST,
@@ -70,7 +61,6 @@ namespace vg
 
 	extern std::map<TextureType, std::string> mapTextureTypeToName;
 	extern std::array<std::pair<TextureType, vk::ImageType>, static_cast<size_t>(TextureType::RANGE_SIZE)> arrTextureTypeToVKImageType;
-	extern std::array<std::pair<TextureFormat, vk::Format>, static_cast<size_t>(TextureFormat::RANGE_SIZE)> arrFormatToVKFormat;
 	extern std::array<std::pair<TextureType, vk::ImageViewType>, static_cast<size_t>(TextureType::RANGE_SIZE)> arrTextureTypeToVKImageViewType;
 	extern std::array<std::tuple<FilterMode, vk::Filter, vk::SamplerMipmapMode>, static_cast<size_t>(FilterMode::RANGE_SIZE)> arrFilerModeToVK;
 	extern std::array<std::pair<SamplerAddressMode, vk::SamplerAddressMode>, static_cast<size_t>(SamplerAddressMode::RANGE_SIZE)> arrSamplerAddressModeToVK;

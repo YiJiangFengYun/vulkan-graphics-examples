@@ -2,7 +2,7 @@
 
 namespace vg
 {
-	Texture1D::Texture1D(TextureFormat format, Bool32 mipMap, uint32_t width)
+	Texture1D::Texture1D(vk::Format format, Bool32 mipMap, uint32_t width)
 		:Texture(format, mipMap)
 	{
 		m_type = TextureType::TEX_1D;

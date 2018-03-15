@@ -45,7 +45,7 @@ namespace vg
 
 	}
 
-	Texture::Texture(TextureFormat format, Bool32 mipMap)
+	Texture::Texture(vk::Format format, Bool32 mipMap)
 		: Base(BaseType::TEXTURE)
 		, m_format(format)
 		, m_mipMap(mipMap)
@@ -118,7 +118,7 @@ namespace vg
 		return m_type;
 	}
 
-	TextureFormat Texture::getFormat() const
+	vk::Format Texture::getFormat() const
 	{
 		return m_format;
 	}
@@ -234,14 +234,7 @@ namespace vg
 
 	void Texture::_updateVkFormat()
 	{
-		vk::Format vkFormat;
-		for (const auto& item : arrFormatToVKFormat)
-		{
-			if (item.first == m_format)
-			{
-				vkFormat = item.second;
-			}
-		}
+		vk::Format vkFormat = m_format;
 
 #ifdef DEBUG
 		if (vkFormat == vk::Format::eUndefined)
@@ -428,14 +421,7 @@ namespace vg
 	void Texture::_createImageView()
 	{
 
-		vk::Format vkFormat;
-		for (const auto& item : arrFormatToVKFormat)
-		{
-			if (item.first == m_format)
-			{
-				vkFormat = item.second;
-			}
-		}
+		vk::Format vkFormat = m_format;
 
 #ifdef DEBUG
 		if (vkFormat == vk::Format::eUndefined)

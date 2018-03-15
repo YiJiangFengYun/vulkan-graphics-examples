@@ -444,7 +444,7 @@ namespace vgim
         io.Fonts->GetTexDataAsRGBA32(&pixels, &width, &height);
         uint32_t size = static_cast<uint32_t>(width * height * 4 * sizeof(char));
 
-        m_pFontTexture = std::shared_ptr<vg::Texture2D>(new vg::Texture2D(vg::TextureFormat::R8G8B8A8_UNORM, 
+        m_pFontTexture = std::shared_ptr<vg::Texture2D>(new vg::Texture2D(vk::Format::eR8G8B8A8Unorm, 
             VG_FALSE, width, height));
 		vg::TextureDataLayout layoutInfo;
 		vg::TextureDataLayout::Component component;

@@ -2,7 +2,7 @@
 
 namespace vg
 {
-	TextureDepthStencilAttachment::TextureDepthStencilAttachment(TextureFormat format, uint32_t width, uint32_t height)
+	TextureDepthStencilAttachment::TextureDepthStencilAttachment(vk::Format format, uint32_t width, uint32_t height)
 		:Texture(format, VG_FALSE)
 	{
 		m_type = TextureType::DEPTH_STENCIL_ATTACHMENT;

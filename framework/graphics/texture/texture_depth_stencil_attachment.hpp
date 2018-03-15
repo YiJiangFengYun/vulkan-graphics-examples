@@ -8,7 +8,7 @@ namespace vg
 	class TextureDepthStencilAttachment : public Texture
 	{
 	public:
-		TextureDepthStencilAttachment(TextureFormat format, uint32_t width, uint32_t height);
+		TextureDepthStencilAttachment(vk::Format format, uint32_t width, uint32_t height);
 		~TextureDepthStencilAttachment();
 		uint32_t getWidth() const;
 		uint32_t getHeight() const;

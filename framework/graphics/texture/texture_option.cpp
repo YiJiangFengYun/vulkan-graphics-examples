@@ -28,11 +28,6 @@ namespace vg
 		std::pair<TextureType, vk::ImageType>(TextureType::DEPTH_STENCIL_ATTACHMENT, vk::ImageType::e2D)
 	};
 
-	std::array<std::pair<TextureFormat, vk::Format>, static_cast<size_t>(TextureFormat::RANGE_SIZE)> arrFormatToVKFormat = {
-		std::pair<TextureFormat, vk::Format>(TextureFormat::R8G8B8A8_UNORM, vk::Format::eR8G8B8A8Unorm),
-		std::pair<TextureFormat, vk::Format>(TextureFormat::D32_SFLOAT_S8_UINT, vk::Format::eD32SfloatS8Uint)
-	};
-
 	std::array<std::pair<TextureType, vk::ImageViewType>, static_cast<size_t>(TextureType::RANGE_SIZE)> arrTextureTypeToVKImageViewType = {
 		std::pair<TextureType, vk::ImageViewType>(TextureType::TEX_1D, vk::ImageViewType::e1D),
 		std::pair<TextureType, vk::ImageViewType>(TextureType::TEX_1D_ARRAY, vk::ImageViewType::e1DArray),

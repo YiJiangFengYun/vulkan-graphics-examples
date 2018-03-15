@@ -613,7 +613,7 @@ namespace vg
 
 		m_pDepthStencilTexture = std::shared_ptr<TextureDepthStencilAttachment>(
 			new TextureDepthStencilAttachment(
-				TextureFormat::D32_SFLOAT_S8_UINT,
+				vk::Format::eD32SfloatS8Uint,
 				m_framebufferWidth,
 				m_framebufferHeight
 			)

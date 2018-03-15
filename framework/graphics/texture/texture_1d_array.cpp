@@ -2,7 +2,7 @@
 
 namespace vg
 {
-	Texture1DArray::Texture1DArray(TextureFormat format, Bool32 mipMap, uint32_t width, uint32_t arraylength)
+	Texture1DArray::Texture1DArray(vk::Format format, Bool32 mipMap, uint32_t width, uint32_t arraylength)
 		:Texture(format, mipMap)
 	{
 		m_type = TextureType::TEX_1D_ARRAY;

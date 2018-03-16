@@ -10,7 +10,7 @@
 
 namespace vg
 {
-	struct TextureDataLayout
+	struct TextureDataInfo
 	{
 		struct Component {
 			uint32_t mipLevel;
@@ -35,7 +35,7 @@ namespace vg
 		uint32_t componentCount;
 		Component *pComponent;
 
-		TextureDataLayout();
+		TextureDataInfo();
 	};
 
 	class Texture : public Base
@@ -87,8 +87,8 @@ namespace vg
 		vk::SamplerAddressMode m_vkSamplerAddressMode;
 
 		//optional storage
-		TextureDataLayout m_dataLayout;
-		std::vector<TextureDataLayout::Component> m_components;
+		TextureDataInfo m_dataLayout;
+		std::vector<TextureDataInfo::Component> m_components;
 		void *m_pMemory;
 		uint32_t m_memorySize;
 		uint32_t m_realSize;
@@ -111,7 +111,7 @@ namespace vg
 		void _createImageView();
 		void _createSampler();
 
-		void _applyData(const TextureDataLayout &layoutInfo
+		void _applyData(const TextureDataInfo &layoutInfo
 			, const void *memory
 			, uint32_t size
 			, Bool32 cacheMemory = VG_FALSE

@@ -125,8 +125,8 @@ void Window::_createTexture()
 	);
 	m_pTexture = std::shared_ptr<vg::Texture2D>(pTex);
 	uint32_t mipLevels = static_cast<uint32_t>(gliTex2D.levels());
-	vg::TextureDataLayout textureLayout;
-	std::vector<vg::TextureDataLayout::Component> components(mipLevels);
+	vg::TextureDataInfo textureLayout;
+	std::vector<vg::TextureDataInfo::Component> components(mipLevels);
 	for (uint32_t i = 0; i < mipLevels; ++i)
 	{
 		components[i].mipLevel = i;

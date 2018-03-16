@@ -12,7 +12,7 @@ namespace vg
 		~Texture1DArray();
 		uint32_t getWidth() const;
 		uint32_t getArrayLength() const;
-		void applyData(const TextureDataLayout &layoutInfo
+		void applyData(const TextureDataInfo &layoutInfo
 			, const void *memory
 			, uint32_t size
 			, Bool32 cacheMemory = VG_FALSE

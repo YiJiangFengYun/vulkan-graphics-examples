@@ -112,8 +112,8 @@ namespace chalet
 		}
 		
 		m_pTexture = std::shared_ptr<vg::Texture2D>(new vg::Texture2D(vk::Format::eR8G8B8A8Unorm, VG_FALSE, texWidth, texHeight));
-		vg::TextureDataLayout layoutInfo;
-		vg::TextureDataLayout::Component component;
+		vg::TextureDataInfo layoutInfo;
+		vg::TextureDataInfo::Component component;
 		component.mipLevel = 0u;
 		component.layerCount = 1u;
 		component.baseArrayLayer = 0u;

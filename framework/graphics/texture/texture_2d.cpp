@@ -25,7 +25,7 @@ namespace vg
 		return m_height;
 	}
 
-	void Texture2D::applyData(const TextureDataLayout &layoutInfo
+	void Texture2D::applyData(const TextureDataInfo &layoutInfo
 			, const void *memory
 			, uint32_t size
 			, Bool32 cacheMemory

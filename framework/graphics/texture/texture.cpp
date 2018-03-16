@@ -4,7 +4,7 @@ namespace vg
 {
 	inline uint32_t caculateImageSizeWithMipmapLevel(uint32_t size, uint32_t mipmapLevel);
 
-	TextureDataLayout::Component::Component()
+	TextureDataInfo::Component::Component()
 		: mipLevel(0u)
 		, baseArrayLayer(0u)
 		, layerCount(0u)
@@ -17,7 +17,7 @@ namespace vg
 
 	}
 
-	TextureDataLayout::Component::Component(uint32_t mipLevel
+	TextureDataInfo::Component::Component(uint32_t mipLevel
 		, uint32_t baseArrayLayer
 		, uint32_t layerCount
 		, uint32_t size
@@ -38,7 +38,7 @@ namespace vg
 
 	}
 
-	TextureDataLayout::TextureDataLayout()
+	TextureDataInfo::TextureDataInfo()
 		: componentCount(0u)
 		, pComponent(nullptr)
 	{
@@ -506,7 +506,7 @@ namespace vg
 		m_pSampler = fd::createSampler(pDevice, createInfo);
 	}
 
-	void Texture::_applyData(const TextureDataLayout &layoutInfo
+	void Texture::_applyData(const TextureDataInfo &layoutInfo
 		, const void *memory
 		, uint32_t size
 		, Bool32 cacheMemory
@@ -516,7 +516,7 @@ namespace vg
 		{
 			m_components.resize(layoutInfo.componentCount);
 			memcpy(m_components.data(), layoutInfo.pComponent,
-				sizeof(TextureDataLayout::Component) * layoutInfo.componentCount);
+				sizeof(TextureDataInfo::Component) * layoutInfo.componentCount);
 			m_dataLayout = layoutInfo;
 			m_dataLayout.pComponent = m_components.data();
 		}

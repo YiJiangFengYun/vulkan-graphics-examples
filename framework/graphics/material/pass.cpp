@@ -385,6 +385,7 @@ namespace vg
 		m_buildInDataInfoComponents.resize(info.componentCount);
 		memcpy(m_buildInDataInfoComponents.data(), info.pComponent, 
 		    static_cast<size_t>(info.componentCount) * sizeof(BuildInDataInfo::Component));
+		m_buildInDataInfo.pComponent = m_buildInDataInfoComponents.data();
 		_initBuildInData();
 	 }
 

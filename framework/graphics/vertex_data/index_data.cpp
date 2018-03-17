@@ -267,7 +267,16 @@ namespace vg
             m_subDatas[offset].vertexDataIndex = *(vertexDataIndices.data() + i);
             ++offset;
         }
-    }  
+    }
+
+    void IndexData::updateClipRect(fd::ArrayProxy<Bool32> hasClipRects, uint32_t count, uint32_t offset)
+    {
+        for (uint32_t i = 0; i < count; ++i)
+        {
+            m_subDatas[offset].hasClipRect = *(hasClipRects.data() + i);;
+            ++offset;
+        }
+    }
 
     void IndexData::updateClipRect(fd::ArrayProxy<fd::Rect2D> rects, uint32_t count, uint32_t offset)
     {

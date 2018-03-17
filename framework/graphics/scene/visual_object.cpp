@@ -7,6 +7,7 @@ namespace vg
 		, m_pMesh()
 		, m_subMeshOffset(-1)
 		, m_subMeshCount(-1)
+		, m_isVisibilityCheck(VG_TRUE)
 	{
 
 	}
@@ -48,6 +49,16 @@ namespace vg
 	{
 		m_subMeshOffset = subMeshOffset;
 		m_subMeshCount = static_cast<int32_t>(subMeshCount);
+	}
+
+	Bool32 BaseVisualObject::getIsVisibilityCheck() const
+	{
+		return m_isVisibilityCheck;
+	}
+
+	void BaseVisualObject::setIsVisibilityCheck(Bool32 value)
+	{
+		m_isVisibilityCheck = value;
 	}
 
 } //namespace kgs

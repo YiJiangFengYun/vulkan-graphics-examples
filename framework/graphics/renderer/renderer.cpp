@@ -874,9 +874,18 @@ namespace vg
 			auto pVisualObject = pScene->getVisualObjectWithIndex(i);
 			auto pMesh = pVisualObject->getMesh();
 			auto isHasBounds = dynamic_cast<SceneType::VisualObjectType::MeshDimType *>(pMesh)->getIsHasBounds();
-			if (isHasBounds == VG_FALSE)
+			if (pVisualObject->getIsVisibilityCheck() == VG_FALSE || isHasBounds == VG_FALSE)
 			{
 				validVisualObjects[validVisualObjectCount++] = pVisualObject;
+				const auto& pIndexData = dynamic_cast<ContentMesh *>(pMesh)->getIndexData();
+				uint32_t subMeshOffset = pVisualObject->getSubMeshOffset();
+				uint32_t subMeshCount = pVisualObject->getSubMeshCount();
+				std::vector<Bool32> hasRects(subMeshCount);
+				for (uint32_t i = 0; i < subMeshCount; ++i)
+				{
+					hasRects[i] = VG_FALSE;
+				}
+				pIndexData->updateClipRect(hasRects, subMeshCount, subMeshOffset);
 			}
 			else 
 			{
@@ -1118,14 +1127,24 @@ namespace vg
 			//Own visual object is placed behind children's visual object.
 			pVisualObjectOfChild = pScene->getVisualObjectWithTransform(pChild);
 			if (pVisualObjectOfChild == nullptr) continue;
-			//Filter obj out of camera view.
+			
 			auto pMeshOfChild = pVisualObjectOfChild->getMesh();
 			auto isHasBoundsOfChild = dynamic_cast<Mesh<MeshDimType::SPACE_2> *>(pMeshOfChild)->getIsHasBounds();
-			if (isHasBoundsOfChild == VG_FALSE) 
+			if (pVisualObjectOfChild->getIsVisibilityCheck() == VG_FALSE || isHasBoundsOfChild == VG_FALSE) 
 			{
 				arrPVObjs[PVObjIndex++] = pVisualObjectOfChild;
+				const auto& pIndexData = dynamic_cast<ContentMesh *>(pMeshOfChild)->getIndexData();
+				uint32_t subMeshOffset = pVisualObjectOfChild->getSubMeshOffset();
+				uint32_t subMeshCount = pVisualObjectOfChild->getSubMeshCount();
+				std::vector<Bool32> hasRects(subMeshCount);
+				for (uint32_t i = 0; i < subMeshCount; ++i)
+				{
+					hasRects[i] = VG_FALSE;
+				}
+				pIndexData->updateClipRect(hasRects, subMeshCount, subMeshOffset);
 			}
 			else {
+				//Filter obj out of camera view.
 			    auto boundsOfChild = dynamic_cast<Mesh<MeshDimType::SPACE_2> *>(pMeshOfChild)->getBounds();
 			    fd::Rect2D clipRect;				
 			    if (pCamera->isInView(pChild, boundsOfChild, &clipRect) == VG_TRUE)

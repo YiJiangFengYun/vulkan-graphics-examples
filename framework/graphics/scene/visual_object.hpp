@@ -24,11 +24,15 @@ namespace vg
 
 		void updateSubMeshInfo(uint32_t subMeshOffset, uint32_t subMeshCount);
 
+		Bool32 getIsVisibilityCheck() const;
+		void setIsVisibilityCheck(Bool32 value);
+
 	protected:
 		Material *m_pMaterial;
 		BaseMesh *m_pMesh;
 		int32_t m_subMeshOffset;
 		int32_t m_subMeshCount;
+		Bool32 m_isVisibilityCheck;
 	};
 
 	template <SpaceType SPACE_TYPE>

@@ -64,7 +64,8 @@ namespace vg {
         void updateSubDataCount(uint32_t count);
         void updateIndexCount(fd::ArrayProxy<uint32_t> indexCounts, uint32_t count, uint32_t offset = 0u);
         void updateBufferSize(fd::ArrayProxy<uint32_t> bufferSizes, uint32_t count, uint32_t offset = 0u);
-        void updateVertexDataIndex(fd::ArrayProxy<uint32_t> vertexDataIndices, uint32_t count, uint32_t offset = 0u);        
+        void updateVertexDataIndex(fd::ArrayProxy<uint32_t> vertexDataIndices, uint32_t count, uint32_t offset = 0u);
+        void updateClipRect(fd::ArrayProxy<Bool32> hasClipRects, uint32_t count, uint32_t offset = 0u);        
         void updateClipRect(fd::ArrayProxy<fd::Rect2D> rects, uint32_t count, uint32_t offset = 0u);
         void updateStateInfo(fd::ArrayProxy<vk::PipelineInputAssemblyStateCreateInfo> stateInfos, uint32_t count, uint32_t offset = 0u);
 

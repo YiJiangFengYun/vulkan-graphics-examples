@@ -46,7 +46,7 @@ namespace vg
 	typename std::vector<typename Transform<SPACE_TYPE>::Type *>::const_iterator Transform<SPACE_TYPE>::getChildPos(const Type *child) const
 	{
 #ifdef DEBUG
-		if (isChild(child)) throw std::invalid_argument("The target is not a child of the tranform.");
+		if (isChild(child) == VG_FALSE) throw std::invalid_argument("The target is not a child of the tranform.");
 #endif // DEBUG
 		return std::find(m_arrPChildren.cbegin(), m_arrPChildren.cend(), child);
 	}
@@ -100,8 +100,8 @@ namespace vg
 		if (m_pParent == pParent) return;
 		if (pParent == nullptr)
 		{
-			_setParentOnly(nullptr);
 			m_pParent->_removeChildOnly(this);
+			_setParentOnly(nullptr);
 		}
 		else
 		{
@@ -120,14 +120,14 @@ namespace vg
 	{
 		if (m_pParent == nullptr)
 		{
-			return this;
+			return nullptr;
 		}
 		else
 		{
 			auto root = m_pParent;
-			while (root.m_pParent != nullptr)
+			while (root->m_pParent != nullptr)
 			{
-				root = root.m_pParent
+				root = root->m_pParent;
 			}
 			return root;
 		}

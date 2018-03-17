@@ -217,7 +217,14 @@ namespace vg
 	)
 	{
 		if (_isHasObject(pTarget, map) == VG_FALSE) return;
-		std::remove(arr.begin(), arr.end(), pTarget);
+		for (auto iter = arr.begin(); iter != arr.end(); ++iter)
+		{
+			if (*iter == pTarget)
+			{
+				arr.erase(iter);
+				break;
+			}
+		}
 		map.erase(pTarget->getID());
 		mapTransformToObjs.erase(pTarget->getTransform()->getID());
 		////clear hierarchy data.

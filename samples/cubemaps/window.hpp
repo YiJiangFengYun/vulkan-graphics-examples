@@ -22,6 +22,7 @@ private:
 	sampleslib::AssimpScene m_skyBoxObject;
 	std::vector<sampleslib::AssimpScene> m_objects;
 	int32_t m_objectIndex;
+	int32_t m_currIndex;
 	std::vector<std::string> m_arrObjectNames;
 	std::shared_ptr<vg::TextureCube> m_pCubeMapTex;
 	std::shared_ptr<vg::Shader> m_pShaderSkybox;
@@ -43,6 +44,8 @@ private:
 	void _createMaterial();
 	void _createModel();
 	void _initScene();
+
+	void _updateScene();
 
 	virtual void _onUpdate() override;
 	virtual void _renderWithRenderer(vg::Renderer *pRenderer

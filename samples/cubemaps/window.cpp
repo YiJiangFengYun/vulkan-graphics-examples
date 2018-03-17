@@ -22,11 +22,12 @@ Window::Window(uint32_t width
 	: sampleslib::Window<vg::SpaceType::SPACE_3>(width
 		, height
 		, title
-	    )
+		)
 	, m_displaySkybox(true)
 	, m_skyBoxObject()
 	, m_objects()
 	, m_objectIndex(0)
+	, m_currIndex(-1)
 	, m_arrObjectNames()
 	, m_pCubeMapTex()
 	, m_pShaderSkybox()
@@ -53,6 +54,7 @@ Window::Window(std::shared_ptr<GLFWwindow> pWindow
 	, m_skyBoxObject()
 	, m_objects()
 	, m_objectIndex(0)
+	, m_currIndex(-1)
 	, m_arrObjectNames()
 	, m_pCubeMapTex()
 	, m_pShaderSkybox()
@@ -74,7 +76,7 @@ void Window::_init()
 	m_zoom = -4.0f;
 	m_rotationSpeed = 0.25f;
 	/// Build a quaternion from euler angles (pitch, yaw, roll), in radians.
-	m_rotation = vg::Vector3(glm::radians(-7.25f), glm::radians(-120.0f), glm::radians(0.0f));
+	m_rotation = vg::Vector3(glm::radians(0.0f), glm::radians(0.0f), glm::radians(0.0f));
 }
 
 void Window::_createTexture()
@@ -117,8 +119,8 @@ void Window::_createTexture()
 	uint32_t mipLevels = static_cast<uint32_t>(gliTex2D.levels());
 	uint32_t faces = static_cast<uint32_t>(gliTex2D.faces());
 	uint32_t count = mipLevels * faces;
-	vg::TextureDataLayout textureLayout;
-	std::vector<vg::TextureDataLayout::Component> components(count);
+	vg::TextureDataInfo textureLayout;
+	std::vector<vg::TextureDataInfo::Component> components(count);
 	for (uint32_t face = 0; face < faces; ++face) {
 		for (uint32_t level = 0; level < mipLevels; ++level) {
 			uint32_t index = face * mipLevels + level;
@@ -162,15 +164,24 @@ void Window::_createMaterial()
 	    	);
 	    //pass
 	    pPass = std::shared_ptr<vg::Pass>(new vg::Pass(pShader.get()));
+		vg::Pass::BuildInDataInfo::Component buildInDataCmps[3] = {
+			{vg::Pass::BuildInDataType::MATRIX_OBJECT_TO_WORLD},
+			{vg::Pass::BuildInDataType::MATRIX_VIEW},
+			{vg::Pass::BuildInDataType::MATRIX_PROJECTION}
+		};
+		vg::Pass::BuildInDataInfo buildInDataInfo;
+		buildInDataInfo.componentCount = 3u;
+		buildInDataInfo.pComponent = buildInDataCmps;
+		pPass->setBuildInDataInfo(buildInDataInfo);
 	    pPass->setCullMode(vg::CullModeFlagBits::FRONT);
-	    pPass->setFrontFace(vg::FrontFaceType::COUNTER_CLOCKWISE);
+	    pPass->setFrontFace(vg::FrontFaceType::CLOCKWISE);
 	    pPass->setMainTexture(m_pCubeMapTex.get());
 	    pPass->apply();
 	    //material
 	    pMaterial = std::shared_ptr<vg::Material>(new vg::Material());
 	    pMaterial->addPass(pPass.get());
 	    pMaterial->setRenderPriority(0u);
-	    pMaterial->setRenderQueueType(vg::MaterialShowType::OPAQUE);
+	    pMaterial->setRenderQueueType(vg::MaterialShowType::BACKGROUND);
 	    pMaterial->apply();
 	}
 	
@@ -242,15 +253,61 @@ void Window::_initScene()
 		for (auto &object : objects)
 		{
 			object->setMaterial(m_pMaterialSkybox.get());
+			object->setIsVisibilityCheck(VG_FALSE);
 			m_pScene->addVisualObject(object.get());
 		}
 	}
 	{
-		auto &objectScene = m_objects[m_objectIndex];
+		uint32_t objectSceneCount = static_cast<uint32_t>(m_objects.size());
+		for (uint32_t i = 0; i < objectSceneCount; ++i)
+		{
+			auto &objectScene = m_objects[i];
+			auto &objects = objectScene.getObjects();
+			for (auto &object : objects)
+			{
+				object->setMaterial(m_pMaterialReflect.get());
+				if (i == m_objectIndex) 
+					m_pScene->addVisualObject(object.get());
+			}
+		}
+		m_currIndex = m_objectIndex;
+		
+	}
+}
+
+void Window::_updateScene()
+{
+	{
+		auto &objects = m_skyBoxObject.getObjects();
+		for (auto &object : objects)
+		{
+			if (m_displaySkybox) 
+			{
+				m_pScene->addVisualObject(object.get());
+			}
+			else
+			{
+				if (object->getTransform()->getRoot() != nullptr) {
+					m_pScene->removeVisualObject(object.get());
+				}
+			}
+		}
+	}
+	{
+		if (m_currIndex >= 0) {
+			auto &objectScene = m_objects[m_currIndex];
+			auto &objects = objectScene.getObjects();
+			for (auto &object : objects)
+			{
+				m_pScene->removeVisualObject(object.get());
+			}
+		}
+
+		m_currIndex = m_objectIndex;
+		auto &objectScene = m_objects[m_currIndex];
 		auto &objects = objectScene.getObjects();
 		for (auto &object : objects)
 		{
-			object->setMaterial(m_pMaterialReflect.get());
 			m_pScene->addVisualObject(object.get());
 		}
 	}
@@ -268,6 +325,19 @@ void Window::_onUpdate()
 	if (ImGui::SliderFloat("LOD bias", &m_otherInfo.lodBias, 0.0f, (float)m_pCubeMapTex->getMipmapLevels())) {
 		m_pPassReflect->setDataValue("other_info", m_otherInfo, 2u);
 		m_pPassReflect->apply();
+	}
+	uint32_t count = static_cast<uint32_t>(m_arrObjectNames.size());
+	std::vector<const char *> charItems(m_arrObjectNames.size());
+	for (size_t i = 0; i < count; ++i)
+	{
+		charItems[i] = m_arrObjectNames[i].c_str();
+	}
+	if (ImGui::Combo("Object type", &m_objectIndex,
+		charItems.data(), count, count)) {
+		_updateScene();
+	}
+	if (ImGui::Checkbox("Skybox", &m_displaySkybox)) {
+		_updateScene();
 	}
 	ImGui::End();
 }

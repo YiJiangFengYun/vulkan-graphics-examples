@@ -138,15 +138,15 @@ namespace sampleslib
             if (handledByIM) return;
 			if (instance->m_mouseButtons.left) {
 			    instance->m_rotation.x += dy * instance->m_rotationSpeed;
-		        instance->m_rotation.y += dx * instance->m_rotationSpeed;
+		        instance->m_rotation.y -= dx * instance->m_rotationSpeed;
 			}
 
 			if (instance->m_mouseButtons.right) {
 				auto &pScene = instance->m_pScene;
 				auto pRootTransform = pScene->pRootTransformForVisualObject;
 				auto localRotation = pRootTransform->getLocalRotation();
-				vg::Vector3 angle = vg::Vector3(dy * instance->m_rotationSpeed, dx * instance->m_rotationSpeed, 0.0f);
-			    vg::Quaternion change = vg::Quaternion(angle);
+				vg::Vector3 eulerAngles = vg::Vector3(dy * instance->m_rotationSpeed, dx * instance->m_rotationSpeed, 0.0f);
+			    vg::Quaternion change = vg::Quaternion(eulerAngles);
 				localRotation = change * localRotation;
 				pRootTransform->setLocalRotation(localRotation);
 				pRootTransform = pScene->pRootTransformForLight;

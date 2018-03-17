@@ -11,8 +11,8 @@ layout (location = 3) in vec3 inColor;
 layout(binding = 0) uniform BuildIn {
     mat4 matrixObjectToNDC;
 	vec4 mainColor;
+	mat4 matrixObjectToWorld;	
 	mat4 matrixObjectToView;
-	mat4 matrixObjectToWorld;
 } _buildIn;
 
 layout(binding = 2) uniform LightInfo {

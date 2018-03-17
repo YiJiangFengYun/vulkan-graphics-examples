@@ -2,45 +2,6 @@
 
 namespace vg
 {
-	MaterialData::BuildInData::BuildInData()
-		: matrixObjectToNDC(1.0f)
-		, mainColor(1.0f, 1.0f, 1.0f, 1.0f)
-		, matrixObjectToView(1.0f)
-		, matrixObjectToWorld(1.0f)
-	{
-
-	}
-
-	MaterialData::BuildInData::BuildInData(Matrix4x4 matrixObjectToNDC
-		, Color mainColor
-		, Matrix4x4 matrixObjectToView
-		, Matrix4x4 matrixObjectToWorld)
-		: matrixObjectToNDC(matrixObjectToNDC)
-		, mainColor(mainColor)
-		, matrixObjectToView(matrixObjectToView)
-		, matrixObjectToWorld(matrixObjectToWorld)
-	{
-
-	}
-
-	MaterialData::BuildInData::BuildInData(const BuildInData &target)
-		: matrixObjectToNDC(target.matrixObjectToNDC)
-		, mainColor(target.mainColor)
-		, matrixObjectToView(target.matrixObjectToView)
-		, matrixObjectToWorld(target.matrixObjectToWorld)
-	{
-
-	}
-
-	MaterialData::BuildInData::BuildInData(const BuildInData &&target)
-		: matrixObjectToNDC(target.matrixObjectToNDC)
-		, mainColor(target.mainColor)
-		, matrixObjectToView(target.matrixObjectToView)
-		, matrixObjectToWorld(target.matrixObjectToWorld)
-	{
-
-	}
-
 	const Texture *MaterialData::getTexture(std::string name) const
 	{
 		return getValue(name, mapTextures);
@@ -62,6 +23,27 @@ namespace vg
 	{
 		const auto& bytes = getValue(name, mapDatas);
 		return static_cast<uint32_t>(bytes.size());
+	}
+
+	void MaterialData::getDataValue(const std::string name, void *dst, uint32_t size, uint32_t offset) const
+	{
+		const auto& bytes = getValue(name, mapDatas);		
+		if (offset + size > static_cast<uint32_t>(bytes.size()))
+		    throw std::range_error("Out range of the saved material data!");
+		memcpy(dst, (char *)(bytes.data()) + offset, size);
+	}
+
+	void MaterialData::setDataValue(const std::string name, void *src, uint32_t size, uint32_t offset)
+	{
+		if (offset + size > static_cast<uint32_t>(mapDatas[name].size()))
+		    mapDatas[name].resize(size);
+		if(src) memcpy((char *)(mapDatas[name].data()) + offset, src, size);
+		auto iterator = std::find(arrDataNames.begin(), arrDataNames.end(), name);
+		if (iterator == arrDataNames.end())
+		{
+			arrDataNames.push_back(name);
+		}
+		mapDataCounts[name] = 1u;
 	}
 
 	void MaterialData::memoryCopyData(const std::string name

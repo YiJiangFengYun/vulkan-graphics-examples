@@ -2,3 +2,4 @@
 format (COLLADA).
 
 2.Graphics add mutiply loggers and the module initialization of graphics is to set all state of its loggers.
+3.Problem: in pass, updating only descriptor will lead to recreate descriptor set.  

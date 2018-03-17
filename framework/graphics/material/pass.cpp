@@ -2,6 +2,22 @@
 
 namespace vg
 {
+	Pass::BuildInDataInfo::BuildInDataInfo()
+	    : componentCount(0u)
+		, pComponent(nullptr)
+	{
+
+	}
+
+	const std::array<uint32_t, static_cast<size_t>(Pass::BuildInDataType::COUNT)> Pass::buildInDataTypeSizes = {
+		sizeof(BuildInDataTypeTypeInfo<BuildInDataType::MATRIX_OBJECT_TO_NDC>::Type),
+		sizeof(BuildInDataTypeTypeInfo<BuildInDataType::MAIN_CLOLOR>::Type),
+		sizeof(BuildInDataTypeTypeInfo<BuildInDataType::MATRIX_OBJECT_TO_WORLD>::Type),
+		sizeof(BuildInDataTypeTypeInfo<BuildInDataType::MATRIX_OBJECT_TO_VIEW>::Type),
+		sizeof(BuildInDataTypeTypeInfo<BuildInDataType::MATRIX_VIEW>::Type),
+		sizeof(BuildInDataTypeTypeInfo<BuildInDataType::MATRIX_PROJECTION>::Type)
+	};
+
 	Pass::SpecializationData::SpecializationData()
 	    : m_mapEntries()
 		, m_info()
@@ -216,6 +232,21 @@ namespace vg
 		bufferSize = static_cast<uint32_t>(std::ceil(size / minOffsetAlignment) * minOffsetAlignment);
 	}
 
+	void Pass::LayoutBindingInfo::updateSize(const uint32_t dataSize)
+	{
+		if (isTexture)
+		{
+			size = 0u;
+			bufferSize = 0u;
+			return;
+		}
+		const auto &pPhysicalDevice = pApp->getPhysicalDevice();
+		const auto &properties = pPhysicalDevice->getProperties();
+		const auto &minOffsetAlignment = static_cast<float>(properties.limits.minUniformBufferOffsetAlignment);
+		size = dataSize;
+		bufferSize = static_cast<uint32_t>(std::ceil(size / minOffsetAlignment) * minOffsetAlignment);
+	}
+
 	Bool32 Pass::LayoutBindingInfo::operator ==(const LayoutBindingInfo& target) const
 	{
 		return name == target.name 
@@ -244,11 +275,14 @@ namespace vg
 		, m_arrPushConstantRangeNames()
 		, m_mapPPushConstantUpdates()		
 		, m_arrPushConstantUpdateNames()
-		, m_buildInData()
+		, m_buildInDataInfo()
+		, m_buildInDataInfoComponents()
 		, m_pipelineStateID()
 		, m_lastBindings()
 		, m_lastPushConstantRanges()
 	{
+		_initDefaultBuildInDataInfo();
+		_initBuildInData();
 	}
 
 	Pass::Pass(Shader *pShader)
@@ -270,12 +304,14 @@ namespace vg
 		, m_arrPushConstantRangeNames()
 		, m_mapPPushConstantUpdates()		
 		, m_arrPushConstantUpdateNames()
-		, m_buildInData()
+		, m_buildInDataInfo()
+		, m_buildInDataInfoComponents()
 		, m_pipelineStateID()
 		, m_lastBindings()
 		, m_lastPushConstantRanges()
 	{
-
+		_initDefaultBuildInDataInfo();
+		_initBuildInData();
 	}
 
 
@@ -334,38 +370,32 @@ namespace vg
 
 	Color Pass::getMainColor() const
 	{
-		return m_buildInData.mainColor;
+		return m_buildInDataCache.mainColor;
 	}
 
 	void Pass::setMainColor(Color color)
 	{
-		m_buildInData.mainColor = color;
-		setDataValue(VG_M_BUILDIN_NAME
-			, m_buildInData
-			, VG_M_BUILDIN_BINDING
-			, DescriptorType::UNIFORM_BUFFER
-			, ShaderStageFlagBits::VERTEX
-		);
+		m_buildInDataCache.mainColor = color;
+		_updateBuildInData(BuildInDataType::MAIN_CLOLOR, color);
 	}
 
-	void Pass::_setBuildInMatrixData(Matrix4x4 matrixObjectToNDC
-		, Matrix4x4 matrixObjectToView
-		, Matrix4x4 matrixObjectToWorld
-	)
+	 void Pass::setBuildInDataInfo(BuildInDataInfo info)
+	 {
+		m_buildInDataInfo = info;
+		m_buildInDataInfoComponents.resize(info.componentCount);
+		memcpy(m_buildInDataInfoComponents.data(), info.pComponent, 
+		    static_cast<size_t>(info.componentCount) * sizeof(BuildInDataInfo::Component));
+		_initBuildInData();
+	 }
+
+	 const Pass::BuildInDataInfo &Pass::getBuildInDataInfo() const
+	 {
+		 return m_buildInDataInfo;
+	 }
+
+	void Pass::_setBuildInMatrixData(BuildInDataType type, Matrix4x4 matrix)
 	{
-		if (m_buildInData.matrixObjectToNDC == matrixObjectToNDC &&
-			m_buildInData.matrixObjectToView == matrixObjectToView &&
-			m_buildInData.matrixObjectToWorld == matrixObjectToWorld)
-			return;
-		m_buildInData.matrixObjectToNDC = matrixObjectToNDC;
-		m_buildInData.matrixObjectToView = matrixObjectToView;
-		m_buildInData.matrixObjectToWorld = matrixObjectToWorld;
-		setDataValue(VG_M_BUILDIN_NAME
-			, m_buildInData
-			, VG_M_BUILDIN_BINDING
-			, DescriptorType::UNIFORM_BUFFER
-			, ShaderStageFlagBits::VERTEX
-		);
+		_updateBuildInData(type, matrix);
 	}
 
 	void Pass::apply()
@@ -985,5 +1015,122 @@ namespace vg
 		{
 			m_pipelineStateID = 0;
 		}
+	}
+
+	void Pass::_initDefaultBuildInDataInfo()
+	{
+		m_buildInDataInfoComponents.resize(3);
+		m_buildInDataInfoComponents[0].type = BuildInDataType::MATRIX_OBJECT_TO_NDC;
+		m_buildInDataInfoComponents[1].type = BuildInDataType::MAIN_CLOLOR;
+		m_buildInDataInfoComponents[2].type = BuildInDataType::MATRIX_OBJECT_TO_WORLD;
+
+		m_buildInDataInfo.componentCount = static_cast<uint32_t>(m_buildInDataInfoComponents.size());
+		m_buildInDataInfo.pComponent = m_buildInDataInfoComponents.data();
+	}
+
+	void Pass::_initBuildInData()
+	{
+		uint32_t size = 0u;
+		auto componentCount = m_buildInDataInfo.componentCount;
+		for (uint32_t componentIndex = 0; componentIndex < componentCount; ++componentIndex)
+		{
+			BuildInDataType type = (*(m_buildInDataInfo.pComponent + componentIndex)).type;
+			uint32_t count = static_cast<uint32_t>(BuildInDataType::COUNT);
+		    for (uint32_t i = 0; i < count; ++i)
+		    {
+		    	if (i == static_cast<uint32_t>(type))
+		    	{
+		    		size += buildInDataTypeSizes[i];
+					break;
+		    	}
+		    }
+		}
+		m_pData->setDataValue(VG_M_BUILDIN_NAME, nullptr, size, 0u);
+		
+		uint32_t offset1 = 0u;
+		for (uint32_t componentIndex = 0; componentIndex < componentCount; ++componentIndex)
+		{
+			BuildInDataType type = (*(m_buildInDataInfo.pComponent + componentIndex)).type;
+			uint32_t count = static_cast<uint32_t>(BuildInDataType::COUNT);
+		    uint32_t offset2= 0u;
+		    for (uint32_t i = 0; i < count; ++i)
+		    {
+		    	if (i == static_cast<uint32_t>(type))
+		    	{
+					m_pData->setDataValue(VG_M_BUILDIN_NAME
+				    , ((char *)(&m_buildInDataCache) + offset2)
+					, buildInDataTypeSizes[static_cast<uint32_t>(type)]
+					, offset1);
+					break;
+		    	}
+				else
+				{
+					offset2 += buildInDataTypeSizes[i];
+				}
+		    }
+			offset1 += buildInDataTypeSizes[static_cast<uint32_t>(type)];
+		}
+		//update layout binding information.
+		uint32_t descriptorCount = 1u;
+		LayoutBindingInfo info(
+			VG_M_BUILDIN_NAME,
+			VG_FALSE,
+			VG_M_BUILDIN_BINDING,
+			DescriptorType::UNIFORM_BUFFER,
+			descriptorCount,
+			ShaderStageFlagBits::VERTEX
+		);
+		info.updateSize(size);
+		setValue(VG_M_BUILDIN_NAME, info, m_mapLayoutBinds, m_arrLayoutBindNames);
+		m_applied = VG_FALSE;
+	}
+
+
+	Pass::_BuildInDataCache::_BuildInDataCache()
+		: matrixObjectToNDC(1.0f)
+		, mainColor(1.0f, 1.0f, 1.0f, 1.0f)
+		, matrixObjectToWorld(1.0f)
+		, matrixObjectToView(1.0f)
+		, matrixView(1.0f)
+		, matrixProjection(1.0f)
+	{
+
+	}
+
+	Pass::_BuildInDataCache::_BuildInDataCache(Matrix4x4 matrixObjectToNDC
+		, Color mainColor
+		, Matrix4x4 matrixObjectToWorld
+		, Matrix4x4 matrixObjectToView
+		, Matrix4x4 matrixView
+		, Matrix4x4 matrixProjection)
+		: matrixObjectToNDC(matrixObjectToNDC)
+		, mainColor(mainColor)
+		, matrixObjectToWorld(matrixObjectToWorld)
+		, matrixObjectToView(matrixObjectToView)
+		, matrixView(matrixView)
+		, matrixProjection(matrixProjection)
+	{
+
+	}
+
+	Pass::_BuildInDataCache::_BuildInDataCache(const _BuildInDataCache &target)
+		: matrixObjectToNDC(target.matrixObjectToNDC)
+		, mainColor(target.mainColor)
+		, matrixObjectToWorld(target.matrixObjectToWorld)
+		, matrixObjectToView(target.matrixObjectToView)
+		, matrixView(target.matrixView)
+		, matrixProjection(target.matrixProjection)
+	{
+
+	}
+
+	Pass::_BuildInDataCache::_BuildInDataCache(const _BuildInDataCache &&target)
+		: matrixObjectToNDC(target.matrixObjectToNDC)
+		, mainColor(target.mainColor)
+		, matrixObjectToWorld(target.matrixObjectToWorld)
+		, matrixObjectToView(target.matrixObjectToView)
+		, matrixView(target.matrixView)
+		, matrixProjection(target.matrixProjection)
+	{
 	}
 }

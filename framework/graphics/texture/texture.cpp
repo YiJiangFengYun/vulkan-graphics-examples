@@ -14,7 +14,6 @@ namespace vg
 		, height(0u)
 		, depth(0u)
 	{
-
 	}
 
 	TextureDataInfo::Component::Component(uint32_t mipLevel

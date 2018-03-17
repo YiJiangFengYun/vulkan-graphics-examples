@@ -9,8 +9,7 @@ layout (location = 1) in vec3 inColor;
 layout(binding = 0) uniform BuildIn {
     mat4 matrixObjectToNDC;
 	vec4 mainColor;
-	mat4 matrixObjectToView;
-	mat4 matrixObjectToWorld;
+	mat4 matrixObjectToWorld;	
 } _buildIn;
 
 layout (location = 0) out vec4 outColor;

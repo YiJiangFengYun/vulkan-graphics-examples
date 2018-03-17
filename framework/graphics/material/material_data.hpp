@@ -46,24 +46,6 @@ namespace vg
 
 	struct MaterialData
 	{
-		struct BuildInData
-		{
-			Matrix4x4 matrixObjectToNDC;
-			Color     mainColor;
-			Matrix4x4 matrixObjectToView;
-			Matrix4x4 matrixObjectToWorld;
-
-			BuildInData();
-
-			BuildInData(Matrix4x4 matrixObjectToNDC
-				, Color mainColor
-				, Matrix4x4 matrixObjectToView
-				, Matrix4x4 matrixObjectToWorld);
-
-			BuildInData(const BuildInData &target);
-			BuildInData(const BuildInData &&target);
-		};
-
 		std::vector<std::string> arrDataNames;
 		std::unordered_map<std::string, std::vector<Byte>> mapDatas;
 		std::unordered_map<std::string, uint32_t> mapDataCounts;
@@ -73,11 +55,15 @@ namespace vg
 		const Texture *getTexture(std::string name) const;
 		void setTexture(std::string name, const Texture *pTex);
 
-		template <typename T>
+		void getDataValue(const std::string name, void *dst, uint32_t size, uint32_t offset) const;
+
+		template<typename T>
 		T getDataValue(const std::string name) const;
 
 		template <typename T>
 		std::vector<T> getDataValue(const std::string name, const uint32_t count) const;
+
+		void setDataValue(const std::string name, void *src, uint32_t size, uint32_t offset);
 
 		template<typename T>
 		void setDataValue(const std::string name, const T &value);

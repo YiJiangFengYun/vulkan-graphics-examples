@@ -4,6 +4,7 @@
 #include <unordered_map>
 #include "graphics/util/find_memory.hpp"
 #include "graphics/material/shader.hpp"
+#include "graphics/global.hpp"
 #include "graphics/material/pass_option.hpp"
 #include "graphics/texture/texture.hpp"
 #include "graphics/material/material_data.hpp"
@@ -16,6 +17,94 @@ namespace vg
 	class Pass : public Base
 	{
 	public:
+	    enum class BuildInDataType
+		{
+			MATRIX_OBJECT_TO_NDC = 0,
+			MAIN_CLOLOR = 1,
+			MATRIX_OBJECT_TO_WORLD = 2,
+			MATRIX_OBJECT_TO_VIEW = 3,
+			MATRIX_VIEW = 4,
+			MATRIX_PROJECTION = 5,
+			COUNT = 6
+		};
+
+        template<BuildInDataType type>
+		struct BuildInDataTypeTypeInfo
+		{
+			using Type = void;
+		};
+
+		template<>
+	    struct BuildInDataTypeTypeInfo<BuildInDataType::MATRIX_OBJECT_TO_NDC>
+	    {
+	    	using Type = Matrix4x4;
+	    };
+
+		template<>
+	    struct BuildInDataTypeTypeInfo<BuildInDataType::MAIN_CLOLOR>
+	    {
+	    	using Type = Color;
+	    };
+
+		template<>
+	    struct BuildInDataTypeTypeInfo<BuildInDataType::MATRIX_OBJECT_TO_WORLD>
+	    {
+	    	using Type = Matrix4x4;
+	    };
+
+		template<>
+	    struct BuildInDataTypeTypeInfo<BuildInDataType::MATRIX_OBJECT_TO_VIEW>
+	    {
+	    	using Type = Matrix4x4;
+	    };
+
+		template<>
+	    struct BuildInDataTypeTypeInfo<BuildInDataType::MATRIX_VIEW>
+	    {
+	    	using Type = Matrix4x4;
+	    };
+
+		template<>
+	    struct BuildInDataTypeTypeInfo<BuildInDataType::MATRIX_PROJECTION>
+	    {
+	    	using Type = Matrix4x4;
+	    };
+
+		static const std::array<uint32_t, static_cast<size_t>(BuildInDataType::COUNT)> buildInDataTypeSizes;
+
+		struct BuildInDataInfo
+		{
+			struct Component {
+				BuildInDataType type;
+			};
+
+			uint32_t componentCount;
+			Component *pComponent;
+			BuildInDataInfo();
+		};
+
+		struct _BuildInDataCache
+		{
+			Matrix4x4 matrixObjectToNDC;
+			Color     mainColor;
+			Matrix4x4 matrixObjectToWorld;
+			Matrix4x4 matrixObjectToView;
+			Matrix4x4 matrixView;
+			Matrix4x4 matrixProjection;
+
+			_BuildInDataCache();
+
+			_BuildInDataCache(Matrix4x4 matrixObjectToNDC
+				, Color mainColor
+				, Matrix4x4 matrixObjectToWorld
+				, Matrix4x4 matrixObjectToView
+				, Matrix4x4 matrixView
+				, Matrix4x4 matrixProjection);
+
+			_BuildInDataCache(const _BuildInDataCache &target);
+			_BuildInDataCache(const _BuildInDataCache &&target);
+		};
+
 	    using PipelineStateID = uint32_t;	    
 	    // to do
 	    class SpecializationData 
@@ -109,6 +198,7 @@ namespace vg
 			Bool32 operator ==(const LayoutBindingInfo& target) const;
 
 			void updateSize(const MaterialData *pMaterialData);
+			void updateSize(const uint32_t dataSize);
 		};
 
 		Pass();
@@ -156,10 +246,10 @@ namespace vg
 		void setMainColor(Color color);
 
 
-		void _setBuildInMatrixData(Matrix4x4 matrixObjectToNDC
-			, Matrix4x4 matrixObjectToView
-			, Matrix4x4 matrixObjectToWorld
-		);
+        void setBuildInDataInfo(BuildInDataInfo info);
+		const BuildInDataInfo &getBuildInDataInfo() const;
+
+		void _setBuildInMatrixData(BuildInDataType type, Matrix4x4 matrix);
 
 		void apply();
         
@@ -264,7 +354,9 @@ namespace vg
 		std::unordered_map<std::string, std::shared_ptr<PushConstantUpdate>> m_mapPPushConstantUpdates;
 		std::vector<std::string> m_arrPushConstantUpdateNames;		
 
-		MaterialData::BuildInData m_buildInData;
+		BuildInDataInfo m_buildInDataInfo;		
+		std::vector<BuildInDataInfo::Component> m_buildInDataInfoComponents;
+		_BuildInDataCache m_buildInDataCache;
 
 		//cache
 		std::vector<vk::DescriptorSetLayoutBinding> m_lastBindings;
@@ -280,6 +372,10 @@ namespace vg
 		void _applyBufferContent();
 		void _updatePipelineStateID();
 
+		void _initDefaultBuildInDataInfo();
+		void _initBuildInData();
+		template <typename T>
+		void _updateBuildInData(BuildInDataType type, T data);
 		//tool methods
 		void createBuffer(vk::DeviceSize size, std::shared_ptr<vk::Buffer> &pBuffer, std::shared_ptr<vk::DeviceMemory> &pBufferMemory);
 	};

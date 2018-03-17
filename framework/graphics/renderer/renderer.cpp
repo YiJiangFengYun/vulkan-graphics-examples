@@ -728,21 +728,93 @@ namespace vg
 		for (uint32_t i = 0u; i < validVisualObjectCount; ++i)
 		{
 			auto pVisualObject = validVisualObjects[i];
-			auto modelMatrix = pVisualObject->getTransform()->getMatrixLocalToWorld();
-			auto mvMatrix = viewMatrix * modelMatrix;
-			auto mvpMatrix = projMatrix * mvMatrix;
-			auto pMesh = pVisualObject->getMesh();
-			auto pContentMesh = dynamic_cast<ContentMesh *>(pMesh);
-			auto subMeshOffset = pVisualObject->getSubMeshOffset();
-			auto subMeshCount = pVisualObject->getSubMeshCount();
 			auto pMaterial = pVisualObject->getMaterial();
 			auto passCount = pMaterial->getPassCount();
+			Bool32 hasMatrixObjectToNDC = VG_FALSE;
+			Bool32 hasMatrixObjectToWorld = VG_FALSE;
+			Bool32 hasMatrixObjectToView = VG_FALSE;
+			Bool32 hasMatrixView = VG_FALSE;
+			Bool32 hasMatrixProjection = VG_FALSE;
 			for (uint32_t passIndex = 0u; passIndex < passCount; ++passIndex)
 			{
 				//update building in matrix variable.
 				auto pPass = pMaterial->getPassWithIndex(passIndex);
+				auto info = pPass->getBuildInDataInfo();
+				uint32_t componentCount = info.componentCount;
+				for (uint32_t componentIndex = 0u; componentIndex < componentCount; ++componentIndex)
+				{
+					Pass::BuildInDataType type = (*(info.pComponent + componentIndex)).type;
+					if (type == Pass::BuildInDataType::MATRIX_OBJECT_TO_NDC)
+					{
+						hasMatrixObjectToNDC = VG_TRUE;
+					}
+					else if (type == Pass::BuildInDataType::MATRIX_OBJECT_TO_WORLD)
+					{
+						hasMatrixObjectToWorld = VG_TRUE;
+					}
+					else if (type == Pass::BuildInDataType::MATRIX_OBJECT_TO_VIEW)
+					{
+						hasMatrixObjectToView = VG_TRUE;
+					}
+					else if (type == Pass::BuildInDataType::MATRIX_VIEW)
+					{
+						hasMatrixView = VG_TRUE;
+					}
+					else if (type == Pass::BuildInDataType::MATRIX_PROJECTION)
+					{
+						hasMatrixProjection = VG_TRUE;
+					}
+				}
+			}
 
-				pPass->_setBuildInMatrixData(tranMat3ToMat4(mvpMatrix), tranMat3ToMat4(mvMatrix), tranMat3ToMat4(modelMatrix));
+			
+			auto modelMatrix = pVisualObject->getTransform()->getMatrixLocalToWorld();
+			Matrix3x3 mvMatrix;
+			Matrix3x3 mvpMatrix;
+			if (hasMatrixObjectToView || hasMatrixObjectToNDC) 
+			{
+				mvMatrix = viewMatrix * modelMatrix;
+			}
+			
+			if (hasMatrixObjectToNDC)
+			{
+				mvpMatrix = projMatrix * mvMatrix;
+			}
+			auto pMesh = pVisualObject->getMesh();
+			auto pContentMesh = dynamic_cast<ContentMesh *>(pMesh);
+			auto subMeshOffset = pVisualObject->getSubMeshOffset();
+			auto subMeshCount = pVisualObject->getSubMeshCount();
+			
+			for (uint32_t passIndex = 0u; passIndex < passCount; ++passIndex)
+			{
+				//update building in matrix variable.
+				auto pPass = pMaterial->getPassWithIndex(passIndex);
+				auto info = pPass->getBuildInDataInfo();
+				uint32_t componentCount = info.componentCount;
+				for (uint32_t componentIndex = 0u; componentIndex < componentCount; ++componentIndex)
+				{
+					Pass::BuildInDataType type = (*(info.pComponent + componentIndex)).type;
+					if (type == Pass::BuildInDataType::MATRIX_OBJECT_TO_NDC)
+					{
+						pPass->_setBuildInMatrixData(type, tranMat3ToMat4(mvpMatrix));
+					}
+					else if (type == Pass::BuildInDataType::MATRIX_OBJECT_TO_WORLD)
+					{
+						pPass->_setBuildInMatrixData(type, tranMat3ToMat4(modelMatrix));
+					}
+					else if (type == Pass::BuildInDataType::MATRIX_OBJECT_TO_VIEW)
+					{
+						pPass->_setBuildInMatrixData(type, tranMat3ToMat4(mvMatrix));
+					}
+					else if (type == Pass::BuildInDataType::MATRIX_VIEW)
+					{
+						pPass->_setBuildInMatrixData(type, tranMat3ToMat4(viewMatrix));
+					}
+					else if (type == Pass::BuildInDataType::MATRIX_PROJECTION)
+					{
+						pPass->_setBuildInMatrixData(type, tranMat3ToMat4(projMatrix));
+					}
+				}
 				pPass->apply();
 			}
 
@@ -914,23 +986,94 @@ namespace vg
 			for (uint32_t objectIndex = 0u; objectIndex < queueLength; ++objectIndex)
 			{
 				auto pVisualObject = queues[typeIndex][objectIndex];
+				auto pMaterial = pVisualObject->getMaterial();
+				auto passCount = pMaterial->getPassCount();
+				Bool32 hasMatrixObjectToNDC = VG_FALSE;
+			    Bool32 hasMatrixObjectToWorld = VG_FALSE;
+			    Bool32 hasMatrixObjectToView = VG_FALSE;
+			    Bool32 hasMatrixView = VG_FALSE;
+			    Bool32 hasMatrixProjection = VG_FALSE;
+			    for (uint32_t passIndex = 0u; passIndex < passCount; ++passIndex)
+			    {
+			    	//update building in matrix variable.
+			    	auto pPass = pMaterial->getPassWithIndex(passIndex);
+			    	auto info = pPass->getBuildInDataInfo();
+			    	uint32_t componentCount = info.componentCount;
+			    	for (uint32_t componentIndex = 0u; componentIndex < componentCount; ++componentIndex)
+			    	{
+			    		Pass::BuildInDataType type = (*(info.pComponent + componentIndex)).type;
+			    		if (type == Pass::BuildInDataType::MATRIX_OBJECT_TO_NDC)
+			    		{
+			    			hasMatrixObjectToNDC = VG_TRUE;
+			    		}
+			    		else if (type == Pass::BuildInDataType::MATRIX_OBJECT_TO_WORLD)
+			    		{
+			    			hasMatrixObjectToWorld = VG_TRUE;
+			    		}
+			    		else if (type == Pass::BuildInDataType::MATRIX_OBJECT_TO_VIEW)
+			    		{
+			    			hasMatrixObjectToView = VG_TRUE;
+			    		}
+			    		else if (type == Pass::BuildInDataType::MATRIX_VIEW)
+			    		{
+			    			hasMatrixView = VG_TRUE;
+			    		}
+			    		else if (type == Pass::BuildInDataType::MATRIX_PROJECTION)
+			    		{
+			    			hasMatrixProjection = VG_TRUE;
+			    		}
+			    	}
+			    }
+
+				
 				auto modelMatrix = pVisualObject->getTransform()->getMatrixLocalToWorld();
-				auto mvMatrix = viewMatrix * modelMatrix;
-				auto mvpMatrix = projMatrix * mvMatrix;
+				Matrix4x4 mvMatrix;
+				Matrix4x4 mvpMatrix;
+				if (hasMatrixObjectToView || hasMatrixObjectToNDC)
+				{
+					mvMatrix = viewMatrix * modelMatrix;
+				}
+
+				if (hasMatrixObjectToNDC)
+				{
+					mvpMatrix = projMatrix * mvMatrix;
+				}
 				auto pMesh = pVisualObject->getMesh();
 				auto pContentMesh = dynamic_cast<ContentMesh *>(pMesh);
 				auto subMeshOffset = pVisualObject->getSubMeshOffset();
 				auto subMeshCount = pVisualObject->getSubMeshCount();
-				auto pMaterial = pVisualObject->getMaterial();
-				auto passCount = pMaterial->getPassCount();
+				
 
 				for (uint32_t passIndex = 0u; passIndex < passCount; ++passIndex)
 				{
 					//update building in matrix variable.
 					auto pPass = pMaterial->getPassWithIndex(passIndex);
-
-					pPass->_setBuildInMatrixData(mvpMatrix, mvMatrix, modelMatrix);
-
+					auto info = pPass->getBuildInDataInfo();
+					uint32_t componentCount = info.componentCount;
+					for (uint32_t componentIndex = 0u; componentIndex < componentCount; ++componentIndex)
+					{
+						Pass::BuildInDataType type = (*(info.pComponent + componentIndex)).type;
+						if (type == Pass::BuildInDataType::MATRIX_OBJECT_TO_NDC)
+						{
+							pPass->_setBuildInMatrixData(type, mvpMatrix);
+						}
+						else if (type == Pass::BuildInDataType::MATRIX_OBJECT_TO_WORLD)
+						{
+							pPass->_setBuildInMatrixData(type, modelMatrix);
+						}
+						else if (type == Pass::BuildInDataType::MATRIX_OBJECT_TO_VIEW)
+						{
+							pPass->_setBuildInMatrixData(type, mvMatrix);
+						}
+						else if (type == Pass::BuildInDataType::MATRIX_VIEW)
+						{
+							pPass->_setBuildInMatrixData(type, viewMatrix);
+						}
+						else if (type == Pass::BuildInDataType::MATRIX_PROJECTION)
+						{
+							pPass->_setBuildInMatrixData(type, projMatrix);
+						}
+					}
 					pPass->apply();
 				}
 

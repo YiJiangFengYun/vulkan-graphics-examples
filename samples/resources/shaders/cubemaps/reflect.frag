@@ -20,7 +20,7 @@ void main()
 	vec3 cR = reflect (cI, normalize(inNormal));
 
 	cR = vec3(inInvModelView * vec4(cR, 0.0));
-	cR.x *= -1.0;
+	// cR.x *= -1.0;
 
 	vec4 color = texture(samplerColor, cR, inLodBias);
 

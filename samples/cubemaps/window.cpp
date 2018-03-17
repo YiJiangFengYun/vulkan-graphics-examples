@@ -74,7 +74,7 @@ Window::Window(std::shared_ptr<GLFWwindow> pWindow
 void Window::_init()
 {
 	m_zoom = -4.0f;
-	m_rotationSpeed = 0.25f;
+	m_rotationSpeed = 0.05f;
 	/// Build a quaternion from euler angles (pitch, yaw, roll), in radians.
 	m_rotation = vg::Vector3(glm::radians(0.0f), glm::radians(0.0f), glm::radians(0.0f));
 }
@@ -196,8 +196,16 @@ void Window::_createMaterial()
 	    	);
 	    //pass
 	    pPass = std::shared_ptr<vg::Pass>(new vg::Pass(pShader.get()));
+		vg::Pass::BuildInDataInfo::Component buildInDataCmps[2] = {
+			{vg::Pass::BuildInDataType::MATRIX_OBJECT_TO_NDC},
+			{vg::Pass::BuildInDataType::MATRIX_OBJECT_TO_VIEW},
+		};
+		vg::Pass::BuildInDataInfo buildInDataInfo;
+		buildInDataInfo.componentCount = 2u;
+		buildInDataInfo.pComponent = buildInDataCmps;
+		pPass->setBuildInDataInfo(buildInDataInfo);
 	    pPass->setCullMode(vg::CullModeFlagBits::BACK);
-	    pPass->setFrontFace(vg::FrontFaceType::COUNTER_CLOCKWISE);
+	    pPass->setFrontFace(vg::FrontFaceType::CLOCKWISE);
 		vk::PipelineDepthStencilStateCreateInfo depthStencilState = {};
 	    depthStencilState.depthTestEnable = VG_TRUE;
 	    depthStencilState.depthWriteEnable = VG_TRUE;

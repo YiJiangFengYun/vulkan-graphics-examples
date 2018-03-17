@@ -8,9 +8,7 @@ layout (location = 1) in vec3 inNormal;
 
 layout(binding = 0) uniform BuildIn {
     mat4 matrixObjectToNDC;
-	vec4 mainColor;
 	mat4 matrixObjectToView;
-	mat4 matrixObjectToWorld;
 } _buildIn;
 
 layout(binding = 2) uniform OtherInfo {

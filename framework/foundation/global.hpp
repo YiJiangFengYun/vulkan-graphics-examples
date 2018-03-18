@@ -34,11 +34,6 @@
 namespace fd
 {
 	using Bool32 = uint32_t;
-
-	extern Bool32 isInited;
-	extern void moduleCreate(plog::Severity severity, plog::IAppender *appender = nullptr);
-	extern void moduleDestroy();
-	extern void setLogSeverity(plog::Severity severity);
 }
 
 #endif // !FD_GLOBAL_H

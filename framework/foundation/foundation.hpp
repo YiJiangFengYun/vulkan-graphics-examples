@@ -5,6 +5,7 @@
 #include "foundation/util.hpp"
 #include "foundation/gemo.hpp"
 #include "foundation/wrapper.hpp"
+#include "foundation/module.hpp"
 
 namespace fd
 {

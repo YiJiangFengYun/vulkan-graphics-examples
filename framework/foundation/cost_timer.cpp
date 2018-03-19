@@ -5,10 +5,10 @@ namespace fd
     CostTimer::CostTimer()
         : startTime()
         , endTime()
-        , currTimer(0u)
-        , costTimer(0u)
+        , currTimer(0.0f)
+        , costTimer(0.0f)
         , m_isDoing(FD_FALSE)
-        , m_addUpTimer(0u)
+        , m_addUpTimer(0.0f)
         , m_addUpCount(0u)
     {
 
@@ -20,18 +20,18 @@ namespace fd
         m_isDoing = FD_TRUE;
     }
 
-    void CostTimer::end()
+    void CostTimer::end(Bool32 once)
     {
         auto now = ClockType::now();
 		endTime = now;
-		auto diff = std::chrono::duration_cast<std::chrono::milliseconds>(now - startTime).count();
-		currTimer = diff;
-		m_addUpTimer += static_cast<uint32_t>(diff);
+		auto diff = std::chrono::duration_cast<std::chrono::microseconds>(now - startTime).count();
+		currTimer = static_cast<float>(diff / 1000.0f);
+		m_addUpTimer += static_cast<float>(diff / 1000.0f);
 		++m_addUpCount;
-		if (m_addUpTimer > 1000u)
+		if (once || m_addUpTimer > 1000.0f)
 		{
-            costTimer = m_addUpTimer / m_addUpCount;
-			m_addUpTimer = 0u;
+            costTimer = m_addUpTimer / static_cast<float>(m_addUpCount);
+			m_addUpTimer = 0.0f;
 			m_addUpCount = 0u;
 		}
 

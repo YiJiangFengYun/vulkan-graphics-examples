@@ -13,16 +13,16 @@ namespace fd
         using TimePointType = typename std::chrono::time_point<ClockType>;
         TimePointType startTime;
 		TimePointType endTime;
-        uint32_t currTimer;
-        uint32_t costTimer;
+        float currTimer;
+        float costTimer;
         CostTimer();
         void begin();
-        void end();
+        void end(Bool32 once = FD_FALSE);
 
         Bool32 getIsDoing() const;
     private:
         Bool32 m_isDoing;
-        uint32_t m_addUpTimer;
+        float m_addUpTimer;
         uint32_t m_addUpCount;
 
     };

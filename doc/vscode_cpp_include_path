@@ -9,5 +9,7 @@
     "${workspaceRoot}/libs/imgui",
     "${workspaceRoot}/libs/libuv/include",
     "${workspaceRoot}/libs/plog/include",
-    "${workspaceRoot}/libs/stb
+    "${workspaceRoot}/libs/stb",
+    "${workspaceRoot}/samples/libs/assimp/include",
+    "${workspaceRoot}/samples"
 ]

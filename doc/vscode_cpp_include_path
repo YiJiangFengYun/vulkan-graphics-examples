@@ -1,0 +1,13 @@
+[
+    "${VK_SDK_PATH}/include",
+    "${BOOST_ROOT}/include",
+    "${workspaceRoot}/build/config_headers",
+    "${workspaceRoot}/framework",
+    "${workspaceRoot}/libs/glfw/include",
+    "${workspaceRoot}/libs/gli",
+    "${workspaceRoot}/libs/glm",
+    "${workspaceRoot}/libs/imgui",
+    "${workspaceRoot}/libs/libuv/include",
+    "${workspaceRoot}/libs/plog/include",
+    "${workspaceRoot}/libs/stb
+]

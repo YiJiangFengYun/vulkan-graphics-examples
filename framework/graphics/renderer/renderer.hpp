@@ -1,6 +1,7 @@
 #ifndef VG_RENDERER_H
 #define VG_RENDERER_H
 
+#include "graphics/global.hpp"
 #include "graphics/scene/space_info.hpp"
 #include "graphics/scene/scene.hpp"
 #include "graphics/scene/camera.hpp"
@@ -76,6 +77,10 @@ namespace vg
 		void setClearValueStencil(uint32_t value);
 		const fd::Rect2D &getClearArea() const;
 		void setClearArea(fd::Rect2D area);
+
+#ifdef DEBUG
+        const fd::CostTimer &getPreparingRenderCostTimer() const;
+#endif //DEBUG
 	protected:
 		//compositions
 		uint32_t m_framebufferWidth;
@@ -101,6 +106,13 @@ namespace vg
 		vk::Format m_swapchainImageFormat;
 		//Renderer will render to color texture when it is not null.
 		TextureColorAttachment *m_pColorTexture;
+
+#ifdef DEBUG
+        fd::CostTimer m_preparingRenderCostTimer;
+		fd::CostTimer m_preparingPipelineCostTimer;
+		fd::CostTimer m_preparingCommandBufferCostTimer;
+		fd::CostTimer m_preparingBuildInDataCostTimer;
+#endif //DEBUG
 
 		virtual void _preRender();
 		virtual void _renderBegin();
@@ -142,6 +154,10 @@ namespace vg
 		    , const Camera<SpaceType::SPACE_3> *pCamera
 	        , const RenderInfo &info
 	    	, RenderResultInfo &resultInfo);
+
+#ifdef DEBUG
+
+#endif //DEBUG
 
 	private:
 		Renderer() = delete;

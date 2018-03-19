@@ -7,7 +7,8 @@ const uint32_t WINDOW_WIDTH = 1280;
 const uint32_t WINDOW_HEIGHT = 720;
 int main() {
 	vgf::moduleCreate(plog::warning);
-	vg::setVulkanLogSeverity(plog::debug);
+	// vg::setVulkanLogSeverity(plog::debug);
+	vg::setCostTimeLogSeverity(plog::debug);
 	static plog::DebugOutputAppender<plog::TxtFormatter> debugOutputAppender;
 	plog::init(plog::debug, &debugOutputAppender);
 

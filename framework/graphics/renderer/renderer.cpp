@@ -32,6 +32,12 @@ namespace vg
 		, m_clearValueStencil(0u)
 		, m_renderArea(0.0f, 0.0f, 1.0f, 1.0f)
 		, m_pipelineCache()
+#ifdef DEBUG
+        , m_preparingRenderCostTimer()
+		, m_preparingPipelineCostTimer()
+		, m_preparingCommandBufferCostTimer()
+		, m_preparingBuildInDataCostTimer()
+#endif
 	{
 		_createRenderPass();
 		_createDepthStencilTex();
@@ -56,6 +62,12 @@ namespace vg
 		, m_clearValueStencil(0u)
 		, m_renderArea(0.0f, 0.0f, 1.0f, 1.0f)
 		, m_pipelineCache()
+#ifdef DEBUG
+        , m_preparingRenderCostTimer()
+		, m_preparingPipelineCostTimer()
+		, m_preparingCommandBufferCostTimer()
+		, m_preparingBuildInDataCostTimer()
+#endif
 	{
 		_createRenderPass();
 		_createDepthStencilTex();
@@ -210,6 +222,13 @@ namespace vg
 		m_renderArea = area;
 	}
 
+#ifdef DEBUG
+    const fd::CostTimer &Renderer::getPreparingRenderCostTimer() const
+	{
+		return m_preparingRenderCostTimer;
+	}
+#endif //DEBUG
+
 	Bool32 Renderer::_isValidForRender() const
 	{
 		return VG_TRUE;
@@ -222,6 +241,9 @@ namespace vg
 
 	void Renderer::_renderBegin()
 	{
+#ifdef DEBUG
+		m_preparingRenderCostTimer.begin();
+#endif //DEBUG
 		//command buffer begin
 		_recordCommandBufferForBegin();
 	}
@@ -238,7 +260,10 @@ namespace vg
 		{
 			const auto &pScene = (*(info.pSceneAndCamera + i)).pScene;
 			const auto &pCamera = (*(info.pSceneAndCamera + i)).pCamera;
-
+#ifdef DEBUG
+            fd::CostTimer preparingSceneCostTimer;
+			preparingSceneCostTimer.begin();
+#endif //DEBUG
 			if (pScene->getSpaceType() == SpaceType::SPACE_2)
 			{
 				_renderScene2(dynamic_cast<const Scene<SpaceType::SPACE_2> *>(pScene), 
@@ -254,6 +279,14 @@ namespace vg
 			} else {
 				//todo
 			}
+#ifdef DEBUG
+			preparingSceneCostTimer.end(FD_TRUE);
+			VG_COST_TIME_LOG(plog::debug) << "Preparing scene cost time: " 
+			    << preparingSceneCostTimer.costTimer 
+				<< "ms, scene id: " << pScene->getID() 
+				<< ", scene type: " << (pScene->getSpaceType() == SpaceType::SPACE_3 ? "space3" : "space2") 
+				<<  std::endl;
+#endif //DEBUG
 		}
 
 		uint32_t semaphoreCount = resultInfo.signalSemaphoreCount + 1u;
@@ -294,6 +327,13 @@ namespace vg
 		//queue.submit(submitInfo, *m_waitFence);
 		pApp->freeGraphicsQueue(queueIndex);
 		VG_LOG(plog::debug) << "Post submit to grahics queue." << std::endl;
+#ifdef DEBUG
+        VG_COST_TIME_LOG(plog::debug) << "Preparing pipeline cost time: " << m_preparingPipelineCostTimer.costTimer << "ms." << std::endl;
+		VG_COST_TIME_LOG(plog::debug) << "Preparing command buffer cost time: " << m_preparingCommandBufferCostTimer.costTimer << "ms." << std::endl;
+		VG_COST_TIME_LOG(plog::debug) << "Preparing buildin data cost time: " << m_preparingBuildInDataCostTimer.costTimer << "ms." << std::endl;
+		m_preparingRenderCostTimer.end(FD_FALSE);
+		VG_COST_TIME_LOG(plog::debug) << "Preparing render cost time: " << m_preparingRenderCostTimer.costTimer << "ms." << std::endl;
+#endif //DEBUG
 	}
 
 	void Renderer::_postRender()
@@ -727,9 +767,14 @@ namespace vg
 		uint32_t drawIndex = 0u;
 		for (uint32_t i = 0u; i < validVisualObjectCount; ++i)
 		{
+
 			auto pVisualObject = validVisualObjects[i];
 			auto pMaterial = pVisualObject->getMaterial();
 			auto passCount = pMaterial->getPassCount();
+
+#ifdef DEBUG
+            m_preparingBuildInDataCostTimer.begin();
+#endif //DEBUG
 			Bool32 hasMatrixObjectToNDC = VG_FALSE;
 			Bool32 hasMatrixObjectToWorld = VG_FALSE;
 			Bool32 hasMatrixObjectToView = VG_FALSE;
@@ -818,6 +863,10 @@ namespace vg
 				pPass->apply();
 			}
 
+#ifdef DEBUG
+            m_preparingBuildInDataCostTimer.end(FD_FALSE);
+#endif //DEBUG
+
 			for (uint32_t subMeshIndex = 0u; subMeshIndex < subMeshCount; ++subMeshIndex)
 			{
 				for (uint32_t passIndex = 0u; passIndex < passCount; ++passIndex)
@@ -828,8 +877,18 @@ namespace vg
 					if (stageInfos.size() != 0)
 					{
 						std::shared_ptr<vk::Pipeline> pPipeline;
+#ifdef DEBUG
+                        m_preparingPipelineCostTimer.begin();
+#endif //DEBUG
 						_createPipelineForObj(pPipeline, pMesh, pMaterial, subMeshIndex + subMeshOffset, passIndex);
+#ifdef DEBUG
+                        m_preparingPipelineCostTimer.end(FD_FALSE);
+						m_preparingCommandBufferCostTimer.begin();
+#endif //DEBUG
 						_recordCommandBufferForObj(pPipeline, pMesh, pMaterial, subMeshIndex + subMeshOffset, passIndex);
+#ifdef DEBUG
+                        m_preparingCommandBufferCostTimer.end(FD_FALSE);
+#endif //DEBUG
 						++drawIndex;
 					}
 					else
@@ -853,6 +912,11 @@ namespace vg
 		auto queueTypeCount = static_cast<uint32_t>(RenderQueueType::RANGE_SIZE);
 		auto pDevice = pApp->getDevice();
 
+#ifdef DEBUG
+        fd::CostTimer preparingCommonMatrixsCostTimer;
+		preparingCommonMatrixsCostTimer.begin();
+#endif //DEBUG
+
 		auto projMatrix = pCamera->getProjMatrix();
 
 		if (pScene->getIsRightHand() == VG_FALSE)
@@ -862,11 +926,23 @@ namespace vg
 
 		auto viewMatrix = pCamera->getTransform()->getMatrixWorldToLocal();
 
+#ifdef DEBUG
+        preparingCommonMatrixsCostTimer.end(FD_TRUE);
+		VG_COST_TIME_LOG(plog::debug) << "Preparing common matrixs cost time: " 
+			    << preparingCommonMatrixsCostTimer.costTimer 
+				<< "ms, scene id: " << pScene->getID() 
+				<< ", scene type: " << (pScene->getSpaceType() == SpaceType::SPACE_3 ? "space3" : "space2") 
+				<<  std::endl;
+#endif //DEBUG
 		uint32_t visualObjectCount = pScene->getVisualObjectCount();
 		
 		//----------Preparing render.
 
 		//Filter visualObject is out of camera with its bounds.
+#ifdef DEBUG
+        fd::CostTimer visibilityCheckCostTimer;
+		visibilityCheckCostTimer.begin();
+#endif //DEBUG
 		std::vector<SceneType::VisualObjectType *> validVisualObjects(visualObjectCount); //allocate enough space for array to storage points.
 		uint32_t validVisualObjectCount(0u);
 		for (uint32_t i = 0; i < visualObjectCount; ++i)
@@ -918,6 +994,15 @@ namespace vg
 				pIndexData->updateClipRect(rects, subMeshCount, subMeshOffset);
 			}
 		}
+
+#ifdef DEBUG
+		visibilityCheckCostTimer.end(FD_TRUE);
+		VG_COST_TIME_LOG(plog::debug) << "Visibility check cost time: " 
+			    << visibilityCheckCostTimer.costTimer 
+				<< "ms, scene id: " << pScene->getID() 
+				<< ", scene type: " << (pScene->getSpaceType() == SpaceType::SPACE_3 ? "space3" : "space2") 
+				<<  std::endl;
+#endif //DEBUG
 
 		//Get queue count for each queue type.
 		std::vector<uint32_t> queueLengths(queueTypeCount, 0u);
@@ -997,6 +1082,9 @@ namespace vg
 				auto pVisualObject = queues[typeIndex][objectIndex];
 				auto pMaterial = pVisualObject->getMaterial();
 				auto passCount = pMaterial->getPassCount();
+#ifdef DEBUG
+            m_preparingBuildInDataCostTimer.begin();
+#endif //DEBUG
 				Bool32 hasMatrixObjectToNDC = VG_FALSE;
 			    Bool32 hasMatrixObjectToWorld = VG_FALSE;
 			    Bool32 hasMatrixObjectToView = VG_FALSE;
@@ -1086,6 +1174,10 @@ namespace vg
 					pPass->apply();
 				}
 
+#ifdef DEBUG
+                m_preparingBuildInDataCostTimer.end(FD_FALSE);
+#endif //DEBUG
+
 				for (uint32_t subMeshIndex = 0u; subMeshIndex < subMeshCount; ++subMeshIndex)
 				{
 					for (uint32_t passIndex = 0u; passIndex < passCount; ++passIndex)
@@ -1096,8 +1188,18 @@ namespace vg
 						if (stageInfos.size() != 0)
 						{
 							std::shared_ptr<vk::Pipeline> pPipeline;
+#ifdef DEBUG
+                            m_preparingPipelineCostTimer.begin();
+#endif //DEBUG
 							_createPipelineForObj(pPipeline, pMesh, pMaterial, subMeshIndex + subMeshOffset, passIndex);
+#ifdef DEBUG
+                            m_preparingPipelineCostTimer.end(FD_FALSE);
+							m_preparingCommandBufferCostTimer.begin();
+#endif //DEBUG
 							_recordCommandBufferForObj(pPipeline, pMesh, pMaterial, subMeshIndex + subMeshOffset, passIndex);
+#ifdef DEBUG
+                            m_preparingCommandBufferCostTimer.end(FD_FALSE);
+#endif //DEBUG
 							++drawIndex;
 						}
 						else

@@ -250,10 +250,13 @@ namespace vg
 		auto avaibleLayers = vk::enumerateInstanceLayerProperties();
 
 		//print available layers.
-		VG_LOG(plog::debug) << "Available layers: " << std::endl;
-		for (const auto& layerProperties : avaibleLayers)
+		VG_IF_LOG(plog::debug)
 		{
-			VG_LOG(plog::debug) << "\t" << layerProperties.layerName << std::endl;
+		    VG_LOG(plog::debug) << "Available layers: " << std::endl;
+		    for (const auto& layerProperties : avaibleLayers)
+		    {
+		    	VG_LOG(plog::debug) << "\t" << layerProperties.layerName << std::endl;
+		    }
 		}
 
 		for (const auto& layerName : validationlayers)
@@ -324,28 +327,28 @@ namespace vg
 	{
 		if (flags & vk::DebugReportFlagBitsEXT::eDebug)
 		{
-			VG_LOG(plog::debug) << code << " : " << msg << " at " << layerPrefix << std::endl;
+			VG_VULKAN_LOG(plog::debug) << code << " : " << msg << " at " << layerPrefix << std::endl;
 		}
 		else if (flags & vk::DebugReportFlagBitsEXT::eInformation)
 		{
-			VG_LOG(plog::info) << code << " : " << msg << " at " << layerPrefix << std::endl;
+			VG_VULKAN_LOG(plog::info) << code << " : " << msg << " at " << layerPrefix << std::endl;
 		}
 		else if (flags & vk::DebugReportFlagBitsEXT::eWarning)
 		{
-			VG_LOG(plog::warning) << code << " : " << msg << " at " << layerPrefix << std::endl;
+			VG_VULKAN_LOG(plog::warning) << code << " : " << msg << " at " << layerPrefix << std::endl;
 		}
 		else if (flags & vk::DebugReportFlagBitsEXT::ePerformanceWarning)
 		{
-			VG_LOG(plog::warning) << code << " : " << msg << " at " << layerPrefix << std::endl;
+			VG_VULKAN_LOG(plog::warning) << code << " : " << msg << " at " << layerPrefix << std::endl;
 		}
 		else if (flags & vk::DebugReportFlagBitsEXT::eError)
 		{
-			VG_LOG(plog::error) << code << " : " << msg << " at " << layerPrefix << std::endl;
+			VG_VULKAN_LOG(plog::error) << code << " : " << msg << " at " << layerPrefix << std::endl;
 			throw std::runtime_error(std::to_string(code) + " : " + std::string(msg) + " at " + std::string(layerPrefix));
 		}
 		else
 		{
-			VG_LOG(plog::info) << code << " : " << msg << " at " << layerPrefix << std::endl;
+			VG_VULKAN_LOG(plog::info) << code << " : " << msg << " at " << layerPrefix << std::endl;
 		}
 	}
 #endif // DEBUG

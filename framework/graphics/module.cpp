@@ -18,12 +18,12 @@ namespace vg
 			appender = &debugOutputAppender;
 		}
 		plog::init<VG_PLOG_ID>(severity, appender);
+		plog::init<VG_VULKAN_PLOG_ID>(severity, appender);
 		fd::moduleCreate(severity, callerAppender);
 	}
 
 	void moduleCreateVkinstance(std::string name, uint32_t version, std::vector<const char*> vkExtensions)
 	{
-
 		if (isCreatedVkInstance == VG_TRUE) return;
 		isCreatedVkInstance = VG_TRUE; 
 		pApp = std::shared_ptr<Application>(new Application(name, version));
@@ -58,5 +58,10 @@ namespace vg
 	void setLogSeverity(plog::Severity severity)
 	{
 		plog::get<VG_PLOG_ID>()->setMaxSeverity(severity);
+	}
+
+	void setVulkanLogSeverity(plog::Severity severity)
+	{
+		plog::get<VG_VULKAN_PLOG_ID>()->setMaxSeverity(severity);
 	}
 }

@@ -6,4 +6,5 @@
 #define VG_VERSION_FULL "@VG_VERSION_FULL@"
 
 #define _VG_PLOG_ID @VG_PLOG_ID@
+#define _VG_VULKAN_PLOG_ID @VG_VULKAN_PLOG_ID@
 #cmakedefine VG_LOG_COST_TIME

@@ -3,8 +3,9 @@ set(FOLDER_NAME "framework")
 
 set(FD_PLOG_ID 1)
 set(VG_PLOG_ID 2)
-set(VGF_PLOG_ID 3)
-set(VGIM_PLOG_ID 4)
+set(VG_VULKAN_PLOG_ID 3)
+set(VGF_PLOG_ID 4)
+set(VGIM_PLOG_ID 5)
 
 # framework include.
 set(INCLUDE_DIRS ${INCLUDE_DIRS} ${PROJECT_FRAMEWORK_DIR})

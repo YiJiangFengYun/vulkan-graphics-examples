@@ -28,6 +28,10 @@
 #define VG_VULKAN_LOG(severity) LOG_(VG_VULKAN_PLOG_ID, severity)
 #define VG_VULKAN_IF_LOG(severity) IF_LOG_(VG_VULKAN_PLOG_ID, severity)
 
+#define VG_COST_TIME_PLOG_ID _VG_COST_TIME_PLOG_ID
+#define VG_COST_TIME_LOG(severity) LOG_(VG_COST_TIME_PLOG_ID, severity)
+#define VG_COST_TIME_IF_LOG(severity) IF_LOG_(VG_COST_TIME_PLOG_ID, severity)
+
 #include "graphics/base.hpp"
 
 

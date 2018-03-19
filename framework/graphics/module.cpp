@@ -19,6 +19,7 @@ namespace vg
 		}
 		plog::init<VG_PLOG_ID>(severity, appender);
 		plog::init<VG_VULKAN_PLOG_ID>(severity, appender);
+		plog::init<VG_COST_TIME_PLOG_ID>(severity, appender);
 		fd::moduleCreate(severity, callerAppender);
 	}
 
@@ -63,5 +64,10 @@ namespace vg
 	void setVulkanLogSeverity(plog::Severity severity)
 	{
 		plog::get<VG_VULKAN_PLOG_ID>()->setMaxSeverity(severity);
+	}
+
+	void setCostTimeLogSeverity(plog::Severity severity)
+	{
+		plog::get<VG_COST_TIME_PLOG_ID>()->setMaxSeverity(severity);
 	}
 }

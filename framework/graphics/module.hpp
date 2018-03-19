@@ -21,6 +21,7 @@ namespace vg
 	extern void moduleDestory();
 	extern void setLogSeverity(plog::Severity severity);
 	extern void setVulkanLogSeverity(plog::Severity severity);
+	extern void setCostTimeLogSeverity(plog::Severity severity);
 } //namespace kgs
 
 #endif // !VG_MODULE_H

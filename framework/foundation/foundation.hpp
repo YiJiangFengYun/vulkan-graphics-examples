@@ -6,6 +6,7 @@
 #include "foundation/gemo.hpp"
 #include "foundation/wrapper.hpp"
 #include "foundation/module.hpp"
+#include "foundation/cost_timer.hpp"
 
 namespace fd
 {

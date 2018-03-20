@@ -341,6 +341,7 @@ namespace vg
 		std::unordered_map<std::string, LayoutBindingInfo> m_mapLayoutBinds;
 		std::shared_ptr<vk::Buffer> m_pUniformBuffer;
 		std::shared_ptr<vk::DeviceMemory> m_pUniformBufferMemory;
+		uint32_t m_uniformBufferSize;
 		std::shared_ptr<vk::DescriptorSetLayout> m_pDescriptorSetLayout;
 		std::shared_ptr<vk::PipelineLayout> m_pPipelineLayout;
 		std::shared_ptr<vk::DescriptorPool> m_pDescriptorPool;
@@ -375,6 +376,8 @@ namespace vg
 		//cache
 		std::vector<vk::DescriptorSetLayoutBinding> m_lastBindings;
 		std::vector<vk::PushConstantRange> m_lastPushConstantRanges;
+		std::unordered_map<vk::DescriptorType, uint32_t> m_lastPoolSizeInfos;
+		Bool32 m_needReAllocateDescriptorSet;
 
 		//aggregations
 		Shader *m_pShader;

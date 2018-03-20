@@ -280,7 +280,10 @@ namespace vg
 		, m_pipelineStateID()
 		, m_lastBindings()
 		, m_lastPushConstantRanges()
+		, m_lastPoolSizeInfos()
+		, m_needReAllocateDescriptorSet(VG_FALSE)
 		, m_instanceCount(1u)
+		, m_uniformBufferSize(0u)
 	{
 		_initDefaultBuildInDataInfo();
 		_initBuildInData();
@@ -310,7 +313,10 @@ namespace vg
 		, m_pipelineStateID()
 		, m_lastBindings()
 		, m_lastPushConstantRanges()
+		, m_needReAllocateDescriptorSet(VG_FALSE)
+		, m_lastPoolSizeInfos()
 		, m_instanceCount(1u)
+		, m_uniformBufferSize(0u)
 	{
 		_initDefaultBuildInDataInfo();
 		_initBuildInData();
@@ -366,10 +372,10 @@ namespace vg
 
 	void Pass::setDataValue(const std::string name
 		    , void *src, uint32_t size, uint32_t offset
-			, uint32_t binding = VG_M_OTHER_MIN_BINDING
-			, DescriptorType descriptorType = DescriptorType::UNIFORM_BUFFER
-			, ShaderStageFlags stageFlags = ShaderStageFlagBits::VERTEX
-			, uint32_t descriptorCount = 1u)
+			, uint32_t binding
+			, DescriptorType descriptorType
+			, ShaderStageFlags stageFlags
+			, uint32_t descriptorCount)
 	{
 		m_pData->setDataValue(name, src, size, offset);
 		//update layout binding information.
@@ -778,6 +784,7 @@ namespace vg
 				m_pDescriptorSetLayout = nullptr;
 			}
 			m_lastBindings = bindings;
+			m_needReAllocateDescriptorSet = VG_TRUE;
 		}
 
 		auto pushConstantRanges = getPushConstantRanges();
@@ -818,21 +825,21 @@ namespace vg
 				totalSize += item.bufferSize;
 			}
 		}
-		if (totalSize)
+		if (totalSize > m_uniformBufferSize)
 		{
 			createBuffer(static_cast<vk::DeviceSize>(totalSize), m_pUniformBuffer, m_pUniformBufferMemory);
+			m_uniformBufferSize = totalSize;
 		}
-		else
-		{
-			m_pUniformBuffer = nullptr;
-			m_pUniformBufferMemory = nullptr;
-		}
+		// else
+		// {
+		// 	m_pUniformBuffer = nullptr;
+		// 	m_pUniformBufferMemory = nullptr;
+		// }
 	}
 
 	void Pass::_createDescriptorSet()
 	{
 		std::unordered_map<vk::DescriptorType, uint32_t> mapTypeCounts;
-		size_t index = 0;
 		for (const auto& name : m_arrLayoutBindNames)
 		{
 			const auto& item = m_mapLayoutBinds[name];
@@ -840,50 +847,78 @@ namespace vg
 			mapTypeCounts[vkDescriptorType] += item.descriptorCount; //??? + 1.
 		}
 
-		auto pDevice = pApp->getDevice();
+		std::unordered_map<vk::DescriptorType, uint32_t> mapAllTypes;
+
+		for (const auto &pair : mapTypeCounts) {
+			mapAllTypes[pair.first] = 1u;
+		}
+
+		for (const auto &pair : m_lastPoolSizeInfos) {
+			mapAllTypes[pair.first] = 1u;
+		}
+
+		Bool32 isSame = VG_TRUE;
+		for (const auto &pair : mapAllTypes) {
+			if (m_lastPoolSizeInfos[pair.first] != mapTypeCounts[pair.first]) {
+				isSame = VG_FALSE;
+				break;
+			}
+		}
+
 		//Save old descriptor pool because it will be used to destory the descriptorset later.
 		std::shared_ptr<vk::DescriptorPool> oldPool = m_pDescriptorPool;
-		//create descriptor pool.
+		if (isSame == VG_FALSE)
 		{
+			m_lastPoolSizeInfos = mapTypeCounts;
+
 			std::vector<vk::DescriptorPoolSize> poolSizeInfos(mapTypeCounts.size());
-			index = 0;
-			for (const auto& item : mapTypeCounts)
-			{
-				poolSizeInfos[index].type = item.first;
-				poolSizeInfos[index].descriptorCount = item.second;
-				++index;
-			}
+		    size_t index = 0;
+		    for (const auto& item : mapTypeCounts)
+		    {
+		    	poolSizeInfos[index].type = item.first;
+		    	poolSizeInfos[index].descriptorCount = item.second;
+		    	++index;
+		    }
 
-			if (poolSizeInfos.size())
-			{
-				vk::DescriptorPoolCreateInfo createInfo = { vk::DescriptorPoolCreateFlagBits::eFreeDescriptorSet
-					, 1u
-					, static_cast<uint32_t>(poolSizeInfos.size())
-					, poolSizeInfos.data()
-				};
-				m_pDescriptorPool = fd::createDescriptorPool(pDevice, createInfo);
-			}
-			else
-			{
-				m_pDescriptorPool = nullptr;
-			}
+			auto pDevice = pApp->getDevice();
+		    //create descriptor pool.
+		    {
+		    	if (poolSizeInfos.size())
+		    	{
+		    		vk::DescriptorPoolCreateInfo createInfo = { vk::DescriptorPoolCreateFlagBits::eFreeDescriptorSet
+		    			, 1u
+		    			, static_cast<uint32_t>(poolSizeInfos.size())
+		    			, poolSizeInfos.data()
+		    		};
+		    		m_pDescriptorPool = fd::createDescriptorPool(pDevice, createInfo);
+		    	}
+		    	else
+		    	{
+		    		m_pDescriptorPool = nullptr;
+		    	}
+		    }
 		}
 
-		//create descriptor set.
-		if (m_pDescriptorSetLayout != nullptr)
-		{
-			vk::DescriptorSetLayout layouts[] = { *m_pDescriptorSetLayout };
-			vk::DescriptorSetAllocateInfo allocateInfo = {
-				*m_pDescriptorPool,
-				1u,
-				layouts
-			};
-			m_pDescriptorSet = fd::allocateDescriptorSet(pDevice, m_pDescriptorPool.get(), allocateInfo);
+		if (m_needReAllocateDescriptorSet) {
+			m_needReAllocateDescriptorSet = VG_FALSE;
+			auto pDevice = pApp->getDevice();
+			//create descriptor set.
+		    if (m_pDescriptorSetLayout != nullptr && m_pDescriptorPool != nullptr)
+		    {
+		    	vk::DescriptorSetLayout layouts[] = { *m_pDescriptorSetLayout };
+		    	vk::DescriptorSetAllocateInfo allocateInfo = {
+		    		*m_pDescriptorPool,
+		    		1u,
+		    		layouts
+		    	};
+		    	m_pDescriptorSet = fd::allocateDescriptorSet(pDevice, m_pDescriptorPool.get(), allocateInfo);
+		    }
+		    else
+		    {
+		    	m_pDescriptorSet = nullptr;
+		    }
 		}
-		else
-		{
-			m_pDescriptorSet = nullptr;
-		}
+		
 	}
 
 	void Pass::_updateDescriptorBufferInfo()

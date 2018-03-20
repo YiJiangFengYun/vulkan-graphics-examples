@@ -33,6 +33,7 @@ namespace fd
         costTimer = 0.0f;
         m_addUpTimer = 0.0f;
 		m_addUpCount = 0u;
+        m_isDoing = FD_FALSE;
     }
 
     void CostTimer::begin()

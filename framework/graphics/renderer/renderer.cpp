@@ -945,7 +945,11 @@ namespace vg
 			auto pVisualObject = pScene->getVisualObjectWithIndex(i);
 			auto pMesh = pVisualObject->getMesh();
 			auto isHasBounds = dynamic_cast<SceneType::VisualObjectType::MeshDimType *>(pMesh)->getIsHasBounds();
-			if (pVisualObject->getIsVisibilityCheck() == VG_FALSE || isHasBounds == VG_FALSE)
+			if (isHasBounds == VG_FALSE)
+			{
+				validVisualObjects[validVisualObjectCount++] = pVisualObject;
+			}
+			else if (pVisualObject->getIsVisibilityCheck() == VG_FALSE)
 			{
 				validVisualObjects[validVisualObjectCount++] = pVisualObject;
 				const auto& pIndexData = dynamic_cast<ContentMesh *>(pMesh)->getIndexData();
@@ -1249,7 +1253,11 @@ namespace vg
 			
 			auto pMeshOfChild = pVisualObjectOfChild->getMesh();
 			auto isHasBoundsOfChild = dynamic_cast<Mesh<MeshDimType::SPACE_2> *>(pMeshOfChild)->getIsHasBounds();
-			if (pVisualObjectOfChild->getIsVisibilityCheck() == VG_FALSE || isHasBoundsOfChild == VG_FALSE) 
+			if (isHasBoundsOfChild == VG_FALSE)
+			{
+				arrPVObjs[PVObjIndex++] = pVisualObjectOfChild;
+			} 
+			else if (pVisualObjectOfChild->getIsVisibilityCheck() == VG_FALSE)
 			{
 				arrPVObjs[PVObjIndex++] = pVisualObjectOfChild;
 				const auto& pIndexData = dynamic_cast<ContentMesh *>(pMeshOfChild)->getIndexData();

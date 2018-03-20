@@ -87,12 +87,12 @@ namespace vg
 
 	void Application::initCreateVkInstance(std::vector<const char*> extensions)
 	{
-#ifdef ENABLE_VALIDATION_LAYERS
+#ifdef VG_ENABLE_VALIDATION_LAYERS
 		if (_checkValidationLayerSupport() == false)
 		{
 			throw std::runtime_error("Validation layers requested is not available!");
 		}
-#endif // ENABLE_VALIDATION_LAYERS
+#endif // VG_ENABLE_VALIDATION_LAYERS
 		vk::ApplicationInfo appInfo = { m_appName.data(), m_appVersion, m_engineName.data(), m_engineVersion, VG_VK_API_VERSION };
 
 		//query application required extensions.
@@ -115,7 +115,7 @@ namespace vg
 		}
 #endif // DEBUG
 
-#ifdef ENABLE_VALIDATION_LAYERS
+#ifdef VG_ENABLE_VALIDATION_LAYERS
 		vk::InstanceCreateInfo createInfo = {
 			vk::InstanceCreateFlags(),
 			&appInfo,
@@ -133,7 +133,7 @@ namespace vg
 			static_cast<uint32_t>(requiredExtensions.size()),
 			requiredExtensions.data()
 		};
-#endif // ENABLE_VALIDATION_LAYERS
+#endif // VG_ENABLE_VALIDATION_LAYERS
 
 		//create vulkan instance
 		m_pInstance = fd::createInstance(createInfo);
@@ -243,7 +243,7 @@ namespace vg
 		m_pQueueMaster->freeQueue(m_presentFamily, queueIndex);
 	}
 
-#ifdef ENABLE_VALIDATION_LAYERS
+#ifdef VG_ENABLE_VALIDATION_LAYERS
 	bool Application::_checkValidationLayerSupport()
 	{
 		//query available layers.
@@ -279,7 +279,7 @@ namespace vg
 
 		return true;
 	}
-#endif // ENABLE_VALIDATION_LAYERS
+#endif // VG_ENABLE_VALIDATION_LAYERS
 
 	std::vector<const char*> Application::_getRequiredExtensions()
 	{
@@ -287,17 +287,17 @@ namespace vg
 
 		uint32_t extensionCount = 0;
 
-#ifdef ENABLE_VALIDATION_LAYERS
+#ifdef VG_ENABLE_VALIDATION_LAYERS
 		uint32_t requiredExtensionCount = extensionCount + 1;
 #else
 		uint32_t requiredExtensionCount = extensionCount;
-#endif // ENABLE_VALIDATION_LAYERS
+#endif // VG_ENABLE_VALIDATION_LAYERS
 
 		requiredExtensions.resize(requiredExtensionCount);
 
-#ifdef ENABLE_VALIDATION_LAYERS
+#ifdef VG_ENABLE_VALIDATION_LAYERS
 		requiredExtensions[extensionCount] = VK_EXT_DEBUG_REPORT_EXTENSION_NAME;
-#endif // ENABLE_VALIDATION_LAYERS
+#endif // VG_ENABLE_VALIDATION_LAYERS
 
 		return requiredExtensions;
 	}
@@ -532,10 +532,10 @@ namespace vg
 			&m_physicalDeviceFeatures                                    //pEnabledFeatures
 		};
 
-#ifdef ENABLE_VALIDATION_LAYERS
+#ifdef VG_ENABLE_VALIDATION_LAYERS
 		createInfo.enabledLayerCount = static_cast<uint32_t>(validationlayers.size());
 		createInfo.ppEnabledLayerNames = validationlayers.data();
-#endif // ENABLE_VALIDATION_LAYERS
+#endif // VG_ENABLE_VALIDATION_LAYERS
 
 		m_pDevice = fd::createDevice(m_pPhysicalDevice.get(), createInfo);
 		m_pQueueMaster = std::shared_ptr<QueueMaster>(new QueueMaster(m_pDevice

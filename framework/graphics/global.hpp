@@ -10,10 +10,6 @@
 #define VG_FALSE 0
 #define VG_TRUE 1
 
-#ifdef DEBUG
-#define ENABLE_VALIDATION_LAYERS
-#endif // DEBUG
-
 #include <graphics/config.hpp>
 
 #include <cstdint>

@@ -17,11 +17,11 @@
 
 namespace vg
 {
-#ifdef ENABLE_VALIDATION_LAYERS
+#ifdef VG_ENABLE_VALIDATION_LAYERS
 	const std::vector<const char*> validationlayers = {
 		"VK_LAYER_LUNARG_standard_validation"
 	};
-#endif // ENABLE_VALIDATION_LAYERS
+#endif // VG_ENABLE_VALIDATION_LAYERS
 
 	const std::vector<const char*> deviceExtensionNames = {
 		VK_KHR_SWAPCHAIN_EXTENSION_NAME
@@ -88,9 +88,9 @@ namespace vg
 		std::shared_ptr<vk::CommandPool> m_pCommandPoolForResetBuffer;
 
 
-#ifdef ENABLE_VALIDATION_LAYERS
+#ifdef VG_ENABLE_VALIDATION_LAYERS
 		bool _checkValidationLayerSupport();
-#endif // ENABLE_VALIDATION_LAYERS
+#endif // VG_ENABLE_VALIDATION_LAYERS
 
 #ifdef DEBUG
 		vk::DebugReportCallbackEXT m_debugReportCallBack;

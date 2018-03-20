@@ -280,6 +280,7 @@ namespace vg
 		, m_pipelineStateID()
 		, m_lastBindings()
 		, m_lastPushConstantRanges()
+		, m_instanceCount(1u)
 	{
 		_initDefaultBuildInDataInfo();
 		_initBuildInData();
@@ -309,6 +310,7 @@ namespace vg
 		, m_pipelineStateID()
 		, m_lastBindings()
 		, m_lastPushConstantRanges()
+		, m_instanceCount(1u)
 	{
 		_initDefaultBuildInDataInfo();
 		_initBuildInData();
@@ -625,11 +627,6 @@ namespace vg
 		return pPushConstantUpdates;
 	}
 
-	Pass::PipelineStateID Pass::getPipelineStateID() const
-    {
-        return m_pipelineStateID;
-    }
-
 	void Pass::setSpecializationData(ShaderStageFlagBits shaderStage
 		, void* pData
 		, uint32_t size
@@ -665,6 +662,21 @@ namespace vg
 		std::shared_ptr<PushConstantUpdate> pPushConstantUpdate(new PushConstantUpdate());
 		pPushConstantUpdate->init(pData, size, stageFlags, offset);
 		setValue(name, pPushConstantUpdate, m_mapPPushConstantUpdates, m_arrPushConstantUpdateNames);
+	}
+
+	Pass::PipelineStateID Pass::getPipelineStateID() const
+    {
+        return m_pipelineStateID;
+    }
+
+	const uint32_t Pass::getInstanceCount() const
+	{
+		return m_instanceCount;
+	}
+
+	void Pass::setInstanceCount(uint32_t count)
+	{
+		m_instanceCount = count;
 	}
 
 	const vk::Buffer *Pass::getUniformBuffer() const

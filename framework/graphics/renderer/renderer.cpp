@@ -529,7 +529,14 @@ namespace vg
 		// 	vertexOffset += subVertexDatas[i].vertexCount;
 		// }
 
-		m_pCommandBuffer->drawIndexed(subIndexData.indexCount, 1u, indexOffset, vertexOffset, 0u);
+		uint32_t instanceOffset = 0u;
+		uint32_t instanceCount = pPass->getInstanceCount();
+
+		m_pCommandBuffer->drawIndexed(subIndexData.indexCount, 
+		    instanceCount, 
+			indexOffset, 
+			vertexOffset, 
+			instanceOffset);
 		//m_pCommandBuffer->draw(3, 1, 0, 0);
 	}
 

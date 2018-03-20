@@ -316,6 +316,9 @@ namespace vg
 			, vk::ShaderStageFlags stageFlags 
 			, uint32_t offset);
 
+		const uint32_t getInstanceCount() const;
+		void setInstanceCount(uint32_t count);
+
 		const vk::Buffer *getUniformBuffer() const;
 		const vk::DeviceMemory *getUniformBufferMemory() const;
 		const vk::DescriptorSetLayout *getDescriptorSetLayout() const;
@@ -346,6 +349,8 @@ namespace vg
 		std::vector<vk::PipelineColorBlendAttachmentState> m_colorBlendAttachmentStates;
 		vk::PipelineColorBlendStateCreateInfo m_colorBlendInfo;
 		float m_lineWidth;
+
+		uint32_t m_instanceCount;
 		//todo
 		//each stage may own a specilization constant data.
 		std::unordered_map<vk::ShaderStageFlagBits, std::shared_ptr<SpecializationData>> m_mapSpecilizationDatas;

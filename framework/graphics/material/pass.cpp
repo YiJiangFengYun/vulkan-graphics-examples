@@ -359,6 +359,34 @@ namespace vg
 		m_applied = VG_FALSE;
 	}
 
+	void Pass::getDataValue(const std::string name, void *dst, uint32_t size, uint32_t offset) const
+	{
+		m_pData->getDataValue(name, dst, size, offset);
+	}
+
+	void Pass::setDataValue(const std::string name
+		    , void *src, uint32_t size, uint32_t offset
+			, uint32_t binding = VG_M_OTHER_MIN_BINDING
+			, DescriptorType descriptorType = DescriptorType::UNIFORM_BUFFER
+			, ShaderStageFlags stageFlags = ShaderStageFlagBits::VERTEX
+			, uint32_t descriptorCount = 1u)
+	{
+		m_pData->setDataValue(name, src, size, offset);
+		//update layout binding information.
+		LayoutBindingInfo info(
+			name,
+			VG_FALSE,
+			binding,
+			descriptorType,
+			descriptorCount,
+			stageFlags
+		);
+
+		info.updateSize(m_pData->getDataSize(name));
+		setValue(name, info, m_mapLayoutBinds, m_arrLayoutBindNames);
+		m_applied = VG_FALSE;
+	}
+
 	const Texture *Pass::getMainTexture() const
 	{
 		return getTexture(VG_M_MAIN_TEXTURE_NAME);

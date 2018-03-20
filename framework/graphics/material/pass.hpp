@@ -223,6 +223,8 @@ namespace vg
 		template <typename T>
 		std::vector<T> getDataValue(std::string name, uint32_t count) const;
 
+		void getDataValue(const std::string name, void *dst, uint32_t size, uint32_t offset) const;
+
 		template<typename T>
 		void setDataValue(std::string name
 			, const T &value
@@ -238,6 +240,13 @@ namespace vg
 			, DescriptorType descriptorType = DescriptorType::UNIFORM_BUFFER
 			, ShaderStageFlags stageFlags = ShaderStageFlagBits::VERTEX
 		);
+
+		void setDataValue(const std::string name
+		    , void *src, uint32_t size, uint32_t offset
+			, uint32_t binding = VG_M_OTHER_MIN_BINDING
+			, DescriptorType descriptorType = DescriptorType::UNIFORM_BUFFER
+			, ShaderStageFlags stageFlags = ShaderStageFlagBits::VERTEX
+			, uint32_t descriptorCount = 1u);
 
 		const Texture *getMainTexture() const;
 		void setMainTexture(const Texture *value);

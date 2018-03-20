@@ -20,21 +20,26 @@ public:
 private:
     std::vector<vg::Vector3> m_tempPositions;
 	std::vector<vg::Vector2> m_tempTexCoords;
-	std::vector<vg::Vector3> m_tempNormals;
 	std::vector<uint32_t> m_tempIndices;
 	std::shared_ptr<vg::VisualObject3> m_pModel;
 	std::shared_ptr<vg::DimSepMesh3> m_pMesh;
-	std::shared_ptr<vg::Texture2D> m_pTexture;
+	std::shared_ptr<vg::Texture2DArray> m_pTexture;
 	std::shared_ptr<vg::Shader> m_pShader;
 	std::shared_ptr<vg::Pass> m_pPass;
 	std::shared_ptr<vg::Material> m_pMaterial;
+	uint32_t m_instanceCount;
+	struct Instance
+    {
+    	vg::Matrix4x4 model;
+    	vg::Vector4 arrayIndex;
+    };
 	struct OtherInfo 
 	{
-		vg::Vector4 viewPos;
-	    float lodBias;
-		OtherInfo();
-		OtherInfo(vg::Vector4 viewPos, float lodBias);
+		Instance instance[8];
 	} m_otherInfo;
+
+	static const uint32_t MAX_INSTANCE_COUNT = 8u;
+
 	void _init();
 	void _loadModel();
 	void _createMesh();

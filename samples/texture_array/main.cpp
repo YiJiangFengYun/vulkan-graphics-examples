@@ -14,6 +14,9 @@ int main() {
 
     vg::PhysicalDeviceFeaturePriorities optionalFeatures;
 	optionalFeatures.samplerAnisotropy = 1u;
+	optionalFeatures.textureCompressionBC = 1u;
+	optionalFeatures.textureCompressionASTC_LDR = 1u;
+	optionalFeatures.textureCompressionETC2 = 1u;
 
 	App app;
 	app.init<Window>(WINDOW_WIDTH, WINDOW_HEIGHT, "texture_array", requiredFeatures, optionalFeatures);

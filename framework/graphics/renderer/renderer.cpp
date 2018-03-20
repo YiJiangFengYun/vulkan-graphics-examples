@@ -32,9 +32,9 @@ namespace vg
 		, m_clearValueStencil(0u)
 		, m_renderArea(0.0f, 0.0f, 1.0f, 1.0f)
 		, m_pipelineCache()
-#if defined(DEBUG) && defined(VG_LOG_COST_TIME)
+#if defined(DEBUG) && defined(VG_ENABLE_COST_TIMER)
         , m_preparingRenderCostTimer(fd::CostTimer::TimerType::AVERAGE)
-#endif //DEBUG and VG_LOG_COST_TIME
+#endif //DEBUG and VG_ENABLE_COST_TIMER
 	{
 		_createRenderPass();
 		_createDepthStencilTex();
@@ -59,9 +59,9 @@ namespace vg
 		, m_clearValueStencil(0u)
 		, m_renderArea(0.0f, 0.0f, 1.0f, 1.0f)
 		, m_pipelineCache()
-#if defined(DEBUG) && defined(VG_LOG_COST_TIME)
+#if defined(DEBUG) && defined(VG_ENABLE_COST_TIMER)
         , m_preparingRenderCostTimer(fd::CostTimer::TimerType::AVERAGE)
-#endif //DEBUG and VG_LOG_COST_TIME
+#endif //DEBUG and VG_ENABLE_COST_TIMER
 	{
 		_createRenderPass();
 		_createDepthStencilTex();
@@ -216,12 +216,12 @@ namespace vg
 		m_renderArea = area;
 	}
 
-#if defined(DEBUG) && defined(VG_LOG_COST_TIME)
+#if defined(DEBUG) && defined(VG_ENABLE_COST_TIMER)
     const fd::CostTimer &Renderer::getPreparingRenderCostTimer() const
 	{
 		return m_preparingRenderCostTimer;
 	}
-#endif //DEBUG and VG_LOG_COST_TIME
+#endif //DEBUG and VG_ENABLE_COST_TIMER
 
 	Bool32 Renderer::_isValidForRender() const
 	{
@@ -235,9 +235,9 @@ namespace vg
 
 	void Renderer::_renderBegin()
 	{
-#if defined(DEBUG) && defined(VG_LOG_COST_TIME)
+#if defined(DEBUG) && defined(VG_ENABLE_COST_TIMER)
 		m_preparingRenderCostTimer.begin();
-#endif //DEBUG and VG_LOG_COST_TIME
+#endif //DEBUG and VG_ENABLE_COST_TIMER
 		//command buffer begin
 		_recordCommandBufferForBegin();
 	}
@@ -254,10 +254,10 @@ namespace vg
 		{
 			const auto &pScene = (*(info.pSceneAndCamera + i)).pScene;
 			const auto &pCamera = (*(info.pSceneAndCamera + i)).pCamera;
-#if defined(DEBUG) && defined(VG_LOG_COST_TIME)
+#if defined(DEBUG) && defined(VG_ENABLE_COST_TIMER)
             fd::CostTimer preparingSceneCostTimer(fd::CostTimer::TimerType::ONCE);
 			preparingSceneCostTimer.begin();
-#endif //DEBUG and VG_LOG_COST_TIME
+#endif //DEBUG and VG_ENABLE_COST_TIMER
 			if (pScene->getSpaceType() == SpaceType::SPACE_2)
 			{
 				_renderScene2(dynamic_cast<const Scene<SpaceType::SPACE_2> *>(pScene), 
@@ -273,14 +273,14 @@ namespace vg
 			} else {
 				//todo
 			}
-#if defined(DEBUG) && defined(VG_LOG_COST_TIME)
+#if defined(DEBUG) && defined(VG_ENABLE_COST_TIMER)
 			preparingSceneCostTimer.end();
 			VG_COST_TIME_LOG(plog::debug) << "Preparing scene cost time: " 
 			    << preparingSceneCostTimer.costTimer 
 				<< "ms, scene id: " << pScene->getID() 
 				<< ", scene type: " << (pScene->getSpaceType() == SpaceType::SPACE_3 ? "space3" : "space2") 
 				<<  std::endl;
-#endif //DEBUG and VG_LOG_COST_TIME
+#endif //DEBUG and VG_ENABLE_COST_TIMER
 		}
 
 		uint32_t semaphoreCount = resultInfo.signalSemaphoreCount + 1u;
@@ -294,10 +294,10 @@ namespace vg
 	void Renderer::_renderEnd(const RenderInfo &info)
 	{
 
-#if defined(DEBUG) && defined(VG_LOG_COST_TIME)
+#if defined(DEBUG) && defined(VG_ENABLE_COST_TIMER)
         fd::CostTimer renderEndCostTimer(fd::CostTimer::TimerType::ONCE);
 		renderEndCostTimer.begin();
-#endif //DEBUG and VG_LOG_COST_TIME	
+#endif //DEBUG and VG_ENABLE_COST_TIMER	
 
 		//command buffer end
 		_recordCommandBufferForEnd();
@@ -328,17 +328,17 @@ namespace vg
 		pApp->freeGraphicsQueue(queueIndex);
 		VG_LOG(plog::debug) << "Post submit to grahics queue." << std::endl;
 		
-#if defined(DEBUG) && defined(VG_LOG_COST_TIME)
+#if defined(DEBUG) && defined(VG_ENABLE_COST_TIMER)
         renderEndCostTimer.end();
 		VG_COST_TIME_LOG(plog::debug) << "Render end cost time: " 
 			    << renderEndCostTimer.costTimer 
 				<< std::endl;
-#endif //DEBUG and VG_LOG_COST_TIME
+#endif //DEBUG and VG_ENABLE_COST_TIMER
 
-#if defined(DEBUG) && defined(VG_LOG_COST_TIME)
+#if defined(DEBUG) && defined(VG_ENABLE_COST_TIMER)
 		m_preparingRenderCostTimer.end();
 		VG_COST_TIME_LOG(plog::debug) << "Average cost time of preparing render: " << m_preparingRenderCostTimer.costTimer << "ms." << std::endl;
-#endif //DEBUG and VG_LOG_COST_TIME
+#endif //DEBUG and VG_ENABLE_COST_TIMER
 	}
 
 	void Renderer::_postRender()
@@ -900,11 +900,11 @@ namespace vg
 		auto queueTypeCount = static_cast<uint32_t>(RenderQueueType::RANGE_SIZE);
 		auto pDevice = pApp->getDevice();
 
-#if defined(DEBUG) && defined(VG_LOG_COST_TIME)
+#if defined(DEBUG) && defined(VG_ENABLE_COST_TIMER)
         
         fd::CostTimer preparingCommonMatrixsCostTimer(fd::CostTimer::TimerType::ONCE);
 		preparingCommonMatrixsCostTimer.begin();
-#endif //DEBUG and VG_LOG_COST_TIME
+#endif //DEBUG and VG_ENABLE_COST_TIMER
 
 		auto projMatrix = pCamera->getProjMatrix();
 
@@ -914,23 +914,23 @@ namespace vg
 		}
 
 		auto viewMatrix = pCamera->getTransform()->getMatrixWorldToLocal();
-#if defined(DEBUG) && defined(VG_LOG_COST_TIME)
+#if defined(DEBUG) && defined(VG_ENABLE_COST_TIMER)
         preparingCommonMatrixsCostTimer.end();
 		VG_COST_TIME_LOG(plog::debug) << "Preparing common matrixs cost time: " 
 			    << preparingCommonMatrixsCostTimer.costTimer 
 				<< "ms, scene id: " << pScene->getID() 
 				<< ", scene type: " << (pScene->getSpaceType() == SpaceType::SPACE_3 ? "space3" : "space2") 
 				<<  std::endl;
-#endif //DEBUG and VG_LOG_COST_TIME
+#endif //DEBUG and VG_ENABLE_COST_TIMER
 		uint32_t visualObjectCount = pScene->getVisualObjectCount();
 		
 		//----------Preparing render.
 
 		//Filter visualObject is out of camera with its bounds.
-#if defined(DEBUG) && defined(VG_LOG_COST_TIME)
+#if defined(DEBUG) && defined(VG_ENABLE_COST_TIMER)
         fd::CostTimer visibilityCheckCostTimer(fd::CostTimer::TimerType::ONCE);
 		visibilityCheckCostTimer.begin();
-#endif //DEBUG and VG_LOG_COST_TIME
+#endif //DEBUG and VG_ENABLE_COST_TIMER
 		std::vector<SceneType::VisualObjectType *> validVisualObjects(visualObjectCount); //allocate enough space for array to storage points.
 		uint32_t validVisualObjectCount(0u);
 		for (uint32_t i = 0; i < visualObjectCount; ++i)
@@ -983,7 +983,7 @@ namespace vg
 			}
 		}
 
-#if defined(DEBUG) && defined(VG_LOG_COST_TIME)
+#if defined(DEBUG) && defined(VG_ENABLE_COST_TIMER)
 		visibilityCheckCostTimer.end();
 		VG_COST_TIME_LOG(plog::debug) << "Visibility check cost time: " 
 			    << visibilityCheckCostTimer.costTimer 
@@ -994,7 +994,7 @@ namespace vg
 		fd::CostTimer preparingBuildInDataCostTimer(fd::CostTimer::TimerType::ACCUMULATION);
 		fd::CostTimer preparingPipelineCostTimer(fd::CostTimer::TimerType::ACCUMULATION);
 		fd::CostTimer preparingCommandBufferCostTimer;(fd::CostTimer::TimerType::ACCUMULATION);
-#endif //DEBUG and VG_LOG_COST_TIME
+#endif //DEBUG and VG_ENABLE_COST_TIMER
 
 		//Get queue count for each queue type.
 		std::vector<uint32_t> queueLengths(queueTypeCount, 0u);
@@ -1074,9 +1074,9 @@ namespace vg
 				auto pVisualObject = queues[typeIndex][objectIndex];
 				auto pMaterial = pVisualObject->getMaterial();
 				auto passCount = pMaterial->getPassCount();
-#if defined(DEBUG) && defined(VG_LOG_COST_TIME)
+#if defined(DEBUG) && defined(VG_ENABLE_COST_TIMER)
                 preparingBuildInDataCostTimer.begin();
-#endif //DEBUG and VG_LOG_COST_TIME
+#endif //DEBUG and VG_ENABLE_COST_TIMER
 				Bool32 hasMatrixObjectToNDC = VG_FALSE;
 			    Bool32 hasMatrixObjectToWorld = VG_FALSE;
 			    Bool32 hasMatrixObjectToView = VG_FALSE;
@@ -1166,9 +1166,9 @@ namespace vg
 					pPass->apply();
 				}
 
-#if defined(DEBUG) && defined(VG_LOG_COST_TIME)
+#if defined(DEBUG) && defined(VG_ENABLE_COST_TIMER)
                 preparingBuildInDataCostTimer.end();
-#endif //DEBUG and VG_LOG_COST_TIME
+#endif //DEBUG and VG_ENABLE_COST_TIMER
 
 				for (uint32_t subMeshIndex = 0u; subMeshIndex < subMeshCount; ++subMeshIndex)
 				{
@@ -1180,18 +1180,18 @@ namespace vg
 						if (stageInfos.size() != 0)
 						{
 							std::shared_ptr<vk::Pipeline> pPipeline;
-#if defined(DEBUG) && defined(VG_LOG_COST_TIME)
+#if defined(DEBUG) && defined(VG_ENABLE_COST_TIMER)
                             preparingPipelineCostTimer.begin();
-#endif //DEBUG and VG_LOG_COST_TIME
+#endif //DEBUG and VG_ENABLE_COST_TIMER
 							_createPipelineForObj(pPipeline, pMesh, pMaterial, subMeshIndex + subMeshOffset, passIndex);
-#if defined(DEBUG) && defined(VG_LOG_COST_TIME)
+#if defined(DEBUG) && defined(VG_ENABLE_COST_TIMER)
                             preparingPipelineCostTimer.end();
 							preparingCommandBufferCostTimer.begin();
-#endif //DEBUG and VG_LOG_COST_TIME
+#endif //DEBUG and VG_ENABLE_COST_TIMER
 							_recordCommandBufferForObj(pPipeline, pMesh, pMaterial, subMeshIndex + subMeshOffset, passIndex);
-#if defined(DEBUG) && defined(VG_LOG_COST_TIME)
+#if defined(DEBUG) && defined(VG_ENABLE_COST_TIMER)
                             preparingCommandBufferCostTimer.end();
-#endif //DEBUG and VG_LOG_COST_TIME
+#endif //DEBUG and VG_ENABLE_COST_TIMER
 							++drawIndex;
 						}
 						else
@@ -1203,7 +1203,7 @@ namespace vg
 			}
 		}
 
-#if defined(DEBUG) && defined(VG_LOG_COST_TIME)
+#if defined(DEBUG) && defined(VG_ENABLE_COST_TIMER)
 		VG_COST_TIME_LOG(plog::debug) << "Preparing buildin data cost time: " 
 		    << preparingBuildInDataCostTimer.costTimer 
 		    << "ms, scene id: " << pScene->getID() 
@@ -1219,7 +1219,7 @@ namespace vg
 			<< "ms, scene id: " << pScene->getID() 
 			<< ", scene type: " << (pScene->getSpaceType() == SpaceType::SPACE_3 ? "space3" : "space2") 
 			<<  std::endl;
-#endif //DEBUG and VG_LOG_COST_TIME
+#endif //DEBUG and VG_ENABLE_COST_TIMER
 	}
 
 	void fillValidVisualObjects(std::vector<VisualObject<SpaceType::SPACE_2> *> &arrPVObjs,

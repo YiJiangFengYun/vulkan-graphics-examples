@@ -78,9 +78,9 @@ namespace vg
 		const fd::Rect2D &getClearArea() const;
 		void setClearArea(fd::Rect2D area);
 
-#if defined(DEBUG) && defined(VG_LOG_COST_TIME)
+#if defined(DEBUG) && defined(VG_ENABLE_COST_TIMER)
         const fd::CostTimer &getPreparingRenderCostTimer() const;
-#endif //DEBUG and VG_LOG_COST_TIME
+#endif //DEBUG and VG_ENABLE_COST_TIMER
 	protected:
 		//compositions
 		uint32_t m_framebufferWidth;
@@ -107,9 +107,9 @@ namespace vg
 		//Renderer will render to color texture when it is not null.
 		TextureColorAttachment *m_pColorTexture;
 
-#if defined(DEBUG) && defined(VG_LOG_COST_TIME)
+#if defined(DEBUG) && defined(VG_ENABLE_COST_TIMER)
         fd::CostTimer m_preparingRenderCostTimer;
-#endif //DEBUG and VG_LOG_COST_TIME
+#endif //DEBUG and VG_ENABLE_COST_TIMER
 
 		virtual void _preRender();
 		virtual void _renderBegin();
@@ -152,9 +152,9 @@ namespace vg
 	        , const RenderInfo &info
 	    	, RenderResultInfo &resultInfo);
 
-#if defined(DEBUG) && defined(VG_LOG_COST_TIME)
+#if defined(DEBUG) && defined(VG_ENABLE_COST_TIMER)
 
-#endif //DEBUG and VG_LOG_COST_TIME
+#endif //DEBUG and VG_ENABLE_COST_TIMER
 
 	private:
 		Renderer() = delete;

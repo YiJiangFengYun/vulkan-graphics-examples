@@ -5,7 +5,7 @@ set(VG_VERSION_EXTRA "")
 set(VG_VERSION "${VG_VERSION_MAJOR}.${VG_VERSION_MINOR}")
 set(VG_VERSION_FULL "${VG_VERSION}.${VG_VERSION_PATCH}${VG_VERSION_EXTRA}")
 
-option(VG_LOG_COST_TIME "Logging cost time info for the important step." ON)
+option(VG_LOG_COST_TIME "Logging cost time info for the important step." OFF)
 
 # add the binary tree directory to the search path for include files
 # include_directories( ${CMAKE_CURRENT_BINARY_DIR} )

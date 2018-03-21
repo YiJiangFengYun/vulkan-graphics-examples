@@ -196,6 +196,7 @@ namespace vg
 			LayoutBindingInfo& operator=(const LayoutBindingInfo &);
 
 			Bool32 operator ==(const LayoutBindingInfo& target) const;
+			Bool32 operator !=(const LayoutBindingInfo& target) const;
 
 			void updateSize(const MaterialData *pMaterialData);
 			void updateSize(const uint32_t dataSize);
@@ -375,17 +376,22 @@ namespace vg
 
 		//cache
 		std::vector<vk::DescriptorSetLayoutBinding> m_lastBindings;
+		std::vector<std::string> m_lastLayoutBindNames;
+		std::unordered_map<std::string, LayoutBindingInfo> m_lastLayoutBinds;
 		std::vector<vk::PushConstantRange> m_lastPushConstantRanges;
 		std::unordered_map<vk::DescriptorType, uint32_t> m_lastPoolSizeInfos;
 		Bool32 m_needReAllocateDescriptorSet;
+		Bool32 m_needUpdateDescriptorInfo;
 
 		//aggregations
 		Shader *m_pShader;
 		void _createPipelineLayout();  
 		void _createUniformBuffer();
 		void _createDescriptorSet();
+		void _beginCheckNeedUpdateDescriptorInfo();
 		void _updateDescriptorBufferInfo();
 		void _updateDescriptorImageInfo();
+		void _endCheckNeedUpdateDescriptorInfo();
 		void _applyBufferContent();
 		void _updatePipelineStateID();
 

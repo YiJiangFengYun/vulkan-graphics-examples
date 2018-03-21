@@ -257,6 +257,12 @@ namespace vg
 			&& stageFlags == target.stageFlags;
 	}
 
+	Bool32 Pass::LayoutBindingInfo::operator !=(const LayoutBindingInfo& target) const
+	{
+		return ! (*this == target);
+	}
+
+
 	Pass::Pass() 
 		: Base(BaseType::PASS)
 		, m_pData(new MaterialData())
@@ -279,9 +285,12 @@ namespace vg
 		, m_buildInDataInfoComponents()
 		, m_pipelineStateID()
 		, m_lastBindings()
+		, m_lastLayoutBindNames()
+		, m_lastLayoutBinds()
 		, m_lastPushConstantRanges()
 		, m_lastPoolSizeInfos()
 		, m_needReAllocateDescriptorSet(VG_FALSE)
+		, m_needUpdateDescriptorInfo(VG_FALSE)
 		, m_instanceCount(1u)
 		, m_uniformBufferSize(0u)
 	{
@@ -312,8 +321,11 @@ namespace vg
 		, m_buildInDataInfoComponents()
 		, m_pipelineStateID()
 		, m_lastBindings()
+		, m_lastLayoutBindNames()
+		, m_lastLayoutBinds()
 		, m_lastPushConstantRanges()
 		, m_needReAllocateDescriptorSet(VG_FALSE)
+		, m_needUpdateDescriptorInfo(VG_FALSE)
 		, m_lastPoolSizeInfos()
 		, m_instanceCount(1u)
 		, m_uniformBufferSize(0u)
@@ -442,8 +454,12 @@ namespace vg
 			_createPipelineLayout();
 			_createUniformBuffer();
 			_createDescriptorSet();
-			_updateDescriptorBufferInfo();
-			_updateDescriptorImageInfo();
+			_beginCheckNeedUpdateDescriptorInfo();
+			if (m_needUpdateDescriptorInfo == VG_TRUE) {
+			    _updateDescriptorBufferInfo();
+			    _updateDescriptorImageInfo();
+			}
+			_endCheckNeedUpdateDescriptorInfo();
 			_applyBufferContent();
 			m_applied = VG_TRUE;
 		}
@@ -869,6 +885,7 @@ namespace vg
 		std::shared_ptr<vk::DescriptorPool> oldPool = m_pDescriptorPool;
 		if (isSame == VG_FALSE)
 		{
+			m_needReAllocateDescriptorSet = VG_TRUE;
 			m_lastPoolSizeInfos = mapTypeCounts;
 
 			std::vector<vk::DescriptorPoolSize> poolSizeInfos(mapTypeCounts.size());
@@ -901,6 +918,8 @@ namespace vg
 
 		if (m_needReAllocateDescriptorSet) {
 			m_needReAllocateDescriptorSet = VG_FALSE;
+			//We must update descriptor information after reallocating descriptor set.
+			m_needUpdateDescriptorInfo = VG_TRUE; 
 			auto pDevice = pApp->getDevice();
 			//create descriptor set.
 		    if (m_pDescriptorSetLayout != nullptr && m_pDescriptorPool != nullptr)
@@ -919,6 +938,23 @@ namespace vg
 		    }
 		}
 		
+	}
+
+	void Pass::_beginCheckNeedUpdateDescriptorInfo()
+	{
+		if (m_needUpdateDescriptorInfo == VG_TRUE) return;
+		if (m_arrLayoutBindNames != m_lastLayoutBindNames) {
+			m_needUpdateDescriptorInfo = VG_TRUE;
+			return;
+		}
+		for (const auto &name : m_arrLayoutBindNames) {
+			const auto &value1 = m_mapLayoutBinds[name];
+			const auto &value2 = m_lastLayoutBinds[name];
+			if (value1 != value2) {
+				m_needUpdateDescriptorInfo = VG_TRUE;
+				return;
+			}
+		}
 	}
 
 	void Pass::_updateDescriptorBufferInfo()
@@ -1012,6 +1048,17 @@ namespace vg
 
 		auto pDevice = pApp->getDevice();
 		pDevice->updateDescriptorSets(writes, nullptr);
+	}
+
+	void Pass::_endCheckNeedUpdateDescriptorInfo()
+	{
+		if (m_needUpdateDescriptorInfo == VG_TRUE) 
+		{
+			m_lastLayoutBindNames = m_arrLayoutBindNames;
+			m_lastLayoutBinds = m_mapLayoutBinds;
+		}
+		m_needUpdateDescriptorInfo = VG_FALSE;
+		
 	}
 
 	void Pass::_applyBufferContent()

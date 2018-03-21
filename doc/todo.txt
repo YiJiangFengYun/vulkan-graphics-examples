@@ -1,8 +1,4 @@
 1.The Module of new own model format and The tool application transfer the new model format to the standardised model
 format (COLLADA).
-
-2.Problem: _updateDescriptorBufferInfo and _updateDescriptorImageInfo of pass should not be called when only _updateDescriptorImageInfo
-    buffer content and image conent.
-
-3.Mesh bounds is not applicable at sample texture array.
-4.A cmake function to compile shaders and copy resources.
+2.Mesh bounds is not applicable at sample texture array.
+3.A cmake function to compile shaders and copy resources.

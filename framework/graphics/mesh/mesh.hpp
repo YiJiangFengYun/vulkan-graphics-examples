@@ -269,6 +269,9 @@ namespace vg
 
 		virtual void apply(Bool32 makeUnreadable) override;
 
+		void setIsHasBounds(Bool32 isHasBounds);
+		void setBounds(fd::Bounds<PointType> bounds);
+
 	private:
 		inline void _updateBounds();
 	};

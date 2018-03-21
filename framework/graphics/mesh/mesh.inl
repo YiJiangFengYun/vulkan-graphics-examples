@@ -163,6 +163,18 @@ namespace vg
 	}
 
 	template <MeshDimType meshDimType>
+	void DimSepMesh<meshDimType>::setIsHasBounds(Bool32 isHasBounds)
+	{
+		m_hasBounds = isHasBounds;
+	}
+
+    template <MeshDimType meshDimType>
+	void DimSepMesh<meshDimType>::setBounds(fd::Bounds<PointType> bounds)
+	{
+		m_bounds = bounds;
+	}
+
+	template <MeshDimType meshDimType>
 	inline void DimSepMesh<meshDimType>::_updateBounds()
 	{
 		if (m_vertexCount == 0u)

@@ -87,6 +87,7 @@ void Window::_createMesh()
 	m_pMesh->setTextureCoordinates<vg::TextureCoordinateType::VECTOR_2, vg::TextureCoordinateIndex::TextureCoordinate_0>(m_tempTexCoords);
 	m_pMesh->setIndices(m_tempIndices, vg::PrimitiveTopology::TRIANGLE_LIST, 0u);
 	m_pMesh->apply(VG_TRUE);
+	m_pMesh->setIsHasBounds(VG_FALSE);
 }
 
 void Window::_createTexture()
@@ -210,7 +211,7 @@ void Window::_createModel()
 	m_pModel = std::shared_ptr<vg::VisualObject3>(new vg::VisualObject3());
 	m_pModel->setMesh(m_pMesh.get());
 	m_pModel->setMaterial(m_pMaterial.get());
-	m_pModel->setIsVisibilityCheck(VG_FALSE);
+	// m_pModel->setIsVisibilityCheck(VG_FALSE);
 	m_pScene->addVisualObject(m_pModel.get());
 }
 

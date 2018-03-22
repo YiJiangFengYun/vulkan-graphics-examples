@@ -18,7 +18,6 @@ macro(res_process target res_output_dir res_dir shader_dir shader_names )
             foreach(SHADER ${SHADERS})
                set(SHADER_SPV "${SHADER}.spv")
                if(WIN32)
-                   message("res_processs, excute add_custom_command")
                    add_custom_command(TARGET ${target} PRE_BUILD
                        COMMAND "${Vulkan_BIN_DIR}/glslangValidator.exe" "-V" "${SHADER}" "-o" "${SHADER_SPV}"
                    )

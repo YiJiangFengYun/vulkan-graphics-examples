@@ -164,6 +164,9 @@ add_subdirectory(framework)
 # enable test
 enable_testing ()
 
+list(APPEND CMAKE_MODULE_PATH "${CMAKE_CURRENT_SOURCE_DIR}/cmake")
+include(ResourceProcess)
+
 # samples generation
 if(BUILD_SAMPLES)
     add_subdirectory(samples)

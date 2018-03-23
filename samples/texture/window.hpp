@@ -4,7 +4,6 @@
 #include "sampleslib/window.hpp"
 #include "sampleslib/scene_assimp.hpp"
 
-#define SCENE_COUNT 3u
 class Window : public sampleslib::Window<vg::SpaceType::SPACE_3>
 {
 public:

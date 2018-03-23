@@ -2,8 +2,8 @@
 #define VG_VERTEX_DATA_UTIL_H
 
 #include "graphics/global.hpp"
-#include "graphics/vertex_data/vertex_data.hpp"
-#include "graphics/vertex_data/index_data.hpp"
+#include "graphics/buffer_data/vertex_data.hpp"
+#include "graphics/buffer_data/index_data.hpp"
 
 namespace vg
 {

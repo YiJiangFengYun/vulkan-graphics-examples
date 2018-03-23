@@ -1,6 +1,6 @@
 #include "graphics/renderer/renderer.hpp"
 
-#include "graphics/vertex_data/util.hpp"
+#include "graphics/buffer_data/util.hpp"
 
 namespace vg
 {

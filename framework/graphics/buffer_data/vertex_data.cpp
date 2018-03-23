@@ -1,4 +1,4 @@
-#include "graphics/vertex_data/vertex_data.hpp"
+#include "graphics/buffer_data/vertex_data.hpp"
 
 #include "graphics/util/find_memory.hpp"
 #include "graphics/util/single_time_command.hpp"

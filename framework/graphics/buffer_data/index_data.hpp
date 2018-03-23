@@ -3,7 +3,7 @@
 
 #include <foundation/foundation.hpp>
 #include "graphics/global.hpp"
-#include "graphics/vertex_data/vertex_data_option.hpp"
+#include "graphics/buffer_data/vertex_data_option.hpp"
 
 namespace vg {
      class IndexData : public Base
@@ -102,5 +102,5 @@ namespace vg {
             uint32_t subDataCount2, const SubIndexData *pSubDatas2);
      };
 } //!vg
-#include "graphics/vertex_data/index_data.inl"
+#include "graphics/buffer_data/index_data.inl"
 #endif //!VG_INDEX_DATA_H

@@ -3,7 +3,7 @@
 
 #include <foundation/foundation.hpp>
 #include "graphics/global.hpp"
-#include "graphics/vertex_data/vertex_data_option.hpp"
+#include "graphics/buffer_data/vertex_data_option.hpp"
 
 namespace vg 
 {
@@ -113,6 +113,6 @@ namespace vg
 
 } //!vg
 
-#include "graphics/vertex_data/vertex_data.inl"
+#include "graphics/buffer_data/vertex_data.inl"
 
 #endif //!VG_VERTEX_DATA_H

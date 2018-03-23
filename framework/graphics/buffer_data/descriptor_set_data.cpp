@@ -1,4 +1,4 @@
-#include "graphics/buffer_data/uniform_buffer_data.hpp"
+#include "graphics/buffer_data/descriptor_set_data.hpp"
 
 #include "graphics/module.hpp"
 #include "graphics/util/find_memory.hpp"
@@ -8,14 +8,16 @@
 namespace vg
 {
     UniformBufferData::DescriptorBufferInfo::DescriptorBufferInfo()
-        : range(0u)
+        : type(DescriptorInfoType::BUFFER)
+        , range(0u)
         , bufferRange(0u)
     {
 
     }
 
     UniformBufferData::DescriptorBufferInfo::DescriptorBufferInfo(uint32_t range, uint32_t bufferRange)
-        : range(range)
+        : type(DescriptorInfoType::BUFFER)
+        , range(range)
         , bufferRange(bufferRange)
     {
 
@@ -34,7 +36,8 @@ namespace vg
     }
 
     UniformBufferData::DescriptorImageInfo::DescriptorImageInfo()
-        : sampler(nullptr)
+        : type(DescriptorInfoType::IMAGE)
+        , sampler(nullptr)
         , imageView(nullptr)
         , imageLayout(vk::ImageLayout::eUndefined)
     {
@@ -45,13 +48,64 @@ namespace vg
         , vk::ImageView imageView
         , vk::ImageLayout imageLayout
         )
-        : sampler(sampler)
+        : type(DescriptorInfoType::IMAGE)
+        , sampler(sampler)
         , imageView(imageView)
         , imageLayout(imageLayout)
 
     {
 
     }
+
+    Bool32  UniformBufferData::DescriptorImageInfo::operator ==(const DescriptorImageInfo& target) const
+    {
+        if (sampler == target.sampler && imageView == target.imageView && imageLayout == target.imageLayout) return VG_TRUE;
+        return VG_FALSE;
+    }
+
+	Bool32  UniformBufferData::DescriptorImageInfo::operator !=(const DescriptorImageInfo& target) const
+    {
+        if ((*this) == target) return VG_FALSE;
+        return VG_TRUE;
+    }
+
+	UniformBufferData::DescriptorInfo::DescriptorInfo()
+	{
+		//bufferInfo = DescriptorBufferInfo();
+	}
+
+	/*UniformBufferData::DescriptorInfo::DescriptorInfo(DescriptorInfoType type)
+	{
+		if (type == DescriptorInfoType::IMAGE)
+		{
+			imageInfo = DescriptorImageInfo();
+			
+		}
+		else
+		{
+			bufferInfo = DescriptorBufferInfo();
+		}
+	}*/
+
+     Bool32  UniformBufferData::DescriptorInfo::operator ==(const DescriptorInfo& target) const
+    {
+        if (this->bufferInfo.type != target.bufferInfo.type) return VG_FALSE;
+        if (this->bufferInfo.type == DescriptorInfoType::BUFFER)
+        {
+            return this->bufferInfo == target.bufferInfo;
+        } else if (this->bufferInfo.type == DescriptorInfoType::IMAGE){
+            return this->imageInfo == target.imageInfo;
+        } else {
+            throw std::runtime_error("Unvalid descriptor type.");
+        }
+    }
+
+	Bool32  UniformBufferData::DescriptorInfo::operator !=(const DescriptorInfo& target) const
+    {
+        if ((*this) == target) return VG_FALSE;
+        return VG_TRUE;
+    }
+
 
     UniformBufferData::SubDataInfo::SubDataInfo()
         : layoutBindingCount(0u)
@@ -64,7 +118,7 @@ namespace vg
 
     UniformBufferData::SubDataInfo::SubDataInfo(uint32_t layoutBindingCount
         , vk::DescriptorSetLayoutBinding *pLayoutBindings
-        , DescriptorBufferInfo *pDescriptorInfos
+        , DescriptorInfo *pDescriptorInfos
         , uint32_t bufferOffset
         )
         : layoutBindingCount(layoutBindingCount)
@@ -171,7 +225,6 @@ namespace vg
         if (poolChanged) m_descriptorPool = descriptorPool;
 
         //Check if descriptor infos  is changed.
-
         uint32_t descriptorInfoCount = 0u;
         for (uint32_t i = 0; i < info.layoutBindingCount; ++i)
         {
@@ -209,28 +262,80 @@ namespace vg
             (descriptorInfosChanged || bufferChanged || layoutBindingChanged || poolChanged))
         {
             std::vector<vk::WriteDescriptorSet> writes(m_layoutBindingCount);
-		    std::vector<std::vector<vk::DescriptorBufferInfo>> bufferInfoss(m_layoutBindingCount);
+            uint32_t bufferInfoCount = 0u;
+            uint32_t imageInfoCount = 0u;
+            for (uint32_t i = 0; i < m_layoutBindingCount; ++i)
+            {
+                const auto &binding = m_layoutBindings[i];
+                if (binding.descriptorType == vk::DescriptorType::eUniformBuffer)
+                {
+                    ++bufferInfoCount;
+                }
+                else if (binding.descriptorType == vk::DescriptorType::eCombinedImageSampler)
+                {
+                    ++imageInfoCount;
+                }
+                else 
+                {
+                    throw std::runtime_error("Unvalid descriptor type.");
+                }
+            }
+
+		    std::vector<std::vector<vk::DescriptorBufferInfo>> bufferInfoss(bufferInfoCount);
+            std::vector<std::vector<vk::DescriptorImageInfo>> imageInfoss(imageInfoCount);
 		    uint32_t offset = info.bufferOffset;
 		    uint32_t descriptorInfoIndex = 0u;
+            uint32_t bufferInfoIndex = 0u;
+            uint32_t imageInfoIndex = 0u;
             for (uint32_t bindingIndex = 0u; bindingIndex < m_layoutBindingCount; ++bindingIndex)
             {
                 const auto &layoutBinding = m_layoutBindings[bindingIndex];
-                bufferInfoss[bindingIndex].resize(layoutBinding.descriptorCount);
-                for (uint32_t descriptorIndex = 0u; descriptorIndex < layoutBinding.descriptorCount; ++descriptorIndex)
+                if (layoutBinding.descriptorType == vk::DescriptorType::eUniformBuffer)
                 {
-                    auto &descriptorInfo = m_descriptorInfos[descriptorInfoIndex];
-                    bufferInfoss[bindingIndex][descriptorIndex].buffer = buffer;
-                    bufferInfoss[bindingIndex][descriptorIndex].offset = offset;
-                    bufferInfoss[bindingIndex][descriptorIndex].range = descriptorInfo.range;
-                    offset += descriptorInfo.bufferRange;
-                    ++descriptorInfoIndex;
+                    bufferInfoss[bufferInfoIndex].resize(layoutBinding.descriptorCount);
+                    for (uint32_t descriptorIndex = 0u; descriptorIndex < layoutBinding.descriptorCount; ++descriptorIndex)
+                    {
+                        auto &descriptorInfo = m_descriptorInfos[descriptorInfoIndex];
+                        bufferInfoss[bufferInfoIndex][descriptorIndex].buffer = buffer;
+                        bufferInfoss[bufferInfoIndex][descriptorIndex].offset = offset;
+                        bufferInfoss[bufferInfoIndex][descriptorIndex].range = descriptorInfo.bufferInfo.range;
+                        offset += descriptorInfo.bufferInfo.bufferRange;
+                        ++descriptorInfoIndex;
+                    }
+                    writes[bindingIndex].dstSet = *m_pDescriptorSet;
+		    	    writes[bindingIndex].dstBinding = layoutBinding.binding;
+		    	    writes[bindingIndex].descriptorType = layoutBinding.descriptorType;
+		    	    writes[bindingIndex].dstArrayElement = 0;
+		    	    writes[bindingIndex].descriptorCount = layoutBinding.descriptorCount;
+		    	    writes[bindingIndex].pBufferInfo = bufferInfoss[bufferInfoIndex].data();
+                    ++bufferInfoIndex;
+                    
                 }
-                writes[bindingIndex].dstSet = *m_pDescriptorSet;
-		    	writes[bindingIndex].dstBinding = layoutBinding.binding;
-		    	writes[bindingIndex].descriptorType = layoutBinding.descriptorType;
-		    	writes[bindingIndex].dstArrayElement = 0;
-		    	writes[bindingIndex].descriptorCount = layoutBinding.descriptorCount;
-		    	writes[bindingIndex].pBufferInfo = bufferInfoss[bindingIndex].data();
+                else if (layoutBinding.descriptorType == vk::DescriptorType::eCombinedImageSampler)
+                {
+                    imageInfoss[imageInfoIndex].resize(layoutBinding.descriptorCount);
+                    for (uint32_t descriptorIndex = 0u; descriptorIndex < layoutBinding.descriptorCount; ++descriptorIndex)
+                    {
+                        auto &descriptorInfo = m_descriptorInfos[descriptorInfoIndex];
+                        imageInfoss[imageInfoIndex][descriptorIndex].sampler = descriptorInfo.imageInfo.sampler;
+                        imageInfoss[imageInfoIndex][descriptorIndex].imageView = descriptorInfo.imageInfo.imageView;
+                        imageInfoss[imageInfoIndex][descriptorIndex].imageLayout = descriptorInfo.imageInfo.imageLayout;
+                        ++descriptorInfoIndex;
+                    }
+                    writes[bindingIndex].dstSet = *m_pDescriptorSet;
+		    	    writes[bindingIndex].dstBinding = layoutBinding.binding;
+		    	    writes[bindingIndex].descriptorType = layoutBinding.descriptorType;
+		    	    writes[bindingIndex].dstArrayElement = 0;
+		    	    writes[bindingIndex].descriptorCount = layoutBinding.descriptorCount;
+		    	    writes[bindingIndex].pImageInfo = imageInfoss[imageInfoIndex].data();
+                    ++imageInfoIndex;
+                }
+                else 
+                {
+                    throw std::runtime_error("Unvalid descriptor type.");
+                }
+                
+                
             }
 		    auto pDevice = pApp->getDevice();
 		    pDevice->updateDescriptorSets(writes, nullptr);
@@ -254,7 +359,7 @@ namespace vg
         return m_descriptorInfos.size();
     }
     
-    const UniformBufferData::DescriptorBufferInfo *UniformBufferData::SubData::getDescriptorBufferInfos() const
+    const UniformBufferData::DescriptorInfo *UniformBufferData::SubData::getDescriptorInfos() const
     {
         return m_descriptorInfos.data();
     }
@@ -289,10 +394,10 @@ namespace vg
         , m_poolSizeInfos()
         , m_pDescriptorPool()
     {
-        //default is device local.
+        //default is host visible.
         if (! m_bufferMemoryPropertyFlags) 
         {
-            m_bufferMemoryPropertyFlags |= MemoryPropertyFlagBits::DEVICE_LOCAL;
+            m_bufferMemoryPropertyFlags |= MemoryPropertyFlagBits::HOST_VISIBLE;
         }
     }
         
@@ -311,10 +416,10 @@ namespace vg
         , m_poolSizeInfos()
         , m_pDescriptorPool()
     {
-        //default is device local.
+        //default is host visible.
         if (! m_bufferMemoryPropertyFlags) 
         {
-            m_bufferMemoryPropertyFlags |= MemoryPropertyFlagBits::DEVICE_LOCAL;
+            m_bufferMemoryPropertyFlags |= MemoryPropertyFlagBits::HOST_VISIBLE;
         }
     }
 
@@ -392,7 +497,7 @@ namespace vg
     void UniformBufferData::updateDesData(uint32_t subDataCount, const SubDataInfo *pSubDataInfos, uint32_t subDataOffset)
     {
         if (_isEqual(m_subDataCount, m_subDatas.data(), subDataOffset, 
-            subDataCount, pSubDataInfos, subDataOffset) == VG_FALSE)
+            subDataCount, pSubDataInfos) == VG_FALSE)
         {
             //Check and reCreate descriptor pool.
             //Caculate current need pool size info.
@@ -528,6 +633,11 @@ namespace vg
         return m_pMemory;
     }
 
+    const vk::DescriptorPool *UniformBufferData::getDescriptorPool() const
+    {
+        return m_pDescriptorPool.get();
+    }
+
     Bool32 UniformBufferData::_isDeviceMemoryLocal() const
     {
         return (m_bufferMemoryPropertyFlags & MemoryPropertyFlagBits::DEVICE_LOCAL) == MemoryPropertyFlagBits::DEVICE_LOCAL;
@@ -544,6 +654,34 @@ namespace vg
             m_bufferMemorySize,
             m_pBufferMemory,
             &m_pMmemoryForHostVisible);
+    }
+
+    Bool32 UniformBufferData::_isEqual(uint32_t subDataCount1, const SubData *pSubDatas1, uint32_t subDataOffset1,
+            uint32_t subDataCount2, const SubDataInfo *pSubDatas2)
+    {
+        if (subDataCount1 < subDataOffset1 + subDataCount2) return VG_FALSE;
+        for (uint32_t i = 0; i < subDataCount2; ++i)
+        {
+            const auto &subData1 = *(pSubDatas1 + (subDataOffset1 + i));
+            const auto &subData2 = *(pSubDatas2 + i);
+            if (subData1.getLayoutBindingCount() != subData2.layoutBindingCount) return VG_FALSE;
+            for (uint32_t j = 0; j < subData2.layoutBindingCount; ++j)
+            {
+                const auto &binding1 = *(subData1.getLayoutBindings() + j);
+                const auto &binding2 = *(subData2.pLayoutBindings + j);
+                if (binding1 != binding2) return VG_FALSE;
+            }
+            uint32_t descriptorInfoCount = subData1.getDescriptorInfoCount();
+            for (uint32_t j = 0; j < descriptorInfoCount; ++j)
+            {
+                const auto &info1 = *(subData1.getDescriptorInfos() + j);
+                const auto &info2 = *(subData2.pDescriptorInfos + j);
+                if (info1 != info2) return VG_FALSE;
+            }
+            if (subData1.getBufferOffset() != subData2.bufferOffset) return VG_FALSE;
+        }
+        
+        return VG_TRUE;
     }
 
 } //vg

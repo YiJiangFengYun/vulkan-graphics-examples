@@ -1,5 +1,5 @@
-#ifndef VG_UNIFORM_BUFFER_DATA_HPP
-#define VG_UNIFORM_BUFFER_DATA_HPP
+#ifndef VG_DESCRIPTOR_SET_DATA_HPP
+#define VG_DESCRIPTOR_SET_DATA_HPP
 
 #include <foundation/foundation.hpp>
 #include "graphics/global.hpp"
@@ -11,8 +11,15 @@ namespace vg
     class UniformBufferData : public Base
     {
     public:
+        enum class DescriptorInfoType
+        {
+            BUFFER,
+            IMAGE
+        };
+
         struct DescriptorBufferInfo 
         {
+            DescriptorInfoType type;
             uint32_t range;
             uint32_t bufferRange;
             DescriptorBufferInfo();
@@ -24,20 +31,33 @@ namespace vg
 
         struct DescriptorImageInfo 
         {
+            DescriptorInfoType type;
             vk::Sampler sampler;
             vk::ImageView imageView;
             vk::ImageLayout imageLayout;
             DescriptorImageInfo();
-            DescriptorImageInfo(vk::Sampler sampler = vk::Sampler()
-                , vk::ImageView imageView = vk::ImageView()
-                , vk::ImageLayout imageLayout = vk::ImageLayout::eUndefined);
+            DescriptorImageInfo(vk::Sampler sampler
+                , vk::ImageView imageView
+                , vk::ImageLayout imageLayout);
+            Bool32 operator ==(const DescriptorImageInfo& target) const;
+			Bool32 operator !=(const DescriptorImageInfo& target) const;
         };
 
-        // union DescriptorInfo
-        // {
-        //     DescriptorBufferInfo bufferInfo;
-        //     DescriptorImageInfo imageInfo;
-        // };
+        union DescriptorInfo
+        {
+		public:
+            DescriptorBufferInfo bufferInfo;
+            DescriptorImageInfo imageInfo;
+
+			DescriptorInfo();
+			//DescriptorInfo(DescriptorInfoType type);
+
+            Bool32 operator ==(const DescriptorInfo& target) const;
+			Bool32 operator !=(const DescriptorInfo& target) const;
+
+		private:
+			
+        };
 
         struct SubDataInfo 
         {
@@ -45,14 +65,14 @@ namespace vg
             vk::DescriptorSetLayoutBinding *pLayoutBindings;
             //Sum of buffer info count and image info count must is equal to descriptor count;
             //Infos of same binding must continue in the one infos array.
-            // DescriptorInfo *pDescriptorInfos;
-            DescriptorBufferInfo *pDescriptorInfos;
+            DescriptorInfo *pDescriptorInfos;
+            // DescriptorBufferInfo *pDescriptorInfos;
             uint32_t bufferOffset;
 
             SubDataInfo();
             SubDataInfo(uint32_t layoutBindingCount = 0u
                 , vk::DescriptorSetLayoutBinding *pLayoutBindings = nullptr
-                , DescriptorBufferInfo *pDescriptorInfos = nullptr
+                , DescriptorInfo *pDescriptorInfos = nullptr
                 , uint32_t bufferOffset = 0u);
         };
 
@@ -67,14 +87,14 @@ namespace vg
             uint32_t getLayoutBindingCount() const;
             const vk::DescriptorSetLayoutBinding *getLayoutBindings() const;
             uint32_t getDescriptorInfoCount() const;
-            const DescriptorBufferInfo *getDescriptorBufferInfos() const;
+            const DescriptorInfo *getDescriptorInfos() const;
             uint32_t getBufferOffset() const;
             const vk::DescriptorSetLayout *getDescriptorSetLayout() const;
             const vk::DescriptorSet *getDescriptorSet() const;
         private:
             uint32_t m_layoutBindingCount;
             std::vector<vk::DescriptorSetLayoutBinding> m_layoutBindings;
-            std::vector<DescriptorBufferInfo> m_descriptorInfos;
+            std::vector<DescriptorInfo> m_descriptorInfos;
             uint32_t m_bufferOffset;
             std::shared_ptr<vk::DescriptorSetLayout> m_pDescriptorSetLayout;
             std::shared_ptr<vk::DescriptorSet> m_pDescriptorSet;
@@ -116,6 +136,7 @@ namespace vg
         const vk::DeviceMemory *getBufferMemory() const;
         uint32_t getMemorySize() const;
         const void *getMemory() const;
+        const vk::DescriptorPool *getDescriptorPool() const;
     private:
         uint32_t m_subDataCount;
         std::vector<SubData> m_subDatas;
@@ -134,11 +155,9 @@ namespace vg
         Bool32 _isDeviceMemoryLocal() const;
         void _createBuffer(fd::ArrayProxy<MemorySlice> memories, uint32_t memorySize);
         Bool32 _isEqual(uint32_t subDataCount1, const SubData *pSubDatas1, uint32_t subDataOffset1,
-            uint32_t subDataCount2, const SubDataInfo *pSubDatas2, uint32_t subDataOffset2);
+            uint32_t subDataCount2, const SubDataInfo *pSubDatas2);
 
     };
 } //vg
 
-#include "graphics/buffer_data/uniform_buffer_data.inl"
-
-#endif //VG_UNIFORM_BUFFER_DATA_HPP
+#endif //VG_DESCRIPTOR_SET_DATA_HPP

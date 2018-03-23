@@ -3,7 +3,7 @@
 
 #include <foundation/foundation.hpp>
 #include "graphics/global.hpp"
-#include "graphics/buffer_data/vertex_data_option.hpp"
+#include "graphics/buffer_data/buffer_data_option.hpp"
 
 namespace vg {
      class IndexData : public Base

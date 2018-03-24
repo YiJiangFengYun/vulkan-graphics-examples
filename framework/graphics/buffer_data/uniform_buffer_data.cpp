@@ -161,6 +161,7 @@ namespace vg
         }
 
         Bool32 descriptorInfosChanged = VG_FALSE;
+        Bool32 needWrite = VG_FALSE;
         if (static_cast<uint32_t>(m_descriptorInfos.size()) != descriptorInfoCount) {
             descriptorInfosChanged = VG_TRUE;
         } else {
@@ -169,6 +170,13 @@ namespace vg
                 auto item2 = *(info.pDescriptorInfos + i);
                 if (item1 != item2) {
                     descriptorInfosChanged = VG_TRUE;
+                }
+                if (item1.range != item2.range || item1.bufferRange != item2.bufferRange)
+                {
+                    needWrite = VG_TRUE;
+                }
+                if (needWrite)
+                {
                     break;
                 }
             }
@@ -188,7 +196,7 @@ namespace vg
         m_bufferOffset = info.bufferOffset;
 
         if (descriptorInfoCount && buffer != vk::Buffer() && 
-            (descriptorInfosChanged || bufferChanged || layoutBindingChanged || poolChanged))
+            (needWrite || bufferChanged || layoutBindingChanged || poolChanged))
         {
             std::vector<vk::WriteDescriptorSet> writes(m_layoutBindingCount);
 		    std::vector<std::vector<vk::DescriptorBufferInfo>> bufferInfoss(m_layoutBindingCount);

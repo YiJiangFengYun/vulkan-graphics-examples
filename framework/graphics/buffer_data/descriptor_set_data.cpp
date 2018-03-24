@@ -7,14 +7,6 @@
 
 namespace vg
 {
-    DescriptorSetBufferData::DescriptorBufferInfo::DescriptorBufferInfo()
-        : type(DescriptorInfoType::BUFFER)
-        , range(0u)
-        , bufferRange(0u)
-    {
-
-    }
-
     DescriptorSetBufferData::DescriptorBufferInfo::DescriptorBufferInfo(uint32_t range, uint32_t bufferRange)
         : type(DescriptorInfoType::BUFFER)
         , range(range)
@@ -33,15 +25,6 @@ namespace vg
     {
         if ((*this) == target) return VG_FALSE;
         return VG_TRUE;
-    }
-
-    DescriptorSetBufferData::DescriptorImageInfo::DescriptorImageInfo()
-        : type(DescriptorInfoType::IMAGE)
-        , sampler(nullptr)
-        , imageView(nullptr)
-        , imageLayout(vk::ImageLayout::eUndefined)
-    {
-
     }
 
     DescriptorSetBufferData::DescriptorImageInfo::DescriptorImageInfo(vk::Sampler sampler
@@ -104,16 +87,6 @@ namespace vg
     {
         if ((*this) == target) return VG_FALSE;
         return VG_TRUE;
-    }
-
-
-    DescriptorSetBufferData::SubDataInfo::SubDataInfo()
-        : layoutBindingCount(0u)
-        , pLayoutBindings(nullptr)
-        , pDescriptorInfos(nullptr)
-        , bufferOffset(0u)
-    {
-
     }
 
     DescriptorSetBufferData::SubDataInfo::SubDataInfo(uint32_t layoutBindingCount

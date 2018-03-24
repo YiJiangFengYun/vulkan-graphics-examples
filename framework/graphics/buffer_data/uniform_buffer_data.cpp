@@ -7,18 +7,10 @@
 
 namespace vg
 {
-    UniformBufferData::DescriptorBufferInfo::DescriptorBufferInfo()
-        : range(0u)
-        , bufferRange(0u)
-        , dynamicOffset(0u)
-    {
-
-    }
-
-    UniformBufferData::DescriptorBufferInfo::DescriptorBufferInfo(uint32_t range, uint32_t bufferRange)
+    UniformBufferData::DescriptorBufferInfo::DescriptorBufferInfo(uint32_t range, uint32_t bufferRange, uint32_t dynamicOffset)
         : range(range)
         , bufferRange(bufferRange)
-        , dynamicOffset(0u)
+        , dynamicOffset(dynamicOffset)
     {
 
     }
@@ -33,16 +25,6 @@ namespace vg
     {
         if ((*this) == target) return VG_FALSE;
         return VG_TRUE;
-    }
-
-
-    UniformBufferData::SubDataInfo::SubDataInfo()
-        : layoutBindingCount(0u)
-        , pLayoutBindings(nullptr)
-        , pDescriptorInfos(nullptr)
-        , bufferOffset(0u)
-    {
-
     }
 
     UniformBufferData::SubDataInfo::SubDataInfo(uint32_t layoutBindingCount

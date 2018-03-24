@@ -16,8 +16,7 @@ namespace vg
             uint32_t range;
             uint32_t bufferRange;
             uint32_t dynamicOffset;
-            DescriptorBufferInfo();
-            DescriptorBufferInfo(uint32_t range, uint32_t bufferRange);
+            DescriptorBufferInfo(uint32_t range = 0u, uint32_t bufferRange = 0u, uint32_t dynamicOffset = 0u);
 
             Bool32 operator ==(const DescriptorBufferInfo& target) const;
 			Bool32 operator !=(const DescriptorBufferInfo& target) const;
@@ -32,7 +31,6 @@ namespace vg
             DescriptorBufferInfo *pDescriptorInfos;
             uint32_t bufferOffset;
 
-            SubDataInfo();
             SubDataInfo(uint32_t layoutBindingCount = 0u
                 , vk::DescriptorSetLayoutBinding *pLayoutBindings = nullptr
                 , DescriptorBufferInfo *pDescriptorInfos = nullptr

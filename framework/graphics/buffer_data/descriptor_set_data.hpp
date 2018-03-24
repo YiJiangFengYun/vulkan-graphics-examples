@@ -8,7 +8,7 @@
 namespace vg
 {
     //One subData is equal to one descriptorSet.    
-    class UniformBufferData : public Base
+    class DescriptorSetBufferData : public Base
     {
     public:
         enum class DescriptorInfoType
@@ -102,10 +102,10 @@ namespace vg
             vk::Buffer m_buffer;
         };
 
-        UniformBufferData();
-        UniformBufferData(MemoryPropertyFlags bufferMemoryPropertyFlags);
+        DescriptorSetBufferData();
+        DescriptorSetBufferData(MemoryPropertyFlags bufferMemoryPropertyFlags);
 
-        ~UniformBufferData();
+        ~DescriptorSetBufferData();
 
         void init(uint32_t subDataCount
             , const SubDataInfo *pSubDataInfos

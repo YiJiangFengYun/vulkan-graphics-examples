@@ -7,7 +7,7 @@
 
 namespace vg
 {
-    UniformBufferData::DescriptorBufferInfo::DescriptorBufferInfo()
+    DescriptorSetBufferData::DescriptorBufferInfo::DescriptorBufferInfo()
         : type(DescriptorInfoType::BUFFER)
         , range(0u)
         , bufferRange(0u)
@@ -15,7 +15,7 @@ namespace vg
 
     }
 
-    UniformBufferData::DescriptorBufferInfo::DescriptorBufferInfo(uint32_t range, uint32_t bufferRange)
+    DescriptorSetBufferData::DescriptorBufferInfo::DescriptorBufferInfo(uint32_t range, uint32_t bufferRange)
         : type(DescriptorInfoType::BUFFER)
         , range(range)
         , bufferRange(bufferRange)
@@ -23,19 +23,19 @@ namespace vg
 
     }
 
-    Bool32  UniformBufferData::DescriptorBufferInfo::operator ==(const DescriptorBufferInfo& target) const
+    Bool32  DescriptorSetBufferData::DescriptorBufferInfo::operator ==(const DescriptorBufferInfo& target) const
     {
         if (range == target.range && bufferRange == target.bufferRange) return VG_TRUE;
         return VG_FALSE;
     }
 
-	Bool32  UniformBufferData::DescriptorBufferInfo::operator !=(const DescriptorBufferInfo& target) const
+	Bool32  DescriptorSetBufferData::DescriptorBufferInfo::operator !=(const DescriptorBufferInfo& target) const
     {
         if ((*this) == target) return VG_FALSE;
         return VG_TRUE;
     }
 
-    UniformBufferData::DescriptorImageInfo::DescriptorImageInfo()
+    DescriptorSetBufferData::DescriptorImageInfo::DescriptorImageInfo()
         : type(DescriptorInfoType::IMAGE)
         , sampler(nullptr)
         , imageView(nullptr)
@@ -44,7 +44,7 @@ namespace vg
 
     }
 
-    UniformBufferData::DescriptorImageInfo::DescriptorImageInfo(vk::Sampler sampler
+    DescriptorSetBufferData::DescriptorImageInfo::DescriptorImageInfo(vk::Sampler sampler
         , vk::ImageView imageView
         , vk::ImageLayout imageLayout
         )
@@ -57,24 +57,24 @@ namespace vg
 
     }
 
-    Bool32  UniformBufferData::DescriptorImageInfo::operator ==(const DescriptorImageInfo& target) const
+    Bool32  DescriptorSetBufferData::DescriptorImageInfo::operator ==(const DescriptorImageInfo& target) const
     {
         if (sampler == target.sampler && imageView == target.imageView && imageLayout == target.imageLayout) return VG_TRUE;
         return VG_FALSE;
     }
 
-	Bool32  UniformBufferData::DescriptorImageInfo::operator !=(const DescriptorImageInfo& target) const
+	Bool32  DescriptorSetBufferData::DescriptorImageInfo::operator !=(const DescriptorImageInfo& target) const
     {
         if ((*this) == target) return VG_FALSE;
         return VG_TRUE;
     }
 
-	UniformBufferData::DescriptorInfo::DescriptorInfo()
+	DescriptorSetBufferData::DescriptorInfo::DescriptorInfo()
 	{
 		//bufferInfo = DescriptorBufferInfo();
 	}
 
-	/*UniformBufferData::DescriptorInfo::DescriptorInfo(DescriptorInfoType type)
+	/*DescriptorSetBufferData::DescriptorInfo::DescriptorInfo(DescriptorInfoType type)
 	{
 		if (type == DescriptorInfoType::IMAGE)
 		{
@@ -87,7 +87,7 @@ namespace vg
 		}
 	}*/
 
-     Bool32  UniformBufferData::DescriptorInfo::operator ==(const DescriptorInfo& target) const
+     Bool32  DescriptorSetBufferData::DescriptorInfo::operator ==(const DescriptorInfo& target) const
     {
         if (this->bufferInfo.type != target.bufferInfo.type) return VG_FALSE;
         if (this->bufferInfo.type == DescriptorInfoType::BUFFER)
@@ -100,14 +100,14 @@ namespace vg
         }
     }
 
-	Bool32  UniformBufferData::DescriptorInfo::operator !=(const DescriptorInfo& target) const
+	Bool32  DescriptorSetBufferData::DescriptorInfo::operator !=(const DescriptorInfo& target) const
     {
         if ((*this) == target) return VG_FALSE;
         return VG_TRUE;
     }
 
 
-    UniformBufferData::SubDataInfo::SubDataInfo()
+    DescriptorSetBufferData::SubDataInfo::SubDataInfo()
         : layoutBindingCount(0u)
         , pLayoutBindings(nullptr)
         , pDescriptorInfos(nullptr)
@@ -116,7 +116,7 @@ namespace vg
 
     }
 
-    UniformBufferData::SubDataInfo::SubDataInfo(uint32_t layoutBindingCount
+    DescriptorSetBufferData::SubDataInfo::SubDataInfo(uint32_t layoutBindingCount
         , vk::DescriptorSetLayoutBinding *pLayoutBindings
         , DescriptorInfo *pDescriptorInfos
         , uint32_t bufferOffset
@@ -129,7 +129,7 @@ namespace vg
 
     }
 
-    UniformBufferData::SubData::SubData()
+    DescriptorSetBufferData::SubData::SubData()
         : m_layoutBindingCount(0u)
         , m_layoutBindings()
         , m_descriptorInfos()
@@ -142,7 +142,7 @@ namespace vg
 
     }
 
-    UniformBufferData::SubData::SubData(SubDataInfo info, vk::Buffer *pBuffer, vk::DescriptorPool *pDescriptorPool)
+    DescriptorSetBufferData::SubData::SubData(SubDataInfo info, vk::Buffer *pBuffer, vk::DescriptorPool *pDescriptorPool)
         : m_layoutBindingCount(0u)
         , m_layoutBindings()
         , m_descriptorInfos()
@@ -155,7 +155,7 @@ namespace vg
         init(info, pBuffer, pDescriptorPool);
     }
 
-    void UniformBufferData::SubData::init(SubDataInfo info, vk::Buffer *pBuffer, vk::DescriptorPool *pDescriptorPool)
+    void DescriptorSetBufferData::SubData::init(SubDataInfo info, vk::Buffer *pBuffer, vk::DescriptorPool *pDescriptorPool)
     {
         //Check if layout binding is changed.
         Bool32 layoutBindingChanged = VG_FALSE;
@@ -344,42 +344,42 @@ namespace vg
         if (bufferChanged) m_buffer = buffer;
     }
 
-    uint32_t UniformBufferData::SubData::getLayoutBindingCount() const
+    uint32_t DescriptorSetBufferData::SubData::getLayoutBindingCount() const
     {
         return m_layoutBindingCount;
     }
 
-    const vk::DescriptorSetLayoutBinding *UniformBufferData::SubData::getLayoutBindings() const
+    const vk::DescriptorSetLayoutBinding *DescriptorSetBufferData::SubData::getLayoutBindings() const
     {
         return m_layoutBindings.data();
     }
     
-    uint32_t UniformBufferData::SubData::getDescriptorInfoCount() const
+    uint32_t DescriptorSetBufferData::SubData::getDescriptorInfoCount() const
     {
         return m_descriptorInfos.size();
     }
     
-    const UniformBufferData::DescriptorInfo *UniformBufferData::SubData::getDescriptorInfos() const
+    const DescriptorSetBufferData::DescriptorInfo *DescriptorSetBufferData::SubData::getDescriptorInfos() const
     {
         return m_descriptorInfos.data();
     }
             
-    uint32_t UniformBufferData::SubData::getBufferOffset() const
+    uint32_t DescriptorSetBufferData::SubData::getBufferOffset() const
     {
         return m_bufferOffset;
     }
             
-    const vk::DescriptorSetLayout *UniformBufferData::SubData::getDescriptorSetLayout() const
+    const vk::DescriptorSetLayout *DescriptorSetBufferData::SubData::getDescriptorSetLayout() const
     {
         return m_pDescriptorSetLayout.get();
     }
 
-    const vk::DescriptorSet *UniformBufferData::SubData::getDescriptorSet() const
+    const vk::DescriptorSet *DescriptorSetBufferData::SubData::getDescriptorSet() const
     {
         return m_pDescriptorSet.get();
     }
 
-    UniformBufferData::UniformBufferData()
+    DescriptorSetBufferData::DescriptorSetBufferData()
         : Base(BaseType::UNIFORM_BUFFER_DATA)
         , m_bufferMemoryPropertyFlags()
         , m_subDataCount()
@@ -401,7 +401,7 @@ namespace vg
         }
     }
         
-    UniformBufferData::UniformBufferData(MemoryPropertyFlags bufferMemoryPropertyFlags)
+    DescriptorSetBufferData::DescriptorSetBufferData(MemoryPropertyFlags bufferMemoryPropertyFlags)
         : Base(BaseType::UNIFORM_BUFFER_DATA)
         , m_bufferMemoryPropertyFlags(bufferMemoryPropertyFlags)
         , m_subDataCount()
@@ -423,7 +423,7 @@ namespace vg
         }
     }
 
-    UniformBufferData::~UniformBufferData()
+    DescriptorSetBufferData::~DescriptorSetBufferData()
     {
         if (m_pMemory != nullptr)
         {
@@ -432,7 +432,7 @@ namespace vg
 
     }
 
-    void UniformBufferData::init(uint32_t subDataCount
+    void DescriptorSetBufferData::init(uint32_t subDataCount
             , const SubDataInfo *pSubDataInfos
             , const void *memory
             , uint32_t size
@@ -443,7 +443,7 @@ namespace vg
         updateDesData(subDataCount, pSubDataInfos);
     }
 
-    void UniformBufferData::updateBuffer(const void *memory
+    void DescriptorSetBufferData::updateBuffer(const void *memory
             , uint32_t size
             , Bool32 cacheMemory
             )
@@ -455,7 +455,7 @@ namespace vg
         updateBuffer(slice, size, cacheMemory);
     }
 
-    void UniformBufferData::updateBuffer(fd::ArrayProxy<MemorySlice> memories
+    void DescriptorSetBufferData::updateBuffer(fd::ArrayProxy<MemorySlice> memories
         , uint32_t size
         , Bool32 cacheMemory
         )
@@ -488,13 +488,13 @@ namespace vg
 		}
     }
 
-    void UniformBufferData::updateSubDataCount(uint32_t count)
+    void DescriptorSetBufferData::updateSubDataCount(uint32_t count)
     {
         m_subDatas.resize(count);
         m_subDataCount = count;
     }
 
-    void UniformBufferData::updateDesData(uint32_t subDataCount, const SubDataInfo *pSubDataInfos, uint32_t subDataOffset)
+    void DescriptorSetBufferData::updateDesData(uint32_t subDataCount, const SubDataInfo *pSubDataInfos, uint32_t subDataOffset)
     {
         if (_isEqual(m_subDataCount, m_subDatas.data(), subDataOffset, 
             subDataCount, pSubDataInfos) == VG_FALSE)
@@ -593,57 +593,57 @@ namespace vg
         }
     }
 
-    uint32_t UniformBufferData::getSubDataCount() const
+    uint32_t DescriptorSetBufferData::getSubDataCount() const
     {
         return m_subDataCount;
     }
 
-    const UniformBufferData::SubData *UniformBufferData::getSubDatas() const
+    const DescriptorSetBufferData::SubData *DescriptorSetBufferData::getSubDatas() const
     {
         return m_subDatas.data();
     }
         
-    uint32_t UniformBufferData::getBufferSize() const
+    uint32_t DescriptorSetBufferData::getBufferSize() const
     {
         return m_bufferSize;
     }
 
-    const vk::Buffer *UniformBufferData::getBuffer() const
+    const vk::Buffer *DescriptorSetBufferData::getBuffer() const
     {
         return m_pBuffer.get();
     }
 
-    uint32_t UniformBufferData::getBufferMemorySize() const
+    uint32_t DescriptorSetBufferData::getBufferMemorySize() const
     {
         return m_bufferMemorySize;
     }
 
-    const vk::DeviceMemory *UniformBufferData::getBufferMemory() const
+    const vk::DeviceMemory *DescriptorSetBufferData::getBufferMemory() const
     {
         return m_pBufferMemory.get();
     }
 
-    uint32_t UniformBufferData::getMemorySize() const
+    uint32_t DescriptorSetBufferData::getMemorySize() const
     {
         return m_memorySize;
     }
 
-    const void *UniformBufferData::getMemory() const
+    const void *DescriptorSetBufferData::getMemory() const
     {
         return m_pMemory;
     }
 
-    const vk::DescriptorPool *UniformBufferData::getDescriptorPool() const
+    const vk::DescriptorPool *DescriptorSetBufferData::getDescriptorPool() const
     {
         return m_pDescriptorPool.get();
     }
 
-    Bool32 UniformBufferData::_isDeviceMemoryLocal() const
+    Bool32 DescriptorSetBufferData::_isDeviceMemoryLocal() const
     {
         return (m_bufferMemoryPropertyFlags & MemoryPropertyFlagBits::DEVICE_LOCAL) == MemoryPropertyFlagBits::DEVICE_LOCAL;
     }
 
-    void UniformBufferData::_createBuffer(fd::ArrayProxy<MemorySlice> memories, uint32_t memorySize)
+    void DescriptorSetBufferData::_createBuffer(fd::ArrayProxy<MemorySlice> memories, uint32_t memorySize)
     {
 		createBufferForBufferData(memories, 
             memorySize, 
@@ -656,7 +656,7 @@ namespace vg
             &m_pMmemoryForHostVisible);
     }
 
-    Bool32 UniformBufferData::_isEqual(uint32_t subDataCount1, const SubData *pSubDatas1, uint32_t subDataOffset1,
+    Bool32 DescriptorSetBufferData::_isEqual(uint32_t subDataCount1, const SubData *pSubDatas1, uint32_t subDataOffset1,
             uint32_t subDataCount2, const SubDataInfo *pSubDatas2)
     {
         if (subDataCount1 < subDataOffset1 + subDataCount2) return VG_FALSE;

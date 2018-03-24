@@ -73,17 +73,17 @@ namespace vg
             , const SubDataInfo *pSubDataInfos
             , const void *memory
             , uint32_t size
-            , Bool32 cacheMemory
+            , Bool32 cacheMemory = VG_FALSE
             );
 
         void updateBuffer(const void *memory
             , uint32_t size
-            , Bool32 cacheMemory
+            , Bool32 cacheMemory = VG_FALSE
             );
 
         void updateBuffer(fd::ArrayProxy<MemorySlice> memories
             , uint32_t size
-            , Bool32 cacheMemory
+            , Bool32 cacheMemory = VG_FALSE
             );
 
         void updateSubDataCount(uint32_t count);

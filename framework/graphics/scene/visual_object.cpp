@@ -12,6 +12,11 @@ namespace vg
 
 	}
 
+	BaseVisualObject::~BaseVisualObject()
+	{
+
+	}
+
 	Material *BaseVisualObject::getMaterial() const
 	{
 		return m_pMaterial;

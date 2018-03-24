@@ -13,6 +13,8 @@ namespace vg
 	public:
 		BaseVisualObject();
 
+		virtual ~BaseVisualObject();
+
 		Material *getMaterial() const;
 
 		void setMaterial(Material *pMaterial);

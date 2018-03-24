@@ -19,6 +19,9 @@ namespace vg
 	class Renderer : public Base
 	{
 	public:
+        using PreObjectRecordingFun = std::function<void(vg::BaseVisualObject * pVisualObject)>;
+		using PostObjectRecordingFun = std::function<void(vg::BaseVisualObject * pVisualObject)>;
+
 		static const vk::Format DEFAULT_DEPTH_STENCIL_FORMAT;
 
 		struct SceneAndCamera {
@@ -78,6 +81,9 @@ namespace vg
 		const fd::Rect2D &getClearArea() const;
 		void setClearArea(fd::Rect2D area);
 
+		PreObjectRecordingFun setPreObjectRecordingCallBack(PreObjectRecordingFun cbFun);
+		PostObjectRecordingFun setPostObjectRecordingCallBack(PostObjectRecordingFun cbFun);
+
 #if defined(DEBUG) && defined(VG_ENABLE_COST_TIMER)
         const fd::CostTimer &getPreparingRenderCostTimer() const;
 #endif //DEBUG and VG_ENABLE_COST_TIMER
@@ -106,6 +112,9 @@ namespace vg
 		vk::Format m_swapchainImageFormat;
 		//Renderer will render to color texture when it is not null.
 		TextureColorAttachment *m_pColorTexture;
+
+		PreObjectRecordingFun m_preObjectRecordingFun;
+		PostObjectRecordingFun m_postObjectRecordingFun;
 
 #if defined(DEBUG) && defined(VG_ENABLE_COST_TIMER)
         fd::CostTimer m_preparingRenderCostTimer;

@@ -32,6 +32,8 @@ namespace vg
 		, m_clearValueStencil(0u)
 		, m_renderArea(0.0f, 0.0f, 1.0f, 1.0f)
 		, m_pipelineCache()
+		, m_preObjectRecordingFun()
+		, m_postObjectRecordingFun()
 #if defined(DEBUG) && defined(VG_ENABLE_COST_TIMER)
         , m_preparingRenderCostTimer(fd::CostTimer::TimerType::AVERAGE)
 #endif //DEBUG and VG_ENABLE_COST_TIMER
@@ -59,6 +61,8 @@ namespace vg
 		, m_clearValueStencil(0u)
 		, m_renderArea(0.0f, 0.0f, 1.0f, 1.0f)
 		, m_pipelineCache()
+		, m_preObjectRecordingFun()
+		, m_postObjectRecordingFun()
 #if defined(DEBUG) && defined(VG_ENABLE_COST_TIMER)
         , m_preparingRenderCostTimer(fd::CostTimer::TimerType::AVERAGE)
 #endif //DEBUG and VG_ENABLE_COST_TIMER
@@ -214,6 +218,20 @@ namespace vg
 #endif // DEBUG
 
 		m_renderArea = area;
+	}
+
+	Renderer::PreObjectRecordingFun Renderer::setPreObjectRecordingCallBack(PreObjectRecordingFun cbFun)
+	{
+		auto oldFun = m_preObjectRecordingFun;
+		m_preObjectRecordingFun = cbFun;
+		return oldFun;
+	}
+		
+	Renderer::PostObjectRecordingFun Renderer::setPostObjectRecordingCallBack(PostObjectRecordingFun cbFun)
+	{
+		auto oldFun = m_postObjectRecordingFun;
+		m_postObjectRecordingFun = cbFun;
+		return oldFun;
 	}
 
 #if defined(DEBUG) && defined(VG_ENABLE_COST_TIMER)
@@ -779,8 +797,13 @@ namespace vg
 		uint32_t drawIndex = 0u;
 		for (uint32_t i = 0u; i < validVisualObjectCount; ++i)
 		{
-
 			auto pVisualObject = validVisualObjects[i];
+
+			if (m_preObjectRecordingFun != nullptr)
+			{
+				m_preObjectRecordingFun(pVisualObject);
+			}
+
 			auto pMaterial = pVisualObject->getMaterial();
 			auto passCount = pMaterial->getPassCount();
 
@@ -891,6 +914,11 @@ namespace vg
 						VG_LOG(plog::warning) << "No one valid shader module for pass. Pass ID: " << pPass->getID() << std::endl;
 					}
 				}
+			}
+
+			if (m_postObjectRecordingFun != nullptr)
+			{
+				m_postObjectRecordingFun(pVisualObject);
 			}
 		}
 	}
@@ -1083,6 +1111,12 @@ namespace vg
 			for (uint32_t objectIndex = 0u; objectIndex < queueLength; ++objectIndex)
 			{
 				auto pVisualObject = queues[typeIndex][objectIndex];
+
+				if (m_preObjectRecordingFun != nullptr)
+			    {
+			    	m_preObjectRecordingFun(pVisualObject);
+			    }
+
 				auto pMaterial = pVisualObject->getMaterial();
 				auto passCount = pMaterial->getPassCount();
 #if defined(DEBUG) && defined(VG_ENABLE_COST_TIMER)
@@ -1211,6 +1245,11 @@ namespace vg
 						}
 					}
 				}
+
+				if (m_postObjectRecordingFun != nullptr)
+			    {
+			    	m_postObjectRecordingFun(pVisualObject);
+			    }
 			}
 		}
 

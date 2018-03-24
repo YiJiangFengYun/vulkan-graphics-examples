@@ -7,6 +7,8 @@
 #include <graphics/buffer_data/buffer_data_option.hpp>
 #include <graphics/buffer_data/vertex_data.hpp>
 #include <graphics/buffer_data/index_data.hpp>
+#include <graphics/buffer_data/uniform_buffer_data.hpp>
+#include <graphics/buffer_data/descriptor_set_data.hpp>
 #include <graphics/mesh/mesh.hpp>
 #include <graphics/mesh/mesh_2.hpp>
 #include <graphics/mesh/mesh_3.hpp>

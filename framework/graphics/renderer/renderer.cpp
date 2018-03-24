@@ -503,13 +503,13 @@ namespace vg
 
 		m_pCommandBuffer->bindPipeline(vk::PipelineBindPoint::eGraphics, *pPipeline);
 
-		uint32_t descriptSetCount = pPass->getDescriptorSet() != nullptr ? 1 : 0;
-		std::vector<vk::DescriptorSet> descriptorSets(descriptSetCount);
-		if (pPass->getDescriptorSet() != nullptr)
-		{
-			descriptorSets[0] = *pPass->getDescriptorSet();
-		}
-		m_pCommandBuffer->bindDescriptorSets(vk::PipelineBindPoint::eGraphics, *pPipelineLayout, 0u, descriptorSets, nullptr);
+		uint32_t descriptSetCount = pPass->getUsingDescriptorSetCount();
+		auto pDescriptorSets = pPass->getUsingDescriptorSets();
+		uint32_t dynamicOffsetCount = pPass->getUsingDescriptorDynamicOffsetCount();
+		auto pDynamicOffsets = pPass->getUsingDescriptorDynamicOffsets();
+
+		m_pCommandBuffer->bindDescriptorSets(vk::PipelineBindPoint::eGraphics, *pPipelineLayout, 
+		    0u, descriptSetCount, pDescriptorSets, dynamicOffsetCount, pDynamicOffsets);
 
 		//dynamic line width
 		m_pCommandBuffer->setLineWidth(pPass->getLineWidth());

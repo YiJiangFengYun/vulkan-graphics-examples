@@ -9,6 +9,7 @@
 #include "graphics/texture/texture.hpp"
 #include "graphics/material/material_data.hpp"
 #include "graphics/util/util.hpp"
+#include "graphics/buffer_data/uniform_buffer_data.hpp"
 
 //to do 
 //specilazation constant and push constant
@@ -17,6 +18,16 @@ namespace vg
 	class Pass : public Base
 	{
 	public:
+	    struct ExternalUniformBufferInfo 
+		{
+			UniformBufferData *pData;
+			uint32_t subDataOffset;
+			uint32_t subDataCount;
+			ExternalUniformBufferInfo(UniformBufferData *pData = nullptr
+			    , uint32_t subDataOffset = 0u
+				, uint32_t subDataCount = 0u);
+		};
+
 	    enum class BuildInDataType
 		{
 			MATRIX_OBJECT_TO_NDC = 0,
@@ -329,12 +340,19 @@ namespace vg
 		const uint32_t getInstanceCount() const;
 		void setInstanceCount(uint32_t count);
 
+		const ExternalUniformBufferInfo getExternalUniformBufferInfo() const;
+		void setExternalUniformBufferInfo(ExternalUniformBufferInfo value);
+
 		const vk::Buffer *getUniformBuffer() const;
 		const vk::DeviceMemory *getUniformBufferMemory() const;
 		const vk::DescriptorSetLayout *getDescriptorSetLayout() const;
 		const vk::DescriptorPool *getDescriptorPool() const;
 		const vk::DescriptorSet *getDescriptorSet() const;
-		const vk::PipelineLayout *getPipelineLayout() const;  
+		const vk::PipelineLayout *getPipelineLayout() const;
+		uint32_t getUsingDescriptorSetCount() const;
+		const vk::DescriptorSet *getUsingDescriptorSets() const;
+		uint32_t getUsingDescriptorDynamicOffsetCount() const;
+		const uint32_t *getUsingDescriptorDynamicOffsets() const;
 	private:
 		//compositons
 		std::shared_ptr<MaterialData> m_pData;
@@ -374,6 +392,9 @@ namespace vg
 		std::vector<BuildInDataInfo::Component> m_buildInDataInfoComponents;
 		_BuildInDataCache m_buildInDataCache;
 
+		//external uniform buffer data.
+		ExternalUniformBufferInfo m_externalUniformBufferInfo;
+
 		//cache
 		std::vector<vk::DescriptorSetLayoutBinding> m_lastBindings;
 		std::vector<std::string> m_lastLayoutBindNames;
@@ -382,6 +403,9 @@ namespace vg
 		std::unordered_map<vk::DescriptorType, uint32_t> m_lastPoolSizeInfos;
 		Bool32 m_needReAllocateDescriptorSet;
 		Bool32 m_needUpdateDescriptorInfo;
+		ExternalUniformBufferInfo m_lastExternalUniformBufferInfo;
+		std::vector<vk::DescriptorSet> m_usingDescriptorSets;
+		std::vector<uint32_t> m_usingDynamicOffsets;
 
 		//aggregations
 		Shader *m_pShader;

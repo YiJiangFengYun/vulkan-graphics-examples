@@ -15,6 +15,7 @@ namespace vg
         {
             uint32_t range;
             uint32_t bufferRange;
+            uint32_t dynamicOffset;
             DescriptorBufferInfo();
             DescriptorBufferInfo(uint32_t range, uint32_t bufferRange);
 
@@ -53,6 +54,7 @@ namespace vg
             uint32_t getBufferOffset() const;
             const vk::DescriptorSetLayout *getDescriptorSetLayout() const;
             const vk::DescriptorSet *getDescriptorSet() const;
+
         private:
             uint32_t m_layoutBindingCount;
             std::vector<vk::DescriptorSetLayoutBinding> m_layoutBindings;

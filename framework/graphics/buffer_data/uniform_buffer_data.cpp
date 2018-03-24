@@ -10,6 +10,7 @@ namespace vg
     UniformBufferData::DescriptorBufferInfo::DescriptorBufferInfo()
         : range(0u)
         , bufferRange(0u)
+        , dynamicOffset(0u)
     {
 
     }
@@ -17,13 +18,14 @@ namespace vg
     UniformBufferData::DescriptorBufferInfo::DescriptorBufferInfo(uint32_t range, uint32_t bufferRange)
         : range(range)
         , bufferRange(bufferRange)
+        , dynamicOffset(0u)
     {
 
     }
 
     Bool32  UniformBufferData::DescriptorBufferInfo::operator ==(const DescriptorBufferInfo& target) const
     {
-        if (range == target.range && bufferRange == target.bufferRange) return VG_TRUE;
+        if (range == target.range && bufferRange == target.bufferRange && dynamicOffset == target.dynamicOffset) return VG_TRUE;
         return VG_FALSE;
     }
 

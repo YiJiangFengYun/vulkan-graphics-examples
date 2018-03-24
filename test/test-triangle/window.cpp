@@ -52,7 +52,7 @@ namespace testTriangle
 		m_pMesh = static_cast<std::shared_ptr<vg::DimSepMesh3>>(new vg::DimSepMesh3());
 		m_pMesh->setVertexCount(static_cast<uint32_t>(m_tempPositions.size()));
 		m_pMesh->setPositions(m_tempPositions);
-		m_pMesh->setColors(m_tempColors);
+		m_pMesh->setColor32s(m_tempColors);
 		m_pMesh->setIndices(m_tempIndices, vg::PrimitiveTopology::TRIANGLE_LIST, 0u);
 		m_pMesh->apply(VG_TRUE);
 	}

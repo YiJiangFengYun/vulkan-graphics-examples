@@ -213,7 +213,7 @@ namespace chalet
         m_pMeshOfBounds = static_cast<std::shared_ptr<vg::DimSepMesh3>>(new vg::DimSepMesh3());
 		m_pMeshOfBounds->setVertexCount(pointCount);
 		m_pMeshOfBounds->setPositions(points);
-		m_pMeshOfBounds->setColors(colors);
+		m_pMeshOfBounds->setColor32s(colors);
 		m_pMeshOfBounds->setIndices(indices, vg::PrimitiveTopology::LINE_LIST, 0u);
 		m_pMeshOfBounds->apply(VG_TRUE);
 	}

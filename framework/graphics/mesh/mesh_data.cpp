@@ -9,32 +9,30 @@ namespace vg
 		case DataType::FLOAT_ARRAY:
 		{
 			return static_cast<uint32_t>(sizeof(DataTypeInfo<DataType::FLOAT_ARRAY>::BaseType));
-			break;
 		}
 		case DataType::INT_ARRAY:
 		{
 			return static_cast<uint32_t>(sizeof(DataTypeInfo<DataType::INT_ARRAY>::BaseType));
-			break;
 		}
 		case DataType::VECTOR_2_ARRAY:
 		{
 			return static_cast<uint32_t>(sizeof(DataTypeInfo<DataType::VECTOR_2_ARRAY>::BaseType));
-			break;
 		}
 		case DataType::VECTOR_3_ARRAY:
 		{
 			return static_cast<uint32_t>(sizeof(DataTypeInfo<DataType::VECTOR_3_ARRAY>::BaseType));
-			break;
 		}
 		case DataType::VECTOR_4_ARRAY:
 		{
 			return static_cast<uint32_t>(sizeof(DataTypeInfo<DataType::VECTOR_4_ARRAY>::BaseType));
-			break;
 		}
 		case DataType::COLOR_32_ARRAY:
 		{
 			return static_cast<uint32_t>(sizeof(DataTypeInfo<DataType::COLOR_32_ARRAY>::BaseType));
-			break;
+		}
+		case DataType::COLOR_ARRAY:
+		{
+			return static_cast<uint32_t>(sizeof(DataTypeInfo<DataType::COLOR_ARRAY>::BaseType));
 		}
 		default:
 		    throw std::runtime_error("Invalid data type for getting memeory size used by its base type.");
@@ -49,37 +47,36 @@ namespace vg
 		{
 			auto arr = getValue(name, mapFloatArrays);
 			return static_cast<uint32_t>(sizeof(DataTypeInfo<DataType::FLOAT_ARRAY>::BaseType) * arr.size());
-			break;
 		}
 		case DataType::INT_ARRAY:
 		{
 			auto arr = getValue(name, mapIntArrays);
 			return static_cast<uint32_t>(sizeof(DataTypeInfo<DataType::INT_ARRAY>::BaseType) * arr.size());
-			break;
 		}
 		case DataType::VECTOR_2_ARRAY:
 		{
 			auto arr = getValue(name, mapVector2Arrays);
 			return static_cast<uint32_t>(sizeof(DataTypeInfo<DataType::VECTOR_2_ARRAY>::BaseType) * arr.size());
-			break;
 		}
 		case DataType::VECTOR_3_ARRAY:
 		{
 			auto arr = getValue(name, mapVector3Arrays);
 			return static_cast<uint32_t>(sizeof(DataTypeInfo<DataType::VECTOR_3_ARRAY>::BaseType) * arr.size());
-			break;
 		}
 		case DataType::VECTOR_4_ARRAY:
 		{
 			auto arr = getValue(name, mapVector4Arrays);
 			return static_cast<uint32_t>(sizeof(DataTypeInfo<DataType::VECTOR_4_ARRAY>::BaseType) * arr.size());
-			break;
 		}
 		case DataType::COLOR_32_ARRAY:
 		{
 			auto arr = getValue(name, mapColor32Arrays);
 			return static_cast<uint32_t>(sizeof(DataTypeInfo<DataType::COLOR_32_ARRAY>::BaseType) * arr.size());
-			break;
+		}
+		case DataType::COLOR_ARRAY:
+		{
+			auto arr = getValue(name, mapColor32Arrays);
+			return static_cast<uint32_t>(sizeof(DataTypeInfo<DataType::COLOR_ARRAY>::BaseType) * arr.size());
 		}
 		default:
 			throw std::runtime_error("Invalid data type for getting its used memory size.");
@@ -138,6 +135,14 @@ namespace vg
 			uint32_t finalElementCount = std::max(0u, std::min(static_cast<uint32_t>(arr.size()) - elementStart, maxElementCount));
 			if (finalElementCount == 0) break;
 			std::memcpy(ptr, arr.data() + elementStart, sizeof(DataTypeInfo<DataType::COLOR_32_ARRAY>::BaseType) * finalElementCount);
+			break;
+		}
+		case DataType::COLOR_ARRAY:
+		{
+			auto arr = getValue(name, mapColorArrays);
+			uint32_t finalElementCount = std::max(0u, std::min(static_cast<uint32_t>(arr.size()) - elementStart, maxElementCount));
+			if (finalElementCount == 0) break;
+			std::memcpy(ptr, arr.data() + elementStart, sizeof(DataTypeInfo<DataType::COLOR_ARRAY>::BaseType) * finalElementCount);
 			break;
 		}
 		default:
@@ -223,5 +228,17 @@ namespace vg
 	void MeshData::setDataValue<MeshData::DataType::COLOR_32_ARRAY>(std::string name, const std::vector<Color32>& value)
 	{
 		setValue(name, value, mapColor32Arrays);
+	}
+
+	template<>
+	const std::vector<Color>& MeshData::getDataValue<MeshData::DataType::COLOR_ARRAY>(std::string name) const
+	{
+		return getValue(name, mapColorArrays);
+	}
+
+	template<>
+	void MeshData::setDataValue<MeshData::DataType::COLOR_ARRAY>(std::string name, const std::vector<Color>& value)
+	{
+		setValue(name, value, mapColorArrays);
 	}
 }

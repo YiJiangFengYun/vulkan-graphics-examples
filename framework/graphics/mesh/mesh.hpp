@@ -153,9 +153,13 @@ namespace vg
 		void setVertexCount(uint32_t value);
 
 		//color
-		const std::vector<Color32> &getColors() const;
+		const std::vector<Color32> &getColor32s() const;
 
-		void setColors(const std::vector<Color32> &colors);
+		void setColor32s(const std::vector<Color32> &colors);
+
+		const std::vector<Color> &getColors() const;
+
+		void setColors(const std::vector<Color> &colors);
 
 		//index
 		virtual uint32_t getSubMeshCount() const override;

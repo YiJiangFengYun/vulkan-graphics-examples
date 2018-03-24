@@ -213,14 +213,24 @@ namespace vg
 		m_applied = VG_FALSE;
 	}
 
-	const std::vector<Color32> &SepMesh::getColors() const
+	const std::vector<Color32> &SepMesh::getColor32s() const
 	{
 		return _getData<MeshData::DataType::COLOR_32_ARRAY>(VG_VERTEX_COLOR_NAME);
 	}
 
-	void SepMesh::setColors(const std::vector<Color32> &colors)
+	void SepMesh::setColor32s(const std::vector<Color32> &colors)
 	{
 		_setData<MeshData::DataType::COLOR_32_ARRAY>(VG_VERTEX_COLOR_NAME, colors, VG_VERTEX_BINDING_PRIORITY_COLOR);
+	}
+
+	const std::vector<Color> &SepMesh::getColors() const
+	{
+		return _getData<MeshData::DataType::COLOR_ARRAY>(VG_VERTEX_COLOR_NAME);
+	}
+
+	void SepMesh::setColors(const std::vector<Color> &colors)
+	{
+		_setData<MeshData::DataType::COLOR_ARRAY>(VG_VERTEX_COLOR_NAME, colors, VG_VERTEX_BINDING_PRIORITY_COLOR);
 	}
 
 	uint32_t SepMesh::getSubMeshCount() const

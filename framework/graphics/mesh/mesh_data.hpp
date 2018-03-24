@@ -38,9 +38,10 @@ namespace vg
 			VECTOR_3_ARRAY,
 			VECTOR_4_ARRAY,
 			COLOR_32_ARRAY,
+			COLOR_ARRAY,
 			BEGIN_RANGE = FLOAT_ARRAY,
-			END_RANGE = COLOR_32_ARRAY,
-			RANGE_SIZE = (END_RANGE - BEGIN_RANGE + 1)
+			END_RANGE = COLOR_ARRAY,
+			RANGE_SIZE = (END_RANGE - BEGIN_RANGE + 1),
 		};
 
 		template <DataType type>
@@ -99,6 +100,14 @@ namespace vg
 			const vk::Format static BASE_FORMAT = vk::Format::eR8G8B8A8Unorm;
 		};
 
+		template<>
+		struct DataTypeInfo<DataType::COLOR_ARRAY>
+		{
+			using ValueType = std::vector<Color>;
+			using BaseType = Color;
+			const vk::Format static BASE_FORMAT = vk::Format::eR32G32B32A32Sfloat;
+		};
+
 		inline static vk::Format getBaseFormatWithDataType(DataType dataType)
 		{
 			switch (dataType)
@@ -106,36 +115,33 @@ namespace vg
 			case DataType::FLOAT_ARRAY:
 			{
 				return DataTypeInfo<DataType::FLOAT_ARRAY>::BASE_FORMAT;
-				break;
 			}
 			case DataType::INT_ARRAY:
 			{
 				return DataTypeInfo<DataType::INT_ARRAY>::BASE_FORMAT;
-				break;
 			}
 			case DataType::VECTOR_2_ARRAY:
 			{
 				return DataTypeInfo<DataType::VECTOR_2_ARRAY>::BASE_FORMAT;
-				break;
 			}
 			case DataType::VECTOR_3_ARRAY:
 			{
 				return DataTypeInfo<DataType::VECTOR_3_ARRAY>::BASE_FORMAT;
-				break;
 			}
 			case DataType::VECTOR_4_ARRAY:
 			{
 				return DataTypeInfo<DataType::VECTOR_4_ARRAY>::BASE_FORMAT;
-				break;
 			}
 			case DataType::COLOR_32_ARRAY:
 			{
 				return DataTypeInfo<DataType::COLOR_32_ARRAY>::BASE_FORMAT;
-				break;
+			}
+			case DataType::COLOR_ARRAY:
+			{
+				return DataTypeInfo<DataType::COLOR_ARRAY>::BASE_FORMAT;
 			}
 			default:
 				throw std::runtime_error("Can't get base format with data type.");
-				break;
 			}
 		}
 
@@ -174,6 +180,8 @@ namespace vg
 
 		//std::vector<std::vector<Color32>> arrColor32Arrays;
 		std::unordered_map<std::string, std::vector<Color32>> mapColor32Arrays;
+
+		std::unordered_map<std::string, std::vector<Color>> mapColorArrays;
 
 		template <DataType type>
 		const typename DataTypeInfo<type>::ValueType& getDataValue(std::string name) const;

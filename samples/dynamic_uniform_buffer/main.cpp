@@ -10,7 +10,7 @@ int main() {
 	static plog::DebugOutputAppender<plog::TxtFormatter> debugOutputAppender;
 	plog::init(plog::debug, &debugOutputAppender);
 
-	vg::setVulkanLogSeverity(plog::info);
+	//vg::setVulkanLogSeverity(plog::info);
 
 	vg::PhysicalDeviceFeatures requiredFeatures;
 

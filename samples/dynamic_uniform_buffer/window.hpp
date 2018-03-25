@@ -4,7 +4,7 @@
 #include "sampleslib/window.hpp"
 #include "sampleslib/scene_assimp.hpp"
 
-#define OBJECT_INSTANCE_COUNT 8
+#define OBJECT_INSTANCE_COUNT 64
 
 
 /**
@@ -52,7 +52,8 @@ private:
 	void _createMaterial();
 	void _createModel();
 
-	void _updateDynamicUniformData();
+	void _updateModelState();
+
 	void _updateDynamicUniformBuffer();
 	void _updateObjectDynamicOffset(vg::BaseVisualObject * pVisualObject);
 

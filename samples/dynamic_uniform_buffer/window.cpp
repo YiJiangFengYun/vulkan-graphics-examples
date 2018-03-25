@@ -29,6 +29,7 @@ Window::Window(uint32_t width
 	_createDynamicUniformData();
 	_createMaterial();
 	_createModel();
+	_updateModelState();
 }
 
 Window::Window(std::shared_ptr<GLFWwindow> pWindow
@@ -51,6 +52,7 @@ Window::Window(std::shared_ptr<GLFWwindow> pWindow
 	_createDynamicUniformData();
 	_createMaterial();
 	_createModel();
+	_updateModelState();
 }
 
 Window::~Window()
@@ -61,7 +63,7 @@ Window::~Window()
 
 void Window::_init()
 {
-	m_zoom = -2.5f;
+	m_zoom = -25.0f;
 	/// Build a quaternion from euler angles (pitch, yaw, roll), in radians.
 	m_rotation = vg::Vector3(glm::radians(0.0f), glm::radians(0.0f), glm::radians(0.0f));
 }
@@ -130,7 +132,6 @@ void Window::_initObjectsStateData()
 		m_rotationSpeeds[i] = vg::Vector3(rndDist(rndGen), rndDist(rndGen), rndDist(rndGen));
 	}
 
-	_updateDynamicUniformData();
 }
 
 
@@ -210,12 +211,12 @@ void Window::_createModel()
 		m_pModels[i] = std::shared_ptr<vg::VisualObject3>(new vg::VisualObject3());
 		m_pModels[i]->setMesh(m_pMesh.get());
 		m_pModels[i]->setMaterial(m_pMaterial.get());
-		m_pModels[i]->setIsVisibilityCheck(VG_FALSE);
+		//m_pModels[i]->setIsVisibilityCheck(VG_FALSE);
 		m_pScene->addVisualObject(m_pModels[i].get());
 	}
 }
 
-void Window::_updateDynamicUniformData()
+void Window::_updateModelState()
 {
 	float time = m_frameTimer;
 
@@ -236,10 +237,14 @@ void Window::_updateDynamicUniformData()
 				// Update matrices
 				vg::Vector3 pos = vg::Vector3(-((dim * offset.x) / 2.0f) + offset.x / 2.0f + x * offset.x, -((dim * offset.y) / 2.0f) + offset.y / 2.0f + y * offset.y, -((dim * offset.z) / 2.0f) + offset.z / 2.0f + z * offset.z);
 				//vg::Vector3 pos = vg::Vector3(1.0f);
-				*modelMat = glm::translate(vg::Matrix4x4(1.0f), pos);
-				*modelMat = glm::rotate(*modelMat, m_rotations[index].x, vg::Vector3(1.0f, 1.0f, 0.0f));
-				*modelMat = glm::rotate(*modelMat, m_rotations[index].y, vg::Vector3(0.0f, 1.0f, 0.0f));
-				*modelMat = glm::rotate(*modelMat, m_rotations[index].z, vg::Vector3(0.0f, 0.0f, 1.0f));
+				vg::Matrix4x4 matrix = glm::translate(vg::Matrix4x4(1.0f), pos);
+				matrix = glm::rotate(matrix, m_rotations[index].x, vg::Vector3(1.0f, 1.0f, 0.0f));
+				matrix = glm::rotate(matrix, m_rotations[index].y, vg::Vector3(0.0f, 1.0f, 0.0f));
+				matrix = glm::rotate(matrix, m_rotations[index].z, vg::Vector3(0.0f, 0.0f, 1.0f));
+
+                auto model = m_pModels[index];
+				model->getTransform()->setLocalMatrix(matrix);
+				*modelMat = matrix;
 			}
 		}
 	}
@@ -278,7 +283,7 @@ void Window::_onUpdate()
 {
 	ParentWindowType::_onUpdate();
 
-	_updateDynamicUniformData();
+	_updateModelState();
 	_updateDynamicUniformBuffer();
 	// auto pos = m_lastWinPos;
 	// auto size = m_lastWinSize;

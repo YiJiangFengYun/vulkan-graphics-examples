@@ -11,7 +11,7 @@ layout(binding = 0) uniform BuildIn {
 	mat4 matrixView;
 } _buildIn;
 
-layout (binding = 2) uniform OtherInfo 
+layout (set = 1, binding = 2) uniform OtherInfo 
 {
 	mat4 model;
 } otherInfo;

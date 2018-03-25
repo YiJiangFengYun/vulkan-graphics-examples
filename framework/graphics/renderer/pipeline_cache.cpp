@@ -86,6 +86,7 @@ namespace vg
         boost::hash_combine(seed, info.vertexSubIndex);
         boost::hash_combine(seed, info.pIndexData->getID());
         boost::hash_combine(seed, info.indexSubIndex);
+
         return seed;
 	}
 
@@ -94,6 +95,7 @@ namespace vg
         boost::hash_combine(seed, info.pPass->getPipelineStateID());
         boost::hash_combine(seed, info.pVertexData->getPipelineStateID());
         boost::hash_combine(seed, info.pIndexData->getPipelineStateID());
+
         return seed;
 	}
 
@@ -120,7 +122,9 @@ namespace vg
     {
         //delete old pipeline.
         auto pOldPipeline1 = m_mapPipelineNoState[info];
+
         auto pOldPipeline2 = m_mapPipelineFullBack[info];
+
         std::shared_ptr<vk::Pipeline> pPipeline;
         if (pOldPipeline1 != nullptr) 
         {
@@ -130,11 +134,16 @@ namespace vg
                 m_mapPipelineFullBack.erase(info);
                 pPipeline = pOldPipeline2;
             } 
-            else 
+			else if (m_mapPipelineFull[info] != nullptr) //Pipeline don't change.
+			{
+				pPipeline = m_mapPipelineFull[info];
+			}
+			else
             {
+				
                 //has old pipeline. delete it from two map.
                 m_mapPipelineNoState.erase(info);
-                m_mapPipelineFullBack.erase(info);
+                //m_mapPipelineFullBack.erase(info);
                 pPipeline = _createNewPipeline(info);
                 m_mapPipelineNoState[info] = pPipeline;
                 m_mapPipelineFull[info] = pPipeline;

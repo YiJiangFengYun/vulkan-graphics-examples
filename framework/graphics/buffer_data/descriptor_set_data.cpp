@@ -621,7 +621,7 @@ namespace vg
 		createBufferForBufferData(memories, 
             memorySize, 
             _isDeviceMemoryLocal(), 
-            vk::BufferUsageFlagBits::eVertexBuffer,
+            vk::BufferUsageFlagBits::eUniformBuffer,
             m_bufferSize,
             m_pBuffer,
             m_bufferMemorySize,

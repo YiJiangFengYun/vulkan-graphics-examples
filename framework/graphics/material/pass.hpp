@@ -341,7 +341,7 @@ namespace vg
 		void setInstanceCount(uint32_t count);
 
 		const ExternalUniformBufferInfo getExternalUniformBufferInfo() const;
-		void setExternalUniformBufferInfo(ExternalUniformBufferInfo value);
+		void setExternalUniformBufferData(ExternalUniformBufferInfo value);
 
 		const vk::Buffer *getUniformBuffer() const;
 		const vk::DeviceMemory *getUniformBufferMemory() const;

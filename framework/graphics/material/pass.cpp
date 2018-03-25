@@ -755,7 +755,7 @@ namespace vg
 		return m_externalUniformBufferInfo;
 	}
 
-	void Pass::setExternalUniformBufferInfo(ExternalUniformBufferInfo value)
+	void Pass::setExternalUniformBufferData(ExternalUniformBufferInfo value)
 	{
 		m_externalUniformBufferInfo = value;
 		m_applied = VG_FALSE;
@@ -959,8 +959,6 @@ namespace vg
                     
 				}
 			}
-
-			auto pSetLayouts = pLayout != nullptr ? pLayout.get() : nullptr;
 
 			vk::PipelineLayoutCreateInfo pipelineLayoutCreateInfo = {
 				vk::PipelineLayoutCreateFlags(),             //flags

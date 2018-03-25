@@ -41,9 +41,9 @@ namespace vg
         {
         public:
             SubData();
-            SubData(SubDataInfo info, vk::Buffer *pBuffer, vk::DescriptorPool *pDescriptorPool);
-            
-            void init(SubDataInfo info, vk::Buffer *pBuffer, vk::DescriptorPool *pDescriptorPool);
+            SubData(SubDataInfo info, std::shared_ptr<vk::Buffer> pBuffer, std::shared_ptr<vk::DescriptorPool> pDescriptorPool);
+			~SubData();
+            void init(SubDataInfo info, std::shared_ptr<vk::Buffer> pBuffer, std::shared_ptr<vk::DescriptorPool> pDescriptorPool);
 
             uint32_t getLayoutBindingCount() const;
             const vk::DescriptorSetLayoutBinding *getLayoutBindings() const;
@@ -60,8 +60,8 @@ namespace vg
             uint32_t m_bufferOffset;
             std::shared_ptr<vk::DescriptorSetLayout> m_pDescriptorSetLayout;
             std::shared_ptr<vk::DescriptorSet> m_pDescriptorSet;
-            vk::DescriptorPool m_descriptorPool;
-            vk::Buffer m_buffer;
+            std::shared_ptr<vk::DescriptorPool> m_pDescriptorPool;
+            std::shared_ptr<vk::Buffer> m_pBuffer;
         };
 
         UniformBufferData();
@@ -100,8 +100,6 @@ namespace vg
         const void *getMemory() const;
         const vk::DescriptorPool *getDescriptorPool() const;
     private:
-        uint32_t m_subDataCount;
-        std::vector<SubData> m_subDatas;
         uint32_t m_bufferSize;
         std::shared_ptr<vk::Buffer> m_pBuffer;
         uint32_t m_bufferMemorySize;
@@ -112,7 +110,12 @@ namespace vg
         void *m_pMmemoryForHostVisible;
 
         std::unordered_map<vk::DescriptorType, uint32_t> m_poolSizeInfos;
-        std::shared_ptr<vk::DescriptorPool> m_pDescriptorPool;
+		std::shared_ptr<vk::DescriptorPool> m_pDescriptorPool;
+
+
+		uint32_t m_subDataCount;
+		std::vector<SubData> m_subDatas;
+        
 
         Bool32 _isDeviceMemoryLocal() const;
         void _createBuffer(fd::ArrayProxy<MemorySlice> memories, uint32_t memorySize);

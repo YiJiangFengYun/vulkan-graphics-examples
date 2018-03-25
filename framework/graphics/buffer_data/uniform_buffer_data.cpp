@@ -47,26 +47,30 @@ namespace vg
         , m_bufferOffset()
         , m_pDescriptorSetLayout(nullptr)
         , m_pDescriptorSet(nullptr)
-        , m_descriptorPool(nullptr)
-        , m_buffer(nullptr)
+        , m_pDescriptorPool(nullptr)
+        , m_pBuffer(nullptr)
     {
 
     }
 
-    UniformBufferData::SubData::SubData(SubDataInfo info, vk::Buffer *pBuffer, vk::DescriptorPool *pDescriptorPool)
+    UniformBufferData::SubData::SubData(SubDataInfo info, std::shared_ptr<vk::Buffer> pBuffer, std::shared_ptr<vk::DescriptorPool> pDescriptorPool)
         : m_layoutBindingCount(0u)
         , m_layoutBindings()
         , m_descriptorInfos()
         , m_bufferOffset()
         , m_pDescriptorSetLayout(nullptr)
         , m_pDescriptorSet(nullptr)
-        , m_descriptorPool(nullptr)
-        , m_buffer(nullptr)
+        , m_pDescriptorPool(nullptr)
+        , m_pBuffer(nullptr)
     {
         init(info, pBuffer, pDescriptorPool);
     }
 
-    void UniformBufferData::SubData::init(SubDataInfo info, vk::Buffer *pBuffer, vk::DescriptorPool *pDescriptorPool)
+	UniformBufferData::SubData::~SubData()
+	{
+	}
+
+    void UniformBufferData::SubData::init(SubDataInfo info, std::shared_ptr<vk::Buffer> pBuffer, std::shared_ptr<vk::DescriptorPool> pDescriptorPool)
     {
         //Check if layout binding is changed.
         Bool32 layoutBindingChanged = VG_FALSE;
@@ -110,8 +114,10 @@ namespace vg
         }
 
         vk::DescriptorPool descriptorPool = pDescriptorPool != nullptr ? *(pDescriptorPool) : vk::DescriptorPool(nullptr);
-
-        Bool32 poolChanged = m_descriptorPool != descriptorPool ? VG_TRUE : VG_FALSE;
+		vk::DescriptorPool lastDescriptorPool = m_pDescriptorPool != nullptr ? *(m_pDescriptorPool) : vk::DescriptorPool(nullptr);
+        Bool32 poolChanged = lastDescriptorPool != descriptorPool ? VG_TRUE : VG_FALSE;
+		//Copy descriptor pool.
+		if (poolChanged) m_pDescriptorPool = pDescriptorPool;
         if (layoutBindingChanged || poolChanged)
         {
             //Create descriptor set.
@@ -124,16 +130,13 @@ namespace vg
 		    		1u,
 		    		layouts
 		    	};
-		    	m_pDescriptorSet = fd::allocateDescriptorSet(pDevice, &descriptorPool, allocateInfo);
+		    	m_pDescriptorSet = fd::allocateDescriptorSet(pDevice, m_pDescriptorPool.get(), allocateInfo);
 		    }
 		    else
 		    {
 		    	m_pDescriptorSet = nullptr;
 		    }
         }
-
-        //Copy descriptor pool.
-        if (poolChanged) m_descriptorPool = descriptorPool;
 
         //Check if descriptor infos  is changed.
         uint32_t descriptorInfoCount = 0u;
@@ -165,9 +168,9 @@ namespace vg
         }
 
         vk::Buffer buffer = pBuffer != nullptr ? *pBuffer : vk::Buffer(nullptr);
-        
-        Bool32 bufferChanged = m_buffer != buffer ? VG_TRUE : VG_FALSE;
-
+		vk::Buffer lastBuffer = m_pBuffer != nullptr ? *m_pBuffer : vk::Buffer(nullptr);
+        Bool32 bufferChanged = lastBuffer != buffer ? VG_TRUE : VG_FALSE;
+		if (bufferChanged) m_pBuffer = pBuffer;
         if (descriptorInfosChanged)
         {
             //Copy descriptor infos data
@@ -207,8 +210,6 @@ namespace vg
 		    auto pDevice = pApp->getDevice();
 		    pDevice->updateDescriptorSets(writes, nullptr);
         }
-
-        if (bufferChanged) m_buffer = buffer;
     }
 
     uint32_t UniformBufferData::SubData::getLayoutBindingCount() const
@@ -411,6 +412,7 @@ namespace vg
                 }
 		    }
 
+			auto oldPool = m_pDescriptorPool;
             if (isGreater == VG_FALSE)
             {
 		        //create descriptor pool.                
@@ -455,7 +457,7 @@ namespace vg
             for (uint32_t i = 0; i < subDataCount; ++i, ++offset)
             {
                 auto &subData = m_subDatas[offset];
-                subData.init(*(pSubDataInfos + i), m_pBuffer.get(), m_pDescriptorPool.get());
+                subData.init(*(pSubDataInfos + i), m_pBuffer, m_pDescriptorPool);
             }
         }
     }

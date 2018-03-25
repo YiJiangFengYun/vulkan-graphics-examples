@@ -11,16 +11,13 @@ namespace vg
         , uint32_t indexCount
         , uint32_t bufferSize
         , vk::PipelineInputAssemblyStateCreateInfo inputAssemblyStateInfo
-        , uint32_t vertexDataIndex 
-        , Bool32 hasClipRect
-        , fd::Rect2D clipRect)
+        , uint32_t vertexDataIndex
+        )
         : indexType(indexType)
         , indexCount(indexCount)
         , bufferSize(bufferSize)
         , inputAssemblyStateInfo(inputAssemblyStateInfo)
         , vertexDataIndex()
-        , hasClipRect(hasClipRect)
-        , clipRect(clipRect)
     {
 
     }
@@ -266,25 +263,6 @@ namespace vg
         for (uint32_t i = 0; i < count; ++i)
         {
             m_subDatas[offset].vertexDataIndex = *(vertexDataIndices.data() + i);
-            ++offset;
-        }
-    }
-
-    void IndexData::updateClipRect(fd::ArrayProxy<Bool32> hasClipRects, uint32_t count, uint32_t offset)
-    {
-        for (uint32_t i = 0; i < count; ++i)
-        {
-            m_subDatas[offset].hasClipRect = *(hasClipRects.data() + i);;
-            ++offset;
-        }
-    }
-
-    void IndexData::updateClipRect(fd::ArrayProxy<fd::Rect2D> rects, uint32_t count, uint32_t offset)
-    {
-        for (uint32_t i = 0; i < count; ++i)
-        {
-            m_subDatas[offset].hasClipRect = VG_TRUE;
-            m_subDatas[offset].clipRect = *(rects.data() + i);
             ++offset;
         }
     }

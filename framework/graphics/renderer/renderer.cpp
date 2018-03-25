@@ -435,7 +435,8 @@ namespace vg
 		BaseMesh *pMesh,
 		Material *pMaterial,
 		uint32_t subMeshIndex,
-		uint32_t passIndex)
+		uint32_t passIndex,
+		const fd::Rect2D *pClipRect)
 	{
 		VG_LOG(plog::debug) << "Pre begin command buffer for render." << std::endl;
 		ContentMesh * pContentMesh = dynamic_cast<ContentMesh *>(pMesh);
@@ -461,9 +462,10 @@ namespace vg
 		const auto &subIndexDatas = pIndexData->getSubIndexDatas();
 		const auto &subIndexData = subIndexDatas[subMeshIndex];
 		fd::Rect2D finalScissor(0.0f, 0.0f, 0.0f, 0.0f);
-		if (subIndexData.hasClipRect)
+		if (pClipRect != nullptr)
 		{
-		    auto clipRect = subIndexData.clipRect;
+
+			auto clipRect = *pClipRect;
 			glm::vec2 minOfClipRect(clipRect.x, clipRect.y);
 			glm::vec2 maxOfclipRect(clipRect.x + clipRect.width, clipRect.y + clipRect.height);
 
@@ -906,7 +908,17 @@ namespace vg
 					{
 						std::shared_ptr<vk::Pipeline> pPipeline;
 						_createPipelineForObj(pPipeline, pMesh, pMaterial, subMeshIndex + subMeshOffset, passIndex);
-						_recordCommandBufferForObj(pPipeline, pMesh, pMaterial, subMeshIndex + subMeshOffset, passIndex);
+
+                        const fd::Rect2D *pClipRect;
+						if(pVisualObject->getHasClipRect())
+						{
+							pClipRect = pVisualObject->getClipRects() + subMeshIndex;
+						}
+						else
+						{
+							pClipRect = nullptr;
+						}
+						_recordCommandBufferForObj(pPipeline, pMesh, pMaterial, subMeshIndex + subMeshOffset, passIndex, pClipRect);
 						++drawIndex;
 					}
 					else
@@ -980,15 +992,7 @@ namespace vg
 			else if (pVisualObject->getIsVisibilityCheck() == VG_FALSE)
 			{
 				validVisualObjects[validVisualObjectCount++] = pVisualObject;
-				const auto& pIndexData = dynamic_cast<ContentMesh *>(pMesh)->getIndexData();
-				uint32_t subMeshOffset = pVisualObject->getSubMeshOffset();
-				uint32_t subMeshCount = pVisualObject->getSubMeshCount();
-				std::vector<Bool32> hasRects(subMeshCount);
-				for (uint32_t i = 0; i < subMeshCount; ++i)
-				{
-					hasRects[i] = VG_FALSE;
-				}
-				pIndexData->updateClipRect(hasRects, subMeshCount, subMeshOffset);
+				pVisualObject->setHasClipRect(VG_FALSE);
 			}
 			else 
 			{
@@ -1010,15 +1014,9 @@ namespace vg
 		        	clipRect.y = 1.0f - clipRect.y - clipRect.height;
 		        }
 
-				const auto& pIndexData = dynamic_cast<ContentMesh *>(pMesh)->getIndexData();
-				uint32_t subMeshOffset = pVisualObject->getSubMeshOffset();
 				uint32_t subMeshCount = pVisualObject->getSubMeshCount();
-				std::vector<fd::Rect2D> rects(subMeshCount);
-				for (uint32_t i = 0; i < subMeshCount; ++i)
-				{
-					rects[i] = clipRect;
-				}
-				pIndexData->updateClipRect(rects, subMeshCount, subMeshOffset);
+				pVisualObject->setHasClipRect(VG_TRUE);
+				pVisualObject->updateClipRects(clipRect, subMeshCount);
 			}
 		}
 
@@ -1233,7 +1231,16 @@ namespace vg
                             preparingPipelineCostTimer.end();
 							preparingCommandBufferCostTimer.begin();
 #endif //DEBUG and VG_ENABLE_COST_TIMER
-							_recordCommandBufferForObj(pPipeline, pMesh, pMaterial, subMeshIndex + subMeshOffset, passIndex);
+                            const fd::Rect2D *pClipRect;
+						    if(pVisualObject->getHasClipRect())
+						    {
+						    	pClipRect = (pVisualObject->getClipRects() + subMeshIndex);
+						    }
+						    else
+						    {
+						    	pClipRect = nullptr;
+						    }
+							_recordCommandBufferForObj(pPipeline, pMesh, pMaterial, subMeshIndex + subMeshOffset, passIndex, pClipRect);
 #if defined(DEBUG) && defined(VG_ENABLE_COST_TIMER)
                             preparingCommandBufferCostTimer.end();
 #endif //DEBUG and VG_ENABLE_COST_TIMER
@@ -1299,15 +1306,7 @@ namespace vg
 			else if (pVisualObjectOfChild->getIsVisibilityCheck() == VG_FALSE)
 			{
 				arrPVObjs[PVObjIndex++] = pVisualObjectOfChild;
-				const auto& pIndexData = dynamic_cast<ContentMesh *>(pMeshOfChild)->getIndexData();
-				uint32_t subMeshOffset = pVisualObjectOfChild->getSubMeshOffset();
-				uint32_t subMeshCount = pVisualObjectOfChild->getSubMeshCount();
-				std::vector<Bool32> hasRects(subMeshCount);
-				for (uint32_t i = 0; i < subMeshCount; ++i)
-				{
-					hasRects[i] = VG_FALSE;
-				}
-				pIndexData->updateClipRect(hasRects, subMeshCount, subMeshOffset);
+				pVisualObjectOfChild->setHasClipRect(VG_FALSE);
 			}
 			else {
 				//Filter obj out of camera view.
@@ -1327,15 +1326,9 @@ namespace vg
 		        {
 		        	clipRect.y = 1.0f - clipRect.y - clipRect.height;
 		        }
-				const auto& pIndexData = dynamic_cast<ContentMesh *>(pMeshOfChild)->getIndexData();
-				uint32_t subMeshOffset = pVisualObjectOfChild->getSubMeshOffset();
 				uint32_t subMeshCount = pVisualObjectOfChild->getSubMeshCount();
-				std::vector<fd::Rect2D> rects(subMeshCount);
-				for (uint32_t i = 0; i < subMeshCount; ++i)
-				{
-					rects[i] = clipRect;
-				}
-				pIndexData->updateClipRect(rects, subMeshCount, subMeshOffset);
+				pVisualObjectOfChild->setHasClipRect(VG_TRUE);
+				pVisualObjectOfChild->updateClipRects(clipRect, subMeshCount);
 			}
 		}
 	}

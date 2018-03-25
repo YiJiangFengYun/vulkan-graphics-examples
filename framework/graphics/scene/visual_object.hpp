@@ -29,12 +29,24 @@ namespace vg
 		Bool32 getIsVisibilityCheck() const;
 		void setIsVisibilityCheck(Bool32 value);
 
+		Bool32 getHasClipRect() const;
+		void setHasClipRect(Bool32 value);
+		uint32_t getClipRectCount() const;
+		const fd::Rect2D *getClipRects() const;
+		void updateClipRects(fd::ArrayProxy<fd::Rect2D> rects, uint32_t count, uint32_t offset = 0u);
+		void updateClipRects(fd::Rect2D rect, uint32_t count, uint32_t offset = 0u);
+
 	protected:
 		Material *m_pMaterial;
 		BaseMesh *m_pMesh;
 		int32_t m_subMeshOffset;
 		int32_t m_subMeshCount;
 		Bool32 m_isVisibilityCheck;
+		Bool32 m_hasClipRect;
+		//Valid range of ClipRect is [(0, 0), (1, 1)]
+		std::vector<fd::Rect2D> m_clipRects;
+
+		void _asyncMeshData();
 	};
 
 	template <SpaceType SPACE_TYPE>
@@ -56,6 +68,7 @@ namespace vg
 			m_pMesh = pMesh;
 			m_subMeshOffset = -1;
 			m_subMeshCount = -1;
+			m_clipRects.resize(dynamic_cast<const ContentMesh *>(m_pMesh)->getSubMeshOffset());
 		}
 
 		void setMesh(MeshDimType *pMesh
@@ -65,6 +78,7 @@ namespace vg
 			m_pMesh = pMesh;
 			m_subMeshOffset = subMeshOffset;
 			m_subMeshCount = subMeshCount;
+			m_clipRects.resize(subMeshCount);
 		}
 	protected:
 		//aggregations

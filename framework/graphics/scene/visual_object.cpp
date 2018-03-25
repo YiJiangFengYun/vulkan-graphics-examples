@@ -8,6 +8,8 @@ namespace vg
 		, m_subMeshOffset(-1)
 		, m_subMeshCount(-1)
 		, m_isVisibilityCheck(VG_TRUE)
+		, m_hasClipRect(VG_FALSE)
+		, m_clipRects()
 	{
 
 	}
@@ -54,6 +56,7 @@ namespace vg
 	{
 		m_subMeshOffset = subMeshOffset;
 		m_subMeshCount = static_cast<int32_t>(subMeshCount);
+		m_clipRects.resize(subMeshCount);
 	}
 
 	Bool32 BaseVisualObject::getIsVisibilityCheck() const
@@ -64,6 +67,58 @@ namespace vg
 	void BaseVisualObject::setIsVisibilityCheck(Bool32 value)
 	{
 		m_isVisibilityCheck = value;
+	}
+
+	Bool32 BaseVisualObject::getHasClipRect() const
+	{
+		return m_hasClipRect;
+	}
+
+	void BaseVisualObject::setHasClipRect(Bool32 value)
+	{
+		m_hasClipRect = value;
+	}
+
+	uint32_t BaseVisualObject::getClipRectCount() const
+	{
+		return static_cast<uint32_t>(m_clipRects.size());
+	}
+		
+	const fd::Rect2D *BaseVisualObject::getClipRects() const
+	{
+		return m_clipRects.data();
+	}
+
+	void BaseVisualObject::updateClipRects(fd::ArrayProxy<fd::Rect2D> rects, uint32_t count, uint32_t offset)
+	{
+		_asyncMeshData();
+		for (uint32_t i = 0; i < count; ++i)
+        {
+            m_clipRects[offset] = *(rects.data() + i);
+            ++offset;
+        }
+	}
+		
+	void BaseVisualObject::updateClipRects(fd::Rect2D rect, uint32_t count, uint32_t offset)
+	{
+		_asyncMeshData();
+		for (uint32_t i = 0; i < count; ++i)
+        {
+			m_clipRects[offset] = rect;
+            ++offset;
+        }
+	}
+
+
+	void BaseVisualObject::_asyncMeshData()
+	{
+		if (m_subMeshCount < 0)
+		{
+			if (m_clipRects.size() < dynamic_cast<const ContentMesh *>(m_pMesh)->getSubMeshCount())
+			{
+				m_clipRects.resize(dynamic_cast<const ContentMesh *>(m_pMesh)->getSubMeshCount());
+			}
+		}
 	}
 
 } //namespace kgs

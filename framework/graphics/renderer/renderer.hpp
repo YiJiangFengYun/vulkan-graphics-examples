@@ -147,7 +147,8 @@ namespace vg
 			BaseMesh *pMesh,
 			Material *pMaterial,
 			uint32_t subMeshIndex = 0u,
-			uint32_t passIndex = 0u);
+			uint32_t passIndex = 0u,
+			const fd::Rect2D *pClipRect = nullptr);
 
 		void _recordCommandBufferForEnd();
 

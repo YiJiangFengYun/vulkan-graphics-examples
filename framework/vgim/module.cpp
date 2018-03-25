@@ -182,6 +182,7 @@ namespace vgim
         uint32_t vertexSize = static_cast<uint32_t>(vertexCount * sizeof(ImDrawVert));
         uint32_t indexSize = static_cast<uint32_t>(indexCount * sizeof(ImDrawIdx));
 
+        auto pUIObject = m_pUIObject;
         const auto& pVertexData = m_pMesh->getVertexData();
         const auto& pIndexData = m_pMesh->getIndexData();
 
@@ -266,8 +267,12 @@ namespace vgim
 			pIndexData->updateIndexCount(indexCounts, indexSubDataCount);
 			pIndexData->updateBufferSize(indexBufferSizes, indexSubDataCount);
 			pIndexData->updateVertexDataIndex(indexVertexDataIndices, indexSubDataCount);
-			pIndexData->updateClipRect(indexRects, indexSubDataCount);
+
+            pUIObject->setHasClipRect(VG_TRUE);
+            pUIObject->updateClipRects(indexRects, indexSubDataCount);
 		}
+
+
         //update material
         // ImGuiIO& io = ImGui::GetIO();
         // float data[4];

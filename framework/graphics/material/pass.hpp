@@ -342,6 +342,7 @@ namespace vg
 
 		const ExternalUniformBufferInfo getExternalUniformBufferInfo() const;
 		void setExternalUniformBufferData(ExternalUniformBufferInfo value);
+		void updateExternalUniformBufferData();
 
 		const vk::Buffer *getUniformBuffer() const;
 		const vk::DeviceMemory *getUniformBufferMemory() const;
@@ -400,10 +401,10 @@ namespace vg
 		std::vector<std::string> m_lastLayoutBindNames;
 		std::unordered_map<std::string, LayoutBindingInfo> m_lastLayoutBinds;
 		std::vector<vk::PushConstantRange> m_lastPushConstantRanges;
+	    std::vector<vk::DescriptorSetLayout> m_lastsetLayouts;
 		std::unordered_map<vk::DescriptorType, uint32_t> m_lastPoolSizeInfos;
 		Bool32 m_needReAllocateDescriptorSet;
 		Bool32 m_needUpdateDescriptorInfo;
-		ExternalUniformBufferInfo m_lastExternalUniformBufferInfo;
 		std::vector<vk::DescriptorSet> m_usingDescriptorSets;
 		std::vector<uint32_t> m_usingDynamicOffsets;
 

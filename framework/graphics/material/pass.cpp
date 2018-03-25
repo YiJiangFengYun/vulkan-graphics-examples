@@ -301,10 +301,10 @@ namespace vg
 		, m_lastLayoutBindNames()
 		, m_lastLayoutBinds()
 		, m_lastPushConstantRanges()
+		, m_lastsetLayouts()
 		, m_lastPoolSizeInfos()
 		, m_needReAllocateDescriptorSet(VG_FALSE)
 		, m_needUpdateDescriptorInfo(VG_FALSE)
-		, m_lastExternalUniformBufferInfo()
 		, m_usingDescriptorSets()
 		, m_usingDynamicOffsets()
 		, m_instanceCount(1u)
@@ -342,12 +342,12 @@ namespace vg
 		, m_lastLayoutBindNames()
 		, m_lastLayoutBinds()
 		, m_lastPushConstantRanges()
+		, m_lastsetLayouts()
+		, m_lastPoolSizeInfos()
 		, m_needReAllocateDescriptorSet(VG_FALSE)
 		, m_needUpdateDescriptorInfo(VG_FALSE)
-		, m_lastExternalUniformBufferInfo()
 		, m_usingDescriptorSets()
 		, m_usingDynamicOffsets()
-		, m_lastPoolSizeInfos()
 		, m_instanceCount(1u)
 		, m_uniformBufferSize(0u)
 	{
@@ -761,6 +761,12 @@ namespace vg
 		m_applied = VG_FALSE;
 	}
 
+	void Pass::updateExternalUniformBufferData()
+	{
+		m_applied = VG_FALSE;
+		apply();
+	}
+
 	const vk::Buffer *Pass::getUniformBuffer() const
 	{
 		return m_pUniformBuffer.get();
@@ -862,104 +868,89 @@ namespace vg
 			pushConstantRangesChanged = VG_TRUE;
 		}
 
-		//external uniform buffers
-		Bool32 externalUniformBufferChanged = VG_FALSE;
-		auto &externalUniformBufferInfo = m_externalUniformBufferInfo;
-		auto &lastExternalUniformBufferInfo = m_lastExternalUniformBufferInfo;
-		auto currPUniformBufferData = m_externalUniformBufferInfo.pData;
-		auto lastPUniformBufferData = m_lastExternalUniformBufferInfo.pData;
-		auto currInstanceID = currPUniformBufferData != nullptr ? currPUniformBufferData->getID() : 0;
-		auto lastInstanceID = lastPUniformBufferData != nullptr ? lastPUniformBufferData->getID() : 0;
-		if (currInstanceID != lastInstanceID)
+		auto pLayout = m_pDescriptorSetLayout;
+		uint32_t layoutCount = pLayout != nullptr ? 1 : 0;
+		uint32_t subDataOffset = m_externalUniformBufferInfo.subDataOffset;
+		uint32_t subDataCount = m_externalUniformBufferInfo.subDataCount;
+		uint32_t dynamicCount = 0u;
+		for (uint32_t i = 0; i < subDataCount; ++i)
 		{
-			externalUniformBufferChanged = VG_TRUE;
-		}
-		else if (m_externalUniformBufferInfo.subDataCount != m_lastExternalUniformBufferInfo.subDataCount)
-		{
-			externalUniformBufferChanged = VG_TRUE;
-		}
-		else if (m_externalUniformBufferInfo.subDataOffset != m_lastExternalUniformBufferInfo.subDataOffset)
-		{
-			externalUniformBufferChanged = VG_TRUE;
-		}
-
-		m_lastExternalUniformBufferInfo = m_externalUniformBufferInfo;
-
-		if (bindingLayoutChanged || pushConstantRangesChanged || externalUniformBufferChanged)
-		{
-			auto pLayout = m_pDescriptorSetLayout;
-			uint32_t layoutCount = pLayout != nullptr ? 1 : 0;
-			uint32_t subDataOffset = externalUniformBufferInfo.subDataOffset;
-			uint32_t subDataCount = externalUniformBufferInfo.subDataCount;
-			uint32_t dynamicCount = 0u;
-			for (uint32_t i = 0; i < subDataCount; ++i)
+			auto pSubDatas = m_externalUniformBufferInfo.pData->getSubDatas();
+			auto &subData = *(pSubDatas + (i + subDataOffset));
+			if (subData.getDescriptorSetLayout() != nullptr)
 			{
-				auto pSubDatas = externalUniformBufferInfo.pData->getSubDatas();
-				auto &subData = *(pSubDatas + (i + subDataOffset));
-				if (subData.getDescriptorSetLayout() != nullptr)
+				++layoutCount;
+				for (uint32_t bindingIndex = 0u; bindingIndex < subData.getLayoutBindingCount(); ++bindingIndex)
 				{
-				    ++layoutCount;
-					for (uint32_t bindingIndex = 0u; bindingIndex < subData.getLayoutBindingCount(); ++bindingIndex)
+					const auto &binding = *(subData.getLayoutBindings() + bindingIndex);
+					if (binding.descriptorType == vk::DescriptorType::eUniformBufferDynamic ||
+						binding.descriptorType == vk::DescriptorType::eStorageBufferDynamic)
 					{
-						const auto &binding = *(subData.getLayoutBindings() + bindingIndex);
-						if (binding.descriptorType == vk::DescriptorType::eUniformBufferDynamic ||
-						    binding.descriptorType == vk::DescriptorType::eStorageBufferDynamic)
-						{
-							dynamicCount += binding.descriptorCount;
-						}
+						dynamicCount += binding.descriptorCount;
 					}
 				}
 			}
+		}
 
-			std::vector<vk::DescriptorSetLayout> setLayouts(layoutCount);
-			m_usingDescriptorSets.resize(layoutCount);
-			m_usingDynamicOffsets.resize(dynamicCount);
-			uint32_t layoutIndex = 0u;
-			uint32_t dynamicIndex = 0u;
-			if (pLayout != nullptr) {
-				setLayouts[layoutIndex] = *pLayout;
-				if (m_needReAllocateDescriptorSet) 
-				{
-				    //now descriptor set has not be created.
-				    m_usingDescriptorSets[layoutIndex] = vk::DescriptorSet();
-				} 
-				else
-				{
-					m_usingDescriptorSets[layoutIndex] = *m_pDescriptorSet;
-				}
+		std::vector<vk::DescriptorSetLayout> setLayouts(layoutCount);
+		m_usingDescriptorSets.resize(layoutCount);
+		m_usingDynamicOffsets.resize(dynamicCount);
+		uint32_t layoutIndex = 0u;
+		uint32_t dynamicIndex = 0u;
+		if (pLayout != nullptr) {
+			setLayouts[layoutIndex] = *pLayout;
+			if (m_needReAllocateDescriptorSet)
+			{
+				//now descriptor set has not be created.
+				m_usingDescriptorSets[layoutIndex] = vk::DescriptorSet();
+			}
+			else
+			{
+				m_usingDescriptorSets[layoutIndex] = *m_pDescriptorSet;
+			}
+			++layoutIndex;
+		}
+
+		for (uint32_t i = 0; i < subDataCount; ++i)
+		{
+			auto pSubDatas = m_externalUniformBufferInfo.pData->getSubDatas();
+			auto &subData = *(pSubDatas + (i + subDataOffset));
+			if (subData.getDescriptorSetLayout() != nullptr)
+			{
+				setLayouts[layoutIndex] = *(subData.getDescriptorSetLayout());
+				m_usingDescriptorSets[layoutIndex] = *(subData.getDescriptorSet());
 				++layoutIndex;
-			}
 
-			for (uint32_t i = 0; i < subDataCount; ++i)
-			{
-				auto pSubDatas = externalUniformBufferInfo.pData->getSubDatas();
-				auto &subData = *(pSubDatas + (i + subDataOffset));
-				if (subData.getDescriptorSetLayout() != nullptr)
+				uint32_t descriptorInfoIndex = 0u;
+				for (uint32_t bindingIndex = 0u; bindingIndex < subData.getLayoutBindingCount(); ++bindingIndex)
 				{
-					setLayouts[layoutIndex] = *(subData.getDescriptorSetLayout());
-					m_usingDescriptorSets[layoutIndex] = *(subData.getDescriptorSet());
-					++layoutIndex;
-
-					uint32_t descriptorInfoIndex = 0u;
-                    for (uint32_t bindingIndex = 0u; bindingIndex < subData.getLayoutBindingCount(); ++bindingIndex)
+					const auto &binding = *(subData.getLayoutBindings() + bindingIndex);
+					if (binding.descriptorType == vk::DescriptorType::eUniformBufferDynamic ||
+						binding.descriptorType == vk::DescriptorType::eStorageBufferDynamic)
 					{
-						const auto &binding = *(subData.getLayoutBindings() + bindingIndex);
-						if (binding.descriptorType == vk::DescriptorType::eUniformBufferDynamic ||
-						    binding.descriptorType == vk::DescriptorType::eStorageBufferDynamic)
+						for (uint32_t descriptorIndex = 0u; descriptorIndex < binding.descriptorCount; ++descriptorIndex)
 						{
-							for (uint32_t descriptorIndex = 0u; descriptorIndex < binding.descriptorCount; ++descriptorIndex)
-							{
-								auto &descriptorInfo = *(subData.getDescriptorInfos() + (descriptorInfoIndex + descriptorIndex));
-								m_usingDynamicOffsets[dynamicIndex] = descriptorInfo.dynamicOffset;
-								++dynamicIndex;
-							}
+							auto &descriptorInfo = *(subData.getDescriptorInfos() + (descriptorInfoIndex + descriptorIndex));
+							m_usingDynamicOffsets[dynamicIndex] = descriptorInfo.dynamicOffset;
+							++dynamicIndex;
 						}
-						descriptorInfoIndex += binding.descriptorCount;
 					}
-                    
+					descriptorInfoIndex += binding.descriptorCount;
 				}
-			}
 
+			}
+		}
+
+		Bool32 setLayoutChanged = VG_FALSE;
+		if (m_lastsetLayouts != setLayouts)
+		{
+			setLayoutChanged = VG_TRUE;
+			m_lastsetLayouts = setLayouts;
+		}
+
+
+		if (bindingLayoutChanged || pushConstantRangesChanged || setLayoutChanged)
+		{
 			vk::PipelineLayoutCreateInfo pipelineLayoutCreateInfo = {
 				vk::PipelineLayoutCreateFlags(),             //flags
 				layoutCount,                                 //setLayoutCount

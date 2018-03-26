@@ -3,20 +3,6 @@
 #include <iostream>
 #include <gli/gli.hpp>
 
-Window::OtherInfo::OtherInfo()
-    : viewPos(vg::Vector4())
-	, lodBias(0.0f)
-{
-
-}
-
-Window::OtherInfo::OtherInfo(vg::Vector4 viewPos, float lodBias)
-    : viewPos(viewPos)
-	, lodBias(lodBias)
-{
-
-}
-
 Window::Window(uint32_t width
 	, uint32_t height
 	, const char* title
@@ -25,23 +11,14 @@ Window::Window(uint32_t width
 		, height
 		, title
 	    )
-	, m_tempPositions()
-	, m_tempTexCoords()
-	, m_tempNormals()
-	, m_tempIndices()
-	, m_pModel()
-	, m_pMesh()
-	, m_pTexture()
 	, m_pShader()
 	, m_pPass()
 	, m_pMaterial()
 {
 	_init();
-	_loadModel();
-	_createMesh();
-	_createTexture();
+	_loadAssimpScene();
 	_createMaterial();
-	_createModel();
+	_fillScene();
 }
 
 Window::Window(std::shared_ptr<GLFWwindow> pWindow
@@ -50,134 +27,72 @@ Window::Window(std::shared_ptr<GLFWwindow> pWindow
 	: sampleslib::Window<vg::SpaceType::SPACE_3>(pWindow
 		, pSurface
 	    )
-	, m_tempPositions()
-	, m_tempTexCoords()
-	, m_tempNormals()
-	, m_tempIndices()
-	, m_pModel()
-	, m_pMesh()
-	, m_pTexture()
 	, m_pShader()
 	, m_pPass()
 	, m_pMaterial()
 {
 	_init();
-	_loadModel();
-	_createMesh();
-	_createTexture();
+	_loadAssimpScene();
 	_createMaterial();
-	_createModel();	
+	_fillScene();
 }
 
 void Window::_init()
 {
-	m_zoom = -2.5f;
+	m_zoom = -20.0f;
 	/// Build a quaternion from euler angles (pitch, yaw, roll), in radians.
-	m_rotation = vg::Vector3(glm::radians(0.0f), glm::radians(15.0f), glm::radians(0.0f));
+	m_rotation = vg::Vector3(glm::radians(32.0f), glm::radians(45.0f), glm::radians(0.0f));
+	m_timerSpeedFactor *= 0.5f;
 }
 
-void Window::_loadModel()
+void Window::_loadAssimpScene()
 {
-	m_tempPositions = { vg::Vector3(1.0f, 1.0f, 1.0f)
-	    , vg::Vector3(-1.0f, 1.0f, 1.0f)
-	    , vg::Vector3(-1.0f, -1.0f, 1.0f)
-	    , vg::Vector3(1.0f, -1.0f, 1.0f)
+	const uint32_t layoutCount = 4u;
+	sampleslib::AssimpScene::VertexLayoutComponent layouts[layoutCount] = {
+		sampleslib::AssimpScene::VertexLayoutComponent::VERTEX_COMPONENT_POSITION,
+		sampleslib::AssimpScene::VertexLayoutComponent::VERTEX_COMPONENT_NORMAL,
+		sampleslib::AssimpScene::VertexLayoutComponent::VERTEX_COMPONENT_UV,
+		sampleslib::AssimpScene::VertexLayoutComponent::VERTEX_COMPONENT_COLOR	    				
 	};
-	m_tempTexCoords = { vg::Vector2(1.0f, 1.0f)
-	    , vg::Vector2(0.0f, 1.0f)
-	    , vg::Vector2(0.0f, 0.0f)
-	    , vg::Vector2(1.0f, 0.0f)
-	};
-	m_tempNormals = {vg::Vector3(0.0f, 0.0f, -1.0f)
-	    , vg::Vector3(0.0f, 0.0f, -1.0f)
-	    , vg::Vector3(0.0f, 0.0f, -1.0f)
-	    , vg::Vector3(0.0f, 0.0f, -1.0f)
-	};
-	m_tempIndices = {
-		0, 1, 2, 2, 3, 0
-	};
-}
-
-void Window::_createMesh()
-{
-	m_pMesh = static_cast<std::shared_ptr<vg::DimSepMesh3>>(new vg::DimSepMesh3());
-	m_pMesh->setVertexCount(static_cast<uint32_t>(m_tempPositions.size()));
-	m_pMesh->setPositions(m_tempPositions);
-	m_pMesh->setNormals(m_tempNormals);
-	m_pMesh->setTextureCoordinates<vg::TextureCoordinateType::VECTOR_2, vg::TextureCoordinateIndex::TextureCoordinate_0>(m_tempTexCoords);
-	m_pMesh->setIndices(m_tempIndices, vg::PrimitiveTopology::TRIANGLE_LIST, 0u);
-	m_pMesh->apply(VG_TRUE);
-}
-
-void Window::_createTexture()
-{
-	//load texture
-	std::string fileName = "textures/metalplate01_rgba.ktx";
-	auto format = vk::Format::eR8G8B8A8Unorm;
-	gli::texture2d gliTex2D(gli::load(fileName));
-	if (gliTex2D.empty()) {
-		throw std::runtime_error("The texture do't exist! path: " + fileName);
-	}
-
-	auto pTex = new vg::Texture2D(format, VG_TRUE, 
-		gliTex2D[0].extent().x, 
-		gliTex2D[0].extent().y
-	);
-	m_pTexture = std::shared_ptr<vg::Texture2D>(pTex);
-	uint32_t mipLevels = static_cast<uint32_t>(gliTex2D.levels());
-	vg::TextureDataInfo textureLayout;
-	std::vector<vg::TextureDataInfo::Component> components(mipLevels);
-	for (uint32_t i = 0; i < mipLevels; ++i)
-	{
-		components[i].mipLevel = i;
-		components[i].baseArrayLayer = 0u;
-		components[i].layerCount = 1u;
-		components[i].size = gliTex2D[i].size();
-		components[i].hasImageExtent = VG_TRUE;
-		components[i].width = gliTex2D[i].extent().x;
-		components[i].height = gliTex2D[i].extent().y;
-		components[i].depth = 1u;
-	}
-	textureLayout.componentCount = components.size();
-	textureLayout.pComponent = components.data();
-	m_pTexture->applyData(textureLayout, gliTex2D.data(), gliTex2D.size());
-
-	m_pTexture->setFilterMode(vg::FilterMode::TRILINEAR);
-	m_pTexture->setSamplerAddressMode(vg::SamplerAddressMode::REPEAT);
-
-	auto &pApp = vg::pApp;
-	auto pDevice = pApp->getDevice();
-	auto pPhysicalDevice = pApp->getPhysicalDevice();
-	if (pApp->getPhysicalDeviceFeatures().samplerAnisotropy)
-	{
-		auto anisotropy = pPhysicalDevice->getProperties().limits.maxSamplerAnisotropy;
-		m_pTexture->setAnisotropy(anisotropy);
-	}
+	sampleslib::AssimpScene::CreateInfo createInfo;
+	createInfo.fileName = "models/samplescene.dae";
+	createInfo.isCreateObject = VG_TRUE;
+	createInfo.layoutComponentCount = layoutCount;
+	createInfo.pLayoutComponent = layouts;
+	createInfo.scale = vg::Vector3(0.35f, 0.35f, 0.35f);
+	createInfo.offset = vg::Vector3(20.0f, -20.0f, -0.0f);
+	m_assimpScene.init(createInfo);
 }
 
 void Window::_createMaterial()
 {
-
 	auto & pShader = m_pShader;
 	auto & pPass = m_pPass;
 	auto & pMaterial = m_pMaterial;
 	auto & pApp = vg::pApp;
 	//shader
 	pShader = std::shared_ptr<vg::Shader>(
-		new vg::Shader("shaders/texture/texture.vert.spv", "shaders/texture/texture.frag.spv")
+		new vg::Shader("shaders/push_constants/lights.vert.spv", "shaders/push_constants/lights.frag.spv")
 		// new vg::Shader("shaders/test.vert.spv", "shaders/test.frag.spv")
 		);
 	//pass
 	pPass = std::shared_ptr<vg::Pass>(new vg::Pass(pShader.get()));
-	pPass->setCullMode(vg::CullModeFlagBits::FRONT);
+	vg::Pass::BuildInDataInfo::Component buildInDataCmps[2] = {
+			{vg::Pass::BuildInDataType::MATRIX_OBJECT_TO_NDC},
+			{vg::Pass::BuildInDataType::MATRIX_OBJECT_TO_WORLD}
+		};
+		vg::Pass::BuildInDataInfo buildInDataInfo;
+		buildInDataInfo.componentCount = 2u;
+		buildInDataInfo.pComponent = buildInDataCmps;
+	pPass->setBuildInDataInfo(buildInDataInfo);
+	pPass->setCullMode(vg::CullModeFlagBits::BACK);
 	pPass->setFrontFace(vg::FrontFaceType::CLOCKWISE);
 	vk::PipelineDepthStencilStateCreateInfo depthStencilState = {};
 	depthStencilState.depthTestEnable = VG_TRUE;
 	depthStencilState.depthWriteEnable = VG_TRUE;
 	depthStencilState.depthCompareOp = vk::CompareOp::eLessOrEqual;
 	pPass->setDepthStencilInfo(depthStencilState);
-	pPass->setMainTexture(m_pTexture.get());
-	pPass->setDataValue("other_info", m_otherInfo, 2u);
+	pPass->setPushConstantRange("push_constants", vk::ShaderStageFlagBits::eVertex, 0u, static_cast<uint32_t>(sizeof(m_pushConstants)));
 	pPass->apply();
 	//material
 	pMaterial = std::shared_ptr<vg::Material>(new vg::Material());
@@ -188,29 +103,48 @@ void Window::_createMaterial()
 
 }
 
-void Window::_createModel()
+void Window::_fillScene()
 {
-	m_pModel = std::shared_ptr<vg::VisualObject3>(new vg::VisualObject3());
-	m_pModel->setMesh(m_pMesh.get());
-	m_pModel->setMaterial(m_pMaterial.get());
-	m_pScene->addVisualObject(m_pModel.get());
+	const auto &objects = m_assimpScene.getObjects();
+	for (const auto &object : objects)
+	{
+		object->setMaterial(m_pMaterial.get());
+	    m_pScene->addVisualObject(object.get());		
+	}
 }
 
 void Window::_onUpdate()
 {
 	ParentWindowType::_onUpdate();
-	m_otherInfo.viewPos = vg::Vector4(0.0f, 0.0f, m_zoom, 1.0f);
 
-	auto pos = m_lastWinPos;
-	auto size = m_lastWinSize;
-	ImGui::SetNextWindowPos(ImVec2(pos.x, pos.y + size.y + 10));
-	ImGui::SetNextWindowSize(ImVec2(0, 0));
-	ImGui::Begin("Settings", nullptr, ImGuiWindowFlags_AlwaysAutoResize | ImGuiWindowFlags_NoResize | ImGuiWindowFlags_NoMove);
-	if (ImGui::SliderFloat("LOD bias", &m_otherInfo.lodBias, 0.0f, (float)m_pTexture->getMipmapLevels())) {
-		m_pPass->setDataValue("other_info", m_otherInfo, 2u);
-	    m_pPass->apply();
-	}
-	ImGui::End();
+	// Update light positions
+	// w component = light radius scale
+#define r 7.5f
+#define sin_t sin(glm::radians(m_passedTime * 360))
+#define cos_t cos(glm::radians(m_passedTime * 360))
+#define x 20.0f
+#define y -20.0f
+	m_pushConstants[0] = glm::vec4(x + r * 1.1 * sin_t,   y, r * 1.1 * cos_t, 1.0f);
+	m_pushConstants[1] = glm::vec4(x + -r * sin_t,        y, -r * cos_t, 1.0f);
+	m_pushConstants[2] = glm::vec4(x + r * 0.85f * sin_t, y, -sin_t * 2.5f, 1.5f);
+	m_pushConstants[3] = glm::vec4(x + 0.0f,              y, r * 1.25f * cos_t, 1.5f);
+	m_pushConstants[4] = glm::vec4(x + r * 2.25f * cos_t, y, 0.0f, 1.25f);
+	m_pushConstants[5] = glm::vec4(x + r * 2.5f * cos_t,  y, r * 2.5f * sin_t, 1.25f);
+#undef r
+#undef x
+#undef y
+#undef sin_t
+#undef cos_t
+    
+	m_pPass->setPushConstantUpdate("push_constants", m_pushConstants.data(), 
+	    static_cast<uint32_t>(sizeof(m_pushConstants)), vk::ShaderStageFlagBits::eVertex, 0u);
+
+	// auto pos = m_lastWinPos;
+	// auto size = m_lastWinSize;
+	// ImGui::SetNextWindowPos(ImVec2(pos.x, pos.y + size.y + 10));
+	// ImGui::SetNextWindowSize(ImVec2(0, 0));
+	// ImGui::Begin("Settings", nullptr, ImGuiWindowFlags_AlwaysAutoResize | ImGuiWindowFlags_NoResize | ImGuiWindowFlags_NoMove);
+	// ImGui::End();
 }
 
 void Window::_renderWithRenderer(vg::Renderer *pRenderer

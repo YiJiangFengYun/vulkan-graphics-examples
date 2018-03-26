@@ -183,7 +183,7 @@ void Window::_createMaterial()
 		buildInDataInfo.componentCount = 2u;
 		buildInDataInfo.pComponent = buildInDataCmps;
 	pPass->setBuildInDataInfo(buildInDataInfo);
-	pPass->setCullMode(vg::CullModeFlagBits::NONE);
+	pPass->setCullMode(vg::CullModeFlagBits::BACK);
 	pPass->setFrontFace(vg::FrontFaceType::COUNTER_CLOCKWISE);
 	vk::PipelineDepthStencilStateCreateInfo depthStencilState = {};
 	depthStencilState.depthTestEnable = VG_TRUE;

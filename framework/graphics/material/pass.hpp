@@ -342,7 +342,9 @@ namespace vg
 
 		const ExternalUniformBufferInfo getExternalUniformBufferInfo() const;
 		void setExternalUniformBufferData(ExternalUniformBufferInfo value);
+
 		void updateExternalUniformBufferData();
+		void applyUniformBufferDynamicOffsets();
 
 		const vk::Buffer *getUniformBuffer() const;
 		const vk::DeviceMemory *getUniformBufferMemory() const;
@@ -357,6 +359,7 @@ namespace vg
 	private:
 		//compositons
 		std::shared_ptr<MaterialData> m_pData;
+		Bool32 m_dataChanged;
 		std::vector<std::string> m_arrLayoutBindNames;
 		std::unordered_map<std::string, LayoutBindingInfo> m_mapLayoutBinds;
 		std::shared_ptr<vk::Buffer> m_pUniformBuffer;

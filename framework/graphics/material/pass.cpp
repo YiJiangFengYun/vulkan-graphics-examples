@@ -276,8 +276,9 @@ namespace vg
 
 	Pass::Pass() 
 		: Base(BaseType::PASS)
+		, m_applied(VG_FALSE)		
 		, m_pData(new MaterialData())
-		, m_applied(VG_FALSE)
+		, m_dataChanged(VG_FALSE)
 		, m_polygonMode(PolygonMode::FILL)
 		, m_cullMode(CullModeFlagBits::BACK)
 		, m_frontFace(FrontFaceType::COUNTER_CLOCKWISE)
@@ -316,8 +317,9 @@ namespace vg
 
 	Pass::Pass(Shader *pShader)
 		: Base(BaseType::PASS)
+		, m_applied(VG_FALSE)		
 		, m_pData(new MaterialData())
-		, m_applied(VG_FALSE)
+		, m_dataChanged(VG_FALSE)
 		, m_pShader(pShader)
 		, m_polygonMode(PolygonMode::FILL)
 		, m_cullMode(CullModeFlagBits::BACK)
@@ -424,6 +426,7 @@ namespace vg
 		info.updateSize(m_pData->getDataSize(name));
 		setValue(name, info, m_mapLayoutBinds, m_arrLayoutBindNames);
 		m_applied = VG_FALSE;
+		m_dataChanged = VG_TRUE;
 	}
 
 	const Texture *Pass::getMainTexture() const
@@ -759,6 +762,61 @@ namespace vg
 	{
 		m_externalUniformBufferInfo = value;
 		m_applied = VG_FALSE;
+	}
+
+	void Pass::applyUniformBufferDynamicOffsets()
+	{
+		uint32_t subDataOffset = m_externalUniformBufferInfo.subDataOffset;
+		uint32_t subDataCount = m_externalUniformBufferInfo.subDataCount;
+		uint32_t dynamicCount = 0u;
+		for (uint32_t i = 0; i < subDataCount; ++i)
+		{
+			auto pSubDatas = m_externalUniformBufferInfo.pData->getSubDatas();
+			auto &subData = *(pSubDatas + (i + subDataOffset));
+			if (subData.getDescriptorSetLayout() != nullptr)
+			{
+				for (uint32_t bindingIndex = 0u; bindingIndex < subData.getLayoutBindingCount(); ++bindingIndex)
+				{
+					const auto &binding = *(subData.getLayoutBindings() + bindingIndex);
+					if (binding.descriptorType == vk::DescriptorType::eUniformBufferDynamic ||
+						binding.descriptorType == vk::DescriptorType::eStorageBufferDynamic)
+					{
+						dynamicCount += binding.descriptorCount;
+					}
+				}
+			}
+		}
+
+		if (static_cast<uint32_t>(m_usingDynamicOffsets.size()) != dynamicCount)
+		      m_usingDynamicOffsets.resize(dynamicCount);
+		uint32_t dynamicIndex = 0u;
+
+		for (uint32_t i = 0; i < subDataCount; ++i)
+		{
+			auto pSubDatas = m_externalUniformBufferInfo.pData->getSubDatas();
+			auto &subData = *(pSubDatas + (i + subDataOffset));
+			if (subData.getDescriptorSetLayout() != nullptr)
+			{
+				uint32_t descriptorInfoIndex = 0u;
+				for (uint32_t bindingIndex = 0u; bindingIndex < subData.getLayoutBindingCount(); ++bindingIndex)
+				{
+					const auto &binding = *(subData.getLayoutBindings() + bindingIndex);
+					if (binding.descriptorType == vk::DescriptorType::eUniformBufferDynamic ||
+						binding.descriptorType == vk::DescriptorType::eStorageBufferDynamic)
+					{
+						for (uint32_t descriptorIndex = 0u; descriptorIndex < binding.descriptorCount; ++descriptorIndex)
+						{
+							auto &descriptorInfo = *(subData.getDescriptorInfos() + (descriptorInfoIndex + descriptorIndex));
+							if(m_usingDynamicOffsets[dynamicIndex] != descriptorInfo.dynamicOffset)
+							    m_usingDynamicOffsets[dynamicIndex] = descriptorInfo.dynamicOffset;
+							++dynamicIndex;
+						}
+					}
+					descriptorInfoIndex += binding.descriptorCount;
+				}
+
+			}
+		}
 	}
 
 	void Pass::updateExternalUniformBufferData()
@@ -1200,7 +1258,7 @@ namespace vg
 
 	void Pass::_applyBufferContent()
 	{
-		if (m_pUniformBufferMemory != nullptr)
+		if (m_dataChanged == VG_TRUE && m_pUniformBufferMemory != nullptr)
 		{
 			//get total number of unimform buffer variables.
 			int32_t uniformBufferCount = 0u;
@@ -1240,6 +1298,7 @@ namespace vg
 				m_pData->memoryCopyData(names[i], data, offsets[i], 0u, descriptorCounts[i]);
 			}
 			pDevice->unmapMemory(*m_pUniformBufferMemory);
+			m_dataChanged = VG_FALSE;
 		}
 	}
 
@@ -1343,6 +1402,7 @@ namespace vg
 		info.updateSize(size);
 		setValue(VG_M_BUILDIN_NAME, info, m_mapLayoutBinds, m_arrLayoutBindNames);
 		m_applied = VG_FALSE;
+		m_dataChanged = VG_TRUE;
 	}
 
 

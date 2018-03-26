@@ -67,6 +67,7 @@ namespace vg
 		info.updateSize(m_pData.get());
 		setValue(name, info, m_mapLayoutBinds, m_arrLayoutBindNames);
 		m_applied = VG_FALSE;
+		m_dataChanged = VG_TRUE;
 	}
 
 	template<typename T>
@@ -91,6 +92,7 @@ namespace vg
 		info.updateSize(m_pData);
 		setValue(name, info, m_mapLayoutBinds, m_arrLayoutBindNames);
 		m_applied = VG_FALSE;
+		m_dataChanged = VG_TRUE;
 	}
 
 	template<typename T>
@@ -155,6 +157,7 @@ namespace vg
 					, size
 					, offset2);
 				m_applied = VG_FALSE;
+				m_dataChanged = VG_TRUE;
 			}
 		}
 	}

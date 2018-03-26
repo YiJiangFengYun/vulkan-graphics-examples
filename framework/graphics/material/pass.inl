@@ -1,22 +1,6 @@
 namespace vg
 {
 	template<typename T>
-	void Pass::SpecializationData::init(const T &data
-		, const vk::SpecializationInfo &info)
-	{
-		init(&data, static_cast<uin32_t>(sizeof(T)), info);
-	}
-
-	template<typename T>
-	T Pass::SpecializationData::getData() const
-	{
-		size_t size = sizeof(T);
-		T data;
-		memcpy(&data, m_pData, size);
-		return data;
-	}
-
-	template<typename T>
 	void Pass::PushConstantUpdate::init(const T &data
 		, vk::ShaderStageFlags stageFlags 
 		, uint32_t offset)
@@ -93,14 +77,6 @@ namespace vg
 		setValue(name, info, m_mapLayoutBinds, m_arrLayoutBindNames);
 		m_applied = VG_FALSE;
 		m_dataChanged = VG_TRUE;
-	}
-
-	template<typename T>
-	void Pass::setSpecializationData(ShaderStageFlagBits shaderStage
-		, const T &data
-		, const vk::SpecializationInfo &info)
-	{
-		setSpecializationData(shaderStage, &data, static_cast<uin32_t>(sizeof(T)), info);
 	}
 
     template<typename T>

@@ -127,20 +127,11 @@ namespace vg
 			SpecializationData(const SpecializationData &&);
 			SpecializationData& operator=(const SpecializationData &);
 
-			void init(const void* pData
-			    , uint32_t size
-				, const vk::SpecializationInfo &info);
-
-			template<typename T>
-			void init(const T &data
-				, const vk::SpecializationInfo &info);
+			void init(const vk::SpecializationInfo &info);
 
             const vk::SpecializationInfo getInfo() const;
 			const void * getData() const;
 			uint32_t getSize() const;
-
-			template<typename T>
-			T getData() const;
 		private:
 			std::vector<vk::SpecializationMapEntry> m_mapEntries;
 			vk::SpecializationInfo m_info;
@@ -311,13 +302,6 @@ namespace vg
 		std::vector<std::shared_ptr<PushConstantUpdate>> getPushconstantUpdates() const;
 
 		void setSpecializationData(ShaderStageFlagBits shaderStage
-		    , void* pData
-			, uint32_t size
-			, const vk::SpecializationInfo &info);
-
-		template<typename T>
-		void setSpecializationData(ShaderStageFlagBits shaderStage
-		    , const T &data
 			, const vk::SpecializationInfo &info);
 
 	    void setPushConstantRange(std::string name

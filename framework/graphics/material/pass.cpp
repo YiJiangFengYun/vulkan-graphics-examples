@@ -48,7 +48,7 @@ namespace vg
 
 	Pass::SpecializationData::SpecializationData(const SpecializationData & target)
 	{
-		init(target.m_pData, target.m_size, target.m_info);
+		init(target.m_info);
 	}
 
 	Pass::SpecializationData::SpecializationData(const SpecializationData && target)
@@ -62,13 +62,11 @@ namespace vg
 
 	Pass::SpecializationData& Pass::SpecializationData::operator=(const SpecializationData & target)
 	{
-		init(target.m_pData, target.m_size, target.m_info);
+		init(target.m_info);
 		return *this;
 	}
 
-	void Pass::SpecializationData::init(const void* pData
-		, uint32_t size
-		, const vk::SpecializationInfo &info)
+	void Pass::SpecializationData::init(const vk::SpecializationInfo &info)
 	{
 		uint32_t count = info.mapEntryCount;
 		size_t sizeOfSrcMap = count * sizeof(vk::SpecializationMapEntry);
@@ -76,7 +74,7 @@ namespace vg
 		m_mapEntries.resize(count);
 		memcpy(m_mapEntries.data(), info.pMapEntries, sizeOfSrcMap);
         m_info.pMapEntries = m_mapEntries.data();
-		if (m_pData != nullptr && (m_size != size))
+		if (m_pData != nullptr && (m_size < info.dataSize))
 		{
 			free(m_pData);
 			m_pData = nullptr;
@@ -85,11 +83,11 @@ namespace vg
 	
 		if (m_pData == nullptr)
 		{
-			m_pData = malloc(size);
-			m_size = size;
+			m_pData = malloc(info.dataSize);
+			m_size = info.dataSize;
 		}
-		memcpy(m_pData, pData, size);
-		m_info.dataSize = size;
+		memcpy(m_pData, info.pData, info.dataSize);
+		m_info.dataSize = info.dataSize;
 		m_info.pData = m_pData;
 	}
 
@@ -702,8 +700,6 @@ namespace vg
 	}
 
 	void Pass::setSpecializationData(ShaderStageFlagBits shaderStage
-		, void* pData
-		, uint32_t size
 		, const vk::SpecializationInfo &info)
 	{
 		auto vkStage = tranShaderStageFlagBitToVK(shaderStage);
@@ -713,7 +709,7 @@ namespace vg
 			pSpecializationData = std::shared_ptr<SpecializationData>(new SpecializationData());
 			m_mapSpecilizationDatas[vkStage] = pSpecializationData;
 		}
-		pSpecializationData->init(pData, size, info);
+		pSpecializationData->init(info);
 		_updatePipelineStateID();
 	}
 

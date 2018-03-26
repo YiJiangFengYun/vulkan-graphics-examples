@@ -119,16 +119,15 @@ namespace vg
 		if (boundsOfView.intersects(boundsInView, &intersectionInView))
 		{
 			isInsideCameraView = VG_TRUE;
-		}
-		
-		if (viewRect != nullptr)
-		{
-			auto min = intersectionInView.getMin();
-			auto size = intersectionInView.getSize();
-			(*viewRect).x = min.x;
-			(*viewRect).y = min.y;
-			(*viewRect).width = size.x;
-			(*viewRect).height = size.y;
+			if (viewRect != nullptr)
+		    {
+		    	auto min = intersectionInView.getMin();
+		    	auto size = intersectionInView.getSize();
+		    	(*viewRect).x = min.x;
+		    	(*viewRect).y = min.y;
+		    	(*viewRect).width = size.x;
+		    	(*viewRect).height = size.y;
+		    }
 		}
 		
 		return isInsideCameraView;

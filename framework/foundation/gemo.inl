@@ -317,7 +317,7 @@ namespace fd
 			}
 		}
 
-		if (intersection != nullptr)
+		if (isInter && intersection != nullptr)
 		{
 			intersection->setMinMax(min, max);
 		}

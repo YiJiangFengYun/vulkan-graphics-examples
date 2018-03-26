@@ -19,6 +19,7 @@ add_subdirectory(cubemaps)
 add_subdirectory(texture_array)
 add_subdirectory(mesh)
 add_subdirectory(dynamic_uniform_buffer)
+add_subdirectory(push_constants)
 
 # sampler include directories and libraries is used by itself
 # set(INCLUDE_DIRS ${INCLUDE_DIRS} PARENT_SCOPE)

@@ -1010,21 +1010,22 @@ namespace vg
 			    if(pCamera->isInView(pTransform, bounds, &clipRect) == VG_TRUE)
 			    {
 			    	validVisualObjects[validVisualObjectCount++] = pVisualObject;
+					//Transform range [-1, 1] to range [0, 1]
+				    clipRect.x = (clipRect.x + 1.0f) / 2.0f;
+				    clipRect.y = (clipRect.y + 1.0f) / 2.0f;
+				    clipRect.width = clipRect.width / 2.0f;
+				    clipRect.height = clipRect.height / 2.0f;
+    
+				    if (pScene->getIsRightHand() == VG_FALSE)
+		            {
+		            	clipRect.y = 1.0f - clipRect.y - clipRect.height;
+		            }
+    
+				    uint32_t subMeshCount = pVisualObject->getSubMeshCount();
+				    pVisualObject->setHasClipRect(VG_TRUE);
+				    pVisualObject->updateClipRects(clipRect, subMeshCount);
 			    }
-				//Transform range [-1, 1] to range [0, 1]
-				clipRect.x = (clipRect.x + 1.0f) / 2.0f;
-				clipRect.y = (clipRect.y + 1.0f) / 2.0f;
-				clipRect.width = clipRect.width / 2.0f;
-				clipRect.height = clipRect.height / 2.0f;
-
-				if (pScene->getIsRightHand() == VG_FALSE)
-		        {
-		        	clipRect.y = 1.0f - clipRect.y - clipRect.height;
-		        }
-
-				uint32_t subMeshCount = pVisualObject->getSubMeshCount();
-				pVisualObject->setHasClipRect(VG_TRUE);
-				pVisualObject->updateClipRects(clipRect, subMeshCount);
+				
 			}
 		}
 
@@ -1347,20 +1348,19 @@ namespace vg
 			    if (pCamera->isInView(pChild, boundsOfChild, &clipRect) == VG_TRUE)
 			    {
 			    	arrPVObjs[PVObjIndex++] = pVisualObjectOfChild;
+					//Transform range [-1, 1] to range [0, 1]
+				    clipRect.x = (clipRect.x + 1.0f) / 2.0f;
+				    clipRect.y = (clipRect.y + 1.0f) / 2.0f;
+				    clipRect.width = clipRect.width / 2.0f;
+				    clipRect.height = clipRect.height / 2.0f;
+				    if (pScene->getIsRightHand() == VG_FALSE)
+		            {
+		            	clipRect.y = 1.0f - clipRect.y - clipRect.height;
+		            }
+				    uint32_t subMeshCount = pVisualObjectOfChild->getSubMeshCount();
+				    pVisualObjectOfChild->setHasClipRect(VG_TRUE);
+				    pVisualObjectOfChild->updateClipRects(clipRect, subMeshCount);
 			    }
-
-				//Transform range [-1, 1] to range [0, 1]
-				clipRect.x = (clipRect.x + 1.0f) / 2.0f;
-				clipRect.y = (clipRect.y + 1.0f) / 2.0f;
-				clipRect.width = clipRect.width / 2.0f;
-				clipRect.height = clipRect.height / 2.0f;
-				if (pScene->getIsRightHand() == VG_FALSE)
-		        {
-		        	clipRect.y = 1.0f - clipRect.y - clipRect.height;
-		        }
-				uint32_t subMeshCount = pVisualObjectOfChild->getSubMeshCount();
-				pVisualObjectOfChild->setHasClipRect(VG_TRUE);
-				pVisualObjectOfChild->updateClipRects(clipRect, subMeshCount);
 			}
 		}
 	}

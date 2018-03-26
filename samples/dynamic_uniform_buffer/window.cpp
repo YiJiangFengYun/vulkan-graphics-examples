@@ -64,6 +64,7 @@ Window::~Window()
 void Window::_init()
 {
 	m_zoom = -25.0f;
+	// m_zoom = -0.15f;
 	/// Build a quaternion from euler angles (pitch, yaw, roll), in radians.
 	m_rotation = vg::Vector3(glm::radians(0.0f), glm::radians(0.0f), glm::radians(0.0f));
 }
@@ -273,7 +274,7 @@ void Window::_updateObjectDynamicOffset(vg::BaseVisualObject * pVisualObject)
 			subDataInfo.pDescriptorInfos = &bufferInfo;
 			bufferInfo.dynamicOffset = i * m_bufferSizeOneObject;
 			m_pDynamicUniformData->updateDesData(1u, &subDataInfo);
-			m_pPass->updateExternalUniformBufferData();
+			m_pPass->applyUniformBufferDynamicOffsets();
 			break;
 		}
 	}

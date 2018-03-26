@@ -4,7 +4,7 @@
 #include "sampleslib/window.hpp"
 #include "sampleslib/scene_assimp.hpp"
 
-#define OBJECT_INSTANCE_COUNT 64
+#define OBJECT_INSTANCE_COUNT 125
 
 
 /**

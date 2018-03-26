@@ -255,16 +255,24 @@ namespace vg
 	{
 #if defined(DEBUG) && defined(VG_ENABLE_COST_TIMER)
 		m_preparingRenderCostTimer.begin();
+
+		fd::CostTimer renderBeginCostTimer(fd::CostTimer::TimerType::ONCE);
+		renderBeginCostTimer.begin();
 #endif //DEBUG and VG_ENABLE_COST_TIMER
 		//command buffer begin
 		_recordCommandBufferForBegin();
+
+#if defined(DEBUG) && defined(VG_ENABLE_COST_TIMER)
+		renderBeginCostTimer.end();
+		VG_COST_TIME_LOG(plog::debug) << "Render begin cost time: "
+			<< renderBeginCostTimer.costTimer
+			<< std::endl;
+#endif //DEBUG and VG_ENABLE_COST_TIMER
 	}
 
 	void Renderer::_render(const RenderInfo &info
 		, RenderResultInfo &resultInfo)
 	{
-		
-
 		resultInfo.signalSemaphoreCount = 0u;
 		resultInfo.drawCount = 0u;
 		uint32_t count = info.sceneAndCameraCount;
@@ -1030,7 +1038,9 @@ namespace vg
         
 		fd::CostTimer preparingBuildInDataCostTimer(fd::CostTimer::TimerType::ACCUMULATION);
 		fd::CostTimer preparingPipelineCostTimer(fd::CostTimer::TimerType::ACCUMULATION);
-		fd::CostTimer preparingCommandBufferCostTimer;(fd::CostTimer::TimerType::ACCUMULATION);
+		fd::CostTimer preparingCommandBufferCostTimer(fd::CostTimer::TimerType::ACCUMULATION);
+		fd::CostTimer preObjectRecordingCallBackCostTimer(fd::CostTimer::TimerType::ACCUMULATION);
+		fd::CostTimer postObjectRecordingCallBackCostTimer(fd::CostTimer::TimerType::ACCUMULATION);
 #endif //DEBUG and VG_ENABLE_COST_TIMER
 
 		//Get queue count for each queue type.
@@ -1112,7 +1122,13 @@ namespace vg
 
 				if (m_preObjectRecordingFun != nullptr)
 			    {
+#if defined(DEBUG) && defined(VG_ENABLE_COST_TIMER)
+					preObjectRecordingCallBackCostTimer.begin();
+#endif //DEBUG and VG_ENABLE_COST_TIMER
 			    	m_preObjectRecordingFun(pVisualObject);
+#if defined(DEBUG) && defined(VG_ENABLE_COST_TIMER)
+					preObjectRecordingCallBackCostTimer.end();
+#endif //DEBUG and VG_ENABLE_COST_TIMER
 			    }
 
 				auto pMaterial = pVisualObject->getMaterial();
@@ -1255,12 +1271,23 @@ namespace vg
 
 				if (m_postObjectRecordingFun != nullptr)
 			    {
+#if defined(DEBUG) && defined(VG_ENABLE_COST_TIMER)
+					postObjectRecordingCallBackCostTimer.begin();
+#endif //DEBUG and VG_ENABLE_COST_TIMER
 			    	m_postObjectRecordingFun(pVisualObject);
+#if defined(DEBUG) && defined(VG_ENABLE_COST_TIMER)
+					postObjectRecordingCallBackCostTimer.end();
+#endif //DEBUG and VG_ENABLE_COST_TIMER
 			    }
 			}
 		}
 
 #if defined(DEBUG) && defined(VG_ENABLE_COST_TIMER)
+		VG_COST_TIME_LOG(plog::debug) << "Pre object recording callback cost time: "
+			<< preObjectRecordingCallBackCostTimer.costTimer
+			<< "ms, scene id: " << pScene->getID()
+			<< ", scene type: " << (pScene->getSpaceType() == SpaceType::SPACE_3 ? "space3" : "space2")
+			<< std::endl;
 		VG_COST_TIME_LOG(plog::debug) << "Preparing buildin data cost time: " 
 		    << preparingBuildInDataCostTimer.costTimer 
 		    << "ms, scene id: " << pScene->getID() 
@@ -1276,6 +1303,11 @@ namespace vg
 			<< "ms, scene id: " << pScene->getID() 
 			<< ", scene type: " << (pScene->getSpaceType() == SpaceType::SPACE_3 ? "space3" : "space2") 
 			<<  std::endl;
+		VG_COST_TIME_LOG(plog::debug) << "Post object recording callback cost time: "
+			<< postObjectRecordingCallBackCostTimer.costTimer
+			<< "ms, scene id: " << pScene->getID()
+			<< ", scene type: " << (pScene->getSpaceType() == SpaceType::SPACE_3 ? "space3" : "space2")
+			<< std::endl;
 #endif //DEBUG and VG_ENABLE_COST_TIMER
 	}
 

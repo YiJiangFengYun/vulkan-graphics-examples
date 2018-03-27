@@ -15,8 +15,6 @@ int main() {
 	vg::PhysicalDeviceFeatures requiredFeatures;
 
     vg::PhysicalDeviceFeaturePriorities optionalFeatures;
-	optionalFeatures.fillModeNonSolid = 1u;
-	optionalFeatures.wideLines = 1u;
 
 	App app;
 	app.init<Window>(WINDOW_WIDTH, WINDOW_HEIGHT, "specialization constants", requiredFeatures, optionalFeatures);

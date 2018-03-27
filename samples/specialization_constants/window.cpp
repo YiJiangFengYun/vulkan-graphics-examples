@@ -79,7 +79,7 @@ void Window::_createTexture()
 		throw std::runtime_error("The texture do't exist! path: " + fileName);
 	}
 
-	auto pTex = new vg::Texture2D(format, VG_TRUE, 
+	auto pTex = new vg::Texture2D(format, VG_FALSE, 
 		gliTex2D[0].extent().x, 
 		gliTex2D[0].extent().y
 	);

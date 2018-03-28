@@ -5,7 +5,6 @@
 #include "graphics/module.hpp"
 #include "graphics/base.hpp"
 #include "graphics/pipeline/pipeline_cache.hpp"
-#include "graphics/material/material.hpp"
 #include "graphics/mesh/mesh.hpp"
 #include "graphics/buffer_data/util.hpp"
 
@@ -29,7 +28,8 @@ namespace vg
             fd::CostTimer *pPreparingCommandBufferCostTimer;
 #endif //DEBUG and VG_ENABLE_COST_TIMER
             const Matrix4x4 *pModelMatrix;
-            const Material *pMaterial;
+            const uint32_t passCount;
+            Pass * const *pPasses;
             const BaseMesh *pMesh;
             uint32_t subMeshOffset;
             uint32_t subMeshCount;
@@ -49,7 +49,8 @@ namespace vg
                 , fd::CostTimer *pPreparingCommandBufferCostTimer = nullptr
 #endif //DEBUG and VG_ENABLE_COST_TIMER
                 , const Matrix4x4 *pModelMatrix = nullptr
-                , const Material *pMaterial = nullptr
+                , const uint32_t passCount = 0u
+                , Pass * const *pPasses = nullptr
                 , const BaseMesh *pMesh = nullptr
                 , uint32_t subMeshOffset = 0u
                 , uint32_t subMeshCount = 0u
@@ -72,9 +73,8 @@ namespace vg
     protected:
         void _createPipelineForObj(vk::RenderPass *pRenderPass,
 		    const BaseMesh *pMesh,
-		    const Material *pMaterial,
 		    uint32_t subMeshIndex,
-		    uint32_t passIndex,
+		    Pass *pPass,
 		    PipelineCache *pPipelineCache,
 		    std::shared_ptr<vk::Pipeline> &pPipeline);
 
@@ -83,9 +83,8 @@ namespace vg
 		    uint32_t framebufferWidth,
 		    uint32_t framebufferHeight,
 		    const BaseMesh *pMesh,
-		    const Material *pMaterial,
 		    uint32_t subMeshIndex,
-		    uint32_t passIndex,
+		    Pass *pPass,
 		    const fd::Rect2D *pClipRect);
     private:
 

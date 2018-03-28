@@ -62,6 +62,7 @@ namespace vg
 	void BaseVisualObject::setMaterial(Material *pMaterial)
 	{
 		m_pMaterial = pMaterial;
+		m_pVisualizer = pMaterial->allocateVisualizer();
 	}
 
 	BaseMesh *BaseVisualObject::getMesh() const
@@ -163,7 +164,8 @@ namespace vg
                 info.pPreparingCommandBufferCostTimer,
 #endif //DEBUG and VG_ENABLE_COST_TIMER
                 &modelMatrix,
-			    m_pMaterial,
+			    m_pMaterial->getPassCount(),
+				m_pMaterial->getPasses(),
 			    m_pMesh,
 			    getSubMeshOffset(),
 			    getSubMeshCount(),
@@ -179,6 +181,11 @@ namespace vg
 		
 	}
 
+	const Visualizer *BaseVisualObject::getVisualizer() const
+	{
+		return m_pVisualizer;
+	}
+
 
 	void BaseVisualObject::_asyncMeshData()
 	{
@@ -190,11 +197,5 @@ namespace vg
 			}
 		}
 	}
-
-	BaseVisualObject_Visualizer::BaseVisualObject_Visualizer()
-		    : BaseVisualObject()
-		{
-			m_pVisualizer = std::shared_ptr<Visualizer>{new Visualizer()};
-		}
 
 } //namespace kgs

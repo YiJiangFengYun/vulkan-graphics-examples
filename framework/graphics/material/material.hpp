@@ -7,6 +7,7 @@
 #include "graphics/material/pass.hpp"
 #include "graphics/texture/texture.hpp"
 #include "graphics/material/material_data.hpp"
+#include "graphics/material/visualizer.hpp"
 
 namespace vg
 {
@@ -18,6 +19,7 @@ namespace vg
 
 		uint32_t getPassCount() const;
 		Pass *getPassWithIndex(uint32_t index) const;
+		Pass * const *getPasses() const;
 		Bool32 isHas(const Pass *pPass) const;
 		void addPass(Pass *pPass);
 		void removePass(Pass *pPass);
@@ -25,13 +27,20 @@ namespace vg
 		void setRenderQueueType(MaterialShowType type);
 		uint32_t getRenderPriority();
 		void setRenderPriority(uint32_t priority);
-
-		/*Call the methods of all passes in the material.*/
+		/*Call the apply methods of all passes in the material.*/
 		void apply();
+
+		/**This method is called by visual object to create its visualizer.**/
+		Visualizer *allocateVisualizer(Visualizer **ppVisualizer = nullptr);
+		void deallocateVisualizer(Visualizer *pVisualizer);
+		void clearVisualizers();
 	private:
 		//--compositions
 		MaterialShowType m_renderQueueType;
 		uint32_t m_renderPriority;
+		std::vector<std::shared_ptr<Visualizer>> m_pVisualizers;
+		uint32_t m_unusedVisualizerCount;
+		std::vector<Visualizer *> m_pUnusedVisualizes;
 		//--compositions
 
 		//--aggregations
@@ -39,8 +48,7 @@ namespace vg
 		std::unordered_map<InstanceID, Pass *> m_mapPasses;
 		//--aggregations
 
-		//tool methods
-		
+		virtual Visualizer *_createVisualizer();
 	};
 }
 

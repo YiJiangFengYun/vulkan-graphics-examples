@@ -5,7 +5,6 @@
 #include "graphics/scene/object.hpp"
 #include "graphics/mesh/mesh.hpp"
 #include "graphics/material/material.hpp"
-#include "graphics/visualizer/visualizer.hpp"
 #include "graphics/pipeline/pipeline_cache.hpp"
 
 namespace vg
@@ -75,6 +74,8 @@ namespace vg
 
 		void bindToRender(const BindInfo info, BindResult *pResult);
 
+		const Visualizer *getVisualizer() const;
+
 	protected:
 		Material *m_pMaterial;
 		BaseMesh *m_pMesh;
@@ -84,51 +85,22 @@ namespace vg
 		Bool32 m_hasClipRect;
 		//Valid range of ClipRect is [(0, 0), (1, 1)]
 		std::vector<fd::Rect2D> m_clipRects;
-		std::shared_ptr<Visualizer> m_pVisualizer;
+		Visualizer* m_pVisualizer;
 		void _asyncMeshData();
 		virtual Matrix4x4 _getModelMatrix() = 0;
 	};
 
-	class BaseVisualObject_Visualizer : public BaseVisualObject
-	{
-	public:
-		BaseVisualObject_Visualizer();
-
-		template <class VisualizerType>
-		BaseVisualObject_Visualizer()
-		    : BaseVisualObject()
-		{
-			m_pVisualizer = std::shared_ptr<Visualizer>{new VisualizerType()};
-		}
-
-		const Visualizer *getVisualizer() const
-		{
-			return m_pVisualizer.get();
-		}
-
-	protected:
-	    
-	};
-
 	template <SpaceType SPACE_TYPE>
-	class VisualObject : public BaseVisualObject_Visualizer, public Object<SPACE_TYPE>
+	class VisualObject : public BaseVisualObject, public Object<SPACE_TYPE>
 	{
 	public:
 		using MeshDimType = Mesh<SpaceTypeInfo<SPACE_TYPE>::MESH_DIM_TYPE>;
 
 		VisualObject()
-			: BaseVisualObject_Visualizer()
+			: BaseVisualObject()
 			, Object<SPACE_TYPE>()
 		{
 			m_objectType = ObjectType::VISUAL_OBJECT;
-
-		}
-
-		template <class VisualizerType>
-		VisualObject()
-		    : BaseVisualObject_Visualizer<VisualizerType>()
-			, Object<SPACE_TYPE>()
-		{
 
 		}
 

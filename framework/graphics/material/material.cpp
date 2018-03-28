@@ -4,6 +4,13 @@ namespace vg
 {
 	Material::Material()
 		: Base(BaseType::MATERIAL)
+		, m_renderQueueType()
+		, m_renderPriority()
+		, m_pVisualizers()
+		, m_unusedVisualizerCount()
+		, m_pUnusedVisualizes()
+		, m_arrPasses()
+		, m_mapPasses()
 	{
 	}
 
@@ -19,6 +26,11 @@ namespace vg
 	Pass *Material::getPassWithIndex(uint32_t index) const
 	{
 		return m_arrPasses[index];
+	}
+
+	Pass * const *Material::getPasses() const
+	{
+		return m_arrPasses.data();
 	}
 
 	Bool32 Material::isHas(const Pass *pass) const
@@ -48,6 +60,37 @@ namespace vg
 		}
 	}
 
+	Visualizer *Material::allocateVisualizer(Visualizer **ppVisualizer)
+	{
+		if (m_unusedVisualizerCount > 0)
+		{
+			Visualizer *pVisualizer = m_pUnusedVisualizes[m_unusedVisualizerCount - 1];
+			--m_unusedVisualizerCount;
+			if(ppVisualizer != nullptr)(*ppVisualizer) = pVisualizer;
+			return pVisualizer;
+		}
+		else
+		{
+			Visualizer *pVisualizer = _createVisualizer();
+			m_pVisualizers.push_back(std::shared_ptr<Visualizer>{pVisualizer});
+			if(ppVisualizer != nullptr)(*ppVisualizer) = pVisualizer;
+			return pVisualizer;
+		}
+	}
+
+	void Material::deallocateVisualizer(Visualizer *pVisualizer)
+	{
+		m_pUnusedVisualizes[m_unusedVisualizerCount] = pVisualizer;
+		++m_unusedVisualizerCount;
+	}
+		
+	void Material::clearVisualizers()
+	{
+		m_pVisualizers.resize(0u);
+		m_pUnusedVisualizes.resize(0u);
+		m_unusedVisualizerCount = 0u;
+	}
+
 	MaterialShowType Material::getShowType()
 	{
 		return m_renderQueueType;
@@ -66,5 +109,10 @@ namespace vg
 	void Material::setRenderPriority(uint32_t priority)
 	{
 		m_renderPriority = priority;
+	}
+
+	Visualizer *Material::_createVisualizer()
+	{
+		return new Visualizer();
 	}
 }

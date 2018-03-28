@@ -2,6 +2,40 @@
 
 namespace vg
 {
+	BaseVisualObject::BindInfo::BindInfo(const Matrix4x4 *pProjMatrix
+        , const Matrix4x4 *pViewMatrix
+        , PipelineCache *pPipelineCache
+		, vk::RenderPass *pRenderPass
+		, vk::CommandBuffer *pCommandBuffer
+		, uint32_t framebufferWidth
+		, uint32_t framebufferHeight
+#if defined(DEBUG) && defined(VG_ENABLE_COST_TIMER)
+        , fd::CostTimer *pPreparingBuildInDataCostTimer
+        , fd::CostTimer *pPreparingPipelineCostTimer
+        , fd::CostTimer *pPreparingCommandBufferCostTimer
+#endif //DEBUG and VG_ENABLE_COST_TIMER
+        )
+        : pProjMatrix(pProjMatrix)
+        , pViewMatrix(pViewMatrix)
+        , pPipelineCache(pPipelineCache)
+		, pRenderPass(pRenderPass)
+		, pCommandBuffer(pCommandBuffer)
+		, framebufferWidth(framebufferWidth)
+		, framebufferHeight(framebufferHeight)
+#if defined(DEBUG) && defined(VG_ENABLE_COST_TIMER)
+        , pPreparingBuildInDataCostTimer(pPreparingBuildInDataCostTimer)
+        , pPreparingPipelineCostTimer(pPreparingPipelineCostTimer)
+        , pPreparingCommandBufferCostTimer(pPreparingCommandBufferCostTimer)
+#endif //DEBUG and VG_ENABLE_COST_TIMER
+    {
+    }
+
+    BaseVisualObject::BindResult::BindResult(uint32_t drawCount)
+	    : drawCount(drawCount)
+    {
+
+    }
+
 	BaseVisualObject::BaseVisualObject()
 	    : m_pMaterial()
 		, m_pMesh()
@@ -10,6 +44,7 @@ namespace vg
 		, m_isVisibilityCheck(VG_TRUE)
 		, m_hasClipRect(VG_FALSE)
 		, m_clipRects()
+		, m_pVisualizer(nullptr)
 	{
 
 	}
@@ -109,6 +144,41 @@ namespace vg
         }
 	}
 
+	void BaseVisualObject::bindToRender(const BindInfo info, BindResult *pResult)
+	{
+		if (m_pVisualizer != nullptr)
+		{
+			auto modelMatrix = _getModelMatrix();
+			Visualizer::BindInfo infoForVisualizer = {
+			    info.pProjMatrix,
+			    info.pViewMatrix,
+			    info.pPipelineCache,
+				info.pRenderPass,
+				info.pCommandBuffer,
+				info.framebufferWidth,
+				info.framebufferHeight,
+#if defined(DEBUG) && defined(VG_ENABLE_COST_TIMER)
+                info.pPreparingBuildInDataCostTimer,
+                info.pPreparingPipelineCostTimer = nullptr,
+                info.pPreparingCommandBufferCostTimer = nullptr,
+#endif //DEBUG and VG_ENABLE_COST_TIMER
+                &modelMatrix,
+			    m_pMaterial,
+			    m_pMesh,
+			    getSubMeshOffset(),
+			    getSubMeshCount(),
+			    m_hasClipRect,
+			    m_clipRects.data(),
+		        };
+    
+		    Visualizer::BindResult resultForVisualizer;
+		    m_pVisualizer->bindToRender(infoForVisualizer, &resultForVisualizer);
+
+			(*pResult).drawCount = resultForVisualizer.drawCount;
+		}
+		
+	}
+
 
 	void BaseVisualObject::_asyncMeshData()
 	{
@@ -120,5 +190,11 @@ namespace vg
 			}
 		}
 	}
+
+	BaseVisualObject_Visualizer::BaseVisualObject_Visualizer()
+		    : BaseVisualObject()
+		{
+			m_pVisualizer = std::shared_ptr<Visualizer>{new Visualizer()};
+		}
 
 } //namespace kgs

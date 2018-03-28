@@ -10,6 +10,15 @@ namespace vg
 	{
 	public:
 		VisualObject2();
+
+		template <class VisualizerType>
+		VisualObject2()
+		    : VisualObject<SpaceType::SPACE_2><VisualizerType>()
+		{
+
+		}
+
+		virtual Matrix4x4 _getModelMatrix() override;
 	};
 
 } //namespace kgs

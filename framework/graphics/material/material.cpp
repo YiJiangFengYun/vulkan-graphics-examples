@@ -11,7 +11,7 @@ namespace vg
 	{
 	}
 
-	uint32_t Material::getPassCount()
+	uint32_t Material::getPassCount() const
 	{
 		return static_cast<uint32_t>(m_arrPasses.size());
 	}

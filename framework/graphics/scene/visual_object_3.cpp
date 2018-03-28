@@ -7,4 +7,9 @@ namespace vg
 	{
 
 	}
+
+	Matrix4x4 VisualObject3::_getModelMatrix()
+	{
+		return m_pTransform->getMatrixLocalToWorld();
+	}
 } //namespace kgs

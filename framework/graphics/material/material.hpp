@@ -16,7 +16,7 @@ namespace vg
 		Material();
 		~Material();
 
-		uint32_t getPassCount();
+		uint32_t getPassCount() const;
 		Pass *getPassWithIndex(uint32_t index) const;
 		Bool32 isHas(const Pass *pPass) const;
 		void addPass(Pass *pPass);

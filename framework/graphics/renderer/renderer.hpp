@@ -8,7 +8,7 @@
 #include "graphics/renderer/renderer_option.hpp"
 #include "graphics/texture/texture_color_attachment.hpp"
 #include "graphics/texture/texture_depth_stencil_attachment.hpp"
-#include "graphics/renderer/pipeline_cache.hpp"
+#include "graphics/pipeline/pipeline_cache.hpp"
 
 //todo: batch mesh,
 //todo: cache graphics pipeline.
@@ -136,19 +136,6 @@ namespace vg
 		//void _createFence();
 
 		void _recordCommandBufferForBegin();
-
-		void _createPipelineForObj(std::shared_ptr<vk::Pipeline> &pPipeline,
-			BaseMesh *pMesh,
-			Material *pMaterial,
-			uint32_t subMeshIndex = 0u,
-			uint32_t passIndex = 0u);
-
-		void _recordCommandBufferForObj(std::shared_ptr<vk::Pipeline> pPipeline,
-			BaseMesh *pMesh,
-			Material *pMaterial,
-			uint32_t subMeshIndex = 0u,
-			uint32_t passIndex = 0u,
-			const fd::Rect2D *pClipRect = nullptr);
 
 		void _recordCommandBufferForEnd();
 

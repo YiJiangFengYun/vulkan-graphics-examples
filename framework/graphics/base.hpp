@@ -20,7 +20,8 @@ namespace vg
 		RENDERER,
 		SCENE,
 		SCENE_OBJECT,
-		TRANSFORM
+		TRANSFORM,
+		VISUALIZER,
 	};
 
 	using InstanceID = uint32_t;

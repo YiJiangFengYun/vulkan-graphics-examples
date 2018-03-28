@@ -1,6 +1,7 @@
 #include "graphics/renderer/renderer.hpp"
 
 #include "graphics/buffer_data/util.hpp"
+#include "graphics/util/gemo_util.hpp"
 
 namespace vg
 {
@@ -9,8 +10,6 @@ namespace vg
 		const Transform<SpaceType::SPACE_2> *pTransform,
 		const Scene<SpaceType::SPACE_2> *pScene,
 	    const Camera<SpaceType::SPACE_2> *pCamera);
-	
-	Matrix4x4 tranMat3ToMat4(Matrix3x3 srcMat);
 
 	const vk::Format Renderer::DEFAULT_DEPTH_STENCIL_FORMAT(vk::Format::eD32SfloatS8Uint);
 
@@ -420,154 +419,6 @@ namespace vg
 		m_pCommandBuffer->beginRenderPass(renderPassBeginInfo, vk::SubpassContents::eInline);
 	}
 
-	void Renderer::_createPipelineForObj(std::shared_ptr<vk::Pipeline> &pPipeline,
-		BaseMesh *pMesh,
-		Material *pMaterial,
-		uint32_t subMeshIndex,
-		uint32_t passIndex)
-	{
-		ContentMesh * pContentMesh = dynamic_cast<ContentMesh *>(pMesh);
-		auto pPass = pMaterial->getPassWithIndex(passIndex);
-		PipelineCache::Info info(
-			*m_pRenderPass,
-			pPass,
-			pContentMesh->getVertexData(),
-			0u,
-			pContentMesh->getIndexData(),
-			subMeshIndex
-		);
-		pPipeline = m_pipelineCache.caching(info);
-	}
-
-	void Renderer::_recordCommandBufferForObj(std::shared_ptr<vk::Pipeline> pPipeline,
-		BaseMesh *pMesh,
-		Material *pMaterial,
-		uint32_t subMeshIndex,
-		uint32_t passIndex,
-		const fd::Rect2D *pClipRect)
-	{
-		VG_LOG(plog::debug) << "Pre begin command buffer for render." << std::endl;
-		ContentMesh * pContentMesh = dynamic_cast<ContentMesh *>(pMesh);
-		auto pPass = pMaterial->getPassWithIndex(passIndex);
-        
-        const auto& viewportOfPass = pPass->getViewport();
-		const auto& scissorOfPass = pPass->getScissor();
-		//View port info.
-		vk::Viewport viewport = {
-			(float)m_framebufferWidth * viewportOfPass.x,                      //x
-			(float)m_framebufferHeight * viewportOfPass.y,                     //y
-			(float)m_framebufferWidth * viewportOfPass.width,                  //width
-			(float)m_framebufferHeight * viewportOfPass.height,                 //height
-			1.0f * viewportOfPass.minDepth,                                     //minDepth
-			1.0f * viewportOfPass.maxDepth                                      //maxDepth
-		};
-
-		m_pCommandBuffer->setViewport(0, viewport);
-
-		const auto &pVertexData = pContentMesh->getVertexData();
-		const auto &subVertexDatas = pVertexData->getSubVertexDatas();
-		const auto &pIndexData = pContentMesh->getIndexData();
-		const auto &subIndexDatas = pIndexData->getSubIndexDatas();
-		const auto &subIndexData = subIndexDatas[subMeshIndex];
-		fd::Rect2D finalScissor(0.0f, 0.0f, 0.0f, 0.0f);
-		if (pClipRect != nullptr)
-		{
-
-			auto clipRect = *pClipRect;
-			glm::vec2 minOfClipRect(clipRect.x, clipRect.y);
-			glm::vec2 maxOfclipRect(clipRect.x + clipRect.width, clipRect.y + clipRect.height);
-
-			fd::Bounds<glm::vec2> boundsOfClipRect(minOfClipRect, maxOfclipRect);
-
-			glm::vec2 minOfScissorOfPass(scissorOfPass.x, scissorOfPass.y);
-			glm::vec2 maxOfScissorOfPass(scissorOfPass.x + scissorOfPass.width, scissorOfPass.y + scissorOfPass.height);
-
-			fd::Bounds<glm::vec2> boundsOfScissorOfPass(minOfScissorOfPass, maxOfScissorOfPass);
-
-			fd::Bounds<glm::vec2> intersection;
-			if (boundsOfScissorOfPass.intersects(boundsOfClipRect, &intersection))
-			{
-				auto min = intersection.getMin();
-				auto size = intersection.getSize();
-				finalScissor.x = min.x;
-				finalScissor.y = min.y;
-				finalScissor.width = size.x;
-				finalScissor.height = size.y;
-			}
-		}
-		else
-		{
-			finalScissor = scissorOfPass;
-		}
-
-		vk::Rect2D scissor = {
-			{                               //offset
-				static_cast<int32_t>(std::floorf((float)m_framebufferWidth * viewportOfPass.x + 
-				    (float)m_framebufferWidth * viewportOfPass.width * finalScissor.x)),    //x
-				static_cast<int32_t>(std::floorf((float)m_framebufferHeight * viewportOfPass.y +
-			        (float)m_framebufferHeight * viewportOfPass.height * finalScissor.y))    //y
-			},
-			{                               //extent
-				static_cast<uint32_t>(std::ceilf((float)m_framebufferWidth * viewportOfPass.width * finalScissor.width)),   //width
-				static_cast<uint32_t>(std::ceilf((float)m_framebufferHeight * viewportOfPass.height * finalScissor.height))  //height
-			}
-		};
-
-		m_pCommandBuffer->setScissor(0, scissor);
-
-		auto pPipelineLayout = pPass->getPipelineLayout();		
-
-		//push constants
-		auto pushConstantUpdates = pPass->getPushconstantUpdates();
-		for(const auto& pPushConstantUpdate : pushConstantUpdates)
-		{
-			m_pCommandBuffer->pushConstants(*pPipelineLayout, 
-			    pPushConstantUpdate->getStageFlags(), 
-				pPushConstantUpdate->getOffset(),
-				pPushConstantUpdate->getSize(),
-				pPushConstantUpdate->getData());
-		}
-
-
-		m_pCommandBuffer->bindPipeline(vk::PipelineBindPoint::eGraphics, *pPipeline);
-
-		uint32_t descriptSetCount = pPass->getUsingDescriptorSetCount();
-		auto pDescriptorSets = pPass->getUsingDescriptorSets();
-		uint32_t dynamicOffsetCount = pPass->getUsingDescriptorDynamicOffsetCount();
-		auto pDynamicOffsets = pPass->getUsingDescriptorDynamicOffsets();
-
-		m_pCommandBuffer->bindDescriptorSets(vk::PipelineBindPoint::eGraphics, *pPipelineLayout, 
-		    0u, descriptSetCount, pDescriptorSets, dynamicOffsetCount, pDynamicOffsets);
-
-		//dynamic line width
-		m_pCommandBuffer->setLineWidth(pPass->getLineWidth());
-
-        vertexDataToCommandBuffer(*m_pCommandBuffer, pVertexData, subIndexData.vertexDataIndex);
-		indexDataToCommandBuffer(*m_pCommandBuffer, pIndexData, subMeshIndex);
-
-		uint32_t indexOffset = 0u;
-		// for (uint32_t i = 0; i < subMeshIndex; ++i)
-		// {
-		// 	indexOffset += subIndexDatas[i].indexCount;
-		// }
-
-		uint32_t vertexOffset = 0u;
-		// for (uint32_t i = 0; i < subIndexData.vertexDataIndex; ++i)
-		// {
-		// 	vertexOffset += subVertexDatas[i].vertexCount;
-		// }
-
-		uint32_t instanceOffset = 0u;
-		uint32_t instanceCount = pPass->getInstanceCount();
-
-		m_pCommandBuffer->drawIndexed(subIndexData.indexCount, 
-		    instanceCount, 
-			indexOffset, 
-			vertexOffset, 
-			instanceOffset);
-		//m_pCommandBuffer->draw(3, 1, 0, 0);
-	}
-
 	void Renderer::_recordCommandBufferForEnd()
 	{
 		m_pCommandBuffer->endRenderPass();
@@ -760,19 +611,22 @@ namespace vg
 	    , const RenderInfo &info
 	    , RenderResultInfo &resultInfo)
 	{
-		resultInfo.isRendered = VG_TRUE;		
+		resultInfo.isRendered = VG_TRUE;
+
+		uint32_t drawCount = 0u;		
 
 		using SceneType = Scene<SpaceType::SPACE_2>;
 		auto pDevice = pApp->getDevice();
 
-		auto projMatrix = pCamera->getProjMatrix();
-
+		auto projMatrix3x3 = pCamera->getProjMatrix();
 		if (pScene->getIsRightHand() == VG_FALSE)
 		{
-			projMatrix[1][1] *= -1;
+			projMatrix3x3[1][1] *= -1;
 		}
+		auto projMatrix = tranMat3ToMat4(projMatrix3x3);
 		
-		auto viewMatrix = pCamera->getTransform()->getMatrixWorldToLocal();
+		auto viewMatrix3x3 = pCamera->getTransform()->getMatrixWorldToLocal();
+		auto viewMatrix = tranMat3ToMat4(viewMatrix3x3);
 		uint32_t visualObjectCount = pScene->getVisualObjectCount();
 
 		//flat visual objects and filter them that is out of camera with its bounds.
@@ -787,21 +641,6 @@ namespace vg
 			, pCamera
 		);
 
-		//Caculate total draw count.
-		uint32_t drawCount = 0;
-		for (uint32_t i = 0; i < validVisualObjectCount; ++i)
-		{
-			auto pVisualObject = validVisualObjects[i];
-			auto pMesh = pVisualObject->getMesh();
-			auto pContentMesh = dynamic_cast<ContentMesh *>(pMesh);
-			auto subMeshCount = pVisualObject->getSubMeshCount();
-			auto pMaterial = pVisualObject->getMaterial();
-			auto passCount = pMaterial->getPassCount();
-			drawCount += subMeshCount * passCount;
-		}
-
-		resultInfo.drawCount += drawCount;
-
 		//------Doing render.		
 
 		uint32_t drawIndex = 0u;
@@ -814,133 +653,32 @@ namespace vg
 				m_preObjectRecordingFun(pVisualObject);
 			}
 
-			auto pMaterial = pVisualObject->getMaterial();
-			auto passCount = pMaterial->getPassCount();
+			BaseVisualObject::BindInfo info = {
+				&projMatrix,
+				&viewMatrix,
+				&m_pipelineCache,
+				m_pRenderPass.get(),
+				m_pCommandBuffer.get(),
+				m_framebufferWidth,
+				m_framebufferHeight,
+#if defined(DEBUG) && defined(VG_ENABLE_COST_TIMER)
+                &preparingBuildInDataCostTimer,
+                &preparingPipelineCostTimer,
+                &preparingCommandBufferCostTimer,
+#endif //DEBUG and VG_ENABLE_COST_TIMER	
+				};
 
-			Bool32 hasMatrixObjectToNDC = VG_FALSE;
-			Bool32 hasMatrixObjectToWorld = VG_FALSE;
-			Bool32 hasMatrixObjectToView = VG_FALSE;
-			Bool32 hasMatrixView = VG_FALSE;
-			Bool32 hasMatrixProjection = VG_FALSE;
-			for (uint32_t passIndex = 0u; passIndex < passCount; ++passIndex)
-			{
-				//update building in matrix variable.
-				auto pPass = pMaterial->getPassWithIndex(passIndex);
-				auto info = pPass->getBuildInDataInfo();
-				uint32_t componentCount = info.componentCount;
-				for (uint32_t componentIndex = 0u; componentIndex < componentCount; ++componentIndex)
-				{
-					Pass::BuildInDataType type = (*(info.pComponent + componentIndex)).type;
-					if (type == Pass::BuildInDataType::MATRIX_OBJECT_TO_NDC)
-					{
-						hasMatrixObjectToNDC = VG_TRUE;
-					}
-					else if (type == Pass::BuildInDataType::MATRIX_OBJECT_TO_WORLD)
-					{
-						hasMatrixObjectToWorld = VG_TRUE;
-					}
-					else if (type == Pass::BuildInDataType::MATRIX_OBJECT_TO_VIEW)
-					{
-						hasMatrixObjectToView = VG_TRUE;
-					}
-					else if (type == Pass::BuildInDataType::MATRIX_VIEW)
-					{
-						hasMatrixView = VG_TRUE;
-					}
-					else if (type == Pass::BuildInDataType::MATRIX_PROJECTION)
-					{
-						hasMatrixProjection = VG_TRUE;
-					}
-				}
-			}
-
-			
-			auto modelMatrix = pVisualObject->getTransform()->getMatrixLocalToWorld();
-			Matrix3x3 mvMatrix;
-			Matrix3x3 mvpMatrix;
-			if (hasMatrixObjectToView || hasMatrixObjectToNDC) 
-			{
-				mvMatrix = viewMatrix * modelMatrix;
-			}
-			
-			if (hasMatrixObjectToNDC)
-			{
-				mvpMatrix = projMatrix * mvMatrix;
-			}
-			auto pMesh = pVisualObject->getMesh();
-			auto pContentMesh = dynamic_cast<ContentMesh *>(pMesh);
-			auto subMeshOffset = pVisualObject->getSubMeshOffset();
-			auto subMeshCount = pVisualObject->getSubMeshCount();
-			
-			for (uint32_t passIndex = 0u; passIndex < passCount; ++passIndex)
-			{
-				//update building in matrix variable.
-				auto pPass = pMaterial->getPassWithIndex(passIndex);
-				auto info = pPass->getBuildInDataInfo();
-				uint32_t componentCount = info.componentCount;
-				for (uint32_t componentIndex = 0u; componentIndex < componentCount; ++componentIndex)
-				{
-					Pass::BuildInDataType type = (*(info.pComponent + componentIndex)).type;
-					if (type == Pass::BuildInDataType::MATRIX_OBJECT_TO_NDC)
-					{
-						pPass->_setBuildInMatrixData(type, tranMat3ToMat4(mvpMatrix));
-					}
-					else if (type == Pass::BuildInDataType::MATRIX_OBJECT_TO_WORLD)
-					{
-						pPass->_setBuildInMatrixData(type, tranMat3ToMat4(modelMatrix));
-					}
-					else if (type == Pass::BuildInDataType::MATRIX_OBJECT_TO_VIEW)
-					{
-						pPass->_setBuildInMatrixData(type, tranMat3ToMat4(mvMatrix));
-					}
-					else if (type == Pass::BuildInDataType::MATRIX_VIEW)
-					{
-						pPass->_setBuildInMatrixData(type, tranMat3ToMat4(viewMatrix));
-					}
-					else if (type == Pass::BuildInDataType::MATRIX_PROJECTION)
-					{
-						pPass->_setBuildInMatrixData(type, tranMat3ToMat4(projMatrix));
-					}
-				}
-				pPass->apply();
-			}
-
-			for (uint32_t subMeshIndex = 0u; subMeshIndex < subMeshCount; ++subMeshIndex)
-			{
-				for (uint32_t passIndex = 0u; passIndex < passCount; ++passIndex)
-				{
-					auto pPass = pMaterial->getPassWithIndex(passIndex);
-					auto pShader = pPass->getShader();
-					auto stageInfos = pShader->getShaderStageInfos();
-					if (stageInfos.size() != 0)
-					{
-						std::shared_ptr<vk::Pipeline> pPipeline;
-						_createPipelineForObj(pPipeline, pMesh, pMaterial, subMeshIndex + subMeshOffset, passIndex);
-
-                        const fd::Rect2D *pClipRect;
-						if(pVisualObject->getHasClipRect())
-						{
-							pClipRect = pVisualObject->getClipRects() + subMeshIndex;
-						}
-						else
-						{
-							pClipRect = nullptr;
-						}
-						_recordCommandBufferForObj(pPipeline, pMesh, pMaterial, subMeshIndex + subMeshOffset, passIndex, pClipRect);
-						++drawIndex;
-					}
-					else
-					{
-						VG_LOG(plog::warning) << "No one valid shader module for pass. Pass ID: " << pPass->getID() << std::endl;
-					}
-				}
-			}
+			BaseVisualObject::BindResult result;
+			pVisualObject->bindToRender(info, &result);
+			drawCount += result.drawCount;
 
 			if (m_postObjectRecordingFun != nullptr)
 			{
 				m_postObjectRecordingFun(pVisualObject);
 			}
 		}
+
+		resultInfo.drawCount += drawCount;
 	}
 
 	void Renderer::_renderScene3(const Scene<SpaceType::SPACE_3> *pScene
@@ -950,7 +688,9 @@ namespace vg
 	{
 		using SceneType = Scene<SpaceType::SPACE_3>;
 
-		resultInfo.isRendered = VG_TRUE;		
+		resultInfo.isRendered = VG_TRUE;
+
+		uint32_t drawCount = 0u;	
 
 		auto queueTypeCount = static_cast<uint32_t>(RenderQueueType::RANGE_SIZE);
 		auto pDevice = pApp->getDevice();
@@ -1093,25 +833,6 @@ namespace vg
         
 	        });
 
-		//Caculate total draw count.
-		uint32_t drawCount = 0;
-		for (uint32_t typeIndex = 0u; typeIndex < queueTypeCount; ++typeIndex)
-		{
-			auto queueLength = queueLengths[typeIndex];
-			for (uint32_t objectIndex = 0u; objectIndex < queueLength; ++objectIndex)
-			{
-				auto pVisualObject = queues[typeIndex][objectIndex];
-				auto pMesh = pVisualObject->getMesh();
-				auto pContentMesh = dynamic_cast<ContentMesh *>(pMesh);
-				auto subMeshCount = pVisualObject->getSubMeshCount();
-				auto pMaterial = pVisualObject->getMaterial();
-				auto passCount = pMaterial->getPassCount();
-				drawCount += subMeshCount * passCount;
-			}
-		}
-
-		resultInfo.drawCount += drawCount;
-
 		//-----Doing render
 		uint32_t drawIndex = 0;
 		for (uint32_t typeIndex = 0u; typeIndex < queueTypeCount; ++typeIndex)
@@ -1132,143 +853,26 @@ namespace vg
 #endif //DEBUG and VG_ENABLE_COST_TIMER
 			    }
 
-				auto pMaterial = pVisualObject->getMaterial();
-				auto passCount = pMaterial->getPassCount();
+				BaseVisualObject::BindInfo info = {
+					&projMatrix,
+					&viewMatrix,
+					&m_pipelineCache,
+					m_pRenderPass.get(),
+					m_pCommandBuffer.get(),
+					m_framebufferWidth,
+					m_framebufferHeight,
 #if defined(DEBUG) && defined(VG_ENABLE_COST_TIMER)
-                preparingBuildInDataCostTimer.begin();
-#endif //DEBUG and VG_ENABLE_COST_TIMER
-				Bool32 hasMatrixObjectToNDC = VG_FALSE;
-			    Bool32 hasMatrixObjectToWorld = VG_FALSE;
-			    Bool32 hasMatrixObjectToView = VG_FALSE;
-			    Bool32 hasMatrixView = VG_FALSE;
-			    Bool32 hasMatrixProjection = VG_FALSE;
-			    for (uint32_t passIndex = 0u; passIndex < passCount; ++passIndex)
-			    {
-			    	//update building in matrix variable.
-			    	auto pPass = pMaterial->getPassWithIndex(passIndex);
-			    	auto info = pPass->getBuildInDataInfo();
-			    	uint32_t componentCount = info.componentCount;
-			    	for (uint32_t componentIndex = 0u; componentIndex < componentCount; ++componentIndex)
-			    	{
-			    		Pass::BuildInDataType type = (*(info.pComponent + componentIndex)).type;
-			    		if (type == Pass::BuildInDataType::MATRIX_OBJECT_TO_NDC)
-			    		{
-			    			hasMatrixObjectToNDC = VG_TRUE;
-			    		}
-			    		else if (type == Pass::BuildInDataType::MATRIX_OBJECT_TO_WORLD)
-			    		{
-			    			hasMatrixObjectToWorld = VG_TRUE;
-			    		}
-			    		else if (type == Pass::BuildInDataType::MATRIX_OBJECT_TO_VIEW)
-			    		{
-			    			hasMatrixObjectToView = VG_TRUE;
-			    		}
-			    		else if (type == Pass::BuildInDataType::MATRIX_VIEW)
-			    		{
-			    			hasMatrixView = VG_TRUE;
-			    		}
-			    		else if (type == Pass::BuildInDataType::MATRIX_PROJECTION)
-			    		{
-			    			hasMatrixProjection = VG_TRUE;
-			    		}
-			    	}
-			    }
+                    &preparingBuildInDataCostTimer,
+                    &preparingPipelineCostTimer,
+                    &preparingCommandBufferCostTimer,
+#endif //DEBUG and VG_ENABLE_COST_TIMER	
+				};
 
-				
-				auto modelMatrix = pVisualObject->getTransform()->getMatrixLocalToWorld();
-				Matrix4x4 mvMatrix;
-				Matrix4x4 mvpMatrix;
-				if (hasMatrixObjectToView || hasMatrixObjectToNDC)
-				{
-					mvMatrix = viewMatrix * modelMatrix;
-				}
+				BaseVisualObject::BindResult result;
 
-				if (hasMatrixObjectToNDC)
-				{
-					mvpMatrix = projMatrix * mvMatrix;
-				}
-				auto pMesh = pVisualObject->getMesh();
-				auto pContentMesh = dynamic_cast<ContentMesh *>(pMesh);
-				auto subMeshOffset = pVisualObject->getSubMeshOffset();
-				auto subMeshCount = pVisualObject->getSubMeshCount();
-				
+				pVisualObject->bindToRender(info, &result);
 
-				for (uint32_t passIndex = 0u; passIndex < passCount; ++passIndex)
-				{
-					//update building in matrix variable.
-					auto pPass = pMaterial->getPassWithIndex(passIndex);
-					auto info = pPass->getBuildInDataInfo();
-					uint32_t componentCount = info.componentCount;
-					for (uint32_t componentIndex = 0u; componentIndex < componentCount; ++componentIndex)
-					{
-						Pass::BuildInDataType type = (*(info.pComponent + componentIndex)).type;
-						if (type == Pass::BuildInDataType::MATRIX_OBJECT_TO_NDC)
-						{
-							pPass->_setBuildInMatrixData(type, mvpMatrix);
-						}
-						else if (type == Pass::BuildInDataType::MATRIX_OBJECT_TO_WORLD)
-						{
-							pPass->_setBuildInMatrixData(type, modelMatrix);
-						}
-						else if (type == Pass::BuildInDataType::MATRIX_OBJECT_TO_VIEW)
-						{
-							pPass->_setBuildInMatrixData(type, mvMatrix);
-						}
-						else if (type == Pass::BuildInDataType::MATRIX_VIEW)
-						{
-							pPass->_setBuildInMatrixData(type, viewMatrix);
-						}
-						else if (type == Pass::BuildInDataType::MATRIX_PROJECTION)
-						{
-							pPass->_setBuildInMatrixData(type, projMatrix);
-						}
-					}
-					pPass->apply();
-				}
-
-#if defined(DEBUG) && defined(VG_ENABLE_COST_TIMER)
-                preparingBuildInDataCostTimer.end();
-#endif //DEBUG and VG_ENABLE_COST_TIMER
-
-				for (uint32_t subMeshIndex = 0u; subMeshIndex < subMeshCount; ++subMeshIndex)
-				{
-					for (uint32_t passIndex = 0u; passIndex < passCount; ++passIndex)
-					{
-						auto pPass = pMaterial->getPassWithIndex(passIndex);
-						auto pShader = pPass->getShader();
-						auto stageInfos = pShader->getShaderStageInfos();
-						if (stageInfos.size() != 0)
-						{
-							std::shared_ptr<vk::Pipeline> pPipeline;
-#if defined(DEBUG) && defined(VG_ENABLE_COST_TIMER)
-                            preparingPipelineCostTimer.begin();
-#endif //DEBUG and VG_ENABLE_COST_TIMER
-							_createPipelineForObj(pPipeline, pMesh, pMaterial, subMeshIndex + subMeshOffset, passIndex);
-#if defined(DEBUG) && defined(VG_ENABLE_COST_TIMER)
-                            preparingPipelineCostTimer.end();
-							preparingCommandBufferCostTimer.begin();
-#endif //DEBUG and VG_ENABLE_COST_TIMER
-                            const fd::Rect2D *pClipRect;
-						    if(pVisualObject->getHasClipRect())
-						    {
-						    	pClipRect = (pVisualObject->getClipRects() + subMeshIndex);
-						    }
-						    else
-						    {
-						    	pClipRect = nullptr;
-						    }
-							_recordCommandBufferForObj(pPipeline, pMesh, pMaterial, subMeshIndex + subMeshOffset, passIndex, pClipRect);
-#if defined(DEBUG) && defined(VG_ENABLE_COST_TIMER)
-                            preparingCommandBufferCostTimer.end();
-#endif //DEBUG and VG_ENABLE_COST_TIMER
-							++drawIndex;
-						}
-						else
-						{
-							VG_LOG(plog::warning) << "No one valid shader module for pass. Pass ID: " << pPass->getID() << std::endl;
-						}
-					}
-				}
+				drawCount += result.drawCount;
 
 				if (m_postObjectRecordingFun != nullptr)
 			    {
@@ -1282,6 +886,8 @@ namespace vg
 			    }
 			}
 		}
+
+		resultInfo.drawCount += drawCount;
 
 #if defined(DEBUG) && defined(VG_ENABLE_COST_TIMER)
 		VG_COST_TIME_LOG(plog::debug) << "Pre object recording callback cost time: "
@@ -1363,15 +969,5 @@ namespace vg
 			    }
 			}
 		}
-	}
-
-	Matrix4x4 tranMat3ToMat4(Matrix3x3 srcMat)
-	{
-		Matrix4x4 resultMat(1.0f);
-		resultMat[0] = { srcMat[0][0], srcMat[0][1], 0.0f, srcMat[0][2] };
-		resultMat[1] = { srcMat[1][0], srcMat[1][1], 0.0f, srcMat[1][2] };
-		resultMat[2] = { 0.0f, 0.0f, 1.0f, 0.0f };
-		resultMat[3] = { srcMat[2][0], srcMat[2][1], 0.0f, srcMat[2][2] };
-		return resultMat;
 	}
 }

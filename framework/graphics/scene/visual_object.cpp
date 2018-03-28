@@ -159,8 +159,8 @@ namespace vg
 				info.framebufferHeight,
 #if defined(DEBUG) && defined(VG_ENABLE_COST_TIMER)
                 info.pPreparingBuildInDataCostTimer,
-                info.pPreparingPipelineCostTimer = nullptr,
-                info.pPreparingCommandBufferCostTimer = nullptr,
+                info.pPreparingPipelineCostTimer,
+                info.pPreparingCommandBufferCostTimer,
 #endif //DEBUG and VG_ENABLE_COST_TIMER
                 &modelMatrix,
 			    m_pMaterial,

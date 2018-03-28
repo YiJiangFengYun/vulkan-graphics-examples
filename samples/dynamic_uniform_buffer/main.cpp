@@ -11,7 +11,7 @@ int main() {
 	plog::init(plog::debug, &debugOutputAppender);
 
 	//vg::setVulkanLogSeverity(plog::info);
-	// vg::setCostTimeLogSeverity(plog::debug);
+	 vg::setCostTimeLogSeverity(plog::debug);
 
 	vg::PhysicalDeviceFeatures requiredFeatures;
 

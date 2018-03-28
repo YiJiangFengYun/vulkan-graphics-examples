@@ -618,6 +618,12 @@ namespace vg
 		using SceneType = Scene<SpaceType::SPACE_2>;
 		auto pDevice = pApp->getDevice();
 
+#if defined(DEBUG) && defined(VG_ENABLE_COST_TIMER)
+        
+        fd::CostTimer preparingCommonMatrixsCostTimer(fd::CostTimer::TimerType::ONCE);
+		preparingCommonMatrixsCostTimer.begin();
+#endif //DEBUG and VG_ENABLE_COST_TIMER
+
 		auto projMatrix3x3 = pCamera->getProjMatrix();
 		if (pScene->getIsRightHand() == VG_FALSE)
 		{
@@ -627,7 +633,21 @@ namespace vg
 		
 		auto viewMatrix3x3 = pCamera->getTransform()->getMatrixWorldToLocal();
 		auto viewMatrix = tranMat3ToMat4(viewMatrix3x3);
+#if defined(DEBUG) && defined(VG_ENABLE_COST_TIMER)
+        preparingCommonMatrixsCostTimer.end();
+		VG_COST_TIME_LOG(plog::debug) << "Preparing common matrixs cost time: " 
+			    << preparingCommonMatrixsCostTimer.costTimer 
+				<< "ms, scene id: " << pScene->getID() 
+				<< ", scene type: " << (pScene->getSpaceType() == SpaceType::SPACE_3 ? "space3" : "space2") 
+				<<  std::endl;
+#endif //DEBUG and VG_ENABLE_COST_TIMER
+
 		uint32_t visualObjectCount = pScene->getVisualObjectCount();
+
+#if defined(DEBUG) && defined(VG_ENABLE_COST_TIMER)
+        fd::CostTimer visibilityCheckCostTimer(fd::CostTimer::TimerType::ONCE);
+		visibilityCheckCostTimer.begin();
+#endif //DEBUG and VG_ENABLE_COST_TIMER
 
 		//flat visual objects and filter them that is out of camera with its bounds.
 		//allocate enough space for array to storage points.
@@ -641,6 +661,21 @@ namespace vg
 			, pCamera
 		);
 
+#if defined(DEBUG) && defined(VG_ENABLE_COST_TIMER)
+		visibilityCheckCostTimer.end();
+		VG_COST_TIME_LOG(plog::debug) << "Visibility check cost time: " 
+			    << visibilityCheckCostTimer.costTimer 
+				<< "ms, scene id: " << pScene->getID() 
+				<< ", scene type: " << (pScene->getSpaceType() == SpaceType::SPACE_3 ? "space3" : "space2") 
+				<<  std::endl;
+        
+		fd::CostTimer preparingBuildInDataCostTimer(fd::CostTimer::TimerType::ACCUMULATION);
+		fd::CostTimer preparingPipelineCostTimer(fd::CostTimer::TimerType::ACCUMULATION);
+		fd::CostTimer preparingCommandBufferCostTimer(fd::CostTimer::TimerType::ACCUMULATION);
+		fd::CostTimer preObjectRecordingCallBackCostTimer(fd::CostTimer::TimerType::ACCUMULATION);
+		fd::CostTimer postObjectRecordingCallBackCostTimer(fd::CostTimer::TimerType::ACCUMULATION);
+#endif //DEBUG and VG_ENABLE_COST_TIMER
+
 		//------Doing render.		
 
 		uint32_t drawIndex = 0u;
@@ -650,7 +685,13 @@ namespace vg
 
 			if (m_preObjectRecordingFun != nullptr)
 			{
-				m_preObjectRecordingFun(pVisualObject);
+#if defined(DEBUG) && defined(VG_ENABLE_COST_TIMER)
+				preObjectRecordingCallBackCostTimer.begin();
+#endif //DEBUG and VG_ENABLE_COST_TIMER
+			    m_preObjectRecordingFun(pVisualObject);
+#if defined(DEBUG) && defined(VG_ENABLE_COST_TIMER)
+				preObjectRecordingCallBackCostTimer.end();
+#endif //DEBUG and VG_ENABLE_COST_TIMER
 			}
 
 			BaseVisualObject::BindInfo info = {
@@ -674,11 +715,45 @@ namespace vg
 
 			if (m_postObjectRecordingFun != nullptr)
 			{
-				m_postObjectRecordingFun(pVisualObject);
+#if defined(DEBUG) && defined(VG_ENABLE_COST_TIMER)
+				postObjectRecordingCallBackCostTimer.begin();
+#endif //DEBUG and VG_ENABLE_COST_TIMER
+			    m_postObjectRecordingFun(pVisualObject);
+#if defined(DEBUG) && defined(VG_ENABLE_COST_TIMER)
+				postObjectRecordingCallBackCostTimer.end();
+#endif //DEBUG and VG_ENABLE_COST_TIMER
 			}
 		}
 
 		resultInfo.drawCount += drawCount;
+		
+#if defined(DEBUG) && defined(VG_ENABLE_COST_TIMER)
+		VG_COST_TIME_LOG(plog::debug) << "Pre object recording callback cost time: "
+			<< preObjectRecordingCallBackCostTimer.costTimer
+			<< "ms, scene id: " << pScene->getID()
+			<< ", scene type: " << (pScene->getSpaceType() == SpaceType::SPACE_3 ? "space3" : "space2")
+			<< std::endl;
+		VG_COST_TIME_LOG(plog::debug) << "Preparing buildin data cost time: " 
+		    << preparingBuildInDataCostTimer.costTimer 
+		    << "ms, scene id: " << pScene->getID() 
+		    << ", scene type: " << (pScene->getSpaceType() == SpaceType::SPACE_3 ? "space3" : "space2") 
+		    <<  std::endl;
+		VG_COST_TIME_LOG(plog::debug) << "Preparing pipeline cost time: " 
+			<< preparingPipelineCostTimer.costTimer 
+			<< "ms, scene id: " << pScene->getID() 
+			<< ", scene type: " << (pScene->getSpaceType() == SpaceType::SPACE_3 ? "space3" : "space2") 
+			<<  std::endl;
+		VG_COST_TIME_LOG(plog::debug) << "Preparing command buffer cost time: " 
+			<< preparingCommandBufferCostTimer.costTimer 
+			<< "ms, scene id: " << pScene->getID() 
+			<< ", scene type: " << (pScene->getSpaceType() == SpaceType::SPACE_3 ? "space3" : "space2") 
+			<<  std::endl;
+		VG_COST_TIME_LOG(plog::debug) << "Post object recording callback cost time: "
+			<< postObjectRecordingCallBackCostTimer.costTimer
+			<< "ms, scene id: " << pScene->getID()
+			<< ", scene type: " << (pScene->getSpaceType() == SpaceType::SPACE_3 ? "space3" : "space2")
+			<< std::endl;
+#endif //DEBUG and VG_ENABLE_COST_TIMER
 	}
 
 	void Renderer::_renderScene3(const Scene<SpaceType::SPACE_3> *pScene
@@ -717,6 +792,7 @@ namespace vg
 				<< ", scene type: " << (pScene->getSpaceType() == SpaceType::SPACE_3 ? "space3" : "space2") 
 				<<  std::endl;
 #endif //DEBUG and VG_ENABLE_COST_TIMER
+
 		uint32_t visualObjectCount = pScene->getVisualObjectCount();
 		
 		//----------Preparing render.
@@ -726,6 +802,7 @@ namespace vg
         fd::CostTimer visibilityCheckCostTimer(fd::CostTimer::TimerType::ONCE);
 		visibilityCheckCostTimer.begin();
 #endif //DEBUG and VG_ENABLE_COST_TIMER
+
 		std::vector<SceneType::VisualObjectType *> validVisualObjects(visualObjectCount); //allocate enough space for array to storage points.
 		uint32_t validVisualObjectCount(0u);
 		for (uint32_t i = 0; i < visualObjectCount; ++i)

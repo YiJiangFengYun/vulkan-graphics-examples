@@ -1,0 +1,17 @@
+    O1P1     O2P2     O3P2     O4P3               O5P4                O6P2
++---------+-------+---------+======--------+==============---------+-------+    (main cmd execute sequence)
+        
+	O2P1	
++---------+                                                                     (Object 2 pass 1 execute sequence)
+
+    O3P1
++---------+                                                                     (Object 3 pass 1 execute sequence)
+
+    O4P1              O4P2
++----------------+-----------------+                                            (Object 4 pass 1, 2 execute sequence)
+
+         O5P1              O5P2              O5P3
++--------------------+------------+-----------------------+                     (Object 5 pass 1, 2, 3 execute sequence)
+
+     O6P1
++--------------+                                                                (Object 6 pass 1 execute sequence)

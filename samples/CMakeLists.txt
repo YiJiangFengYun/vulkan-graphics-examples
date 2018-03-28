@@ -21,6 +21,7 @@ add_subdirectory(mesh)
 add_subdirectory(dynamic_uniform_buffer)
 add_subdirectory(push_constants)
 add_subdirectory(specialization_constants)
+add_subdirectory(off_screen)
 
 # sampler include directories and libraries is used by itself
 # set(INCLUDE_DIRS ${INCLUDE_DIRS} PARENT_SCOPE)

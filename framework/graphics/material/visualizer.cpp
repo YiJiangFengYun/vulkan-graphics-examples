@@ -62,7 +62,8 @@ namespace vg
     {
 		uint32_t drawCount = 0u;
 
-		auto passCount = info.passCount;
+		// auto passCount = info.passCount;
+		auto passCount = 1u;
 #if defined(DEBUG) && defined(VG_ENABLE_COST_TIMER)
         info.pPreparingBuildInDataCostTimer->begin();
 #endif //DEBUG and VG_ENABLE_COST_TIMER

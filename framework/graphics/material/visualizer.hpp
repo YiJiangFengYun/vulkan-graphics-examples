@@ -28,8 +28,6 @@ namespace vg
             fd::CostTimer *pPreparingCommandBufferCostTimer;
 #endif //DEBUG and VG_ENABLE_COST_TIMER
             const Matrix4x4 *pModelMatrix;
-            const uint32_t passCount;
-            Pass * const *pPasses;
             const BaseMesh *pMesh;
             uint32_t subMeshOffset;
             uint32_t subMeshCount;
@@ -49,8 +47,6 @@ namespace vg
                 , fd::CostTimer *pPreparingCommandBufferCostTimer = nullptr
 #endif //DEBUG and VG_ENABLE_COST_TIMER
                 , const Matrix4x4 *pModelMatrix = nullptr
-                , const uint32_t passCount = 0u
-                , Pass * const *pPasses = nullptr
                 , const BaseMesh *pMesh = nullptr
                 , uint32_t subMeshOffset = 0u
                 , uint32_t subMeshCount = 0u
@@ -65,12 +61,17 @@ namespace vg
             BindResult(uint32_t drawCount = 0u);
         };
 
-        Visualizer();
+        Visualizer(uint32_t passCount, Pass * const *pPasses);
+
+        void updatePassInfo(uint32_t passCount, Pass * const *pPasses);
 
         void bindToRender(const BindInfo info, BindResult *pResult);
         
 
     protected:
+        Visualizer() = delete;
+        uint32_t m_passCount;
+        Pass * const *m_pPasses;
         void _createPipelineForObj(vk::RenderPass *pRenderPass,
 		    const BaseMesh *pMesh,
 		    uint32_t subMeshIndex,

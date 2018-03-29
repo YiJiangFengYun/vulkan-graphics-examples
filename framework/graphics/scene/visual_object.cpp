@@ -164,8 +164,6 @@ namespace vg
                 info.pPreparingCommandBufferCostTimer,
 #endif //DEBUG and VG_ENABLE_COST_TIMER
                 &modelMatrix,
-			    m_pMaterial->getPassCount(),
-				m_pMaterial->getPasses(),
 			    m_pMesh,
 			    getSubMeshOffset(),
 			    getSubMeshCount(),

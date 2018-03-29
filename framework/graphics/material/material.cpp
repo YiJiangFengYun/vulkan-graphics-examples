@@ -43,6 +43,7 @@ namespace vg
 		if (isHas(pPass)) return;
 		m_arrPasses.push_back(pPass);
 		m_mapPasses[pPass->getID()] = pPass;
+		_updateVisualizer();
 	}
 
 	void Material::removePass(Pass *pPass)
@@ -50,6 +51,7 @@ namespace vg
 		if (isHas(pPass) == VG_FALSE) return;
 		std::remove(m_arrPasses.begin(), m_arrPasses.end(), pPass);
 		m_mapPasses.erase(pPass->getID());
+		_updateVisualizer();		
 	}
 
 	void Material::apply()
@@ -113,6 +115,14 @@ namespace vg
 
 	Visualizer *Material::_createVisualizer()
 	{
-		return new Visualizer();
+		return new Visualizer(static_cast<uint32_t>(m_arrPasses.size()), m_arrPasses.data());
+	}
+
+	void Material::_updateVisualizer()
+	{
+		for (const auto& pVisualizer : m_pVisualizers)
+		{
+			pVisualizer->updatePassInfo(static_cast<uint32_t>(m_arrPasses.size()), m_arrPasses.data());
+		}
 	}
 }

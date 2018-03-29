@@ -15,8 +15,6 @@ namespace vg
         , fd::CostTimer *pPreparingCommandBufferCostTimer
 #endif //DEBUG and VG_ENABLE_COST_TIMER
         , const Matrix4x4 *pModelMatrix
-		, const uint32_t passCount
-        , Pass * const *pPasses
         , const BaseMesh *pMesh
         , uint32_t subMeshOffset
         , uint32_t subMeshCount
@@ -36,8 +34,6 @@ namespace vg
         , pPreparingCommandBufferCostTimer(pPreparingCommandBufferCostTimer)
 #endif //DEBUG and VG_ENABLE_COST_TIMER
 		, pModelMatrix(pModelMatrix)
-        , passCount(passCount)
-		, pPasses(pPasses)
         , pMesh(pMesh)
         , subMeshOffset(subMeshOffset)
         , subMeshCount(subMeshCount)
@@ -52,17 +48,24 @@ namespace vg
 
     }
 
-    Visualizer::Visualizer()
+    Visualizer::Visualizer(uint32_t passCount, Pass * const *pPasses)
         : Base(BaseType::VISUALIZER)
+		, m_passCount(passCount)
+		, m_pPasses(pPasses)
     {
 
     }
+
+	void Visualizer::updatePassInfo(uint32_t passCount, Pass * const *pPasses)
+	{
+		m_passCount = passCount;
+		m_pPasses = pPasses;
+	}
 
     void Visualizer::bindToRender(const BindInfo info, BindResult *pResult)
     {
 		uint32_t drawCount = 0u;
 
-		// auto passCount = info.passCount;
 		auto passCount = 1u;
 #if defined(DEBUG) && defined(VG_ENABLE_COST_TIMER)
         info.pPreparingBuildInDataCostTimer->begin();
@@ -75,7 +78,7 @@ namespace vg
 		for (uint32_t passIndex = 0u; passIndex < passCount; ++passIndex)
 		{
 			//update building in matrix variable.
-			auto pPass = *(info.pPasses + passIndex);
+			auto pPass = *(m_pPasses + passIndex);
 			auto info = pPass->getBuildInDataInfo();
 			uint32_t componentCount = info.componentCount;
 			for (uint32_t componentIndex = 0u; componentIndex < componentCount; ++componentIndex)
@@ -123,7 +126,7 @@ namespace vg
 		for (uint32_t passIndex = 0u; passIndex < passCount; ++passIndex)
 		{
 			//update building in matrix variable.
-			auto pPass = *(info.pPasses + passIndex);
+			auto pPass = *(m_pPasses + passIndex);
 			auto buildInDataInfo = pPass->getBuildInDataInfo();
 			uint32_t componentCount = buildInDataInfo.componentCount;
 			for (uint32_t componentIndex = 0u; componentIndex < componentCount; ++componentIndex)
@@ -161,7 +164,7 @@ namespace vg
 		{
 			for (uint32_t passIndex = 0u; passIndex < passCount; ++passIndex)
 			{
-				auto pPass = *(info.pPasses + passIndex);
+				auto pPass = *(m_pPasses + passIndex);
 				auto pShader = pPass->getShader();
 				auto stageInfos = pShader->getShaderStageInfos();
 				if (stageInfos.size() != 0)

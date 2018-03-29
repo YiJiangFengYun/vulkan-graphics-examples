@@ -49,6 +49,7 @@ namespace vg
 		//--aggregations
 
 		virtual Visualizer *_createVisualizer();
+		void _updateVisualizer();
 	};
 }
 

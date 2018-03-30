@@ -1,4 +1,4 @@
-#include "graphics/material/pass.hpp"
+#include "graphics/pass/pass.hpp"
 
 namespace vg
 {
@@ -226,7 +226,7 @@ namespace vg
 
 	}
 
-	void Pass::LayoutBindingInfo::updateSize(const MaterialData *pMaterialData)
+	void Pass::LayoutBindingInfo::updateSize(const PassData *pPassData)
 	{
 		if (isTexture)
 		{
@@ -237,7 +237,7 @@ namespace vg
 		const auto &pPhysicalDevice = pApp->getPhysicalDevice();
 		const auto &properties = pPhysicalDevice->getProperties();
 		const auto &minOffsetAlignment = static_cast<float>(properties.limits.minUniformBufferOffsetAlignment);
-		size = pMaterialData->getDataBaseSize(name) * descriptorCount;
+		size = pPassData->getDataBaseSize(name) * descriptorCount;
 		bufferSize = static_cast<uint32_t>(std::ceil(size / minOffsetAlignment) * minOffsetAlignment);
 	}
 
@@ -275,7 +275,7 @@ namespace vg
 	Pass::Pass() 
 		: Base(BaseType::PASS)
 		, m_applied(VG_FALSE)		
-		, m_pData(new MaterialData())
+		, m_pData(new PassData())
 		, m_dataChanged(VG_FALSE)
 		, m_polygonMode(PolygonMode::FILL)
 		, m_cullMode(CullModeFlagBits::BACK)
@@ -316,7 +316,7 @@ namespace vg
 	Pass::Pass(Shader *pShader)
 		: Base(BaseType::PASS)
 		, m_applied(VG_FALSE)		
-		, m_pData(new MaterialData())
+		, m_pData(new PassData())
 		, m_dataChanged(VG_FALSE)
 		, m_pShader(pShader)
 		, m_polygonMode(PolygonMode::FILL)

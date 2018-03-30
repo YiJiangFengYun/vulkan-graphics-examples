@@ -13,8 +13,8 @@
 #include <graphics/mesh/mesh_2.hpp>
 #include <graphics/mesh/mesh_3.hpp>
 #include <graphics/material/material.hpp>
-#include <graphics/material/pass.hpp>
-#include <graphics/material/shader.hpp>
+#include <graphics/pass/pass.hpp>
+#include <graphics/pass/shader.hpp>
 #include <graphics/texture/texture_1d.hpp>
 #include <graphics/texture/texture_1d_array.hpp>
 #include <graphics/texture/texture_2d.hpp>

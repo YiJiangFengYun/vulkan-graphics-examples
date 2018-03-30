@@ -4,7 +4,7 @@
 #include <memory>
 #include "graphics/global.hpp"
 #include "graphics/util/util.hpp"
-#include "graphics/material/pass.hpp"
+#include "graphics/pass/pass.hpp"
 #include "graphics/texture/texture.hpp"
 #include "graphics/material/material_data.hpp"
 #include "graphics/material/visualizer.hpp"

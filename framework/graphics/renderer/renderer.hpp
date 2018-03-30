@@ -8,7 +8,7 @@
 #include "graphics/renderer/renderer_option.hpp"
 #include "graphics/texture/texture_color_attachment.hpp"
 #include "graphics/texture/texture_depth_stencil_attachment.hpp"
-#include "graphics/pipeline/pipeline_cache.hpp"
+#include "graphics/renderer/pipeline_cache.hpp"
 
 //todo: batch mesh,
 //todo: cache graphics pipeline.
@@ -19,8 +19,8 @@ namespace vg
 	class Renderer : public Base
 	{
 	public:
-        using PreObjectRecordingFun = std::function<void(vg::BaseVisualObject * pVisualObject)>;
-		using PostObjectRecordingFun = std::function<void(vg::BaseVisualObject * pVisualObject)>;
+        // using PreObjectRecordingFun = std::function<void(vg::BaseVisualObject * pVisualObject)>;
+		// using PostObjectRecordingFun = std::function<void(vg::BaseVisualObject * pVisualObject)>;
 
 		static const vk::Format DEFAULT_DEPTH_STENCIL_FORMAT;
 
@@ -81,8 +81,8 @@ namespace vg
 		const fd::Rect2D &getClearArea() const;
 		void setClearArea(fd::Rect2D area);
 
-		PreObjectRecordingFun setPreObjectRecordingCallBack(PreObjectRecordingFun cbFun);
-		PostObjectRecordingFun setPostObjectRecordingCallBack(PostObjectRecordingFun cbFun);
+		// PreObjectRecordingFun setPreObjectRecordingCallBack(PreObjectRecordingFun cbFun);
+		// PostObjectRecordingFun setPostObjectRecordingCallBack(PostObjectRecordingFun cbFun);
 
 #if defined(DEBUG) && defined(VG_ENABLE_COST_TIMER)
         const fd::CostTimer &getPreparingRenderCostTimer() const;
@@ -113,8 +113,8 @@ namespace vg
 		//Renderer will render to color texture when it is not null.
 		TextureColorAttachment *m_pColorTexture;
 
-		PreObjectRecordingFun m_preObjectRecordingFun;
-		PostObjectRecordingFun m_postObjectRecordingFun;
+		// PreObjectRecordingFun m_preObjectRecordingFun;
+		// PostObjectRecordingFun m_postObjectRecordingFun;
 
 #if defined(DEBUG) && defined(VG_ENABLE_COST_TIMER)
         fd::CostTimer m_preparingRenderCostTimer;
@@ -136,18 +136,24 @@ namespace vg
 		//void _createFence();
 
 		void _recordCommandBufferForBegin();
+		void _recordTrunkRenderPassForBegin();
 
+		void _recordTrunkRenderPassForEnd();
 		void _recordCommandBufferForEnd();
 
 	    void _renderScene2(const Scene<SpaceType::SPACE_2> *pScene
 		    , const Camera<SpaceType::SPACE_2> *pCamera
 	        , const RenderInfo &info
-	    	, RenderResultInfo &resultInfo);
+	    	, RenderResultInfo &resultInfo
+			, std::vector<RenderPassInfo> &trunkRenderPassInfos
+			, std::vector<RenderPassInfo> &branchRenderPassInfos);
 
 		 void _renderScene3(const Scene<SpaceType::SPACE_3> *pScene
 		    , const Camera<SpaceType::SPACE_3> *pCamera
 	        , const RenderInfo &info
-	    	, RenderResultInfo &resultInfo);
+	    	, RenderResultInfo &resultInfo
+			, std::vector<RenderPassInfo> &trunkRenderPassInfos
+			, std::vector<RenderPassInfo> &branchRenderPassInfos);
 
 #if defined(DEBUG) && defined(VG_ENABLE_COST_TIMER)
 

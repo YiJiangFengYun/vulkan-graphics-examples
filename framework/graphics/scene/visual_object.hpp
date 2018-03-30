@@ -5,7 +5,6 @@
 #include "graphics/scene/object.hpp"
 #include "graphics/mesh/mesh.hpp"
 #include "graphics/material/material.hpp"
-#include "graphics/pipeline/pipeline_cache.hpp"
 
 namespace vg
 {
@@ -14,25 +13,22 @@ namespace vg
 	public:
 	    struct BindInfo 
         {
+			vk::RenderPass *pTrunkRenderPass;
+			uint32_t trunkFramebufferWidth;
+			uint32_t trunkFramebufferHeight;
             const Matrix4x4 *pProjMatrix;
             const Matrix4x4 *pViewMatrix;
-            PipelineCache *pPipelineCache;
-			vk::RenderPass *pRenderPass;
-			vk::CommandBuffer *pCommandBuffer;
-			uint32_t framebufferWidth;
-			uint32_t framebufferHeight;
 #if defined(DEBUG) && defined(VG_ENABLE_COST_TIMER)
             fd::CostTimer *pPreparingBuildInDataCostTimer;
             fd::CostTimer *pPreparingPipelineCostTimer;
             fd::CostTimer *pPreparingCommandBufferCostTimer;
 #endif //DEBUG and VG_ENABLE_COST_TIMER
-            BindInfo(const Matrix4x4 *pProjMatrix = nullptr
+
+            BindInfo(vk::RenderPass *pTrunkRenderPass = nullptr
+			    , uint32_t trunkFramebufferWidth = 0u
+			    , uint32_t trunkFramebufferHeight = 0u
+				, const Matrix4x4 *pProjMatrix = nullptr
                 , const Matrix4x4 *pViewMatrix = nullptr
-                , PipelineCache *pPipelineCache = nullptr
-				, vk::RenderPass *pRenderPass = nullptr
-				, vk::CommandBuffer *pCommandBuffer = nullptr
-			    , uint32_t framebufferWidth = 0u
-			    , uint32_t framebufferHeight = 0u
 #if defined(DEBUG) && defined(VG_ENABLE_COST_TIMER)
                 , fd::CostTimer *pPreparingBuildInDataCostTimer = nullptr
                 , fd::CostTimer *pPreparingPipelineCostTimer = nullptr
@@ -43,8 +39,15 @@ namespace vg
     
         struct BindResult
         {
-            uint32_t drawCount;
-            BindResult(uint32_t drawCount = 0u);
+            uint32_t branchRenderPassCount;
+            RenderPassInfo *pBranchRenderPasses;
+            uint32_t trunkRenderPassCount;
+            RenderPassInfo *pTrunkRenderPasses;
+            BindResult(uint32_t branchRenderPassCount = 0u
+                , RenderPassInfo *pBranchRenderPasses = nullptr
+                , uint32_t trunkRenderPassCount = 0u
+                , RenderPassInfo *pTrunkRenderPasses = nullptr
+                );
         };
 
 		BaseVisualObject();

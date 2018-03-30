@@ -4,9 +4,9 @@
 #include "graphics/global.hpp"
 #include "graphics/module.hpp"
 #include "graphics/base.hpp"
-#include "graphics/pipeline/pipeline_cache.hpp"
 #include "graphics/mesh/mesh.hpp"
 #include "graphics/buffer_data/util.hpp"
+#include "graphics/material/render_pass_info.hpp"
 
 namespace vg
 {
@@ -17,30 +17,25 @@ namespace vg
         {
             const Matrix4x4 *pProjMatrix;
             const Matrix4x4 *pViewMatrix;
-            PipelineCache *pPipelineCache;
-            vk::RenderPass *pRenderPass;
-            vk::CommandBuffer *pCommandBuffer;
-			uint32_t framebufferWidth;
-			uint32_t framebufferHeight;
+            vk::RenderPass *pTrunkRenderPass;
+			uint32_t trunkFramebufferWidth;
+			uint32_t trunkFramebufferHeight;
+            const Matrix4x4 *pModelMatrix;
+            const BaseMesh *pMesh;
+            uint32_t subMeshIndex;
+            Bool32 hasClipRect;
+            const fd::Rect2D *pClipRect;
 #if defined(DEBUG) && defined(VG_ENABLE_COST_TIMER)
             fd::CostTimer *pPreparingBuildInDataCostTimer;
             fd::CostTimer *pPreparingPipelineCostTimer;
             fd::CostTimer *pPreparingCommandBufferCostTimer;
 #endif //DEBUG and VG_ENABLE_COST_TIMER
-            const Matrix4x4 *pModelMatrix;
-            const BaseMesh *pMesh;
-            uint32_t subMeshOffset;
-            uint32_t subMeshCount;
-            Bool32 hasClipRect;
-            const fd::Rect2D *pClipRects;
 
             BindInfo(const Matrix4x4 *pProjMatrix = nullptr
                 , const Matrix4x4 *pViewMatrix = nullptr
-                , PipelineCache *pPipelineCache = nullptr
-                , vk::RenderPass *pRenderPass = nullptr
-                , vk::CommandBuffer *pCommandBuffer = nullptr
-			    , uint32_t framebufferWidth = 0u
-			    , uint32_t framebufferHeight = 0u
+                , vk::RenderPass *pTrunkRenderPass = nullptr
+			    , uint32_t trunkFramebufferWidth = 0u
+			    , uint32_t trunkFramebufferHeight = 0u
 #if defined(DEBUG) && defined(VG_ENABLE_COST_TIMER)
                 , fd::CostTimer *pPreparingBuildInDataCostTimer = nullptr
                 , fd::CostTimer *pPreparingPipelineCostTimer = nullptr
@@ -48,17 +43,23 @@ namespace vg
 #endif //DEBUG and VG_ENABLE_COST_TIMER
                 , const Matrix4x4 *pModelMatrix = nullptr
                 , const BaseMesh *pMesh = nullptr
-                , uint32_t subMeshOffset = 0u
-                , uint32_t subMeshCount = 0u
+                , uint32_t subMeshIndex = 0u
                 , Bool32 hasClipRect = VG_FALSE
-                , const fd::Rect2D *pClipRects = nullptr
+                , const fd::Rect2D *pClipRect = nullptr
                 );
         };
     
         struct BindResult
         {
-            uint32_t drawCount;
-            BindResult(uint32_t drawCount = 0u);
+            uint32_t branchRenderPassCount;
+            RenderPassInfo *pBranchRenderPasses;
+            uint32_t trunkRenderPassCount;
+            RenderPassInfo *pTrunkRenderPasses;
+            BindResult(uint32_t branchRenderPassCount = 0u
+                , RenderPassInfo *pBranchRenderPasses = nullptr
+                , uint32_t trunkRenderPassCount = 0u
+                , RenderPassInfo *pTrunkRenderPasses = nullptr
+                );
         };
 
         Visualizer(uint32_t passCount, Pass * const *pPasses);
@@ -72,23 +73,8 @@ namespace vg
         Visualizer() = delete;
         uint32_t m_passCount;
         Pass * const *m_pPasses;
-        void _createPipelineForObj(vk::RenderPass *pRenderPass,
-		    const BaseMesh *pMesh,
-		    uint32_t subMeshIndex,
-		    Pass *pPass,
-		    PipelineCache *pPipelineCache,
-		    std::shared_ptr<vk::Pipeline> &pPipeline);
 
-		void _recordCommandBufferForObj(vk::Pipeline *pPipeline,
-	        vk::CommandBuffer *pCommandBuffer,
-		    uint32_t framebufferWidth,
-		    uint32_t framebufferHeight,
-		    const BaseMesh *pMesh,
-		    uint32_t subMeshIndex,
-		    Pass *pPass,
-		    const fd::Rect2D *pClipRect);
     private:
-
     };
 } //vg
 

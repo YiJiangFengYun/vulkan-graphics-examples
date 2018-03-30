@@ -4,7 +4,7 @@
 #include <boost/functional/hash.hpp>
 
 #include "graphics/global.hpp"
-#include "graphics/material/pass.hpp"
+#include "graphics/pass/pass.hpp"
 #include "graphics/buffer_data/vertex_data.hpp"
 #include "graphics/buffer_data/index_data.hpp"
 

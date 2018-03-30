@@ -1,4 +1,4 @@
-#include "graphics/material/pass_option.hpp"
+#include "graphics/pass/pass_option.hpp"
 
 namespace vg
 {

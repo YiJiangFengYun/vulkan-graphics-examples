@@ -2,6 +2,7 @@
 
 #include "graphics/buffer_data/util.hpp"
 #include "graphics/util/gemo_util.hpp"
+#include "graphics/renderer/render_pass.hpp"
 
 namespace vg
 {
@@ -31,8 +32,8 @@ namespace vg
 		, m_clearValueStencil(0u)
 		, m_renderArea(0.0f, 0.0f, 1.0f, 1.0f)
 		, m_pipelineCache()
-		, m_preObjectRecordingFun()
-		, m_postObjectRecordingFun()
+		// , m_preObjectRecordingFun()
+		// , m_postObjectRecordingFun()
 #if defined(DEBUG) && defined(VG_ENABLE_COST_TIMER)
         , m_preparingRenderCostTimer(fd::CostTimer::TimerType::AVERAGE)
 #endif //DEBUG and VG_ENABLE_COST_TIMER
@@ -60,8 +61,8 @@ namespace vg
 		, m_clearValueStencil(0u)
 		, m_renderArea(0.0f, 0.0f, 1.0f, 1.0f)
 		, m_pipelineCache()
-		, m_preObjectRecordingFun()
-		, m_postObjectRecordingFun()
+		// , m_preObjectRecordingFun()
+		// , m_postObjectRecordingFun()
 #if defined(DEBUG) && defined(VG_ENABLE_COST_TIMER)
         , m_preparingRenderCostTimer(fd::CostTimer::TimerType::AVERAGE)
 #endif //DEBUG and VG_ENABLE_COST_TIMER
@@ -129,9 +130,7 @@ namespace vg
 	void Renderer::render(const RenderInfo &info, 
 		RenderResultInfo &resultInfo)
 	{
-		
 		_render(info, resultInfo);
-		
 	}
 
 	void Renderer::renderEnd(const RenderInfo &info)
@@ -219,19 +218,19 @@ namespace vg
 		m_renderArea = area;
 	}
 
-	Renderer::PreObjectRecordingFun Renderer::setPreObjectRecordingCallBack(PreObjectRecordingFun cbFun)
-	{
-		auto oldFun = m_preObjectRecordingFun;
-		m_preObjectRecordingFun = cbFun;
-		return oldFun;
-	}
+	// Renderer::PreObjectRecordingFun Renderer::setPreObjectRecordingCallBack(PreObjectRecordingFun cbFun)
+	// {
+	// 	auto oldFun = m_preObjectRecordingFun;
+	// 	m_preObjectRecordingFun = cbFun;
+	// 	return oldFun;
+	// }
 		
-	Renderer::PostObjectRecordingFun Renderer::setPostObjectRecordingCallBack(PostObjectRecordingFun cbFun)
-	{
-		auto oldFun = m_postObjectRecordingFun;
-		m_postObjectRecordingFun = cbFun;
-		return oldFun;
-	}
+	// Renderer::PostObjectRecordingFun Renderer::setPostObjectRecordingCallBack(PostObjectRecordingFun cbFun)
+	// {
+	// 	auto oldFun = m_postObjectRecordingFun;
+	// 	m_postObjectRecordingFun = cbFun;
+	// 	return oldFun;
+	// }
 
 #if defined(DEBUG) && defined(VG_ENABLE_COST_TIMER)
     const fd::CostTimer &Renderer::getPreparingRenderCostTimer() const
@@ -270,11 +269,17 @@ namespace vg
 	}
 
 	void Renderer::_render(const RenderInfo &info
-		, RenderResultInfo &resultInfo)
+		    , RenderResultInfo &resultInfo)
 	{
 		resultInfo.signalSemaphoreCount = 0u;
 		resultInfo.drawCount = 0u;
+
+		
+		std::vector<RenderPassInfo> trunkRenderPassInfos;
+		std::vector<RenderPassInfo> branchRenderPassInfos;
 		uint32_t count = info.sceneAndCameraCount;
+		uint32_t trunkRenderPassInfoCount = static_cast<uint32_t>(trunkRenderPassInfos.size());
+		uint32_t branchRenderPassInfoCount = static_cast<uint32_t>(branchRenderPassInfos.size());
 		for (uint32_t i = 0; i < count; ++i)
 		{
 			const auto &pScene = (*(info.pSceneAndCamera + i)).pScene;
@@ -283,21 +288,42 @@ namespace vg
             fd::CostTimer preparingSceneCostTimer(fd::CostTimer::TimerType::ONCE);
 			preparingSceneCostTimer.begin();
 #endif //DEBUG and VG_ENABLE_COST_TIMER
+            
+			std::vector<RenderPassInfo> tempTrunkRenderPassInfos;
+			std::vector<RenderPassInfo> tempBranchRenderPassInfos;
 			if (pScene->getSpaceType() == SpaceType::SPACE_2)
 			{
 				_renderScene2(dynamic_cast<const Scene<SpaceType::SPACE_2> *>(pScene), 
 				    dynamic_cast<const Camera<SpaceType::SPACE_2> *>(pCamera), 
 					info, 
-					resultInfo);
+					resultInfo,
+					tempTrunkRenderPassInfos,
+					tempBranchRenderPassInfos
+					);
 			} else if (pScene->getSpaceType() == SpaceType::SPACE_3)
 			{
 				_renderScene3(dynamic_cast<const Scene<SpaceType::SPACE_3> *>(pScene), 
 				    dynamic_cast<const Camera<SpaceType::SPACE_3> *>(pCamera), 
 					info, 
-					resultInfo);
+					resultInfo,
+					tempTrunkRenderPassInfos,
+					tempBranchRenderPassInfos
+					);
 			} else {
 				//todo
 			}
+
+			if (tempBranchRenderPassInfos.size() > 0) throw std::runtime_error("It is not ready to do branch render pass.");
+
+			trunkRenderPassInfoCount += static_cast<uint32_t>(tempTrunkRenderPassInfos.size());
+			branchRenderPassInfoCount += static_cast<uint32_t>(tempBranchRenderPassInfos.size());
+			uint32_t trunkOriginCount = static_cast<uint32_t>(trunkRenderPassInfos.size());
+			uint32_t branchOriginCount = static_cast<uint32_t>(branchRenderPassInfos.size());
+			trunkRenderPassInfos.resize(trunkRenderPassInfoCount);
+			branchRenderPassInfos.resize(branchRenderPassInfoCount);
+			memcpy(trunkRenderPassInfos.data() + trunkOriginCount, tempTrunkRenderPassInfos.data(), sizeof(RenderPassInfo) * tempTrunkRenderPassInfos.size());
+			memcpy(branchRenderPassInfos.data() + branchOriginCount, tempBranchRenderPassInfos.data(), sizeof(RenderPassInfo) * tempBranchRenderPassInfos.size());
+
 #if defined(DEBUG) && defined(VG_ENABLE_COST_TIMER)
 			preparingSceneCostTimer.end();
 			VG_COST_TIME_LOG(plog::debug) << "Preparing scene cost time: " 
@@ -307,6 +333,15 @@ namespace vg
 				<<  std::endl;
 #endif //DEBUG and VG_ENABLE_COST_TIMER
 		}
+
+		_recordTrunkRenderPassForBegin();
+
+		RenderPass::record(trunkRenderPassInfoCount,
+		    trunkRenderPassInfos.data(),
+			m_pCommandBuffer.get(),
+			&m_pipelineCache);
+
+		_recordTrunkRenderPassForEnd();
 
 		uint32_t semaphoreCount = resultInfo.signalSemaphoreCount + 1u;
 		uint32_t semaphoreIndex = resultInfo.signalSemaphoreCount;
@@ -381,6 +416,11 @@ namespace vg
 		m_pCommandBuffer->begin(beginInfo);
 		VG_LOG(plog::debug) << "Post begin command buffer for render." << std::endl;
 
+		
+	}
+
+	void Renderer::_recordTrunkRenderPassForBegin()
+	{
 		vk::ClearValue clearValueColor = {
 			std::array<float, 4>{
 			    m_clearValueColor[0], 
@@ -419,10 +459,14 @@ namespace vg
 		m_pCommandBuffer->beginRenderPass(renderPassBeginInfo, vk::SubpassContents::eInline);
 	}
 
+	void Renderer::_recordTrunkRenderPassForEnd()
+    {
+		m_pCommandBuffer->endRenderPass();
+	}
+
 	void Renderer::_recordCommandBufferForEnd()
 	{
-		m_pCommandBuffer->endRenderPass();
-
+		
 		VG_LOG(plog::debug) << "Pre end command buffer." << std::endl;
 		m_pCommandBuffer->end();
 		VG_LOG(plog::debug) << "Post end command buffer." << std::endl;
@@ -609,7 +653,10 @@ namespace vg
 	void Renderer::_renderScene2(const Scene<SpaceType::SPACE_2> *pScene
 		, const Camera<SpaceType::SPACE_2> *pCamera
 	    , const RenderInfo &info
-	    , RenderResultInfo &resultInfo)
+	    , RenderResultInfo &resultInfo
+		, std::vector<RenderPassInfo> &trunkRenderPassInfos
+		, std::vector<RenderPassInfo> &branchRenderPassInfos
+		)
 	{
 		resultInfo.isRendered = VG_TRUE;
 
@@ -672,36 +719,23 @@ namespace vg
 		fd::CostTimer preparingBuildInDataCostTimer(fd::CostTimer::TimerType::ACCUMULATION);
 		fd::CostTimer preparingPipelineCostTimer(fd::CostTimer::TimerType::ACCUMULATION);
 		fd::CostTimer preparingCommandBufferCostTimer(fd::CostTimer::TimerType::ACCUMULATION);
-		fd::CostTimer preObjectRecordingCallBackCostTimer(fd::CostTimer::TimerType::ACCUMULATION);
-		fd::CostTimer postObjectRecordingCallBackCostTimer(fd::CostTimer::TimerType::ACCUMULATION);
 #endif //DEBUG and VG_ENABLE_COST_TIMER
 
 		//------Doing render.		
 
-		uint32_t drawIndex = 0u;
+		uint32_t trunkRenderPassCount = 0u;
+		uint32_t branchRenderPassCount = 0u;
+		
 		for (uint32_t i = 0u; i < validVisualObjectCount; ++i)
 		{
 			auto pVisualObject = validVisualObjects[i];
 
-			if (m_preObjectRecordingFun != nullptr)
-			{
-#if defined(DEBUG) && defined(VG_ENABLE_COST_TIMER)
-				preObjectRecordingCallBackCostTimer.begin();
-#endif //DEBUG and VG_ENABLE_COST_TIMER
-			    m_preObjectRecordingFun(pVisualObject);
-#if defined(DEBUG) && defined(VG_ENABLE_COST_TIMER)
-				preObjectRecordingCallBackCostTimer.end();
-#endif //DEBUG and VG_ENABLE_COST_TIMER
-			}
-
 			BaseVisualObject::BindInfo info = {
+				m_pRenderPass.get(),
+                m_framebufferWidth,
+				m_framebufferHeight,
 				&projMatrix,
 				&viewMatrix,
-				&m_pipelineCache,
-				m_pRenderPass.get(),
-				m_pCommandBuffer.get(),
-				m_framebufferWidth,
-				m_framebufferHeight,
 #if defined(DEBUG) && defined(VG_ENABLE_COST_TIMER)
                 &preparingBuildInDataCostTimer,
                 &preparingPipelineCostTimer,
@@ -711,21 +745,43 @@ namespace vg
 
 			BaseVisualObject::BindResult result;
 			pVisualObject->bindToRender(info, &result);
-			drawCount += result.drawCount;
-
-			if (m_postObjectRecordingFun != nullptr)
-			{
-#if defined(DEBUG) && defined(VG_ENABLE_COST_TIMER)
-				postObjectRecordingCallBackCostTimer.begin();
-#endif //DEBUG and VG_ENABLE_COST_TIMER
-			    m_postObjectRecordingFun(pVisualObject);
-#if defined(DEBUG) && defined(VG_ENABLE_COST_TIMER)
-				postObjectRecordingCallBackCostTimer.end();
-#endif //DEBUG and VG_ENABLE_COST_TIMER
-			}
+			
+			trunkRenderPassCount += result.trunkRenderPassCount;
+			branchRenderPassCount += result.branchRenderPassCount;
 		}
 
-		resultInfo.drawCount += drawCount;
+		trunkRenderPassInfos.resize(trunkRenderPassCount);
+		branchRenderPassInfos.resize(branchRenderPassCount);
+
+		resultInfo.drawCount += trunkRenderPassCount + branchRenderPassCount;
+
+		trunkRenderPassCount = 0u;
+		branchRenderPassCount = 0u;
+		for (uint32_t i = 0u; i < validVisualObjectCount; ++i)
+		{
+			auto pVisualObject = validVisualObjects[i];
+
+			BaseVisualObject::BindInfo info = {
+				m_pRenderPass.get(),
+                m_framebufferWidth,
+				m_framebufferHeight,
+				&projMatrix,
+				&viewMatrix,
+#if defined(DEBUG) && defined(VG_ENABLE_COST_TIMER)
+                &preparingBuildInDataCostTimer,
+                &preparingPipelineCostTimer,
+                &preparingCommandBufferCostTimer,
+#endif //DEBUG and VG_ENABLE_COST_TIMER	
+				};
+
+			BaseVisualObject::BindResult result;
+			result.pTrunkRenderPasses = trunkRenderPassInfos.data() + trunkRenderPassCount;
+			result.pBranchRenderPasses = branchRenderPassInfos.data() + branchRenderPassCount;
+			pVisualObject->bindToRender(info, &result);
+
+			trunkRenderPassCount += result.trunkRenderPassCount;
+			branchRenderPassCount += result.branchRenderPassCount;
+		}
 		
 #if defined(DEBUG) && defined(VG_ENABLE_COST_TIMER)
 		VG_COST_TIME_LOG(plog::debug) << "Pre object recording callback cost time: "
@@ -759,7 +815,10 @@ namespace vg
 	void Renderer::_renderScene3(const Scene<SpaceType::SPACE_3> *pScene
 		, const Camera<SpaceType::SPACE_3> *pCamera
 	    , const RenderInfo &info
-	    , RenderResultInfo &resultInfo)
+	    , RenderResultInfo &resultInfo
+		, std::vector<RenderPassInfo> &trunkRenderPassInfos
+		, std::vector<RenderPassInfo> &branchRenderPassInfos
+		)
 	{
 		using SceneType = Scene<SpaceType::SPACE_3>;
 
@@ -911,7 +970,10 @@ namespace vg
 	        });
 
 		//-----Doing render
-		uint32_t drawIndex = 0;
+
+		uint32_t trunkRenderPassCount = 0u;
+		uint32_t branchRenderPassCount = 0u;
+
 		for (uint32_t typeIndex = 0u; typeIndex < queueTypeCount; ++typeIndex)
 		{
 			auto queueLength = queueLengths[typeIndex];
@@ -919,52 +981,62 @@ namespace vg
 			{
 				auto pVisualObject = queues[typeIndex][objectIndex];
 
-				if (m_preObjectRecordingFun != nullptr)
-			    {
-#if defined(DEBUG) && defined(VG_ENABLE_COST_TIMER)
-					preObjectRecordingCallBackCostTimer.begin();
-#endif //DEBUG and VG_ENABLE_COST_TIMER
-			    	m_preObjectRecordingFun(pVisualObject);
-#if defined(DEBUG) && defined(VG_ENABLE_COST_TIMER)
-					preObjectRecordingCallBackCostTimer.end();
-#endif //DEBUG and VG_ENABLE_COST_TIMER
-			    }
-
 				BaseVisualObject::BindInfo info = {
-					&projMatrix,
-					&viewMatrix,
-					&m_pipelineCache,
-					m_pRenderPass.get(),
-					m_pCommandBuffer.get(),
-					m_framebufferWidth,
-					m_framebufferHeight,
+				    m_pRenderPass.get(),
+                    m_framebufferWidth,
+				    m_framebufferHeight,
+				    &projMatrix,
+				    &viewMatrix,
 #if defined(DEBUG) && defined(VG_ENABLE_COST_TIMER)
                     &preparingBuildInDataCostTimer,
                     &preparingPipelineCostTimer,
                     &preparingCommandBufferCostTimer,
 #endif //DEBUG and VG_ENABLE_COST_TIMER	
-				};
+				    };
 
-				BaseVisualObject::BindResult result;
-
-				pVisualObject->bindToRender(info, &result);
-
-				drawCount += result.drawCount;
-
-				if (m_postObjectRecordingFun != nullptr)
-			    {
-#if defined(DEBUG) && defined(VG_ENABLE_COST_TIMER)
-					postObjectRecordingCallBackCostTimer.begin();
-#endif //DEBUG and VG_ENABLE_COST_TIMER
-			    	m_postObjectRecordingFun(pVisualObject);
-#if defined(DEBUG) && defined(VG_ENABLE_COST_TIMER)
-					postObjectRecordingCallBackCostTimer.end();
-#endif //DEBUG and VG_ENABLE_COST_TIMER
-			    }
+			    BaseVisualObject::BindResult result;
+			    pVisualObject->bindToRender(info, &result);
+				trunkRenderPassCount += result.trunkRenderPassCount;
+			    branchRenderPassCount += result.branchRenderPassCount;
 			}
 		}
 
-		resultInfo.drawCount += drawCount;
+		trunkRenderPassInfos.resize(trunkRenderPassCount);
+		branchRenderPassInfos.resize(branchRenderPassCount);
+
+		resultInfo.drawCount += trunkRenderPassCount + branchRenderPassCount;
+
+		trunkRenderPassCount = 0u;
+		branchRenderPassCount = 0u;
+		for (uint32_t typeIndex = 0u; typeIndex < queueTypeCount; ++typeIndex)
+		{
+			auto queueLength = queueLengths[typeIndex];
+			for (uint32_t objectIndex = 0u; objectIndex < queueLength; ++objectIndex)
+			{
+				auto pVisualObject = queues[typeIndex][objectIndex];
+
+				BaseVisualObject::BindInfo info = {
+				    m_pRenderPass.get(),
+                    m_framebufferWidth,
+				    m_framebufferHeight,
+				    &projMatrix,
+				    &viewMatrix,
+#if defined(DEBUG) && defined(VG_ENABLE_COST_TIMER)
+                    &preparingBuildInDataCostTimer,
+                    &preparingPipelineCostTimer,
+                    &preparingCommandBufferCostTimer,
+#endif //DEBUG and VG_ENABLE_COST_TIMER	
+				    };
+
+			    BaseVisualObject::BindResult result;
+				result.pTrunkRenderPasses = trunkRenderPassInfos.data() + trunkRenderPassCount;
+			    result.pBranchRenderPasses = branchRenderPassInfos.data() + branchRenderPassCount;
+			    pVisualObject->bindToRender(info, &result);
+
+				trunkRenderPassCount += result.trunkRenderPassCount;
+				branchRenderPassCount += result.branchRenderPassCount;
+			}
+		}
 
 #if defined(DEBUG) && defined(VG_ENABLE_COST_TIMER)
 		VG_COST_TIME_LOG(plog::debug) << "Pre object recording callback cost time: "

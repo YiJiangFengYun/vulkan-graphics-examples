@@ -3,11 +3,11 @@
 
 #include <unordered_map>
 #include "graphics/util/find_memory.hpp"
-#include "graphics/material/shader.hpp"
+#include "graphics/pass/shader.hpp"
 #include "graphics/global.hpp"
-#include "graphics/material/pass_option.hpp"
+#include "graphics/pass/pass_option.hpp"
 #include "graphics/texture/texture.hpp"
-#include "graphics/material/material_data.hpp"
+#include "graphics/pass/pass_data.hpp"
 #include "graphics/util/util.hpp"
 #include "graphics/buffer_data/uniform_buffer_data.hpp"
 
@@ -200,7 +200,7 @@ namespace vg
 			Bool32 operator ==(const LayoutBindingInfo& target) const;
 			Bool32 operator !=(const LayoutBindingInfo& target) const;
 
-			void updateSize(const MaterialData *pMaterialData);
+			void updateSize(const PassData *pPassData);
 			void updateSize(const uint32_t dataSize);
 		};
 
@@ -342,7 +342,7 @@ namespace vg
 		const uint32_t *getUsingDescriptorDynamicOffsets() const;
 	private:
 		//compositons
-		std::shared_ptr<MaterialData> m_pData;
+		std::shared_ptr<PassData> m_pData;
 		Bool32 m_dataChanged;
 		std::vector<std::string> m_arrLayoutBindNames;
 		std::unordered_map<std::string, LayoutBindingInfo> m_mapLayoutBinds;
@@ -416,6 +416,6 @@ namespace vg
 	};
 }
 
-#include "graphics/material/pass.inl"
+#include "graphics/pass/pass.inl"
 
 #endif // !VG_PASS_H

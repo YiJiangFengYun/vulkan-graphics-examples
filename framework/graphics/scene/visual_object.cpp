@@ -2,26 +2,23 @@
 
 namespace vg
 {
-	BaseVisualObject::BindInfo::BindInfo(const Matrix4x4 *pProjMatrix
+	BaseVisualObject::BindInfo::BindInfo(vk::RenderPass *pTrunkRenderPass
+		, uint32_t trunkFramebufferWidth
+		, uint32_t trunkFramebufferHeight
+		, const Matrix4x4 *pProjMatrix
         , const Matrix4x4 *pViewMatrix
-        , PipelineCache *pPipelineCache
-		, vk::RenderPass *pRenderPass
-		, vk::CommandBuffer *pCommandBuffer
-		, uint32_t framebufferWidth
-		, uint32_t framebufferHeight
 #if defined(DEBUG) && defined(VG_ENABLE_COST_TIMER)
         , fd::CostTimer *pPreparingBuildInDataCostTimer
         , fd::CostTimer *pPreparingPipelineCostTimer
         , fd::CostTimer *pPreparingCommandBufferCostTimer
 #endif //DEBUG and VG_ENABLE_COST_TIMER
         )
-        : pProjMatrix(pProjMatrix)
+        : pTrunkRenderPass(pTrunkRenderPass)
+		, trunkFramebufferWidth(trunkFramebufferWidth)
+		, trunkFramebufferHeight(trunkFramebufferHeight)
+		, pProjMatrix(pProjMatrix)
         , pViewMatrix(pViewMatrix)
-        , pPipelineCache(pPipelineCache)
-		, pRenderPass(pRenderPass)
-		, pCommandBuffer(pCommandBuffer)
-		, framebufferWidth(framebufferWidth)
-		, framebufferHeight(framebufferHeight)
+		
 #if defined(DEBUG) && defined(VG_ENABLE_COST_TIMER)
         , pPreparingBuildInDataCostTimer(pPreparingBuildInDataCostTimer)
         , pPreparingPipelineCostTimer(pPreparingPipelineCostTimer)
@@ -30,8 +27,15 @@ namespace vg
     {
     }
 
-    BaseVisualObject::BindResult::BindResult(uint32_t drawCount)
-	    : drawCount(drawCount)
+    BaseVisualObject::BindResult::BindResult(uint32_t branchRenderPassCount
+        , RenderPassInfo *pBranchRenderPasses
+        , uint32_t trunkRenderPassCount
+        , RenderPassInfo *pTrunkRenderPasses
+        )
+	    : branchRenderPassCount(branchRenderPassCount)
+        , pBranchRenderPasses(pBranchRenderPasses)
+        , trunkRenderPassCount(trunkRenderPassCount)
+        , pTrunkRenderPasses(pTrunkRenderPasses)
     {
 
     }
@@ -147,35 +151,52 @@ namespace vg
 
 	void BaseVisualObject::bindToRender(const BindInfo info, BindResult *pResult)
 	{
+		auto &result = *pResult;
+		uint32_t branchRenderPassCount = 0u;
+		uint32_t trunkRenderPassCount = 0u;
 		if (m_pVisualizer != nullptr)
 		{
 			auto modelMatrix = _getModelMatrix();
-			Visualizer::BindInfo infoForVisualizer = {
-			    info.pProjMatrix,
-			    info.pViewMatrix,
-			    info.pPipelineCache,
-				info.pRenderPass,
-				info.pCommandBuffer,
-				info.framebufferWidth,
-				info.framebufferHeight,
-#if defined(DEBUG) && defined(VG_ENABLE_COST_TIMER)
-                info.pPreparingBuildInDataCostTimer,
-                info.pPreparingPipelineCostTimer,
-                info.pPreparingCommandBufferCostTimer,
-#endif //DEBUG and VG_ENABLE_COST_TIMER
-                &modelMatrix,
-			    m_pMesh,
-			    getSubMeshOffset(),
-			    getSubMeshCount(),
-			    m_hasClipRect,
-			    m_clipRects.data(),
-		        };
-    
-		    Visualizer::BindResult resultForVisualizer;
-		    m_pVisualizer->bindToRender(infoForVisualizer, &resultForVisualizer);
 
-			(*pResult).drawCount = resultForVisualizer.drawCount;
+			uint32_t subMeshCount = getSubMeshCount();
+			uint32_t subMeshOffset = getSubMeshOffset();
+			
+			for (uint32_t i = 0; i < subMeshCount; ++i)
+			{
+				uint32_t subMeshIndex = subMeshOffset + i;
+				Visualizer::BindInfo infoForVisualizer = {
+			        info.pProjMatrix,
+			        info.pViewMatrix,
+				    info.pTrunkRenderPass,
+				    info.trunkFramebufferWidth,
+				    info.trunkFramebufferHeight,
+                    &modelMatrix,
+			        m_pMesh,
+			        subMeshIndex,
+			        m_hasClipRect,
+			        m_clipRects.data() + i,
+#if defined(DEBUG) && defined(VG_ENABLE_COST_TIMER)
+                    info.pPreparingBuildInDataCostTimer,
+                    info.pPreparingPipelineCostTimer,
+                    info.pPreparingCommandBufferCostTimer,
+#endif //DEBUG and VG_ENABLE_COST_TIMER
+		            };
+    
+		        Visualizer::BindResult resultForVisualizer;
+				
+				if (result.pBranchRenderPasses != nullptr)
+					resultForVisualizer.pBranchRenderPasses = result.pBranchRenderPasses + branchRenderPassCount;
+				if (result.pTrunkRenderPasses != nullptr)
+					resultForVisualizer.pTrunkRenderPasses = result.pTrunkRenderPasses + trunkRenderPassCount;
+
+		        m_pVisualizer->bindToRender(infoForVisualizer, &resultForVisualizer);
+
+				branchRenderPassCount += resultForVisualizer.branchRenderPassCount;
+				trunkRenderPassCount += resultForVisualizer.trunkRenderPassCount;
+			}
 		}
+		result.branchRenderPassCount = branchRenderPassCount;
+		result.trunkRenderPassCount = trunkRenderPassCount;
 		
 	}
 

@@ -1,4 +1,4 @@
-#include "graphics/pipeline/pipeline_cache.hpp"
+#include "graphics/renderer/pipeline_cache.hpp"
 
 namespace vg
 {

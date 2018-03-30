@@ -1,4 +1,4 @@
-#include "graphics/material/shader.hpp"
+#include "graphics/pass/shader.hpp"
 
 namespace vg
 {

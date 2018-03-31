@@ -8,8 +8,8 @@
 
 
 /**
- * This sample explain we can use a few of materials, passes, descriptorsets and uniform buffers 
- * to render plenty of objects via dynamic unform buffer. Complexity is constant.
+ * This sample explain we can use a uniform buffer
+ * to render plenty of objects via external unform buffer of pass.
  **/
 class Window : public sampleslib::Window<vg::SpaceType::SPACE_3>
 {
@@ -33,14 +33,16 @@ private:
 	std::vector<vg::Color> m_tempColors;
 	std::vector<uint32_t> m_tempIndices;
 	std::shared_ptr<vg::DimSepMesh3> m_pMesh;
-	std::shared_ptr<vg::UniformBufferData> m_pDynamicUniformData;
+	std::shared_ptr<vg::UniformBufferData> m_pExtUniformData;
 	uint32_t m_sizeOneObject;
 	uint32_t m_bufferSizeOneObject;
 	uint32_t m_uniformMemorySize;
 	void *m_pUniformMemory;
 	std::shared_ptr<vg::Shader> m_pShader;
-	std::shared_ptr<vg::Pass> m_pPass;
-	std::shared_ptr<vg::Material> m_pMaterial;
+
+
+	std::shared_ptr<vg::Pass> m_pPasses[OBJECT_INSTANCE_COUNT];
+	std::shared_ptr<vg::Material> m_pMaterials[OBJECT_INSTANCE_COUNT];
 
 	std::shared_ptr<vg::VisualObject3> m_pModels[OBJECT_INSTANCE_COUNT];	
 	
@@ -54,8 +56,7 @@ private:
 	void _createModel();
 
 	void _updateModelState();
-
-	void _updateDynamicUniformBuffer();
+	void _updateExtUniformBuffer();
 	void _updateObjectDynamicOffset(vg::BaseVisualObject * pVisualObject);
 
 	virtual void _onUpdate() override;

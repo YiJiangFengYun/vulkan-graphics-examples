@@ -1,4 +1,4 @@
-#include "dynamic_uniform_buffer/window.hpp"
+#include "external_uniform_buffer/window.hpp"
 
 #include <iostream>
 #include <gli/gli.hpp>
@@ -19,8 +19,9 @@ Window::Window(uint32_t width
 	, m_tempIndices()
 	, m_pMesh()
 	, m_pShader()
-	, m_pPass()
-	, m_pMaterial()
+	, m_pPasses()
+	, m_pMaterials()
+	, m_pExtUniformData()
 {
 	_init();
 	
@@ -36,8 +37,9 @@ Window::Window(std::shared_ptr<GLFWwindow> pWindow
 	, m_tempIndices()
 	, m_pMesh()
 	, m_pShader()
-	, m_pPass()
-	, m_pMaterial()
+	, m_pPasses()
+	, m_pMaterials()
+	, m_pExtUniformData()
 {
 	_init();
 	
@@ -136,73 +138,93 @@ void Window::_initObjectsStateData()
 
 }
 
-
-
 void Window::_createDynamicUniformData()
 {
-	m_pDynamicUniformData = std::shared_ptr<vg::UniformBufferData>{ new vg::UniformBufferData() };
-	vg::UniformBufferData::SubDataInfo subDataInfo;
+	m_pExtUniformData = std::shared_ptr<vg::UniformBufferData>{ new vg::UniformBufferData() };
+	std::array<vg::UniformBufferData::SubDataInfo, OBJECT_INSTANCE_COUNT> subDataInfos;
+	std::array<vk::DescriptorSetLayoutBinding, OBJECT_INSTANCE_COUNT> bindingInfos;
+	std::array<vg::UniformBufferData::DescriptorBufferInfo, OBJECT_INSTANCE_COUNT> bufferInfos;
 
-	vk::DescriptorSetLayoutBinding bindingInfo;
-	bindingInfo.binding = 2u;
-	bindingInfo.descriptorType = vk::DescriptorType::eUniformBufferDynamic;
-	bindingInfo.descriptorCount = 1u;
-	bindingInfo.stageFlags = vk::ShaderStageFlagBits::eVertex;
+	uint32_t bufferOffset = 0u;
+	uint32_t bufferSizeOneObject = m_bufferSizeOneObject;
+	for (uint32_t i = 0; i < OBJECT_INSTANCE_COUNT; ++i)
+	{
+		auto &subDataInfo = subDataInfos[i];
+		auto &bindingInfo = bindingInfos[i];
 
-	subDataInfo.layoutBindingCount = 1u;
-	subDataInfo.pLayoutBindings = &bindingInfo;
-	subDataInfo.bufferOffset = 0u;
+		bindingInfo.binding = 2u;
+	    bindingInfo.descriptorType = vk::DescriptorType::eUniformBufferDynamic;
+	    bindingInfo.descriptorCount = 1u;
+	    bindingInfo.stageFlags = vk::ShaderStageFlagBits::eVertex;
 
-	vg::UniformBufferData::DescriptorBufferInfo bufferInfo;
-	bufferInfo.range = m_sizeOneObject;
-	bufferInfo.bufferRange = m_bufferSizeOneObject;
+		subDataInfo.layoutBindingCount = 1u;
+	    subDataInfo.pLayoutBindings = &bindingInfo;
+	    subDataInfo.bufferOffset = bufferOffset;
 
-	subDataInfo.pDescriptorInfos = &bufferInfo;
+		bufferOffset += bufferSizeOneObject;
 
-	m_pDynamicUniformData->init(1u, &subDataInfo, m_pUniformMemory, m_uniformMemorySize);
+		auto &bufferInfo = bufferInfos[i];
+		
+	    bufferInfo.range = m_sizeOneObject;
+	    bufferInfo.bufferRange = m_bufferSizeOneObject;
+
+		subDataInfo.pDescriptorInfos = &bufferInfo;
+    
+	}
+
+	m_pExtUniformData->init(static_cast<uint32_t>(subDataInfos.size()), 
+	    subDataInfos.data(), m_pUniformMemory, m_uniformMemorySize);
 }
 
 void Window::_createMaterial()
 {
-
+	
 	auto & pShader = m_pShader;
-	auto & pPass = m_pPass;
-	auto & pMaterial = m_pMaterial;
-	auto & pApp = vg::pApp;
+
 	//shader
 	pShader = std::shared_ptr<vg::Shader>(
 		new vg::Shader("shaders/dynamic_uniform_buffer/base.vert.spv", "shaders/dynamic_uniform_buffer/base.frag.spv")
 		 //new vg::Shader("shaders/test.vert.spv", "shaders/test.frag.spv")
 		);
-	//pass
-	pPass = std::shared_ptr<vg::Pass>(new vg::Pass(pShader.get()));
-	vg::Pass::BuildInDataInfo::Component buildInDataCmps[2] = {
-			{vg::Pass::BuildInDataType::MATRIX_PROJECTION},
-			{vg::Pass::BuildInDataType::MATRIX_VIEW}
-		};
-		vg::Pass::BuildInDataInfo buildInDataInfo;
-		buildInDataInfo.componentCount = 2u;
-		buildInDataInfo.pComponent = buildInDataCmps;
-	pPass->setBuildInDataInfo(buildInDataInfo);
-	pPass->setCullMode(vg::CullModeFlagBits::BACK);
-	pPass->setFrontFace(vg::FrontFaceType::CLOCKWISE);
-	vk::PipelineDepthStencilStateCreateInfo depthStencilState = {};
-	depthStencilState.depthTestEnable = VG_TRUE;
-	depthStencilState.depthWriteEnable = VG_TRUE;
-	depthStencilState.depthCompareOp = vk::CompareOp::eLessOrEqual;
-	pPass->setDepthStencilInfo(depthStencilState);
-	vg::Pass::ExternalUniformBufferInfo externalUniformBufferInfo;
-	externalUniformBufferInfo.pData = m_pDynamicUniformData.get();
-	externalUniformBufferInfo.subDataOffset = 0u;
-	externalUniformBufferInfo.subDataCount = 1u;
-	pPass->setExternalUniformBufferData(externalUniformBufferInfo);
-	pPass->apply();
-	//material
-	pMaterial = std::shared_ptr<vg::Material>(new vg::Material());
-	pMaterial->addPass(pPass.get());
-	pMaterial->setRenderPriority(0u);
-	pMaterial->setRenderQueueType(vg::MaterialShowType::OPAQUE);
-	pMaterial->apply();
+
+	for (uint32_t i = 0; i < OBJECT_INSTANCE_COUNT; ++i)
+	{
+		auto & pPass = m_pPasses[i];
+	    auto & pMaterial = m_pMaterials[i];
+	    auto & pApp = vg::pApp;
+	    
+	    //pass
+	    pPass = std::shared_ptr<vg::Pass>(new vg::Pass(pShader.get()));
+	    vg::Pass::BuildInDataInfo::Component buildInDataCmps[2] = {
+	    		{vg::Pass::BuildInDataType::MATRIX_PROJECTION},
+	    		{vg::Pass::BuildInDataType::MATRIX_VIEW}
+	    	};
+	    	vg::Pass::BuildInDataInfo buildInDataInfo;
+	    	buildInDataInfo.componentCount = 2u;
+	    	buildInDataInfo.pComponent = buildInDataCmps;
+	    pPass->setBuildInDataInfo(buildInDataInfo);
+	    pPass->setCullMode(vg::CullModeFlagBits::BACK);
+	    pPass->setFrontFace(vg::FrontFaceType::CLOCKWISE);
+	    vk::PipelineDepthStencilStateCreateInfo depthStencilState = {};
+	    depthStencilState.depthTestEnable = VG_TRUE;
+	    depthStencilState.depthWriteEnable = VG_TRUE;
+	    depthStencilState.depthCompareOp = vk::CompareOp::eLessOrEqual;
+	    pPass->setDepthStencilInfo(depthStencilState);
+	    vg::Pass::ExternalUniformBufferInfo externalUniformBufferInfo;
+	    externalUniformBufferInfo.pData = m_pExtUniformData.get();
+	    externalUniformBufferInfo.subDataOffset = i;
+	    externalUniformBufferInfo.subDataCount = 1u;
+	    pPass->setExternalUniformBufferData(externalUniformBufferInfo);
+	    pPass->apply();
+	    //material
+	    pMaterial = std::shared_ptr<vg::Material>(new vg::Material());
+	    pMaterial->addPass(pPass.get());
+	    pMaterial->setRenderPriority(0u);
+	    pMaterial->setRenderQueueType(vg::MaterialShowType::OPAQUE);
+	    pMaterial->apply();
+	}
+
+	
 
 }
 
@@ -212,7 +234,7 @@ void Window::_createModel()
 	{
 		m_pModels[i] = std::shared_ptr<vg::VisualObject3>(new vg::VisualObject3());
 		m_pModels[i]->setMesh(m_pMesh.get());
-		m_pModels[i]->setMaterial(m_pMaterial.get());
+		m_pModels[i]->setMaterial(m_pMaterials[i].get());
 		//m_pModels[i]->setIsVisibilityCheck(VG_FALSE);
 		m_pScene->addVisualObject(m_pModels[i].get());
 	}
@@ -253,32 +275,9 @@ void Window::_updateModelState()
 
 }
 
-void Window::_updateDynamicUniformBuffer()
+void Window::_updateExtUniformBuffer()
 {
-	m_pDynamicUniformData->updateBuffer(m_pUniformMemory, m_uniformMemorySize);
-}
-
-void Window::_updateObjectDynamicOffset(vg::BaseVisualObject * pVisualObject)
-{
-	for (uint32_t i = 0; i < OBJECT_INSTANCE_COUNT; ++i)
-	{
-		if (m_pModels[i]->getID() == dynamic_cast<vg::BaseObject *>(pVisualObject)->getID())
-		{
-			auto &subData = *m_pDynamicUniformData->getSubDatas();
-			vg::UniformBufferData::SubDataInfo subDataInfo;
-			subDataInfo.bufferOffset = subData.getBufferOffset();
-			subDataInfo.layoutBindingCount = subData.getLayoutBindingCount();
-
-			auto binding = *subData.getLayoutBindings();
-			subDataInfo.pLayoutBindings = &binding;
-			auto bufferInfo = *subData.getDescriptorInfos();
-			subDataInfo.pDescriptorInfos = &bufferInfo;
-			bufferInfo.dynamicOffset = i * m_bufferSizeOneObject;
-			m_pDynamicUniformData->updateDesData(1u, &subDataInfo);
-			m_pPass->applyUniformBufferDynamicOffsets();
-			break;
-		}
-	}
+	m_pExtUniformData->updateBuffer(m_pUniformMemory, m_uniformMemorySize);
 }
 
 void Window::_onUpdate()
@@ -286,7 +285,7 @@ void Window::_onUpdate()
 	ParentWindowType::_onUpdate();
 
 	_updateModelState();
-	_updateDynamicUniformBuffer();
+	_updateExtUniformBuffer();
 	// auto pos = m_lastWinPos;
 	// auto size = m_lastWinSize;
 	// ImGui::SetNextWindowPos(ImVec2(pos.x, pos.y + size.y + 10));
@@ -301,6 +300,5 @@ void Window::_renderWithRenderer(vg::Renderer *pRenderer
 		    , const vg::Renderer::RenderInfo &info
 			, vg::Renderer::RenderResultInfo &resultInfo)
 {
-	pRenderer->setPreObjectRecordingCallBack(std::bind(&Window::_updateObjectDynamicOffset, this, std::placeholders::_1));
 	ParentWindowType::_renderWithRenderer(pRenderer, info, resultInfo);	
 }

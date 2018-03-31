@@ -14,7 +14,8 @@ namespace sampleslib
                 , vg::Vector3 scale
                 , vg::Vector2 uvScale
                 , vg::Bool32 isCreateObject
-                , vgf::Bool32 isRightHand
+                , vg::Bool32 isRightHand
+                , vg::Bool32 separateMesh
                 )
                 : fileName(fileName)
                 , layoutComponentCount(layoutComponentCount)
@@ -24,6 +25,7 @@ namespace sampleslib
                 , uvScale(uvScale)
                 , isCreateObject(isCreateObject)
                 , isRightHand(isRightHand)
+                , separateMesh(separateMesh)
     {
     }
 
@@ -352,17 +354,54 @@ namespace sampleslib
 
             {
                 //Filling the meshes vertex buffer data.
-                auto &pMeshes = m_pMeshes;
-                pMeshes.resize(meshCount);
-    
-                for (uint32_t i = 0; i < meshCount; ++i)
+                if (createInfo.separateMesh)
                 {
-                    auto &pMesh = pMeshes[i];
-					pMesh = std::shared_ptr<vg::DimSharedContentMesh3>(new vg::DimSharedContentMesh3());
-                    pMesh->init(pSharedVertexData, pSharedIndexData, i, 1u);
-                    pMesh->setIsHasBounds(VG_TRUE);
-                    pMesh->setBounds(boundses[i]);
+                    auto &pMeshes = m_pMeshes;
+                    pMeshes.resize(meshCount);
+        
+                    for (uint32_t i = 0; i < meshCount; ++i)
+                    {
+                        auto &pMesh = pMeshes[i];
+				    	pMesh = std::shared_ptr<vg::DimSharedContentMesh3>(new vg::DimSharedContentMesh3());
+                        pMesh->init(pSharedVertexData, pSharedIndexData, i, 1u);
+                        pMesh->setIsHasBounds(VG_TRUE);
+                        pMesh->setBounds(boundses[i]);
+                    }
                 }
+                else
+                {
+                    auto &pMeshes = m_pMeshes;
+                    pMeshes.resize(1u);
+
+                    vg::Vector3 minOfBounds(std::numeric_limits<typename vg::Vector3::value_type>::max());
+                    vg::Vector3 maxOfBounds(std::numeric_limits<typename vg::Vector3::value_type>::lowest());
+                    for (uint32_t i = 0; i < meshCount; ++i)
+                    {
+                        //bounds...
+                        float x = boundses[i].getMin().x;
+                        float y = boundses[i].getMin().y;
+                        float z = boundses[i].getMin().z;
+						if (minOfBounds.x > x)minOfBounds.x = x;
+						if (minOfBounds.y > y)minOfBounds.y = y;
+						if (minOfBounds.z > z)minOfBounds.z = z;
+
+                        x = boundses[i].getMax().x;
+                        y = boundses[i].getMax().y;
+                        z = boundses[i].getMax().z;
+						if (maxOfBounds.x < x)maxOfBounds.x = x;
+						if (maxOfBounds.y < y)maxOfBounds.y = y;
+						if (maxOfBounds.z < z)maxOfBounds.z = z;
+                    }
+
+                    fd::Bounds<vg::Vector3> bounds(minOfBounds, maxOfBounds);
+
+                    auto &pMesh = pMeshes[0];
+                    pMesh = std::shared_ptr<vg::DimSharedContentMesh3>(new vg::DimSharedContentMesh3());
+                    pMesh->init(pSharedVertexData, pSharedIndexData, 0, meshCount);
+                    pMesh->setIsHasBounds(VG_TRUE);
+                    pMesh->setBounds(bounds);
+                }
+                
             }
 
             {

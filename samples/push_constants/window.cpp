@@ -16,9 +16,6 @@ Window::Window(uint32_t width
 	, m_pMaterial()
 {
 	_init();
-	_loadAssimpScene();
-	_createMaterial();
-	_fillScene();
 }
 
 Window::Window(std::shared_ptr<GLFWwindow> pWindow
@@ -32,13 +29,20 @@ Window::Window(std::shared_ptr<GLFWwindow> pWindow
 	, m_pMaterial()
 {
 	_init();
+	
+}
+
+void Window::_init()
+{
+	ParentWindowType::_init();
 	_loadAssimpScene();
 	_createMaterial();
 	_fillScene();
 }
 
-void Window::_init()
+void Window::_initState()
 {
+	ParentWindowType::_initState();
 	m_zoom = -20.0f;
 	/// Build a quaternion from euler angles (pitch, yaw, roll), in radians.
 	m_rotation = vg::Vector3(glm::radians(32.0f), glm::radians(45.0f), glm::radians(0.0f));

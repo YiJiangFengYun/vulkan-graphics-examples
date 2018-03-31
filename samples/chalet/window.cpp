@@ -18,14 +18,7 @@ namespace chalet
 			, title
 		)
 	{
-		_loadModel();
-		_createMesh();
-		_createTexture();
-		_createMaterial();
-		_createModel();
-		_createMeshOfBounds();
-		_createMaterialOfBounds();
-		_createModelOfBounds();
+		_init();
 	}
 
 	Window::Window(std::shared_ptr<GLFWwindow> pWindow
@@ -35,6 +28,12 @@ namespace chalet
 			, pSurface
 		)
 	{
+		_init();
+	}
+
+	void Window::_init()
+    {
+    	ParentWindowType::_init();
 		_loadModel();
 		_createMesh();
 		_createTexture();
@@ -43,7 +42,7 @@ namespace chalet
 		_createMeshOfBounds();
 		_createMaterialOfBounds();
 		_createModelOfBounds();
-	}
+    }
 
 	void Window::_loadModel()
 	{

@@ -49,7 +49,8 @@ namespace chalet
 		std::shared_ptr<vg::Pass> m_pPassOfBounds;
 		std::shared_ptr<vg::Shader> m_pShaderOfBounds;
 
-
+        virtual void _init() override;
+		
 		void _loadModel();
 		void _createMesh();
 		void _createTexture();

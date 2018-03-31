@@ -44,7 +44,8 @@ private:
 
 	std::shared_ptr<vg::VisualObject3> m_pModels[OBJECT_INSTANCE_COUNT];	
 	
-	void _init();
+	virtual void _init() override;
+	virtual void _initState() override;
 	void _loadModel();
 	void _createMesh();
 	void _initObjectsStateData();

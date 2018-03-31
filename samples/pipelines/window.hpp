@@ -22,16 +22,19 @@ private:
 	std::array<std::shared_ptr<vg::Shader>, SCENE_COUNT> m_pShaders;
 	std::array<std::shared_ptr<vg::Pass>, SCENE_COUNT> m_pPasses;
 	std::array<std::shared_ptr<vg::Material>, SCENE_COUNT> m_pMaterials;
+	std::array<std::shared_ptr<vg::VisualObject3>, SCENE_COUNT> m_pVisualObjects;
+
 	struct LightInfo 
 	{
 		vg::Vector4 lightPos;
 	} m_lightInfo;
-	void _init();
+
+	virtual void _init() override;
+	virtual void _initState() override;
 	void _loadAssimpScene();
 	void _createMaterial();
+	void _createVisualObjects();
 	void _fillScene();
-
-    void _setMaterialToObjects(std::shared_ptr<vg::Material> pMaterial);
 
 	virtual void _onUpdate() override;
 	virtual void _renderWithRenderer(vg::Renderer *pRenderer

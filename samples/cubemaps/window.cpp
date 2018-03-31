@@ -38,10 +38,7 @@ Window::Window(uint32_t width
 	, m_pMaterialReflect()
 {
 	_init();
-	_createTexture();
-	_createMaterial();
-	_createModel();
-	_initScene();
+	
 }
 
 Window::Window(std::shared_ptr<GLFWwindow> pWindow
@@ -65,14 +62,21 @@ Window::Window(std::shared_ptr<GLFWwindow> pWindow
 	, m_pMaterialReflect()
 {
 	_init();
+	
+}
+
+void Window::_init()
+{
+	ParentWindowType::_init();
 	_createTexture();
 	_createMaterial();
 	_createModel();
 	_initScene();
 }
 
-void Window::_init()
+void Window::_initState()
 {
+	ParentWindowType::_initState();
 	m_zoom = -4.0f;
 	m_rotationSpeed = 0.05f;
 	/// Build a quaternion from euler angles (pitch, yaw, roll), in radians.

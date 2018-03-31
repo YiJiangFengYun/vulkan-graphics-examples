@@ -17,10 +17,8 @@ Window::Window(uint32_t width
 	, m_pMaterials()
 {
 	_init();
-	_loadAssimpScene();
-	_createMaterial();
-	_fillScene();
 }
+
 Window::Window(std::shared_ptr<GLFWwindow> pWindow
 	, std::shared_ptr<vk::SurfaceKHR> pSurface
 )
@@ -33,13 +31,22 @@ Window::Window(std::shared_ptr<GLFWwindow> pWindow
 	, m_pMaterials()
 {
 	_init();
-	_loadAssimpScene();	
-	_createMaterial();
-	_fillScene();
 }
 
 void Window::_init()
 {
+	ParentWindowType::_init();
+	_loadAssimpScene();	
+	_createMaterial();
+	_createVisualObjects();
+	_fillScene();
+}
+
+void Window::_initState()
+{
+	ParentWindowType::_initState();
+	m_sceneCount = SCENE_COUNT;
+
 	m_cameraAspect = (float)m_width / 3.0f / (float)m_height;
 	m_zoom = -10.5f;
 	/// Build a quaternion from euler angles (pitch, yaw, roll), in radians.
@@ -63,6 +70,7 @@ void Window::_loadAssimpScene()
 	createInfo.layoutComponentCount = layoutCount;
 	createInfo.pLayoutComponent = layouts;
 	createInfo.offset = vg::Vector3(3.0f, -6.0f, -1.0f);
+	createInfo.isCreateObject = VG_FALSE;
 	m_assimpScene.init(createInfo);
 }
 
@@ -125,21 +133,24 @@ void Window::_createMaterial()
 	}
 
 }
-void Window::_fillScene()
+
+void Window::_createVisualObjects()
 {
-	const auto &objects = m_assimpScene.getObjects();
-	for (const auto &object : objects)
+	const auto &meshes = m_assimpScene.getMeshes();
+	if (meshes.size() > 1) throw std::runtime_error("Mesh count more than 1 in assimp scene.");
+	for (uint32_t i = 0; i < SCENE_COUNT; ++i)
 	{
-	    m_pScene->addVisualObject(object.get());		
+		m_pVisualObjects[i] = std::shared_ptr<vg::VisualObject3>{new vg::VisualObject3()};
+		m_pVisualObjects[i]->setMesh(meshes[0].get());
+		m_pVisualObjects[i]->setMaterial(m_pMaterials[i].get());
 	}
 }
 
-void Window::_setMaterialToObjects(std::shared_ptr<vg::Material> pMaterial)
+void Window::_fillScene()
 {
-	const auto &objects = m_assimpScene.getObjects();
-	for (const auto &object : objects)
+	for (uint32_t i = 0; i < SCENE_COUNT; ++i)
 	{
-	    object->setMaterial(pMaterial.get());
+		m_pScenes[i]->addVisualObject(m_pVisualObjects[i].get());
 	}
 }
 
@@ -164,36 +175,5 @@ void Window::_renderWithRenderer(vg::Renderer *pRenderer
 			, vg::Renderer::RenderResultInfo &resultInfo)
 {
 
-    // _setMaterialToObjects(m_pMaterials[0]);
-	// ParentWindowType::_renderWithRenderer(pRenderer, info, resultInfo);
-	const auto &pApp = vg::pApp;
-	for (uint32_t i = 0u; i < SCENE_COUNT; ++i)
-	{
-		_setMaterialToObjects(m_pMaterials[i]);
-		if (i != 2u || pApp->getPhysicalDeviceFeatures().fillModeNonSolid)
-		{
-			if (i != 2u)
-			{
-			    vg::Renderer::SceneAndCamera sceneAndCamera;
-			    sceneAndCamera.pScene = m_pScene.get();
-			    sceneAndCamera.pCamera = m_pCamera.get();
-			    auto addedInfo = info;
-			    addedInfo.sceneAndCameraCount = 1u;
-			    addedInfo.pSceneAndCamera = &sceneAndCamera;
-                pRenderer->render(addedInfo, resultInfo);
-			}
-			else
-			{
-				ParentWindowType::_renderWithRenderer(pRenderer, info, resultInfo);
-			}
-		}
-		else if (i == 2u)
-		{
-			ParentWindowType::_renderWithRenderer(pRenderer, info, resultInfo);
-		}
-	}
-	
-	
-	m_lastDrawCount += resultInfo.drawCount;	
-	
+	ParentWindowType::_renderWithRenderer(pRenderer, info, resultInfo);	
 }

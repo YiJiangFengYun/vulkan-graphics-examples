@@ -38,7 +38,8 @@ private:
 		OtherInfo(float lodBias);
 	} m_otherInfo;
 	
-	void _init();
+	virtual void _init() override;
+	virtual void _initState() override;
 	void _createTexture();
 	void _createMaterial();
 	void _createModel();

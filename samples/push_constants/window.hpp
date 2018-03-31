@@ -26,7 +26,8 @@ private:
 
 	std::array<vg::Vector4, LIGHT_COUNT> m_pushConstants;
 
-	void _init();
+	virtual void _init() override;
+	virtual void _initState() override;
 	void _loadAssimpScene();
 	void _createMaterial();
 	void _fillScene();

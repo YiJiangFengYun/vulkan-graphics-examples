@@ -12,10 +12,7 @@ Window::Window(uint32_t width
 		, title
 	    )
 {
-	_loadModel();
-	_createMesh();
-	_createMaterial();
-	_createModel();
+	_init();
 }
 Window::Window(std::shared_ptr<GLFWwindow> pWindow
 	, std::shared_ptr<vk::SurfaceKHR> pSurface
@@ -24,11 +21,18 @@ Window::Window(std::shared_ptr<GLFWwindow> pWindow
 		, pSurface
 	    )
 {
+	_init();
+}
+
+void Window::_init()
+{
+	ParentWindowType::_init();
 	_loadModel();
 	_createMesh();
 	_createMaterial();
 	_createModel();
 }
+
 void Window::_loadModel()
 {
 	m_tempPositions = { vg::Vector3(1.0f, 1.0f, 0.0f)

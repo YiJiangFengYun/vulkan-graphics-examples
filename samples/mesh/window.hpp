@@ -34,7 +34,8 @@ private:
 		vg::Vector4 lightPos;
 	} m_otherInfo;
 
-	void _init();
+	virtual void _init() override;
+	virtual void _initState() override;
 	void _createModel();
 	void _createTexture();
 	void _createMaterial();

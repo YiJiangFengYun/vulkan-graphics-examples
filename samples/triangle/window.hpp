@@ -25,6 +25,9 @@ private:
 	std::shared_ptr<vg::Material> m_pMaterial;
 	std::shared_ptr<vg::Pass> m_pPass;
 	std::shared_ptr<vg::Shader> m_pShader;
+
+	virtual void _init() override;
+	
 	void _loadModel();
 	void _createMesh();
 	void _createMaterial();

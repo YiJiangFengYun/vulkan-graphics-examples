@@ -34,7 +34,8 @@ private:
 		OtherInfo();
 		OtherInfo(vg::Vector4 viewPos, float lodBias);
 	} m_otherInfo;
-	void _init();
+	virtual void _init() override;
+	virtual void _initState() override;
 	void _loadModel();
 	void _createMesh();
 	void _createTexture();

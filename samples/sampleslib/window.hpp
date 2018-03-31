@@ -83,6 +83,8 @@ namespace sampleslib
 	    } m_mouseButtons;
 		double m_mousePos[2];
 
+        uint32_t m_sceneCount;
+		std::vector<std::shared_ptr<SceneType>> m_pScenes;
 		std::shared_ptr<SceneType> m_pScene;
 		std::shared_ptr<CameraType> m_pCamera;
 
@@ -101,9 +103,12 @@ namespace sampleslib
 		virtual void _renderWithRenderer(vg::Renderer *pRenderer
 			, const vg::Renderer::RenderInfo &info
 			, vg::Renderer::RenderResultInfo &resultInfo) override;
+
+		virtual void _init();
+		virtual void _initState();
+		
 	private:
-		void _initState();
-		void _createCamera();
+	    void _createCamera();
 		void _createScene();
 		void _initUI();
 		void _initInputHanders();

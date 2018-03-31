@@ -39,7 +39,8 @@ private:
 
 	static const uint32_t MAX_INSTANCE_COUNT = 8u;
 
-	void _init();
+	virtual void _init() override;
+	virtual void _initState() override;
 	void _loadModel();
 	void _createMesh();
 	void _createTexture();

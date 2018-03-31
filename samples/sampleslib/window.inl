@@ -28,12 +28,9 @@ namespace sampleslib
 		, m_frameCounter(0u)
 		, m_lastFPS(0u)
 		, m_lastDrawCount(0u)
+		, m_sceneCount(1u)
 	{
-		_initState();
-		_createCamera();
-		_createScene();
-		_initUI();
-		_initInputHanders();
+		
 	}
 
 	template <vg::SpaceType SPACE_TYPE>
@@ -58,7 +55,14 @@ namespace sampleslib
 		, m_fpsTimer(0u)
 		, m_frameCounter(0u)
 		, m_lastFPS(0u)
-		, m_lastDrawCount(0u)		
+		, m_lastDrawCount(0u)
+		, m_sceneCount(1u)	
+	{
+		
+	}
+
+    template <vg::SpaceType SPACE_TYPE>
+	void Window<SPACE_TYPE>::_init()
 	{
 		_initState();
 		_createCamera();
@@ -74,6 +78,7 @@ namespace sampleslib
 		m_zoomSpeed = 0.1f;
 		m_rotationSpeed = 0.05f;
 		m_cameraAspect = (float)m_width / (float)m_height;
+		m_sceneCount = 1u;
 	}
 
 	template <vg::SpaceType SPACE_TYPE>
@@ -86,8 +91,14 @@ namespace sampleslib
 	template <vg::SpaceType SPACE_TYPE>
 	void Window<SPACE_TYPE>::_createScene()
 	{
-		m_pScene = std::shared_ptr<SceneType>(new SceneType());
-		m_pScene->addCamera(m_pCamera.get());
+		uint32_t sceneCount = m_sceneCount > 1u ? m_sceneCount : 1u;
+		m_pScenes.resize(sceneCount);
+		for (uint32_t i = 0; i < sceneCount; ++i)
+		{
+			m_pScenes[i] = std::shared_ptr<SceneType>(new SceneType());
+			m_pScenes[i]->addCamera(m_pCamera.get());
+		}
+		m_pScene = m_pScenes[0];
 	}
 
 	template <vg::SpaceType SPACE_TYPE>
@@ -95,65 +106,6 @@ namespace sampleslib
 	{
 		vgim::setShaderPath("shaders/ui.vert.spv", "shaders/ui.frag.spv");
 	}
-
-	template <vg::SpaceType SPACE_TYPE>
-	void Window<SPACE_TYPE>::_initInputHanders()
-	{
-		glfwSetScrollCallback(m_pWindow.get(), [](GLFWwindow *window, double xOffset, double yOffset)
-		{
-			Window* const instance = (Window*)glfwGetWindowUserPointer(window);
-			instance->m_zoom += static_cast<float>(yOffset) * instance->m_zoomSpeed;
-			instance->m_zoom = std::min(-0.15f, std::max(-25.0f, instance->m_zoom));
-			std::cout << "Current zoom: " << instance->m_zoom << std::endl;
-		});
-
-		glfwSetMouseButtonCallback(m_pWindow.get(), [](GLFWwindow* glfwWindow, int button, int action, int /*mods*/) 
-		{
-			Window* const instance = (Window*)glfwGetWindowUserPointer(glfwWindow);
-			if (action == GLFW_PRESS && button >= 0 && button < 3)
-			{
-				const vgf::Bool32 VALUE = VGF_TRUE;
-				memcpy(reinterpret_cast<vgf::Bool32 *>(&(instance->m_mouseButtons)) + button,
-					&VALUE, sizeof(vgf::Bool32));
-			}
-			if (instance->m_mouseButtons.left) 
-			{
-				glfwGetCursorPos(glfwWindow, instance->m_mousePos, instance->m_mousePos + 1);
-			}
-		});
-
-		glfwSetCursorPosCallback(m_pWindow.get(), [](GLFWwindow *glfwWindow, double xPos, double yPos)
-		{
-			bool handledByIM = false;
-			ImGuiIO& io = ImGui::GetIO();
-		    handledByIM = io.WantCaptureMouse;
-			Window* const instance = (Window*)glfwGetWindowUserPointer(glfwWindow);
-			auto &lastPos = instance->m_mousePos;
-			float dx = static_cast<float>(xPos - lastPos[0]);
-			float dy = static_cast<float>(yPos - lastPos[1]);
-
-			lastPos[0] = xPos;
-			lastPos[1] = yPos;
-
-            if (handledByIM) return;
-			if (instance->m_mouseButtons.left) {
-			    instance->m_rotation.x += dy * instance->m_rotationSpeed;
-		        instance->m_rotation.y -= dx * instance->m_rotationSpeed;
-			}
-
-			if (instance->m_mouseButtons.right) {
-				auto &pScene = instance->m_pScene;
-				auto pRootTransform = pScene->pRootTransformForVisualObject;
-				auto localRotation = pRootTransform->getLocalRotation();
-				vg::Vector3 eulerAngles = vg::Vector3(dy * instance->m_rotationSpeed, dx * instance->m_rotationSpeed, 0.0f);
-			    vg::Quaternion change = vg::Quaternion(eulerAngles);
-				localRotation = change * localRotation;
-				pRootTransform->setLocalRotation(localRotation);
-				pRootTransform = pScene->pRootTransformForLight;
-				pRootTransform->setLocalRotation(localRotation);
-			}
-		});
-	}	
 
 	template <vg::SpaceType SPACE_TYPE>
 	void Window<SPACE_TYPE>::_onResize()
@@ -278,18 +230,32 @@ namespace sampleslib
 		    , const vg::Renderer::RenderInfo &info
 			, vg::Renderer::RenderResultInfo &resultInfo)
 	{
-		vg::Renderer::SceneAndCamera sceneAndCamera;
-		sceneAndCamera.pScene = m_pScene.get();
-		sceneAndCamera.pCamera = m_pCamera.get();
+		
+		uint32_t sceneCount = m_sceneCount;
+		std::vector<vg::Renderer::SceneAndCamera> sceneAndCameras(sceneCount);
+		for (uint32_t i = 0; i < sceneCount; ++i)
+		{
+			sceneAndCameras[i].pScene = m_pScenes[i].get();
+		    sceneAndCameras[i].pCamera = m_pCamera.get();
+		}
+		
 		auto myInfo = info;
-		myInfo.sceneAndCameraCount = myInfo.sceneAndCameraCount + 1u;
-		std::vector<vg::Renderer::SceneAndCamera> sceneAndCameras(myInfo.sceneAndCameraCount);
+		myInfo.sceneAndCameraCount = myInfo.sceneAndCameraCount + sceneCount;
+		std::vector<vg::Renderer::SceneAndCamera> mySceneAndCameras(myInfo.sceneAndCameraCount);
+		uint32_t index = 0u;
 		for (uint32_t i = 0; i < info.sceneAndCameraCount; ++i)
 		{
-			sceneAndCameras[i] = *(info.pSceneAndCamera + i);
+			mySceneAndCameras[index] = *(info.pSceneAndCamera + i);
+			++index;
 		}
-		sceneAndCameras[info.sceneAndCameraCount] = sceneAndCamera;
-		myInfo.pSceneAndCamera = sceneAndCameras.data();
+
+		for (uint32_t i = 0; i < sceneCount; ++i)
+		{
+			mySceneAndCameras[index] = sceneAndCameras[i];
+			++index;
+		}
+		
+		myInfo.pSceneAndCamera = mySceneAndCameras.data();
 		vgf::Window::_renderWithRenderer(pRenderer, myInfo, resultInfo);
 		m_lastDrawCount += resultInfo.drawCount;
 	}

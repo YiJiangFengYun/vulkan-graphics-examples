@@ -415,7 +415,14 @@ namespace sampleslib
                     for (uint32_t i = 0; i < meshCount; ++i)
                     {
 						pObjects[i] = std::shared_ptr<vg::VisualObject3>(new vg::VisualObject3());
-                        pObjects[i]->setMesh(pMeshes[i].get());
+						if (createInfo.separateMesh)
+						{
+							pObjects[i]->setMesh(pMeshes[i].get());
+						}
+						else
+						{
+							pObjects[i]->setMesh(pMeshes[0].get());
+						}
                     }
                 }
                 else

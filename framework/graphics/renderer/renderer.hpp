@@ -63,9 +63,9 @@ namespace vg
 
 		Bool32 isValidForRender() const;
 
-		void renderBegin();
+		// void renderBegin();
 		void render(const RenderInfo &info, RenderResultInfo &resultInfo);
-		void renderEnd(const RenderInfo &info);
+		// void renderEnd(const RenderInfo &info);
 
 		uint32_t getFramebufferWidth() const ;
 		uint32_t getFramebufferHeight() const;

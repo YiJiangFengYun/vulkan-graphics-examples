@@ -121,20 +121,12 @@ namespace vg
 		return _isValidForRender();
 	}
 
-	void Renderer::renderBegin()
-	{
-		_preRender();
-		_renderBegin();
-	}
-
 	void Renderer::render(const RenderInfo &info, 
 		RenderResultInfo &resultInfo)
 	{
+		_preRender();
+		_renderBegin();
 		_render(info, resultInfo);
-	}
-
-	void Renderer::renderEnd(const RenderInfo &info)
-	{
 		_renderEnd(info);
 		_postRender();
 	}

@@ -259,7 +259,8 @@ namespace vg
         , m_memorySize(0u)
         , m_pMemory(nullptr)
         , m_pMmemoryForHostVisible(nullptr)
-        , m_poolSizeInfos()
+        , m_poolMaxSetCount()
+        , m_poolSizeInfos(0u)
         , m_pDescriptorPool()
     {
         //default is host visible.
@@ -281,7 +282,8 @@ namespace vg
         , m_memorySize(0u)
         , m_pMemory(nullptr)
         , m_pMmemoryForHostVisible(nullptr)
-        , m_poolSizeInfos()
+        , m_poolMaxSetCount()
+        , m_poolSizeInfos(0u)
         , m_pDescriptorPool()
     {
         //default is host visible.
@@ -369,11 +371,13 @@ namespace vg
         {
             //Check and reCreate descriptor pool.
             //Caculate current need pool size info.
+            uint32_t poolMaxSetCount = 0u;
             std::unordered_map<vk::DescriptorType, uint32_t> poolSizeInfos;
             for (uint32_t i = 0; i < subDataOffset && i < m_subDataCount; ++i) 
             {
                 auto &subData = m_subDatas[i];
                 uint32_t bindingCount = subData.getLayoutBindingCount();
+                poolMaxSetCount += bindingCount;                
                 for (uint32_t j = 0; j < bindingCount; ++j)
                 {
                     auto &binding = *(subData.getLayoutBindings() + j);
@@ -385,6 +389,7 @@ namespace vg
             {
                 auto &subDataInfo = pSubDataInfos[i];
                 uint32_t bindingCount = subDataInfo.layoutBindingCount;
+                poolMaxSetCount += bindingCount; 
                 for (uint32_t j = 0; j < bindingCount; ++j)
                 {
                     auto &binding = *(subDataInfo.pLayoutBindings + j);
@@ -396,6 +401,7 @@ namespace vg
             {
                 auto &subData = m_subDatas[i];
                 uint32_t bindingCount = subData.getLayoutBindingCount();
+                poolMaxSetCount += bindingCount; 
                 for (uint32_t j = 0; j < bindingCount; ++j)
                 {
                     auto &binding = *(subData.getLayoutBindings() + j);
@@ -405,12 +411,20 @@ namespace vg
 
             //Check pool size is greater than need. if not, recreating pool.
             Bool32 isGreater = VG_TRUE;
-		    for (const auto &pair : poolSizeInfos) {
-                if (m_poolSizeInfos[pair.first] < poolSizeInfos[pair.first]) {
-                    isGreater = VG_FALSE;
-                    break;
-                }
-		    }
+            if (m_poolMaxSetCount < poolMaxSetCount)
+            {
+                isGreater = VG_FALSE;
+            }
+            else 
+            {
+                for (const auto &pair : poolSizeInfos) {
+                    if (m_poolSizeInfos[pair.first] < poolSizeInfos[pair.first]) {
+                        isGreater = VG_FALSE;
+                        break;
+                    }
+		        }
+            }
+		    
 
 			auto oldPool = m_pDescriptorPool;
             if (isGreater == VG_FALSE)
@@ -430,7 +444,7 @@ namespace vg
 		        	if (arrPoolSizeInfos.size())
 		        	{
 		        		vk::DescriptorPoolCreateInfo createInfo = { vk::DescriptorPoolCreateFlagBits::eFreeDescriptorSet
-		        			, 1u
+		        			, poolMaxSetCount
 		        			, static_cast<uint32_t>(arrPoolSizeInfos.size())
 		        			, arrPoolSizeInfos.data()
 		        		};

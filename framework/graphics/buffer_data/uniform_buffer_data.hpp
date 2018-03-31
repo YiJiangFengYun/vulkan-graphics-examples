@@ -109,6 +109,7 @@ namespace vg
         void *m_pMemory;
         void *m_pMmemoryForHostVisible;
 
+        std::uint32_t m_poolMaxSetCount;
         std::unordered_map<vk::DescriptorType, uint32_t> m_poolSizeInfos;
 		std::shared_ptr<vk::DescriptorPool> m_pDescriptorPool;
 

@@ -15,6 +15,8 @@ add_subdirectory(foundation)
 set(LIBRARIES ${LIBRARIES} foundation)
 add_subdirectory(graphics)
 set(LIBRARIES ${LIBRARIES} graphics)
+add_subdirectory(graphics_ext)
+set(LIBRARIES ${LIBRARIES} graphics_ext)
 
 if(USE_IMGUI_BIND)
     add_subdirectory(vgim)

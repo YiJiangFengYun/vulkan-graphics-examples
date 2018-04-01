@@ -34,6 +34,9 @@ namespace vg
 		, m_pipelineCache()
 		// , m_preObjectRecordingFun()
 		// , m_postObjectRecordingFun()
+		, m_trunkRenderPassCmdBuffer()
+		, m_trunkWaitBarrierCmdBuffer()
+		, m_branchCmdBuffer()
 #if defined(DEBUG) && defined(VG_ENABLE_COST_TIMER)
         , m_preparingRenderCostTimer(fd::CostTimer::TimerType::AVERAGE)
 #endif //DEBUG and VG_ENABLE_COST_TIMER
@@ -63,6 +66,9 @@ namespace vg
 		, m_pipelineCache()
 		// , m_preObjectRecordingFun()
 		// , m_postObjectRecordingFun()
+		, m_trunkRenderPassCmdBuffer()
+		, m_trunkWaitBarrierCmdBuffer()
+		, m_branchCmdBuffer()
 #if defined(DEBUG) && defined(VG_ENABLE_COST_TIMER)
         , m_preparingRenderCostTimer(fd::CostTimer::TimerType::AVERAGE)
 #endif //DEBUG and VG_ENABLE_COST_TIMER
@@ -266,14 +272,10 @@ namespace vg
 		resultInfo.signalSemaphoreCount = 0u;
 		resultInfo.drawCount = 0u;
 
-		
-		std::vector<RenderPassInfo> trunkRenderPassInfos;
-		std::vector<RenderPassInfo> branchRenderPassInfos;
-		std::vector<TrunkWaitBarrierInfo> trunkWaitBarrierInfos;
+		m_trunkRenderPassCmdBuffer.begin();
+		m_trunkWaitBarrierCmdBuffer.begin();
+		m_branchCmdBuffer.begin();
 		uint32_t count = info.sceneAndCameraCount;
-		uint32_t trunkRenderPassInfoCount = 0u;
-		uint32_t branchRenderPassInfoCount = 0u;
-		uint32_t trunkWaitBarrierInfoCount = 0u;
 		for (uint32_t i = 0; i < count; ++i)
 		{
 			const auto &pScene = (*(info.pSceneAndCamera + i)).pScene;
@@ -283,47 +285,29 @@ namespace vg
 			preparingSceneCostTimer.begin();
 #endif //DEBUG and VG_ENABLE_COST_TIMER
             
-			std::vector<RenderPassInfo> tempTrunkRenderPassInfos;
-			std::vector<RenderPassInfo> tempBranchRenderPassInfos;
-			std::vector<TrunkWaitBarrierInfo> tempTrunkWaitBarrierInfos;
 			if (pScene->getSpaceType() == SpaceType::SPACE_2)
 			{
 				_renderScene2(dynamic_cast<const Scene<SpaceType::SPACE_2> *>(pScene), 
 				    dynamic_cast<const Camera<SpaceType::SPACE_2> *>(pCamera), 
-					info, 
-					resultInfo,
-					tempTrunkRenderPassInfos,
-					tempBranchRenderPassInfos,
-					tempTrunkWaitBarrierInfos
+					info,
+					&m_branchCmdBuffer,					
+					&m_trunkRenderPassCmdBuffer,
+					&m_trunkWaitBarrierCmdBuffer
 					);
 			} else if (pScene->getSpaceType() == SpaceType::SPACE_3)
 			{
 				_renderScene3(dynamic_cast<const Scene<SpaceType::SPACE_3> *>(pScene), 
 				    dynamic_cast<const Camera<SpaceType::SPACE_3> *>(pCamera), 
 					info, 
-					resultInfo,
-					tempTrunkRenderPassInfos,
-					tempBranchRenderPassInfos,
-					tempTrunkWaitBarrierInfos
+					&m_branchCmdBuffer,					
+					&m_trunkRenderPassCmdBuffer,
+					&m_trunkWaitBarrierCmdBuffer
 					);
 			} else {
 				//todo
 			}
 
-			if (tempBranchRenderPassInfos.size() > 0) throw std::runtime_error("It is not ready to do branch render pass.");
-
-			trunkRenderPassInfoCount += static_cast<uint32_t>(tempTrunkRenderPassInfos.size());
-			branchRenderPassInfoCount += static_cast<uint32_t>(tempBranchRenderPassInfos.size());
-			trunkWaitBarrierInfoCount += static_cast<uint32_t>(tempTrunkWaitBarrierInfos.size());
-			uint32_t trunkOriginCount = static_cast<uint32_t>(trunkRenderPassInfos.size());
-			uint32_t branchOriginCount = static_cast<uint32_t>(branchRenderPassInfos.size());
-			uint32_t trunkWaitBarrierOriginCount = static_cast<uint32_t>(trunkWaitBarrierInfos.size());
-			trunkRenderPassInfos.resize(trunkRenderPassInfoCount);
-			branchRenderPassInfos.resize(branchRenderPassInfoCount);
-			trunkWaitBarrierInfos.resize(trunkWaitBarrierInfoCount);
-			memcpy(trunkRenderPassInfos.data() + trunkOriginCount, tempTrunkRenderPassInfos.data(), sizeof(RenderPassInfo) * tempTrunkRenderPassInfos.size());
-			memcpy(branchRenderPassInfos.data() + branchOriginCount, tempBranchRenderPassInfos.data(), sizeof(RenderPassInfo) * tempBranchRenderPassInfos.size());
-			memcpy(trunkWaitBarrierInfos.data() + trunkWaitBarrierOriginCount, tempTrunkWaitBarrierInfos.data(), sizeof(TrunkWaitBarrierInfo) * tempTrunkWaitBarrierInfos.size());
+			resultInfo.isRendered = VG_TRUE;
 
 #if defined(DEBUG) && defined(VG_ENABLE_COST_TIMER)
 			preparingSceneCostTimer.end();
@@ -336,19 +320,18 @@ namespace vg
 		}
 
 		//branch render pass.
-		RenderPass::recordBranch(branchRenderPassInfoCount,
-		    branchRenderPassInfos.data(),
+		RenderPass::recordBranch(&m_branchCmdBuffer,
 			m_pCommandBuffer.get(),
 			&m_pipelineCache
 			);
 
 		//trunk wait barrier
-		_recordTrunkWaitBarrier(trunkWaitBarrierInfos);
+		_recordTrunkWaitBarrier(&m_trunkWaitBarrierCmdBuffer);
 
         //trunk render pass.
+		resultInfo.drawCount = m_trunkRenderPassCmdBuffer.getCmdCount();
 		_recordTrunkRenderPassForBegin();
-		RenderPass::recordTrunk(trunkRenderPassInfoCount,
-		    trunkRenderPassInfos.data(),
+		RenderPass::recordTrunk(&m_trunkRenderPassCmdBuffer,
 			m_pCommandBuffer.get(),
 			&m_pipelineCache,
 			m_pRenderPass.get()
@@ -431,16 +414,22 @@ namespace vg
 		
 	}
 
-	void Renderer::_recordTrunkWaitBarrier(std::vector<TrunkWaitBarrierInfo> &trunkWaitBarrierInfos)
+	void Renderer::_recordTrunkWaitBarrier(CmdBuffer *pTrunkRenderPassCmdBuffer)
 	{
-		if (trunkWaitBarrierInfos.size() == 0) return;
+		
+		if (pTrunkRenderPassCmdBuffer->getCmdCount() == 0) return;
 		vk::PipelineStageFlags srcStageMask = vk::PipelineStageFlags();
 		vk::PipelineStageFlags dstStageMask = vk::PipelineStageFlags();
-		for (const auto& trunkWaitBarrierInfo : trunkWaitBarrierInfos)
+		uint32_t cmdCount = pTrunkRenderPassCmdBuffer->getCmdCount();
+		for (uint32_t i = 0; i < cmdCount; ++i)
 		{
+			const auto &cmdInfo = *(pTrunkRenderPassCmdBuffer->getCmdInfos() + i);
+			if (cmdInfo.pRenderPassInfo != nullptr) throw std::runtime_error("it must no exist render pass info in trunk render pass cmd buffer.");
+			const auto &trunkWaitBarrierInfo = *(cmdInfo.pBarrierInfo);
 			srcStageMask |= trunkWaitBarrierInfo.srcStageMask;
 			dstStageMask |= trunkWaitBarrierInfo.dstStageMask;
 		}
+
 		m_pCommandBuffer->pipelineBarrier(srcStageMask, 
 		    dstStageMask, 
 			vk::DependencyFlags(vk::DependencyFlagBits::eByRegion),
@@ -614,14 +603,15 @@ namespace vg
 	{
 		if (m_pDepthStencilTexture != nullptr && 
 			m_framebufferWidth == m_pDepthStencilTexture->getWidth() &&
-			m_framebufferHeight == m_pDepthStencilTexture->getHeight()) return;
+			m_framebufferHeight == m_pDepthStencilTexture->getHeight() &&
+			m_depthStencilImageFormat != m_pDepthStencilTexture->getVKFormat()) return;
 
 		m_pDepthStencilTexture = std::shared_ptr<TextureDepthStencilAttachment>(
 			new TextureDepthStencilAttachment(
-				vk::Format::eD32SfloatS8Uint,
+			    m_depthStencilImageFormat,
 				m_framebufferWidth,
 				m_framebufferHeight
-			)
+			    )
 			);
 	}
 
@@ -683,14 +673,11 @@ namespace vg
 	void Renderer::_renderScene2(const Scene<SpaceType::SPACE_2> *pScene
 		, const Camera<SpaceType::SPACE_2> *pCamera
 	    , const RenderInfo &info
-	    , RenderResultInfo &resultInfo
-		, std::vector<RenderPassInfo> &trunkRenderPassInfos
-		, std::vector<RenderPassInfo> &branchRenderPassInfos
-		, std::vector<TrunkWaitBarrierInfo> &trunkWaitBarrierInfos
+		, CmdBuffer *pBranchCmdBuffer
+        , CmdBuffer *pTrunkRenderPassCmdBuffer
+        , CmdBuffer *pTrunkWaitBarrierCmdBuffer
 		)
 	{
-		resultInfo.isRendered = VG_TRUE;
-
 		uint32_t drawCount = 0u;		
 
 		using SceneType = Scene<SpaceType::SPACE_2>;
@@ -753,11 +740,6 @@ namespace vg
 #endif //DEBUG and VG_ENABLE_COST_TIMER
 
 		//------Doing render.		
-
-		uint32_t trunkRenderPassCount = 0u;
-		uint32_t branchRenderPassCount = 0u;
-		uint32_t trunkWaitBarrierCount = 0u;
-		
 		for (uint32_t i = 0u; i < validVisualObjectCount; ++i)
 		{
 			auto pVisualObject = validVisualObjects[i];
@@ -775,46 +757,10 @@ namespace vg
 				};
 
 			BaseVisualObject::BindResult result;
+			result.pTrunkRenderPassCmdBuffer = pTrunkRenderPassCmdBuffer;
+			result.pBranchCmdBuffer = pBranchCmdBuffer;
+			result.pTrunkWaitBarrierCmdBuffer = pTrunkWaitBarrierCmdBuffer;
 			pVisualObject->bindToRender(info, &result);
-			
-			trunkRenderPassCount += result.trunkRenderPassCount;
-			branchRenderPassCount += result.branchRenderPassCount;
-			trunkWaitBarrierCount += result.trunkWaitBarrierCount;
-		}
-
-		trunkRenderPassInfos.resize(trunkRenderPassCount);
-		branchRenderPassInfos.resize(branchRenderPassCount);
-		trunkWaitBarrierInfos.resize(trunkWaitBarrierCount);
-
-		resultInfo.drawCount += trunkRenderPassCount + branchRenderPassCount;
-
-		trunkRenderPassCount = 0u;
-		branchRenderPassCount = 0u;
-		for (uint32_t i = 0u; i < validVisualObjectCount; ++i)
-		{
-			auto pVisualObject = validVisualObjects[i];
-
-			BaseVisualObject::BindInfo info = {
-                m_framebufferWidth,
-				m_framebufferHeight,
-				&projMatrix,
-				&viewMatrix,
-#if defined(DEBUG) && defined(VG_ENABLE_COST_TIMER)
-                &preparingBuildInDataCostTimer,
-                &preparingPipelineCostTimer,
-                &preparingCommandBufferCostTimer,
-#endif //DEBUG and VG_ENABLE_COST_TIMER	
-				};
-
-			BaseVisualObject::BindResult result;
-			result.pTrunkRenderPassInfos = trunkRenderPassInfos.data() + trunkRenderPassCount;
-			result.pBranchRenderPassInfos = branchRenderPassInfos.data() + branchRenderPassCount;
-			result.pTrunkWaitBarrierInos = trunkWaitBarrierInfos.data() + trunkWaitBarrierCount;
-			pVisualObject->bindToRender(info, &result);
-
-			trunkRenderPassCount += result.trunkRenderPassCount;
-			branchRenderPassCount += result.branchRenderPassCount;
-			trunkWaitBarrierCount += result.trunkWaitBarrierCount;
 		}
 		
 #if defined(DEBUG) && defined(VG_ENABLE_COST_TIMER)
@@ -849,15 +795,12 @@ namespace vg
 	void Renderer::_renderScene3(const Scene<SpaceType::SPACE_3> *pScene
 		, const Camera<SpaceType::SPACE_3> *pCamera
 	    , const RenderInfo &info
-	    , RenderResultInfo &resultInfo
-		, std::vector<RenderPassInfo> &trunkRenderPassInfos
-		, std::vector<RenderPassInfo> &branchRenderPassInfos
-		, std::vector<TrunkWaitBarrierInfo> &trunkWaitBarrierInfos
+		, CmdBuffer *pBranchCmdBuffer
+        , CmdBuffer *pTrunkRenderPassCmdBuffer
+        , CmdBuffer *pTrunkWaitBarrierCmdBuffer
 		)
 	{
 		using SceneType = Scene<SpaceType::SPACE_3>;
-
-		resultInfo.isRendered = VG_TRUE;
 
 		uint32_t drawCount = 0u;	
 
@@ -1005,10 +948,6 @@ namespace vg
 	        });
 
 		//-----Doing render
-		uint32_t trunkRenderPassCount = 0u;
-		uint32_t branchRenderPassCount = 0u;
-		uint32_t trunkWaitBarrierCount = 0u;
-
 		for (uint32_t typeIndex = 0u; typeIndex < queueTypeCount; ++typeIndex)
 		{
 			auto queueLength = queueLengths[typeIndex];
@@ -1029,49 +968,10 @@ namespace vg
 				    };
 
 			    BaseVisualObject::BindResult result;
+				result.pTrunkRenderPassCmdBuffer = pTrunkRenderPassCmdBuffer;
+			    result.pBranchCmdBuffer = pBranchCmdBuffer;
+				result.pTrunkWaitBarrierCmdBuffer = pTrunkWaitBarrierCmdBuffer;
 			    pVisualObject->bindToRender(info, &result);
-				trunkRenderPassCount += result.trunkRenderPassCount;
-			    branchRenderPassCount += result.branchRenderPassCount;
-				trunkWaitBarrierCount += result.trunkWaitBarrierCount;
-			}
-		}
-
-		trunkRenderPassInfos.resize(trunkRenderPassCount);
-		branchRenderPassInfos.resize(branchRenderPassCount);
-		trunkWaitBarrierInfos.resize(trunkWaitBarrierCount);
-
-		resultInfo.drawCount += trunkRenderPassCount + branchRenderPassCount;
-
-		trunkRenderPassCount = 0u;
-		branchRenderPassCount = 0u;
-		for (uint32_t typeIndex = 0u; typeIndex < queueTypeCount; ++typeIndex)
-		{
-			auto queueLength = queueLengths[typeIndex];
-			for (uint32_t objectIndex = 0u; objectIndex < queueLength; ++objectIndex)
-			{
-				auto pVisualObject = queues[typeIndex][objectIndex];
-
-				BaseVisualObject::BindInfo info = {
-                    m_framebufferWidth,
-				    m_framebufferHeight,
-				    &projMatrix,
-				    &viewMatrix,
-#if defined(DEBUG) && defined(VG_ENABLE_COST_TIMER)
-                    &preparingBuildInDataCostTimer,
-                    &preparingPipelineCostTimer,
-                    &preparingCommandBufferCostTimer,
-#endif //DEBUG and VG_ENABLE_COST_TIMER	
-				    };
-
-			    BaseVisualObject::BindResult result;
-				result.pTrunkRenderPassInfos = trunkRenderPassInfos.data() + trunkRenderPassCount;
-			    result.pBranchRenderPassInfos = branchRenderPassInfos.data() + branchRenderPassCount;
-				result.pTrunkWaitBarrierInos = trunkWaitBarrierInfos.data() + trunkWaitBarrierCount;
-			    pVisualObject->bindToRender(info, &result);
-
-				trunkRenderPassCount += result.trunkRenderPassCount;
-				branchRenderPassCount += result.branchRenderPassCount;
-				trunkWaitBarrierCount += result.trunkWaitBarrierCount;
 			}
 		}
 

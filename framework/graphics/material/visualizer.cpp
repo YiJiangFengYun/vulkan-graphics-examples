@@ -34,19 +34,13 @@ namespace vg
     {
     }
 
-    Visualizer::BindResult::BindResult(uint32_t branchRenderPassCount
-        , RenderPassInfo *pBranchRenderPassInfos
-        , uint32_t trunkRenderPassCount
-        , RenderPassInfo *pTrunkRenderPassInfos
-        , uint32_t trunkWaitBarrierCount
-        , TrunkWaitBarrierInfo *pTrunkWaitBarrierInos
+    Visualizer::BindResult::BindResult(CmdBuffer *pBranchCmdBuffer
+        , CmdBuffer *pTrunkRenderPassCmdBuffer
+        , CmdBuffer *pTrunkWaitBarrierCmdBuffer
         )
-	    : branchRenderPassCount(branchRenderPassCount)
-        , pBranchRenderPassInfos(pBranchRenderPassInfos)
-        , trunkRenderPassCount(trunkRenderPassCount)
-        , pTrunkRenderPassInfos(pTrunkRenderPassInfos)
-        , trunkWaitBarrierCount(trunkWaitBarrierCount)
-        , pTrunkWaitBarrierInos(pTrunkWaitBarrierInos)
+	    : pBranchCmdBuffer(pBranchCmdBuffer)
+        , pTrunkRenderPassCmdBuffer(pTrunkRenderPassCmdBuffer)
+        , pTrunkWaitBarrierCmdBuffer(pTrunkWaitBarrierCmdBuffer)
     {
 
     }
@@ -70,20 +64,10 @@ namespace vg
         if (m_passCount == 0) throw std::runtime_error("Pass of visualizer is empty.");
         if (m_passCount > 1) throw std::runtime_error("Visualizer don't support passes more than 1.");
 		auto &result = *pResult;
-        result.branchRenderPassCount = 0u;
 
-        if (result.pBranchRenderPassInfos != nullptr)
+        if (result.pTrunkRenderPassCmdBuffer != nullptr)
         {
-
-        }
-
-        result.trunkWaitBarrierCount = 0u;
-        
-        result.trunkRenderPassCount = 1u;
-
-        if (result.pTrunkRenderPassInfos != nullptr)
-        {
-            auto &trunkRenderPassInfo = *result.pTrunkRenderPassInfos;
+            RenderPassInfo trunkRenderPassInfo;
             trunkRenderPassInfo.pRenderPass = nullptr;
             trunkRenderPassInfo.framebufferWidth = info.trunkFramebufferWidth;
             trunkRenderPassInfo.framebufferHeight = info.trunkFramebufferHeight;
@@ -95,6 +79,11 @@ namespace vg
             trunkRenderPassInfo.subMeshIndex = info.subMeshIndex;
             trunkRenderPassInfo.hasClipRect = info.hasClipRect;
             trunkRenderPassInfo.pClipRect = info.pClipRect;
+
+            CmdInfo cmdInfo;
+            cmdInfo.pRenderPassInfo = &trunkRenderPassInfo;
+
+            result.pTrunkRenderPassCmdBuffer->addCmd(cmdInfo);
         }
 
         

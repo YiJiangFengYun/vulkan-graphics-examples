@@ -6,47 +6,60 @@ namespace vg
     {
     }
 	
-    void RenderPass::recordTrunk(uint32_t itemCount
-        , RenderPassInfo *pItems
+    void RenderPass::recordTrunk(CmdBuffer *pCmdBuffer
         ,  vk::CommandBuffer *pCommandBuffer
         , PipelineCache *pPipelineCache
 		, vk::RenderPass *pRenderPass
         , ResultInfo *pResult
         )
     {
-		for (uint32_t itemIndex = 0u; itemIndex < itemCount; ++itemIndex)
+		auto cmdInfoCount = pCmdBuffer->getCmdCount();
+		for (uint32_t cmdInfoIndex = 0u; cmdInfoIndex < cmdInfoCount; ++cmdInfoIndex)
 		{
-			auto pItem = pItems + itemIndex;
-			pItem->pRenderPass = pRenderPass;
-			recordItem(pItem, pCommandBuffer, pPipelineCache, pResult);
+			auto pRenderPassInfo = (pCmdBuffer->getCmdInfos() + cmdInfoIndex)->pRenderPassInfo;
+			if (pRenderPassInfo == nullptr) throw std::runtime_error("There isn't render pass info in trunk render pass cmd buffer.");
+			pRenderPassInfo->pRenderPass = pRenderPass;
+			recordItem(pRenderPassInfo, pCommandBuffer, pPipelineCache, pResult);
 		}
 	}
 
-	void RenderPass::recordBranch(uint32_t itemCount
-        , RenderPassInfo *pItems
+	void RenderPass::recordBranch(CmdBuffer *pCmdBuffer
         ,  vk::CommandBuffer *pCommandBuffer
         , PipelineCache *pPipelineCache
         , ResultInfo *pResult
         )
     {
-		for (uint32_t itemIndex = 0u; itemIndex < itemCount; ++itemIndex)
+		auto cmdInfoCount = pCmdBuffer->getCmdCount();
+		for (uint32_t cmdInfoIndex = 0u; cmdInfoIndex < cmdInfoCount; ++cmdInfoIndex)
 		{
-			auto pItem = pItems + itemIndex;
-			recordItemRenderPassBegin(pItem, pCommandBuffer);
-			recordItem(pItem, pCommandBuffer, pPipelineCache, pResult);
-			recordItemRenderPassEnd(pItem, pCommandBuffer);
+			auto pRenderPassInfo = (pCmdBuffer->getCmdInfos() + cmdInfoIndex)->pRenderPassInfo;
+			if (pRenderPassInfo)
+			{
+			    recordItemRenderPassBegin(pRenderPassInfo, pCommandBuffer);
+			    recordItem(pRenderPassInfo, pCommandBuffer, pPipelineCache, pResult);
+			    recordItemRenderPassEnd(pRenderPassInfo, pCommandBuffer);
+			}
+			else 
+		    {
+				auto barrierInfo = (pCmdBuffer->getCmdInfos() + cmdInfoIndex)->pBarrierInfo;
+			    if (barrierInfo)
+			    {
+    
+			    }
+			}
+			
 		}
 	}
 
-	void RenderPass::recordItemRenderPassBegin(RenderPassInfo *pItem
+	void RenderPass::recordItemRenderPassBegin(RenderPassInfo *pRenderPassInfo
             ,  vk::CommandBuffer *pCommandBuffer)
 	{
-		uint32_t framebufferWidth = pItem->framebufferWidth;
-		uint32_t framebufferHeight = pItem->framebufferHeight;
-		auto renderArea = pItem->renderArea;
+		uint32_t framebufferWidth = pRenderPassInfo->framebufferWidth;
+		uint32_t framebufferHeight = pRenderPassInfo->framebufferHeight;
+		auto renderArea = pRenderPassInfo->renderArea;
 		vk::RenderPassBeginInfo renderPassBeginInfo = {
-			* (pItem->pRenderPass), 
-			* (pItem->pFrameBuffer),
+			* (pRenderPassInfo->pRenderPass), 
+			* (pRenderPassInfo->pFrameBuffer),
 			vk::Rect2D(           
 				vk::Offset2D(static_cast<int32_t>(std::round(framebufferWidth * renderArea.x))
 					, static_cast<int32_t>(std::round(framebufferHeight * renderArea.y))
@@ -55,28 +68,28 @@ namespace vg
 					static_cast<uint32_t>(std::round(framebufferHeight * renderArea.height))
 				)
 			),
-			pItem->clearValueCount,
-			pItem->pClearValues
+			pRenderPassInfo->clearValueCount,
+			pRenderPassInfo->pClearValues
 		};
 
 		pCommandBuffer->beginRenderPass(renderPassBeginInfo, vk::SubpassContents::eInline);
 	}
 
-    void RenderPass::recordItemRenderPassEnd(RenderPassInfo *pItem
+    void RenderPass::recordItemRenderPassEnd(RenderPassInfo *pRenderPassInfo
             ,  vk::CommandBuffer *pCommandBuffer)
 	{
 		pCommandBuffer->endRenderPass();
 	}
 
-	void RenderPass::recordItem(RenderPassInfo *pItem
+	void RenderPass::recordItem(RenderPassInfo *pRenderPassInfo
         ,  vk::CommandBuffer *pCommandBuffer
         , PipelineCache *pPipelineCache
         , ResultInfo *pResult)
 	{
 
-		const auto &itemInfo = *pItem; 
+		const auto &renderPassInfo = *pRenderPassInfo; 
 #if defined(DEBUG) && defined(VG_ENABLE_COST_TIMER)
-		itemInfo.pPreparingBuildInDataCostTimer->begin();
+		renderPassInfo.pPreparingBuildInDataCostTimer->begin();
 #endif //DEBUG and VG_ENABLE_COST_TIMER
 		Bool32 hasMatrixObjectToNDC = VG_FALSE;
 		Bool32 hasMatrixObjectToWorld = VG_FALSE;
@@ -84,7 +97,7 @@ namespace vg
 		Bool32 hasMatrixView = VG_FALSE;
 		Bool32 hasMatrixProjection = VG_FALSE;
 		//update building in matrix variable.
-		auto pPass = itemInfo.pPass;
+		auto pPass = renderPassInfo.pPass;
 		auto info = pPass->getBuildInDataInfo();
 		uint32_t componentCount = info.componentCount;
 		for (uint32_t componentIndex = 0u; componentIndex < componentCount; ++componentIndex)
@@ -116,16 +129,16 @@ namespace vg
 		Matrix4x4 mvpMatrix;
 		if (hasMatrixObjectToView || hasMatrixObjectToNDC)
 		{
-			mvMatrix = itemInfo.viewMatrix * itemInfo.modelMatrix;
+			mvMatrix = renderPassInfo.viewMatrix * renderPassInfo.modelMatrix;
         }
 		
 		if (hasMatrixObjectToNDC)
 		{
-			mvpMatrix = itemInfo.projMatrix * mvMatrix;
+			mvpMatrix = renderPassInfo.projMatrix * mvMatrix;
 		}
-		auto pMesh = itemInfo.pMesh;
+		auto pMesh = renderPassInfo.pMesh;
 		auto pContentMesh = dynamic_cast<const ContentMesh *>(pMesh);
-		auto subMeshIndex = itemInfo.subMeshIndex;
+		auto subMeshIndex = renderPassInfo.subMeshIndex;
 		//update building in matrix variable.
 		for (uint32_t componentIndex = 0u; componentIndex < componentCount; ++componentIndex)
 		{
@@ -136,7 +149,7 @@ namespace vg
 			}
 			else if (type == Pass::BuildInDataType::MATRIX_OBJECT_TO_WORLD)
 			{
-				pPass->_setBuildInMatrixData(type, itemInfo.modelMatrix);
+				pPass->_setBuildInMatrixData(type, renderPassInfo.modelMatrix);
 			}
 			else if (type == Pass::BuildInDataType::MATRIX_OBJECT_TO_VIEW)
 			{
@@ -144,18 +157,18 @@ namespace vg
 			}
 			else if (type == Pass::BuildInDataType::MATRIX_VIEW)
 			{
-				pPass->_setBuildInMatrixData(type, itemInfo.viewMatrix);
+				pPass->_setBuildInMatrixData(type, renderPassInfo.viewMatrix);
 			}
 			else if (type == Pass::BuildInDataType::MATRIX_PROJECTION)
 			{
-				pPass->_setBuildInMatrixData(type, itemInfo.projMatrix);
+				pPass->_setBuildInMatrixData(type, renderPassInfo.projMatrix);
 			}
 		}
 		pPass->apply();
 		
 
 #if defined(DEBUG) && defined(VG_ENABLE_COST_TIMER)
-		itemInfo.pPreparingBuildInDataCostTimer->end();
+		renderPassInfo.pPreparingBuildInDataCostTimer->end();
 #endif //DEBUG and VG_ENABLE_COST_TIMER
 		auto pShader = pPass->getShader();
 		auto stageInfos = pShader->getShaderStageInfos();
@@ -163,22 +176,22 @@ namespace vg
 		{
 			std::shared_ptr<vk::Pipeline> pPipeline;
 #if defined(DEBUG) && defined(VG_ENABLE_COST_TIMER)
-			itemInfo.pPreparingPipelineCostTimer->begin();
+			renderPassInfo.pPreparingPipelineCostTimer->begin();
 #endif //DEBUG and VG_ENABLE_COST_TIMER
-			_createPipeline(itemInfo.pRenderPass,
-				itemInfo.pMesh,
+			_createPipeline(renderPassInfo.pRenderPass,
+				renderPassInfo.pMesh,
 				subMeshIndex, 
 				pPass, 
 				pPipelineCache,
 				pPipeline);
 #if defined(DEBUG) && defined(VG_ENABLE_COST_TIMER)
-			itemInfo.pPreparingPipelineCostTimer->end();
-			itemInfo.pPreparingCommandBufferCostTimer->begin();
+			renderPassInfo.pPreparingPipelineCostTimer->end();
+			renderPassInfo.pPreparingCommandBufferCostTimer->begin();
 #endif //DEBUG and VG_ENABLE_COST_TIMER
             const fd::Rect2D *pClipRect;
-			if(itemInfo.hasClipRect)
+			if(renderPassInfo.hasClipRect)
 			{
-				pClipRect = itemInfo.pClipRect;
+				pClipRect = renderPassInfo.pClipRect;
 			}
 			else
 			{
@@ -186,14 +199,14 @@ namespace vg
 			}
 			_recordCommandBuffer(pPipeline.get(),
 				pCommandBuffer,
-				itemInfo.framebufferWidth,
-				itemInfo.framebufferHeight,
-				itemInfo.pMesh,
+				renderPassInfo.framebufferWidth,
+				renderPassInfo.framebufferHeight,
+				renderPassInfo.pMesh,
 				subMeshIndex, 
 				pPass, 
 				pClipRect);
 #if defined(DEBUG) && defined(VG_ENABLE_COST_TIMER)
-			itemInfo.pPreparingCommandBufferCostTimer->end();
+			renderPassInfo.pPreparingCommandBufferCostTimer->end();
 #endif //DEBUG and VG_ENABLE_COST_TIMER
 		}
 		else

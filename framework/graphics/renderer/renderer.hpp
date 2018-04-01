@@ -116,6 +116,10 @@ namespace vg
 		// PreObjectRecordingFun m_preObjectRecordingFun;
 		// PostObjectRecordingFun m_postObjectRecordingFun;
 
+		CmdBuffer m_trunkRenderPassCmdBuffer;
+		CmdBuffer m_trunkWaitBarrierCmdBuffer;
+		CmdBuffer m_branchCmdBuffer;
+
 #if defined(DEBUG) && defined(VG_ENABLE_COST_TIMER)
         fd::CostTimer m_preparingRenderCostTimer;
 #endif //DEBUG and VG_ENABLE_COST_TIMER
@@ -136,7 +140,7 @@ namespace vg
 		//void _createFence();
 
 		void _recordCommandBufferForBegin();
-		void _recordTrunkWaitBarrier(std::vector<TrunkWaitBarrierInfo> &trunkWaitBarrierInfos);
+		void _recordTrunkWaitBarrier(CmdBuffer *pTrunkRenderPassCmdBuffer);
 		void _recordTrunkRenderPassForBegin();
 
 		void _recordTrunkRenderPassForEnd();
@@ -145,19 +149,17 @@ namespace vg
 	    void _renderScene2(const Scene<SpaceType::SPACE_2> *pScene
 		    , const Camera<SpaceType::SPACE_2> *pCamera
 	        , const RenderInfo &info
-	    	, RenderResultInfo &resultInfo
-			, std::vector<RenderPassInfo> &trunkRenderPassInfos
-			, std::vector<RenderPassInfo> &branchRenderPassInfos
-			, std::vector<TrunkWaitBarrierInfo> &trunkWaitBarrierInfos
+			, CmdBuffer *pBranchCmdBuffer = nullptr
+            , CmdBuffer *pTrunkRenderPassCmdBuffer = nullptr
+            , CmdBuffer *pTrunkWaitBarrierCmdBuffer = nullptr
 			);
 
 		 void _renderScene3(const Scene<SpaceType::SPACE_3> *pScene
 		    , const Camera<SpaceType::SPACE_3> *pCamera
 	        , const RenderInfo &info
-	    	, RenderResultInfo &resultInfo
-			, std::vector<RenderPassInfo> &trunkRenderPassInfos
-			, std::vector<RenderPassInfo> &branchRenderPassInfos
-			, std::vector<TrunkWaitBarrierInfo> &pTrunkWaitBarrierInos
+			, CmdBuffer *pBranchCmdBuffer = nullptr
+            , CmdBuffer *pTrunkRenderPassCmdBuffer = nullptr
+            , CmdBuffer *pTrunkWaitBarrierCmdBuffer = nullptr
 			);
 
 #if defined(DEBUG) && defined(VG_ENABLE_COST_TIMER)

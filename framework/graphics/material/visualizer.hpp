@@ -6,7 +6,7 @@
 #include "graphics/base.hpp"
 #include "graphics/mesh/mesh.hpp"
 #include "graphics/buffer_data/util.hpp"
-#include "graphics/material/render_pass_info.hpp"
+#include "graphics/material/cmd.hpp"
 
 namespace vg
 {
@@ -49,18 +49,12 @@ namespace vg
     
         struct BindResult
         {
-            uint32_t branchRenderPassCount;
-            RenderPassInfo *pBranchRenderPassInfos;
-            uint32_t trunkRenderPassCount;
-            RenderPassInfo *pTrunkRenderPassInfos;
-            uint32_t trunkWaitBarrierCount;
-            TrunkWaitBarrierInfo *pTrunkWaitBarrierInos;
-            BindResult(uint32_t branchRenderPassCount = 0u
-                , RenderPassInfo *pBranchRenderPassInfos = nullptr
-                , uint32_t trunkRenderPassCount = 0u
-                , RenderPassInfo *pTrunkRenderPassInfos = nullptr
-                , uint32_t trunkWaitBarrierCount = 0u
-                , TrunkWaitBarrierInfo *pTrunkWaitBarrierInos = nullptr
+            CmdBuffer *pBranchCmdBuffer;
+            CmdBuffer *pTrunkRenderPassCmdBuffer;
+            CmdBuffer *pTrunkWaitBarrierCmdBuffer;
+            BindResult(CmdBuffer *pBranchCmdBuffer = nullptr
+                , CmdBuffer *pTrunkRenderPassCmdBuffer = nullptr
+                , CmdBuffer *pTrunkWaitBarrierCmdBuffer = nullptr
                 );
         };
 

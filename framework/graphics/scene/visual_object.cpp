@@ -25,19 +25,13 @@ namespace vg
     {
     }
 
-    BaseVisualObject::BindResult::BindResult(uint32_t branchRenderPassCount
-        , RenderPassInfo *pBranchRenderPassInfos
-        , uint32_t trunkRenderPassCount
-        , RenderPassInfo *pTrunkRenderPassInfos
-		, uint32_t trunkWaitBarrierCount
-        , TrunkWaitBarrierInfo *pTrunkWaitBarrierInos
+    BaseVisualObject::BindResult::BindResult(CmdBuffer *pBranchCmdBuffer
+        , CmdBuffer *pTrunkRenderPassCmdBuffer
+        , CmdBuffer *pTrunkWaitBarrierCmdBuffer
         )
-	    : branchRenderPassCount(branchRenderPassCount)
-        , pBranchRenderPassInfos(pBranchRenderPassInfos)
-        , trunkRenderPassCount(trunkRenderPassCount)
-        , pTrunkRenderPassInfos(pTrunkRenderPassInfos)
-		, trunkWaitBarrierCount(trunkWaitBarrierCount)
-		, pTrunkWaitBarrierInos(pTrunkWaitBarrierInos)
+	    : pBranchCmdBuffer(pBranchCmdBuffer)
+        , pTrunkRenderPassCmdBuffer(pTrunkRenderPassCmdBuffer)
+        , pTrunkWaitBarrierCmdBuffer(pTrunkWaitBarrierCmdBuffer)
     {
 
     }
@@ -154,7 +148,7 @@ namespace vg
 	void BaseVisualObject::bindToRender(const BindInfo info, BindResult *pResult)
 	{
 		auto &result = *pResult;
-		uint32_t branchRenderPassCount = 0u;
+		uint32_t branchCmdCount = 0u;
 		uint32_t trunkRenderPassCount = 0u;
 		uint32_t trunkWaitBarrierCount = 0u;
 		if (m_pVisualizer != nullptr)
@@ -186,23 +180,17 @@ namespace vg
     
 		        Visualizer::BindResult resultForVisualizer;
 				
-				if (result.pBranchRenderPassInfos != nullptr)
-					resultForVisualizer.pBranchRenderPassInfos = result.pBranchRenderPassInfos + branchRenderPassCount;
-				if (result.pTrunkRenderPassInfos != nullptr)
-					resultForVisualizer.pTrunkRenderPassInfos = result.pTrunkRenderPassInfos + trunkRenderPassCount;
-				if (result.pTrunkWaitBarrierInos != nullptr)
-				    resultForVisualizer.pTrunkWaitBarrierInos = result.pTrunkWaitBarrierInos + trunkWaitBarrierCount;
+				if (result.pBranchCmdBuffer != nullptr)
+					resultForVisualizer.pBranchCmdBuffer = result.pBranchCmdBuffer;
+				if (result.pTrunkRenderPassCmdBuffer != nullptr)
+					resultForVisualizer.pTrunkRenderPassCmdBuffer = result.pTrunkRenderPassCmdBuffer;
+				if (result.pTrunkWaitBarrierCmdBuffer != nullptr)
+				    resultForVisualizer.pTrunkWaitBarrierCmdBuffer = result.pTrunkWaitBarrierCmdBuffer;
 
 		        m_pVisualizer->bindToRender(infoForVisualizer, &resultForVisualizer);
 
-				branchRenderPassCount += resultForVisualizer.branchRenderPassCount;
-				trunkRenderPassCount += resultForVisualizer.trunkRenderPassCount;
-				trunkWaitBarrierCount += resultForVisualizer.trunkWaitBarrierCount;
 			}
 		}
-		result.branchRenderPassCount = branchRenderPassCount;
-		result.trunkRenderPassCount = trunkRenderPassCount;
-		result.trunkWaitBarrierCount = trunkWaitBarrierCount;
 		
 	}
 

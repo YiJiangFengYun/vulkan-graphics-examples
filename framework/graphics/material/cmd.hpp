@@ -7,10 +7,13 @@
 
 namespace vg
 {
-    struct TrunkWaitBarrierInfo
+    struct BarrierInfo
     {
         vk::PipelineStageFlags  srcStageMask; 
         vk::PipelineStageFlags  dstStageMask;
+
+        BarrierInfo(vk::PipelineStageFlags srcStageMask = vk::PipelineStageFlags()
+            , vk::PipelineStageFlags  dstStageMask = vk::PipelineStageFlags());
     };
 
     struct RenderPassInfo
@@ -59,6 +62,39 @@ namespace vg
 #endif //DEBUG and VG_ENABLE_COST_TIMER
             );
     };
+
+	struct CmdInfo
+	{
+		RenderPassInfo *pRenderPassInfo;
+		BarrierInfo *pBarrierInfo;
+		CmdInfo();
+	};
+
+    class CmdBuffer 
+    {
+    public:
+        CmdBuffer();
+        uint32_t getCmdCount() const;
+        const CmdInfo *getCmdInfos() const;
+        void begin();
+        void addCmd(CmdInfo cmdInfo);
+        void end();
+    
+    private:
+        uint32_t m_cmdInfoCount;
+        uint32_t m_cmdInfoCapacity;
+        std::vector<CmdInfo> m_cmdInfos;
+        uint32_t m_renderPassInfoCount;
+        uint32_t m_renderPassInfoCapacity;
+        std::vector<RenderPassInfo> m_renderPassInfos;
+		std::vector<uint32_t> m_renderPassInfoToCmdInfoIndices;
+        uint32_t m_barrierInfoCount;
+        uint32_t m_barrierInfosCapacity;
+        std::vector<BarrierInfo> m_barrierInfos;
+		std::vector<uint32_t> m_barrierInfoToCmdInfoIndices;
+
+        static uint32_t _getNextCapacity(uint32_t current);
+	};
 } //vg
 
 #endif //VG_RENDER_PASS_INFO_HPP

@@ -6,7 +6,7 @@
 #include "graphics/renderer/pipeline_cache.hpp"
 #include "graphics/mesh/mesh.hpp"
 #include "graphics/buffer_data/util.hpp"
-#include "graphics/material/render_pass_info.hpp"
+#include "graphics/material/cmd.hpp"
 
 namespace vg
 {
@@ -18,27 +18,25 @@ namespace vg
 			ResultInfo();
         };
 
-        static void recordTrunk(uint32_t itemCount
-            , RenderPassInfo *pItems
+        static void recordTrunk(CmdBuffer *pCmdBuffer
             , vk::CommandBuffer *pCommandBuffer
             , PipelineCache *pPipelineCache
             , vk::RenderPass *pRenderPass
             , ResultInfo *pResult = nullptr
             );
         
-        static void recordBranch(uint32_t itemCount
-            , RenderPassInfo *pItems
+        static void recordBranch(CmdBuffer *pCmdBuffer
             , vk::CommandBuffer *pCommandBuffer
             , PipelineCache *pPipelineCache
             , ResultInfo *pResult = nullptr
             );
 
-        static void recordItemRenderPassBegin(RenderPassInfo *pItem
+        static void recordItemRenderPassBegin(RenderPassInfo *pRenderPassInfo
             ,  vk::CommandBuffer *pCommandBuffer);
-        static void recordItemRenderPassEnd(RenderPassInfo *pItem
+        static void recordItemRenderPassEnd(RenderPassInfo *pRenderPassInfo
             ,  vk::CommandBuffer *pCommandBuffer);
 
-        static void recordItem(RenderPassInfo *pItem
+        static void recordItem(RenderPassInfo *pRenderPassInfo
             ,  vk::CommandBuffer *pCommandBuffer
             , PipelineCache *pPipelineCache
             , ResultInfo *pResult = nullptr);

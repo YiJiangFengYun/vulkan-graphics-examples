@@ -5,7 +5,24 @@ namespace vg
     RenderPass::ResultInfo::ResultInfo()
     {
     }
-    void RenderPass::record(uint32_t itemCount
+	
+    void RenderPass::recordTrunk(uint32_t itemCount
+        , RenderPassInfo *pItems
+        ,  vk::CommandBuffer *pCommandBuffer
+        , PipelineCache *pPipelineCache
+		, vk::RenderPass *pRenderPass
+        , ResultInfo *pResult
+        )
+    {
+		for (uint32_t itemIndex = 0u; itemIndex < itemCount; ++itemIndex)
+		{
+			auto pItem = pItems + itemIndex;
+			pItem->pRenderPass = pRenderPass;
+			recordItem(pItem, pCommandBuffer, pPipelineCache, pResult);
+		}
+	}
+
+	void RenderPass::recordBranch(uint32_t itemCount
         , RenderPassInfo *pItems
         ,  vk::CommandBuffer *pCommandBuffer
         , PipelineCache *pPipelineCache
@@ -14,8 +31,41 @@ namespace vg
     {
 		for (uint32_t itemIndex = 0u; itemIndex < itemCount; ++itemIndex)
 		{
-			recordItem(pItems + itemIndex, pCommandBuffer, pPipelineCache, pResult);
+			auto pItem = pItems + itemIndex;
+			recordItemRenderPassBegin(pItem, pCommandBuffer);
+			recordItem(pItem, pCommandBuffer, pPipelineCache, pResult);
+			recordItemRenderPassEnd(pItem, pCommandBuffer);
 		}
+	}
+
+	void RenderPass::recordItemRenderPassBegin(RenderPassInfo *pItem
+            ,  vk::CommandBuffer *pCommandBuffer)
+	{
+		uint32_t framebufferWidth = pItem->framebufferWidth;
+		uint32_t framebufferHeight = pItem->framebufferHeight;
+		auto renderArea = pItem->renderArea;
+		vk::RenderPassBeginInfo renderPassBeginInfo = {
+			* (pItem->pRenderPass), 
+			* (pItem->pFrameBuffer),
+			vk::Rect2D(           
+				vk::Offset2D(static_cast<int32_t>(std::round(framebufferWidth * renderArea.x))
+					, static_cast<int32_t>(std::round(framebufferHeight * renderArea.y))
+				),
+				vk::Extent2D(static_cast<uint32_t>(std::round(framebufferWidth * renderArea.width)),
+					static_cast<uint32_t>(std::round(framebufferHeight * renderArea.height))
+				)
+			),
+			pItem->clearValueCount,
+			pItem->pClearValues
+		};
+
+		pCommandBuffer->beginRenderPass(renderPassBeginInfo, vk::SubpassContents::eInline);
+	}
+
+    void RenderPass::recordItemRenderPassEnd(RenderPassInfo *pItem
+            ,  vk::CommandBuffer *pCommandBuffer)
+	{
+		pCommandBuffer->endRenderPass();
 	}
 
 	void RenderPass::recordItem(RenderPassInfo *pItem
@@ -23,6 +73,7 @@ namespace vg
         , PipelineCache *pPipelineCache
         , ResultInfo *pResult)
 	{
+
 		const auto &itemInfo = *pItem; 
 #if defined(DEBUG) && defined(VG_ENABLE_COST_TIMER)
 		itemInfo.pPreparingBuildInDataCostTimer->begin();

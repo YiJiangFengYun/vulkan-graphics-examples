@@ -3,8 +3,12 @@
 namespace vg
 {
     RenderPassInfo::RenderPassInfo( vk::RenderPass *pRenderPass
-		, uint32_t framebufferWidth
-		, uint32_t framebufferHeight
+        , vk::Framebuffer *pFrameBuffer
+        , uint32_t framebufferWidth
+        , uint32_t framebufferHeight
+        , fd::Rect2D renderArea
+        , uint32_t clearValueCount
+        , vk::ClearValue *pClearValues
         , Matrix4x4 projMatrix
         , Matrix4x4 viewMatrix
         , Pass *pPass
@@ -20,8 +24,12 @@ namespace vg
 #endif //DEBUG and VG_ENABLE_COST_TIMER
         )
         : pRenderPass(pRenderPass)
+        , pFrameBuffer(pFrameBuffer)
 	, framebufferWidth(framebufferWidth)
 	, framebufferHeight(framebufferHeight)
+        , renderArea(renderArea)
+        , clearValueCount(clearValueCount)
+        , pClearValues(pClearValues)
         , projMatrix(projMatrix)
         , viewMatrix(viewMatrix)
         , pPass(pPass)
@@ -34,7 +42,7 @@ namespace vg
         , pPreparingBuildInDataCostTimer(pPreparingBuildInDataCostTimer)
         , pPreparingPipelineCostTimer(pPreparingPipelineCostTimer)
         , pPreparingCommandBufferCostTimer(pPreparingCommandBufferCostTimer)
-#endif //DEBUG and VG_ENABLE_COST_TIMER       
+#endif //DEBUG and VG_ENABLE_COST_TIMER
         {
 
         }

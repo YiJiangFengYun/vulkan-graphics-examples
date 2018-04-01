@@ -17,7 +17,6 @@ namespace vg
         {
             const Matrix4x4 *pProjMatrix;
             const Matrix4x4 *pViewMatrix;
-            vk::RenderPass *pTrunkRenderPass;
 			uint32_t trunkFramebufferWidth;
 			uint32_t trunkFramebufferHeight;
             const Matrix4x4 *pModelMatrix;
@@ -33,7 +32,6 @@ namespace vg
 
             BindInfo(const Matrix4x4 *pProjMatrix = nullptr
                 , const Matrix4x4 *pViewMatrix = nullptr
-                , vk::RenderPass *pTrunkRenderPass = nullptr
 			    , uint32_t trunkFramebufferWidth = 0u
 			    , uint32_t trunkFramebufferHeight = 0u
 #if defined(DEBUG) && defined(VG_ENABLE_COST_TIMER)
@@ -52,13 +50,17 @@ namespace vg
         struct BindResult
         {
             uint32_t branchRenderPassCount;
-            RenderPassInfo *pBranchRenderPasses;
+            RenderPassInfo *pBranchRenderPassInfos;
             uint32_t trunkRenderPassCount;
-            RenderPassInfo *pTrunkRenderPasses;
+            RenderPassInfo *pTrunkRenderPassInfos;
+            uint32_t trunkWaitBarrierCount;
+            TrunkWaitBarrierInfo *pTrunkWaitBarrierInos;
             BindResult(uint32_t branchRenderPassCount = 0u
-                , RenderPassInfo *pBranchRenderPasses = nullptr
+                , RenderPassInfo *pBranchRenderPassInfos = nullptr
                 , uint32_t trunkRenderPassCount = 0u
-                , RenderPassInfo *pTrunkRenderPasses = nullptr
+                , RenderPassInfo *pTrunkRenderPassInfos = nullptr
+                , uint32_t trunkWaitBarrierCount = 0u
+                , TrunkWaitBarrierInfo *pTrunkWaitBarrierInos = nullptr
                 );
         };
 

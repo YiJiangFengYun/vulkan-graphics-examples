@@ -18,12 +18,25 @@ namespace vg
 			ResultInfo();
         };
 
-        static void record(uint32_t itemCount
+        static void recordTrunk(uint32_t itemCount
             , RenderPassInfo *pItems
-            ,  vk::CommandBuffer *pCommandBuffer
+            , vk::CommandBuffer *pCommandBuffer
+            , PipelineCache *pPipelineCache
+            , vk::RenderPass *pRenderPass
+            , ResultInfo *pResult = nullptr
+            );
+        
+        static void recordBranch(uint32_t itemCount
+            , RenderPassInfo *pItems
+            , vk::CommandBuffer *pCommandBuffer
             , PipelineCache *pPipelineCache
             , ResultInfo *pResult = nullptr
             );
+
+        static void recordItemRenderPassBegin(RenderPassInfo *pItem
+            ,  vk::CommandBuffer *pCommandBuffer);
+        static void recordItemRenderPassEnd(RenderPassInfo *pItem
+            ,  vk::CommandBuffer *pCommandBuffer);
 
         static void recordItem(RenderPassInfo *pItem
             ,  vk::CommandBuffer *pCommandBuffer

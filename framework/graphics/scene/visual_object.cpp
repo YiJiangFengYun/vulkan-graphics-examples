@@ -2,8 +2,7 @@
 
 namespace vg
 {
-	BaseVisualObject::BindInfo::BindInfo(vk::RenderPass *pTrunkRenderPass
-		, uint32_t trunkFramebufferWidth
+	BaseVisualObject::BindInfo::BindInfo(uint32_t trunkFramebufferWidth
 		, uint32_t trunkFramebufferHeight
 		, const Matrix4x4 *pProjMatrix
         , const Matrix4x4 *pViewMatrix
@@ -13,8 +12,7 @@ namespace vg
         , fd::CostTimer *pPreparingCommandBufferCostTimer
 #endif //DEBUG and VG_ENABLE_COST_TIMER
         )
-        : pTrunkRenderPass(pTrunkRenderPass)
-		, trunkFramebufferWidth(trunkFramebufferWidth)
+        : trunkFramebufferWidth(trunkFramebufferWidth)
 		, trunkFramebufferHeight(trunkFramebufferHeight)
 		, pProjMatrix(pProjMatrix)
         , pViewMatrix(pViewMatrix)
@@ -28,14 +26,18 @@ namespace vg
     }
 
     BaseVisualObject::BindResult::BindResult(uint32_t branchRenderPassCount
-        , RenderPassInfo *pBranchRenderPasses
+        , RenderPassInfo *pBranchRenderPassInfos
         , uint32_t trunkRenderPassCount
-        , RenderPassInfo *pTrunkRenderPasses
+        , RenderPassInfo *pTrunkRenderPassInfos
+		, uint32_t trunkWaitBarrierCount
+        , TrunkWaitBarrierInfo *pTrunkWaitBarrierInos
         )
 	    : branchRenderPassCount(branchRenderPassCount)
-        , pBranchRenderPasses(pBranchRenderPasses)
+        , pBranchRenderPassInfos(pBranchRenderPassInfos)
         , trunkRenderPassCount(trunkRenderPassCount)
-        , pTrunkRenderPasses(pTrunkRenderPasses)
+        , pTrunkRenderPassInfos(pTrunkRenderPassInfos)
+		, trunkWaitBarrierCount(trunkWaitBarrierCount)
+		, pTrunkWaitBarrierInos(pTrunkWaitBarrierInos)
     {
 
     }
@@ -154,6 +156,7 @@ namespace vg
 		auto &result = *pResult;
 		uint32_t branchRenderPassCount = 0u;
 		uint32_t trunkRenderPassCount = 0u;
+		uint32_t trunkWaitBarrierCount = 0u;
 		if (m_pVisualizer != nullptr)
 		{
 			auto modelMatrix = _getModelMatrix();
@@ -167,7 +170,6 @@ namespace vg
 				Visualizer::BindInfo infoForVisualizer = {
 			        info.pProjMatrix,
 			        info.pViewMatrix,
-				    info.pTrunkRenderPass,
 				    info.trunkFramebufferWidth,
 				    info.trunkFramebufferHeight,
                     &modelMatrix,
@@ -184,19 +186,23 @@ namespace vg
     
 		        Visualizer::BindResult resultForVisualizer;
 				
-				if (result.pBranchRenderPasses != nullptr)
-					resultForVisualizer.pBranchRenderPasses = result.pBranchRenderPasses + branchRenderPassCount;
-				if (result.pTrunkRenderPasses != nullptr)
-					resultForVisualizer.pTrunkRenderPasses = result.pTrunkRenderPasses + trunkRenderPassCount;
+				if (result.pBranchRenderPassInfos != nullptr)
+					resultForVisualizer.pBranchRenderPassInfos = result.pBranchRenderPassInfos + branchRenderPassCount;
+				if (result.pTrunkRenderPassInfos != nullptr)
+					resultForVisualizer.pTrunkRenderPassInfos = result.pTrunkRenderPassInfos + trunkRenderPassCount;
+				if (result.pTrunkWaitBarrierInos != nullptr)
+				    resultForVisualizer.pTrunkWaitBarrierInos = result.pTrunkWaitBarrierInos + trunkWaitBarrierCount;
 
 		        m_pVisualizer->bindToRender(infoForVisualizer, &resultForVisualizer);
 
 				branchRenderPassCount += resultForVisualizer.branchRenderPassCount;
 				trunkRenderPassCount += resultForVisualizer.trunkRenderPassCount;
+				trunkWaitBarrierCount += resultForVisualizer.trunkWaitBarrierCount;
 			}
 		}
 		result.branchRenderPassCount = branchRenderPassCount;
 		result.trunkRenderPassCount = trunkRenderPassCount;
+		result.trunkWaitBarrierCount = trunkWaitBarrierCount;
 		
 	}
 

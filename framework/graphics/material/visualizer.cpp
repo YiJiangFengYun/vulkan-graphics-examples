@@ -4,7 +4,6 @@ namespace vg
 {
     Visualizer::BindInfo::BindInfo(const Matrix4x4 *pProjMatrix
         , const Matrix4x4 *pViewMatrix
-        , vk::RenderPass *pTrunkRenderPass
 		, uint32_t trunkFramebufferWidth
 		, uint32_t trunkFramebufferHeight
         , const Matrix4x4 *pModelMatrix
@@ -20,7 +19,6 @@ namespace vg
         )
         : pProjMatrix(pProjMatrix)
         , pViewMatrix(pViewMatrix)
-		, pTrunkRenderPass(pTrunkRenderPass)
 		, trunkFramebufferWidth(trunkFramebufferWidth)
 		, trunkFramebufferHeight(trunkFramebufferHeight)
 		, pModelMatrix(pModelMatrix)
@@ -37,14 +35,18 @@ namespace vg
     }
 
     Visualizer::BindResult::BindResult(uint32_t branchRenderPassCount
-        , RenderPassInfo *pBranchRenderPasses
+        , RenderPassInfo *pBranchRenderPassInfos
         , uint32_t trunkRenderPassCount
-        , RenderPassInfo *pTrunkRenderPasses
+        , RenderPassInfo *pTrunkRenderPassInfos
+        , uint32_t trunkWaitBarrierCount
+        , TrunkWaitBarrierInfo *pTrunkWaitBarrierInos
         )
 	    : branchRenderPassCount(branchRenderPassCount)
-        , pBranchRenderPasses(pBranchRenderPasses)
+        , pBranchRenderPassInfos(pBranchRenderPassInfos)
         , trunkRenderPassCount(trunkRenderPassCount)
-        , pTrunkRenderPasses(pTrunkRenderPasses)
+        , pTrunkRenderPassInfos(pTrunkRenderPassInfos)
+        , trunkWaitBarrierCount(trunkWaitBarrierCount)
+        , pTrunkWaitBarrierInos(pTrunkWaitBarrierInos)
     {
 
     }
@@ -70,17 +72,19 @@ namespace vg
 		auto &result = *pResult;
         result.branchRenderPassCount = 0u;
 
-        if (result.pBranchRenderPasses != nullptr)
+        if (result.pBranchRenderPassInfos != nullptr)
         {
 
         }
+
+        result.trunkWaitBarrierCount = 0u;
         
         result.trunkRenderPassCount = 1u;
 
-        if (result.pTrunkRenderPasses != nullptr)
+        if (result.pTrunkRenderPassInfos != nullptr)
         {
-            auto &trunkRenderPassInfo = *result.pTrunkRenderPasses;
-            trunkRenderPassInfo.pRenderPass = info.pTrunkRenderPass;
+            auto &trunkRenderPassInfo = *result.pTrunkRenderPassInfos;
+            trunkRenderPassInfo.pRenderPass = nullptr;
             trunkRenderPassInfo.framebufferWidth = info.trunkFramebufferWidth;
             trunkRenderPassInfo.framebufferHeight = info.trunkFramebufferHeight;
             trunkRenderPassInfo.projMatrix = *(info.pProjMatrix);
@@ -92,6 +96,8 @@ namespace vg
             trunkRenderPassInfo.hasClipRect = info.hasClipRect;
             trunkRenderPassInfo.pClipRect = info.pClipRect;
         }
+
+        
         
     }
 } //vg

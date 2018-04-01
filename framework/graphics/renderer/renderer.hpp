@@ -136,6 +136,7 @@ namespace vg
 		//void _createFence();
 
 		void _recordCommandBufferForBegin();
+		void _recordTrunkWaitBarrier(std::vector<TrunkWaitBarrierInfo> &trunkWaitBarrierInfos);
 		void _recordTrunkRenderPassForBegin();
 
 		void _recordTrunkRenderPassForEnd();
@@ -146,14 +147,18 @@ namespace vg
 	        , const RenderInfo &info
 	    	, RenderResultInfo &resultInfo
 			, std::vector<RenderPassInfo> &trunkRenderPassInfos
-			, std::vector<RenderPassInfo> &branchRenderPassInfos);
+			, std::vector<RenderPassInfo> &branchRenderPassInfos
+			, std::vector<TrunkWaitBarrierInfo> &trunkWaitBarrierInfos
+			);
 
 		 void _renderScene3(const Scene<SpaceType::SPACE_3> *pScene
 		    , const Camera<SpaceType::SPACE_3> *pCamera
 	        , const RenderInfo &info
 	    	, RenderResultInfo &resultInfo
 			, std::vector<RenderPassInfo> &trunkRenderPassInfos
-			, std::vector<RenderPassInfo> &branchRenderPassInfos);
+			, std::vector<RenderPassInfo> &branchRenderPassInfos
+			, std::vector<TrunkWaitBarrierInfo> &pTrunkWaitBarrierInos
+			);
 
 #if defined(DEBUG) && defined(VG_ENABLE_COST_TIMER)
 

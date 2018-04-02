@@ -688,13 +688,7 @@ namespace vg
         fd::CostTimer preparingCommonMatrixsCostTimer(fd::CostTimer::TimerType::ONCE);
 		preparingCommonMatrixsCostTimer.begin();
 #endif //DEBUG and VG_ENABLE_COST_TIMER
-
-		auto projMatrix3x3 = pCamera->getProjMatrix();
-		if (pScene->getIsRightHand() == VG_FALSE)
-		{
-			projMatrix3x3[1][1] *= -1;
-		}
-		auto projMatrix = tranMat3ToMat4(projMatrix3x3);
+		auto projMatrix = pScene->getProjMatrix(pCamera);
 		
 		auto viewMatrix3x3 = pCamera->getTransform()->getMatrixWorldToLocal();
 		auto viewMatrix = tranMat3ToMat4(viewMatrix3x3);
@@ -813,12 +807,7 @@ namespace vg
 		preparingCommonMatrixsCostTimer.begin();
 #endif //DEBUG and VG_ENABLE_COST_TIMER
 
-		auto projMatrix = pCamera->getProjMatrix();
-
-		if (pScene->getIsRightHand() == VG_FALSE)
-		{
-			projMatrix[1][1] *= -1;
-		}
+		auto projMatrix = pScene->getProjMatrix(pCamera);
 
 		auto viewMatrix = pCamera->getTransform()->getMatrixWorldToLocal();
 #if defined(DEBUG) && defined(VG_ENABLE_COST_TIMER)
@@ -861,7 +850,7 @@ namespace vg
 			    auto bounds = dynamic_cast<SceneType::VisualObjectType::MeshDimType *>(pMesh)->getBounds();
 			    auto pTransform = pVisualObject->getTransform();
 				fd::Rect2D clipRect;
-			    if(pCamera->isInView(pTransform, bounds, &clipRect) == VG_TRUE)
+				if (pScene->isInView(pCamera, pTransform, bounds, &clipRect) == VG_TRUE)
 			    {
 			    	validVisualObjects[validVisualObjectCount++] = pVisualObject;
 					//Transform range [-1, 1] to range [0, 1]
@@ -869,11 +858,6 @@ namespace vg
 				    clipRect.y = (clipRect.y + 1.0f) / 2.0f;
 				    clipRect.width = clipRect.width / 2.0f;
 				    clipRect.height = clipRect.height / 2.0f;
-    
-				    if (pScene->getIsRightHand() == VG_FALSE)
-		            {
-		            	clipRect.y = 1.0f - clipRect.y - clipRect.height;
-		            }
     
 				    uint32_t subMeshCount = pVisualObject->getSubMeshCount();
 				    pVisualObject->setHasClipRect(VG_TRUE);
@@ -1036,8 +1020,8 @@ namespace vg
 			else {
 				//Filter obj out of camera view.
 			    auto boundsOfChild = dynamic_cast<Mesh<MeshDimType::SPACE_2> *>(pMeshOfChild)->getBounds();
-			    fd::Rect2D clipRect;				
-			    if (pCamera->isInView(pChild, boundsOfChild, &clipRect) == VG_TRUE)
+			    fd::Rect2D clipRect;	
+				if (pScene->isInView(pCamera, pChild, boundsOfChild, &clipRect) == VG_TRUE)			
 			    {
 			    	arrPVObjs[PVObjIndex++] = pVisualObjectOfChild;
 					//Transform range [-1, 1] to range [0, 1]
@@ -1045,10 +1029,6 @@ namespace vg
 				    clipRect.y = (clipRect.y + 1.0f) / 2.0f;
 				    clipRect.width = clipRect.width / 2.0f;
 				    clipRect.height = clipRect.height / 2.0f;
-				    if (pScene->getIsRightHand() == VG_FALSE)
-		            {
-		            	clipRect.y = 1.0f - clipRect.y - clipRect.height;
-		            }
 				    uint32_t subMeshCount = pVisualObjectOfChild->getSubMeshCount();
 				    pVisualObjectOfChild->setHasClipRect(VG_TRUE);
 				    pVisualObjectOfChild->updateClipRects(clipRect, subMeshCount);

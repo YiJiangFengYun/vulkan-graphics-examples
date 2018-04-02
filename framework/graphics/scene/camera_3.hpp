@@ -26,7 +26,6 @@ namespace vg
 		void setZFar(float zFar);
 
 		typename TransformType::MatrixType getProjMatrix() const override;
-		Bool32 isInView(Transform<SpaceType::SPACE_3> *pTransform, BoundsType bounds, fd::Rect2D *viewRect = nullptr) const override;
 	private:
 		float m_fovy, m_aspect, m_zNear, m_zFar;
 		TransformType::MatrixType m_projMatrix;

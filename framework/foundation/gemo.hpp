@@ -173,6 +173,8 @@ namespace fd
 		float width;
 		float height;
 	};
+
+	
 }
 
 #include "foundation/gemo.inl"

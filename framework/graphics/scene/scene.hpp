@@ -34,6 +34,7 @@ namespace vg
 		using CameraType = Camera<SPACE_TYPE>;
 		using LightType = Light<SPACE_TYPE>;
 		using TransformType = Transform<SPACE_TYPE>;
+		using BoundsType = fd::Bounds<typename SpaceTypeInfo<SPACE_TYPE>::PointType>;
 
 		const std::shared_ptr<TransformType> pRootTransformForVisualObject;
 		const std::shared_ptr<TransformType> pRootTransformForCamera;
@@ -64,7 +65,13 @@ namespace vg
 		void addLight(LightType *pTarget, LightType *pParent = nullptr);
 		void removeLight(LightType *pTarget);
 
-
+		/*Get projective matrix with camera, it will change origin projective matrix of the camera
+		  with handed type info.*/
+        virtual Matrix4x4 getProjMatrix(const CameraType *pCamera) const = 0;
+		virtual Bool32 isInView(const CameraType *pCamera
+		    , TransformType *pTransform
+		    , BoundsType bounds
+			, fd::Rect2D *viewRect = nullptr) const = 0;
 	protected:
 
 		//aggregations

@@ -62,7 +62,7 @@ namespace vg
 
         void updatePassInfo(uint32_t passCount, Pass * const *pPasses);
 
-        void bindToRender(const BindInfo info, BindResult *pResult);
+        virtual void bindToRender(const BindInfo info, BindResult *pResult);
         
 
     protected:

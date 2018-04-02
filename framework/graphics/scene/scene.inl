@@ -248,4 +248,6 @@ namespace vg
 
 		pTransform->setParent(nullptr);
 	}
+
+    
 } //namespace kgs

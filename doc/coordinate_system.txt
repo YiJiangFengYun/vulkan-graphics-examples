@@ -1,0 +1,4 @@
+1.left handed 3d coordinate system: x towards the right, y towards the up and z towards the inner.
+2.left handed 2d coorindate system: x towards the right, y towrads the up (and z towards the inner).
+3.right handed 3d coorindate system: x towards the right, y towards the inner and z towards the up.
+4.right handed 2d coorindate system: x towards the right, y towards the down (and z towards the inner). 

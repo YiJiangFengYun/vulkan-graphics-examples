@@ -26,10 +26,6 @@ namespace vg
 		}
 
 		virtual typename TransformType::MatrixType getProjMatrix() const = 0;
-
-		virtual Bool32 isInView(Transform<SPACE_TYPE> *pTransform
-		    , BoundsType bounds
-			, fd::Rect2D *viewRect = nullptr) const = 0;
 	};
 } //namespace kgs
 

@@ -1,5 +1,8 @@
 #include "graphics/scene/scene_3.hpp"
 
+#include "graphics/scene/camera_3.hpp"
+#include "graphics/scene/camera_op_3.hpp"
+
 namespace vg
 {
 	Scene3::Scene3()
@@ -8,7 +11,7 @@ namespace vg
 
 	}
 
-	Matrix4x4 Scene3::getProjMatrix(const CameraType *pCamera) const
+	Scene3::MatrixType Scene3::getProjMatrix(const CameraType *pCamera) const
 	{
 		auto projMatrix = pCamera->getProjMatrix();
 		if (m_isRightHand == VG_FALSE)
@@ -24,90 +27,46 @@ namespace vg
 		return projMatrix;
 	}
 
+	Scene3::BoundsType Scene3::getViewBoundsInWorld(const CameraType *pCamera) const
+	{
+		using PointType = typename SpaceTypeInfo<SpaceType::SPACE_3>::PointType;
+		using MatrixVectorType = typename SpaceTypeInfo<SpaceType::SPACE_3>::MatrixVectorType;
+		BoundsType bounds;
+		if (pCamera->getIsOrthographic() == VG_FALSE)
+		{
+			const Camera3 *pCamera3 = dynamic_cast<const Camera3 *>(pCamera);
+			auto tanHalfFovy = glm::tan(pCamera3->getFovY() / 2.0f);
+			float minZ = pCamera3->getZNear();
+			float maxZ = pCamera3->getZFar();
+			float maxX = maxZ * pCamera3->getAspect() * tanHalfFovy;
+			float minX = -maxX;
+			float maxY = maxZ * tanHalfFovy;
+			float minY = -minY;
+			bounds.setMinMax(PointType(minX, minY, minZ), PointType(maxX, maxY, maxZ));
+		}
+		else
+		{
+			const CameraOP3 *pCameraOP3 = dynamic_cast<const CameraOP3 *>(pCamera);
+			bounds = pCameraOP3->getViewBounds();
+		}
+
+		//matrix from camera local to world.
+		auto matrix = pCamera->getTransform()->getMatrixLocalToWorld();
+		auto boundsInWorld = tranBoundsToNewSpace(bounds, matrix, VG_FALSE);
+
+		return boundsInWorld;
+	}
+
 	Bool32 Scene3::isInView(const CameraType *pCamera
 		, TransformType *pTransform
 		, BoundsType bounds
 		, fd::Rect2D *viewRect) const
 	{
-		auto min = bounds.getMin();
-		auto max = bounds.getMax();
-		using PointType = typename SpaceTypeInfo<SpaceType::SPACE_3>::PointType;
-		using MatrixVectorType = typename SpaceTypeInfo<SpaceType::SPACE_3>::MatrixVectorType;
-		typename PointType::length_type len = PointType::length();
-
-		//use permutation combination algorithm to get all points of bounds.
-		uint32_t pointCount = static_cast<uint32_t>(std::pow(2u, len));
-		std::vector<MatrixVectorType> points(pointCount);
-		uint32_t pointIndex = 0u;
-		std::vector<Bool32> places(len);
-		for (typename PointType::length_type i = 0; i <= len; ++i)
-		{
-			std::fill(places.begin(), places.end(), VG_FALSE);
-			std::fill(places.begin(), places.begin() + i, VG_TRUE);
-			do
-			{
-				typename PointType::length_type j;
-				for (j = 0; j < len; ++j)
-				{
-					if (places[j] == VG_TRUE)
-					{
-						points[pointIndex][j] = min[j];
-					}
-					else
-					{
-						points[pointIndex][j] = max[j];
-					}
-				}
-				points[pointIndex][j] = 1.0f; //final number is 1.0 for point.
-				++pointIndex;
-			} while (std::prev_permutation(places.begin(), places.end()));
-		}
-
 		//get MVP matrix.
 		auto mvpMatrix = getProjMatrix(pCamera) * pCamera->getTransform()->getMatrixWorldToLocal() * pTransform->getMatrixLocalToWorld();
-
-		//transform point from model coordinate system to normalize device coordinate system.
-		const typename PointType::value_type epsilon = std::numeric_limits<typename PointType::value_type>::epsilon();
-		for (uint8_t i = 0; i < pointCount; ++i)
-		{
-			points[i] = mvpMatrix * points[i];
-			if(glm::abs(points[i].w) > epsilon)
-			{
-				points[i] = points[i] / points[i].w;
-			}
-			else
-			{
-				typename PointType::length_type j;
-				for (j = 0; j < len; ++j) {
-					if (j < len - 1) {
-						//x y value is infinite.
-						points[i][j] = std::numeric_limits<typename PointType::value_type>::max();
-					} else {
-						// z value is zero.
-						points[i][j] = 0.0f;
-					}
-				}
-			}
-		}
-
-		PointType minInView;
-		PointType maxInView;
-
-		for (typename PointType::length_type i = 0; i < len; ++i)
-		{
-			typename PointType::value_type min = std::numeric_limits<typename PointType::value_type>::max(), max = -std::numeric_limits<typename PointType::value_type>::max();
-			for (uint8_t j = 0; j < pointCount; ++j)
-			{
-				if (min > points[j][i])min = points[j][i];
-				if (max < points[j][i])max = points[j][i];
-			}
-			minInView[i] = min;
-			maxInView[i] = max;
-		}
-
-		fd::Bounds<PointType> boundsInView(minInView, maxInView);
-		fd::Bounds<PointType> boundsOfView(PointType(-1.0f, -1.0f, 0.0f), PointType(1.0f, 1.0f, 1.0f));
-		fd::Bounds<PointType> intersectionInView;		
+		auto boundsInView = tranBoundsToNewSpace(bounds, mvpMatrix, pCamera->getIsOrthographic() == VG_FALSE);
+		BoundsType boundsOfView(PointType(-1.0f, -1.0f, 0.0f), PointType(1.0f, 1.0f, 1.0f));
+		BoundsType intersectionInView;		
 		Bool32 isInsideCameraView = VG_FALSE;
 		////check if it is inside camera view.
 		if (boundsOfView.intersects(boundsInView, &intersectionInView))

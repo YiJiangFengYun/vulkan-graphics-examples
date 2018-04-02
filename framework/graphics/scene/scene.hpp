@@ -36,6 +36,9 @@ namespace vg
 		using TransformType = Transform<SPACE_TYPE>;
 		using BoundsType = fd::Bounds<typename SpaceTypeInfo<SPACE_TYPE>::PointType>;
 
+		using MatrixType = SpaceTypeInfo<SPACE_TYPE>::MatrixType;
+		using PointType = SpaceTypeInfo<SPACE_TYPE>::PointType;
+
 		const std::shared_ptr<TransformType> pRootTransformForVisualObject;
 		const std::shared_ptr<TransformType> pRootTransformForCamera;
 		const std::shared_ptr<TransformType> pRootTransformForLight;
@@ -67,11 +70,14 @@ namespace vg
 
 		/*Get projective matrix with camera, it will change origin projective matrix of the camera
 		  with handed type info.*/
-        virtual Matrix4x4 getProjMatrix(const CameraType *pCamera) const = 0;
+        virtual MatrixType getProjMatrix(const CameraType *pCamera) const = 0;
+		virtual BoundsType getViewBoundsInWorld(const CameraType *pCamera) const = 0;
 		virtual Bool32 isInView(const CameraType *pCamera
 		    , TransformType *pTransform
 		    , BoundsType bounds
 			, fd::Rect2D *viewRect = nullptr) const = 0;
+
+		static BoundsType tranBoundsToNewSpace(BoundsType bounds, MatrixType matrix, Bool32 isProjective);
 	protected:
 
 		//aggregations
@@ -90,12 +96,12 @@ namespace vg
 		virtual void _removeVisualObject(VisualObjectType *pTarget);
 	private:
 		template <typename T>
-		inline Bool32 _isHasObject(const T *pTarget
+		Bool32 _isHasObject(const T *pTarget
 			, const std::unordered_map<InstanceID, T *> &map
 		) const;
 
 		template <typename T>
-		inline void _addObject(T *pTarget
+		void _addObject(T *pTarget
 			, std::vector<T *> &arr
 			, std::unordered_map<InstanceID, T *> &map
 			, std::unordered_map<InstanceID, T *> &mapTransformToObjs
@@ -104,7 +110,7 @@ namespace vg
 		);
 
 		template <typename T>
-		inline void _removeObject(T *pTarget
+		void _removeObject(T *pTarget
 			, std::vector<T *> &arr
 			, std::unordered_map<InstanceID, T *> &map
 			, std::unordered_map<InstanceID, T *> &mapTransformToObjs

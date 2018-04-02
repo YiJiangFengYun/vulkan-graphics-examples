@@ -10,7 +10,8 @@ namespace vg
 	{
 	public:
 		Scene2();
-		virtual Matrix4x4 getProjMatrix(const CameraType *pCamera) const override;
+		virtual MatrixType getProjMatrix(const CameraType *pCamera) const override;
+		virtual BoundsType getViewBoundsInWorld(const CameraType *pCamera) const override;
 		virtual Bool32 isInView(const CameraType *pCamera
 		    , TransformType *pTransform
 		    , BoundsType bounds

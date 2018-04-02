@@ -5,6 +5,7 @@ namespace vg
 		: Camera<SPACE_TYPE>()
 		, m_viewBounds(BoundsType::ValueType(-1.0f), BoundsType::ValueType(1.0f))
 	{
+		m_isOrthographic = VG_TRUE;		
 		apply();
 	}
 

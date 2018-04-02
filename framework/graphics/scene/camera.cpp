@@ -3,6 +3,7 @@
 namespace vg
 {
     BaseCamera::BaseCamera()
+        : m_isOrthographic(VG_FALSE)
     {
 
     }
@@ -10,5 +11,10 @@ namespace vg
     BaseCamera::~BaseCamera()
     {
         
+    }
+
+    Bool32 BaseCamera::getIsOrthographic() const
+    {
+        return m_isOrthographic;
     }
 }

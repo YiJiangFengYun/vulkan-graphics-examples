@@ -5,13 +5,15 @@
 
 namespace vg
 {
+	// enum class Camera
 	class BaseCamera
 	{
 	public:
 	    BaseCamera();
 		virtual ~BaseCamera();
+		Bool32 getIsOrthographic() const;		
 	protected:
-
+	    Bool32 m_isOrthographic;
 	};
 	template <SpaceType SPACE_TYPE>
 	class Camera : public BaseCamera, public Object<SPACE_TYPE>

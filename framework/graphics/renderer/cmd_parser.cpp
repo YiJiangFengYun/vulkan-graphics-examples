@@ -1,12 +1,12 @@
-#include "graphics/renderer/render_pass.hpp"
+#include "graphics/renderer/cmd_parser.hpp"
 
 namespace vg
 {
-    RenderPass::ResultInfo::ResultInfo()
+    CMDParser::ResultInfo::ResultInfo()
     {
     }
 	
-    void RenderPass::recordTrunk(CmdBuffer *pCmdBuffer
+    void CMDParser::recordTrunk(CmdBuffer *pCmdBuffer
         ,  vk::CommandBuffer *pCommandBuffer
         , PipelineCache *pPipelineCache
 		, vk::RenderPass *pRenderPass
@@ -23,7 +23,7 @@ namespace vg
 		}
 	}
 
-	void RenderPass::recordBranch(CmdBuffer *pCmdBuffer
+	void CMDParser::recordBranch(CmdBuffer *pCmdBuffer
         ,  vk::CommandBuffer *pCommandBuffer
         , PipelineCache *pPipelineCache
         , ResultInfo *pResult
@@ -51,7 +51,7 @@ namespace vg
 		}
 	}
 
-	void RenderPass::recordItemRenderPassBegin(RenderPassInfo *pRenderPassInfo
+	void CMDParser::recordItemRenderPassBegin(RenderPassInfo *pRenderPassInfo
             ,  vk::CommandBuffer *pCommandBuffer)
 	{
 		uint32_t framebufferWidth = pRenderPassInfo->framebufferWidth;
@@ -75,13 +75,13 @@ namespace vg
 		pCommandBuffer->beginRenderPass(renderPassBeginInfo, vk::SubpassContents::eInline);
 	}
 
-    void RenderPass::recordItemRenderPassEnd(RenderPassInfo *pRenderPassInfo
+    void CMDParser::recordItemRenderPassEnd(RenderPassInfo *pRenderPassInfo
             ,  vk::CommandBuffer *pCommandBuffer)
 	{
 		pCommandBuffer->endRenderPass();
 	}
 
-	void RenderPass::recordItem(RenderPassInfo *pRenderPassInfo
+	void CMDParser::recordItem(RenderPassInfo *pRenderPassInfo
         ,  vk::CommandBuffer *pCommandBuffer
         , PipelineCache *pPipelineCache
         , ResultInfo *pResult)
@@ -215,7 +215,7 @@ namespace vg
 		}
     }
 
-    void RenderPass::_createPipeline(vk::RenderPass *pRenderPass,
+    void CMDParser::_createPipeline(vk::RenderPass *pRenderPass,
 		const BaseMesh *pMesh,
 		uint32_t subMeshIndex,
 		Pass *pPass,
@@ -234,7 +234,7 @@ namespace vg
 		pPipeline = pPipelineCache->caching(info);
 	}
 
-	void RenderPass::_recordCommandBuffer(vk::Pipeline *pPipeline,
+	void CMDParser::_recordCommandBuffer(vk::Pipeline *pPipeline,
 	    vk::CommandBuffer *pCommandBuffer,
 		uint32_t framebufferWidth,
 		uint32_t framebufferHeight,

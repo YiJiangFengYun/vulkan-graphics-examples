@@ -1,5 +1,5 @@
-#ifndef VG_RENDER_PASS_HPP
-#define VG_RENDER_PASS_HPP
+#ifndef VG_CMD_PARSER_HPP
+#define VG_CMD_PARSER_HPP
 
 #include "graphics/global.hpp"
 #include "graphics/module.hpp"
@@ -10,7 +10,7 @@
 
 namespace vg
 {
-    class RenderPass
+    class CMDParser
     {
     public:
         struct ResultInfo
@@ -59,4 +59,4 @@ namespace vg
     };
 } //vg
 
-#endif
+#endif //VG_CMD_PARSER_HPP

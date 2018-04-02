@@ -2,7 +2,7 @@
 
 #include "graphics/buffer_data/util.hpp"
 #include "graphics/util/gemo_util.hpp"
-#include "graphics/renderer/render_pass.hpp"
+#include "graphics/renderer/cmd_parser.hpp"
 
 namespace vg
 {
@@ -320,7 +320,7 @@ namespace vg
 		}
 
 		//branch render pass.
-		RenderPass::recordBranch(&m_branchCmdBuffer,
+		CMDParser::recordBranch(&m_branchCmdBuffer,
 			m_pCommandBuffer.get(),
 			&m_pipelineCache
 			);
@@ -331,7 +331,7 @@ namespace vg
         //trunk render pass.
 		resultInfo.drawCount = m_trunkRenderPassCmdBuffer.getCmdCount();
 		_recordTrunkRenderPassForBegin();
-		RenderPass::recordTrunk(&m_trunkRenderPassCmdBuffer,
+		CMDParser::recordTrunk(&m_trunkRenderPassCmdBuffer,
 			m_pCommandBuffer.get(),
 			&m_pipelineCache,
 			m_pRenderPass.get()

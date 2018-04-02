@@ -67,4 +67,32 @@ namespace vg
 
 		return isInsideCameraView;
 	}
+
+	Bool32 Scene2::isInView(const CameraType *pCamera
+		    , BoundsType bounds
+			, fd::Rect2D *viewRect) const
+	{
+		//get VP matrix.
+		auto vpMatrix = getProjMatrix(pCamera) * pCamera->getTransform()->getMatrixWorldToLocal();
+		auto boundsInView = tranBoundsToNewSpace(bounds, vpMatrix, VG_FALSE);
+		BoundsType boundsOfView(PointType(-1.0f, -1.0f), PointType(1.0f, 1.0f));
+		BoundsType intersectionInView;		
+		Bool32 isInsideCameraView = VG_FALSE;
+		////check if it is inside camera view.
+		if (boundsOfView.intersects(boundsInView, &intersectionInView))
+		{
+			isInsideCameraView = VG_TRUE;
+			if (viewRect != nullptr)
+		    {
+		    	auto min = intersectionInView.getMin();
+		    	auto size = intersectionInView.getSize();
+		    	(*viewRect).x = min.x;
+		    	(*viewRect).y = min.y;
+		    	(*viewRect).width = size.x;
+		    	(*viewRect).height = size.y;
+		    }
+		}
+
+		return isInsideCameraView;
+	}
 } //namespace kgs

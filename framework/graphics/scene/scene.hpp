@@ -36,8 +36,9 @@ namespace vg
 		using TransformType = Transform<SPACE_TYPE>;
 		using BoundsType = fd::Bounds<typename SpaceTypeInfo<SPACE_TYPE>::PointType>;
 
-		using MatrixType = SpaceTypeInfo<SPACE_TYPE>::MatrixType;
-		using PointType = SpaceTypeInfo<SPACE_TYPE>::PointType;
+		using MatrixType = typename SpaceTypeInfo<SPACE_TYPE>::MatrixType;
+		using PointType = typename SpaceTypeInfo<SPACE_TYPE>::PointType;
+		using MatrixVectorType = typename SpaceTypeInfo<SPACE_TYPE>::MatrixVectorType;
 
 		const std::shared_ptr<TransformType> pRootTransformForVisualObject;
 		const std::shared_ptr<TransformType> pRootTransformForCamera;
@@ -72,8 +73,18 @@ namespace vg
 		  with handed type info.*/
         virtual MatrixType getProjMatrix(const CameraType *pCamera) const = 0;
 		virtual BoundsType getViewBoundsInWorld(const CameraType *pCamera) const = 0;
+		/**
+		 * This bounds is in object coordinate system. 
+		 **/
 		virtual Bool32 isInView(const CameraType *pCamera
 		    , TransformType *pTransform
+		    , BoundsType bounds
+			, fd::Rect2D *viewRect = nullptr) const = 0;
+		
+		/**
+		 * This Bounds is in world coorindate system.
+		 **/
+		virtual Bool32 isInView(const CameraType *pCamera
 		    , BoundsType bounds
 			, fd::Rect2D *viewRect = nullptr) const = 0;
 

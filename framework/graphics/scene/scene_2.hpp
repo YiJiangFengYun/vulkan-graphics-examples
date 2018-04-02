@@ -16,6 +16,10 @@ namespace vg
 		    , TransformType *pTransform
 		    , BoundsType bounds
 			, fd::Rect2D *viewRect = nullptr) const override;
+		
+		virtual Bool32 isInView(const CameraType *pCamera
+		    , BoundsType bounds
+			, fd::Rect2D *viewRect = nullptr) const override;
 	private:
 	};
 

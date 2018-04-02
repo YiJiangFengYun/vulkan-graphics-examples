@@ -250,7 +250,7 @@ namespace vg
 	}
 
     template <SpaceType SPACE_TYPE>
-	BoundsType Scene<SPACE_TYPE>::tranBoundsToNewSpace(BoundsType bounds, MatrixType matrix, Bool32 isProjective)
+	typename Scene<SPACE_TYPE>::BoundsType Scene<SPACE_TYPE>::tranBoundsToNewSpace(BoundsType bounds, MatrixType matrix, Bool32 isProjective)
 	{
 		auto min = bounds.getMin();
 		auto max = bounds.getMax();
@@ -284,8 +284,6 @@ namespace vg
 			} while (std::prev_permutation(places.begin(), places.end()));
 		}
 
-		auto matrix = pCamera->getTransform()->getMatrixLocalToWorld();
-
         const typename PointType::value_type epsilon = std::numeric_limits<typename PointType::value_type>::epsilon();
 
 		for (uint8_t i = 0; i < pointCount; ++i)
@@ -293,9 +291,10 @@ namespace vg
 			points[i] = matrix * points[i];
 			if (isProjective)
 			{
-				if(glm::abs(points[i].w) > epsilon)
+				//3 is w
+				if(glm::abs(points[i][3]) > epsilon)
 			    {
-			    	points[i] = points[i] / points[i].w;
+			    	points[i] = points[i] / points[i][3];
 			    }
 			    else
 			    {

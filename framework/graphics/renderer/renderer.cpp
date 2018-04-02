@@ -688,7 +688,8 @@ namespace vg
         fd::CostTimer preparingCommonMatrixsCostTimer(fd::CostTimer::TimerType::ONCE);
 		preparingCommonMatrixsCostTimer.begin();
 #endif //DEBUG and VG_ENABLE_COST_TIMER
-		auto projMatrix = pScene->getProjMatrix(pCamera);
+		auto projMatrix3x3 = pScene->getProjMatrix(pCamera);
+		auto projMatrix = tranMat3ToMat4(projMatrix3x3);
 		
 		auto viewMatrix3x3 = pCamera->getTransform()->getMatrixWorldToLocal();
 		auto viewMatrix = tranMat3ToMat4(viewMatrix3x3);

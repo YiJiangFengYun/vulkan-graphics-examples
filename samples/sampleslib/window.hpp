@@ -30,6 +30,7 @@ namespace sampleslib
 	class Window : public vgf::Window
 	{
 	public:
+	    using PointType = typename vg::SpaceTypeInfo<SPACE_TYPE>::PointType;
 	    using RotationType = typename vg::SpaceTypeInfo<SPACE_TYPE>::RotationType;
 		using RotationDimType = typename vg::SpaceTypeInfo<SPACE_TYPE>::RotationDimType;
 	    using SceneType = typename SpaceObjectInfo<SPACE_TYPE>::SceneType;
@@ -45,9 +46,7 @@ namespace sampleslib
 			, std::shared_ptr<vk::SurfaceKHR> pSurface
 		);
 	protected:
-		float m_zoom;
 		float m_zoomSpeed;
-		RotationDimType m_rotation;
 		float m_rotationSpeed;
 
 		TimePointType m_startTimeFrame;
@@ -75,6 +74,8 @@ namespace sampleslib
 		ImVec2 m_lastWinSize;
 
 		float m_cameraAspect;
+		PointType m_cameraPosition;
+		RotationDimType m_cameraRotation;
         
 		struct  {
 		    vgf::Bool32 left = VGF_FALSE;

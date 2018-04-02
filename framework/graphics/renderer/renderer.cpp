@@ -56,7 +56,7 @@ namespace vg
 		//_createFence();
 	}
 
-	Renderer::Renderer(TextureColorAttachment *pColorAttachmentTex)
+	Renderer::Renderer(Texture2D *pColorAttachmentTex)
 		: Base(BaseType::RENDERER)
 		, m_pSwapchainImageView(nullptr)
 		, m_swapchainImageFormat()
@@ -112,7 +112,7 @@ namespace vg
 		//_createFence();
 	}
 	
-	void Renderer::reset(TextureColorAttachment *pColorAttachmentTex)
+	void Renderer::reset(Texture2D *pColorAttachmentTex)
 	{
 		m_pSwapchainImageView = nullptr;
 		m_pColorTexture = pColorAttachmentTex;
@@ -526,8 +526,8 @@ namespace vg
 			vk::AttachmentStoreOp::eStore,        //storeOp
 			vk::AttachmentLoadOp::eDontCare,      //stencilLoadOp
 			vk::AttachmentStoreOp::eDontCare,     //stencilStoreOp
-			vk::ImageLayout::eUndefined,          //initialLayout
-			m_pColorTexture == nullptr ? vk::ImageLayout::ePresentSrcKHR : vk::ImageLayout::eShaderReadOnlyOptimal     //finalLayout
+			m_pColorTexture == nullptr ? vk::ImageLayout::eUndefined : m_pColorTexture->getImageLayout(),    //initialLayout
+			m_pColorTexture == nullptr ? vk::ImageLayout::ePresentSrcKHR : m_pColorTexture->getImageLayout()     //finalLayout
 		};
 
 		vk::AttachmentDescription depthAttachment = {

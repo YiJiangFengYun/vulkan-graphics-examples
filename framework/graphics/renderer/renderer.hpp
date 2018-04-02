@@ -8,6 +8,7 @@
 #include "graphics/renderer/renderer_option.hpp"
 #include "graphics/texture/texture_color_attachment.hpp"
 #include "graphics/texture/texture_depth_stencil_attachment.hpp"
+#include "graphics/texture/texture_2d.hpp"
 #include "graphics/renderer/pipeline_cache.hpp"
 
 //todo: batch mesh,
@@ -49,7 +50,7 @@ namespace vg
 			, uint32_t swapchainImageHeight
 		);
 
-		Renderer(TextureColorAttachment *pColorAttachmentTex
+		Renderer(Texture2D *pColorAttachmentTex
 		);
 
 		~Renderer();
@@ -59,7 +60,7 @@ namespace vg
 			, uint32_t swapchainImageWidth
 			, uint32_t swapchainImageHeight
 		);
-		void reset(TextureColorAttachment *pColorAttachmentTex);
+		void reset(Texture2D *pColorAttachmentTex);
 
 		Bool32 isValidForRender() const;
 
@@ -111,7 +112,7 @@ namespace vg
 		vk::ImageView *m_pSwapchainImageView;
 		vk::Format m_swapchainImageFormat;
 		//Renderer will render to color texture when it is not null.
-		TextureColorAttachment *m_pColorTexture;
+		Texture2D *m_pColorTexture;
 
 		// PreObjectRecordingFun m_preObjectRecordingFun;
 		// PostObjectRecordingFun m_postObjectRecordingFun;

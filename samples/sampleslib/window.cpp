@@ -18,9 +18,9 @@ namespace sampleslib
 		glfwSetScrollCallback(m_pWindow.get(), [](GLFWwindow *window, double xOffset, double yOffset)
 		{
 			Window* const instance = (Window*)glfwGetWindowUserPointer(window);
-			instance->m_zoom += static_cast<float>(yOffset) * instance->m_zoomSpeed;
-			instance->m_zoom = std::min(-0.15f, std::max(-25.0f, instance->m_zoom));
-			std::cout << "Current zoom: " << instance->m_zoom << std::endl;
+			instance->m_cameraPosition.z += static_cast<float>(yOffset) * instance->m_zoomSpeed;
+			instance->m_cameraPosition.z = std::min(-0.15f, instance->m_cameraPosition.z);
+			std::cout << "Current camera position z: " << instance->m_cameraPosition.z << std::endl;
 		});
 
 		glfwSetMouseButtonCallback(m_pWindow.get(), [](GLFWwindow* glfwWindow, int button, int action, int /*mods*/) 
@@ -53,8 +53,8 @@ namespace sampleslib
 
             if (handledByIM) return;
 			if (instance->m_mouseButtons.left) {
-			    instance->m_rotation.x += dy * instance->m_rotationSpeed;
-		        instance->m_rotation.y -= dx * instance->m_rotationSpeed;
+			    instance->m_cameraRotation.x += dy * instance->m_rotationSpeed;
+		        instance->m_cameraRotation.y += dx * instance->m_rotationSpeed;
 			}
 
 			if (instance->m_mouseButtons.right) {
@@ -88,8 +88,8 @@ namespace sampleslib
 		m_pCamera->updateProj(glm::radians(60.0f), m_cameraAspect, 0.1f, 256.0f);
 		auto pTransform = m_pCamera->getTransform();
 
-		vg::Quaternion eulerAngles = vg::Quaternion(m_rotation);
-		pTransform->setLocalPosition(glm::vec3(0.0f, 0.0f, m_zoom));
+		vg::Quaternion eulerAngles = vg::Quaternion(m_cameraRotation);
+		pTransform->setLocalPosition(m_cameraPosition);
 		pTransform->setLocalRotation(eulerAngles);
 		m_pCamera->apply();		
 	}
@@ -101,7 +101,8 @@ namespace sampleslib
 		    glm::vec2(1.0f, 1.0f)));
 		auto pTransform = m_pCamera->getTransform();
 
-		pTransform->setLocalRotation(m_rotation);
+		pTransform->setLocalPosition(m_cameraPosition);
+		pTransform->setLocalRotation(m_cameraRotation);
 		m_pCamera->apply();		
 	}
 }

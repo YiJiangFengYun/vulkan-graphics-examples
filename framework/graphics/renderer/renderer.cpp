@@ -4,13 +4,19 @@
 #include "graphics/util/gemo_util.hpp"
 #include "graphics/renderer/cmd_parser.hpp"
 
+// #define USE_WORLD_BOUNDS
+
 namespace vg
 {
-	void fillValidVisualObjects(std::vector<VisualObject<SpaceType::SPACE_2> *> &arrPVObjs,
-		uint32_t &PVObjIndex,
-		const Transform<SpaceType::SPACE_2> *pTransform,
-		const Scene<SpaceType::SPACE_2> *pScene,
-	    const Camera<SpaceType::SPACE_2> *pCamera);
+	void fillValidVisualObjects(std::vector<VisualObject<SpaceType::SPACE_2> *> &arrPVObjs
+	    , uint32_t &PVObjIndex
+		, const Transform<SpaceType::SPACE_2> *pTransform
+		, const Scene<SpaceType::SPACE_2> *pScene
+		, const Camera<SpaceType::SPACE_2> *pCamera
+#ifdef USE_WORLD_BOUNDS
+		, const fd::Bounds<SpaceTypeInfo<SpaceType::SPACE_2>::PointType> *pBounds
+#endif
+		);
 
 	const vk::Format Renderer::DEFAULT_DEPTH_STENCIL_FORMAT(vk::Format::eD32SfloatS8Uint);
 
@@ -690,6 +696,9 @@ namespace vg
 #endif //DEBUG and VG_ENABLE_COST_TIMER
 		auto projMatrix3x3 = pScene->getProjMatrix(pCamera);
 		auto projMatrix = tranMat3ToMat4(projMatrix3x3);
+#ifdef USE_WORLD_BOUNDS
+		auto boundsOfViewInWorld = pScene->getViewBoundsInWorld(pCamera);
+#endif
 		
 		auto viewMatrix3x3 = pCamera->getTransform()->getMatrixWorldToLocal();
 		auto viewMatrix = tranMat3ToMat4(viewMatrix3x3);
@@ -719,6 +728,9 @@ namespace vg
 			, pRoot.get()
 			, pScene
 			, pCamera
+#ifdef USE_WORLD_BOUNDS
+			, &boundsOfViewInWorld
+#endif //USE_WORLD_BOUNDS
 		);
 
 #if defined(DEBUG) && defined(VG_ENABLE_COST_TIMER)
@@ -810,6 +822,10 @@ namespace vg
 
 		auto projMatrix = pScene->getProjMatrix(pCamera);
 
+#ifdef USE_WORLD_BOUNDS
+		auto boundsOfViewInWorld = pScene->getViewBoundsInWorld(pCamera);
+#endif
+
 		auto viewMatrix = pCamera->getTransform()->getMatrixWorldToLocal();
 #if defined(DEBUG) && defined(VG_ENABLE_COST_TIMER)
         preparingCommonMatrixsCostTimer.end();
@@ -850,8 +866,16 @@ namespace vg
 			{
 			    auto bounds = dynamic_cast<SceneType::VisualObjectType::MeshDimType *>(pMesh)->getBounds();
 			    auto pTransform = pVisualObject->getTransform();
+#ifdef USE_WORLD_BOUNDS
+				auto boundsInWorld = tranBoundsToNewSpace<Vector3>(bounds, pTransform->getMatrixLocalToWorld(), VG_FALSE);      
+#endif //USE_WORLD_BOUNDS
 				fd::Rect2D clipRect;
-				if (pScene->isInView(pCamera, pTransform, bounds, &clipRect) == VG_TRUE)
+#ifdef USE_WORLD_BOUNDS
+				if (boundsOfViewInWorld.isIntersects(boundsInWorld) == FD_TRUE && 
+				    pScene->isInView(pCamera, boundsInWorld, &clipRect) == VG_TRUE)
+#else 
+                if (pScene->isInView(pCamera, pTransform, bounds, &clipRect) == VG_TRUE)
+#endif //USE_WORLD_BOUNDS
 			    {
 			    	validVisualObjects[validVisualObjectCount++] = pVisualObject;
 					//Transform range [-1, 1] to range [0, 1]
@@ -989,11 +1013,15 @@ namespace vg
 #endif //DEBUG and VG_ENABLE_COST_TIMER
 	}
 
-	void fillValidVisualObjects(std::vector<VisualObject<SpaceType::SPACE_2> *> &arrPVObjs,
-		uint32_t &PVObjIndex,
-		const Transform<SpaceType::SPACE_2> *pTransform,
-		const Scene<SpaceType::SPACE_2> *pScene,
-	    const Camera<SpaceType::SPACE_2> *pCamera)
+	void fillValidVisualObjects(std::vector<VisualObject<SpaceType::SPACE_2> *> &arrPVObjs
+	    , uint32_t &PVObjIndex
+		, const Transform<SpaceType::SPACE_2> *pTransform
+		, const Scene<SpaceType::SPACE_2> *pScene
+		, const Camera<SpaceType::SPACE_2> *pCamera
+#ifdef USE_WORLD_BOUNDS
+		, const fd::Bounds<SpaceTypeInfo<SpaceType::SPACE_2>::PointType> *pViewBoundsInWorld
+#endif
+		)
 	{
 		VisualObject<SpaceType::SPACE_2> *pVisualObjectOfChild;
 		uint32_t childCount = pTransform->getChildCount();
@@ -1002,7 +1030,15 @@ namespace vg
 		{
 			pChild = pTransform->getChildWithIndex(i);
 			//Children's visual object is placed ahead of own visual objects
-			fillValidVisualObjects(arrPVObjs, PVObjIndex, pChild, pScene, pCamera);
+			fillValidVisualObjects(arrPVObjs
+			    , PVObjIndex
+				, pChild
+				, pScene
+				, pCamera
+#ifdef USE_WORLD_BOUNDS
+				, pViewBoundsInWorld
+#endif //USE_WORLD_BOUNDS
+				);
 			//Own visual object is placed behind children's visual object.
 			pVisualObjectOfChild = pScene->getVisualObjectWithTransform(pChild);
 			if (pVisualObjectOfChild == nullptr) continue;
@@ -1021,8 +1057,15 @@ namespace vg
 			else {
 				//Filter obj out of camera view.
 			    auto boundsOfChild = dynamic_cast<Mesh<MeshDimType::SPACE_2> *>(pMeshOfChild)->getBounds();
+#ifdef USE_WORLD_BOUNDS
+				auto boundsOfChildInWorld = tranBoundsToNewSpace<Vector2>(boundsOfChild, pChild->getMatrixLocalToWorld(), VG_FALSE);
+#endif //USE_WORLD_BOUNDS
 			    fd::Rect2D clipRect;	
-				if (pScene->isInView(pCamera, pChild, boundsOfChild, &clipRect) == VG_TRUE)			
+#ifdef USE_WORLD_BOUNDS
+				if (pViewBoundsInWorld->isIntersects(boundsOfChildInWorld) && pScene->isInView(pCamera, boundsOfChildInWorld, &clipRect) == VG_TRUE)
+#else 
+                if (pScene->isInView(pCamera, pChild, boundsOfChild, &clipRect) == VG_TRUE)
+#endif //USE_WORLD_BOUNDS
 			    {
 			    	arrPVObjs[PVObjIndex++] = pVisualObjectOfChild;
 					//Transform range [-1, 1] to range [0, 1]

@@ -87,8 +87,6 @@ namespace vg
 		virtual Bool32 isInView(const CameraType *pCamera
 		    , BoundsType bounds
 			, fd::Rect2D *viewRect = nullptr) const = 0;
-
-		static BoundsType tranBoundsToNewSpace(BoundsType bounds, MatrixType matrix, Bool32 isProjective);
 	protected:
 
 		//aggregations

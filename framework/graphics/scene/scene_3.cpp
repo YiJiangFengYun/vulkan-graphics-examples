@@ -1,5 +1,6 @@
 #include "graphics/scene/scene_3.hpp"
 
+#include "graphics/util/gemo_util.hpp"
 #include "graphics/scene/camera_3.hpp"
 #include "graphics/scene/camera_op_3.hpp"
 
@@ -52,7 +53,7 @@ namespace vg
 
 		//matrix from camera local to world.
 		auto matrix = pCamera->getTransform()->getMatrixLocalToWorld();
-		auto boundsInWorld = tranBoundsToNewSpace(bounds, matrix, VG_FALSE);
+		auto boundsInWorld = tranBoundsToNewSpace<PointType>(bounds, matrix, VG_FALSE);
 
 		return boundsInWorld;
 	}
@@ -64,7 +65,7 @@ namespace vg
 	{
 		//get MVP matrix.
 		auto mvpMatrix = getProjMatrix(pCamera) * pCamera->getTransform()->getMatrixWorldToLocal() * pTransform->getMatrixLocalToWorld();
-		auto boundsInView = tranBoundsToNewSpace(bounds, mvpMatrix, pCamera->getIsOrthographic() == VG_FALSE);
+		auto boundsInView = tranBoundsToNewSpace<PointType>(bounds, mvpMatrix, pCamera->getIsOrthographic() == VG_FALSE);
 		BoundsType boundsOfView(PointType(-1.0f, -1.0f, 0.0f), PointType(1.0f, 1.0f, 1.0f));
 		BoundsType intersectionInView;		
 		Bool32 isInsideCameraView = VG_FALSE;
@@ -92,7 +93,7 @@ namespace vg
 	{
 		//get VP matrix.
 		auto vpMatrix = getProjMatrix(pCamera) * pCamera->getTransform()->getMatrixWorldToLocal();
-		auto boundsInView = tranBoundsToNewSpace(bounds, vpMatrix, pCamera->getIsOrthographic() == VG_FALSE);
+		auto boundsInView = tranBoundsToNewSpace<PointType>(bounds, vpMatrix, pCamera->getIsOrthographic() == VG_FALSE);
 		BoundsType boundsOfView(PointType(-1.0f, -1.0f, 0.0f), PointType(1.0f, 1.0f, 1.0f));
 		BoundsType intersectionInView;		
 		Bool32 isInsideCameraView = VG_FALSE;

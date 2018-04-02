@@ -34,7 +34,7 @@ namespace vg
 
 		//matrix from camera local to world.
 		auto matrix = pCamera->getTransform()->getMatrixLocalToWorld();
-		auto boundsInWorld = tranBoundsToNewSpace(bounds, matrix, VG_FALSE);
+		auto boundsInWorld = tranBoundsToNewSpace<PointType>(bounds, matrix, VG_FALSE);
 
 		return boundsInWorld;
 	}
@@ -46,7 +46,7 @@ namespace vg
 	{
 		//get MVP matrix.
 		auto mvpMatrix = getProjMatrix(pCamera) * pCamera->getTransform()->getMatrixWorldToLocal() * pTransform->getMatrixLocalToWorld();
-		auto boundsInView = tranBoundsToNewSpace(bounds, mvpMatrix, VG_FALSE);
+		auto boundsInView = tranBoundsToNewSpace<PointType>(bounds, mvpMatrix, VG_FALSE);
 		BoundsType boundsOfView(PointType(-1.0f, -1.0f), PointType(1.0f, 1.0f));
 		BoundsType intersectionInView;		
 		Bool32 isInsideCameraView = VG_FALSE;
@@ -74,7 +74,7 @@ namespace vg
 	{
 		//get VP matrix.
 		auto vpMatrix = getProjMatrix(pCamera) * pCamera->getTransform()->getMatrixWorldToLocal();
-		auto boundsInView = tranBoundsToNewSpace(bounds, vpMatrix, VG_FALSE);
+		auto boundsInView = tranBoundsToNewSpace<PointType>(bounds, vpMatrix, VG_FALSE);
 		BoundsType boundsOfView(PointType(-1.0f, -1.0f), PointType(1.0f, 1.0f));
 		BoundsType intersectionInView;		
 		Bool32 isInsideCameraView = VG_FALSE;

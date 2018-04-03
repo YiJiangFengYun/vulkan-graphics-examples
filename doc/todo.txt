@@ -2,7 +2,4 @@
 format (COLLADA).
 //2.Mesh bounds is not applicable at sample texture array.
 3.Move pipeline state of VertexData and IndexData to their sub datas.
-4.Optimize visibility check. Objects in scene should check if in the bounds of camera view in the world, and then we calculate
-the objects in the view bounds clip rectangle. (In this way, the complexities of transfroming bounds and calculating clip rectangle
-turn to constant.)
-5.Change one material to multiply material for visual object.
+4.Change one material to multiply material for visual object.

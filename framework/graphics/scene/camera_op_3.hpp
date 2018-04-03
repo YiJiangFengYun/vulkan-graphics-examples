@@ -9,9 +9,8 @@ namespace vg
 	{
 	public:
 		CameraOP3();
-		void apply() override;
 	private:
-
+	    virtual void _applyProj() override;
 	};
 } //namespace kgs
 

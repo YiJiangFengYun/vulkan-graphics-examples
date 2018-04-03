@@ -9,7 +9,7 @@ namespace vg
 	{
 	public:
 		CameraOP2();
-		void apply() override;
+		virtual void _applyProj() override;
 	private:
 
 	};

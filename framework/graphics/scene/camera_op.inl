@@ -5,20 +5,14 @@ namespace vg
 		: Camera<SPACE_TYPE>()
 		, m_viewBounds(BoundsType::ValueType(-1.0f), BoundsType::ValueType(1.0f))
 	{
-		m_isOrthographic = VG_TRUE;		
-		apply();
-	}
-
-	template <SpaceType SPACE_TYPE>
-	void CameraOP<SPACE_TYPE>::apply()
-	{
-
+		m_isOrthographic = VG_TRUE;
 	}
 
 	template <SpaceType SPACE_TYPE>
 	void CameraOP<SPACE_TYPE>::updateProj(BoundsType viewBounds)
 	{
 		m_viewBounds = viewBounds;
+		_applyProj();
 	}
 
 	template <SpaceType SPACE_TYPE>

@@ -13,7 +13,7 @@ namespace vg
 		, m_zNear(DEFAULT_Z_NEAR)
 		, m_zFar(DEFAULT_Z_FAR)
 	{
-		apply();
+		m_projMatrix = glm::perspective(m_fovy, m_aspect, m_zNear, m_zFar);
 	}
 
 	void Camera3::updateProj(float fovy, float aspect, float zNear, float zFar)
@@ -22,13 +22,7 @@ namespace vg
 		m_aspect = aspect;
 		m_zNear = zNear;
 		m_zFar = zFar;
-	}
-
-	void Camera3::apply()
-	{
 		m_projMatrix = glm::perspective(m_fovy, m_aspect, m_zNear, m_zFar);
-		//GLM was originally designed for OpenGL, where the Y coordinate of the clip coordinates is inverted. 
-		// m_projMatrix[1][1] *= -1;
 	}
 
 	float Camera3::getFovY() const

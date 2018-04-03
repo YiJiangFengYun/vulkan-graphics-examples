@@ -15,7 +15,6 @@ namespace vg
 		static const float DEFAULT_Z_FAR;
 		Camera3();
 		void updateProj(float fovy, float aspect, float zNear, float zFar);
-		void apply();
 		float getFovY() const;
 		void setFovY(float fovy);
 		float getAspect() const;

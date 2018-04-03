@@ -5,10 +5,10 @@ namespace vg
 	CameraOP2::CameraOP2()
 		: CameraOP<SpaceType::SPACE_2>()
 	{
-
+		_applyProj();
 	}
-
-	void CameraOP2::apply()
+	 
+	void CameraOP2::_applyProj()
 	{
 		auto min = m_viewBounds.getMin();
 		auto max = m_viewBounds.getMax();

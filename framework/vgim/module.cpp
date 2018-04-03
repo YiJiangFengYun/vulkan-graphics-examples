@@ -154,7 +154,6 @@ namespace vgim
         auto &pCamera = m_pCamera;
 		pCamera->updateProj(fd::Bounds<glm::vec2>(glm::vec2(0.0f, 0.0f), 
 		    glm::vec2(static_cast<float>(canvasWidth), static_cast<float>(canvasHeight))));
-		pCamera->apply();
 
         //time
         io.DeltaTime = static_cast<float>(currTime - m_time);

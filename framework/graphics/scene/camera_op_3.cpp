@@ -6,9 +6,10 @@ namespace vg
 		: CameraOP<SpaceType::SPACE_3>()
 	{
 		m_viewBounds = { {-1.0f, -1.0f, 0.0f}, {1.0f, 1.0f, 1.0f} };
+		_applyProj();
 	}
 
-	void CameraOP3::apply()
+	void CameraOP3::_applyProj()
 	{
 		auto min = m_viewBounds.getMin();
 		auto max = m_viewBounds.getMax();
@@ -19,6 +20,5 @@ namespace vg
 			, -(max.y + min.y) / (max.y - min.y)
 			, -min.z / (max.z - min.z)
 		    , 1.0f };
-		// m_projMatrix[1][1] *= -1;
 	}
 } //namespace kgs

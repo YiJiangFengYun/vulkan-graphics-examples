@@ -11,13 +11,12 @@ namespace vg
 	public:
 		CameraOP();
 		void updateProj(BoundsType viewBounds);
-		virtual void apply();
 		typename TransformType::MatrixType getProjMatrix() const override;
 		BoundsType getViewBounds() const;
 	protected:
 		BoundsType m_viewBounds;
 		typename TransformType::MatrixType m_projMatrix;
-
+		virtual void _applyProj() = 0;
 	private:
 		
 	};

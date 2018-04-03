@@ -18,9 +18,9 @@ namespace sampleslib
 		glfwSetScrollCallback(m_pWindow.get(), [](GLFWwindow *window, double xOffset, double yOffset)
 		{
 			Window* const instance = (Window*)glfwGetWindowUserPointer(window);
-			instance->m_cameraPosition.z += static_cast<float>(yOffset) * instance->m_zoomSpeed;
-			instance->m_cameraPosition.z = std::min(-0.15f, instance->m_cameraPosition.z);
-			std::cout << "Current camera position z: " << instance->m_cameraPosition.z << std::endl;
+			instance->m_cameraZoom += static_cast<float>(yOffset) * instance->m_cameraZoomSpeed;
+			instance->m_cameraZoom = std::min(-0.15f, instance->m_cameraZoom);
+			std::cout << "Current camera zoom: " << instance->m_cameraZoom << std::endl;
 		});
 
 		glfwSetMouseButtonCallback(m_pWindow.get(), [](GLFWwindow* glfwWindow, int button, int action, int /*mods*/) 
@@ -86,12 +86,26 @@ namespace sampleslib
 	void Window<vg::SpaceType::SPACE_3>::_updateCamera()
 	{
 		m_pCamera->updateProj(glm::radians(60.0f), m_cameraAspect, 0.1f, 256.0f);
+
+		auto matrix = glm::mat4(1.0f);
+		matrix = glm::translate(matrix, glm::vec3(0.0f, 0.0f, m_cameraZoom));
+
+		auto rotationMatrix = glm::mat4(1.0f);
+		rotationMatrix = glm::rotate(rotationMatrix, glm::radians(m_cameraRotation.x), glm::vec3(1.0f, 0.0f, 0.0f));
+		rotationMatrix = glm::rotate(rotationMatrix, glm::radians(m_cameraRotation.y), glm::vec3(0.0f, 1.0f, 0.0f));
+		rotationMatrix = glm::rotate(rotationMatrix, glm::radians(m_cameraRotation.z), glm::vec3(0.0f, 1.0f, 0.0f));
+
+		auto translateMatrix = glm::translate(glm::mat4(1.0f), m_cameraPosition);
+		auto lookAtRotationMatrix = glm::rotation(vg::Vector3(0.0f, 0.0f, 1.0f), - m_cameraPosition);
+		auto localMatrix = glm::toMat4(lookAtRotationMatrix) * translateMatrix * rotationMatrix * matrix;
+		
+		// auto lookAtMatrix = glm::lookAt(m_cameraPosition, vg::Vector3(0.0f), vg::Vector3(0.0f, 1.0f, 0.0f));
+		// auto localMatrix = lookAtMatrix * rotationMatrix * matrix;
+
 		auto pTransform = m_pCamera->getTransform();
 
-		vg::Quaternion eulerAngles = vg::Quaternion(m_cameraRotation);
-		pTransform->setLocalPosition(m_cameraPosition);
-		pTransform->setLocalRotation(eulerAngles);
-		m_pCamera->apply();		
+		m_pCamera->getTransform()->setLocalMatrix(localMatrix);
+
 	}
 
     template <>
@@ -103,6 +117,5 @@ namespace sampleslib
 
 		pTransform->setLocalPosition(m_cameraPosition);
 		pTransform->setLocalRotation(m_cameraRotation);
-		m_pCamera->apply();		
 	}
 }

@@ -43,9 +43,9 @@ void Window::_init()
 void Window::_initState()
 {
 	ParentWindowType::_initState();
-	m_zoom = -20.0f;
+	m_cameraZoom = -20.0f;
 	/// Build a quaternion from euler angles (pitch, yaw, roll), in radians.
-	m_rotation = vg::Vector3(glm::radians(32.0f), glm::radians(45.0f), glm::radians(0.0f));
+	m_cameraRotation = vg::Vector3(glm::radians(0.0f), glm::radians(0.0f), glm::radians(0.0f));
 	m_timerSpeedFactor *= 0.5f;
 }
 
@@ -64,7 +64,7 @@ void Window::_loadAssimpScene()
 	createInfo.layoutComponentCount = layoutCount;
 	createInfo.pLayoutComponent = layouts;
 	createInfo.scale = vg::Vector3(0.35f, 0.35f, 0.35f);
-	createInfo.offset = vg::Vector3(20.0f, -20.0f, -0.0f);
+	createInfo.offset = vg::Vector3(0.0f, 0.0f, -0.0f);
 	m_assimpScene.init(createInfo);
 }
 

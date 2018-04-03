@@ -46,7 +46,7 @@ namespace sampleslib
 			, std::shared_ptr<vk::SurfaceKHR> pSurface
 		);
 	protected:
-		float m_zoomSpeed;
+		
 		float m_rotationSpeed;
 
 		TimePointType m_startTimeFrame;
@@ -73,6 +73,8 @@ namespace sampleslib
 		ImVec2 m_lastWinPos;
 		ImVec2 m_lastWinSize;
 
+		float m_cameraZoom;
+		float m_cameraZoomSpeed;
 		float m_cameraAspect;
 		PointType m_cameraPosition;
 		RotationDimType m_cameraRotation;

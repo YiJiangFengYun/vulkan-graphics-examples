@@ -11,8 +11,9 @@ namespace sampleslib
 			, height
 			, title
 		    )
-		, m_zoomSpeed(0.0)
 		, m_rotationSpeed(0.0)
+		, m_cameraZoom(0.0f)
+		, m_cameraZoomSpeed(0.0)
 		, m_cameraAspect(1.0f)
 		, m_cameraPosition()
 		, m_cameraRotation()
@@ -41,6 +42,8 @@ namespace sampleslib
 			, pSurface
 		)
 		, m_rotationSpeed(0.0)
+		, m_cameraZoom(0.0f)
+		, m_cameraZoomSpeed(0.0)
 		, m_cameraAspect(1.0f)
 		, m_cameraPosition()
 		, m_cameraRotation()
@@ -74,7 +77,8 @@ namespace sampleslib
 	template <vg::SpaceType SPACE_TYPE>
 	void Window<SPACE_TYPE>::_initState()
 	{
-		m_zoomSpeed = 0.1f;
+		m_cameraZoom = 0.0f;
+		m_cameraZoomSpeed = 0.1f;
 		m_rotationSpeed = 0.05f;
 		m_cameraAspect = (float)m_width / (float)m_height;
 		m_sceneCount = 1u;

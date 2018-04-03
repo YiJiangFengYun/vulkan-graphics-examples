@@ -27,6 +27,7 @@ Window::Window(std::shared_ptr<GLFWwindow> pWindow
 void Window::_init()
 {
 	ParentWindowType::_init();
+	m_cameraZoom = -5.0f;
 	_loadModel();
 	_createMesh();
 	_createMaterial();

@@ -72,9 +72,9 @@ void Window::_init()
 void Window::_initState()
 {
 	ParentWindowType::_initState();
-	m_zoom = -2.5f;
+	m_cameraZoom = -2.5f;
 	/// Build a quaternion from euler angles (pitch, yaw, roll), in radians.
-	m_rotation = vg::Vector3(glm::radians(0.0f), glm::radians(15.0f), glm::radians(0.0f));
+	m_cameraRotation = vg::Vector3(glm::radians(0.0f), glm::radians(0.0f), glm::radians(0.0f));
 
 }
 
@@ -201,7 +201,7 @@ void Window::_createModel()
 void Window::_onUpdate()
 {
 	ParentWindowType::_onUpdate();
-	m_otherInfo.viewPos = vg::Vector4(0.0f, 0.0f, m_zoom, 1.0f);
+	m_otherInfo.viewPos = vg::Vector4(m_pCamera->getTransform()->getLocalPosition(), 1.0f);
 
 	auto pos = m_lastWinPos;
 	auto size = m_lastWinSize;

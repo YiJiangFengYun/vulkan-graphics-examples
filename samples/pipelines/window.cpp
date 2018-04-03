@@ -48,9 +48,9 @@ void Window::_initState()
 	m_sceneCount = SCENE_COUNT;
 
 	m_cameraAspect = (float)m_width / 3.0f / (float)m_height;
-	m_zoom = -10.5f;
+	m_cameraZoom = -10.5f;
 	/// Build a quaternion from euler angles (pitch, yaw, roll), in radians.
-	m_rotation = vg::Vector3(glm::radians(25.0f), glm::radians(15.0f), glm::radians(0.0f));
+	m_cameraRotation = vg::Vector3(glm::radians(0.0f), glm::radians(15.0f), glm::radians(0.0f));
 
 	m_lightInfo.lightPos = vg::Vector4(0.0f, 2.0f, -1.0f, 1.0f);
 }
@@ -69,7 +69,7 @@ void Window::_loadAssimpScene()
 	createInfo.isCreateObject = VG_TRUE;
 	createInfo.layoutComponentCount = layoutCount;
 	createInfo.pLayoutComponent = layouts;
-	createInfo.offset = vg::Vector3(3.0f, -6.0f, -1.0f);
+	createInfo.offset = vg::Vector3(3.0f, -1.2f, -1.0f);
 	createInfo.isCreateObject = VG_FALSE;
 	m_assimpScene.init(createInfo);
 }

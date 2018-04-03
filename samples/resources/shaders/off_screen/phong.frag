@@ -19,7 +19,7 @@ void main()
 	vec4 IDiffuse = vec4(max(dot(inNormal, inLightVec), 0.0));
 	float specular = 0.75;
 	vec4 ISpecular = vec4(0.0);
-	if (dot(inEyePos, inNormal) < 0.0)
+	if (dot(inPos, inNormal) < 0.0)
 	{
 		ISpecular = vec4(0.5, 0.5, 0.5, 1.0) * pow(max(dot(Reflected, Eye), 0.0), 16.0) * specular; 
 	}

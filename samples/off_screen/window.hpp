@@ -17,17 +17,18 @@ public:
 		, std::shared_ptr<vk::SurfaceKHR> pSurface
 	);
 private:
-    bool m_wireFrame;
-	sampleslib::AssimpScene m_assimpScene;
-	std::shared_ptr<vg::Texture2D> m_pTexture;
+	sampleslib::AssimpScene m_assimpSceneModel;
+	sampleslib::AssimpScene m_assimpScenePlane;
+	// std::shared_ptr<vg::Texture2D> m_pOffScreenTex;
 	
-	std::shared_ptr<vg::Shader> m_pShaderSolid;
-	std::shared_ptr<vg::Pass> m_pPassSolid;
-	std::shared_ptr<vg::Material> m_pMaterialSolid;
+	std::shared_ptr<vg::Shader> m_pShaderModel;
+	std::shared_ptr<vg::Pass> m_pPassModel;
+	std::shared_ptr<vg::Material> m_pMaterialModel;
 
-	std::shared_ptr<vg::Shader> m_pShaderWireframe;
-	std::shared_ptr<vg::Pass> m_pPassWireframe;
-	std::shared_ptr<vg::Material> m_pMaterialWireframe;
+	std::shared_ptr<vg::Texture2D> m_pTexturePlane;    
+	std::shared_ptr<vg::Shader> m_pShaderPlane;
+	std::shared_ptr<vg::Pass> m_pPassPlane;
+	std::shared_ptr<vg::Material> m_PMaterialPlane;
 
 	struct OtherInfo 
 	{

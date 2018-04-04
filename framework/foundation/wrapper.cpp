@@ -7,7 +7,7 @@ namespace fd
 	std::shared_ptr<vk::Instance> createInstance(const vk::InstanceCreateInfo & createInfo,
 		vk::Optional<const vk::AllocationCallbacks> allocator)
 	{
-		auto instance = vk::createInstance(createInfo);
+		auto instance = vk::createInstance(createInfo, allocator);
 		return std::shared_ptr<vk::Instance>(new vk::Instance(instance),
 			[](vk::Instance *p) {
 			p->destroy();
@@ -17,7 +17,7 @@ namespace fd
 	std::shared_ptr<vk::Device> createDevice(vk::PhysicalDevice *pPhysicalDevice,
 		const vk::DeviceCreateInfo & createInfo, vk::Optional<const vk::AllocationCallbacks> allocator)
 	{
-		auto device = pPhysicalDevice->createDevice(createInfo);
+		auto device = pPhysicalDevice->createDevice(createInfo, allocator);
 		return std::shared_ptr<vk::Device>(new vk::Device(device),
 			[](vk::Device *p) {
 			p->destroy();
@@ -114,7 +114,7 @@ namespace fd
 	std::shared_ptr<vk::Semaphore> createSemaphore(vk::Device *pDevice,
 		const vk::SemaphoreCreateInfo & createInfo, vk::Optional<const vk::AllocationCallbacks> allocator)
 	{
-		auto semaphore = pDevice->createSemaphore(createInfo);
+		auto semaphore = pDevice->createSemaphore(createInfo, allocator);
 		return std::shared_ptr<vk::Semaphore>(new vk::Semaphore(semaphore),
 			[pDevice](vk::Semaphore *p) {
 			pDevice->destroySemaphore(*p);
@@ -222,7 +222,7 @@ namespace fd
 	std::shared_ptr<vk::Fence> createFence(vk::Device *pDevice,
 		const vk::FenceCreateInfo &createInfo, vk::Optional<const vk::AllocationCallbacks> allocator)
 	{
-		auto fence = pDevice->createFence(createInfo);
+		auto fence = pDevice->createFence(createInfo, allocator);
 		return std::shared_ptr<vk::Fence>(new vk::Fence(fence),
 			[pDevice](vk::Fence *p) {
 			pDevice->destroyFence(*p);

@@ -93,7 +93,11 @@ namespace vg
 			throw std::runtime_error("Validation layers requested is not available!");
 		}
 #endif // VG_ENABLE_VALIDATION_LAYERS
-		vk::ApplicationInfo appInfo = { m_appName.data(), m_appVersion, m_engineName.data(), m_engineVersion, VG_VK_API_VERSION };
+		vk::ApplicationInfo appInfo = { m_appName.data(), 
+			m_appVersion, 
+			m_engineName.data(), 
+			m_engineVersion, 
+			VG_VK_API_VERSION };
 
 		//query application required extensions.
 		auto requiredExtensions = _getRequiredExtensions();

@@ -303,3 +303,4 @@ __pycache__/
 build/
 .vscode/
 *.discard
+*.spv

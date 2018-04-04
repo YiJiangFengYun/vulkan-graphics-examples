@@ -44,6 +44,7 @@ void Window::_initState()
 {
 	ParentWindowType::_initState();
 	m_cameraZoom = -20.0f;
+	m_cameraPosition = vg::Vector3(0.0f, 0.0f, 0.0f);
 	/// Build a quaternion from euler angles (pitch, yaw, roll), in radians.
 	m_cameraRotation = vg::Vector3(glm::radians(0.0f), glm::radians(0.0f), glm::radians(0.0f));
 	m_timerSpeedFactor *= 0.5f;
@@ -64,7 +65,7 @@ void Window::_loadAssimpScene()
 	createInfo.layoutComponentCount = layoutCount;
 	createInfo.pLayoutComponent = layouts;
 	createInfo.scale = vg::Vector3(0.35f, 0.35f, 0.35f);
-	createInfo.offset = vg::Vector3(0.0f, 0.0f, -0.0f);
+	createInfo.offset = vg::Vector3(0.0f, -5.0f, -0.0f);
 	m_assimpScene.init(createInfo);
 }
 
@@ -126,8 +127,8 @@ void Window::_onUpdate()
 #define r 7.5f
 #define sin_t sin(glm::radians(m_passedTime * 360))
 #define cos_t cos(glm::radians(m_passedTime * 360))
-#define x 20.0f
-#define y -20.0f
+#define x 0.0f
+#define y -5.0f
 	m_pushConstants[0] = glm::vec4(x + r * 1.1 * sin_t,   y, r * 1.1 * cos_t, 1.0f);
 	m_pushConstants[1] = glm::vec4(x + -r * sin_t,        y, -r * cos_t, 1.0f);
 	m_pushConstants[2] = glm::vec4(x + r * 0.85f * sin_t, y, -sin_t * 2.5f, 1.5f);

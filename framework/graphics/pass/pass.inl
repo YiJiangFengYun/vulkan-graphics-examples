@@ -132,7 +132,6 @@ namespace vg
 				    , &data
 					, size
 					, offset2);
-				m_applied = VG_FALSE;
 				m_dataChanged = VG_TRUE;
 			}
 		}

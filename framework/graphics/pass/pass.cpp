@@ -482,9 +482,9 @@ namespace vg
 			    _updateDescriptorImageInfo();
 			}
 			_endCheckNeedUpdateDescriptorInfo();
-			_applyBufferContent();
 			m_applied = VG_TRUE;
 		}
+		_applyBufferContent();
 	}
 
 	PolygonMode Pass::getPolygonMode() const
@@ -564,6 +564,7 @@ namespace vg
 		else if(viewport.minDepth > viewport.maxDepth)
 			throw std::invalid_argument("The minDepth of viewport is bigger than the maxDepth of viewport!");
 #endif // DEBUG
+		if (m_viewport == viewport) return;
 		m_viewport = viewport;
 		_updatePipelineStateID();
 	}
@@ -593,6 +594,7 @@ namespace vg
 		else if (scissor.y > scissor.height)
 			throw std::invalid_argument("The y of scissor is bigger than the height of scissor!");
 #endif // DEBUG
+		if (m_scissor == scissor) return;
 		m_scissor = scissor;
 		_updatePipelineStateID();
 	}
@@ -920,6 +922,7 @@ namespace vg
 		Bool32 pushConstantRangesChanged = VG_FALSE;
 		if (m_lastPushConstantRanges != pushConstantRanges) {
 			pushConstantRangesChanged = VG_TRUE;
+			m_lastPushConstantRanges = pushConstantRanges;
 		}
 
 		auto pLayout = m_pDescriptorSetLayout;

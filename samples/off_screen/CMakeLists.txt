@@ -9,9 +9,10 @@ if(SOURCES)
     add_executable(${EXE_NAME} ${HEADERS} ${SOURCES})
     target_link_libraries(${EXE_NAME} ${LIBRARIES})
     set_property(TARGET ${EXE_NAME} PROPERTY FOLDER ${FOLDER_NAME})
-        
+    
     set(COMMON_SHADER_NAMES ${COMMON_SHADER_NAMES} "mirror")
     set(COMMON_SHADER_NAMES ${COMMON_SHADER_NAMES} "phong")
+    set(COMMON_SHADER_NAMES ${COMMON_SHADER_NAMES} "phong_offscreen")
     set(COMMON_SHADER_NAMES ${COMMON_SHADER_NAMES} "quad")
     set(SHADERS_DIR "${SHADERS_DIR}/${EXE_NAME}")
     set(RESOURCES_OUTPUT_DIR "${CMAKE_CURRENT_BINARY_DIR}")

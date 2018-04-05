@@ -4,6 +4,9 @@
 #include "sampleslib/window.hpp"
 #include "sampleslib/scene_assimp.hpp"
 
+#define FB_DIM 512
+#define FB_COLOR_FORMAT vk::Format::eR8G8B8A8Unorm
+
 class Window : public sampleslib::Window<vg::SpaceType::SPACE_3>
 {
 public:
@@ -19,30 +22,52 @@ public:
 private:
 	sampleslib::AssimpScene m_assimpSceneModel;
 	sampleslib::AssimpScene m_assimpScenePlane;
-	// std::shared_ptr<vg::Texture2D> m_pOffScreenTex;
+
+	std::vector<std::shared_ptr<vg::VisualObject3>> m_pVisualObjects;
+	std::vector<std::shared_ptr<vg::VisualObject3>> m_pVisualObjectOffscreens;
+    std::shared_ptr<vg::Scene3> m_pSceneOffScreen;
+	std::array<std::shared_ptr<vg::Texture2DColorAttachment>, 2> m_pOffScreenTexs;
+	std::array<std::shared_ptr<vg::Renderer>, 2> m_pOffScreenRenderers;
 	
-	std::shared_ptr<vg::Shader> m_pShaderModel;
+	std::shared_ptr<vg::Shader> m_pShaderModelOffscreen;
+    std::shared_ptr<vg::Pass> m_pPassModelOffscreen;
+	std::shared_ptr<vg::Material> m_pMaterialModelOffscreen;
+
+	std::shared_ptr<vg::Shader> m_pShaderModel;	
 	std::shared_ptr<vg::Pass> m_pPassModel;
 	std::shared_ptr<vg::Material> m_pMaterialModel;
 
 	std::shared_ptr<vg::Texture2D> m_pTexturePlane;    
 	std::shared_ptr<vg::Shader> m_pShaderPlane;
-	std::shared_ptr<vg::Pass> m_pPassPlane;
-	std::shared_ptr<vg::Material> m_PMaterialPlane;
+	std::array<std::shared_ptr<vg::Pass>, 2> m_pPassPlanes;
+	std::shared_ptr<vg::Material> m_pMaterialPlane;
 
-	struct OtherInfo 
+	struct OtherInfo
 	{
 		vg::Vector4 lightPos;
 	} m_otherInfo;
 
+	struct OtherInfoOffScreen
+	{
+		vg::Matrix4x4 matrixInverse;
+		vg::Vector4 lightPos;
+	} m_otherInfoOffScreen;
+
 	virtual void _init() override;
 	virtual void _initState() override;
 	void _createModel();
+	void _createSceneOffScreen();
+	void _createOffscreenTex();
+	void _createOffscreenRenderer();
 	void _createTexture();
 	void _createMaterial();
+	void _createVisualObjects();
 	void _initScene();
 
 	virtual void _onUpdate() override;
+
+	virtual void _onPreRender() override;
+
 	virtual void _renderWithRenderer(vg::Renderer *pRenderer
 		    , const vg::Renderer::RenderInfo &info
 			, vg::Renderer::RenderResultInfo &resultInfo) override;

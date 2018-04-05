@@ -30,9 +30,14 @@ Window::Window(std::shared_ptr<GLFWwindow> pWindow
 void Window::_init()
 {
 	ParentWindowType::_init();
+
 	_createModel();
+	_createSceneOffScreen();
+	_createOffscreenTex();
+	_createOffscreenRenderer();
 	_createTexture();
 	_createMaterial();
+	_createVisualObjects();
 	_initScene();
 }
 
@@ -42,7 +47,9 @@ void Window::_initState()
 	m_cameraPosition = { 0.0f, 1.0f, -6.0f };
 	/// Build a quaternion from euler angles (pitch, yaw, roll), in radians.
 	m_cameraRotation = vg::Vector3(glm::radians(0.0f), glm::radians(0.0f), glm::radians(0.0f));
-	m_otherInfo.lightPos = vg::Vector4(0.0f, 0.0f, 0.0f, 1.0f);
+
+	m_otherInfoOffScreen.matrixInverse = glm::scale(vg::Matrix4x4(1.0f), glm::vec3(1.0f, -1.0f, 1.0f));
+	m_otherInfo.lightPos = m_otherInfoOffScreen.lightPos = vg::Vector4(0.0f, 0.0f, 0.0f, 1.0f);
 }
 
 void Window::_createModel()
@@ -56,7 +63,7 @@ void Window::_createModel()
 	};
 	sampleslib::AssimpScene::CreateInfo createInfo;
 	createInfo.fileName = "models/chinesedragon.dae";
-	createInfo.isCreateObject = VG_TRUE;
+	createInfo.isCreateObject = VG_FALSE;
 	createInfo.layoutComponentCount = layoutCount;
 	createInfo.pLayoutComponent = layouts;
 	createInfo.offset = vg::Vector3(0.0f, 1.5f, 0.0f);
@@ -64,10 +71,36 @@ void Window::_createModel()
 	m_assimpSceneModel.init(createInfo);
 
 	createInfo.fileName = "models/plane.obj";
+	createInfo.isCreateObject = VG_TRUE;
 	createInfo.offset = vg::Vector3(0.0f, 0.0f, 2.0f);
 	createInfo.scale = vg::Vector3(0.5f);
 
 	m_assimpScenePlane.init(createInfo);
+}
+
+void Window::_createSceneOffScreen()
+{
+	m_pSceneOffScreen = std::shared_ptr<vg::Scene3>(new vg::Scene3());
+}
+
+void Window::_createOffscreenTex()
+{
+	m_pOffScreenTexs = std::array<std::shared_ptr<vg::Texture2DColorAttachment>, 2> {
+		std::shared_ptr<vg::Texture2DColorAttachment> {
+		    new vg::Texture2DColorAttachment(FB_COLOR_FORMAT, false, FB_DIM, FB_DIM),
+		    },
+		std::shared_ptr<vg::Texture2DColorAttachment> {
+		    new vg::Texture2DColorAttachment(FB_COLOR_FORMAT, false, FB_DIM, FB_DIM),
+		    },
+		};
+}
+
+void Window::_createOffscreenRenderer()
+{
+	m_pOffScreenRenderers = std::array<std::shared_ptr<vg::Renderer>, 2>{
+		std::shared_ptr<vg::Renderer> { new vg::Renderer(m_pOffScreenTexs[0].get()) },
+		std::shared_ptr<vg::Renderer> { new vg::Renderer(m_pOffScreenTexs[1].get()) },
+    	};
 }
 
 void Window::_createTexture()
@@ -152,12 +185,12 @@ void Window::_createMaterial()
 	    	);
 	    //pass
 	    pPass = std::shared_ptr<vg::Pass>(new vg::Pass(pShader.get()));
-	    vg::Pass::BuildInDataInfo::Component buildInDataCmps[3] = {
+	    vg::Pass::BuildInDataInfo::Component buildInDataCmps[2] = {
 	    		{vg::Pass::BuildInDataType::MATRIX_OBJECT_TO_NDC},
 	    		{vg::Pass::BuildInDataType::MATRIX_OBJECT_TO_VIEW}
 	    	};
 	    	vg::Pass::BuildInDataInfo buildInDataInfo;
-	    	buildInDataInfo.componentCount = 3u;
+	    	buildInDataInfo.componentCount = 2u;
 	    	buildInDataInfo.pComponent = buildInDataCmps;
 	    	pPass->setBuildInDataInfo(buildInDataInfo);
 	    pPass->setCullMode(vg::CullModeFlagBits::BACK);
@@ -178,32 +211,34 @@ void Window::_createMaterial()
 	}
 
 	{
-	    auto & pShader = m_pShaderPlane;
-	    auto & pPass = m_pPassPlane;
-	    auto & pMaterial = m_PMaterialPlane;
+		auto & pShader = m_pShaderModelOffscreen;
+		auto & pPass = m_pPassModelOffscreen;
+	    auto & pMaterial = m_pMaterialModelOffscreen;
 	    auto & pApp = vg::pApp;
-	    //shader
+		//shader
 	    pShader = std::shared_ptr<vg::Shader>(
-	    	new vg::Shader("shaders/off_screen/mirror.vert.spv", "shaders/off_screen/mirror.frag.spv")
+	    	new vg::Shader("shaders/off_screen/phong_offscreen.vert.spv", "shaders/off_screen/phong_offscreen.frag.spv")
 	    	// new vg::Shader("shaders/test.vert.spv", "shaders/test.frag.spv")
 	    	);
 	    //pass
 	    pPass = std::shared_ptr<vg::Pass>(new vg::Pass(pShader.get()));
 	    vg::Pass::BuildInDataInfo::Component buildInDataCmps[3] = {
-	    		{vg::Pass::BuildInDataType::MATRIX_OBJECT_TO_NDC},
+	    		{vg::Pass::BuildInDataType::MATRIX_OBJECT_TO_WORLD},
+	    		{vg::Pass::BuildInDataType::MATRIX_VIEW},
+				{vg::Pass::BuildInDataType::MATRIX_PROJECTION},
 	    	};
 	    	vg::Pass::BuildInDataInfo buildInDataInfo;
 	    	buildInDataInfo.componentCount = 3u;
 	    	buildInDataInfo.pComponent = buildInDataCmps;
 	    	pPass->setBuildInDataInfo(buildInDataInfo);
-	    pPass->setCullMode(vg::CullModeFlagBits::NONE);
+	    pPass->setCullMode(vg::CullModeFlagBits::BACK);
 	    pPass->setFrontFace(vg::FrontFaceType::CLOCKWISE);
 	    vk::PipelineDepthStencilStateCreateInfo depthStencilState = {};
 	    depthStencilState.depthTestEnable = VG_TRUE;
 	    depthStencilState.depthWriteEnable = VG_TRUE;
 	    depthStencilState.depthCompareOp = vk::CompareOp::eLessOrEqual;
 	    pPass->setDepthStencilInfo(depthStencilState);
-		pPass->setMainTexture(m_pTexturePlane.get());
+	    pPass->setDataValue("other_info", m_otherInfoOffScreen, 2u);
 	    pPass->apply();
 	    //material
 	    pMaterial = std::shared_ptr<vg::Material>(new vg::Material());
@@ -213,23 +248,92 @@ void Window::_createMaterial()
 	    pMaterial->apply();
 	}
 
+	{
+        auto & pShader = m_pShaderPlane;
+		//shader
+	    pShader = std::shared_ptr<vg::Shader>(
+	    	new vg::Shader("shaders/off_screen/mirror.vert.spv", "shaders/off_screen/mirror.frag.spv")
+	    	// new vg::Shader("shaders/test.vert.spv", "shaders/test.frag.spv")
+	    	);
+		auto & pMaterial = m_pMaterialPlane;
+		//material
+	    pMaterial = std::shared_ptr<vg::Material>(new vg::Material());
+
+		uint32_t count = static_cast<uint32_t>(m_pPassPlanes.size());
+		for (uint32_t i = 0; i < count; ++i)
+		{
+	        auto & pPass = m_pPassPlanes[i];
+	        pPass = std::shared_ptr<vg::Pass>(new vg::Pass(pShader.get()));
+	        vg::Pass::BuildInDataInfo::Component buildInDataCmps[3] = {
+	        		{vg::Pass::BuildInDataType::MATRIX_OBJECT_TO_NDC},
+	        	};
+	        	vg::Pass::BuildInDataInfo buildInDataInfo;
+	        	buildInDataInfo.componentCount = 3u;
+	        	buildInDataInfo.pComponent = buildInDataCmps;
+	        	pPass->setBuildInDataInfo(buildInDataInfo);
+	        pPass->setCullMode(vg::CullModeFlagBits::NONE);
+	        pPass->setFrontFace(vg::FrontFaceType::CLOCKWISE);
+	        vk::PipelineDepthStencilStateCreateInfo depthStencilState = {};
+	        depthStencilState.depthTestEnable = VG_TRUE;
+	        depthStencilState.depthWriteEnable = VG_TRUE;
+	        depthStencilState.depthCompareOp = vk::CompareOp::eLessOrEqual;
+	        pPass->setDepthStencilInfo(depthStencilState);
+		    pPass->setMainTexture(m_pTexturePlane.get());
+			pPass->setTexture("offscreen_tex", m_pOffScreenTexs[i].get(), 2u, vg::ShaderStageFlagBits::FRAGMENT);
+	        pPass->apply();
+		}
+
+	    pMaterial->setRenderPriority(0u);
+	    pMaterial->setRenderQueueType(vg::MaterialShowType::OPAQUE);
+	    pMaterial->apply();
+	   
+	}
+
+}
+
+void Window::_createVisualObjects()
+{
+	const auto &meshes = m_assimpSceneModel.getMeshes();	
+	m_pVisualObjects.resize(meshes.size());
+	m_pVisualObjectOffscreens.resize(meshes.size());
+	uint32_t index = 0;
+	uint32_t count = static_cast<uint32_t>(meshes.size());
+	for (index = 0; index < count; ++index)
+	{
+		auto &mesh = meshes[index];
+		m_pVisualObjects[index] = std::shared_ptr<vg::VisualObject3>{ new vg::VisualObject3() };
+		m_pVisualObjects[index]->setMesh(mesh.get());
+		m_pVisualObjects[index]->setMaterial(m_pMaterialModel.get());
+
+		m_pVisualObjectOffscreens[index] = std::shared_ptr<vg::VisualObject3>{ new vg::VisualObject3() };
+		m_pVisualObjectOffscreens[index]->setMesh(mesh.get());
+		m_pVisualObjectOffscreens[index]->setMaterial(m_pMaterialModelOffscreen.get());
+	}
 }
 
 void Window::_initScene()
 {
 	{
-	    const auto &objects = m_assimpSceneModel.getObjects();
+	    const auto &objects = m_pVisualObjects;
 	    for (const auto &object : objects)
 	    {
-	    	object->setMaterial(m_pMaterialModel.get());
-	        m_pScene->addVisualObject(object.get());		
+	        m_pScene->addVisualObject(object.get());	
 	    }
 	}
+
+	{
+	    const auto &objects = m_pVisualObjectOffscreens;
+	    for (const auto &object : objects)
+	    {
+	        m_pSceneOffScreen->addVisualObject(object.get());
+	    }
+	}
+
 	{
 	    const auto &objects = m_assimpScenePlane.getObjects();
 	    for (const auto &object : objects)
 	    {
-	    	object->setMaterial(m_PMaterialPlane.get());
+	    	object->setMaterial(m_pMaterialPlane.get());
 	        m_pScene->addVisualObject(object.get());		
 	    }
 	}
@@ -247,10 +351,55 @@ void Window::_onUpdate()
 	// ImGui::End();
 }
 
+void Window::_onPreRender()
+{
+	
+	
+}
+
 void Window::_renderWithRenderer(vg::Renderer *pRenderer
 		    , const vg::Renderer::RenderInfo &info
 			, vg::Renderer::RenderResultInfo &resultInfo)
 {
+	uint32_t renderCount = static_cast<uint32_t>(m_pRenderers.size());
+	uint32_t index = 0;
+	for (uint32_t i = 0; i < renderCount; ++i)
+	{
+		if (m_pRenderers[i].get() == pRenderer)
+		{
+			index = i;
+			break;
+		}
+	}
 
-	ParentWindowType::_renderWithRenderer(pRenderer, info, resultInfo);	
+	uint32_t drawCount = 0u;
+
+	auto info1 = info;
+	vg::Renderer::SceneAndCamera tempSceneAndCamera;
+	tempSceneAndCamera.pCamera = m_pCamera.get();
+	tempSceneAndCamera.pScene = m_pSceneOffScreen.get();
+	info1.sceneAndCameraCount = 1u;
+	info1.pSceneAndCamera = &tempSceneAndCamera;
+	vg::Renderer::RenderResultInfo tempResultInfo1;
+	
+
+    m_pOffScreenRenderers[index]->render(info1, tempResultInfo1);
+	drawCount += tempResultInfo1.drawCount;
+
+
+    auto info2 = info;
+	info2.waitSemaphoreCount = tempResultInfo1.signalSemaphoreCount;
+	info2.pWaitSemaphores = tempResultInfo1.pSignalSemaphores;
+
+    vg::Renderer::RenderResultInfo tempResultInfo2;
+
+	
+	if (m_pMaterialPlane->getPassCount() != 0u) m_pMaterialPlane->removePass(m_pMaterialPlane->getPasses()[0]);
+	m_pMaterialPlane->addPass(m_pPassPlanes[index].get());
+
+	ParentWindowType::_renderWithRenderer(pRenderer, info, tempResultInfo2);
+
+	drawCount += tempResultInfo2.drawCount;
+	resultInfo = tempResultInfo2;
+	resultInfo.drawCount = drawCount;
 }

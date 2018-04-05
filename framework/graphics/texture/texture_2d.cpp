@@ -101,6 +101,17 @@ namespace vg
 		return m_pImageView.get();
 	}
 
+	void Texture2DColorAttachment::_init()
+	{
+		Texture::_init();
+		//Transform Image layout to final layout.
+		auto pCommandBuffer = beginSingleTimeCommands();
+		_tranImageLayout(pCommandBuffer, *m_pImage, m_usingVkImageLayout, m_vkImageLayout,
+			0, m_mipMapLevels, 0, m_arrayLayer);
+		endSingleTimeCommands(pCommandBuffer);
+		m_usingVkImageLayout = m_vkImageLayout;
+	}
+
 	Texture2DDepthStencilAttachment::Texture2DDepthStencilAttachment(vk::Format format, Bool32 mipMap, uint32_t width, uint32_t height)
 		:Texture(format, mipMap)
 		, BaseDepthStencilAttachment()
@@ -166,6 +177,17 @@ namespace vg
 		    , Bool32 createMipmaps)
 	{
 		_applyData(layoutInfo, memory, size, cacheMemory, createMipmaps);
+	}
+
+	void Texture2DDepthStencilAttachment::_init()
+	{
+		Texture::_init();
+		//Transform Image layout to final layout.
+		auto pCommandBuffer = beginSingleTimeCommands();
+		_tranImageLayout(pCommandBuffer, *m_pImage, m_usingVkImageLayout, m_vkImageLayout,
+			0, m_mipMapLevels, 0, m_arrayLayer);
+		endSingleTimeCommands(pCommandBuffer);
+		m_usingVkImageLayout = m_vkImageLayout;
 	}
 
 	void Texture2DDepthStencilAttachment::_checkDepthFormat()

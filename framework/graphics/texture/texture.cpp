@@ -420,7 +420,7 @@ namespace vg
 
 		pDevice->bindImageMemory(*m_pImage, *m_pImageMemory, vk::DeviceSize(0));
 
-		m_currVkImageLayout = imageLayout;
+		m_usingVkImageLayout = imageLayout;
 	}
 
 	void Texture::_createImageView()
@@ -561,7 +561,7 @@ namespace vg
 			{
 				//transfer image from initial current image layout to dst layout.
 				//here use undefined layout not to use curr layout of image, it can clear image old data.
-				_tranImageLayout(pCommandBuffer, *m_pImage, m_currVkImageLayout, vk::ImageLayout::eTransferDstOptimal,
+				_tranImageLayout(pCommandBuffer, *m_pImage, m_usingVkImageLayout, vk::ImageLayout::eTransferDstOptimal,
 					0, 1, 0, m_arrayLayer);
 
 				//copy the first mip of the chain.
@@ -665,7 +665,7 @@ namespace vg
 				}
 				//transfer image from initial current image layout to dst layout.
 				//here use undefined layout not to use curr layout of image, it can clear image old data.
-				_tranImageLayout(pCommandBuffer, *m_pImage, m_currVkImageLayout, vk::ImageLayout::eTransferDstOptimal,
+				_tranImageLayout(pCommandBuffer, *m_pImage, m_usingVkImageLayout, vk::ImageLayout::eTransferDstOptimal,
 					0, m_mipMapLevels, 0, m_arrayLayer);
 				
 				pCommandBuffer->copyBufferToImage(*pStagingBuffer, *m_pImage, vk::ImageLayout::eTransferDstOptimal, bufferCopyRegions);
@@ -677,7 +677,7 @@ namespace vg
 			}
 
 			endSingleTimeCommands(pCommandBuffer);
-			m_currVkImageLayout = m_vkImageLayout;
+			m_usingVkImageLayout = m_vkImageLayout;
 		}
 	}
 

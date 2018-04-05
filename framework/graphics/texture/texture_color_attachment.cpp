@@ -64,9 +64,9 @@ namespace vg
 		Texture::_init();
 		//Transform Image layout to final layout.
 		auto pCommandBuffer = beginSingleTimeCommands();
-		_tranImageLayout(pCommandBuffer, *m_pImage, m_currVkImageLayout, m_vkImageLayout,
+		_tranImageLayout(pCommandBuffer, *m_pImage, m_usingVkImageLayout, m_vkImageLayout,
 			0, m_mipMapLevels, 0, m_arrayLayer);
 		endSingleTimeCommands(pCommandBuffer);
-		m_currVkImageLayout = m_vkImageLayout;
+		m_usingVkImageLayout = m_vkImageLayout;
 	}
 } //namespace kgs

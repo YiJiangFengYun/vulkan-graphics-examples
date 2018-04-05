@@ -81,7 +81,7 @@ namespace vg
 		uint32_t m_mipMapLevels;
 		uint32_t m_arrayLayer;
 		vk::Format m_vkFormat;
-		vk::ImageLayout m_currVkImageLayout; //record texture current image layout state.
+		vk::ImageLayout m_usingVkImageLayout; //record texture current image layout state.
 		vk::Filter m_vkFilter;
 		vk::SamplerMipmapMode m_vkSamplerMipmapMode;
 		vk::SamplerAddressMode m_vkSamplerAddressMode;

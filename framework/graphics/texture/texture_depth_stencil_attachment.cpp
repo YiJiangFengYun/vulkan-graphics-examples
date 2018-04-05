@@ -28,6 +28,36 @@ namespace vg
 		return m_height;
 	}
 
+	uint32_t TextureDepthStencilAttachment::getDepthStencilAttachmentWidth() const
+	{
+		return m_width;
+	}
+
+	uint32_t TextureDepthStencilAttachment::getDepthStencilAttachmentHeight() const
+	{
+		return m_height;
+	}
+	
+	uint32_t TextureDepthStencilAttachment::getDepthStencilAttachmentLayers() const
+	{
+		return 1u;
+	}
+
+	vk::Format TextureDepthStencilAttachment::getDepthStencilAttachmentFormat() const
+	{
+		return m_vkFormat;
+	}
+
+	vk::ImageLayout TextureDepthStencilAttachment::getDepthStencilAttachmentLayout() const
+	{
+		return m_vkImageLayout;
+	}
+
+	vk::ImageView *TextureDepthStencilAttachment::getDepthStencilAttachmentImageView() const
+	{
+		return m_pImageView.get();
+	}
+
 	void TextureDepthStencilAttachment::_init()
 	{
 		_checkDepthFormat();

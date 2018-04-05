@@ -50,7 +50,7 @@ namespace vg
 			, uint32_t swapchainImageHeight
 		);
 
-		Renderer(Texture2D *pColorAttachmentTex
+		Renderer(BaseColorAttachment *pColorAttachmentTex
 		);
 
 		~Renderer();
@@ -60,7 +60,7 @@ namespace vg
 			, uint32_t swapchainImageWidth
 			, uint32_t swapchainImageHeight
 		);
-		void reset(Texture2D *pColorAttachmentTex);
+		void reset(BaseColorAttachment *pColorAttachmentTex);
 
 		Bool32 isValidForRender() const;
 
@@ -99,7 +99,7 @@ namespace vg
 		uint32_t m_clearValueStencil;
 		fd::Rect2D m_renderArea;
 		std::shared_ptr<vk::RenderPass> m_pRenderPass;
-		std::shared_ptr<TextureDepthStencilAttachment> m_pDepthStencilTexture;
+		std::shared_ptr<BaseDepthStencilAttachment> m_pDepthStencilAttachment;
 		std::shared_ptr<vk::Framebuffer> m_pFrameBuffer;
 		std::shared_ptr<vk::CommandPool> m_pCommandPool;
 		std::shared_ptr<vk::CommandBuffer> m_pCommandBuffer;
@@ -112,7 +112,7 @@ namespace vg
 		vk::ImageView *m_pSwapchainImageView;
 		vk::Format m_swapchainImageFormat;
 		//Renderer will render to color texture when it is not null.
-		Texture2D *m_pColorTexture;
+		BaseColorAttachment *m_pColorAttchment;
 
 		// PreObjectRecordingFun m_preObjectRecordingFun;
 		// PostObjectRecordingFun m_postObjectRecordingFun;

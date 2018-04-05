@@ -28,9 +28,10 @@ namespace vg
 		: Base(BaseType::RENDERER)
 		, m_pSwapchainImageView(pSwapchainImageView)
 		, m_swapchainImageFormat(swapchainImageFormat)
-		, m_pColorTexture(nullptr)
+		, m_pColorAttchment(nullptr)
 		, m_colorImageFormat(swapchainImageFormat)
 		, m_depthStencilImageFormat(DEFAULT_DEPTH_STENCIL_FORMAT)
+		, m_pDepthStencilAttachment()
 		, m_framebufferWidth(swapchainImageWidth)
 		, m_framebufferHeight(swapchainImageHeight)
 		, m_clearValueColor(0.0f)
@@ -56,15 +57,16 @@ namespace vg
 		//_createFence();
 	}
 
-	Renderer::Renderer(Texture2D *pColorAttachmentTex)
+	Renderer::Renderer(BaseColorAttachment *pColorAttachmentTex)
 		: Base(BaseType::RENDERER)
 		, m_pSwapchainImageView(nullptr)
 		, m_swapchainImageFormat()
-		, m_pColorTexture(pColorAttachmentTex)
-		, m_colorImageFormat(pColorAttachmentTex->getVKFormat())
+		, m_pColorAttchment(pColorAttachmentTex)
+		, m_colorImageFormat(pColorAttachmentTex->getColorAttachmentFormat())
 		, m_depthStencilImageFormat(DEFAULT_DEPTH_STENCIL_FORMAT)
-		, m_framebufferWidth(pColorAttachmentTex->getWidth())
-		, m_framebufferHeight(pColorAttachmentTex->getHeight())
+		, m_pDepthStencilAttachment()
+		, m_framebufferWidth(pColorAttachmentTex->getColorAttachmentWidth())
+		, m_framebufferHeight(pColorAttachmentTex->getColorAttachmentHeight())
 		, m_clearValueColor(0.0f)
 		, m_clearValueDepth(1.0f)
 		, m_clearValueStencil(0u)
@@ -100,7 +102,7 @@ namespace vg
 	{
 		m_pSwapchainImageView = pSwapchainImageView;
 		m_swapchainImageFormat = swapchainImageFormat;
-		m_pColorTexture = nullptr;
+		m_pColorAttchment = nullptr;
 		m_framebufferWidth = swapchainImageWidth;
 		m_framebufferHeight = swapchainImageHeight;
 		_createRenderPass();
@@ -112,13 +114,13 @@ namespace vg
 		//_createFence();
 	}
 	
-	void Renderer::reset(Texture2D *pColorAttachmentTex)
+	void Renderer::reset(BaseColorAttachment *pColorAttachmentTex)
 	{
 		m_pSwapchainImageView = nullptr;
-		m_pColorTexture = pColorAttachmentTex;
-		m_colorImageFormat = pColorAttachmentTex->getVKFormat();
-		m_framebufferWidth = pColorAttachmentTex->getWidth();
-		m_framebufferHeight = pColorAttachmentTex->getHeight();
+		m_pColorAttchment = pColorAttachmentTex;
+		m_colorImageFormat = pColorAttachmentTex->getColorAttachmentFormat();
+		m_framebufferWidth = pColorAttachmentTex->getColorAttachmentWidth();
+		m_framebufferHeight = pColorAttachmentTex->getColorAttachmentHeight();
 		_createRenderPass();
 		_createDepthStencilTex();
 		_createFramebuffer();
@@ -526,8 +528,8 @@ namespace vg
 			vk::AttachmentStoreOp::eStore,        //storeOp
 			vk::AttachmentLoadOp::eDontCare,      //stencilLoadOp
 			vk::AttachmentStoreOp::eDontCare,     //stencilStoreOp
-			m_pColorTexture == nullptr ? vk::ImageLayout::eUndefined : m_pColorTexture->getImageLayout(),    //initialLayout
-			m_pColorTexture == nullptr ? vk::ImageLayout::ePresentSrcKHR : m_pColorTexture->getImageLayout()     //finalLayout
+			m_pColorAttchment == nullptr ? vk::ImageLayout::eUndefined : m_pColorAttchment->getColorAttachmentLayout(),    //initialLayout
+			m_pColorAttchment == nullptr ? vk::ImageLayout::ePresentSrcKHR : m_pColorAttchment->getColorAttachmentLayout()     //finalLayout
 		};
 
 		vk::AttachmentDescription depthAttachment = {
@@ -607,30 +609,29 @@ namespace vg
 
 	void Renderer::_createDepthStencilTex()
 	{
-		if (m_pDepthStencilTexture != nullptr && 
-			m_framebufferWidth == m_pDepthStencilTexture->getWidth() &&
-			m_framebufferHeight == m_pDepthStencilTexture->getHeight() &&
-			m_depthStencilImageFormat != m_pDepthStencilTexture->getVKFormat()) return;
+		if (m_pDepthStencilAttachment != nullptr && 
+			m_framebufferWidth == m_pDepthStencilAttachment->getDepthStencilAttachmentWidth() &&
+			m_framebufferHeight == m_pDepthStencilAttachment->getDepthStencilAttachmentHeight() &&
+			m_depthStencilImageFormat != m_pDepthStencilAttachment->getDepthStencilAttachmentFormat()) return;
 
-		m_pDepthStencilTexture = std::shared_ptr<TextureDepthStencilAttachment>(
-			new TextureDepthStencilAttachment(
+		auto pTex = new TextureDepthStencilAttachment(
 			    m_depthStencilImageFormat,
 				m_framebufferWidth,
 				m_framebufferHeight
-			    )
-			);
+			    );
+		m_pDepthStencilAttachment = std::shared_ptr<BaseDepthStencilAttachment>(pTex);
 	}
 
 	void Renderer::_createFramebuffer()
 	{
 		std::array<vk::ImageView, 2> attachments;
-		if (m_pColorTexture != nullptr)
+		if (m_pColorAttchment != nullptr)
 		{
-			attachments = { *m_pColorTexture->getImageView(), *m_pDepthStencilTexture->getImageView() };
+			attachments = { *m_pColorAttchment->getColorAttachmentImageView(), *m_pDepthStencilAttachment->getDepthStencilAttachmentImageView()};
 		}
 		else
 		{
-			attachments = { *m_pSwapchainImageView, *m_pDepthStencilTexture->getImageView() };
+			attachments = { *m_pSwapchainImageView, *m_pDepthStencilAttachment->getDepthStencilAttachmentImageView() };
 		}
 
 		vk::FramebufferCreateInfo createInfo = {

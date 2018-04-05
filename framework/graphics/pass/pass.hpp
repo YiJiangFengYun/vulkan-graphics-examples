@@ -216,7 +216,6 @@ namespace vg
 		void setTexture(std::string name
 			, const Texture *pTex
 			, uint32_t binding = VG_M_OTHER_MIN_BINDING
-			, DescriptorType descriptorType = DescriptorType::UNIFORM_BUFFER
 			, ShaderStageFlags stageFlags = ShaderStageFlagBits::VERTEX
 		);
 

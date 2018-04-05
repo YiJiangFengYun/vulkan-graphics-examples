@@ -378,7 +378,6 @@ namespace vg
 	void Pass::setTexture(std::string name
 		, const Texture *pTex
 		, uint32_t binding
-		, DescriptorType descriptorType
 		, ShaderStageFlags stageFlags
 	)
 	{
@@ -389,7 +388,7 @@ namespace vg
 			name,
 			VG_TRUE,
 			binding,
-			descriptorType,
+			vg::DescriptorType::COMBINED_IMAGE_SAMPLER,
 			descriptorCount,
 			stageFlags
 		);
@@ -434,8 +433,7 @@ namespace vg
 
 	void Pass::setMainTexture(const Texture *value)
 	{
-		setTexture(VG_M_MAIN_TEXTURE_NAME, value, VG_M_MAIN_TEXTURE_BINDING,
-			DescriptorType::COMBINED_IMAGE_SAMPLER, ShaderStageFlagBits::FRAGMENT);
+		setTexture(VG_M_MAIN_TEXTURE_NAME, value, VG_M_MAIN_TEXTURE_BINDING, ShaderStageFlagBits::FRAGMENT);
 	}
 
 	Color Pass::getMainColor() const

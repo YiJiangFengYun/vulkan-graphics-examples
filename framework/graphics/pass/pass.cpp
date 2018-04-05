@@ -484,7 +484,12 @@ namespace vg
 			_endCheckNeedUpdateDescriptorInfo();
 			m_applied = VG_TRUE;
 		}
-		_applyBufferContent();
+		if (m_dataChanged == VG_TRUE)
+		{
+			_applyBufferContent();
+			m_dataChanged = VG_FALSE;
+		}
+		
 	}
 
 	PolygonMode Pass::getPolygonMode() const
@@ -1257,7 +1262,7 @@ namespace vg
 
 	void Pass::_applyBufferContent()
 	{
-		if (m_dataChanged == VG_TRUE && m_pUniformBufferMemory != nullptr)
+		if (m_pUniformBufferMemory != nullptr)
 		{
 			//get total number of unimform buffer variables.
 			int32_t uniformBufferCount = 0u;
@@ -1297,7 +1302,6 @@ namespace vg
 				m_pData->memoryCopyData(names[i], data, offsets[i], 0u, descriptorCounts[i]);
 			}
 			pDevice->unmapMemory(*m_pUniformBufferMemory);
-			m_dataChanged = VG_FALSE;
 		}
 	}
 

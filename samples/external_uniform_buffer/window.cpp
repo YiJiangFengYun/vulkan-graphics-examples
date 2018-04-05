@@ -183,7 +183,7 @@ void Window::_createMaterial()
 
 	//shader
 	pShader = std::shared_ptr<vg::Shader>(
-		new vg::Shader("shaders/dynamic_uniform_buffer/base.vert.spv", "shaders/dynamic_uniform_buffer/base.frag.spv")
+		new vg::Shader("shaders/external_uniform_buffer/base.vert.spv", "shaders/external_uniform_buffer/base.frag.spv")
 		 //new vg::Shader("shaders/test.vert.spv", "shaders/test.frag.spv")
 		);
 

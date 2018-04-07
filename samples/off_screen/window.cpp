@@ -66,13 +66,13 @@ void Window::_createModel()
 	createInfo.isCreateObject = VG_FALSE;
 	createInfo.layoutComponentCount = layoutCount;
 	createInfo.pLayoutComponent = layouts;
-	createInfo.offset = vg::Vector3(0.0f, 1.5f, 3.0f);
+	createInfo.offset = vg::Vector3(0.0f, 1.5f, 0.0f);
 	createInfo.scale = vg::Vector3(0.3f);
 	m_assimpSceneModel.init(createInfo);
 
 	createInfo.fileName = "models/plane.obj";
 	createInfo.isCreateObject = VG_TRUE;
-	createInfo.offset = vg::Vector3(0.0f, 0.0f, 5.0f);
+	createInfo.offset = vg::Vector3(0.0f, 0.0f, 2.0f);
 	createInfo.scale = vg::Vector3(0.5f);
 
 	m_assimpScenePlane.init(createInfo);

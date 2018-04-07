@@ -95,14 +95,14 @@ namespace sampleslib
 		rotationMatrix = glm::rotate(rotationMatrix, glm::radians(m_cameraRotation.y), glm::vec3(0.0f, 1.0f, 0.0f));
 		rotationMatrix = glm::rotate(rotationMatrix, glm::radians(m_cameraRotation.z), glm::vec3(0.0f, 1.0f, 0.0f));
 
-		auto translateMatrix = glm::translate(glm::mat4(1.0f), m_cameraPosition);
 		auto lookAtRotationMatrix = vg::Matrix4x4(1.0f);
 		auto epsilon = std::numeric_limits<float>::epsilon();
 		if (glm::length(m_cameraPosition) > epsilon)
 		{
 			lookAtRotationMatrix = glm::toMat4(glm::rotation(vg::Vector3(0.0f, 0.0f, 1.0f), glm::normalize(-m_cameraPosition)));
 		}
-		auto localMatrix = lookAtRotationMatrix * translateMatrix * rotationMatrix * matrix;
+		auto translateMatrix = glm::translate(glm::mat4(1.0f), m_cameraPosition);		
+		auto localMatrix = translateMatrix * lookAtRotationMatrix * rotationMatrix * matrix;
 		
 		// auto lookAtMatrix = glm::lookAt(m_cameraPosition, vg::Vector3(0.0f), vg::Vector3(0.0f, 1.0f, 0.0f));
 		// auto localMatrix = lookAtMatrix * rotationMatrix * matrix;

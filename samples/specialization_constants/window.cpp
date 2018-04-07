@@ -49,7 +49,8 @@ void Window::_initState()
 	ParentWindowType::_initState();
 	m_sceneCount = SCENE_COUNT;
 	m_cameraAspect = (float)m_width / 3.0f / (float)m_height;
-	m_cameraZoom = -1.5f;
+	m_cameraZoom = -0.0f;
+	m_cameraPosition = vg::Vector3(0.0f, 1.0f, -1.0f);
 	/// Build a quaternion from euler angles (pitch, yaw, roll), in radians.
 	m_cameraRotation = vg::Vector3(glm::radians(0.0f), glm::radians(0.0f), glm::radians(0.0f));
 

@@ -210,6 +210,18 @@ namespace vg
 		return scale;
 	}
 
+    template <SpaceType SPACE_TYPE>
+	typename Transform<SPACE_TYPE>::MatrixType Transform<SPACE_TYPE>::getLocalMatrix() const
+	{
+		return m_localMatrix;
+	}
+
+	template <SpaceType SPACE_TYPE>
+	typename Transform<SPACE_TYPE>::MatrixType Transform<SPACE_TYPE>::getLocalMatrixInverse() const
+	{
+		return m_localMatrixInverse;
+	}
+
 	template <SpaceType SPACE_TYPE>
 	typename Transform<SPACE_TYPE>::VectorType Transform<SPACE_TYPE>::transformVectorToWorld(VectorType vector) const
 	{

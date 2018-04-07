@@ -75,7 +75,9 @@ namespace vg
 		VectorType getScale() const;
 
 		void setLocalMatrix(MatrixType matrix);
+		MatrixType getLocalMatrix() const;
 		void setLocalMatrixInverse(MatrixType matrix);
+		MatrixType getLocalMatrixInverse() const;
 
 		/*void apply()
 		{

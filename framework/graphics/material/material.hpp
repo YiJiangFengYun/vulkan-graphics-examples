@@ -23,6 +23,7 @@ namespace vg
 		Bool32 isHas(const Pass *pPass) const;
 		void addPass(Pass *pPass);
 		void removePass(Pass *pPass);
+		void clearPasses();
 		MaterialShowType getShowType();
 		void setRenderQueueType(MaterialShowType type);
 		uint32_t getRenderPriority();

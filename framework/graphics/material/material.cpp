@@ -49,9 +49,15 @@ namespace vg
 	void Material::removePass(Pass *pPass)
 	{
 		if (isHas(pPass) == VG_FALSE) return;
-		std::remove(m_arrPasses.begin(), m_arrPasses.end(), pPass);
+		m_arrPasses.erase(std::remove(m_arrPasses.begin(), m_arrPasses.end(), pPass));
 		m_mapPasses.erase(pPass->getID());
 		_updateVisualizer();		
+	}
+
+	void Material::clearPasses()
+	{
+		m_arrPasses.clear();
+		m_mapPasses.clear();
 	}
 
 	void Material::apply()

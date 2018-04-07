@@ -59,7 +59,10 @@ namespace testTriangle2D
 
 	void Window::_createMaterial()
 	{
-		m_pShader = std::shared_ptr<vg::Shader>(new vg::Shader("shaders/triangle-2d.vert.spv", "shaders/triangle-2d.frag.spv"));
+		m_pShader = std::shared_ptr<vg::Shader>(new vg::Shader(
+			"shaders/test-triangle-2d/triangle-2d.vert.spv", 
+			"shaders/test-triangle-2d/triangle-2d.frag.spv"
+		));
 		m_pPass = std::shared_ptr<vg::Pass>(new vg::Pass(m_pShader.get()));
 		m_pPass->setCullMode(vg::CullModeFlagBits::NONE);
 		m_pMaterial = std::shared_ptr<vg::Material>(new vg::Material());

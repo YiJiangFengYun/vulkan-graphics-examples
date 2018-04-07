@@ -20,27 +20,19 @@ namespace vg
 
 	const vk::Format Renderer::DEFAULT_DEPTH_STENCIL_FORMAT(vk::Format::eD32SfloatS8Uint);
 
-	Renderer::Renderer(vk::ImageView *pSwapchainImageView
-		, vk::Format swapchainImageFormat
-		, uint32_t swapchainImageWidth
-		, uint32_t swapchainImageHeight
-	)
+	Renderer::Renderer()
 		: Base(BaseType::RENDERER)
-		, m_pSwapchainImageView(pSwapchainImageView)
-		, m_swapchainImageFormat(swapchainImageFormat)
-		, m_pColorAttchment(nullptr)
-		, m_colorImageFormat(swapchainImageFormat)
+		, m_colorImageFormat(vk::Format::eUndefined)
 		, m_depthStencilImageFormat(DEFAULT_DEPTH_STENCIL_FORMAT)
-		, m_pDepthStencilAttachment()
-		, m_framebufferWidth(swapchainImageWidth)
-		, m_framebufferHeight(swapchainImageHeight)
+		, m_framebufferWidth(0)
+		, m_framebufferHeight(0)
 		, m_clearValueColor(0.0f)
 		, m_clearValueDepth(1.0f)
 		, m_clearValueStencil(0u)
 		, m_renderArea(0.0f, 0.0f, 1.0f, 1.0f)
 		, m_pipelineCache()
-		// , m_preObjectRecordingFun()
-		// , m_postObjectRecordingFun()
+		, m_pCurrRenderPass()
+		, m_pCurrFrameBuffer()
 		, m_trunkRenderPassCmdBuffer()
 		, m_trunkWaitBarrierCmdBuffer()
 		, m_branchCmdBuffer()
@@ -48,42 +40,6 @@ namespace vg
         , m_preparingRenderCostTimer(fd::CostTimer::TimerType::AVERAGE)
 #endif //DEBUG and VG_ENABLE_COST_TIMER
 	{
-		_createRenderPass();
-		_createDepthStencilTex();
-		_createFramebuffer();
-		_createCommandPool();
-		_createCommandBuffer();
-		_createSemaphore();
-		//_createFence();
-	}
-
-	Renderer::Renderer(BaseColorAttachment *pColorAttachmentTex)
-		: Base(BaseType::RENDERER)
-		, m_pSwapchainImageView(nullptr)
-		, m_swapchainImageFormat()
-		, m_pColorAttchment(pColorAttachmentTex)
-		, m_colorImageFormat(pColorAttachmentTex->getColorAttachmentFormat())
-		, m_depthStencilImageFormat(DEFAULT_DEPTH_STENCIL_FORMAT)
-		, m_pDepthStencilAttachment()
-		, m_framebufferWidth(pColorAttachmentTex->getColorAttachmentWidth())
-		, m_framebufferHeight(pColorAttachmentTex->getColorAttachmentHeight())
-		, m_clearValueColor(0.0f)
-		, m_clearValueDepth(1.0f)
-		, m_clearValueStencil(0u)
-		, m_renderArea(0.0f, 0.0f, 1.0f, 1.0f)
-		, m_pipelineCache()
-		// , m_preObjectRecordingFun()
-		// , m_postObjectRecordingFun()
-		, m_trunkRenderPassCmdBuffer()
-		, m_trunkWaitBarrierCmdBuffer()
-		, m_branchCmdBuffer()
-#if defined(DEBUG) && defined(VG_ENABLE_COST_TIMER)
-        , m_preparingRenderCostTimer(fd::CostTimer::TimerType::AVERAGE)
-#endif //DEBUG and VG_ENABLE_COST_TIMER
-	{
-		_createRenderPass();
-		_createDepthStencilTex();
-		_createFramebuffer();
 		_createCommandPool();
 		_createCommandBuffer();
 		_createSemaphore();
@@ -92,42 +48,6 @@ namespace vg
 
 	Renderer::~Renderer()
 	{
-	}
-
-	void Renderer::reset(vk::ImageView *pSwapchainImageView
-		, vk::Format swapchainImageFormat
-		, uint32_t swapchainImageWidth
-		, uint32_t swapchainImageHeight
-	)
-	{
-		m_pSwapchainImageView = pSwapchainImageView;
-		m_swapchainImageFormat = swapchainImageFormat;
-		m_pColorAttchment = nullptr;
-		m_framebufferWidth = swapchainImageWidth;
-		m_framebufferHeight = swapchainImageHeight;
-		_createRenderPass();
-		_createDepthStencilTex();
-		_createFramebuffer();
-		_createCommandPool();
-		_createCommandBuffer();
-		_createSemaphore();
-		//_createFence();
-	}
-	
-	void Renderer::reset(BaseColorAttachment *pColorAttachmentTex)
-	{
-		m_pSwapchainImageView = nullptr;
-		m_pColorAttchment = pColorAttachmentTex;
-		m_colorImageFormat = pColorAttachmentTex->getColorAttachmentFormat();
-		m_framebufferWidth = pColorAttachmentTex->getColorAttachmentWidth();
-		m_framebufferHeight = pColorAttachmentTex->getColorAttachmentHeight();
-		_createRenderPass();
-		_createDepthStencilTex();
-		_createFramebuffer();
-		_createCommandPool();
-		_createCommandBuffer();
-		_createSemaphore();
-		//_createFence();
 	}
 
 	Bool32 Renderer::isValidForRender() const
@@ -342,7 +262,7 @@ namespace vg
 		CMDParser::recordTrunk(&m_trunkRenderPassCmdBuffer,
 			m_pCommandBuffer.get(),
 			&m_pipelineCache,
-			m_pRenderPass.get()
+			m_pCurrRenderPass
 			);
 		_recordTrunkRenderPassForEnd();
 
@@ -469,8 +389,8 @@ namespace vg
 		const auto& renderArea = m_renderArea;
 
 		vk::RenderPassBeginInfo renderPassBeginInfo = {
-			*m_pRenderPass,                                   //renderPass
-			*m_pFrameBuffer,                                  //framebuffer
+			*m_pCurrRenderPass,                                   //renderPass
+			*m_pCurrFrameBuffer,                                  //framebuffer
 			vk::Rect2D(                                       //renderArea
 				vk::Offset2D(static_cast<int32_t>(std::round(m_framebufferWidth * renderArea.x))
 					, static_cast<int32_t>(std::round(m_framebufferHeight * renderArea.y))
@@ -517,136 +437,6 @@ namespace vg
 		createInfo.flags = vk::FenceCreateFlagBits::eSignaled;
 		m_waitFence = fd::createFence(pDevice, createInfo);
 	}*/
-
-	void Renderer::_createRenderPass()
-	{
-		vk::AttachmentDescription colorAttachment = {
-			vk::AttachmentDescriptionFlags(),     //flags
-			m_colorImageFormat,                   //format
-			vk::SampleCountFlagBits::e1,          //samples
-			vk::AttachmentLoadOp::eClear,         //loadOp
-			vk::AttachmentStoreOp::eStore,        //storeOp
-			vk::AttachmentLoadOp::eDontCare,      //stencilLoadOp
-			vk::AttachmentStoreOp::eDontCare,     //stencilStoreOp
-			m_pColorAttchment == nullptr ? vk::ImageLayout::eUndefined : m_pColorAttchment->getColorAttachmentLayout(),    //initialLayout
-			m_pColorAttchment == nullptr ? vk::ImageLayout::ePresentSrcKHR : m_pColorAttchment->getColorAttachmentLayout()     //finalLayout
-		};
-
-		vk::AttachmentDescription depthAttachment = {
-			vk::AttachmentDescriptionFlags(),
-			m_depthStencilImageFormat,
-			vk::SampleCountFlagBits::e1,
-			vk::AttachmentLoadOp::eClear,
-			vk::AttachmentStoreOp::eDontCare,
-			vk::AttachmentLoadOp::eClear,
-			vk::AttachmentStoreOp::eDontCare,
-			vk::ImageLayout::eUndefined,
-			vk::ImageLayout::eDepthStencilAttachmentOptimal
-		};
-
-		vk::AttachmentReference colorAttachmentRef = {
-			uint32_t(0),
-			vk::ImageLayout::eColorAttachmentOptimal
-		};
-
-		vk::AttachmentReference depthAttachmentRef = {
-			uint32_t(1),
-			vk::ImageLayout::eDepthStencilAttachmentOptimal
-		};
-
-		vk::SubpassDescription subpass = {
-			vk::SubpassDescriptionFlags(),       //flags
-			vk::PipelineBindPoint::eGraphics,    //pipelineBindPoint
-			0,                                   //inputAttachmentCount
-			nullptr,                             //pInputAttachments
-			1,                                   //colorAttachmentCount
-			&colorAttachmentRef,                 //pColorAttachments
-			nullptr,                             //pResolveAttachments
-			&depthAttachmentRef,                 //pDepthStencilAttachment
-			0,                                   //preserveAttachmentCount
-			nullptr                              //pPreserveAttachments
-		};
-
-		std::array<vk::SubpassDependency, 2> dependencies = { 
-			vk::SubpassDependency 
-		    {
-			    VK_SUBPASS_EXTERNAL,                                  //srcSubpass
-			    0,                                                    //dstSubpass
-			    vk::PipelineStageFlagBits::eTopOfPipe,                //srcStageMask
-			    vk::PipelineStageFlagBits::eColorAttachmentOutput,    //dstStageMask
-			    vk::AccessFlagBits::eMemoryRead,                                    //srcAccessMask
-			    vk::AccessFlagBits::eColorAttachmentRead |
-				    vk::AccessFlagBits::eColorAttachmentWrite,        //dstAccessMask
-			    vk::DependencyFlagBits::eByRegion                     //dependencyFlags
-		    },
-			vk::SubpassDependency
-		    {
-			    0,                                                    //srcSubpass
-			    VK_SUBPASS_EXTERNAL,                                  //dstSubpass
-			    vk::PipelineStageFlagBits::eColorAttachmentOutput,    //srcStageMask
-			    vk::PipelineStageFlagBits::eBottomOfPipe,             //dstStageMask
-				vk::AccessFlagBits::eColorAttachmentRead |
-				    vk::AccessFlagBits::eColorAttachmentWrite,        //srcAccessMask
-			    vk::AccessFlagBits::eMemoryRead,                      //dstAccessMask
-			    vk::DependencyFlagBits::eByRegion                     //dependencyFlags
-		    }
-		};
-
-		std::array<vk::AttachmentDescription, 2> attachments = { colorAttachment, depthAttachment };
-		vk::RenderPassCreateInfo createInfo = {
-			vk::RenderPassCreateFlags(),
-			static_cast<uint32_t>(attachments.size()),
-			attachments.data(),
-			1u,
-			&subpass,
-			static_cast<uint32_t>(dependencies.size()),
-			dependencies.data()
-		};
-
-		auto pDevice = pApp->getDevice();
-		m_pRenderPass = fd::createRenderPass(pDevice, createInfo);
-	}
-
-	void Renderer::_createDepthStencilTex()
-	{
-		if (m_pDepthStencilAttachment != nullptr && 
-			m_framebufferWidth == m_pDepthStencilAttachment->getDepthStencilAttachmentWidth() &&
-			m_framebufferHeight == m_pDepthStencilAttachment->getDepthStencilAttachmentHeight() &&
-			m_depthStencilImageFormat != m_pDepthStencilAttachment->getDepthStencilAttachmentFormat()) return;
-
-		auto pTex = new TextureDepthStencilAttachment(
-			    m_depthStencilImageFormat,
-				m_framebufferWidth,
-				m_framebufferHeight
-			    );
-		m_pDepthStencilAttachment = std::shared_ptr<BaseDepthStencilAttachment>(pTex);
-	}
-
-	void Renderer::_createFramebuffer()
-	{
-		std::array<vk::ImageView, 2> attachments;
-		if (m_pColorAttchment != nullptr)
-		{
-			attachments = { *m_pColorAttchment->getColorAttachmentImageView(), *m_pDepthStencilAttachment->getDepthStencilAttachmentImageView()};
-		}
-		else
-		{
-			attachments = { *m_pSwapchainImageView, *m_pDepthStencilAttachment->getDepthStencilAttachmentImageView() };
-		}
-
-		vk::FramebufferCreateInfo createInfo = {
-			vk::FramebufferCreateFlags(),                   //flags
-			*m_pRenderPass,                                 //renderPass
-			static_cast<uint32_t>(attachments.size()),      //attachmentCount
-			attachments.data(),                             //pAttachments
-			m_framebufferWidth,                             //width
-			m_framebufferHeight,                            //height
-			1u                                              //layers
-		};
-
-		auto pDevice = pApp->getDevice();
-		m_pFrameBuffer = fd::createFrameBuffer(pDevice, createInfo);
-	}
 
 	void Renderer::_createCommandPool()
 	{

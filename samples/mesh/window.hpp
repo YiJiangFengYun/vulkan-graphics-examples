@@ -42,8 +42,7 @@ private:
 	void _initScene();
 
 	virtual void _onUpdate() override;
-	virtual void _renderWithRenderer(vg::Renderer *pRenderer
-		    , const vg::Renderer::RenderInfo &info
+	virtual void _render(const vg::Renderer::RenderInfo &info
 			, vg::Renderer::RenderResultInfo &resultInfo) override;
 };
 

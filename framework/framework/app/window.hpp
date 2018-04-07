@@ -43,9 +43,10 @@ namespace vgf
 		vk::Format m_swapchainImageFormat;
 		vk::Extent2D m_swapchainExtent;
 		std::vector<std::shared_ptr<vk::ImageView>> m_pSwapchainImageViews;
+		std::vector<vk::ImageView> m_swapchainImageViews;
 		//vk::Queue m_presentQueue;
 		//uint32_t m_presentQueueIndex;
-		std::vector<std::shared_ptr<vg::Renderer>> m_pRenderers;
+		std::shared_ptr<vg::SurfaceRenderer> m_pRenderer;
 		std::shared_ptr<vk::Semaphore> m_pImageAvailableSemaphore;
 		int32_t m_currImageIndex;
 
@@ -69,14 +70,7 @@ namespace vgf
 		virtual void _onRender() = 0;
 		virtual void _onPostRender() = 0;
 
-		virtual std::shared_ptr<vg::Renderer> _createRenderer(vk::ImageView *pSwapchainImageView
-		    , vk::Format swapchainImageFormat
-			, uint32_t swapchainImageWidth
-			, uint32_t swapchainImageHeight
-		);
-
-		virtual void _renderWithRenderer(vg::Renderer *pRenderer
-		    , const vg::Renderer::RenderInfo &info
+		virtual void _render(const vg::Renderer::RenderInfo &info
 			, vg::Renderer::RenderResultInfo &resultInfo);
 
 		// tool methods
@@ -91,7 +85,7 @@ namespace vgf
 		void _createSurface();
 		void _createSwapchain();
 		void _createSwapchainImageViews();
-		void _createRenderers();
+		void _createRenderer();
 		void _createSemaphores();
 
 #ifdef USE_IMGUI_BIND

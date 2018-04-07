@@ -20,9 +20,6 @@ namespace vg
 	class Renderer : public Base
 	{
 	public:
-        // using PreObjectRecordingFun = std::function<void(vg::BaseVisualObject * pVisualObject)>;
-		// using PostObjectRecordingFun = std::function<void(vg::BaseVisualObject * pVisualObject)>;
-
 		static const vk::Format DEFAULT_DEPTH_STENCIL_FORMAT;
 
 		struct SceneAndCamera {
@@ -44,23 +41,9 @@ namespace vg
 			uint32_t drawCount;
 		};
 
-		Renderer(vk::ImageView *pSwapchainImageView
-			, vk::Format swapchainImageFormat
-			, uint32_t swapchainImageWidth
-			, uint32_t swapchainImageHeight
-		);
-
-		Renderer(BaseColorAttachment *pColorAttachmentTex
-		);
+		Renderer();
 
 		~Renderer();
-
-		void reset(vk::ImageView *pSwapchainImageView
-			, vk::Format swapchainImageFormat
-			, uint32_t swapchainImageWidth
-			, uint32_t swapchainImageHeight
-		);
-		void reset(BaseColorAttachment *pColorAttachmentTex);
 
 		Bool32 isValidForRender() const;
 
@@ -82,9 +65,6 @@ namespace vg
 		const fd::Rect2D &getClearArea() const;
 		void setClearArea(fd::Rect2D area);
 
-		// PreObjectRecordingFun setPreObjectRecordingCallBack(PreObjectRecordingFun cbFun);
-		// PostObjectRecordingFun setPostObjectRecordingCallBack(PostObjectRecordingFun cbFun);
-
 #if defined(DEBUG) && defined(VG_ENABLE_COST_TIMER)
         const fd::CostTimer &getPreparingRenderCostTimer() const;
 #endif //DEBUG and VG_ENABLE_COST_TIMER
@@ -98,24 +78,14 @@ namespace vg
 		float m_clearValueDepth;
 		uint32_t m_clearValueStencil;
 		fd::Rect2D m_renderArea;
-		std::shared_ptr<vk::RenderPass> m_pRenderPass;
-		std::shared_ptr<BaseDepthStencilAttachment> m_pDepthStencilAttachment;
-		std::shared_ptr<vk::Framebuffer> m_pFrameBuffer;
+		vk::RenderPass *m_pCurrRenderPass;
+		vk::Framebuffer* m_pCurrFrameBuffer;
 		std::shared_ptr<vk::CommandPool> m_pCommandPool;
 		std::shared_ptr<vk::CommandBuffer> m_pCommandBuffer;
 		PipelineCache m_pipelineCache;
 		//std::shared_ptr<vk::Fence> m_waitFence;
 		std::shared_ptr<vk::Semaphore> m_cachePSemaphore;
 		std::vector<vk::Semaphore> m_arrSemaphores;
-		//aggregations
-		//Renderer will use swapchain image when color attachment texture is null.
-		vk::ImageView *m_pSwapchainImageView;
-		vk::Format m_swapchainImageFormat;
-		//Renderer will render to color texture when it is not null.
-		BaseColorAttachment *m_pColorAttchment;
-
-		// PreObjectRecordingFun m_preObjectRecordingFun;
-		// PostObjectRecordingFun m_postObjectRecordingFun;
 
 		CmdBuffer m_trunkRenderPassCmdBuffer;
 		CmdBuffer m_trunkWaitBarrierCmdBuffer;
@@ -132,9 +102,7 @@ namespace vg
 		virtual void _postRender();
 		virtual Bool32 _isValidForRender() const;
 
-		void _createRenderPass();
-		void _createDepthStencilTex();
-		void _createFramebuffer();
+		
 		void _createCommandPool();
 		void _createCommandBuffer();
 		void _createSemaphore();
@@ -168,8 +136,9 @@ namespace vg
 #endif //DEBUG and VG_ENABLE_COST_TIMER
 
 	private:
-		Renderer() = delete;
 	};
+
+	
 } //namespace kgs
 
 #endif // !VG_RENDERER_H

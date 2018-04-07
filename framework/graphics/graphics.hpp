@@ -25,6 +25,8 @@
 #include <graphics/texture/texture_depth_stencil_attachment.hpp>
 
 #include <graphics/renderer/renderer.hpp>
+#include <graphics/renderer/renderer_surface.hpp>
+#include <graphics/renderer/renderer_color_texture.hpp>
 #include <graphics/scene/scene_2.hpp>
 #include <graphics/scene/scene_3.hpp>
 #include <graphics/scene/camera_3.hpp>

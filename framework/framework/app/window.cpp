@@ -46,7 +46,7 @@ namespace vgf {
 		_createSurface();
 		_createSwapchain();
 		_createSwapchainImageViews();
-		_createRenderers();
+		_createRenderer();
 		_createSemaphores();
 	}
 
@@ -66,7 +66,7 @@ namespace vgf {
 		glfwSetWindowSizeCallback(pWindow.get(), onWindowResized);
 		_createSwapchain();
 		_createSwapchainImageViews();
-		_createRenderers();
+		_createRenderer();
 		_createSemaphores();
 	}
 
@@ -193,60 +193,30 @@ namespace vgf {
 	{
 		size_t num = m_swapchainImages.size();
 		m_pSwapchainImageViews.resize(num);
+		m_swapchainImageViews.resize(num);		
 
 		for (size_t i = 0; i < num; ++i)
 		{
 			m_pSwapchainImageViews[i] = _createImageView(m_swapchainImages[i], m_swapchainImageFormat, vk::ImageAspectFlagBits::eColor);
+			m_swapchainImageViews[i] = *(m_pSwapchainImageViews[i]);
 		}
+		
 	}
 
-	void Window::_createRenderers()
+	void Window::_createRenderer()
 	{
 		size_t num = m_swapchainImages.size();
-
-		//Clear references in m_pRenderers.
-		if(m_pRenderers.size() != num) m_pRenderers.resize(num);
-
-		//Create the renders of the specified type.
-		for (size_t i = 0; i < num; ++i)
-		{
-			if (m_pRenderers[i] == nullptr) 
-			{
-				m_pRenderers[i] = _createRenderer(
-					m_pSwapchainImageViews[i].get(),
-					m_swapchainImageFormat,
-					m_swapchainExtent.width,
-					m_swapchainExtent.height
-				);
-			}
-			else 
-			{
-				m_pRenderers[i]->reset(m_pSwapchainImageViews[i].get(),
-					m_swapchainImageFormat,
-					m_swapchainExtent.width,
-					m_swapchainExtent.height);
-			}
-		}
-
+		m_pRenderer = std::shared_ptr<vg::SurfaceRenderer>{ new vg::SurfaceRenderer(
+			    static_cast<uint32_t>(m_swapchainImageViews.size()),
+			    m_swapchainImageViews.data(),
+			    m_swapchainImageFormat,
+			    m_swapchainExtent.width,
+			    m_swapchainExtent.height
+		       )
+		   };
 	}
 
-	std::shared_ptr<vg::Renderer> Window::_createRenderer(vk::ImageView *pSwapchainImageView
-		, vk::Format swapchainImageFormat
-		, uint32_t swapchainImageWidth
-		, uint32_t swapchainImageHeight
-	)
-	{
-		return std::shared_ptr<vg::Renderer>(
-					new vg::Renderer(pSwapchainImageView
-						, swapchainImageFormat
-					    , swapchainImageWidth
-					    , swapchainImageHeight
-					)
-				);
-	}
-
-	void Window::_renderWithRenderer(vg::Renderer *pRenderer
-		    , const vg::Renderer::RenderInfo &info
+	void Window::_render( const vg::Renderer::RenderInfo &info
 			, vg::Renderer::RenderResultInfo &resultInfo)
 	{
 #ifdef USE_IMGUI_BIND
@@ -262,7 +232,7 @@ namespace vgf {
 		}
 		sceneAndCameras[info.sceneAndCameraCount] = sceneAndCamera;
 		addedInfo.pSceneAndCamera = sceneAndCameras.data();
-        pRenderer->render(addedInfo, resultInfo);
+        m_pRenderer->render(addedInfo, resultInfo);
 #else
         pRenderer->render(info, resultInfo); 		
 #endif //USE_IMGUI_BIND
@@ -360,7 +330,7 @@ namespace vgf {
 	{
 		_createSwapchain();
 		_createSwapchainImageViews();
-		_createRenderers();
+		_createRenderer();
 	}
 
 	void Window::_doUpdate()
@@ -437,7 +407,9 @@ namespace vgf {
 			imageIndex = m_currImageIndex;
 		}
 
-		if (m_pRenderers[imageIndex]->isValidForRender())
+		m_pRenderer->setImageIndex(imageIndex);
+
+		if (m_pRenderer->isValidForRender())
 		{
 			vg::Renderer::RenderInfo info;
 			info.sceneAndCameraCount = 0;
@@ -448,7 +420,7 @@ namespace vgf {
 			vg::Renderer::RenderResultInfo resultInfo;
 			resultInfo.isRendered = VG_FALSE;
 
-			_renderWithRenderer(m_pRenderers[imageIndex].get(), info, resultInfo);
+			_render(info, resultInfo);
 			//if (resultInfo.isRendered == VG_FALSE) throw std::runtime_error("No content was rendered.");
 			if (resultInfo.isRendered)
 			{

@@ -231,8 +231,7 @@ namespace sampleslib
 	}
 
 	template <vg::SpaceType SPACE_TYPE>
-	void Window<SPACE_TYPE>::_renderWithRenderer(vg::Renderer *pRenderer
-		    , const vg::Renderer::RenderInfo &info
+	void Window<SPACE_TYPE>::_render(const vg::Renderer::RenderInfo &info
 			, vg::Renderer::RenderResultInfo &resultInfo)
 	{
 		
@@ -261,7 +260,7 @@ namespace sampleslib
 		}
 		
 		myInfo.pSceneAndCamera = mySceneAndCameras.data();
-		vgf::Window::_renderWithRenderer(pRenderer, myInfo, resultInfo);
+		vgf::Window::_render(myInfo, resultInfo);
 		m_lastDrawCount += resultInfo.drawCount;
 	}
 } //sampleslib

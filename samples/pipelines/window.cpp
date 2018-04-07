@@ -170,10 +170,9 @@ void Window::_onUpdate()
 	}
 }
 
-void Window::_renderWithRenderer(vg::Renderer *pRenderer
-		    , const vg::Renderer::RenderInfo &info
+void Window::_render(const vg::Renderer::RenderInfo &info
 			, vg::Renderer::RenderResultInfo &resultInfo)
 {
 
-	ParentWindowType::_renderWithRenderer(pRenderer, info, resultInfo);	
+	ParentWindowType::_render(info, resultInfo);	
 }

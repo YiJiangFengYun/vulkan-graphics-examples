@@ -15,7 +15,6 @@ namespace testlib
 
 		transform->setLocalPosition(glm::vec3(0.0f, 0.0f, m_zoom));
 		transform->setLocalRotation(m_rotation);
-		m_pCamera->apply();		
 	}
 
     template <>
@@ -26,6 +25,5 @@ namespace testlib
 		auto pTransform = m_pCamera->getTransform();
 
 		pTransform->setLocalRotation(m_rotation);
-		m_pCamera->apply();		
 	}
 }

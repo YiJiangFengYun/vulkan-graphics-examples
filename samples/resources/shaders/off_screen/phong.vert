@@ -31,7 +31,7 @@ out gl_PerVertex
 
 void main() 
 {
-	outNormal = inNormal;
+	outNormal = mat3(_buildIn.matrixObjectToView) * inNormal;
 	outColor = inColor;
 	gl_Position = _buildIn.matrixObjectToNDC * inPos;
 	outPos = vec3(_buildIn.matrixObjectToView * inPos);

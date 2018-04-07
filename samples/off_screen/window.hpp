@@ -26,6 +26,7 @@ private:
 	std::vector<std::shared_ptr<vg::VisualObject3>> m_pVisualObjects;
 	std::vector<std::shared_ptr<vg::VisualObject3>> m_pVisualObjectOffscreens;
     std::shared_ptr<vg::Scene3> m_pSceneOffScreen;
+	std::shared_ptr<vg::Camera3> m_pCameraOffScreen;
 	std::shared_ptr<vg::Texture2DColorAttachment> m_pOffScreenTex;
 	std::shared_ptr<vg::ColorTexRenderer> m_pOffScreenRenderer;
 	

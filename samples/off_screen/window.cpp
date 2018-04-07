@@ -44,7 +44,7 @@ void Window::_init()
 void Window::_initState()
 {
 	ParentWindowType::_initState();
-	m_cameraPosition = { 0.0f, 1.0f, -6.0f };
+	m_cameraPosition = { 0.0f, 4.0f, -4.0f };
 	/// Build a quaternion from euler angles (pitch, yaw, roll), in radians.
 	m_cameraRotation = vg::Vector3(glm::radians(0.0f), glm::radians(0.0f), glm::radians(0.0f));
 
@@ -66,13 +66,13 @@ void Window::_createModel()
 	createInfo.isCreateObject = VG_FALSE;
 	createInfo.layoutComponentCount = layoutCount;
 	createInfo.pLayoutComponent = layouts;
-	createInfo.offset = vg::Vector3(0.0f, 1.5f, 0.0f);
+	createInfo.offset = vg::Vector3(0.0f, 1.5f, 3.0f);
 	createInfo.scale = vg::Vector3(0.3f);
 	m_assimpSceneModel.init(createInfo);
 
 	createInfo.fileName = "models/plane.obj";
 	createInfo.isCreateObject = VG_TRUE;
-	createInfo.offset = vg::Vector3(0.0f, 0.0f, 2.0f);
+	createInfo.offset = vg::Vector3(0.0f, 0.0f, 5.0f);
 	createInfo.scale = vg::Vector3(0.5f);
 
 	m_assimpScenePlane.init(createInfo);
@@ -81,6 +81,12 @@ void Window::_createModel()
 void Window::_createSceneOffScreen()
 {
 	m_pSceneOffScreen = std::shared_ptr<vg::Scene3>(new vg::Scene3());
+	m_pCameraOffScreen = std::shared_ptr<vg::Camera3>(new vg::Camera3());
+	m_pCameraOffScreen->updateProj(m_pCamera->getFovY(),
+		m_pCamera->getAspect(),
+		m_pCamera->getZNear(),
+		m_pCamera->getZFar());
+	m_pSceneOffScreen->addCamera(m_pCameraOffScreen.get());
 }
 
 void Window::_createOffscreenTex()
@@ -299,6 +305,7 @@ void Window::_createVisualObjects()
 		m_pVisualObjectOffscreens[index] = std::shared_ptr<vg::VisualObject3>{ new vg::VisualObject3() };
 		m_pVisualObjectOffscreens[index]->setMesh(mesh.get());
 		m_pVisualObjectOffscreens[index]->setMaterial(m_pMaterialModelOffscreen.get());
+		m_pVisualObjectOffscreens[index]->setIsVisibilityCheck(VG_FALSE);
 	}
 }
 
@@ -334,6 +341,15 @@ void Window::_onUpdate()
 {
 	ParentWindowType::_onUpdate();
 
+	auto cameraMatrix = m_pCamera->getTransform()->getLocalMatrix();
+	m_pCameraOffScreen->getTransform()->setLocalMatrix(cameraMatrix);
+
+    //This sample don't support trnasform by top transform of scene.
+	auto matrix = vg::Matrix4x4(1.0f);
+	m_pScene->pRootTransformForCamera->setLocalMatrix(matrix);
+	m_pScene->pRootTransformForLight->setLocalMatrix(matrix);
+	m_pScene->pRootTransformForVisualObject->setLocalMatrix(matrix);
+
 	// auto pos = m_lastWinPos;
 	// auto size = m_lastWinSize;
 	// ImGui::SetNextWindowPos(ImVec2(pos.x, pos.y + size.y + 10));
@@ -349,7 +365,7 @@ void Window::_render(const vg::Renderer::RenderInfo &info
 
 	auto info1 = info;
 	vg::Renderer::SceneAndCamera tempSceneAndCamera;
-	tempSceneAndCamera.pCamera = m_pCamera.get();
+	tempSceneAndCamera.pCamera = m_pCameraOffScreen.get();
 	tempSceneAndCamera.pScene = m_pSceneOffScreen.get();
 	info1.sceneAndCameraCount = 1u;
 	info1.pSceneAndCamera = &tempSceneAndCamera;

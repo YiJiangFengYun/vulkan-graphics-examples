@@ -35,9 +35,9 @@ void main()
 		{
 			for (int y = -3; y <= 3; y++)
 			{
-				reflection += texture(samplerColor, vec2(projCoord.s + x * blurSize, projCoord.t + y * blurSize)) / 49.0;
+				reflection += texture(samplerColor, vec2(projCoord.s + x * blurSize, projCoord.t + y * blurSize)) / 49; //7^2
 			}
 		}
-		outFragColor += reflection * 1.5 * (color.r);
+		outFragColor += reflection;
 	};
 }

@@ -35,7 +35,7 @@ void main()
 {
 	mat4 matrixObjectToView = _buildIn.matrixView * otherInfo.matrixInverse * _buildIn.matrixModel;
 	mat4 matrixObjectToNDC = _buildIn.matrixProj * matrixObjectToView;
-	outNormal = inNormal;
+	outNormal = mat3(matrixObjectToView) * inNormal;
 	outColor = inColor;
 	gl_Position = matrixObjectToNDC * inPos;
 	outPos = vec3(matrixObjectToView * inPos);

@@ -26,8 +26,8 @@ private:
 	std::vector<std::shared_ptr<vg::VisualObject3>> m_pVisualObjects;
 	std::vector<std::shared_ptr<vg::VisualObject3>> m_pVisualObjectOffscreens;
     std::shared_ptr<vg::Scene3> m_pSceneOffScreen;
-	std::array<std::shared_ptr<vg::Texture2DColorAttachment>, 2> m_pOffScreenTexs;
-	std::array<std::shared_ptr<vg::Renderer>, 2> m_pOffScreenRenderers;
+	std::shared_ptr<vg::Texture2DColorAttachment> m_pOffScreenTex;
+	std::shared_ptr<vg::ColorTexRenderer> m_pOffScreenRenderer;
 	
 	std::shared_ptr<vg::Shader> m_pShaderModelOffscreen;
     std::shared_ptr<vg::Pass> m_pPassModelOffscreen;
@@ -39,7 +39,7 @@ private:
 
 	std::shared_ptr<vg::Texture2D> m_pTexturePlane;    
 	std::shared_ptr<vg::Shader> m_pShaderPlane;
-	std::array<std::shared_ptr<vg::Pass>, 2> m_pPassPlanes;
+	std::shared_ptr<vg::Pass> m_pPassPlane;
 	std::shared_ptr<vg::Material> m_pMaterialPlane;
 
 	struct OtherInfo
@@ -66,10 +66,7 @@ private:
 
 	virtual void _onUpdate() override;
 
-	virtual void _onPreRender() override;
-
-	virtual void _renderWithRenderer(vg::Renderer *pRenderer
-		    , const vg::Renderer::RenderInfo &info
+	virtual void _render(const vg::Renderer::RenderInfo &info
 			, vg::Renderer::RenderResultInfo &resultInfo) override;
 };
 

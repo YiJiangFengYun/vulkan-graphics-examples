@@ -85,22 +85,14 @@ void Window::_createSceneOffScreen()
 
 void Window::_createOffscreenTex()
 {
-	m_pOffScreenTexs = std::array<std::shared_ptr<vg::Texture2DColorAttachment>, 2> {
-		std::shared_ptr<vg::Texture2DColorAttachment> {
-		    new vg::Texture2DColorAttachment(FB_COLOR_FORMAT, false, FB_DIM, FB_DIM),
-		    },
-		std::shared_ptr<vg::Texture2DColorAttachment> {
-		    new vg::Texture2DColorAttachment(FB_COLOR_FORMAT, false, FB_DIM, FB_DIM),
-		    },
-		};
+	m_pOffScreenTex = std::shared_ptr<vg::Texture2DColorAttachment>{
+		new vg::Texture2DColorAttachment(FB_COLOR_FORMAT, false, FB_DIM, FB_DIM),
+	};
 }
 
 void Window::_createOffscreenRenderer()
 {
-	m_pOffScreenRenderers = std::array<std::shared_ptr<vg::Renderer>, 2>{
-		std::shared_ptr<vg::Renderer> { new vg::Renderer(m_pOffScreenTexs[0].get()) },
-		std::shared_ptr<vg::Renderer> { new vg::Renderer(m_pOffScreenTexs[1].get()) },
-    	};
+	m_pOffScreenRenderer = std::shared_ptr<vg::ColorTexRenderer>{ new vg::ColorTexRenderer(m_pOffScreenTex.get()) };
 }
 
 void Window::_createTexture()
@@ -250,39 +242,38 @@ void Window::_createMaterial()
 
 	{
         auto & pShader = m_pShaderPlane;
+		auto & pPass = m_pPassPlane;
+		auto & pMaterial = m_pMaterialPlane;
+
 		//shader
 	    pShader = std::shared_ptr<vg::Shader>(
 	    	new vg::Shader("shaders/off_screen/mirror.vert.spv", "shaders/off_screen/mirror.frag.spv")
 	    	// new vg::Shader("shaders/test.vert.spv", "shaders/test.frag.spv")
 	    	);
-		auto & pMaterial = m_pMaterialPlane;
+		
+	    pPass = std::shared_ptr<vg::Pass>(new vg::Pass(pShader.get()));
+	    vg::Pass::BuildInDataInfo::Component buildInDataCmps[3] = {
+	    		{vg::Pass::BuildInDataType::MATRIX_OBJECT_TO_NDC},
+	    	};
+	    	vg::Pass::BuildInDataInfo buildInDataInfo;
+	    	buildInDataInfo.componentCount = 3u;
+	    	buildInDataInfo.pComponent = buildInDataCmps;
+	    	pPass->setBuildInDataInfo(buildInDataInfo);
+	    pPass->setCullMode(vg::CullModeFlagBits::NONE);
+	    pPass->setFrontFace(vg::FrontFaceType::CLOCKWISE);
+	    vk::PipelineDepthStencilStateCreateInfo depthStencilState = {};
+	    depthStencilState.depthTestEnable = VG_TRUE;
+	    depthStencilState.depthWriteEnable = VG_TRUE;
+	    depthStencilState.depthCompareOp = vk::CompareOp::eLessOrEqual;
+	    pPass->setDepthStencilInfo(depthStencilState);
+		pPass->setMainTexture(m_pTexturePlane.get());
+		pPass->setTexture("offscreen_tex", m_pOffScreenTex.get(), 2u, vg::ShaderStageFlagBits::FRAGMENT);
+	    pPass->apply();
+		
+
 		//material
-	    pMaterial = std::shared_ptr<vg::Material>(new vg::Material());
-
-		uint32_t count = static_cast<uint32_t>(m_pPassPlanes.size());
-		for (uint32_t i = 0; i < count; ++i)
-		{
-	        auto & pPass = m_pPassPlanes[i];
-	        pPass = std::shared_ptr<vg::Pass>(new vg::Pass(pShader.get()));
-	        vg::Pass::BuildInDataInfo::Component buildInDataCmps[3] = {
-	        		{vg::Pass::BuildInDataType::MATRIX_OBJECT_TO_NDC},
-	        	};
-	        	vg::Pass::BuildInDataInfo buildInDataInfo;
-	        	buildInDataInfo.componentCount = 3u;
-	        	buildInDataInfo.pComponent = buildInDataCmps;
-	        	pPass->setBuildInDataInfo(buildInDataInfo);
-	        pPass->setCullMode(vg::CullModeFlagBits::NONE);
-	        pPass->setFrontFace(vg::FrontFaceType::CLOCKWISE);
-	        vk::PipelineDepthStencilStateCreateInfo depthStencilState = {};
-	        depthStencilState.depthTestEnable = VG_TRUE;
-	        depthStencilState.depthWriteEnable = VG_TRUE;
-	        depthStencilState.depthCompareOp = vk::CompareOp::eLessOrEqual;
-	        pPass->setDepthStencilInfo(depthStencilState);
-		    pPass->setMainTexture(m_pTexturePlane.get());
-			pPass->setTexture("offscreen_tex", m_pOffScreenTexs[i].get(), 2u, vg::ShaderStageFlagBits::FRAGMENT);
-	        pPass->apply();
-		}
-
+		pMaterial = std::shared_ptr<vg::Material>(new vg::Material());
+		pMaterial->addPass(pPass.get());
 	    pMaterial->setRenderPriority(0u);
 	    pMaterial->setRenderQueueType(vg::MaterialShowType::OPAQUE);
 	    pMaterial->apply();
@@ -351,27 +342,9 @@ void Window::_onUpdate()
 	// ImGui::End();
 }
 
-void Window::_onPreRender()
-{
-	
-	
-}
-
-void Window::_renderWithRenderer(vg::Renderer *pRenderer
-		    , const vg::Renderer::RenderInfo &info
+void Window::_render(const vg::Renderer::RenderInfo &info
 			, vg::Renderer::RenderResultInfo &resultInfo)
 {
-	uint32_t renderCount = static_cast<uint32_t>(m_pRenderers.size());
-	uint32_t index = 0;
-	for (uint32_t i = 0; i < renderCount; ++i)
-	{
-		if (m_pRenderers[i].get() == pRenderer)
-		{
-			index = i;
-			break;
-		}
-	}
-
 	uint32_t drawCount = 0u;
 
 	auto info1 = info;
@@ -383,7 +356,7 @@ void Window::_renderWithRenderer(vg::Renderer *pRenderer
 	vg::Renderer::RenderResultInfo tempResultInfo1;
 	
 
-    m_pOffScreenRenderers[index]->render(info1, tempResultInfo1);
+    m_pOffScreenRenderer->render(info1, tempResultInfo1);
 	drawCount += tempResultInfo1.drawCount;
 
 
@@ -393,11 +366,7 @@ void Window::_renderWithRenderer(vg::Renderer *pRenderer
 
     vg::Renderer::RenderResultInfo tempResultInfo2;
 
-	
-	if (m_pMaterialPlane->getPassCount() != 0u) m_pMaterialPlane->removePass(m_pMaterialPlane->getPasses()[0]);
-	m_pMaterialPlane->addPass(m_pPassPlanes[index].get());
-
-	ParentWindowType::_renderWithRenderer(pRenderer, info, tempResultInfo2);
+	ParentWindowType::_render(info2, tempResultInfo2);
 
 	drawCount += tempResultInfo2.drawCount;
 	resultInfo = tempResultInfo2;

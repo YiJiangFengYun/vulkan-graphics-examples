@@ -57,7 +57,7 @@ namespace vg
 				//3 is w
 				if(glm::abs(points[i][3]) > epsilon)
 			    {
-			    	points[i] = points[i] / points[i][3];
+			    	points[i] = points[i] / std::abs(points[i][3]);
 			    }
 			    else
 			    {

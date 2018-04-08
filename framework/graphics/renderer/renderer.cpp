@@ -22,23 +22,24 @@ namespace vg
 		, const SceneAndCamera *pSceneAndCameras
 		, uint32_t waitSemaphoreCount
 		, const vk::Semaphore* pWaitSemaphores
-		, const vk::PipelineStageFlags* pWaitDstStageMask)
+		, const vk::PipelineStageFlags* pWaitDstStageMask
+		, uint32_t signalSemaphoreCount
+		, const vk::Semaphore* pSignalSemaphores
+		)
 		: sceneAndCameraCount(sceneAndCameraCount)
 		, pSceneAndCameras(pSceneAndCameras)
 		, waitSemaphoreCount(waitSemaphoreCount)
 		, pWaitSemaphores(pWaitSemaphores)
 		, pWaitDstStageMask(pWaitDstStageMask)
+		, signalSemaphoreCount(signalSemaphoreCount)
+		, pSignalSemaphores(pSignalSemaphores)
 	{
 	}
 
 	Renderer::RenderResultInfo::RenderResultInfo(Bool32 isRendered
-		, uint32_t signalSemaphoreCount
-		, const vk::Semaphore* pSignalSemaphores
 		, uint32_t drawCount
 	    )
 		: isRendered(isRendered)
-		, signalSemaphoreCount(signalSemaphoreCount)
-		, pSignalSemaphores(pSignalSemaphores)
 		, drawCount(drawCount)
 	{
 
@@ -62,7 +63,6 @@ namespace vg
 		, m_trunkRenderPassCmdBuffer()
 		, m_trunkWaitBarrierCmdBuffer()
 		, m_branchCmdBuffer()
-		, m_pSemaphore(nullptr)
 #if defined(DEBUG) && defined(VG_ENABLE_COST_TIMER)
         , m_preparingRenderCostTimer(fd::CostTimer::TimerType::AVERAGE)
 #endif //DEBUG and VG_ENABLE_COST_TIMER
@@ -224,7 +224,6 @@ namespace vg
 	void Renderer::_render(const RenderInfo &info
 		    , RenderResultInfo &resultInfo)
 	{
-		resultInfo.signalSemaphoreCount = 0u;
 		resultInfo.drawCount = 0u;
 
 		m_trunkRenderPassCmdBuffer.begin();
@@ -292,10 +291,6 @@ namespace vg
 			m_pCurrRenderPass
 			);
 		_recordTrunkRenderPassForEnd();
-
-		
-		resultInfo.signalSemaphoreCount = m_pSemaphore == nullptr ? 0u : 1u;
-		resultInfo.pSignalSemaphores = m_pSemaphore;
 	}
 
 	void Renderer::_renderEnd(const RenderInfo &info)
@@ -322,8 +317,8 @@ namespace vg
 			waitStages,                           //pWaitDstStageMask
 			1u,                                   //commandBufferCount
 			m_pCommandBuffer.get(),               //pCommandBuffers
-			m_pSemaphore != nullptr ? 1u : 0u,                                   //signalSemaphoreCount
-			m_pSemaphore != nullptr ? m_pSemaphore : nullptr,                      //pSignalSemaphores
+			info.signalSemaphoreCount,            //signalSemaphoreCount
+			info.pSignalSemaphores,               //pSignalSemaphores
 		};
 
 		VG_LOG(plog::debug) << "Pre submit to grahics queue." << std::endl;

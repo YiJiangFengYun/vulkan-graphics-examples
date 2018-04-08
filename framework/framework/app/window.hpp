@@ -49,6 +49,7 @@ namespace vgf
 		std::shared_ptr<vg::SurfaceRenderer> m_pRenderer;
 		std::shared_ptr<vk::Semaphore> m_pImageAvailableSemaphore;
 		vk::PipelineStageFlags m_renderWaitStageMask;
+		std::shared_ptr<vk::Semaphore> m_pRenderFinishedSemaphore;		
 		int32_t m_currImageIndex;
 
 		//std::mutex m_windowMutex;

@@ -248,7 +248,7 @@ namespace vgf {
 		};
 		auto pDevice = vg::pApp->getDevice();
 		m_pImageAvailableSemaphore = fd::createSemaphore(pDevice, createInfo);
-		//m_pRenderFinishedSemaphore = fd::createSemaphore(m_pDevice, createInfo);
+		m_pRenderFinishedSemaphore = fd::createSemaphore(pDevice, createInfo);
 	}
 
 #ifdef USE_IMGUI_BIND
@@ -419,6 +419,8 @@ namespace vgf {
 			info.waitSemaphoreCount = 1u;
 			info.pWaitSemaphores = m_pImageAvailableSemaphore.get();
 			info.pWaitDstStageMask = &m_renderWaitStageMask;
+			info.signalSemaphoreCount = 1u;
+			info.pSignalSemaphores = m_pRenderFinishedSemaphore.get();
 
 			vg::Renderer::RenderResultInfo resultInfo;
 			resultInfo.isRendered = VG_FALSE;
@@ -428,8 +430,8 @@ namespace vgf {
 			if (resultInfo.isRendered)
 			{
 				vk::PresentInfoKHR presentInfo = {
-					resultInfo.signalSemaphoreCount, //waitSemaphoreCount
-					resultInfo.pSignalSemaphores,   //pWaitSemaphores
+					1u,                                 //waitSemaphoreCount
+					m_pRenderFinishedSemaphore.get(),   //pWaitSemaphores
 					1u,                                 //swapchainCount
 					m_pSwapchain.get(),                 //pSwapchains
 					&imageIndex,                        //pImageIndices

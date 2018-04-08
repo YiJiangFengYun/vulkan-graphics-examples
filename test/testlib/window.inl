@@ -134,10 +134,10 @@ namespace testlib
 		std::vector<vg::Renderer::SceneAndCamera> sceneAndCameras(myInfo.sceneAndCameraCount);
 		for (uint32_t i = 0; i < info.sceneAndCameraCount; ++i)
 		{
-			sceneAndCameras[i] = *(info.pSceneAndCamera + i);
+			sceneAndCameras[i] = *(info.pSceneAndCameras + i);
 		}
 		sceneAndCameras[info.sceneAndCameraCount] = sceneAndCamera;
-		myInfo.pSceneAndCamera = sceneAndCameras.data();
+		myInfo.pSceneAndCameras = sceneAndCameras.data();
 		vgf::Window::_render(myInfo, resultInfo);
 	}
 }

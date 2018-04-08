@@ -249,7 +249,7 @@ namespace sampleslib
 		uint32_t index = 0u;
 		for (uint32_t i = 0; i < info.sceneAndCameraCount; ++i)
 		{
-			mySceneAndCameras[index] = *(info.pSceneAndCamera + i);
+			mySceneAndCameras[index] = *(info.pSceneAndCameras + i);
 			++index;
 		}
 
@@ -259,7 +259,7 @@ namespace sampleslib
 			++index;
 		}
 		
-		myInfo.pSceneAndCamera = mySceneAndCameras.data();
+		myInfo.pSceneAndCameras = mySceneAndCameras.data();
 		vgf::Window::_render(myInfo, resultInfo);
 		m_lastDrawCount += resultInfo.drawCount;
 	}

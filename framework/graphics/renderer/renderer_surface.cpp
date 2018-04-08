@@ -20,6 +20,7 @@ namespace vg
         _createRenderPass();
 		_createDepthStencilTex();
 		_createFramebuffers();
+		_createSemaphore();
     }
 
 	void SurfaceRenderer::setImageIndex(uint32_t imageIndex)
@@ -154,4 +155,15 @@ namespace vg
         m_pCurrFrameBuffer = m_pFrameBuffers[m_imageIndex].get();
        
     }
+
+	void SurfaceRenderer::_createSemaphore()
+	{
+		if (m_cachePSemaphore != nullptr) return;
+		auto pDevice = pApp->getDevice();
+		vk::SemaphoreCreateInfo createInfo = {
+			vk::SemaphoreCreateFlags()
+		};
+		m_cachePSemaphore = fd::createSemaphore(pDevice, createInfo);
+		m_pSemaphore = m_cachePSemaphore.get();
+	}
 } //vg

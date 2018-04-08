@@ -23,9 +23,12 @@ namespace vg
 		vk::ImageView *m_pSwapchainImageViews;
         uint32_t m_imageIndex;
 
+		std::shared_ptr<vk::Semaphore> m_cachePSemaphore;
+
 		void _createRenderPass();
 		void _createDepthStencilTex();
 		void _createFramebuffers();
+		void _createSemaphore();
 	};
 } //vg
 

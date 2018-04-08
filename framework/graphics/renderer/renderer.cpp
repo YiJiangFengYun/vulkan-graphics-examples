@@ -18,6 +18,32 @@ namespace vg
 #endif
 		);
 
+	Renderer::RenderInfo::RenderInfo(uint32_t sceneAndCameraCount
+		, const SceneAndCamera *pSceneAndCameras
+		, uint32_t waitSemaphoreCount
+		, const vk::Semaphore* pWaitSemaphores
+		, const vk::PipelineStageFlags* pWaitDstStageMask)
+		: sceneAndCameraCount(sceneAndCameraCount)
+		, pSceneAndCameras(pSceneAndCameras)
+		, waitSemaphoreCount(waitSemaphoreCount)
+		, pWaitSemaphores(pWaitSemaphores)
+		, pWaitDstStageMask(pWaitDstStageMask)
+	{
+	}
+
+	Renderer::RenderResultInfo::RenderResultInfo(Bool32 isRendered
+		, uint32_t signalSemaphoreCount
+		, const vk::Semaphore* pSignalSemaphores
+		, uint32_t drawCount
+	    )
+		: isRendered(isRendered)
+		, signalSemaphoreCount(signalSemaphoreCount)
+		, pSignalSemaphores(pSignalSemaphores)
+		, drawCount(drawCount)
+	{
+
+	}
+
 	const vk::Format Renderer::DEFAULT_DEPTH_STENCIL_FORMAT(vk::Format::eD32SfloatS8Uint);
 
 	Renderer::Renderer()
@@ -36,13 +62,14 @@ namespace vg
 		, m_trunkRenderPassCmdBuffer()
 		, m_trunkWaitBarrierCmdBuffer()
 		, m_branchCmdBuffer()
+		, m_pSemaphore(nullptr)
 #if defined(DEBUG) && defined(VG_ENABLE_COST_TIMER)
         , m_preparingRenderCostTimer(fd::CostTimer::TimerType::AVERAGE)
 #endif //DEBUG and VG_ENABLE_COST_TIMER
 	{
 		_createCommandPool();
 		_createCommandBuffer();
-		_createSemaphore();
+		
 		//_createFence();
 	}
 
@@ -206,8 +233,8 @@ namespace vg
 		uint32_t count = info.sceneAndCameraCount;
 		for (uint32_t i = 0; i < count; ++i)
 		{
-			const auto &pScene = (*(info.pSceneAndCamera + i)).pScene;
-			const auto &pCamera = (*(info.pSceneAndCamera + i)).pCamera;
+			const auto &pScene = (*(info.pSceneAndCameras + i)).pScene;
+			const auto &pCamera = (*(info.pSceneAndCameras + i)).pCamera;
 #if defined(DEBUG) && defined(VG_ENABLE_COST_TIMER)
             fd::CostTimer preparingSceneCostTimer(fd::CostTimer::TimerType::ONCE);
 			preparingSceneCostTimer.begin();
@@ -266,12 +293,9 @@ namespace vg
 			);
 		_recordTrunkRenderPassForEnd();
 
-		uint32_t semaphoreCount = resultInfo.signalSemaphoreCount + 1u;
-		uint32_t semaphoreIndex = resultInfo.signalSemaphoreCount;
-		m_arrSemaphores.resize(semaphoreCount);
-		m_arrSemaphores[semaphoreIndex] = *m_cachePSemaphore;
-		resultInfo.signalSemaphoreCount = static_cast<uint32_t>(m_arrSemaphores.size());
-		resultInfo.pSignalSemaphores = m_arrSemaphores.data();
+		
+		resultInfo.signalSemaphoreCount = m_pSemaphore == nullptr ? 0u : 1u;
+		resultInfo.pSignalSemaphores = m_pSemaphore;
 	}
 
 	void Renderer::_renderEnd(const RenderInfo &info)
@@ -298,8 +322,8 @@ namespace vg
 			waitStages,                           //pWaitDstStageMask
 			1u,                                   //commandBufferCount
 			m_pCommandBuffer.get(),               //pCommandBuffers
-			1u,                                   //signalSemaphoreCount
-			m_cachePSemaphore.get()                      //pSignalSemaphores
+			m_pSemaphore != nullptr ? 1u : 0u,                                   //signalSemaphoreCount
+			m_pSemaphore != nullptr ? m_pSemaphore : nullptr,                      //pSignalSemaphores
 		};
 
 		VG_LOG(plog::debug) << "Pre submit to grahics queue." << std::endl;
@@ -419,15 +443,7 @@ namespace vg
 		VG_LOG(plog::debug) << "Post end command buffer." << std::endl;
 	}
 
-	void Renderer::_createSemaphore()
-	{
-		if (m_cachePSemaphore != nullptr) return;
-		auto pDevice = pApp->getDevice();
-		vk::SemaphoreCreateInfo createInfo = {
-			vk::SemaphoreCreateFlags()
-		};
-		m_cachePSemaphore = fd::createSemaphore(pDevice, createInfo);
-	}
+	
 
 	/*void Renderer::_createFence()
 	{

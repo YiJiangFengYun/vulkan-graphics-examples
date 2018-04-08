@@ -363,28 +363,24 @@ void Window::_render(const vg::Renderer::RenderInfo &info
 {
 	uint32_t drawCount = 0u;
 
-	auto info1 = info;
+	vg::Renderer::RenderInfo infoOffscreen;
 	vg::Renderer::SceneAndCamera tempSceneAndCamera;
 	tempSceneAndCamera.pCamera = m_pCameraOffScreen.get();
 	tempSceneAndCamera.pScene = m_pSceneOffScreen.get();
-	info1.sceneAndCameraCount = 1u;
-	info1.pSceneAndCamera = &tempSceneAndCamera;
-	vg::Renderer::RenderResultInfo tempResultInfo1;
+	infoOffscreen.sceneAndCameraCount = 1u;
+	infoOffscreen.pSceneAndCameras = &tempSceneAndCamera;
+	vg::Renderer::RenderResultInfo offscreenResultInfo;
 	
 
-    m_pOffScreenRenderer->render(info1, tempResultInfo1);
-	drawCount += tempResultInfo1.drawCount;
+    m_pOffScreenRenderer->render(infoOffscreen, offscreenResultInfo);
+	drawCount += offscreenResultInfo.drawCount;
 
 
-    auto info2 = info;
-	info2.waitSemaphoreCount = tempResultInfo1.signalSemaphoreCount;
-	info2.pWaitSemaphores = tempResultInfo1.pSignalSemaphores;
+    vg::Renderer::RenderResultInfo tempResultInfo;
 
-    vg::Renderer::RenderResultInfo tempResultInfo2;
+	ParentWindowType::_render(info, tempResultInfo);
 
-	ParentWindowType::_render(info2, tempResultInfo2);
-
-	drawCount += tempResultInfo2.drawCount;
-	resultInfo = tempResultInfo2;
+	drawCount += tempResultInfo.drawCount;
+	resultInfo = tempResultInfo;
 	resultInfo.drawCount = drawCount;
 }

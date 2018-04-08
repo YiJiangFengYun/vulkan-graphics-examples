@@ -28,10 +28,17 @@ namespace vg
 		};
 
 		struct RenderInfo {
-			const SceneAndCamera *pSceneAndCamera;
+			const SceneAndCamera *pSceneAndCameras;
 			uint32_t sceneAndCameraCount;
 			uint32_t waitSemaphoreCount;
 			const vk::Semaphore* pWaitSemaphores;
+			const vk::PipelineStageFlags* pWaitDstStageMask;
+
+			RenderInfo(uint32_t sceneAndCameraCount = 0u
+				, const SceneAndCamera *pSceneAndCameras = nullptr
+				, uint32_t waitSemaphoreCount = 0u
+				, const vk::Semaphore* pWaitSemaphores = nullptr
+			    , const vk::PipelineStageFlags* pWaitDstStageMask = nullptr);
 		};
 
 		struct RenderResultInfo {
@@ -39,6 +46,11 @@ namespace vg
 			uint32_t signalSemaphoreCount;
 			const vk::Semaphore* pSignalSemaphores;
 			uint32_t drawCount;
+
+			RenderResultInfo(Bool32 isRendered = VG_FALSE
+				, uint32_t signalSemaphoreCount = 0u
+				, const vk::Semaphore* pSignalSemaphores = nullptr
+				, uint32_t drawCount = 0u);
 		};
 
 		Renderer();
@@ -84,8 +96,7 @@ namespace vg
 		std::shared_ptr<vk::CommandBuffer> m_pCommandBuffer;
 		PipelineCache m_pipelineCache;
 		//std::shared_ptr<vk::Fence> m_waitFence;
-		std::shared_ptr<vk::Semaphore> m_cachePSemaphore;
-		std::vector<vk::Semaphore> m_arrSemaphores;
+		vk::Semaphore *m_pSemaphore;
 
 		CmdBuffer m_trunkRenderPassCmdBuffer;
 		CmdBuffer m_trunkWaitBarrierCmdBuffer;
@@ -105,7 +116,7 @@ namespace vg
 		
 		void _createCommandPool();
 		void _createCommandBuffer();
-		void _createSemaphore();
+		
 		//void _createFence();
 
 		void _recordCommandBufferForBegin();

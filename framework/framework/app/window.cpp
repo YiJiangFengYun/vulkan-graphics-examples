@@ -41,6 +41,7 @@ namespace vgf {
 		: m_width(width)
 		, m_height(height)
 		, m_currImageIndex(-1)
+		, m_renderWaitStageMask(vk::PipelineStageFlagBits::eColorAttachmentOutput)
 	{
 		_createWindow(width, height, title);
 		_createSurface();
@@ -56,6 +57,7 @@ namespace vgf {
 		: m_pWindow(pWindow)
 		, m_pSurface(pSurface)
 		, m_currImageIndex(-1)
+		, m_renderWaitStageMask(vk::PipelineStageFlagBits::eColorAttachmentOutput)
 	{
 		int32_t width;
 		int32_t height;
@@ -228,10 +230,10 @@ namespace vgf {
 		std::vector<vg::Renderer::SceneAndCamera> sceneAndCameras(addedInfo.sceneAndCameraCount);
 		for (uint32_t i = 0; i < info.sceneAndCameraCount; ++i)
 		{
-			sceneAndCameras[i] = *(info.pSceneAndCamera + i);
+			sceneAndCameras[i] = *(info.pSceneAndCameras + i);
 		}
 		sceneAndCameras[info.sceneAndCameraCount] = sceneAndCamera;
-		addedInfo.pSceneAndCamera = sceneAndCameras.data();
+		addedInfo.pSceneAndCameras = sceneAndCameras.data();
         m_pRenderer->render(addedInfo, resultInfo);
 #else
         pRenderer->render(info, resultInfo); 		
@@ -413,9 +415,10 @@ namespace vgf {
 		{
 			vg::Renderer::RenderInfo info;
 			info.sceneAndCameraCount = 0;
-			info.pSceneAndCamera = nullptr;
+			info.pSceneAndCameras = nullptr;
 			info.waitSemaphoreCount = 1u;
 			info.pWaitSemaphores = m_pImageAvailableSemaphore.get();
+			info.pWaitDstStageMask = &m_renderWaitStageMask;
 
 			vg::Renderer::RenderResultInfo resultInfo;
 			resultInfo.isRendered = VG_FALSE;

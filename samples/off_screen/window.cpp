@@ -72,7 +72,7 @@ void Window::_createModel()
 
 	createInfo.fileName = "models/plane.obj";
 	createInfo.isCreateObject = VG_TRUE;
-	createInfo.offset = vg::Vector3(0.0f, 0.0f, 2.0f);
+	createInfo.offset = vg::Vector3(0.0f, 0.0f, 0.0f);
 	createInfo.scale = vg::Vector3(0.5f);
 
 	m_assimpScenePlane.init(createInfo);
@@ -332,7 +332,8 @@ void Window::_initScene()
 	    for (const auto &object : objects)
 	    {
 	    	object->setMaterial(m_pMaterialPlane.get());
-	        m_pScene->addVisualObject(object.get());		
+	        m_pScene->addVisualObject(object.get());
+			// object->setIsVisibilityCheck(VG_FALSE);	
 	    }
 	}
 }
@@ -343,12 +344,6 @@ void Window::_onUpdate()
 
 	auto cameraMatrix = m_pCamera->getTransform()->getLocalMatrix();
 	m_pCameraOffScreen->getTransform()->setLocalMatrix(cameraMatrix);
-
-    //This sample don't support trnasform by top transform of scene.
-	auto matrix = vg::Matrix4x4(1.0f);
-	m_pScene->pRootTransformForCamera->setLocalMatrix(matrix);
-	m_pScene->pRootTransformForLight->setLocalMatrix(matrix);
-	m_pScene->pRootTransformForVisualObject->setLocalMatrix(matrix);
 
 	// auto pos = m_lastWinPos;
 	// auto size = m_lastWinSize;

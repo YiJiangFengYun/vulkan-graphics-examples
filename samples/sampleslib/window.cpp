@@ -58,20 +58,22 @@ namespace sampleslib
 			}
 
 			if (instance->m_mouseButtons.right) {
-				auto &pScenes = instance->m_pScenes;
-				uint32_t sceneCount = static_cast<uint32_t>(pScenes.size());
-				for (uint32_t i = 0; i < sceneCount; ++i)
-				{
-					auto &pScene = pScenes[i];
-					auto pRootTransform = pScene->pRootTransformForVisualObject;
-				    auto localRotation = pRootTransform->getLocalRotation();
-				    vg::Vector3 eulerAngles = vg::Vector3(dy * instance->m_rotationSpeed, dx * instance->m_rotationSpeed, 0.0f);
-			        vg::Quaternion change = vg::Quaternion(eulerAngles);
-				    localRotation = change * localRotation;
-				    pRootTransform->setLocalRotation(localRotation);
-				    pRootTransform = pScene->pRootTransformForLight;
-				    pRootTransform->setLocalRotation(localRotation);
-				}
+				instance->m_worldRotation.x += dy * instance->m_rotationSpeed;
+		        instance->m_worldRotation.y += dx * instance->m_rotationSpeed;
+				// auto &pScenes = instance->m_pScenes;
+				// uint32_t sceneCount = static_cast<uint32_t>(pScenes.size());
+				// for (uint32_t i = 0; i < sceneCount; ++i)
+				// {
+				// 	auto &pScene = pScenes[i];
+				// 	auto pRootTransform = pScene->pRootTransformForVisualObject;
+				//     auto localRotation = pRootTransform->getLocalRotation();
+				//     vg::Vector3 eulerAngles = vg::Vector3(dy * instance->m_rotationSpeed, dx * instance->m_rotationSpeed, 0.0f);
+			    //     vg::Quaternion change = vg::Quaternion(eulerAngles);
+				//     localRotation = change * localRotation;
+				//     pRootTransform->setLocalRotation(localRotation);
+				//     pRootTransform = pScene->pRootTransformForLight;
+				//     pRootTransform->setLocalRotation(localRotation);
+				// }
 				
 			}
 		});
@@ -85,7 +87,7 @@ namespace sampleslib
     template <>
 	void Window<vg::SpaceType::SPACE_3>::_updateCamera()
 	{
-		m_pCamera->updateProj(glm::radians(60.0f), m_cameraAspect, 0.1f, 256.0f);
+		m_pCamera->updateProj(glm::radians(60.0f), m_cameraAspect, 0.001f, 256.0f);
 
 		auto matrix = glm::mat4(1.0f);
 		matrix = glm::translate(matrix, glm::vec3(0.0f, 0.0f, m_cameraZoom));
@@ -101,8 +103,14 @@ namespace sampleslib
 		{
 			lookAtRotationMatrix = glm::toMat4(glm::rotation(vg::Vector3(0.0f, 0.0f, 1.0f), glm::normalize(-m_cameraPosition)));
 		}
-		auto translateMatrix = glm::translate(glm::mat4(1.0f), m_cameraPosition);		
-		auto localMatrix = translateMatrix * lookAtRotationMatrix * rotationMatrix * matrix;
+		auto translateMatrix = glm::translate(glm::mat4(1.0f), m_cameraPosition);
+
+		auto worldRotationMatrix = glm::mat4(1.0f);
+		worldRotationMatrix = glm::rotate(worldRotationMatrix, glm::radians(m_worldRotation.x), glm::vec3(1.0f, 0.0f, 0.0f));
+		worldRotationMatrix = glm::rotate(worldRotationMatrix, glm::radians(m_worldRotation.y), glm::vec3(0.0f, 1.0f, 0.0f));
+		worldRotationMatrix = glm::rotate(worldRotationMatrix, glm::radians(m_worldRotation.z), glm::vec3(0.0f, 1.0f, 0.0f));
+
+		vg::Matrix4x4 localMatrix = worldRotationMatrix * translateMatrix * lookAtRotationMatrix * rotationMatrix * matrix;
 		
 		// auto lookAtMatrix = glm::lookAt(m_cameraPosition, vg::Vector3(0.0f), vg::Vector3(0.0f, 1.0f, 0.0f));
 		// auto localMatrix = lookAtMatrix * rotationMatrix * matrix;

@@ -78,6 +78,7 @@ namespace sampleslib
 		float m_cameraAspect;
 		PointType m_cameraPosition;
 		RotationDimType m_cameraRotation;
+		RotationDimType m_worldRotation;
         
 		struct  {
 		    vgf::Bool32 left = VGF_FALSE;

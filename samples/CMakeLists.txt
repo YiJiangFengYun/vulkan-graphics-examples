@@ -22,6 +22,7 @@ add_subdirectory(external_uniform_buffer)
 add_subdirectory(push_constants)
 add_subdirectory(specialization_constants)
 add_subdirectory(off_screen)
+add_subdirectory(passes)
 
 # sampler include directories and libraries is used by itself
 # set(INCLUDE_DIRS ${INCLUDE_DIRS} PARENT_SCOPE)

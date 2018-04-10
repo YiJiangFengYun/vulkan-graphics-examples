@@ -20,6 +20,7 @@ set(HEADERS ${HEADERS} "${PROJECT_CONFIG_HEADER_DIR}/framework/config.hpp")
 include_directories(${INCLUDE_DIRS})
 add_library(${LIBRARY_NAME} STATIC ${HEADERS} ${SOURCES})
 set_property(TARGET ${LIBRARY_NAME} PROPERTY FOLDER ${FOLDER_NAME})
+set(LIBRARIES ${LIBRARIES} ${LIBRARY_NAME})
 
 # install
 install (TARGETS ${LIBRARY_NAME} DESTINATION bin)

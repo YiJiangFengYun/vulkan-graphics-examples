@@ -1,10 +1,16 @@
 set(LIBRARY_NAME "graphics_ext")
 file(GLOB_RECURSE HEADERS *.hpp *.inl)
 file(GLOB_RECURSE SOURCES *.cpp)
-include_directories(${INCLUDE_DIRS})
-add_library(${LIBRARY_NAME} STATIC ${HEADERS} ${SOURCES})
-set_property(TARGET ${LIBRARY_NAME} PROPERTY FOLDER ${FOLDER_NAME})
+if(SOURCES)
+    include_directories(${INCLUDE_DIRS})
+    add_library(${LIBRARY_NAME} STATIC ${HEADERS} ${SOURCES})
+    set_property(TARGET ${LIBRARY_NAME} PROPERTY FOLDER ${FOLDER_NAME})
+    set(LIBRARIES ${LIBRARIES} ${LIBRARY_NAME})
 
-# install
-install (TARGETS ${LIBRARY_NAME} DESTINATION bin)
-install (FILES ${HEADERS} DESTINATION include)
+    # install
+    install (TARGETS ${LIBRARY_NAME} DESTINATION bin)
+    install (FILES ${HEADERS} DESTINATION include)
+endif(SOURCES)
+
+set(INCLUDE_DIRS ${INCLUDE_DIRS} PARENT_SCOPE)
+set(LIBRARIES ${LIBRARIES} PARENT_SCOPE)

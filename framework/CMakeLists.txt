@@ -12,19 +12,14 @@ set(VGIM_PLOG_ID 401)
 set(INCLUDE_DIRS ${INCLUDE_DIRS} ${PROJECT_FRAMEWORK_DIR})
 
 add_subdirectory(foundation)
-set(LIBRARIES ${LIBRARIES} foundation)
 add_subdirectory(graphics)
-set(LIBRARIES ${LIBRARIES} graphics)
 add_subdirectory(graphics_ext)
-set(LIBRARIES ${LIBRARIES} graphics_ext)
 
 if(USE_IMGUI_BIND)
-    add_subdirectory(vgim)
-    set(LIBRARIES ${LIBRARIES} vgim)            
+    add_subdirectory(vgim)           
 endif(USE_IMGUI_BIND)
 
 add_subdirectory(framework)
-set(LIBRARIES ${LIBRARIES} framework)
 
 set(INCLUDE_DIRS ${INCLUDE_DIRS} PARENT_SCOPE)
 set(LIBRARIES ${LIBRARIES} PARENT_SCOPE)

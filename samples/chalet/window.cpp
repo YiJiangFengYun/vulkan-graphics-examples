@@ -124,21 +124,25 @@ namespace chalet
 
 	void Window::_createMaterial()
 	{
-		m_pShader = std::shared_ptr<vg::Shader>(new vg::Shader("shaders/chalet.vert.spv", "shaders/chalet.frag.spv"));
-		m_pPass = std::shared_ptr<vg::Pass>(new vg::Pass(m_pShader.get()));
-		m_pPass->setCullMode(vg::CullModeFlagBits::BACK);
-		m_pPass->setFrontFace(vg::FrontFaceType::CLOCKWISE);
+		m_pMaterial = std::shared_ptr<vg::Material>(new vg::Material());
+		m_pMaterial->setRenderPriority(0u);
+		m_pMaterial->setRenderQueueType(vg::MaterialShowType::OPAQUE);
+
+		auto pShader = m_pMaterial->getMainShader();
+		auto pPass = m_pMaterial->getMainPass();
+		pShader->load("shaders/chalet.vert.spv",
+			"shaders/chalet.frag.spv");
+		pPass->setCullMode(vg::CullModeFlagBits::BACK);
+		pPass->setFrontFace(vg::FrontFaceType::CLOCKWISE);
 		vk::PipelineDepthStencilStateCreateInfo depthStencilStateInfo;
 		depthStencilStateInfo.depthTestEnable = VG_TRUE;
 		depthStencilStateInfo.depthWriteEnable = VG_TRUE;
 		depthStencilStateInfo.depthCompareOp = vk::CompareOp::eLess;
-		m_pPass->setDepthStencilInfo(depthStencilStateInfo);
-		m_pMaterial = std::shared_ptr<vg::Material>(new vg::Material());
-		m_pMaterial->addPass(m_pPass.get());
-		m_pMaterial->setRenderPriority(0u);
-		m_pMaterial->setRenderQueueType(vg::MaterialShowType::OPAQUE);
-		m_pPass->setMainTexture(m_pTexture.get());
-
+		pPass->setDepthStencilInfo(depthStencilStateInfo);
+		
+		pPass->setMainTexture(m_pTexture.get());
+		
+		m_pMaterial->apply();
 	}
 
 	void Window::_createModel()
@@ -219,18 +223,21 @@ namespace chalet
 		
 	void Window::_createMaterialOfBounds()
 	{
-		m_pShaderOfBounds = std::shared_ptr<vg::Shader>(new vg::Shader("shaders/only_color.vert.spv", "shaders/only_color.frag.spv"));
-		m_pPassOfBounds = std::shared_ptr<vg::Pass>(new vg::Pass(m_pShaderOfBounds.get()));
-		m_pPassOfBounds->setCullMode(vg::CullModeFlagBits::NONE);
+		m_pMaterialOfBounds = std::shared_ptr<vg::Material>(new vg::Material());
+		m_pMaterialOfBounds->setRenderPriority(0u);
+		m_pMaterialOfBounds->setRenderQueueType(vg::MaterialShowType::OPAQUE);
+		auto pShader = m_pMaterialOfBounds->getMainShader();
+		auto pPass = m_pMaterialOfBounds->getMainPass();
+		pShader->load("shaders/only_color.vert.spv", 
+			"shaders/only_color.frag.spv");
+		pPass->setCullMode(vg::CullModeFlagBits::NONE);
 		vk::PipelineDepthStencilStateCreateInfo depthStencilStateInfo;
 		depthStencilStateInfo.depthTestEnable = VG_FALSE;
 		depthStencilStateInfo.depthWriteEnable = VG_FALSE;
 		depthStencilStateInfo.depthCompareOp = vk::CompareOp::eNever;
-		m_pPassOfBounds->setDepthStencilInfo(depthStencilStateInfo);
-		m_pMaterialOfBounds = std::shared_ptr<vg::Material>(new vg::Material());
-		m_pMaterialOfBounds->addPass(m_pPassOfBounds.get());
-		m_pMaterialOfBounds->setRenderPriority(0u);
-		m_pMaterialOfBounds->setRenderQueueType(vg::MaterialShowType::OPAQUE);
+		pPass->setDepthStencilInfo(depthStencilStateInfo);
+		
+		m_pMaterialOfBounds->apply();
 	}
 
 	void Window::_createModelOfBounds()

@@ -17,8 +17,6 @@ Window::Window(uint32_t width
 	, m_pModel()
 	, m_pMesh()
 	, m_pTexture()
-	, m_pShader()
-	, m_pPass()
 	, m_pMaterial()
 	, m_instanceCount(0u)
 {
@@ -37,8 +35,6 @@ Window::Window(std::shared_ptr<GLFWwindow> pWindow
 	, m_pModel()
 	, m_pMesh()
 	, m_pTexture()
-	, m_pShader()
-	, m_pPass()
 	, m_pMaterial()
 	, m_instanceCount(0u)
 {
@@ -167,18 +163,19 @@ void Window::_createTexture()
 
 void Window::_createMaterial()
 {
-
-	auto & pShader = m_pShader;
-	auto & pPass = m_pPass;
-	auto & pMaterial = m_pMaterial;
 	auto & pApp = vg::pApp;
+	//material
+	auto & pMaterial = m_pMaterial;
+	pMaterial = std::shared_ptr<vg::Material>(new vg::Material());
+	pMaterial->setRenderPriority(0u);
+	pMaterial->setRenderQueueType(vg::MaterialShowType::OPAQUE);
+
+	auto pShader = pMaterial->getMainShader();
+	auto pPass = pMaterial->getMainPass();
+	
 	//shader
-	pShader = std::shared_ptr<vg::Shader>(
-		new vg::Shader("shaders/texture_array/instancing.vert.spv", "shaders/texture_array/instancing.frag.spv")
-		// new vg::Shader("shaders/test.vert.spv", "shaders/test.frag.spv")
-		);
+	pShader->load("shaders/texture_array/instancing.vert.spv", "shaders/texture_array/instancing.frag.spv");
 	//pass
-	pPass = std::shared_ptr<vg::Pass>(new vg::Pass(pShader.get()));
 	vg::Pass::BuildInDataInfo::Component buildInDataCmps[2] = {
 			{vg::Pass::BuildInDataType::MATRIX_PROJECTION},
 			{vg::Pass::BuildInDataType::MATRIX_VIEW}
@@ -198,11 +195,7 @@ void Window::_createMaterial()
 	pPass->setDataValue("other_info", m_otherInfo, 2u);
 	pPass->setInstanceCount(m_instanceCount);
 	pPass->apply();
-	//material
-	pMaterial = std::shared_ptr<vg::Material>(new vg::Material());
-	pMaterial->addPass(pPass.get());
-	pMaterial->setRenderPriority(0u);
-	pMaterial->setRenderQueueType(vg::MaterialShowType::OPAQUE);
+	
 	pMaterial->apply();
 
 }
@@ -234,7 +227,7 @@ void Window::_onUpdate()
 		// Instance texture array index
 		otherInfo.instance[i].arrayIndex.x = static_cast<float>(i);
 	}
-	auto & pPass = m_pPass;
+	auto pPass = m_pMaterial->getMainPass();
 	pPass->setDataValue("other_info", m_otherInfo, 2u);
 	pPass->apply();
 

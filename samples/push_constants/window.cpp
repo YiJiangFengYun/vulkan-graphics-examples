@@ -11,8 +11,6 @@ Window::Window(uint32_t width
 		, height
 		, title
 	    )
-	, m_pShader()
-	, m_pPass()
 	, m_pMaterial()
 {
 	_init();
@@ -24,8 +22,6 @@ Window::Window(std::shared_ptr<GLFWwindow> pWindow
 	: sampleslib::Window<vg::SpaceType::SPACE_3>(pWindow
 		, pSurface
 	    )
-	, m_pShader()
-	, m_pPass()
 	, m_pMaterial()
 {
 	_init();
@@ -71,17 +67,21 @@ void Window::_loadAssimpScene()
 
 void Window::_createMaterial()
 {
-	auto & pShader = m_pShader;
-	auto & pPass = m_pPass;
-	auto & pMaterial = m_pMaterial;
 	auto & pApp = vg::pApp;
+	//material
+	auto & pMaterial = m_pMaterial;
+	pMaterial = std::shared_ptr<vg::Material>(new vg::Material());
+	pMaterial->setRenderPriority(0u);
+	pMaterial->setRenderQueueType(vg::MaterialShowType::OPAQUE);
+
+	auto pShader = pMaterial->getMainShader();
+	auto pPass = pMaterial->getMainPass();
+	
+	
 	//shader
-	pShader = std::shared_ptr<vg::Shader>(
-		new vg::Shader("shaders/push_constants/lights.vert.spv", "shaders/push_constants/lights.frag.spv")
-		// new vg::Shader("shaders/test.vert.spv", "shaders/test.frag.spv")
-		);
+	pShader->load("shaders/push_constants/lights.vert.spv", 
+		"shaders/push_constants/lights.frag.spv");
 	//pass
-	pPass = std::shared_ptr<vg::Pass>(new vg::Pass(pShader.get()));
 	vg::Pass::BuildInDataInfo::Component buildInDataCmps[2] = {
 			{vg::Pass::BuildInDataType::MATRIX_OBJECT_TO_NDC},
 			{vg::Pass::BuildInDataType::MATRIX_OBJECT_TO_WORLD}
@@ -99,11 +99,7 @@ void Window::_createMaterial()
 	pPass->setDepthStencilInfo(depthStencilState);
 	pPass->setPushConstantRange("push_constants", vk::ShaderStageFlagBits::eVertex, 0u, static_cast<uint32_t>(sizeof(m_pushConstants)));
 	pPass->apply();
-	//material
-	pMaterial = std::shared_ptr<vg::Material>(new vg::Material());
-	pMaterial->addPass(pPass.get());
-	pMaterial->setRenderPriority(0u);
-	pMaterial->setRenderQueueType(vg::MaterialShowType::OPAQUE);
+	
 	pMaterial->apply();
 
 }
@@ -141,7 +137,8 @@ void Window::_onUpdate()
 #undef sin_t
 #undef cos_t
     
-	m_pPass->setPushConstantUpdate("push_constants", m_pushConstants.data(), 
+	auto pPass = m_pMaterial->getMainPass();
+	pPass->setPushConstantUpdate("push_constants", m_pushConstants.data(),
 	    static_cast<uint32_t>(sizeof(m_pushConstants)), vk::ShaderStageFlagBits::eVertex, 0u);
 
 	// auto pos = m_lastWinPos;

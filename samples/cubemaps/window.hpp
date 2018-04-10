@@ -24,12 +24,8 @@ private:
 	int32_t m_currIndex;
 	std::vector<std::string> m_arrObjectNames;
 	std::shared_ptr<vg::TextureCube> m_pCubeMapTex;
-	std::shared_ptr<vg::Shader> m_pShaderSkybox;
-	std::shared_ptr<vg::Pass> m_pPassSkybox;
 	std::shared_ptr<vg::Material> m_pMaterialSkybox;
 
-	std::shared_ptr<vg::Shader> m_pShaderReflect;
-	std::shared_ptr<vg::Pass> m_pPassReflect;
 	std::shared_ptr<vg::Material> m_pMaterialReflect;
 	struct OtherInfo 
 	{

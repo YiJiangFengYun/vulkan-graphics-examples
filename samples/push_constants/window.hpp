@@ -20,8 +20,6 @@ public:
 	);
 private:
     sampleslib::AssimpScene m_assimpScene;
-	std::shared_ptr<vg::Shader> m_pShader;
-	std::shared_ptr<vg::Pass> m_pPass;
 	std::shared_ptr<vg::Material> m_pMaterial;
 
 	std::array<vg::Vector4, LIGHT_COUNT> m_pushConstants;

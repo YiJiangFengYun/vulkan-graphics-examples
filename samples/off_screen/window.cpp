@@ -171,18 +171,19 @@ void Window::_createTexture()
 
 void Window::_createMaterial()
 {
+	auto & pApp = vg::pApp;
 	{
-	    auto & pShader = m_pShaderModel;
-	    auto & pPass = m_pPassModel;
-	    auto & pMaterial = m_pMaterialModel;
-	    auto & pApp = vg::pApp;
+	    auto &pMaterial = m_pMaterialModel;
+		//material
+		pMaterial = std::shared_ptr<vg::Material>(new vg::Material());
+		pMaterial->setRenderPriority(0u);
+		pMaterial->setRenderQueueType(vg::MaterialShowType::OPAQUE);
+
+		auto pShader = pMaterial->getMainShader();
+		auto pPass = pMaterial->getMainPass();
 	    //shader
-	    pShader = std::shared_ptr<vg::Shader>(
-	    	new vg::Shader("shaders/off_screen/phong.vert.spv", "shaders/off_screen/phong.frag.spv")
-	    	// new vg::Shader("shaders/test.vert.spv", "shaders/test.frag.spv")
-	    	);
+		pShader->load("shaders/off_screen/phong.vert.spv", "shaders/off_screen/phong.frag.spv");
 	    //pass
-	    pPass = std::shared_ptr<vg::Pass>(new vg::Pass(pShader.get()));
 	    vg::Pass::BuildInDataInfo::Component buildInDataCmps[2] = {
 	    		{vg::Pass::BuildInDataType::MATRIX_OBJECT_TO_NDC},
 	    		{vg::Pass::BuildInDataType::MATRIX_OBJECT_TO_VIEW}
@@ -200,26 +201,23 @@ void Window::_createMaterial()
 	    pPass->setDepthStencilInfo(depthStencilState);
 	    pPass->setDataValue("other_info", m_otherInfo, 2u);
 	    pPass->apply();
-	    //material
-	    pMaterial = std::shared_ptr<vg::Material>(new vg::Material());
-	    pMaterial->addPass(pPass.get());
-	    pMaterial->setRenderPriority(0u);
-	    pMaterial->setRenderQueueType(vg::MaterialShowType::OPAQUE);
+	    
 	    pMaterial->apply();
 	}
 
 	{
-		auto & pShader = m_pShaderModelOffscreen;
-		auto & pPass = m_pPassModelOffscreen;
-	    auto & pMaterial = m_pMaterialModelOffscreen;
-	    auto & pApp = vg::pApp;
+		auto & pMaterial = m_pMaterialModelOffscreen;
+		//material
+		pMaterial = std::shared_ptr<vg::Material>(new vg::Material());
+		pMaterial->setRenderPriority(0u);
+		pMaterial->setRenderQueueType(vg::MaterialShowType::OPAQUE);
+
+		auto pShader = pMaterial->getMainShader();
+		auto pPass = pMaterial->getMainPass();
+	    
 		//shader
-	    pShader = std::shared_ptr<vg::Shader>(
-	    	new vg::Shader("shaders/off_screen/phong_offscreen.vert.spv", "shaders/off_screen/phong_offscreen.frag.spv")
-	    	// new vg::Shader("shaders/test.vert.spv", "shaders/test.frag.spv")
-	    	);
+		pShader->load("shaders/off_screen/phong_offscreen.vert.spv", "shaders/off_screen/phong_offscreen.frag.spv");
 	    //pass
-	    pPass = std::shared_ptr<vg::Pass>(new vg::Pass(pShader.get()));
 	    vg::Pass::BuildInDataInfo::Component buildInDataCmps[3] = {
 	    		{vg::Pass::BuildInDataType::MATRIX_OBJECT_TO_WORLD},
 	    		{vg::Pass::BuildInDataType::MATRIX_VIEW},
@@ -238,26 +236,24 @@ void Window::_createMaterial()
 	    pPass->setDepthStencilInfo(depthStencilState);
 	    pPass->setDataValue("other_info", m_otherInfoOffScreen, 2u);
 	    pPass->apply();
-	    //material
-	    pMaterial = std::shared_ptr<vg::Material>(new vg::Material());
-	    pMaterial->addPass(pPass.get());
-	    pMaterial->setRenderPriority(0u);
-	    pMaterial->setRenderQueueType(vg::MaterialShowType::OPAQUE);
+	    
 	    pMaterial->apply();
 	}
 
 	{
-        auto & pShader = m_pShaderPlane;
-		auto & pPass = m_pPassPlane;
 		auto & pMaterial = m_pMaterialPlane;
+		//material
+		pMaterial = std::shared_ptr<vg::Material>(new vg::Material());
+		pMaterial->setRenderPriority(0u);
+		pMaterial->setRenderQueueType(vg::MaterialShowType::OPAQUE);
+
+        auto pShader = pMaterial->getMainShader();
+		auto pPass = pMaterial->getMainPass();
+		
 
 		//shader
-	    pShader = std::shared_ptr<vg::Shader>(
-	    	new vg::Shader("shaders/off_screen/mirror.vert.spv", "shaders/off_screen/mirror.frag.spv")
-	    	// new vg::Shader("shaders/test.vert.spv", "shaders/test.frag.spv")
-	    	);
+		pShader->load("shaders/off_screen/mirror.vert.spv", "shaders/off_screen/mirror.frag.spv");
 		
-	    pPass = std::shared_ptr<vg::Pass>(new vg::Pass(pShader.get()));
 	    vg::Pass::BuildInDataInfo::Component buildInDataCmps[3] = {
 	    		{vg::Pass::BuildInDataType::MATRIX_OBJECT_TO_NDC},
 	    	};
@@ -276,12 +272,6 @@ void Window::_createMaterial()
 		pPass->setTexture("offscreen_tex", m_pOffScreenTex.get(), 2u, vg::ShaderStageFlagBits::FRAGMENT);
 	    pPass->apply();
 		
-
-		//material
-		pMaterial = std::shared_ptr<vg::Material>(new vg::Material());
-		pMaterial->addPass(pPass.get());
-	    pMaterial->setRenderPriority(0u);
-	    pMaterial->setRenderQueueType(vg::MaterialShowType::OPAQUE);
 	    pMaterial->apply();
 	   
 	}

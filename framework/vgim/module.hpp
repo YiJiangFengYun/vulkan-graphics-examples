@@ -17,7 +17,6 @@ namespace vgim {
 	extern const vg::CameraOP2 *getCamera();
 	extern const vg::Scene2 *getScene();
 	extern void setShaderPath(const std::string &vertShaderPath, const std::string &fragShaderPat);
-	extern void setShader(vg::Shader *pShader);
 	extern void updateIMGUI(uint32_t canvasWidth
         , uint32_t canvasHeight
         , double currTime

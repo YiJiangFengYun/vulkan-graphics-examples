@@ -51,7 +51,12 @@ namespace vg
 		, m_renderPriority()
 		, m_arrPasses()
 		, m_mapPasses()
+		, m_pMainShader()
+		, m_pMainPass()
 	{
+		m_pMainShader = std::shared_ptr<vg::Shader>{new vg::Shader()};
+		m_pMainPass = std::shared_ptr<vg::Pass>{ new vg::Pass(m_pMainShader.get())};
+		_addPass(m_pMainPass.get());
 	}
 
 	Material::~Material()
@@ -78,24 +83,15 @@ namespace vg
 		return m_mapPasses.find(pass->getID()) != m_mapPasses.cend();
 	}
 
-	void Material::addPass(Pass *pPass)
+
+	Shader *Material::getMainShader() const 
 	{
-		if (isHas(pPass)) return;
-		m_arrPasses.push_back(pPass);
-		m_mapPasses[pPass->getID()] = pPass;
+		return m_pMainShader.get();
 	}
 
-	void Material::removePass(Pass *pPass)
+	Pass *Material::getMainPass() const
 	{
-		if (isHas(pPass) == VG_FALSE) return;
-		m_arrPasses.erase(std::remove(m_arrPasses.begin(), m_arrPasses.end(), pPass));
-		m_mapPasses.erase(pPass->getID());
-	}
-
-	void Material::clearPasses()
-	{
-		m_arrPasses.clear();
-		m_mapPasses.clear();
+		return m_pMainPass.get();
 	}
 
 	void Material::apply()
@@ -151,7 +147,19 @@ namespace vg
             result.pTrunkRenderPassCmdBuffer->addCmd(cmdInfo);
         }
 
-        
-        
     }
+
+	void Material::_addPass(Pass *pPass)
+	{
+		if (isHas(pPass)) return;
+		m_arrPasses.push_back(pPass);
+		m_mapPasses[pPass->getID()] = pPass;
+	}
+
+	void Material::_removePass(Pass *pPass)
+	{
+		if (isHas(pPass) == VG_FALSE) return;
+		m_arrPasses.erase(std::remove(m_arrPasses.begin(), m_arrPasses.end(), pPass));
+		m_mapPasses.erase(pPass->getID());
+	}
 }

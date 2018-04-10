@@ -65,27 +65,33 @@ namespace vg
 		Pass *getPassWithIndex(uint32_t index) const;
 		Pass * const *getPasses() const;
 		Bool32 isHas(const Pass *pPass) const;
-		void addPass(Pass *pPass);
-		void removePass(Pass *pPass);
-		void clearPasses();
+
+		Shader *getMainShader() const;
+		Pass *getMainPass() const;
+
 		MaterialShowType getShowType();
 		void setRenderQueueType(MaterialShowType type);
 		uint32_t getRenderPriority();
 		void setRenderPriority(uint32_t priority);
 		/*Call the apply methods of all passes in the material.*/
-		void apply();
+		virtual void apply();
 
 		virtual void bindToRender(const BindInfo info, BindResult *pResult);
-	private:
+	protected:
 		//--compositions
 		MaterialShowType m_renderQueueType;
 		uint32_t m_renderPriority;
+		std::shared_ptr<Shader> m_pMainShader; 
+		std::shared_ptr<Pass> m_pMainPass;
 		//--compositions
 
 		//--aggregations
 		std::vector<Pass *> m_arrPasses;
 		std::unordered_map<InstanceID, Pass *> m_mapPasses;
 		//--aggregations
+
+		virtual void _addPass(Pass *pPass);
+		virtual void _removePass(Pass *pPass);
 	};
 }
 

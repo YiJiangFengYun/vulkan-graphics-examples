@@ -59,16 +59,18 @@ namespace testTriangle2D
 
 	void Window::_createMaterial()
 	{
-		m_pShader = std::shared_ptr<vg::Shader>(new vg::Shader(
-			"shaders/test-triangle-2d/triangle-2d.vert.spv", 
-			"shaders/test-triangle-2d/triangle-2d.frag.spv"
-		));
-		m_pPass = std::shared_ptr<vg::Pass>(new vg::Pass(m_pShader.get()));
-		m_pPass->setCullMode(vg::CullModeFlagBits::NONE);
 		m_pMaterial = std::shared_ptr<vg::Material>(new vg::Material());
-		m_pMaterial->addPass(m_pPass.get());
 		m_pMaterial->setRenderPriority(0u);
 		m_pMaterial->setRenderQueueType(vg::MaterialShowType::OPAQUE);
+
+		auto pShader = m_pMaterial->getMainShader();
+		auto pPass = m_pMaterial->getMainPass();
+
+		pShader->load(
+			"shaders/test-triangle-2d/triangle-2d.vert.spv", 
+			"shaders/test-triangle-2d/triangle-2d.frag.spv");
+		pPass->setCullMode(vg::CullModeFlagBits::NONE);
+
 		m_pMaterial->apply();
 	}
 

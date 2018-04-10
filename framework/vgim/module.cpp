@@ -8,8 +8,6 @@ namespace vgim
     double m_time;
 	
     std::shared_ptr<vg::Texture2D> m_pFontTexture;
-    std::shared_ptr<vg::Shader> m_pShader;
-    std::shared_ptr<vg::Pass> m_pPass;
     std::shared_ptr<vg::Material> m_pMaterial;
     
     std::shared_ptr<vg::DimSimpleMesh2> m_pMesh;
@@ -64,12 +62,7 @@ namespace vgim
 
 	void setShaderPath(const std::string &vertShaderPath, const std::string &fragShaderPath)
 	{
-		m_pShader->load(vertShaderPath, fragShaderPath);
-	}
-
-	void setShader(vg::Shader *pShader)
-	{
-		m_pPass->setShader(pShader);
+		m_pMaterial->getMainShader()->load(vertShaderPath, fragShaderPath);
 	}
 
     void _createMaterial();
@@ -282,25 +275,27 @@ namespace vgim
         // m_pPass->setPushConstantUpdate("default", &data, static_cast<uint32_t>(sizeof(data)), 
         //     vk::ShaderStageFlagBits::eVertex, 0u);
 
+		auto pPass = m_pMaterial->getMainPass();
+
         fd::Viewport viewPort(0.0f, 0.0f, ImGui::GetIO().DisplaySize.x / static_cast<float>(m_canvasWidth), 
             ImGui::GetIO().DisplaySize.y / static_cast<float>(m_canvasHeight), 0.0f, 1.0f);
-        m_pPass->setViewport(viewPort);
+		pPass->setViewport(viewPort);
 
         fd::Rect2D scissor(0.0f, 0.0f, ImGui::GetIO().DisplaySize.x / static_cast<float>(m_canvasWidth), 
             ImGui::GetIO().DisplaySize.y / static_cast<float>(m_canvasHeight));
-        m_pPass->setScissor(scissor);
+		pPass->setScissor(scissor);
     }
 
 	void _createMaterial()
 	{
-        //shader
-        m_pShader = std::shared_ptr<vg::Shader>(new vg::Shader());
-		m_pPass = std::shared_ptr<vg::Pass>(new vg::Pass(m_pShader.get()));
+		m_pMaterial = std::shared_ptr<vg::Material>(new vg::Material());
+		m_pMaterial->setRenderPriority(0u);
+		m_pMaterial->setRenderQueueType(vg::MaterialShowType::TRANSPARENT);
 
-        m_pPass->setFrontFace(vg::FrontFaceType::CLOCKWISE);
-
+		auto pPass = m_pMaterial->getMainPass();
+		pPass->setFrontFace(vg::FrontFaceType::CLOCKWISE);
         //push constant
-        // m_pPass->setPushConstantRange("default", vk::ShaderStageFlagBits::eVertex, static_cast<uint32_t>(sizeof(float) * 0), static_cast<uint32_t>(sizeof(float) * 4));
+        // pPass->setPushConstantRange("default", vk::ShaderStageFlagBits::eVertex, static_cast<uint32_t>(sizeof(float) * 0), static_cast<uint32_t>(sizeof(float) * 4));
 
         //color blend
         uint32_t attachmentCount = 1u;
@@ -324,26 +319,21 @@ namespace vgim
         vk::PipelineColorBlendStateCreateInfo colorBlendInfo;
         colorBlendInfo.attachmentCount = blendAttachmentStates.size();
         colorBlendInfo.pAttachments = blendAttachmentStates.data();
-        m_pPass->setColorBlendInfo(colorBlendInfo);
+		pPass->setColorBlendInfo(colorBlendInfo);
 
         //depth stencil
         vk::PipelineDepthStencilStateCreateInfo depthStencilInfo;
         depthStencilInfo.depthTestEnable = VK_FALSE;
         depthStencilInfo.depthWriteEnable = VK_FALSE;
-        m_pPass->setDepthStencilInfo(depthStencilInfo);
+		pPass->setDepthStencilInfo(depthStencilInfo);
 
-		m_pMaterial = std::shared_ptr<vg::Material>(new vg::Material());
-		m_pMaterial->addPass(m_pPass.get());
-		m_pMaterial->setRenderPriority(0u);
-		m_pMaterial->setRenderQueueType(vg::MaterialShowType::TRANSPARENT);
+		
 		m_pMaterial->apply();
 	}
 
     void _destroyMaterial()
     {
         m_pMaterial = nullptr;
-        m_pPass = nullptr;
-        m_pShader = nullptr;
     }
 
     void _createMesh()
@@ -462,14 +452,16 @@ namespace vgim
         
         io.Fonts->TexID = reinterpret_cast<void *>(VkImage(*(m_pFontTexture->getImage())));
 
-        m_pPass->setMainTexture(m_pFontTexture.get());
+		auto pPass = m_pMaterial->getMainPass();
+		pPass->setMainTexture(m_pFontTexture.get());
     }
 
     void _destroyFontTexture()
     {
+		auto pPass = m_pMaterial->getMainPass();
         ImGuiIO& io = ImGui::GetIO();
         io.Fonts->TexID = reinterpret_cast<void *>(0);        
-        m_pPass->setMainTexture(nullptr);        
+		pPass->setMainTexture(nullptr);
         m_pFontTexture = nullptr;
     }  
 } //vgim

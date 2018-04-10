@@ -19,7 +19,6 @@ Window::Window(uint32_t width
 	, m_tempIndices()
 	, m_pMesh()
 	, m_pShader()
-	, m_pPasses()
 	, m_pMaterials()
 	, m_pExtUniformData()
 {
@@ -37,7 +36,6 @@ Window::Window(std::shared_ptr<GLFWwindow> pWindow
 	, m_tempIndices()
 	, m_pMesh()
 	, m_pShader()
-	, m_pPasses()
 	, m_pMaterials()
 	, m_pExtUniformData()
 {
@@ -186,15 +184,20 @@ void Window::_createMaterial()
 		new vg::Shader("shaders/external_uniform_buffer/base.vert.spv", "shaders/external_uniform_buffer/base.frag.spv")
 		 //new vg::Shader("shaders/test.vert.spv", "shaders/test.frag.spv")
 		);
+	auto & pApp = vg::pApp;
 
 	for (uint32_t i = 0; i < OBJECT_INSTANCE_COUNT; ++i)
 	{
-		auto & pPass = m_pPasses[i];
-	    auto & pMaterial = m_pMaterials[i];
-	    auto & pApp = vg::pApp;
+		//material
+		auto & pMaterial = m_pMaterials[i];
+		pMaterial = std::shared_ptr<vg::Material>(new vg::Material());
+		pMaterial->setRenderPriority(0u);
+		pMaterial->setRenderQueueType(vg::MaterialShowType::OPAQUE);
+
+		auto pPass = pMaterial->getMainPass();
 	    
 	    //pass
-	    pPass = std::shared_ptr<vg::Pass>(new vg::Pass(pShader.get()));
+	    pPass->setShader(pShader.get());
 	    vg::Pass::BuildInDataInfo::Component buildInDataCmps[2] = {
 	    		{vg::Pass::BuildInDataType::MATRIX_PROJECTION},
 	    		{vg::Pass::BuildInDataType::MATRIX_VIEW}
@@ -216,11 +219,7 @@ void Window::_createMaterial()
 	    externalUniformBufferInfo.subDataCount = 1u;
 	    pPass->setExternalUniformBufferData(externalUniformBufferInfo);
 	    pPass->apply();
-	    //material
-	    pMaterial = std::shared_ptr<vg::Material>(new vg::Material());
-	    pMaterial->addPass(pPass.get());
-	    pMaterial->setRenderPriority(0u);
-	    pMaterial->setRenderQueueType(vg::MaterialShowType::OPAQUE);
+	    
 	    pMaterial->apply();
 	}
 

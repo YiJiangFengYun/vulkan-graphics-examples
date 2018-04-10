@@ -21,12 +21,8 @@ private:
 	sampleslib::AssimpScene m_assimpScene;
 	std::shared_ptr<vg::Texture2D> m_pTexture;
 	
-	std::shared_ptr<vg::Shader> m_pShaderSolid;
-	std::shared_ptr<vg::Pass> m_pPassSolid;
 	std::shared_ptr<vg::Material> m_pMaterialSolid;
 
-	std::shared_ptr<vg::Shader> m_pShaderWireframe;
-	std::shared_ptr<vg::Pass> m_pPassWireframe;
 	std::shared_ptr<vg::Material> m_pMaterialWireframe;
 
 	struct OtherInfo 

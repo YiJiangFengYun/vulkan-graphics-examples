@@ -12,8 +12,6 @@ Window::Window(uint32_t width
 		, title
 	    )
 	, m_assimpScene()
-	, m_pShaders()
-	, m_pPasses()
 	, m_pMaterials()
 {
 	_init();
@@ -26,8 +24,6 @@ Window::Window(std::shared_ptr<GLFWwindow> pWindow
 		, pSurface
 	    )
 	, m_assimpScene()
-	, m_pShaders()
-	, m_pPasses()
 	, m_pMaterials()
 {
 	_init();
@@ -88,21 +84,23 @@ void Window::_createMaterial()
 		"shaders/pipelines/wireframe.frag.spv"
 	};
 
-	auto& pShaders = m_pShaders;
-	auto& pPasses = m_pPasses;
 	auto& pMaterials = m_pMaterials;
 	auto& pApp = vg::pApp;
 	for (uint32_t i = 0; i < SCENE_COUNT; ++i)
 	{
+		//material
+		pMaterials[i] = std::shared_ptr<vg::Material>(new vg::Material());
+		pMaterials[i]->setRenderPriority(0u);
+		pMaterials[i]->setRenderQueueType(vg::MaterialShowType::OPAQUE);
+
+		auto pShader = pMaterials[i]->getMainShader();
+		auto pPass = pMaterials[i]->getMainPass();
 		//shader
-	    pShaders[i] = std::shared_ptr<vg::Shader>(
-	    	new vg::Shader(vertShaderPaths[i], fragShaderPaths[i])
-	    	);
+		pShader->load(vertShaderPaths[i], fragShaderPaths[i]);
 	    //pass
-	    pPasses[i] = std::shared_ptr<vg::Pass>(new vg::Pass(pShaders[i].get()));
-		pPasses[i]->setCullMode(vg::CullModeFlagBits::BACK);
-		pPasses[i]->setFrontFace(vg::FrontFaceType::CLOCKWISE);
-		pPasses[i]->setViewport(fd::Viewport(static_cast<float>(i) / static_cast<float>(SCENE_COUNT),
+		pPass->setCullMode(vg::CullModeFlagBits::BACK);
+		pPass->setFrontFace(vg::FrontFaceType::CLOCKWISE);
+		pPass->setViewport(fd::Viewport(static_cast<float>(i) / static_cast<float>(SCENE_COUNT),
 		     0.0f,
 		 	1.0f / static_cast<float>(SCENE_COUNT),
 		 	1.0f));
@@ -110,25 +108,21 @@ void Window::_createMaterial()
 	    depthStencilState.depthTestEnable = VG_TRUE;
 	    depthStencilState.depthWriteEnable = VG_TRUE;
 	    depthStencilState.depthCompareOp = vk::CompareOp::eLessOrEqual;
-	    pPasses[i]->setDepthStencilInfo(depthStencilState);
+		pPass->setDepthStencilInfo(depthStencilState);
 		if (i == 1u && pApp->getPhysicalDeviceFeatures().wideLines)
 		{
-			pPasses[i]->setLineWidth(2.0f);
+			pPass->setLineWidth(2.0f);
 		}
 
 		if (i == 2u)
 		{
-			pPasses[i]->setPolygonMode(vg::PolygonMode::LINE);
+			pPass->setPolygonMode(vg::PolygonMode::LINE);
 		}
 
-		pPasses[i]->setDataValue("light_info", m_lightInfo, 2u);
-		pPasses[i]->apply();
+		pPass->setDataValue("light_info", m_lightInfo, 2u);
+		pPass->apply();
 
-	    //material
-	    pMaterials[i] = std::shared_ptr<vg::Material>(new vg::Material());
-	    pMaterials[i]->addPass(pPasses[i].get());
-		pMaterials[i]->setRenderPriority(0u);
-	    pMaterials[i]->setRenderQueueType(vg::MaterialShowType::OPAQUE);
+	    
 	    pMaterials[i]->apply();
 	}
 

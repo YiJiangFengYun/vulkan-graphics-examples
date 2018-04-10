@@ -38,10 +38,9 @@ private:
 	uint32_t m_bufferSizeOneObject;
 	uint32_t m_uniformMemorySize;
 	void *m_pUniformMemory;
+
 	std::shared_ptr<vg::Shader> m_pShader;
 
-
-	std::shared_ptr<vg::Pass> m_pPasses[OBJECT_INSTANCE_COUNT];
 	std::shared_ptr<vg::Material> m_pMaterials[OBJECT_INSTANCE_COUNT];
 
 	std::shared_ptr<vg::VisualObject3> m_pModels[OBJECT_INSTANCE_COUNT];	

@@ -27,8 +27,6 @@ namespace testTriangle2D
 		std::shared_ptr<vg::VisualObject2> m_pModel;
 		std::shared_ptr<vg::DimSepMesh2> m_pMesh;
 		std::shared_ptr<vg::Material> m_pMaterial;
-		std::shared_ptr<vg::Pass> m_pPass;
-		std::shared_ptr<vg::Shader> m_pShader;
 
 
 		void _loadModel();

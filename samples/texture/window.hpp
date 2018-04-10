@@ -24,8 +24,6 @@ private:
 	std::shared_ptr<vg::VisualObject3> m_pModel;
 	std::shared_ptr<vg::DimSepMesh3> m_pMesh;
 	std::shared_ptr<vg::Texture2D> m_pTexture;
-	std::shared_ptr<vg::Shader> m_pShader;
-	std::shared_ptr<vg::Pass> m_pPass;
 	std::shared_ptr<vg::Material> m_pMaterial;
 	struct OtherInfo 
 	{

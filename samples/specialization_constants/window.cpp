@@ -12,8 +12,6 @@ Window::Window(uint32_t width
 		, title
 	    )
 	, m_assimpScene()
-	, m_pShaders()
-	, m_pPasses()
 	, m_pMaterials()
 	, m_pVisualObjects()
 {
@@ -26,8 +24,6 @@ Window::Window(std::shared_ptr<GLFWwindow> pWindow
 		, pSurface
 	    )
 	, m_assimpScene()
-	, m_pShaders()
-	, m_pPasses()
 	, m_pMaterials()
 	, m_pVisualObjects()
 {
@@ -134,18 +130,20 @@ void Window::_createMaterial()
 		"shaders/specialization_constants/uber.frag.spv",
 	};
 
-	auto& pShaders = m_pShaders;
-	auto& pPasses = m_pPasses;
 	auto& pMaterials = m_pMaterials;
 	auto& pApp = vg::pApp;
 	for (uint32_t i = 0; i < SCENE_COUNT; ++i)
 	{
+		//material
+		pMaterials[i] = std::shared_ptr<vg::Material>(new vg::Material());
+		pMaterials[i]->setRenderPriority(0u);
+		pMaterials[i]->setRenderQueueType(vg::MaterialShowType::OPAQUE);
+
+		auto pShader = pMaterials[i]->getMainShader();
+		auto pPass = pMaterials[i]->getMainPass();
 		//shader
-	    pShaders[i] = std::shared_ptr<vg::Shader>(
-	    	new vg::Shader(vertShaderPaths, fragShaderPaths)
-	    	);
+		pShader->load(vertShaderPaths, fragShaderPaths);
 	    //pass
-	    pPasses[i] = std::shared_ptr<vg::Pass>(new vg::Pass(pShaders[i].get()));
 		vg::Pass::BuildInDataInfo::Component buildInDataCmps[2] = {
 			{vg::Pass::BuildInDataType::MATRIX_OBJECT_TO_NDC},
 			{vg::Pass::BuildInDataType::MATRIX_OBJECT_TO_VIEW}
@@ -153,10 +151,10 @@ void Window::_createMaterial()
 		vg::Pass::BuildInDataInfo buildInDataInfo;
 		buildInDataInfo.componentCount = 2u;
 		buildInDataInfo.pComponent = buildInDataCmps;
-	    pPasses[i]->setBuildInDataInfo(buildInDataInfo);
-		pPasses[i]->setCullMode(vg::CullModeFlagBits::BACK);
-		pPasses[i]->setFrontFace(vg::FrontFaceType::CLOCKWISE);
-		pPasses[i]->setViewport(fd::Viewport(static_cast<float>(i) / static_cast<float>(SCENE_COUNT),
+		pPass->setBuildInDataInfo(buildInDataInfo);
+		pPass->setCullMode(vg::CullModeFlagBits::BACK);
+		pPass->setFrontFace(vg::FrontFaceType::CLOCKWISE);
+		pPass->setViewport(fd::Viewport(static_cast<float>(i) / static_cast<float>(SCENE_COUNT),
 		     0.0f,
 		 	1.0f / static_cast<float>(SCENE_COUNT),
 		 	1.0f));
@@ -164,7 +162,7 @@ void Window::_createMaterial()
 	    depthStencilState.depthTestEnable = VG_TRUE;
 	    depthStencilState.depthWriteEnable = VG_TRUE;
 	    depthStencilState.depthCompareOp = vk::CompareOp::eLessOrEqual;
-	    pPasses[i]->setDepthStencilInfo(depthStencilState);
+		pPass->setDepthStencilInfo(depthStencilState);
 
 		//!!!
 		// Prepare specialization data
@@ -202,16 +200,11 @@ void Window::_createMaterial()
 
 		specializationData.lightingModel = i;
 
-		pPasses[i]->setSpecializationData(vg::ShaderStageFlagBits::FRAGMENT, specializationInfo);
-		pPasses[i]->setMainTexture(m_pTexture.get());
-		pPasses[i]->setDataValue("light_info", m_lightInfo, 2u);
-		pPasses[i]->apply();
+		pPass->setSpecializationData(vg::ShaderStageFlagBits::FRAGMENT, specializationInfo);
+		pPass->setMainTexture(m_pTexture.get());
+		pPass->setDataValue("light_info", m_lightInfo, 2u);
+		pPass->apply();
 
-	    //material
-	    pMaterials[i] = std::shared_ptr<vg::Material>(new vg::Material());
-	    pMaterials[i]->addPass(pPasses[i].get());
-		pMaterials[i]->setRenderPriority(0u);
-	    pMaterials[i]->setRenderQueueType(vg::MaterialShowType::OPAQUE);
 	    pMaterials[i]->apply();
 	}
 

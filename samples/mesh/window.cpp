@@ -14,11 +14,7 @@ Window::Window(uint32_t width
 	, m_wireFrame(false)
 	, m_assimpScene()
 	, m_pTexture()
-	, m_pShaderSolid()
-	, m_pPassSolid()
 	, m_pMaterialSolid()
-	, m_pShaderWireframe()
-	, m_pPassWireframe()
 	, m_pMaterialWireframe()
 {
 	_init();
@@ -33,11 +29,7 @@ Window::Window(std::shared_ptr<GLFWwindow> pWindow
 	, m_wireFrame(false)
 	, m_assimpScene()
 	, m_pTexture()
-	, m_pShaderSolid()
-	, m_pPassSolid()
 	, m_pMaterialSolid()
-	, m_pShaderWireframe()
-	, m_pPassWireframe()
 	, m_pMaterialWireframe()
 {
 	_init();
@@ -149,18 +141,21 @@ void Window::_createTexture()
 
 void Window::_createMaterial()
 {
+	auto & pApp = vg::pApp;
 	{
-	    auto & pShader = m_pShaderSolid;
-	    auto & pPass = m_pPassSolid;
-	    auto & pMaterial = m_pMaterialSolid;
-	    auto & pApp = vg::pApp;
+		//material
+		auto & pMaterial = m_pMaterialSolid;
+		pMaterial = std::shared_ptr<vg::Material>(new vg::Material());
+		pMaterial->setRenderPriority(0u);
+		pMaterial->setRenderQueueType(vg::MaterialShowType::OPAQUE);
+
+	    auto pShader = pMaterial->getMainShader();
+	    auto pPass = pMaterial->getMainPass();
+	    
 	    //shader
-	    pShader = std::shared_ptr<vg::Shader>(
-	    	new vg::Shader("shaders/mesh/mesh.vert.spv", "shaders/mesh/mesh.frag.spv")
-	    	// new vg::Shader("shaders/test.vert.spv", "shaders/test.frag.spv")
-	    	);
+		pShader->load("shaders/mesh/mesh.vert.spv",
+			"shaders/mesh/mesh.frag.spv");
 	    //pass
-	    pPass = std::shared_ptr<vg::Pass>(new vg::Pass(pShader.get()));
 	    vg::Pass::BuildInDataInfo::Component buildInDataCmps[3] = {
 	    		{vg::Pass::BuildInDataType::MATRIX_OBJECT_TO_NDC},
 	    		{vg::Pass::BuildInDataType::MAIN_CLOLOR},
@@ -180,26 +175,23 @@ void Window::_createMaterial()
 	    pPass->setMainTexture(m_pTexture.get());
 	    pPass->setDataValue("other_info", m_otherInfo, 2u);
 	    pPass->apply();
-	    //material
-	    pMaterial = std::shared_ptr<vg::Material>(new vg::Material());
-	    pMaterial->addPass(pPass.get());
-	    pMaterial->setRenderPriority(0u);
-	    pMaterial->setRenderQueueType(vg::MaterialShowType::OPAQUE);
+	    
 	    pMaterial->apply();
 	}
 
 	{
-	    auto & pShader = m_pShaderWireframe;
-	    auto & pPass = m_pPassWireframe;
-	    auto & pMaterial = m_pMaterialWireframe;
-	    auto & pApp = vg::pApp;
+		//material
+		auto & pMaterial = m_pMaterialWireframe;
+		pMaterial = std::shared_ptr<vg::Material>(new vg::Material());
+		pMaterial->setRenderPriority(0u);
+		pMaterial->setRenderQueueType(vg::MaterialShowType::OPAQUE);
+	    auto pShader = pMaterial->getMainShader();
+	    auto pPass = pMaterial->getMainPass();
+	    
 	    //shader
-	    pShader = std::shared_ptr<vg::Shader>(
-	    	new vg::Shader("shaders/mesh/mesh.vert.spv", "shaders/mesh/mesh.frag.spv")
-	    	// new vg::Shader("shaders/test.vert.spv", "shaders/test.frag.spv")
-	    	);
+		pShader->load("shaders/mesh/mesh.vert.spv", 
+			"shaders/mesh/mesh.frag.spv");
 	    //pass
-	    pPass = std::shared_ptr<vg::Pass>(new vg::Pass(pShader.get()));
 	    vg::Pass::BuildInDataInfo::Component buildInDataCmps[3] = {
 	    		{vg::Pass::BuildInDataType::MATRIX_OBJECT_TO_NDC},
 	    		{vg::Pass::BuildInDataType::MAIN_CLOLOR},
@@ -225,11 +217,7 @@ void Window::_createMaterial()
 	    pPass->setMainTexture(m_pTexture.get());
 	    pPass->setDataValue("other_info", m_otherInfo, 2u);
 	    pPass->apply();
-	    //material
-	    pMaterial = std::shared_ptr<vg::Material>(new vg::Material());
-	    pMaterial->addPass(pPass.get());
-	    pMaterial->setRenderPriority(0u);
-	    pMaterial->setRenderQueueType(vg::MaterialShowType::OPAQUE);
+	    
 	    pMaterial->apply();
 	}
 

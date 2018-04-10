@@ -20,8 +20,6 @@ public:
 private:
     sampleslib::AssimpScene m_assimpScene;
 	std::shared_ptr<vg::Texture2D> m_pTexture;
-	std::array<std::shared_ptr<vg::Shader>, SCENE_COUNT> m_pShaders;
-	std::array<std::shared_ptr<vg::Pass>, SCENE_COUNT> m_pPasses;
 	std::array<std::shared_ptr<vg::Material>, SCENE_COUNT> m_pMaterials;
 	std::array<std::shared_ptr<vg::VisualObject3>, SCENE_COUNT> m_pVisualObjects;
 	struct LightInfo 

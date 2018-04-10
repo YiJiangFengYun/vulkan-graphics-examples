@@ -59,16 +59,20 @@ void Window::_createMesh()
 }
 void Window::_createMaterial()
 {
+	//material
+	m_pMaterial = std::shared_ptr<vg::Material>(new vg::Material());
+	m_pMaterial->setRenderPriority(0u);
+	m_pMaterial->setRenderQueueType(vg::MaterialShowType::OPAQUE);
+
+	auto pShader = m_pMaterial->getMainShader();
+	auto pPass = m_pMaterial->getMainPass();
 	//shader
-	m_pShader = std::shared_ptr<vg::Shader>(
-		new vg::Shader("shaders/triangle/triangle.vert.spv", "shaders/triangle/triangle.frag.spv")
-		);
+	pShader->load("shaders/triangle/triangle.vert.spv", "shaders/triangle/triangle.frag.spv");
 	//pass
-	m_pPass = std::shared_ptr<vg::Pass>(new vg::Pass(m_pShader.get()));
-	m_pPass->setMainColor(vg::Color(1.0f, 1.0f, 1.0f, 1.0f));
-	m_pPass->setPolygonMode(vg::PolygonMode::FILL);
-	m_pPass->setCullMode(vg::CullModeFlagBits::NONE);
-	m_pPass->setFrontFace(vg::FrontFaceType::COUNTER_CLOCKWISE);
+	pPass->setMainColor(vg::Color(1.0f, 1.0f, 1.0f, 1.0f));
+	pPass->setPolygonMode(vg::PolygonMode::FILL);
+	pPass->setCullMode(vg::CullModeFlagBits::NONE);
+	pPass->setFrontFace(vg::FrontFaceType::COUNTER_CLOCKWISE);
 	vk::PipelineColorBlendAttachmentState attachmentState[1] = {};
 	attachmentState[0].colorWriteMask = vk::ColorComponentFlagBits::eR
 		| vk::ColorComponentFlagBits::eG
@@ -78,17 +82,13 @@ void Window::_createMaterial()
 	vk::PipelineColorBlendStateCreateInfo colorBlendState = {};
 	colorBlendState.attachmentCount = 1;
 	colorBlendState.pAttachments = attachmentState;
-	m_pPass->setColorBlendInfo(colorBlendState);
+	pPass->setColorBlendInfo(colorBlendState);
 	vk::PipelineDepthStencilStateCreateInfo depthStencilState = {};
 	depthStencilState.depthTestEnable = VG_TRUE;
 	depthStencilState.depthWriteEnable = VG_TRUE;
 	depthStencilState.depthCompareOp = vk::CompareOp::eLessOrEqual;
-	m_pPass->setDepthStencilInfo(depthStencilState);
-	//material
-	m_pMaterial = std::shared_ptr<vg::Material>(new vg::Material());
-	m_pMaterial->addPass(m_pPass.get());
-	m_pMaterial->setRenderPriority(0u);
-	m_pMaterial->setRenderQueueType(vg::MaterialShowType::OPAQUE);
+	pPass->setDepthStencilInfo(depthStencilState);
+	
 	m_pMaterial->apply();
 }
 void Window::_createModel()

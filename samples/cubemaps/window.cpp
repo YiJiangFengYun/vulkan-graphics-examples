@@ -30,11 +30,7 @@ Window::Window(uint32_t width
 	, m_currIndex(-1)
 	, m_arrObjectNames()
 	, m_pCubeMapTex()
-	, m_pShaderSkybox()
-	, m_pPassSkybox()
 	, m_pMaterialSkybox()
-	, m_pShaderReflect()
-	, m_pPassReflect()
 	, m_pMaterialReflect()
 {
 	_init();
@@ -54,11 +50,7 @@ Window::Window(std::shared_ptr<GLFWwindow> pWindow
 	, m_currIndex(-1)
 	, m_arrObjectNames()
 	, m_pCubeMapTex()
-	, m_pShaderSkybox()
-	, m_pPassSkybox()
 	, m_pMaterialSkybox()
-	, m_pShaderReflect()
-	, m_pPassReflect()
 	, m_pMaterialReflect()
 {
 	_init();
@@ -158,16 +150,18 @@ void Window::_createMaterial()
 {
 	auto & pApp = vg::pApp;
     {
-        auto & pShader = m_pShaderSkybox;
-	    auto & pPass = m_pPassSkybox;
-	    auto & pMaterial = m_pMaterialSkybox;
+		//material
+		auto & pMaterial = m_pMaterialSkybox;
+		pMaterial = std::shared_ptr<vg::Material>(new vg::Material());
+		pMaterial->setRenderPriority(0u);
+		pMaterial->setRenderQueueType(vg::MaterialShowType::BACKGROUND);
+		auto pShader = pMaterial->getMainShader();
+	    auto pPass = pMaterial->getMainPass();
+	    
 	    //shader
-	    pShader = std::shared_ptr<vg::Shader>(
-	    	new vg::Shader("shaders/cubemaps/skybox.vert.spv", "shaders/cubemaps/skybox.frag.spv")
-	    	// new vg::Shader("shaders/test.vert.spv", "shaders/test.frag.spv")
-	    	);
+	    pShader->load("shaders/cubemaps/skybox.vert.spv",
+			"shaders/cubemaps/skybox.frag.spv");
 	    //pass
-	    pPass = std::shared_ptr<vg::Pass>(new vg::Pass(pShader.get()));
 		vg::Pass::BuildInDataInfo::Component buildInDataCmps[3] = {
 			{vg::Pass::BuildInDataType::MATRIX_OBJECT_TO_WORLD},
 			{vg::Pass::BuildInDataType::MATRIX_VIEW},
@@ -181,25 +175,23 @@ void Window::_createMaterial()
 	    pPass->setFrontFace(vg::FrontFaceType::CLOCKWISE);
 	    pPass->setMainTexture(m_pCubeMapTex.get());
 	    pPass->apply();
-	    //material
-	    pMaterial = std::shared_ptr<vg::Material>(new vg::Material());
-	    pMaterial->addPass(pPass.get());
-	    pMaterial->setRenderPriority(0u);
-	    pMaterial->setRenderQueueType(vg::MaterialShowType::BACKGROUND);
+	    
 	    pMaterial->apply();
 	}
 	
 	{
-		auto & pShader = m_pShaderReflect;
-	    auto & pPass = m_pPassReflect;
-	    auto & pMaterial = m_pMaterialReflect;
+		//material
+		auto & pMaterial = m_pMaterialReflect;
+		pMaterial = std::shared_ptr<vg::Material>(new vg::Material());
+		pMaterial->setRenderPriority(0u);
+		pMaterial->setRenderQueueType(vg::MaterialShowType::OPAQUE);
+		auto pShader = pMaterial->getMainShader();
+	    auto pPass = pMaterial->getMainPass();
+	    
 	    //shader
-	    pShader = std::shared_ptr<vg::Shader>(
-	    	new vg::Shader("shaders/cubemaps/reflect.vert.spv", "shaders/cubemaps/reflect.frag.spv")
-	    	// new vg::Shader("shaders/test.vert.spv", "shaders/test.frag.spv")
-	    	);
+		pShader->load("shaders/cubemaps/reflect.vert.spv",
+			"shaders/cubemaps/reflect.frag.spv");
 	    //pass
-	    pPass = std::shared_ptr<vg::Pass>(new vg::Pass(pShader.get()));
 		vg::Pass::BuildInDataInfo::Component buildInDataCmps[2] = {
 			{vg::Pass::BuildInDataType::MATRIX_OBJECT_TO_NDC},
 			{vg::Pass::BuildInDataType::MATRIX_OBJECT_TO_VIEW},
@@ -218,11 +210,7 @@ void Window::_createMaterial()
 	    pPass->setMainTexture(m_pCubeMapTex.get());
 	    pPass->setDataValue("other_info", m_otherInfo, 2u);	
 	    pPass->apply();
-	    //material
-	    pMaterial = std::shared_ptr<vg::Material>(new vg::Material());
-	    pMaterial->addPass(pPass.get());
-	    pMaterial->setRenderPriority(0u);
-	    pMaterial->setRenderQueueType(vg::MaterialShowType::OPAQUE);
+	    
 	    pMaterial->apply();
 	}
 }
@@ -335,8 +323,9 @@ void Window::_onUpdate()
 	ImGui::SetNextWindowSize(ImVec2(0, 0));
 	ImGui::Begin("Settings", nullptr, ImGuiWindowFlags_AlwaysAutoResize | ImGuiWindowFlags_NoResize | ImGuiWindowFlags_NoMove);
 	if (ImGui::SliderFloat("LOD bias", &m_otherInfo.lodBias, 0.0f, (float)m_pCubeMapTex->getMipmapLevels())) {
-		m_pPassReflect->setDataValue("other_info", m_otherInfo, 2u);
-		m_pPassReflect->apply();
+		auto pPass = m_pMaterialReflect->getMainPass();
+		pPass->setDataValue("other_info", m_otherInfo, 2u);
+		pPass->apply();
 	}
 	uint32_t count = static_cast<uint32_t>(m_arrObjectNames.size());
 	std::vector<const char *> charItems(m_arrObjectNames.size());

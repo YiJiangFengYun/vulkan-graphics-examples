@@ -30,17 +30,11 @@ private:
 	std::shared_ptr<vg::Texture2DColorAttachment> m_pOffScreenTex;
 	std::shared_ptr<vg::ColorTexRenderer> m_pOffScreenRenderer;
 	
-	std::shared_ptr<vg::Shader> m_pShaderModelOffscreen;
-    std::shared_ptr<vg::Pass> m_pPassModelOffscreen;
 	std::shared_ptr<vg::Material> m_pMaterialModelOffscreen;
 
-	std::shared_ptr<vg::Shader> m_pShaderModel;	
-	std::shared_ptr<vg::Pass> m_pPassModel;
 	std::shared_ptr<vg::Material> m_pMaterialModel;
 
 	std::shared_ptr<vg::Texture2D> m_pTexturePlane;    
-	std::shared_ptr<vg::Shader> m_pShaderPlane;
-	std::shared_ptr<vg::Pass> m_pPassPlane;
 	std::shared_ptr<vg::Material> m_pMaterialPlane;
 
 	struct OtherInfo

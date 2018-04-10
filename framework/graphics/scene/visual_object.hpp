@@ -73,8 +73,6 @@ namespace vg
 
 		void bindToRender(const BindInfo info, BindResult *pResult);
 
-		const Visualizer *getVisualizer() const;
-
 	protected:
 		Material *m_pMaterial;
 		BaseMesh *m_pMesh;
@@ -84,7 +82,6 @@ namespace vg
 		Bool32 m_hasClipRect;
 		//Valid range of ClipRect is [(0, 0), (1, 1)]
 		std::vector<fd::Rect2D> m_clipRects;
-		Visualizer* m_pVisualizer;
 		void _asyncMeshData();
 		virtual Matrix4x4 _getModelMatrix() = 0;
 	};

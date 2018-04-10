@@ -2,13 +2,53 @@
 
 namespace vg
 {
+	Material::BindInfo::BindInfo(const Matrix4x4 *pProjMatrix
+        , const Matrix4x4 *pViewMatrix
+		, uint32_t trunkFramebufferWidth
+		, uint32_t trunkFramebufferHeight
+        , const Matrix4x4 *pModelMatrix
+        , const BaseMesh *pMesh
+        , uint32_t subMeshIndex
+        , Bool32 hasClipRect
+        , const fd::Rect2D *pClipRect
+#if defined(DEBUG) && defined(VG_ENABLE_COST_TIMER)
+        , fd::CostTimer *pPreparingBuildInDataCostTimer
+        , fd::CostTimer *pPreparingPipelineCostTimer
+        , fd::CostTimer *pPreparingCommandBufferCostTimer
+#endif //DEBUG and VG_ENABLE_COST_TIMER
+        )
+        : pProjMatrix(pProjMatrix)
+        , pViewMatrix(pViewMatrix)
+		, trunkFramebufferWidth(trunkFramebufferWidth)
+		, trunkFramebufferHeight(trunkFramebufferHeight)
+		, pModelMatrix(pModelMatrix)
+        , pMesh(pMesh)
+        , subMeshIndex(subMeshIndex)
+        , hasClipRect(hasClipRect)
+        , pClipRect(pClipRect)
+#if defined(DEBUG) && defined(VG_ENABLE_COST_TIMER)
+        , pPreparingBuildInDataCostTimer(pPreparingBuildInDataCostTimer)
+        , pPreparingPipelineCostTimer(pPreparingPipelineCostTimer)
+        , pPreparingCommandBufferCostTimer(pPreparingCommandBufferCostTimer)
+#endif //DEBUG and VG_ENABLE_COST_TIMER
+    {
+    }
+
+    Material::BindResult::BindResult(CmdBuffer *pBranchCmdBuffer
+        , CmdBuffer *pTrunkRenderPassCmdBuffer
+        , CmdBuffer *pTrunkWaitBarrierCmdBuffer
+        )
+	    : pBranchCmdBuffer(pBranchCmdBuffer)
+        , pTrunkRenderPassCmdBuffer(pTrunkRenderPassCmdBuffer)
+        , pTrunkWaitBarrierCmdBuffer(pTrunkWaitBarrierCmdBuffer)
+    {
+
+    }
+
 	Material::Material()
 		: Base(BaseType::MATERIAL)
 		, m_renderQueueType()
 		, m_renderPriority()
-		, m_pVisualizers()
-		, m_unusedVisualizerCount()
-		, m_pUnusedVisualizes()
 		, m_arrPasses()
 		, m_mapPasses()
 	{
@@ -43,7 +83,6 @@ namespace vg
 		if (isHas(pPass)) return;
 		m_arrPasses.push_back(pPass);
 		m_mapPasses[pPass->getID()] = pPass;
-		_updateVisualizer();
 	}
 
 	void Material::removePass(Pass *pPass)
@@ -51,7 +90,6 @@ namespace vg
 		if (isHas(pPass) == VG_FALSE) return;
 		m_arrPasses.erase(std::remove(m_arrPasses.begin(), m_arrPasses.end(), pPass));
 		m_mapPasses.erase(pPass->getID());
-		_updateVisualizer();		
 	}
 
 	void Material::clearPasses()
@@ -66,37 +104,6 @@ namespace vg
 		{
 			item.second->apply();
 		}
-	}
-
-	Visualizer *Material::allocateVisualizer(Visualizer **ppVisualizer)
-	{
-		if (m_unusedVisualizerCount > 0)
-		{
-			Visualizer *pVisualizer = m_pUnusedVisualizes[m_unusedVisualizerCount - 1];
-			--m_unusedVisualizerCount;
-			if(ppVisualizer != nullptr)(*ppVisualizer) = pVisualizer;
-			return pVisualizer;
-		}
-		else
-		{
-			Visualizer *pVisualizer = _createVisualizer();
-			m_pVisualizers.push_back(std::shared_ptr<Visualizer>{pVisualizer});
-			if(ppVisualizer != nullptr)(*ppVisualizer) = pVisualizer;
-			return pVisualizer;
-		}
-	}
-
-	void Material::deallocateVisualizer(Visualizer *pVisualizer)
-	{
-		m_pUnusedVisualizes[m_unusedVisualizerCount] = pVisualizer;
-		++m_unusedVisualizerCount;
-	}
-		
-	void Material::clearVisualizers()
-	{
-		m_pVisualizers.resize(0u);
-		m_pUnusedVisualizes.resize(0u);
-		m_unusedVisualizerCount = 0u;
 	}
 
 	MaterialShowType Material::getShowType()
@@ -119,16 +126,32 @@ namespace vg
 		m_renderPriority = priority;
 	}
 
-	Visualizer *Material::_createVisualizer()
-	{
-		return new Visualizer(static_cast<uint32_t>(m_arrPasses.size()), m_arrPasses.data());
-	}
+	void Material::bindToRender(const BindInfo info, BindResult *pResult)
+    {
+		auto &result = *pResult;
 
-	void Material::_updateVisualizer()
-	{
-		for (const auto& pVisualizer : m_pVisualizers)
-		{
-			pVisualizer->updatePassInfo(static_cast<uint32_t>(m_arrPasses.size()), m_arrPasses.data());
-		}
-	}
+        if (result.pTrunkRenderPassCmdBuffer != nullptr)
+        {
+            RenderPassInfo trunkRenderPassInfo;
+            trunkRenderPassInfo.pRenderPass = nullptr;
+            trunkRenderPassInfo.framebufferWidth = info.trunkFramebufferWidth;
+            trunkRenderPassInfo.framebufferHeight = info.trunkFramebufferHeight;
+            trunkRenderPassInfo.projMatrix = *(info.pProjMatrix);
+            trunkRenderPassInfo.viewMatrix = *(info.pViewMatrix);
+            trunkRenderPassInfo.pPass = *m_arrPasses.data();
+            trunkRenderPassInfo.modelMatrix = *(info.pModelMatrix);
+            trunkRenderPassInfo.pMesh = info.pMesh;
+            trunkRenderPassInfo.subMeshIndex = info.subMeshIndex;
+            trunkRenderPassInfo.hasClipRect = info.hasClipRect;
+            trunkRenderPassInfo.pClipRect = info.pClipRect;
+
+            CmdInfo cmdInfo;
+            cmdInfo.pRenderPassInfo = &trunkRenderPassInfo;
+
+            result.pTrunkRenderPassCmdBuffer->addCmd(cmdInfo);
+        }
+
+        
+        
+    }
 }

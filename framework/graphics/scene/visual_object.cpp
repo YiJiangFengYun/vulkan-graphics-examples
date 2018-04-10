@@ -44,7 +44,6 @@ namespace vg
 		, m_isVisibilityCheck(VG_TRUE)
 		, m_hasClipRect(VG_FALSE)
 		, m_clipRects()
-		, m_pVisualizer(nullptr)
 	{
 
 	}
@@ -62,7 +61,6 @@ namespace vg
 	void BaseVisualObject::setMaterial(Material *pMaterial)
 	{
 		m_pMaterial = pMaterial;
-		m_pVisualizer = pMaterial->allocateVisualizer();
 	}
 
 	BaseMesh *BaseVisualObject::getMesh() const
@@ -151,7 +149,7 @@ namespace vg
 		uint32_t branchCmdCount = 0u;
 		uint32_t trunkRenderPassCount = 0u;
 		uint32_t trunkWaitBarrierCount = 0u;
-		if (m_pVisualizer != nullptr)
+		if (m_pMaterial != nullptr)
 		{
 			auto modelMatrix = _getModelMatrix();
 
@@ -161,7 +159,7 @@ namespace vg
 			for (uint32_t i = 0; i < subMeshCount; ++i)
 			{
 				uint32_t subMeshIndex = subMeshOffset + i;
-				Visualizer::BindInfo infoForVisualizer = {
+				Material::BindInfo infoForVisualizer = {
 			        info.pProjMatrix,
 			        info.pViewMatrix,
 				    info.trunkFramebufferWidth,
@@ -178,7 +176,7 @@ namespace vg
 #endif //DEBUG and VG_ENABLE_COST_TIMER
 		            };
     
-		        Visualizer::BindResult resultForVisualizer;
+		        Material::BindResult resultForVisualizer;
 				
 				if (result.pBranchCmdBuffer != nullptr)
 					resultForVisualizer.pBranchCmdBuffer = result.pBranchCmdBuffer;
@@ -187,18 +185,12 @@ namespace vg
 				if (result.pTrunkWaitBarrierCmdBuffer != nullptr)
 				    resultForVisualizer.pTrunkWaitBarrierCmdBuffer = result.pTrunkWaitBarrierCmdBuffer;
 
-		        m_pVisualizer->bindToRender(infoForVisualizer, &resultForVisualizer);
+		        m_pMaterial->bindToRender(infoForVisualizer, &resultForVisualizer);
 
 			}
 		}
 		
 	}
-
-	const Visualizer *BaseVisualObject::getVisualizer() const
-	{
-		return m_pVisualizer;
-	}
-
 
 	void BaseVisualObject::_asyncMeshData()
 	{

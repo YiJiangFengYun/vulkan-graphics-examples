@@ -8,7 +8,7 @@ namespace vg
     class BaseColorAttachment
 	{
 	public:
-	    BaseColorAttachment();
+	    BaseColorAttachment(Bool32 isInputUsage);
 	    virtual ~BaseColorAttachment();
 	    virtual uint32_t getColorAttachmentWidth() const = 0;
 		virtual uint32_t getColorAttachmentHeight() const =  0;
@@ -18,12 +18,13 @@ namespace vg
 		virtual vk::ImageView *getColorAttachmentImageView() const = 0;
 
 	protected:
+	    Bool32 m_isInputUsage;
 	};
 
 	class BaseDepthStencilAttachment
 	{
 	public:
-	    BaseDepthStencilAttachment();
+	    BaseDepthStencilAttachment(Bool32 isInputUsage);
 	    virtual ~BaseDepthStencilAttachment();
 	    virtual uint32_t getDepthStencilAttachmentWidth() const = 0;
 		virtual uint32_t getDepthStencilAttachmentHeight() const =  0;
@@ -32,6 +33,7 @@ namespace vg
 		virtual vk::ImageLayout getDepthStencilAttachmentLayout() const = 0;
 		virtual vk::ImageView *getDepthStencilAttachmentImageView() const = 0;
 	protected:
+	    Bool32 m_isInputUsage;
 	};
 } //vg
 

@@ -2,9 +2,9 @@
 
 namespace vg
 {
-	TextureColorAttachment::TextureColorAttachment(vk::Format format, uint32_t width, uint32_t height)
+	TextureColorAttachment::TextureColorAttachment(vk::Format format, uint32_t width, uint32_t height, Bool32 isInputUsage)
 		:Texture(format, VG_FALSE)
-		, BaseColorAttachment()
+		, BaseColorAttachment(isInputUsage)
 	{
 		m_type = TextureType::COLOR_ATTACHMENT;
 		m_width = width;
@@ -12,6 +12,11 @@ namespace vg
 		m_vkImageUsageFlags = vk::ImageUsageFlagBits::eColorAttachment;
 		m_vkImageLayout = vk::ImageLayout::eColorAttachmentOptimal;
 		m_vkImageAspectFlags = vk::ImageAspectFlagBits::eColor;
+
+		if (isInputUsage)
+		{
+			m_vkImageUsageFlags |= vk::ImageUsageFlagBits::eInputAttachment;
+		}
 		_init();
 	}
 

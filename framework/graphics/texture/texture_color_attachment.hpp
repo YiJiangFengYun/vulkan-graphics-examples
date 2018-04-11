@@ -9,7 +9,7 @@ namespace vg
 	class TextureColorAttachment : public Texture, public BaseColorAttachment
 	{
 	public:
-		TextureColorAttachment(vk::Format format, uint32_t width, uint32_t height);
+		TextureColorAttachment(vk::Format format, uint32_t width, uint32_t height, Bool32 isInputUsage = VG_FALSE);
 		~TextureColorAttachment();
 		uint32_t getWidth() const;
 		uint32_t getHeight() const;

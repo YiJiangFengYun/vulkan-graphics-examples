@@ -2,8 +2,9 @@
 
 namespace vg
 {
-	TextureDepthStencilAttachment::TextureDepthStencilAttachment(vk::Format format, uint32_t width, uint32_t height)
-		:Texture(format, VG_FALSE)
+	TextureDepthStencilAttachment::TextureDepthStencilAttachment(vk::Format format, uint32_t width, uint32_t height, Bool32 isInputUsage)
+		: Texture(format, VG_FALSE)
+		, BaseDepthStencilAttachment(isInputUsage)
 	{
 		m_type = TextureType::DEPTH_STENCIL_ATTACHMENT;
 		m_width = width;
@@ -11,6 +12,10 @@ namespace vg
 		m_vkImageUsageFlags = vk::ImageUsageFlagBits::eDepthStencilAttachment;
 		m_vkImageLayout = vk::ImageLayout::eDepthStencilAttachmentOptimal;
 		m_vkImageAspectFlags = vk::ImageAspectFlagBits::eDepth | vk::ImageAspectFlagBits::eStencil;
+		if (isInputUsage)
+		{
+			m_vkImageUsageFlags |= vk::ImageUsageFlagBits::eInputAttachment;
+		}
 		_init();
 	}
 

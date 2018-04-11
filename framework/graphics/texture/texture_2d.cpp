@@ -35,9 +35,9 @@ namespace vg
 	}
 
 
-	Texture2DColorAttachment::Texture2DColorAttachment(vk::Format format, Bool32 mipMap, uint32_t width, uint32_t height)
-		:Texture(format, mipMap)
-		, BaseColorAttachment()
+	Texture2DColorAttachment::Texture2DColorAttachment(vk::Format format, uint32_t width, uint32_t height, Bool32 isInputUsage)
+		: Texture(format, false)
+		, BaseColorAttachment(isInputUsage)
 	{
 		m_type = TextureType::TEX_2D_COLOR_ATTACHMENT;
 		m_width = width;
@@ -45,6 +45,10 @@ namespace vg
 		m_vkImageUsageFlags = vk::ImageUsageFlagBits::eSampled | vk::ImageUsageFlagBits::eColorAttachment;
 		m_vkImageLayout = vk::ImageLayout::eShaderReadOnlyOptimal;
 		m_vkImageAspectFlags = vk::ImageAspectFlagBits::eColor;
+		if (isInputUsage)
+		{
+			m_vkImageUsageFlags |= vk::ImageUsageFlagBits::eInputAttachment;
+		}
 		_init();
 	}
 
@@ -112,9 +116,9 @@ namespace vg
 		m_usingVkImageLayout = m_vkImageLayout;
 	}
 
-	Texture2DDepthStencilAttachment::Texture2DDepthStencilAttachment(vk::Format format, Bool32 mipMap, uint32_t width, uint32_t height)
-		:Texture(format, mipMap)
-		, BaseDepthStencilAttachment()
+	Texture2DDepthStencilAttachment::Texture2DDepthStencilAttachment(vk::Format format, uint32_t width, uint32_t height, Bool32 isInputUsage)
+		:Texture(format,  false)
+		, BaseDepthStencilAttachment(isInputUsage)
 	{
 		m_type = TextureType::TEX_2D_DEPTH_STENCIL_ATTACHMENT;
 		m_width = width;
@@ -122,6 +126,10 @@ namespace vg
 		m_vkImageUsageFlags = vk::ImageUsageFlagBits::eSampled | vk::ImageUsageFlagBits::eDepthStencilAttachment;
 		m_vkImageLayout = vk::ImageLayout::eDepthStencilReadOnlyOptimal;
 		m_vkImageAspectFlags = vk::ImageAspectFlagBits::eDepth | vk::ImageAspectFlagBits::eStencil;
+		if (isInputUsage)
+		{
+			m_vkImageUsageFlags |= vk::ImageUsageFlagBits::eInputAttachment;
+		}
 		_checkDepthFormat();
 		_init();
 	}

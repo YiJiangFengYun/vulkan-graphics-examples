@@ -379,6 +379,7 @@ namespace vg
 		, const Texture *pTex
 		, uint32_t binding
 		, ShaderStageFlags stageFlags
+		, DescriptorType descriptorType
 	)
 	{
 		m_pData->setTexture(name, pTex);
@@ -388,7 +389,7 @@ namespace vg
 			name,
 			VG_TRUE,
 			binding,
-			vg::DescriptorType::COMBINED_IMAGE_SAMPLER,
+			descriptorType,
 			descriptorCount,
 			stageFlags
 		);

@@ -217,6 +217,7 @@ namespace vg
 			, const Texture *pTex
 			, uint32_t binding = VG_M_OTHER_MIN_BINDING
 			, ShaderStageFlags stageFlags = ShaderStageFlagBits::VERTEX
+			, DescriptorType descriptorType = DescriptorType::COMBINED_IMAGE_SAMPLER 
 		);
 
 		template <typename T>

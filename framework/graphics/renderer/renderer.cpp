@@ -280,7 +280,8 @@ namespace vg
 			);
 
 		//trunk wait barrier
-		_recordTrunkWaitBarrier(&m_trunkWaitBarrierCmdBuffer);
+		CMDParser::recordTrunkWaitBarrier(&m_trunkWaitBarrierCmdBuffer,
+			m_pCommandBuffer.get());
 
         //trunk render pass.
 		resultInfo.drawCount = m_trunkRenderPassCmdBuffer.getCmdCount();
@@ -359,30 +360,6 @@ namespace vg
 		VG_LOG(plog::debug) << "Post begin command buffer for render." << std::endl;
 
 		
-	}
-
-	void Renderer::_recordTrunkWaitBarrier(CmdBuffer *pTrunkRenderPassCmdBuffer)
-	{
-		
-		if (pTrunkRenderPassCmdBuffer->getCmdCount() == 0) return;
-		vk::PipelineStageFlags srcStageMask = vk::PipelineStageFlags();
-		vk::PipelineStageFlags dstStageMask = vk::PipelineStageFlags();
-		uint32_t cmdCount = pTrunkRenderPassCmdBuffer->getCmdCount();
-		for (uint32_t i = 0; i < cmdCount; ++i)
-		{
-			const auto &cmdInfo = *(pTrunkRenderPassCmdBuffer->getCmdInfos() + i);
-			if (cmdInfo.pRenderPassInfo != nullptr) throw std::runtime_error("it must no exist render pass info in trunk render pass cmd buffer.");
-			const auto &trunkWaitBarrierInfo = *(cmdInfo.pBarrierInfo);
-			srcStageMask |= trunkWaitBarrierInfo.srcStageMask;
-			dstStageMask |= trunkWaitBarrierInfo.dstStageMask;
-		}
-
-		m_pCommandBuffer->pipelineBarrier(srcStageMask, 
-		    dstStageMask, 
-			vk::DependencyFlags(vk::DependencyFlagBits::eByRegion),
-			nullptr,
-			nullptr,
-			nullptr);
 	}
 
 	void Renderer::_recordTrunkRenderPassForBegin()

@@ -18,9 +18,44 @@ namespace vg
 		{
 			auto pRenderPassInfo = (pCmdBuffer->getCmdInfos() + cmdInfoIndex)->pRenderPassInfo;
 			if (pRenderPassInfo == nullptr) throw std::runtime_error("There isn't render pass info in trunk render pass cmd buffer.");
-			pRenderPassInfo->pRenderPass = pRenderPass;
-			recordItem(pRenderPassInfo, pCommandBuffer, pPipelineCache, pResult);
+			auto tempRenderPassInfo = *pRenderPassInfo;
+			tempRenderPassInfo.pRenderPass = pRenderPass;
+			recordItem(&tempRenderPassInfo, pCommandBuffer, pPipelineCache, pResult);
 		}
+	}
+
+	void CMDParser::recordTrunkWaitBarrier(CmdBuffer *pTrunkWaitBarrierCmdBuffer
+            , vk::CommandBuffer *pCommandBuffer
+            )
+	{
+		if (pTrunkWaitBarrierCmdBuffer->getCmdCount() == 0) return;
+		vk::PipelineStageFlags srcStageMask = vk::PipelineStageFlags();
+		vk::PipelineStageFlags dstStageMask = vk::PipelineStageFlags();
+		vk::DependencyFlags dependencyFlags = vk::DependencyFlags();
+		uint32_t cmdCount = pTrunkWaitBarrierCmdBuffer->getCmdCount();
+		for (uint32_t i = 0; i < cmdCount; ++i)
+		{
+			const auto &cmdInfo = *(pTrunkWaitBarrierCmdBuffer->getCmdInfos() + i);
+			if (cmdInfo.pRenderPassInfo != nullptr) 
+			    VG_LOG(plog::warning) << "The render pass info in trunk wait barrier cmd buffer is invalid." << std::endl;
+			const auto &trunkWaitBarrierInfo = *(cmdInfo.pBarrierInfo);
+			if (trunkWaitBarrierInfo.memoryBarrierCount > 0) 
+			    VG_LOG(plog::warning) << "The memory barrier in trunk wait barrier cmd buffer is invalid." << std::endl;
+			if (trunkWaitBarrierInfo.bufferMemoryBarrierCount > 0) 
+			    VG_LOG(plog::warning) << "The buffer memory barrier in trunk wait barrier cmd buffer is invalid." << std::endl;
+			if (trunkWaitBarrierInfo.imageMemoryBarrierCount > 0) 
+			    VG_LOG(plog::warning) << "The image memory barrier in trunk wait barrier cmd buffer is invalid." << std::endl;
+			srcStageMask |= trunkWaitBarrierInfo.srcStageMask;
+			dstStageMask |= trunkWaitBarrierInfo.dstStageMask;
+			dependencyFlags |= trunkWaitBarrierInfo.dependencyFlags;
+		}
+
+		pCommandBuffer->pipelineBarrier(srcStageMask, 
+		    dstStageMask, 
+			dependencyFlags,
+			nullptr,
+			nullptr,
+			nullptr);
 	}
 
 	void CMDParser::recordBranch(CmdBuffer *pCmdBuffer
@@ -30,28 +65,66 @@ namespace vg
         )
     {
 		auto cmdInfoCount = pCmdBuffer->getCmdCount();
+		vk::RenderPass lastRenderPass = vk::RenderPass();
+        uint32_t lastSubPassIndex = 0u;
 		for (uint32_t cmdInfoIndex = 0u; cmdInfoIndex < cmdInfoCount; ++cmdInfoIndex)
 		{
 			auto pRenderPassInfo = (pCmdBuffer->getCmdInfos() + cmdInfoIndex)->pRenderPassInfo;
 			if (pRenderPassInfo)
 			{
-			    recordItemRenderPassBegin(pRenderPassInfo, pCommandBuffer);
+				if (lastRenderPass == vk::RenderPass() || lastRenderPass != *(pRenderPassInfo->pRenderPass)) {
+					if (pRenderPassInfo->subPassIndex != 0) {
+						throw std::runtime_error("Error of start of subpass index of render pass for cmd info.");
+					}
+					recordItemRenderPassBegin(pRenderPassInfo, pCommandBuffer);
+				} else if (pRenderPassInfo->subPassIndex - lastSubPassIndex != 1u) {
+					recordItemNextSubpass(pCommandBuffer);
+				} else if (pRenderPassInfo->subPassIndex - lastSubPassIndex > 1u) {
+					throw std::runtime_error("Error of increasing of subpass index of render pass for cmd info.");
+				} //else it is inner sub pass.
+				
 			    recordItem(pRenderPassInfo, pCommandBuffer, pPipelineCache, pResult);
-			    recordItemRenderPassEnd(pRenderPassInfo, pCommandBuffer);
+
+				//do end render pass.
+				const RenderPassInfo * pNextRenderPassInfo = nullptr;
+				uint32_t nextIndex = cmdInfoIndex + 1;
+				while (nextIndex < cmdInfoCount && pNextRenderPassInfo == nullptr) {
+					pNextRenderPassInfo = (pCmdBuffer->getCmdInfos() + nextIndex)->pRenderPassInfo;
+					++nextIndex;
+				}
+				if (pNextRenderPassInfo == nullptr || *(pNextRenderPassInfo->pRenderPass) != *(pRenderPassInfo->pRenderPass)) {
+					recordItemRenderPassEnd(pRenderPassInfo, pCommandBuffer);
+				}
+
+				lastRenderPass = *(pRenderPassInfo->pRenderPass);
+				lastSubPassIndex = pRenderPassInfo->subPassIndex;
 			}
 			else 
 		    {
-				auto barrierInfo = (pCmdBuffer->getCmdInfos() + cmdInfoIndex)->pBarrierInfo;
-			    if (barrierInfo)
+				auto pBarrierInfo = (pCmdBuffer->getCmdInfos() + cmdInfoIndex)->pBarrierInfo;
+			    if (pBarrierInfo != nullptr)
 			    {
-    
+					pCommandBuffer->pipelineBarrier(pBarrierInfo->srcStageMask
+					    , pBarrierInfo->dstStageMask
+						, pBarrierInfo->dependencyFlags
+						, pBarrierInfo->memoryBarrierCount
+						, pBarrierInfo->pMemoryBarriers
+						, pBarrierInfo->bufferMemoryBarrierCount
+						, pBarrierInfo->pBufferMemoryBarriers
+						, pBarrierInfo->imageMemoryBarrierCount
+						, pBarrierInfo->pImageMemoryBarriers
+						);
 			    }
 			}
 			
 		}
+
+		if (lastRenderPass != vk::RenderPass()) {
+			recordItemRenderPassEnd(pCommandBuffer);
+		}
 	}
 
-	void CMDParser::recordItemRenderPassBegin(RenderPassInfo *pRenderPassInfo
+	void CMDParser::recordItemRenderPassBegin(const RenderPassInfo *pRenderPassInfo
             ,  vk::CommandBuffer *pCommandBuffer)
 	{
 		uint32_t framebufferWidth = pRenderPassInfo->framebufferWidth;
@@ -75,13 +148,23 @@ namespace vg
 		pCommandBuffer->beginRenderPass(renderPassBeginInfo, vk::SubpassContents::eInline);
 	}
 
-    void CMDParser::recordItemRenderPassEnd(RenderPassInfo *pRenderPassInfo
+    void CMDParser::recordItemRenderPassEnd(const RenderPassInfo *pRenderPassInfo
             ,  vk::CommandBuffer *pCommandBuffer)
 	{
 		pCommandBuffer->endRenderPass();
 	}
 
-	void CMDParser::recordItem(RenderPassInfo *pRenderPassInfo
+	void CMDParser::recordItemRenderPassEnd(vk::CommandBuffer *pCommandBuffer)
+	{
+		pCommandBuffer->endRenderPass();
+	}
+
+	void CMDParser::recordItemNextSubpass(vk::CommandBuffer *pCommandBuffer)
+	{
+		pCommandBuffer->nextSubpass(vk::SubpassContents::eInline);
+	}
+
+	void CMDParser::recordItem(const RenderPassInfo *pRenderPassInfo
         ,  vk::CommandBuffer *pCommandBuffer
         , PipelineCache *pPipelineCache
         , ResultInfo *pResult)

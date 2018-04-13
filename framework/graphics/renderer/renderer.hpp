@@ -119,7 +119,6 @@ namespace vg
 		//void _createFence();
 
 		void _recordCommandBufferForBegin();
-		void _recordTrunkWaitBarrier(CmdBuffer *pTrunkRenderPassCmdBuffer);
 		void _recordTrunkRenderPassForBegin();
 
 		void _recordTrunkRenderPassForEnd();

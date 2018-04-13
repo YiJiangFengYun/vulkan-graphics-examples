@@ -2,6 +2,75 @@
 
 namespace vg
 {
+    uint32_t getNextCapacity(uint32_t current)
+    {
+        if (current == 0u) return 1u;
+        else return static_cast<uint32_t>(std::pow(2, std::log2(current) + 1));
+    }
+
+    template <typename T, typename ParentT, uint32_t parentPointOffset>
+    void addData(uint32_t &count
+         , uint32_t &capacity
+         , std::vector<T> &arr
+         , std::vector<uint32_t> *pToParentIndices
+         , std::vector<ParentT> *pParentArr
+		 , uint32_t parentArrCount
+         , const T &newData
+         )
+    {
+        if (count == capacity)
+        {
+            capacity = getNextCapacity(capacity);
+            arr.resize(capacity);
+            if (pParentArr != nullptr) {
+                pToParentIndices->resize(capacity);
+			    for (uint32_t i = 0; i < count; ++i)
+			    {
+			    	auto &parent = (*pParentArr)[(*pToParentIndices)[i]];
+                    auto point = &(arr[i]);
+                    memcpy((char *)(&parent) + parentPointOffset, &point, sizeof(point));
+			    }
+            }
+        }
+        auto &dstData = arr[count];
+        dstData = newData;
+        if (pParentArr != nullptr) {
+            auto pDst = &dstData;
+			uint32_t parentIndex = parentArrCount - 1;
+            ParentT * pParent = &((*pParentArr)[parentIndex]);
+            memcpy((char *)pParent + parentPointOffset, &pDst, sizeof(pDst));
+            (*pToParentIndices)[count] = parentIndex;
+        }
+        ++count;
+    }
+
+    template <typename T, typename ParentT, uint32_t parentPointOffset>
+    void addData(uint32_t &count
+         , uint32_t &capacity
+         , std::vector<std::vector<T>> &arr
+         , std::vector<ParentT> *pParentArr
+		 , uint32_t parentArrCount
+         , uint32_t dataCount
+         , const T *pDatas
+         )
+    {
+        if (count == capacity)
+        {
+            capacity = getNextCapacity(capacity);
+            arr.resize(capacity);
+        }
+        auto &dstData = arr[count];
+        dstData.resize(dataCount);
+        memcpy(dstData.data(), pDatas, dataCount * sizeof(T));
+        if (pParentArr != nullptr) {
+            auto pDst = dstData.data();
+			uint32_t parentIndex = parentArrCount - 1;
+            ParentT * pParent = &((*pParentArr)[parentIndex]);
+            memcpy((char *)pParent + parentPointOffset, &pDst, sizeof(pDst));
+        }
+        ++count;
+    }
+
     CmdInfo::CmdInfo()
         : pRenderPassInfo(nullptr)
         , pBarrierInfo(nullptr)
@@ -10,14 +79,30 @@ namespace vg
     }
 
     BarrierInfo::BarrierInfo(vk::PipelineStageFlags srcStageMask
-        , vk::PipelineStageFlags  dstStageMask)
+        , vk::PipelineStageFlags  dstStageMask
+        , vk::DependencyFlags dependencyFlags
+        , uint32_t memoryBarrierCount
+        , const vk::MemoryBarrier * pMemoryBarriers
+        , uint32_t bufferMemoryBarrierCount
+        , const vk::BufferMemoryBarrier * pBufferMemoryBarriers
+        , uint32_t imageMemoryBarrierCount
+        , const vk::ImageMemoryBarrier * pImageMemoryBarriers
+        )
         : srcStageMask(srcStageMask)
         , dstStageMask(dstStageMask)
+        , dependencyFlags(dependencyFlags)
+        , memoryBarrierCount(memoryBarrierCount)
+        , pMemoryBarriers(pMemoryBarriers)
+        , bufferMemoryBarrierCount(bufferMemoryBarrierCount)
+        , pBufferMemoryBarriers(pBufferMemoryBarriers)
+        , imageMemoryBarrierCount(imageMemoryBarrierCount)
+        , pImageMemoryBarriers(pImageMemoryBarriers)
     {
 
     }
 
     RenderPassInfo::RenderPassInfo( vk::RenderPass *pRenderPass
+        , uint32_t subPassIndex
         , vk::Framebuffer *pFrameBuffer
         , uint32_t framebufferWidth
         , uint32_t framebufferHeight
@@ -39,9 +124,10 @@ namespace vg
 #endif //DEBUG and VG_ENABLE_COST_TIMER
         )
         : pRenderPass(pRenderPass)
+        , subPassIndex(subPassIndex)
         , pFrameBuffer(pFrameBuffer)
-	, framebufferWidth(framebufferWidth)
-	, framebufferHeight(framebufferHeight)
+	    , framebufferWidth(framebufferWidth)
+	    , framebufferHeight(framebufferHeight)
         , renderArea(renderArea)
         , clearValueCount(clearValueCount)
         , pClearValues(pClearValues)
@@ -66,14 +152,28 @@ namespace vg
         : m_cmdInfoCount(0u)
         , m_cmdInfoCapacity(0u)
         , m_cmdInfos()
+
         , m_renderPassInfoCount(0u)
         , m_renderPassInfoCapacity(0u)
         , m_renderPassInfos()
 		, m_renderPassInfoToCmdInfoIndices()
+
         , m_barrierInfoCount(0u)
         , m_barrierInfosCapacity(0u)
         , m_barrierInfos()
 		, m_barrierInfoToCmdInfoIndices()
+
+        , m_memoryBarrierCount(0u)
+        , m_memoryBarrierCapacity(0u)
+        , m_memoryBarriers()
+
+        , m_bufferMemoryBarrierCount(0u)
+        , m_bufferMemoryBarrierCapacity(0u)
+        , m_bufferMemoryBarriers()
+
+        , m_imageMemoryBarrierCount(0u)
+        , m_imageMemoryBarrierCapacity(0u)
+        , m_imageMemoryBarriers()
     {    
     }    
     uint32_t CmdBuffer::getCmdCount() const
@@ -92,81 +192,81 @@ namespace vg
     }    
     void CmdBuffer::addCmd(CmdInfo cmdInfo)
     {
-        if (m_cmdInfoCount == m_cmdInfoCapacity)
-        {
-            m_cmdInfoCapacity = _getNextCapacity(m_cmdInfoCapacity);
-            m_cmdInfos.resize(m_cmdInfoCapacity);
-        }
-
-		uint32_t cmdInfoIndex = m_cmdInfoCount;
-        auto &dstCmdInfo = m_cmdInfos[cmdInfoIndex];
-        dstCmdInfo = cmdInfo;
-        ++m_cmdInfoCount;
+        addData<CmdInfo, nullptr_t, 0>(m_cmdInfoCount, 
+            m_cmdInfoCapacity,
+            m_cmdInfos,
+            nullptr,
+            nullptr,
+			0,
+            cmdInfo
+            );
 
         //copy render pass info
         if (cmdInfo.pRenderPassInfo != nullptr)
         {
-            if (m_renderPassInfoCount == m_renderPassInfoCapacity)
-            {
-                m_renderPassInfoCapacity = _getNextCapacity(m_renderPassInfoCapacity);
-                m_renderPassInfos.resize(m_renderPassInfoCapacity);
-				m_renderPassInfoToCmdInfoIndices.resize(m_renderPassInfoCapacity);
-
-				uint32_t count = m_renderPassInfoCount;
-				for (uint32_t i = 0; i < count; ++i)
-				{
-					auto &cmdInfo = m_cmdInfos[m_renderPassInfoToCmdInfoIndices[i]];
-					cmdInfo.pRenderPassInfo = &(m_renderPassInfos[i]);
-				}
-            }
-    
-            
-            auto &srcRenderPassInfo = *(cmdInfo.pRenderPassInfo);
-            auto &dstRenderPassInfo = m_renderPassInfos[m_renderPassInfoCount];
-            dstRenderPassInfo = srcRenderPassInfo;
-           
-            dstCmdInfo.pRenderPassInfo = &dstRenderPassInfo;
-			m_renderPassInfoToCmdInfoIndices[m_renderPassInfoCount] = cmdInfoIndex;
-
-			++m_renderPassInfoCount;
+            addData<RenderPassInfo, CmdInfo, offsetof(CmdInfo, pRenderPassInfo)>(
+                m_renderPassInfoCount,
+                m_renderPassInfoCapacity,
+                m_renderPassInfos,
+                &m_renderPassInfoToCmdInfoIndices,
+                &m_cmdInfos,
+				m_cmdInfoCount,
+                *(cmdInfo.pRenderPassInfo)
+            );
         }
 
         //copy barrier info
         if (cmdInfo.pBarrierInfo != nullptr)
         {
-            if (m_barrierInfoCount == m_barrierInfosCapacity)
-            {
-                m_barrierInfosCapacity = _getNextCapacity(m_barrierInfosCapacity);
-                m_barrierInfos.resize(m_barrierInfosCapacity);
-				m_barrierInfoToCmdInfoIndices.resize(m_barrierInfosCapacity);
+            addData<BarrierInfo, CmdInfo, offsetof(CmdInfo, pBarrierInfo)>(
+                m_barrierInfoCount,
+                m_barrierInfosCapacity,
+                m_barrierInfos,
+                &m_barrierInfoToCmdInfoIndices,
+                &m_cmdInfos,
+				m_cmdInfoCount,
+                *(cmdInfo.pBarrierInfo)
+            );
 
-				uint32_t count = m_barrierInfoCount;
-				for (uint32_t i = 0; i < count; ++i)
-				{
-					auto &cmdInfo = m_cmdInfos[m_barrierInfoToCmdInfoIndices[i]];
-					cmdInfo.pBarrierInfo = &(m_barrierInfos[i]);
-				}
-            }
+            auto memoryBarrierCount = cmdInfo.pBarrierInfo->memoryBarrierCount;
+            auto pMemoryBarriers = cmdInfo.pBarrierInfo->pMemoryBarriers;
+            addData<vk::MemoryBarrier, BarrierInfo, offsetof(BarrierInfo, pMemoryBarriers)>(
+                m_memoryBarrierCount,
+                m_memoryBarrierCapacity,
+                m_memoryBarriers,
+                &m_barrierInfos,
+				m_barrierInfoCount,
+                memoryBarrierCount,
+                pMemoryBarriers
+            );
+            
+            auto bufferMemoryBarrierCount = cmdInfo.pBarrierInfo->bufferMemoryBarrierCount;
+            auto pBufferMemoryBarriers = cmdInfo.pBarrierInfo->pBufferMemoryBarriers;
+            addData<vk::BufferMemoryBarrier, BarrierInfo, offsetof(BarrierInfo, pBufferMemoryBarriers)>(
+                m_bufferMemoryBarrierCount,
+                m_bufferMemoryBarrierCapacity,
+                m_bufferMemoryBarriers,
+                &m_barrierInfos,
+				m_barrierInfoCount,
+                bufferMemoryBarrierCount,
+                pBufferMemoryBarriers
+            );
 
-            auto &srcBarrierInfo = *(cmdInfo.pBarrierInfo);
-            auto &dstBarrierInfo = m_barrierInfos[m_barrierInfoCount];
-            dstBarrierInfo = srcBarrierInfo;
-
-            dstCmdInfo.pBarrierInfo = &dstBarrierInfo;
-			m_barrierInfoToCmdInfoIndices[m_barrierInfoCount] = cmdInfoIndex;
-
-			++m_barrierInfoCount;
-
+            auto imageMemoryBarrierCount = cmdInfo.pBarrierInfo->imageMemoryBarrierCount;
+            auto pImageMemoryBarriers = cmdInfo.pBarrierInfo->pImageMemoryBarriers;
+            addData<vk::ImageMemoryBarrier, BarrierInfo, offsetof(BarrierInfo, pImageMemoryBarriers)>(
+                m_imageMemoryBarrierCount,
+                m_imageMemoryBarrierCapacity,
+                m_imageMemoryBarriers,
+                &m_barrierInfos,
+				m_barrierInfoCount,
+                imageMemoryBarrierCount,
+                pImageMemoryBarriers
+            );
         }
     }
     
     void CmdBuffer::end()
     {    
-    }
-
-    uint32_t CmdBuffer::_getNextCapacity(uint32_t current)
-    {
-        if (current == 0u) return 1u;
-        else return static_cast<uint32_t>(std::pow(2, std::log2(current) + 1));
     }
 } //vg

@@ -24,6 +24,9 @@ namespace vg
             , vk::RenderPass *pRenderPass
             , ResultInfo *pResult = nullptr
             );
+        static void recordTrunkWaitBarrier(CmdBuffer *pTrunkWaitBarrierCmdBuffer
+            , vk::CommandBuffer *pCommandBuffer
+            );
         
         static void recordBranch(CmdBuffer *pCmdBuffer
             , vk::CommandBuffer *pCommandBuffer
@@ -31,12 +34,15 @@ namespace vg
             , ResultInfo *pResult = nullptr
             );
 
-        static void recordItemRenderPassBegin(RenderPassInfo *pRenderPassInfo
+        static void recordItemRenderPassBegin(const RenderPassInfo *pRenderPassInfo
             ,  vk::CommandBuffer *pCommandBuffer);
-        static void recordItemRenderPassEnd(RenderPassInfo *pRenderPassInfo
+        static void recordItemRenderPassEnd(const RenderPassInfo *pRenderPassInfo
             ,  vk::CommandBuffer *pCommandBuffer);
+        static void recordItemRenderPassEnd(vk::CommandBuffer *pCommandBuffer);
 
-        static void recordItem(RenderPassInfo *pRenderPassInfo
+        static void recordItemNextSubpass(vk::CommandBuffer *pCommandBuffer);
+
+        static void recordItem(const RenderPassInfo *pRenderPassInfo
             ,  vk::CommandBuffer *pCommandBuffer
             , PipelineCache *pPipelineCache
             , ResultInfo *pResult = nullptr);

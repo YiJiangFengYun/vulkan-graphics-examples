@@ -48,8 +48,8 @@ namespace vg
         Matrix4x4 modelMatrix;
         const BaseMesh *pMesh;
 		uint32_t subMeshIndex;
-        Bool32 hasClipRect;
-        const fd::Rect2D *pClipRect;
+        const fd::Viewport *pViewport;
+        const fd::Rect2D *pScissor;
 #if defined(DEBUG) && defined(VG_ENABLE_COST_TIMER)
         fd::CostTimer *pPreparingBuildInDataCostTimer;
         fd::CostTimer *pPreparingPipelineCostTimer;
@@ -70,8 +70,8 @@ namespace vg
             , Matrix4x4 modelMatrix = Matrix4x4(1.0f)
             , const BaseMesh *pMesh = nullptr
             , uint32_t subMeshIndex = 0u
-            , Bool32 hasClipRect = VG_FALSE
-            , const fd::Rect2D *pClipRect = nullptr
+            , const fd::Viewport *pViewport = nullptr
+            , const fd::Rect2D *pScissor = nullptr
 #if defined(DEBUG) && defined(VG_ENABLE_COST_TIMER)
             , fd::CostTimer *pPreparingBuildInDataCostTimer = nullptr
             , fd::CostTimer *pPreparingPipelineCostTimer = nullptr

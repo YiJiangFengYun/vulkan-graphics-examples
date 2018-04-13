@@ -61,7 +61,8 @@ namespace vg
 		    const BaseMesh *pMesh,
 		    uint32_t subMeshIndex,
 		    Pass *pPass,
-		    const fd::Rect2D *pClipRect);
+            const fd::Viewport *pViewport,
+		    const fd::Rect2D *pClip);
     };
 } //vg
 

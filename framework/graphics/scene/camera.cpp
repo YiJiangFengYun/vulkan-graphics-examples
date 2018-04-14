@@ -3,7 +3,8 @@
 namespace vg
 {
     BaseCamera::BaseCamera()
-        : m_isOrthographic(VG_FALSE)
+        : Base(BaseType::SCENE_OBJECT)
+        , m_isOrthographic(VG_FALSE)
     {
 
     }

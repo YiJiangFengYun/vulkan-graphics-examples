@@ -18,7 +18,7 @@ namespace vg
 		RANGE_SIZE = (END_RANGE - BEGIN_RANGE + 1)
 	};
 
-	class BaseObject : public Base
+	class BaseObject
 	{
 	public:
 		BaseObject();

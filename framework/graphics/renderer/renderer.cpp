@@ -1,5 +1,6 @@
 #include "graphics/renderer/renderer.hpp"
 
+#include "graphics/util/util.hpp"
 #include "graphics/buffer_data/util.hpp"
 #include "graphics/util/gemo_util.hpp"
 #include "graphics/renderer/cmd_parser.hpp"
@@ -63,6 +64,8 @@ namespace vg
 		, m_trunkRenderPassCmdBuffer()
 		, m_trunkWaitBarrierCmdBuffer()
 		, m_branchCmdBuffer()
+		, m_bindedObjects()
+		, m_bindedObjectCount(0u)
 #if defined(DEBUG) && defined(VG_ENABLE_COST_TIMER)
         , m_preparingRenderCostTimer(fd::CostTimer::TimerType::AVERAGE)
 #endif //DEBUG and VG_ENABLE_COST_TIMER
@@ -210,8 +213,7 @@ namespace vg
 		fd::CostTimer renderBeginCostTimer(fd::CostTimer::TimerType::ONCE);
 		renderBeginCostTimer.begin();
 #endif //DEBUG and VG_ENABLE_COST_TIMER
-		//command buffer begin
-		_recordCommandBufferForBegin();
+		
 
 #if defined(DEBUG) && defined(VG_ENABLE_COST_TIMER)
 		renderBeginCostTimer.end();
@@ -229,6 +231,7 @@ namespace vg
 		m_trunkRenderPassCmdBuffer.begin();
 		m_trunkWaitBarrierCmdBuffer.begin();
 		m_branchCmdBuffer.begin();
+		_beginBind();
 		uint32_t count = info.sceneAndCameraCount;
 		for (uint32_t i = 0; i < count; ++i)
 		{
@@ -273,6 +276,9 @@ namespace vg
 #endif //DEBUG and VG_ENABLE_COST_TIMER
 		}
 
+		//command buffer begin
+		_recordCommandBufferForBegin();
+
 		//branch render pass.
 		CMDParser::recordBranch(&m_branchCmdBuffer,
 			m_pCommandBuffer.get(),
@@ -292,6 +298,11 @@ namespace vg
 			m_pCurrRenderPass
 			);
 		_recordTrunkRenderPassForEnd();
+
+		//command buffer end
+		_recordCommandBufferForEnd();
+
+		_endBind();
 	}
 
 	void Renderer::_renderEnd(const RenderInfo &info)
@@ -301,9 +312,6 @@ namespace vg
         fd::CostTimer renderEndCostTimer(fd::CostTimer::TimerType::ONCE);
 		renderEndCostTimer.begin();
 #endif //DEBUG and VG_ENABLE_COST_TIMER	
-
-		//command buffer end
-		_recordCommandBufferForEnd();
 
 		/*auto pDevice = pApp->getDevice();
 		pDevice->waitForFences(*m_waitFence, VK_TRUE, std::numeric_limits<uint64_t>::max());
@@ -546,7 +554,7 @@ namespace vg
 			result.pTrunkRenderPassCmdBuffer = pTrunkRenderPassCmdBuffer;
 			result.pBranchCmdBuffer = pBranchCmdBuffer;
 			result.pTrunkWaitBarrierCmdBuffer = pTrunkWaitBarrierCmdBuffer;
-			pVisualObject->bindToRender(info, &result);
+			_bind(pVisualObject, info, &result);
 		}
 		
 #if defined(DEBUG) && defined(VG_ENABLE_COST_TIMER)
@@ -576,6 +584,74 @@ namespace vg
 			<< ", scene type: " << (pScene->getSpaceType() == SpaceType::SPACE_3 ? "space3" : "space2")
 			<< std::endl;
 #endif //DEBUG and VG_ENABLE_COST_TIMER
+	}
+
+		void fillValidVisualObjects(std::vector<VisualObject<SpaceType::SPACE_2> *> &arrPVObjs
+	    , uint32_t &PVObjIndex
+		, const Transform<SpaceType::SPACE_2> *pTransform
+		, const Scene<SpaceType::SPACE_2> *pScene
+		, const Camera<SpaceType::SPACE_2> *pCamera
+#ifdef USE_WORLD_BOUNDS
+		, const fd::Bounds<SpaceTypeInfo<SpaceType::SPACE_2>::PointType> *pViewBoundsInWorld
+#endif
+		)
+	{
+		VisualObject<SpaceType::SPACE_2> *pVisualObjectOfChild;
+		uint32_t childCount = pTransform->getChildCount();
+		Transform<SpaceType::SPACE_2> *pChild;
+		for (uint32_t i = 0; i < childCount; ++i)
+		{
+			pChild = pTransform->getChildWithIndex(i);
+			//Children's visual object is placed ahead of own visual objects
+			fillValidVisualObjects(arrPVObjs
+			    , PVObjIndex
+				, pChild
+				, pScene
+				, pCamera
+#ifdef USE_WORLD_BOUNDS
+				, pViewBoundsInWorld
+#endif //USE_WORLD_BOUNDS
+				);
+			//Own visual object is placed behind children's visual object.
+			pVisualObjectOfChild = pScene->getVisualObjectWithTransform(pChild);
+			if (pVisualObjectOfChild == nullptr) continue;
+			
+			auto pMeshOfChild = pVisualObjectOfChild->getMesh();
+			auto isHasBoundsOfChild = dynamic_cast<Mesh<MeshDimType::SPACE_2> *>(pMeshOfChild)->getIsHasBounds();
+			if (isHasBoundsOfChild == VG_FALSE)
+			{
+				arrPVObjs[PVObjIndex++] = pVisualObjectOfChild;
+			} 
+			else if (pVisualObjectOfChild->getIsVisibilityCheck() == VG_FALSE)
+			{
+				arrPVObjs[PVObjIndex++] = pVisualObjectOfChild;
+				pVisualObjectOfChild->setHasClipRect(VG_FALSE);
+			}
+			else {
+				//Filter obj out of camera view.
+			    auto boundsOfChild = dynamic_cast<Mesh<MeshDimType::SPACE_2> *>(pMeshOfChild)->getBounds();
+#ifdef USE_WORLD_BOUNDS
+				auto boundsOfChildInWorld = tranBoundsToNewSpace<Vector2>(boundsOfChild, pChild->getMatrixLocalToWorld(), VG_FALSE);
+#endif //USE_WORLD_BOUNDS
+			    fd::Rect2D clipRect;	
+#ifdef USE_WORLD_BOUNDS
+				if (pViewBoundsInWorld->isIntersects(boundsOfChildInWorld) && pScene->isInView(pCamera, boundsOfChildInWorld, &clipRect) == VG_TRUE)
+#else 
+                if (pScene->isInView(pCamera, pChild, boundsOfChild, &clipRect) == VG_TRUE)
+#endif //USE_WORLD_BOUNDS
+			    {
+			    	arrPVObjs[PVObjIndex++] = pVisualObjectOfChild;
+					//Transform range [-1, 1] to range [0, 1]
+				    clipRect.x = (clipRect.x + 1.0f) / 2.0f;
+				    clipRect.y = (clipRect.y + 1.0f) / 2.0f;
+				    clipRect.width = clipRect.width / 2.0f;
+				    clipRect.height = clipRect.height / 2.0f;
+				    uint32_t subMeshCount = pVisualObjectOfChild->getSubMeshCount();
+				    pVisualObjectOfChild->setHasClipRect(VG_TRUE);
+				    pVisualObjectOfChild->updateClipRects(clipRect, subMeshCount);
+			    }
+			}
+		}
 	}
 
 	void Renderer::_renderScene3(const Scene<SpaceType::SPACE_3> *pScene
@@ -759,7 +835,7 @@ namespace vg
 				result.pTrunkRenderPassCmdBuffer = pTrunkRenderPassCmdBuffer;
 			    result.pBranchCmdBuffer = pBranchCmdBuffer;
 				result.pTrunkWaitBarrierCmdBuffer = pTrunkWaitBarrierCmdBuffer;
-			    pVisualObject->bindToRender(info, &result);
+			    _bind(pVisualObject, info, &result);
 			}
 		}
 
@@ -792,71 +868,30 @@ namespace vg
 #endif //DEBUG and VG_ENABLE_COST_TIMER
 	}
 
-	void fillValidVisualObjects(std::vector<VisualObject<SpaceType::SPACE_2> *> &arrPVObjs
-	    , uint32_t &PVObjIndex
-		, const Transform<SpaceType::SPACE_2> *pTransform
-		, const Scene<SpaceType::SPACE_2> *pScene
-		, const Camera<SpaceType::SPACE_2> *pCamera
-#ifdef USE_WORLD_BOUNDS
-		, const fd::Bounds<SpaceTypeInfo<SpaceType::SPACE_2>::PointType> *pViewBoundsInWorld
-#endif
-		)
+	void Renderer::_beginBind()
 	{
-		VisualObject<SpaceType::SPACE_2> *pVisualObjectOfChild;
-		uint32_t childCount = pTransform->getChildCount();
-		Transform<SpaceType::SPACE_2> *pChild;
-		for (uint32_t i = 0; i < childCount; ++i)
-		{
-			pChild = pTransform->getChildWithIndex(i);
-			//Children's visual object is placed ahead of own visual objects
-			fillValidVisualObjects(arrPVObjs
-			    , PVObjIndex
-				, pChild
-				, pScene
-				, pCamera
-#ifdef USE_WORLD_BOUNDS
-				, pViewBoundsInWorld
-#endif //USE_WORLD_BOUNDS
-				);
-			//Own visual object is placed behind children's visual object.
-			pVisualObjectOfChild = pScene->getVisualObjectWithTransform(pChild);
-			if (pVisualObjectOfChild == nullptr) continue;
-			
-			auto pMeshOfChild = pVisualObjectOfChild->getMesh();
-			auto isHasBoundsOfChild = dynamic_cast<Mesh<MeshDimType::SPACE_2> *>(pMeshOfChild)->getIsHasBounds();
-			if (isHasBoundsOfChild == VG_FALSE)
-			{
-				arrPVObjs[PVObjIndex++] = pVisualObjectOfChild;
-			} 
-			else if (pVisualObjectOfChild->getIsVisibilityCheck() == VG_FALSE)
-			{
-				arrPVObjs[PVObjIndex++] = pVisualObjectOfChild;
-				pVisualObjectOfChild->setHasClipRect(VG_FALSE);
-			}
-			else {
-				//Filter obj out of camera view.
-			    auto boundsOfChild = dynamic_cast<Mesh<MeshDimType::SPACE_2> *>(pMeshOfChild)->getBounds();
-#ifdef USE_WORLD_BOUNDS
-				auto boundsOfChildInWorld = tranBoundsToNewSpace<Vector2>(boundsOfChild, pChild->getMatrixLocalToWorld(), VG_FALSE);
-#endif //USE_WORLD_BOUNDS
-			    fd::Rect2D clipRect;	
-#ifdef USE_WORLD_BOUNDS
-				if (pViewBoundsInWorld->isIntersects(boundsOfChildInWorld) && pScene->isInView(pCamera, boundsOfChildInWorld, &clipRect) == VG_TRUE)
-#else 
-                if (pScene->isInView(pCamera, pChild, boundsOfChild, &clipRect) == VG_TRUE)
-#endif //USE_WORLD_BOUNDS
-			    {
-			    	arrPVObjs[PVObjIndex++] = pVisualObjectOfChild;
-					//Transform range [-1, 1] to range [0, 1]
-				    clipRect.x = (clipRect.x + 1.0f) / 2.0f;
-				    clipRect.y = (clipRect.y + 1.0f) / 2.0f;
-				    clipRect.width = clipRect.width / 2.0f;
-				    clipRect.height = clipRect.height / 2.0f;
-				    uint32_t subMeshCount = pVisualObjectOfChild->getSubMeshCount();
-				    pVisualObjectOfChild->setHasClipRect(VG_TRUE);
-				    pVisualObjectOfChild->updateClipRects(clipRect, subMeshCount);
-			    }
-			}
-		}
+		m_bindedObjectCount = 0u;
 	}
+		
+	void Renderer::_bind(BaseVisualObject *pVisublObject, BaseVisualObject::BindInfo & bindInfo, BaseVisualObject::BindResult *pResult)
+	{
+		pVisublObject->beginBindToRender(bindInfo, pResult);
+		if (static_cast<uint32_t>(m_bindedObjects.size()) == m_bindedObjectCount) {
+			auto newSize = getNextCapacity(static_cast<uint32_t>(m_bindedObjects.size()));
+			m_bindedObjects.resize(newSize);
+		}
+
+		m_bindedObjects[m_bindedObjectCount] = pVisublObject;
+
+		++m_bindedObjectCount;
+	}
+
+	void Renderer::_endBind()
+	{
+		for (uint32_t i = 0; i < m_bindedObjectCount; ++i) {
+			m_bindedObjects[i]->endBindToRender();
+		}
+		m_bindedObjectCount = 0u;
+	}
+
 }

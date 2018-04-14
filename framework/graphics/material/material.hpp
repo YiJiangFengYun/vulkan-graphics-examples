@@ -19,6 +19,7 @@ namespace vg
             const Matrix4x4 *pViewMatrix;
 			uint32_t trunkFramebufferWidth;
 			uint32_t trunkFramebufferHeight;
+			InstanceID objectID;
             const Matrix4x4 *pModelMatrix;
             const BaseMesh *pMesh;
             uint32_t subMeshIndex;
@@ -39,6 +40,7 @@ namespace vg
                 , fd::CostTimer *pPreparingPipelineCostTimer = nullptr
                 , fd::CostTimer *pPreparingCommandBufferCostTimer = nullptr
 #endif //DEBUG and VG_ENABLE_COST_TIMER
+                , InstanceID objectID = 0
                 , const Matrix4x4 *pModelMatrix = nullptr
                 , const BaseMesh *pMesh = nullptr
                 , uint32_t subMeshIndex = 0u
@@ -58,6 +60,15 @@ namespace vg
                 );
         };
 
+
+		struct EndBindInfo 
+		{
+			InstanceID objectID;
+			uint32_t subMeshIndex;
+			EndBindInfo(InstanceID objectID = 0
+			    , uint32_t subMeshIndex = 0u);
+		};
+
 		Material();
 		~Material();
 
@@ -76,7 +87,8 @@ namespace vg
 		/*Call the apply methods of all passes in the material.*/
 		virtual void apply();
 
-		virtual void bindToRender(const BindInfo info, BindResult *pResult);
+		virtual void beginBindToRender(const BindInfo info, BindResult *pResult);
+		virtual void endBindToRender(const EndBindInfo info);
 	protected:
 		//--compositions
 		MaterialShowType m_renderQueueType;

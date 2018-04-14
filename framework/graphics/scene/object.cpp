@@ -3,7 +3,6 @@
 namespace vg
 {
 	BaseObject::BaseObject()
-		: Base(BaseType::SCENE_OBJECT)
 	{
 
 	}

@@ -8,7 +8,7 @@
 
 namespace vg
 {
-	class BaseVisualObject
+	class BaseVisualObject : public Base
 	{
 	public:
 	    struct BindInfo 
@@ -71,7 +71,8 @@ namespace vg
 		void updateClipRects(fd::ArrayProxy<fd::Rect2D> rects, uint32_t count, uint32_t offset = 0u);
 		void updateClipRects(fd::Rect2D rect, uint32_t count, uint32_t offset = 0u);
 
-		void bindToRender(const BindInfo info, BindResult *pResult);
+		void beginBindToRender(const BindInfo info, BindResult *pResult);
+		void endBindToRender();
 
 	protected:
 		Material *m_pMaterial;

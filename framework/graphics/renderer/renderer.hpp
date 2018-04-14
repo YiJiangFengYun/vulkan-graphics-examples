@@ -101,6 +101,9 @@ namespace vg
 		CmdBuffer m_trunkWaitBarrierCmdBuffer;
 		CmdBuffer m_branchCmdBuffer;
 
+		std::vector<BaseVisualObject *> m_bindedObjects;
+		uint32_t m_bindedObjectCount;
+
 #if defined(DEBUG) && defined(VG_ENABLE_COST_TIMER)
         fd::CostTimer m_preparingRenderCostTimer;
 #endif //DEBUG and VG_ENABLE_COST_TIMER
@@ -132,17 +135,18 @@ namespace vg
             , CmdBuffer *pTrunkWaitBarrierCmdBuffer = nullptr
 			);
 
-		 void _renderScene3(const Scene<SpaceType::SPACE_3> *pScene
+		void _renderScene3(const Scene<SpaceType::SPACE_3> *pScene
 		    , const Camera<SpaceType::SPACE_3> *pCamera
 	        , const RenderInfo &info
 			, CmdBuffer *pBranchCmdBuffer = nullptr
             , CmdBuffer *pTrunkRenderPassCmdBuffer = nullptr
             , CmdBuffer *pTrunkWaitBarrierCmdBuffer = nullptr
 			);
-
-#if defined(DEBUG) && defined(VG_ENABLE_COST_TIMER)
-
-#endif //DEBUG and VG_ENABLE_COST_TIMER
+	    
+		void _beginBind();
+		void _bind(BaseVisualObject *pVisublObject, BaseVisualObject::BindInfo & bindInfo, BaseVisualObject::BindResult *pResult);
+		void _endBind();
+        
 
 	private:
 	};

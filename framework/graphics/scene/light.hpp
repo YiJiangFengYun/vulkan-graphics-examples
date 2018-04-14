@@ -5,9 +5,10 @@
 
 namespace vg
 {
-	class BaseLight
+	class BaseLight : public Base
 	{
 	public:
+	    BaseLight();
 
 	protected:
 

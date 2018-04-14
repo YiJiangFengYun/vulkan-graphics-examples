@@ -6,7 +6,7 @@
 namespace vg
 {
 	// enum class Camera
-	class BaseCamera
+	class BaseCamera : public Base
 	{
 	public:
 	    BaseCamera();

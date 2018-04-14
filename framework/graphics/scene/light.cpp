@@ -2,5 +2,9 @@
 
 namespace vg
 {
+    BaseLight::BaseLight()
+        : Base(BaseType::SCENE_OBJECT)
+    {
 
+    }
 }

@@ -73,5 +73,7 @@ namespace vg
 
 		return isContain;
 	}
-} //namespace kgs
+
+	uint32_t getNextCapacity(uint32_t current);
+} //namespace vg
 #endif // !VG_UTIL_H

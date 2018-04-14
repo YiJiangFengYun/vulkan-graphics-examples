@@ -6,6 +6,7 @@ namespace vg
         , const Matrix4x4 *pViewMatrix
 		, uint32_t trunkFramebufferWidth
 		, uint32_t trunkFramebufferHeight
+		, InstanceID objectID
         , const Matrix4x4 *pModelMatrix
         , const BaseMesh *pMesh
         , uint32_t subMeshIndex
@@ -21,6 +22,7 @@ namespace vg
         , pViewMatrix(pViewMatrix)
 		, trunkFramebufferWidth(trunkFramebufferWidth)
 		, trunkFramebufferHeight(trunkFramebufferHeight)
+		, objectID(objectID)
 		, pModelMatrix(pModelMatrix)
         , pMesh(pMesh)
         , subMeshIndex(subMeshIndex)
@@ -44,6 +46,15 @@ namespace vg
     {
 
     }
+
+	Material::EndBindInfo::EndBindInfo(InstanceID objectID
+	    , uint32_t subMeshIndex
+		)
+	    : objectID(objectID)
+		, subMeshIndex(subMeshIndex)
+	{
+
+	}
 
 	Material::Material()
 		: Base(BaseType::MATERIAL)
@@ -122,7 +133,7 @@ namespace vg
 		m_renderPriority = priority;
 	}
 
-	void Material::bindToRender(const BindInfo info, BindResult *pResult)
+	void Material::beginBindToRender(const BindInfo info, BindResult *pResult)
     {
 		auto &result = *pResult;
 
@@ -148,6 +159,11 @@ namespace vg
         }
 
     }
+
+	void Material::endBindToRender(const EndBindInfo info)
+	{
+
+	}
 
 	void Material::_addPass(Pass *pPass)
 	{

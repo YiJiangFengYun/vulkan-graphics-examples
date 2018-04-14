@@ -115,8 +115,8 @@ namespace vg
         , Matrix4x4 modelMatrix
         , const BaseMesh *pMesh
         , uint32_t subMeshIndex
-        , const fd::Viewport *pViewport
-        , const fd::Rect2D *pScissor
+        , fd::Viewport viewport
+        , fd::Rect2D scissor
 #if defined(DEBUG) && defined(VG_ENABLE_COST_TIMER)
         , fd::CostTimer *pPreparingBuildInDataCostTimer
         , fd::CostTimer *pPreparingPipelineCostTimer
@@ -137,8 +137,8 @@ namespace vg
         , modelMatrix(modelMatrix)
         , pMesh(pMesh)
         , subMeshIndex(subMeshIndex)
-        , pViewport(pViewport)
-        , pScissor(pScissor)
+        , viewport(viewport)
+        , scissor(scissor)
 #if defined(DEBUG) && defined(VG_ENABLE_COST_TIMER)
         , pPreparingBuildInDataCostTimer(pPreparingBuildInDataCostTimer)
         , pPreparingPipelineCostTimer(pPreparingPipelineCostTimer)

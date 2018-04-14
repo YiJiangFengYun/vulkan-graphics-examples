@@ -9,8 +9,8 @@ namespace vg
         , const Matrix4x4 *pModelMatrix
         , const BaseMesh *pMesh
         , uint32_t subMeshIndex
-        , const fd::Viewport *pViewport
-        , const fd::Rect2D *pScissor
+        , Bool32 hasClipRect
+        , const fd::Rect2D clipRect
 #if defined(DEBUG) && defined(VG_ENABLE_COST_TIMER)
         , fd::CostTimer *pPreparingBuildInDataCostTimer
         , fd::CostTimer *pPreparingPipelineCostTimer
@@ -24,8 +24,8 @@ namespace vg
 		, pModelMatrix(pModelMatrix)
         , pMesh(pMesh)
         , subMeshIndex(subMeshIndex)
-        , pViewport(pViewport)
-        , pScissor(pScissor)
+        , hasClipRect(hasClipRect)
+        , clipRect(clipRect)
 #if defined(DEBUG) && defined(VG_ENABLE_COST_TIMER)
         , pPreparingBuildInDataCostTimer(pPreparingBuildInDataCostTimer)
         , pPreparingPipelineCostTimer(pPreparingPipelineCostTimer)
@@ -138,8 +138,8 @@ namespace vg
             trunkRenderPassInfo.modelMatrix = *(info.pModelMatrix);
             trunkRenderPassInfo.pMesh = info.pMesh;
             trunkRenderPassInfo.subMeshIndex = info.subMeshIndex;
-            trunkRenderPassInfo.pViewport = info.pViewport;
-            trunkRenderPassInfo.pScissor = info.pScissor;
+            trunkRenderPassInfo.viewport = fd::Viewport();
+            trunkRenderPassInfo.scissor = info.hasClipRect ? info.clipRect : fd::Rect2D();
 
             CmdInfo cmdInfo;
             cmdInfo.pRenderPassInfo = &trunkRenderPassInfo;

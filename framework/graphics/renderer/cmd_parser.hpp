@@ -61,8 +61,8 @@ namespace vg
 		    const BaseMesh *pMesh,
 		    uint32_t subMeshIndex,
 		    Pass *pPass,
-            const fd::Viewport *pViewport,
-		    const fd::Rect2D *pClip);
+            const fd::Viewport viewport,
+		    const fd::Rect2D scissor);
     };
 } //vg
 

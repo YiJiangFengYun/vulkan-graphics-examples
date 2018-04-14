@@ -167,8 +167,8 @@ namespace vg
                     &modelMatrix,
 			        m_pMesh,
 			        subMeshIndex,
-			        nullptr,
-			        m_hasClipRect ? m_clipRects.data() + i : nullptr,
+			        m_hasClipRect,
+			        *(m_clipRects.data() + i),
 #if defined(DEBUG) && defined(VG_ENABLE_COST_TIMER)
                     info.pPreparingBuildInDataCostTimer,
                     info.pPreparingPipelineCostTimer,

@@ -278,8 +278,8 @@ namespace vg
 				renderPassInfo.pMesh,
 				subMeshIndex, 
 				pPass, 
-				renderPassInfo.pViewport,
-				renderPassInfo.pScissor
+				renderPassInfo.viewport,
+				renderPassInfo.scissor
 			);
 #if defined(DEBUG) && defined(VG_ENABLE_COST_TIMER)
 			renderPassInfo.pPreparingCommandBufferCostTimer->end();
@@ -317,8 +317,8 @@ namespace vg
 		const BaseMesh *pMesh,
 		uint32_t subMeshIndex,
 		Pass *pPass,
-		const fd::Viewport *pViewport,
-		const fd::Rect2D *pScissor)
+		const fd::Viewport viewport,
+		const fd::Rect2D scissor)
 	{
 		VG_LOG(plog::debug) << "Pre begin command buffer for render." << std::endl;
 		auto pContentMesh = dynamic_cast<const ContentMesh *>(pMesh);
@@ -326,21 +326,17 @@ namespace vg
         const auto& viewportOfPass = pPass->getViewport();
 		const auto& scissorOfPass = pPass->getScissor();
 
-		fd::Viewport finalViewport(0.0f, 0.0f, 1.0f, 1.0f);
+		fd::Viewport finalViewport;
 		//The mesh viewport is base on the viewport of pass.
-		if (pViewport != nullptr) {
-			finalViewport.x = pViewport->x * viewportOfPass.width + viewportOfPass.x;
-			finalViewport.y = pViewport->y * viewportOfPass.height + viewportOfPass.y;
-			finalViewport.width = pViewport->width * viewportOfPass.width;
-			finalViewport.height = pViewport->height * viewportOfPass.height;
-			finalViewport.minDepth = pViewport->minDepth * viewportOfPass.minDepth;
-			finalViewport.maxDepth = pViewport->maxDepth * viewportOfPass.maxDepth;
-		} else {
-			finalViewport = viewportOfPass;
-		}
+		finalViewport.x = viewport.x * viewportOfPass.width + viewportOfPass.x;
+		finalViewport.y = viewport.y * viewportOfPass.height + viewportOfPass.y;
+		finalViewport.width = viewport.width * viewportOfPass.width;
+		finalViewport.height = viewport.height * viewportOfPass.height;
+		finalViewport.minDepth = viewport.minDepth * viewportOfPass.minDepth;
+		finalViewport.maxDepth = viewport.maxDepth * viewportOfPass.maxDepth;
 
 		//View port info.
-		vk::Viewport viewport = {
+		vk::Viewport vkViewport = {
 			(float)framebufferWidth * finalViewport.x,                      //x
 			(float)framebufferHeight * finalViewport.y,                     //y
 			(float)framebufferWidth * finalViewport.width,                  //width
@@ -349,45 +345,32 @@ namespace vg
 			1.0f * finalViewport.maxDepth                                      //maxDepth
 		};
 
-		pCommandBuffer->setViewport(0, viewport);
+		pCommandBuffer->setViewport(0, vkViewport);
 
 		const auto &pVertexData = pContentMesh->getVertexData();
 		const auto &subVertexDatas = pVertexData->getSubVertexDatas();
 		const auto &pIndexData = pContentMesh->getIndexData();
 		const auto &subIndexDatas = pIndexData->getSubIndexDatas();
 		const auto &subIndexData = subIndexDatas[subMeshIndex];
-		fd::Rect2D finalScissor(0.0f, 0.0f, 1.0f, 1.0f);
-		if (pScissor != nullptr)
+		fd::Rect2D finalScissor = scissorOfPass;
+		glm::vec2 minOfClipRect(scissor.x, scissor.y);
+		glm::vec2 maxOfclipRect(scissor.x + scissor.width, scissor.y + scissor.height);
+		fd::Bounds<glm::vec2> boundsOfClipRect(minOfClipRect, maxOfclipRect);
+		glm::vec2 minOfScissorOfPass(scissorOfPass.x, scissorOfPass.y);
+		glm::vec2 maxOfScissorOfPass(scissorOfPass.x + scissorOfPass.width, scissorOfPass.y + scissorOfPass.height);
+		fd::Bounds<glm::vec2> boundsOfScissorOfPass(minOfScissorOfPass, maxOfScissorOfPass);
+		fd::Bounds<glm::vec2> intersection;
+		if (boundsOfScissorOfPass.intersects(boundsOfClipRect, &intersection))
 		{
-
-			auto scissor = *pScissor;
-			glm::vec2 minOfClipRect(scissor.x, scissor.y);
-			glm::vec2 maxOfclipRect(scissor.x + scissor.width, scissor.y + scissor.height);
-
-			fd::Bounds<glm::vec2> boundsOfClipRect(minOfClipRect, maxOfclipRect);
-
-			glm::vec2 minOfScissorOfPass(scissorOfPass.x, scissorOfPass.y);
-			glm::vec2 maxOfScissorOfPass(scissorOfPass.x + scissorOfPass.width, scissorOfPass.y + scissorOfPass.height);
-
-			fd::Bounds<glm::vec2> boundsOfScissorOfPass(minOfScissorOfPass, maxOfScissorOfPass);
-
-			fd::Bounds<glm::vec2> intersection;
-			if (boundsOfScissorOfPass.intersects(boundsOfClipRect, &intersection))
-			{
-				auto min = intersection.getMin();
-				auto size = intersection.getSize();
-				finalScissor.x = min.x;
-				finalScissor.y = min.y;
-				finalScissor.width = size.x;
-				finalScissor.height = size.y;
-			}
-		}
-		else
-		{
-			finalScissor = scissorOfPass;
+			auto min = intersection.getMin();
+			auto size = intersection.getSize();
+			finalScissor.x = min.x;
+			finalScissor.y = min.y;
+			finalScissor.width = size.x;
+			finalScissor.height = size.y;
 		}
 
-		vk::Rect2D scissor = {
+		vk::Rect2D vkScissor = {
 			{                               //offset
 				static_cast<int32_t>(std::floorf((float)framebufferWidth * viewportOfPass.x + 
 				    (float)framebufferWidth * viewportOfPass.width * finalScissor.x)),    //x
@@ -400,7 +383,7 @@ namespace vg
 			}
 		};
 
-		pCommandBuffer->setScissor(0, scissor);
+		pCommandBuffer->setScissor(0, vkScissor);
 
 		auto pPipelineLayout = pPass->getPipelineLayout();		
 

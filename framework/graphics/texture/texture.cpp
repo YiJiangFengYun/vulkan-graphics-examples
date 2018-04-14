@@ -167,6 +167,11 @@ namespace vg
 		return m_pSampler.get();
 	}
 
+	vk::ImageAspectFlags Texture::getImageAspectFlags() const
+	{
+		return m_vkImageAspectFlags;
+	}
+
 	void Texture::_init()
 	{
 		_updateMipMapLevels();

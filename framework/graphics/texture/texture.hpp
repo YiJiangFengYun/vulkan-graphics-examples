@@ -62,6 +62,7 @@ namespace vg
 		vk::DeviceMemory *getImageMemory() const;
 		vk::ImageView *getImageView() const;
 		vk::Sampler *getSampler() const;
+		vk::ImageAspectFlags getImageAspectFlags() const;
 	protected:
 		//--compositions
 		uint32_t m_width;

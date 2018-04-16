@@ -167,7 +167,7 @@ namespace vg
 			        m_pMesh,
 			        subMeshIndex,
 			        m_hasClipRect,
-			        *(m_clipRects.data() + i),
+					m_hasClipRect ? *(m_clipRects.data() + i) : fd::Rect2D(),
 #if defined(DEBUG) && defined(VG_ENABLE_COST_TIMER)
                     info.pPreparingBuildInDataCostTimer,
                     info.pPreparingPipelineCostTimer,

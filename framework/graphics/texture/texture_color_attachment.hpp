@@ -9,7 +9,13 @@ namespace vg
 	class TextureColorAttachment : public Texture, public BaseColorAttachment
 	{
 	public:
-		TextureColorAttachment(vk::Format format, uint32_t width, uint32_t height, Bool32 isInputUsage = VG_FALSE);
+		TextureColorAttachment(vk::Format format
+		    , uint32_t width
+			, uint32_t height
+			, Bool32 isInputUsage = VG_FALSE
+			, Bool32 defaultImageView = VG_TRUE
+			, Bool32 defaultSampler = VG_TRUE
+			);
 		~TextureColorAttachment();
 		uint32_t getWidth() const;
 		uint32_t getHeight() const;
@@ -17,9 +23,9 @@ namespace vg
 		virtual uint32_t getColorAttachmentWidth() const override;
 		virtual uint32_t getColorAttachmentHeight() const override;
 		virtual uint32_t getColorAttachmentLayers() const override;
-		virtual vk::Format getColorAttachmentFormat() const override;
-		virtual vk::ImageLayout getColorAttachmentLayout() const override;
-		virtual vk::ImageView *getColorAttachmentImageView() const override;
+		virtual const vk::Format getColorAttachmentFormat() const override;
+		virtual const vk::ImageLayout getColorAttachmentLayout() const override;
+		virtual const vk::ImageView *getColorAttachmentImageView() const override;
 	private:
 		TextureColorAttachment() = delete;
 		virtual void _init() override;

@@ -2,12 +2,25 @@
 
 namespace vg
 {
-	Texture1DArray::Texture1DArray(vk::Format format, Bool32 mipMap, uint32_t width, uint32_t arraylength)
-		:Texture(format, mipMap)
+	Texture1DArray::Texture1DArray(vk::Format format
+	    , Bool32 mipMap
+		, uint32_t width
+		, uint32_t arraylength
+		, Bool32 defaultImageView
+		, Bool32 defaultSampler
+		)
+		:Texture(format
+		, mipMap
+		, defaultImageView
+		, defaultSampler
+		)
 	{
 		m_type = TextureType::TEX_1D_ARRAY;
 		m_width = width;
 		m_arrayLength = arraylength;
+		m_allAspectFlags = vk::ImageAspectFlagBits::eColor;
+		m_usageFlags = vk::ImageUsageFlagBits::eSampled;
+		m_layout = vk::ImageLayout::eShaderReadOnlyOptimal;
 		_init();
 	}
 

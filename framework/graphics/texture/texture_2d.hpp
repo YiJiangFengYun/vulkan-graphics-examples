@@ -9,7 +9,13 @@ namespace vg
 	class Texture2D : public Texture
 	{
 	public:
-		Texture2D(vk::Format format, Bool32 mipmap, uint32_t width, uint32_t height);
+		Texture2D(vk::Format format
+		    , Bool32 mipmap
+			, uint32_t width
+			, uint32_t height
+			, Bool32 defaultImageView = VG_TRUE
+			, Bool32 defaultSampler = VG_TRUE
+			);
 		~Texture2D();
 		uint32_t getWidth() const;
 		uint32_t getHeight() const;
@@ -25,7 +31,13 @@ namespace vg
 	class Texture2DColorAttachment : public Texture, public BaseColorAttachment
 	{
 	public:
-	    Texture2DColorAttachment(vk::Format format, uint32_t width, uint32_t height, Bool32 isInputUsage = VG_FALSE);
+	    Texture2DColorAttachment(vk::Format format
+		    , uint32_t width
+			, uint32_t height
+			, Bool32 isInputUsage = VG_FALSE
+			, Bool32 defaultImageView = VG_TRUE
+			, Bool32 defaultSampler = VG_TRUE
+			);
 		~Texture2DColorAttachment();
 		uint32_t getWidth() const;
 		uint32_t getHeight() const;
@@ -37,9 +49,9 @@ namespace vg
 		virtual uint32_t getColorAttachmentWidth() const override;
 		virtual uint32_t getColorAttachmentHeight() const override;
 		virtual uint32_t getColorAttachmentLayers() const override;
-		virtual vk::Format getColorAttachmentFormat() const override;
-		virtual vk::ImageLayout getColorAttachmentLayout() const override;
-		virtual vk::ImageView *getColorAttachmentImageView() const override;
+		virtual const vk::Format getColorAttachmentFormat() const override;
+		virtual const vk::ImageLayout getColorAttachmentLayout() const override;
+		virtual const vk::ImageView *getColorAttachmentImageView() const override;
 	private:
 	   Texture2DColorAttachment() = delete;
 	   virtual void _init() override;
@@ -48,7 +60,13 @@ namespace vg
 	class Texture2DDepthStencilAttachment : public Texture, public BaseDepthStencilAttachment
 	{
 	public:
-	    Texture2DDepthStencilAttachment(vk::Format format, uint32_t width, uint32_t height, Bool32 isInputUsage = VG_FALSE);
+	    Texture2DDepthStencilAttachment(vk::Format format
+		    , uint32_t width
+			, uint32_t height
+			, Bool32 isInputUsage = VG_FALSE
+			, Bool32 defaultImageView = VG_TRUE
+			, Bool32 defaultSampler = VG_TRUE
+			);
 		~Texture2DDepthStencilAttachment();
 		uint32_t getWidth() const;
 		uint32_t getHeight() const;
@@ -60,9 +78,9 @@ namespace vg
 		virtual uint32_t getDepthStencilAttachmentWidth() const override;
 		virtual uint32_t getDepthStencilAttachmentHeight() const override;
 		virtual uint32_t getDepthStencilAttachmentLayers() const override;
-		virtual vk::Format getDepthStencilAttachmentFormat() const override;
-		virtual vk::ImageLayout getDepthStencilAttachmentLayout() const = 0;
-		virtual vk::ImageView *getDepthStencilAttachmentImageView() const = 0;
+		virtual const vk::Format getDepthStencilAttachmentFormat() const override;
+		virtual const vk::ImageLayout getDepthStencilAttachmentLayout() const = 0;
+		virtual const vk::ImageView *getDepthStencilAttachmentImageView() const = 0;
 	private:
 	   Texture2DDepthStencilAttachment() = delete;
 	   virtual void _init() override;

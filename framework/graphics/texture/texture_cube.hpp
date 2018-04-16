@@ -8,7 +8,13 @@ namespace vg
 	class TextureCube : public Texture
 	{
 	public:
-		TextureCube(vk::Format format, Bool32 mipmap, uint32_t width, uint32_t height);
+		TextureCube(vk::Format format
+		    , Bool32 mipmap
+			, uint32_t width
+			, uint32_t height
+			, Bool32 defaultImageView = VG_TRUE
+			, Bool32 defaultSampler = VG_TRUE
+			);
 		~TextureCube();
 		uint32_t getWidth() const;
 		uint32_t getHeight() const;

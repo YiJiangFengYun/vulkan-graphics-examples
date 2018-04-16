@@ -26,28 +26,6 @@ namespace vg
 		RANGE_SIZE = (END_RANGE - BEGIN_RANGE + 1)
 	};
 
-	enum class FilterMode
-	{
-		NEAREST,
-		LINEAR,
-		TRILINEAR,
-		BEGIN_RANGE = NEAREST,
-		END_RANGE = TRILINEAR,
-		RANGE_SIZE = (END_RANGE - BEGIN_RANGE + 1)
-	};
-
-	enum class SamplerAddressMode
-	{
-		REPEAT,
-		MIRRORED_REPEAT,
-		CLAMP_TO_EDGE,
-		CLAMP_TO_BORDER,
-		MIRROR_CLAMP_TO_EDGE,
-		BEGIN_RANGE = REPEAT,
-		END_RANGE = MIRROR_CLAMP_TO_EDGE,
-		RANGE_SIZE = (END_RANGE - BEGIN_RANGE + 1)
-	};
-
 	enum class CubemapFace
 	{
 		POSITIVE_X,
@@ -64,8 +42,6 @@ namespace vg
 	extern std::map<TextureType, std::string> mapTextureTypeToName;
 	extern std::array<std::pair<TextureType, vk::ImageType>, static_cast<size_t>(TextureType::RANGE_SIZE)> arrTextureTypeToVKImageType;
 	extern std::array<std::pair<TextureType, vk::ImageViewType>, static_cast<size_t>(TextureType::RANGE_SIZE)> arrTextureTypeToVKImageViewType;
-	extern std::array<std::tuple<FilterMode, vk::Filter, vk::SamplerMipmapMode>, static_cast<size_t>(FilterMode::RANGE_SIZE)> arrFilerModeToVK;
-	extern std::array<std::pair<SamplerAddressMode, vk::SamplerAddressMode>, static_cast<size_t>(SamplerAddressMode::RANGE_SIZE)> arrSamplerAddressModeToVK;
 }
 
 

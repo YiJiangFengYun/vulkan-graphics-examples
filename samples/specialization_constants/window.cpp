@@ -107,17 +107,32 @@ void Window::_createTexture()
 	textureLayout.pComponent = components.data();
 	m_pTexture->applyData(textureLayout, gliTex2D.data(), gliTex2D.size());
 
-	m_pTexture->setFilterMode(vg::FilterMode::TRILINEAR);
-	m_pTexture->setSamplerAddressMode(vg::SamplerAddressMode::REPEAT);
-
 	auto &pApp = vg::pApp;
 	auto pDevice = pApp->getDevice();
 	auto pPhysicalDevice = pApp->getPhysicalDevice();
+	vk::Bool32 enableAnisotropy = VK_FALSE;
+	float anisotropy = 0.0f;
 	if (pApp->getPhysicalDeviceFeatures().samplerAnisotropy)
 	{
-		auto anisotropy = pPhysicalDevice->getProperties().limits.maxSamplerAnisotropy;
-		m_pTexture->setAnisotropy(anisotropy);
+		enableAnisotropy = VK_TRUE;
+		anisotropy = pPhysicalDevice->getProperties().limits.maxSamplerAnisotropy;
 	}
+
+	vg::Texture::SamplerCreateInfo info = {
+		vk::SamplerCreateFlags(),
+		vk::Filter::eLinear,
+		vk::Filter::eLinear,
+		vk::SamplerMipmapMode::eLinear,
+		vk::SamplerAddressMode::eRepeat,
+		vk::SamplerAddressMode::eRepeat,
+		vk::SamplerAddressMode::eRepeat,
+		0.0f,
+		enableAnisotropy,
+		anisotropy,
+		0.0f,
+		(float)(m_pTexture->getImage()->getInfo().mipLevels),
+	};
+	m_pTexture->createSampler("other_sampler", info);
 }
 
 void Window::_createMaterial()
@@ -201,7 +216,11 @@ void Window::_createMaterial()
 		specializationData.lightingModel = i;
 
 		pPass->setSpecializationData(vg::ShaderStageFlagBits::FRAGMENT, specializationInfo);
-		pPass->setMainTexture(m_pTexture.get());
+		pPass->setMainTexture(m_pTexture.get(),
+			vg::ShaderStageFlagBits::FRAGMENT,
+			vg::DescriptorType::COMBINED_IMAGE_SAMPLER,
+			nullptr,
+			m_pTexture->getSampler("other_sampler"));
 		pPass->setDataValue("light_info", m_lightInfo, 2u);
 		pPass->apply();
 

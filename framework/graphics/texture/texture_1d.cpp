@@ -2,11 +2,23 @@
 
 namespace vg
 {
-	Texture1D::Texture1D(vk::Format format, Bool32 mipMap, uint32_t width)
-		:Texture(format, mipMap)
+	Texture1D::Texture1D(vk::Format format
+	    , Bool32 mipMap
+		, uint32_t width
+		, Bool32 defaultImageView
+		, Bool32 defaultSampler
+		)
+		:Texture(format
+		, mipMap
+		, defaultImageView
+		, defaultSampler
+		)
 	{
 		m_type = TextureType::TEX_1D;
 		m_width = width;
+		m_allAspectFlags = vk::ImageAspectFlagBits::eColor;
+		m_usageFlags = vk::ImageUsageFlagBits::eSampled;
+		m_layout = vk::ImageLayout::eShaderReadOnlyOptimal;
 		_init();
 	}
 

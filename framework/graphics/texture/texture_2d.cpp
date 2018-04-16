@@ -2,12 +2,25 @@
 
 namespace vg
 {
-	Texture2D::Texture2D(vk::Format format, Bool32 mipMap, uint32_t width, uint32_t height)
-		:Texture(format, mipMap)
+	Texture2D::Texture2D(vk::Format format
+	    , Bool32 mipMap
+		, uint32_t width
+		, uint32_t height
+		, Bool32 cacheMemory
+		, Bool32 createMipmaps
+		)
+		: Texture(format
+		, mipMap
+		, cacheMemory
+		, createMipmaps
+		)
 	{
 		m_type = TextureType::TEX_2D;
 		m_width = width;
 		m_height = height;
+		m_allAspectFlags = vk::ImageAspectFlagBits::eColor;
+		m_usageFlags = vk::ImageUsageFlagBits::eSampled;
+		m_layout = vk::ImageLayout::eShaderReadOnlyOptimal;
 		_init();
 	}
 
@@ -35,19 +48,29 @@ namespace vg
 	}
 
 
-	Texture2DColorAttachment::Texture2DColorAttachment(vk::Format format, uint32_t width, uint32_t height, Bool32 isInputUsage)
-		: Texture(format, false)
+	Texture2DColorAttachment::Texture2DColorAttachment(vk::Format format
+	    , uint32_t width
+		, uint32_t height
+		, Bool32 isInputUsage
+		, Bool32 defaultImageView
+		, Bool32 defaultSampler
+		)
+		: Texture(format
+		, false
+		, defaultImageView
+		, defaultSampler
+		)
 		, BaseColorAttachment(isInputUsage)
 	{
 		m_type = TextureType::TEX_2D_COLOR_ATTACHMENT;
 		m_width = width;
 		m_height = height;
-		m_vkImageUsageFlags = vk::ImageUsageFlagBits::eSampled | vk::ImageUsageFlagBits::eColorAttachment;
-		m_vkImageLayout = vk::ImageLayout::eShaderReadOnlyOptimal;
-		m_vkImageAspectFlags = vk::ImageAspectFlagBits::eColor;
+		m_allAspectFlags = vk::ImageAspectFlagBits::eColor;
+		m_usageFlags = vk::ImageUsageFlagBits::eSampled | vk::ImageUsageFlagBits::eColorAttachment;
+		m_layout = vk::ImageLayout::eShaderReadOnlyOptimal;
 		if (isInputUsage)
 		{
-			m_vkImageUsageFlags |= vk::ImageUsageFlagBits::eInputAttachment;
+			m_usageFlags |= vk::ImageUsageFlagBits::eInputAttachment;
 		}
 		_init();
 	}
@@ -90,45 +113,50 @@ namespace vg
 		return 1u;
 	}
 
-	vk::Format Texture2DColorAttachment::getColorAttachmentFormat() const
+	const vk::Format Texture2DColorAttachment::getColorAttachmentFormat() const
 	{
-		return m_vkFormat;
+		return m_format;
 	}
 
-	vk::ImageLayout Texture2DColorAttachment::getColorAttachmentLayout() const
+	const vk::ImageLayout Texture2DColorAttachment::getColorAttachmentLayout() const
 	{
-		return m_vkImageLayout;
+		return m_layout;
 	}
 
-	vk::ImageView *Texture2DColorAttachment::getColorAttachmentImageView() const
+	const vk::ImageView *Texture2DColorAttachment::getColorAttachmentImageView() const
 	{
-		return m_pImageView.get();
+		if (m_pImageView == nullptr)throw std::runtime_error("Image view of texture don't exist!");
+		return m_pImageView->getImageView();
 	}
 
 	void Texture2DColorAttachment::_init()
 	{
 		Texture::_init();
-		//Transform Image layout to final layout.
-		auto pCommandBuffer = beginSingleTimeCommands();
-		_tranImageLayout(pCommandBuffer, *m_pImage, m_usingVkImageLayout, m_vkImageLayout,
-			0, m_mipMapLevels, 0, m_arrayLayer);
-		endSingleTimeCommands(pCommandBuffer);
-		m_usingVkImageLayout = m_vkImageLayout;
 	}
 
-	Texture2DDepthStencilAttachment::Texture2DDepthStencilAttachment(vk::Format format, uint32_t width, uint32_t height, Bool32 isInputUsage)
-		:Texture(format,  false)
+	Texture2DDepthStencilAttachment::Texture2DDepthStencilAttachment(vk::Format format
+	    , uint32_t width
+		, uint32_t height
+		, Bool32 isInputUsage
+		, Bool32 defaultImageView
+		, Bool32 defaultSampler
+		)
+		:Texture(format
+		,  false
+		, defaultImageView
+		, defaultSampler
+		)
 		, BaseDepthStencilAttachment(isInputUsage)
 	{
 		m_type = TextureType::TEX_2D_DEPTH_STENCIL_ATTACHMENT;
 		m_width = width;
 		m_height = height;
-		m_vkImageUsageFlags = vk::ImageUsageFlagBits::eSampled | vk::ImageUsageFlagBits::eDepthStencilAttachment;
-		m_vkImageLayout = vk::ImageLayout::eDepthStencilReadOnlyOptimal;
-		m_vkImageAspectFlags = vk::ImageAspectFlagBits::eDepth | vk::ImageAspectFlagBits::eStencil;
+		m_allAspectFlags = vk::ImageAspectFlagBits::eDepth | vk::ImageAspectFlagBits::eStencil;
+		m_usageFlags = vk::ImageUsageFlagBits::eSampled | vk::ImageUsageFlagBits::eDepthStencilAttachment;
+		m_layout = vk::ImageLayout::eDepthStencilReadOnlyOptimal;
 		if (isInputUsage)
 		{
-			m_vkImageUsageFlags |= vk::ImageUsageFlagBits::eInputAttachment;
+			m_usageFlags |= vk::ImageUsageFlagBits::eInputAttachment;
 		}
 		_checkDepthFormat();
 		_init();
@@ -163,19 +191,19 @@ namespace vg
 		return 1u;
 	}
 
-	vk::Format Texture2DDepthStencilAttachment::getDepthStencilAttachmentFormat() const
+	const vk::Format Texture2DDepthStencilAttachment::getDepthStencilAttachmentFormat() const
 	{
-		return m_vkFormat;
+		return m_format;
 	}
 
-	vk::ImageLayout Texture2DDepthStencilAttachment::getDepthStencilAttachmentLayout() const
+	const vk::ImageLayout Texture2DDepthStencilAttachment::getDepthStencilAttachmentLayout() const
 	{
-		return m_vkImageLayout;
+		return m_layout;
 	}
 
-	vk::ImageView *Texture2DDepthStencilAttachment::getDepthStencilAttachmentImageView() const
+	const vk::ImageView *Texture2DDepthStencilAttachment::getDepthStencilAttachmentImageView() const
 	{
-		return m_pImageView.get();
+		return m_pImageView->getImageView();
 	}
 
 	void Texture2DDepthStencilAttachment::applyData(const TextureDataInfo &layoutInfo
@@ -190,19 +218,12 @@ namespace vg
 	void Texture2DDepthStencilAttachment::_init()
 	{
 		Texture::_init();
-		//Transform Image layout to final layout.
-		auto pCommandBuffer = beginSingleTimeCommands();
-		_tranImageLayout(pCommandBuffer, *m_pImage, m_usingVkImageLayout, m_vkImageLayout,
-			0, m_mipMapLevels, 0, m_arrayLayer);
-		endSingleTimeCommands(pCommandBuffer);
-		m_usingVkImageLayout = m_vkImageLayout;
 	}
 
 	void Texture2DDepthStencilAttachment::_checkDepthFormat()
 	{
-		_updateVkFormat();
 		const auto &pPhysicalDevice = pApp->getPhysicalDevice();
-		const auto &props = pPhysicalDevice->getFormatProperties(m_vkFormat);
+		const auto &props = pPhysicalDevice->getFormatProperties(m_format);
 		if ((props.optimalTilingFeatures & vk::FormatFeatureFlagBits::eDepthStencilAttachment) !=
 			vk::FormatFeatureFlagBits::eDepthStencilAttachment)
 		{

@@ -16,14 +16,25 @@ namespace vg
 {
     struct PassData
 	{
+		struct TexData {
+			const Texture *pTexture;
+			const Texture::ImageView *pImageView;
+			const Texture::Sampler *pSampler;
+
+			TexData(const Texture *pTexture = nullptr
+			    , const Texture::ImageView *pImageView = nullptr
+				, const Texture::Sampler *pSampler = nullptr
+				);
+		};
+		
 		std::vector<std::string> arrDataNames;
 		std::unordered_map<std::string, std::vector<Byte>> mapDatas;
 		std::unordered_map<std::string, uint32_t> mapDataCounts;
 		std::vector<std::string> arrTexNames;
-		std::unordered_map<std::string, const Texture *> mapTextures;
+		std::unordered_map<std::string, TexData> mapTextures;
 
-		const Texture *getTexture(std::string name) const;
-		void setTexture(std::string name, const Texture *pTex);
+		TexData getTexture(std::string name) const;
+		void setTexture(std::string name, TexData texData);
 
 		void getDataValue(const std::string name, void *dst, uint32_t size, uint32_t offset) const;
 

@@ -8,7 +8,14 @@ namespace vg
 	class TextureCubeArray : public Texture
 	{
 	public:
-		TextureCubeArray(vk::Format format, Bool32 mipmap, uint32_t width, uint32_t height, uint32_t arraylength);
+		TextureCubeArray(vk::Format format
+		    , Bool32 mipmap
+			, uint32_t width
+			, uint32_t height
+			, uint32_t arraylength
+			, Bool32 defaultImageView = VG_TRUE
+			, Bool32 defaultSampler = VG_TRUE
+			);
 		~TextureCubeArray();
 		uint32_t getSize() const;
 		uint32_t getArrayLength() const;

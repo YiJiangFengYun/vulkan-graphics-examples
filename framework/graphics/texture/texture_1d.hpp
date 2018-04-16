@@ -8,7 +8,12 @@ namespace vg
 	class Texture1D : public Texture
 	{
 	public:
-		Texture1D(vk::Format format, Bool32 mipmap, uint32_t width);
+		Texture1D(vk::Format format
+		    , Bool32 mipmap
+			, uint32_t width
+			, Bool32 defaultImageView = VG_TRUE
+			, Bool32 defaultSampler = VG_TRUE
+			);
 		~Texture1D();
 		uint32_t getWidth() const;
 		void applyData(const TextureDataInfo &layoutInfo

@@ -45,20 +45,4 @@ namespace vg
 		std::pair<TextureType, vk::ImageViewType>(TextureType::TEX_2D_COLOR_ATTACHMENT, vk::ImageViewType::e2D),
 		std::pair<TextureType, vk::ImageViewType>(TextureType::TEX_2D_DEPTH_STENCIL_ATTACHMENT, vk::ImageViewType::e2D),
 	};
-
-	std::array<std::tuple<FilterMode, vk::Filter, vk::SamplerMipmapMode>, static_cast<size_t>(FilterMode::RANGE_SIZE)> arrFilerModeToVK =
-	{
-		std::tuple<FilterMode, vk::Filter, vk::SamplerMipmapMode>(FilterMode::NEAREST, vk::Filter::eNearest, vk::SamplerMipmapMode::eNearest),
-		std::tuple<FilterMode, vk::Filter, vk::SamplerMipmapMode>(FilterMode::LINEAR, vk::Filter::eLinear, vk::SamplerMipmapMode::eNearest),
-		std::tuple<FilterMode, vk::Filter, vk::SamplerMipmapMode>(FilterMode::TRILINEAR, vk::Filter::eLinear, vk::SamplerMipmapMode::eLinear)
-	};
-
-	std::array<std::pair<SamplerAddressMode, vk::SamplerAddressMode>, static_cast<size_t>(SamplerAddressMode::RANGE_SIZE)> arrSamplerAddressModeToVK = 
-	{
-		std::pair<SamplerAddressMode, vk::SamplerAddressMode>(SamplerAddressMode::REPEAT, vk::SamplerAddressMode::eRepeat),
-		std::pair<SamplerAddressMode, vk::SamplerAddressMode>(SamplerAddressMode::MIRRORED_REPEAT, vk::SamplerAddressMode::eMirroredRepeat),
-		std::pair<SamplerAddressMode, vk::SamplerAddressMode>(SamplerAddressMode::CLAMP_TO_EDGE, vk::SamplerAddressMode::eClampToEdge),
-		std::pair<SamplerAddressMode, vk::SamplerAddressMode>(SamplerAddressMode::CLAMP_TO_BORDER, vk::SamplerAddressMode::eClampToBorder),
-		std::pair<SamplerAddressMode, vk::SamplerAddressMode>(SamplerAddressMode::MIRROR_CLAMP_TO_EDGE, vk::SamplerAddressMode::eMirrorClampToEdge)
-	};
 }

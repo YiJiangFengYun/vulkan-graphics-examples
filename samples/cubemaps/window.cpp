@@ -134,16 +134,31 @@ void Window::_createTexture()
 	textureLayout.pComponent = components.data();
 	m_pCubeMapTex->applyData(textureLayout, gliTex2D.data(), gliTex2D.size());
 
-	m_pCubeMapTex->setFilterMode(vg::FilterMode::TRILINEAR);
-	m_pCubeMapTex->setSamplerAddressMode(vg::SamplerAddressMode::REPEAT);
-
 	auto pDevice = pApp->getDevice();
 	auto pPhysicalDevice = pApp->getPhysicalDevice();
+	vk::Bool32 enableAnisotropy = VK_FALSE;
+	float anisotropy = 0.0f;
 	if (pApp->getPhysicalDeviceFeatures().samplerAnisotropy)
 	{
-		auto anisotropy = pPhysicalDevice->getProperties().limits.maxSamplerAnisotropy;
-		m_pCubeMapTex->setAnisotropy(anisotropy);
+		enableAnisotropy = VK_TRUE;
+		anisotropy = pPhysicalDevice->getProperties().limits.maxSamplerAnisotropy;
 	}
+
+	vg::Texture::SamplerCreateInfo info = {
+		vk::SamplerCreateFlags(),
+		vk::Filter::eLinear,
+		vk::Filter::eLinear,
+		vk::SamplerMipmapMode::eLinear,
+		vk::SamplerAddressMode::eRepeat,
+		vk::SamplerAddressMode::eRepeat,
+		vk::SamplerAddressMode::eRepeat,
+		0.0f,
+		enableAnisotropy,
+		anisotropy,
+		0.0f,
+		(float)(m_pCubeMapTex->getImage()->getInfo().mipLevels),
+	};
+	m_pCubeMapTex->createSampler("other_sampler", info);
 }
 
 void Window::_createMaterial()
@@ -173,7 +188,12 @@ void Window::_createMaterial()
 		pPass->setBuildInDataInfo(buildInDataInfo);
 	    pPass->setCullMode(vg::CullModeFlagBits::FRONT);
 	    pPass->setFrontFace(vg::FrontFaceType::CLOCKWISE);
-	    pPass->setMainTexture(m_pCubeMapTex.get());
+	    pPass->setMainTexture(m_pCubeMapTex.get(),
+			vg::ShaderStageFlagBits::FRAGMENT,
+			vg::DescriptorType::COMBINED_IMAGE_SAMPLER,
+			nullptr,
+			m_pCubeMapTex->getSampler("other_sampler")
+			);
 	    pPass->apply();
 	    
 	    pMaterial->apply();
@@ -207,7 +227,12 @@ void Window::_createMaterial()
 	    depthStencilState.depthWriteEnable = VG_TRUE;
 	    depthStencilState.depthCompareOp = vk::CompareOp::eLessOrEqual;
 	    pPass->setDepthStencilInfo(depthStencilState);
-	    pPass->setMainTexture(m_pCubeMapTex.get());
+	    pPass->setMainTexture(m_pCubeMapTex.get(),
+			vg::ShaderStageFlagBits::FRAGMENT,
+			vg::DescriptorType::COMBINED_IMAGE_SAMPLER,
+			nullptr,
+			m_pCubeMapTex->getSampler("other_sampler")
+		    );
 	    pPass->setDataValue("other_info", m_otherInfo, 2u);	
 	    pPass->apply();
 	    
@@ -322,7 +347,7 @@ void Window::_onUpdate()
 	ImGui::SetNextWindowPos(ImVec2(pos.x, pos.y + size.y + 10));
 	ImGui::SetNextWindowSize(ImVec2(0, 0));
 	ImGui::Begin("Settings", nullptr, ImGuiWindowFlags_AlwaysAutoResize | ImGuiWindowFlags_NoResize | ImGuiWindowFlags_NoMove);
-	if (ImGui::SliderFloat("LOD bias", &m_otherInfo.lodBias, 0.0f, (float)m_pCubeMapTex->getMipmapLevels())) {
+	if (ImGui::SliderFloat("LOD bias", &m_otherInfo.lodBias, 0.0f, (float)m_pCubeMapTex->getImage()->getInfo().mipLevels)) {
 		auto pPass = m_pMaterialReflect->getMainPass();
 		pPass->setDataValue("other_info", m_otherInfo, 2u);
 		pPass->apply();

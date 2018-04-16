@@ -450,7 +450,7 @@ namespace vgim
 		layoutInfo.pComponent = &component;
 		m_pFontTexture->applyData(layoutInfo, reinterpret_cast<void *>(pixels), size);
         
-        io.Fonts->TexID = reinterpret_cast<void *>(VkImage(*(m_pFontTexture->getImage())));
+        io.Fonts->TexID = reinterpret_cast<void *>(VkImage(*(m_pFontTexture->getImage()->getImage())));
 
 		auto pPass = m_pMaterial->getMainPass();
 		pPass->setMainTexture(m_pFontTexture.get());

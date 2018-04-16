@@ -2,19 +2,29 @@
 
 namespace vg
 {
-	TextureDepthStencilAttachment::TextureDepthStencilAttachment(vk::Format format, uint32_t width, uint32_t height, Bool32 isInputUsage)
-		: Texture(format, VG_FALSE)
+	TextureDepthStencilAttachment::TextureDepthStencilAttachment(vk::Format format
+	    , uint32_t width
+		, uint32_t height
+		, Bool32 isInputUsage
+		, Bool32 defaultImageView
+		, Bool32 defaultSampler
+		)
+		: Texture(format
+		, VG_FALSE
+		, defaultImageView
+		, defaultSampler
+		)
 		, BaseDepthStencilAttachment(isInputUsage)
 	{
 		m_type = TextureType::DEPTH_STENCIL_ATTACHMENT;
 		m_width = width;
 		m_height = height;
-		m_vkImageUsageFlags = vk::ImageUsageFlagBits::eDepthStencilAttachment;
-		m_vkImageLayout = vk::ImageLayout::eDepthStencilAttachmentOptimal;
-		m_vkImageAspectFlags = vk::ImageAspectFlagBits::eDepth | vk::ImageAspectFlagBits::eStencil;
+		m_allAspectFlags = vk::ImageAspectFlagBits::eDepth | vk::ImageAspectFlagBits::eStencil;
+		m_usageFlags = vk::ImageUsageFlagBits::eDepthStencilAttachment;
+		m_layout = vk::ImageLayout::eDepthStencilAttachmentOptimal;
 		if (isInputUsage)
 		{
-			m_vkImageUsageFlags |= vk::ImageUsageFlagBits::eInputAttachment;
+			m_usageFlags |= vk::ImageUsageFlagBits::eInputAttachment;
 		}
 		_init();
 	}
@@ -48,38 +58,31 @@ namespace vg
 		return 1u;
 	}
 
-	vk::Format TextureDepthStencilAttachment::getDepthStencilAttachmentFormat() const
+	const vk::Format TextureDepthStencilAttachment::getDepthStencilAttachmentFormat() const
 	{
-		return m_vkFormat;
+		return m_format;
 	}
 
-	vk::ImageLayout TextureDepthStencilAttachment::getDepthStencilAttachmentLayout() const
+	const vk::ImageLayout TextureDepthStencilAttachment::getDepthStencilAttachmentLayout() const
 	{
-		return m_vkImageLayout;
+		return m_layout;
 	}
 
-	vk::ImageView *TextureDepthStencilAttachment::getDepthStencilAttachmentImageView() const
+	const vk::ImageView *TextureDepthStencilAttachment::getDepthStencilAttachmentImageView() const
 	{
-		return m_pImageView.get();
+		return m_pImageView->getImageView();
 	}
 
 	void TextureDepthStencilAttachment::_init()
 	{
 		_checkDepthFormat();
 		Texture::_init();
-		//Transform Image layout to final layout.
-		auto pCommandBuffer = beginSingleTimeCommands();
-		_tranImageLayout(pCommandBuffer, *m_pImage, m_usingVkImageLayout, m_vkImageLayout,
-			0, m_mipMapLevels, 0, m_arrayLayer);
-		endSingleTimeCommands(pCommandBuffer);
-		m_usingVkImageLayout = m_vkImageLayout;
 	}
 
 	void TextureDepthStencilAttachment::_checkDepthFormat()
 	{
-		_updateVkFormat();
 		const auto &pPhysicalDevice = pApp->getPhysicalDevice();
-		const auto &props = pPhysicalDevice->getFormatProperties(m_vkFormat);
+		const auto &props = pPhysicalDevice->getFormatProperties(m_format);
 		if ((props.optimalTilingFeatures & vk::FormatFeatureFlagBits::eDepthStencilAttachment) !=
 			vk::FormatFeatureFlagBits::eDepthStencilAttachment)
 		{

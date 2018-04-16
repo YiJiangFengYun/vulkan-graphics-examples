@@ -44,24 +44,318 @@ namespace vg
 
 	}
 
-	Texture::Texture(vk::Format format, Bool32 mipMap)
+	Texture::ImageInfo::ImageInfo(vk::ImageCreateFlags flags
+		, vk::ImageType imageType
+		, vk::Format format
+		, vk::Extent3D extent
+		, uint32_t mipLevels
+		, uint32_t arrayLayers
+        , vk::SampleCountFlagBits samples
+		, vk::ImageTiling tiling
+		, vk::ImageUsageFlags usage
+		, vk::SharingMode sharingMode
+		, vk::ImageLayout layout
+		, vk::ImageAspectFlags allAspect
+		)
+		: flags(flags)
+		, imageType(imageType)
+		, format(format)
+		, extent(extent)
+		, mipLevels(mipLevels)
+		, arrayLayers(arrayLayers)
+		, samples(samples)
+		, tiling(tiling)
+		, usage(usage)
+		, sharingMode(sharingMode)
+		, layout(layout)
+		, allAspect(allAspect)
+	{
+
+	}
+
+	Texture::Image::Image(ImageInfo info)
+	    : m_info(info)
+		, m_pImage()
+		, m_pImageMemory()
+	{
+		_create();
+	}
+
+	Texture::ImageInfo Texture::Image::getInfo() const
+	{
+		return m_info;
+	}
+
+	const vk::Image *Texture::Image::getImage() const
+	{
+		return m_pImage.get();
+	}
+
+	const vk::DeviceMemory *Texture::Image::getImageMemory() const
+	{
+		return m_pImageMemory.get();
+	}
+    
+	void Texture::Image::_create()
+	{
+		auto &info = m_info;
+		vk::ImageCreateInfo createInfo = {
+			info.flags,
+			info.imageType,
+			info.format,
+			info.extent,
+			info.mipLevels,
+			info.arrayLayers,
+			info.samples,
+			info.tiling,
+			info.usage,
+			info.sharingMode,
+			0U,
+			nullptr,
+			vk::ImageLayout::eUndefined
+		};
+
+		auto pDevice = pApp->getDevice();
+		m_pImage = fd::createImage(pDevice, createInfo);
+
+		const auto &memRequirements = pDevice->getImageMemoryRequirements(*m_pImage);
+
+		vk::MemoryAllocateInfo allocInfo = {
+			memRequirements.size,
+			vg::findMemoryType(pApp->getPhysicalDevice(), memRequirements.memoryTypeBits, vk::MemoryPropertyFlagBits::eDeviceLocal)
+		};
+
+		m_pImageMemory = fd::allocateMemory(pDevice, allocInfo);
+
+		pDevice->bindImageMemory(*m_pImage, *m_pImageMemory, vk::DeviceSize(0));
+
+		if (m_info.layout != vk::ImageLayout::eUndefined) {
+			//Transform Image layout to final layout.
+		    auto pCommandBuffer = beginSingleTimeCommands();
+
+			vk::ImageMemoryBarrier barrier = {};
+		    barrier.oldLayout = vk::ImageLayout::eUndefined;
+		    barrier.newLayout = info.layout;
+		    barrier.srcQueueFamilyIndex = VK_QUEUE_FAMILY_IGNORED;
+		    barrier.dstQueueFamilyIndex = VK_QUEUE_FAMILY_IGNORED;
+		    barrier.image = *m_pImage;
+    
+		    barrier.subresourceRange.aspectMask = m_info.allAspect;
+		    barrier.subresourceRange.baseMipLevel = 0u;
+		    barrier.subresourceRange.levelCount = m_info.mipLevels;
+		    barrier.subresourceRange.baseArrayLayer = 0u;
+		    barrier.subresourceRange.layerCount = m_info.arrayLayers;
+
+			vk::PipelineStageFlags srcStageMask = vk::PipelineStageFlagBits::eAllCommands;
+			vk::PipelineStageFlags dstStageMask = vk::PipelineStageFlagBits::eAllCommands;
+    
+		    pCommandBuffer->pipelineBarrier(srcStageMask,
+		    	dstStageMask,
+		    	vk::DependencyFlags(),
+		    	nullptr, nullptr,
+		    	barrier);
+
+		    endSingleTimeCommands(pCommandBuffer);
+		}
+
+		
+	}
+
+	Texture::ImageViewInfo::ImageViewInfo(vk::ImageViewCreateFlags flags
+	    , vk::Image image
+	    , vk::ImageViewType viewType
+	    , vk::Format format
+	    , vk::ComponentMapping coponents
+        , vk::ImageSubresourceRange subResourceRange
+	    )
+		: flags(flags)
+		, image(image)
+		, viewType(viewType)
+		, format(format)
+		, coponents(coponents)
+		, subResourceRange(subResourceRange)
+	{
+
+	}
+
+	Texture::ImageViewCreateInfo::ImageViewCreateInfo(vk::ComponentMapping coponents
+        , vk::ImageSubresourceRange subResourceRange
+		)
+		: coponents(coponents)
+		, subResourceRange(subResourceRange)
+	{
+
+	}
+
+	Texture::ImageView::ImageView(ImageViewInfo info)
+	    : m_info(info)
+		, m_pImageView()
+	{
+		_create();
+	}
+
+	Texture::ImageViewInfo Texture::ImageView::getInfo() const
+	{
+		return m_info;
+	}
+
+	const vk::ImageView *Texture::ImageView::getImageView() const
+	{
+		return m_pImageView.get();
+	}
+
+	void Texture::ImageView::_create()
+	{
+		auto &info = m_info;
+        vk::ImageViewCreateInfo createInfo = {
+			info.flags,
+			info.image,
+			info.viewType,
+			info.format,
+			info.coponents,
+			info.subResourceRange,
+		};
+
+		auto pDevice = pApp->getDevice();
+		m_pImageView = fd::createImageView(pDevice, createInfo);
+	}
+
+	Texture::SamplerInfo::SamplerInfo(vk::SamplerCreateFlags flags
+	    , vk::Filter magFilter
+	    , vk::Filter minFilter
+	    , vk::SamplerMipmapMode mipmapMode
+	    , vk::SamplerAddressMode addressModeU
+	    , vk::SamplerAddressMode addressModeV
+	    , vk::SamplerAddressMode addressModeW
+	    , float mipLodBias
+	    , vk::Bool32 anisotropyEnable
+	    , float maxAnisotropy
+	    , vk::Bool32 compareEnable
+	    , vk::CompareOp compareOp
+	    , float minLod
+	    , float maxLod
+	    , vk::BorderColor borderColor
+	    , vk::Bool32 unnormalizedCoordinates
+	    )
+		: flags(flags)
+		, magFilter(magFilter)
+		, minFilter(minFilter)
+		, mipmapMode(mipmapMode)
+		, addressModeU(addressModeU)
+		, addressModeV(addressModeV)
+		, addressModeW(addressModeW)
+		, mipLodBias(mipLodBias)
+		, anisotropyEnable(anisotropyEnable)
+		, maxAnisotropy(maxAnisotropy)
+		, compareEnable(compareEnable)
+		, compareOp(compareOp)
+		, minLod(minLod)
+		, maxLod(maxLod)
+		, borderColor(borderColor)
+		, unnormalizedCoordinates(unnormalizedCoordinates)
+	{
+
+	}
+
+	Texture::SamplerCreateInfo::SamplerCreateInfo(vk::SamplerCreateFlags flags
+		, vk::Filter magFilter
+		, vk::Filter minFilter
+		, vk::SamplerMipmapMode mipmapMode
+		, vk::SamplerAddressMode addressModeU
+		, vk::SamplerAddressMode addressModeV
+		, vk::SamplerAddressMode addressModeW
+		, float mipLodBias
+		, vk::Bool32 anisotropyEnable
+		, float maxAnisotropy
+		, float minLod
+		, float maxLod
+		, vk::BorderColor borderColor
+		)
+		: flags(flags)
+		, magFilter(magFilter)
+		, minFilter(minFilter)
+		, mipmapMode(mipmapMode)
+		, addressModeU(addressModeU)
+		, addressModeV(addressModeV)
+		, addressModeW(addressModeW)
+		, mipLodBias(mipLodBias)
+		, anisotropyEnable(anisotropyEnable)
+		, maxAnisotropy(maxAnisotropy)
+		, minLod(minLod)
+		, maxLod(maxLod)
+		, borderColor(borderColor)
+	{
+
+	}
+
+	Texture::Sampler::Sampler(SamplerInfo info)
+	    : m_info(info)
+		, m_pSampler()
+	{
+		_create();
+	}
+
+	Texture::SamplerInfo Texture::Sampler::getInfo() const
+	{
+		return m_info;
+	}
+
+	const vk::Sampler *Texture::Sampler::getSampler() const
+	{
+		return m_pSampler.get();
+	}
+
+	void Texture::Sampler::_create()
+	{
+		auto &info = m_info;
+		vk::SamplerCreateInfo createInfo = {
+			info.flags,                
+			info.magFilter, 
+			info.minFilter,  
+			info.mipmapMode,  
+			info.addressModeU, 
+			info.addressModeV, 
+			info.addressModeW, 
+			info.mipLodBias, 
+			info.anisotropyEnable,     
+			info.maxAnisotropy,
+			info.compareEnable, 
+			info.compareOp, 
+			info.minLod, 
+			info.maxLod, 
+			info.borderColor,
+			info.unnormalizedCoordinates,
+		};
+
+		auto pDevice = pApp->getDevice();
+		m_pSampler = fd::createSampler(pDevice, createInfo);
+	}
+
+	Texture::Texture(vk::Format format, Bool32 mipMap, Bool32 defaultImageView, Bool32 defaultSampler)
 		: Base(BaseType::TEXTURE)
-		, m_format(format)
-		, m_mipMap(mipMap)
+		, m_type()
 		, m_width(1U)
 		, m_height(1U)
 		, m_depth(1U)
 		, m_arrayLength(1U)
-		, m_filterMode(FilterMode::LINEAR)
-		, m_samplerAddressMode(SamplerAddressMode::CLAMP_TO_BORDER)
-		, m_anisotropy(0.0f)
-		, m_vkImageUsageFlags(vk::ImageUsageFlagBits::eTransferDst | vk::ImageUsageFlagBits::eSampled) //default image usage is for sampled texture.
-		, m_vkImageLayout(vk::ImageLayout::eShaderReadOnlyOptimal) //default image layout is for sampled texture.
-		, m_vkImageAspectFlags(vk::ImageAspectFlagBits::eColor) //default image aspect is for sampled texture.
+		, m_format(format)		
+		, m_mipMap(mipMap)
+		, m_mipLevels()
+		, m_arrayLayers()
+		, m_allAspectFlags()
+		, m_usageFlags()
+		, m_layout()
+		, m_isCreateDefaultImageView(defaultImageView)
+		, m_isCreateDefaultSampler(defaultSampler)
 		, m_dataLayout()
 		, m_components()
 		, m_pMemory(nullptr)
 		, m_memorySize(0u)
+		, m_pImage()
+		, m_pImageView()
+		, m_pSampler()
+		, m_mapPOtherImageViews()
+		, m_mapPOtherSamplers()
 	{
 
 	}
@@ -74,52 +368,9 @@ namespace vg
 		}
 	}
 
-	float Texture::getAnisotropy() const
-	{
-		return m_anisotropy;
-	}
-
-	void Texture::setAnisotropy(float value)
-	{
-		m_anisotropy = value;
-		//Need to receate sampler when chaning anisotropy.
-		_createSampler();
-	}
-
-	FilterMode Texture::getFilterMode() const
-	{
-		return m_filterMode;
-	}
-
-	void Texture::setFilterMode(FilterMode value)
-	{
-		m_filterMode = value;
-		_updateVkFilter();
-		//Need to receate sampler when chaning filterMode.
-		_createSampler();
-	}
-
-	SamplerAddressMode Texture::getSamplerAddressMode() const
-	{
-		return m_samplerAddressMode;
-	}
-
-	void Texture::setSamplerAddressMode(SamplerAddressMode value)
-	{
-		m_samplerAddressMode = value;
-		_updateVkSamplerAddressMode();
-		//Need to receate sampler when chaning sampler address mode.
-		_createSampler();
-	}
-
 	TextureType Texture::getType() const
 	{
 		return m_type;
-	}
-
-	vk::Format Texture::getFormat() const
-	{
-		return m_format;
 	}
 
 	Bool32 Texture::getIsMipmap() const
@@ -127,58 +378,105 @@ namespace vg
 		return m_mipMap;
 	}
 
-	uint32_t Texture::getMipmapLevels() const
-	{
-		return m_mipMapLevels;
-	}
-
-	uint32_t Texture::getArrayLayerCount() const
-	{
-		return m_arrayLayer;
-	}
-
-	vk::Format Texture::getVKFormat() const
-	{
-		return m_vkFormat;
-	}
-
-	vk::ImageLayout Texture::getImageLayout() const
-	{
-		return m_vkImageLayout;
-	}
-
-	vk::Image *Texture::getImage() const
+	const Texture::Image *Texture::getImage() const
 	{
 		return m_pImage.get();
 	}
 
-	vk::DeviceMemory *Texture::getImageMemory() const
-	{
-		return m_pImageMemory.get();
-	}
-
-	vk::ImageView *Texture::getImageView() const
+	const Texture::ImageView *Texture::getImageView() const
 	{
 		return m_pImageView.get();
 	}
 
-	vk::Sampler *Texture::getSampler() const
+	const Texture::Sampler *Texture::getSampler() const
 	{
 		return m_pSampler.get();
 	}
 
-	vk::ImageAspectFlags Texture::getImageAspectFlags() const
+	const Texture::ImageView *Texture::createImageView(std::string name, ImageViewCreateInfo createInfo)
 	{
-		return m_vkImageAspectFlags;
+		auto pImageView = m_mapPOtherImageViews[name];
+		if (pImageView != nullptr) {
+			VG_LOG(plog::warning) << "Image view its key is " << name << " has exist!" << std::endl;
+			return pImageView.get();
+		}
+
+		ImageViewInfo info = {
+			vk::ImageViewCreateFlags(),
+			*(m_pImage->getImage()),
+			_getImageViewType(),
+			m_format,
+			createInfo.coponents,
+			createInfo.subResourceRange,
+		};
+
+		pImageView = std::shared_ptr<ImageView>{new ImageView(info)};
+		m_mapPOtherImageViews[name] = pImageView;
+		return pImageView.get();
+		
+	}
+
+	const Texture::ImageView *Texture::getImageView(std::string name) const
+	{
+		auto &map = m_mapPOtherImageViews;
+		const auto& iterator = map.find(name);
+		if (iterator == map.cend())
+		{
+			return nullptr;
+		}
+		else
+		{
+			return iterator->second.get();
+		}
+	}
+
+	const Texture::Sampler *Texture::createSampler(std::string name, SamplerCreateInfo createInfo)
+	{
+		auto pSampler = m_mapPOtherSamplers[name];
+		if (pSampler != nullptr) {
+			VG_LOG(plog::warning) << "Sampler its key is " << name << " has exist!" << std::endl;
+			return pSampler.get();
+		}
+		SamplerInfo info = {
+			createInfo.flags,
+			createInfo.magFilter,
+			createInfo.minFilter,
+			createInfo.mipmapMode,
+			createInfo.addressModeU,
+			createInfo.addressModeV,
+			createInfo.addressModeW,
+			createInfo.mipLodBias,
+			createInfo.anisotropyEnable,
+			createInfo.maxAnisotropy,
+			VG_FALSE,
+			vk::CompareOp::eNever,
+			createInfo.minLod,
+			createInfo.maxLod,
+			createInfo.borderColor,
+		};
+		pSampler = std::shared_ptr<Sampler>{new Sampler(info)};
+		m_mapPOtherSamplers[name] = pSampler;
+		return pSampler.get();
+	}
+
+	const Texture::Sampler *Texture::getSampler(std::string name) const
+	{
+        auto &map = m_mapPOtherSamplers;
+		const auto& iterator = map.find(name);
+		if (iterator == map.cend())
+		{
+			return nullptr;
+		}
+		else
+		{
+			return iterator->second.get();
+		}
 	}
 
 	void Texture::_init()
 	{
 		_updateMipMapLevels();
 		_updateArrayLayer();
-		_updateVkFormat();
-		_updateVkFilter();
-		_updateVkSamplerAddressMode();
 		_createImage();
 		_createImageView();
 		_createSampler();
@@ -190,17 +488,17 @@ namespace vg
 		{
 			// calculate num of mip maps
 			// numLevels = 1 + floor(log2(max(w, h, d)))
-			m_mipMapLevels = static_cast<uint32_t>(std::floor(std::log2(std::max({ m_width, m_height, m_depth }))) + 1);
+			m_mipLevels = static_cast<uint32_t>(std::floor(std::log2(std::max({ m_width, m_height, m_depth }))) + 1);
 		}
 		else
 		{
-			m_mipMapLevels = 1;
+			m_mipLevels = 1u;
 		}
 	}
 
 	void Texture::_updateArrayLayer()
 	{
-		uint32_t arraylayer;
+		uint32_t arraylayers;
 		switch (m_type)
 		{
 		case TextureType::TEX_1D:
@@ -211,23 +509,23 @@ namespace vg
 		case TextureType::COLOR_ATTACHMENT:
 		case TextureType::DEPTH_STENCIL_ATTACHMENT:
 		{
-			arraylayer = 1U;
+			arraylayers = 1U;
 			break;
 		}
 		case TextureType::TEX_1D_ARRAY:
 		case TextureType::TEX_2D_ARRAY:
 		{
-			arraylayer = m_arrayLength;
+			arraylayers = m_arrayLength;
 			break;
 		}
 		case TextureType::CUBE:
 		{
-			arraylayer = static_cast<uint32_t>(CubemapFace::RANGE_SIZE);
+			arraylayers = static_cast<uint32_t>(CubemapFace::RANGE_SIZE);
 			break;
 		}
 		case TextureType::CUBE_ARRARY:
 		{
-			arraylayer = static_cast<uint32_t>(CubemapFace::RANGE_SIZE) * m_arrayLength;
+			arraylayers = static_cast<uint32_t>(CubemapFace::RANGE_SIZE) * m_arrayLength;
 			break;
 		}
 		default:
@@ -235,45 +533,7 @@ namespace vg
 			break;
 		}
 
-		m_arrayLayer = arraylayer;
-	}
-
-	void Texture::_updateVkFormat()
-	{
-		vk::Format vkFormat = m_format;
-
-#ifdef DEBUG
-		if (vkFormat == vk::Format::eUndefined)
-		{
-			throw std::invalid_argument("Invalid format argument at creating image for texture.");
-		}
-#endif // DEBUG
-
-		m_vkFormat = vkFormat;
-	}
-
-	void Texture::_updateVkFilter()
-	{
-		for (const auto& item : arrFilerModeToVK)
-		{
-			if (std::get<0>(item) == m_filterMode)
-			{
-				m_vkFilter = std::get<1>(item);
-				m_vkSamplerMipmapMode = std::get<2>(item);
-				break;
-			}
-		}
-	}
-
-	void Texture::_updateVkSamplerAddressMode()
-	{
-		for (const auto& item : arrSamplerAddressModeToVK)
-		{
-			if (item.first == m_samplerAddressMode)
-			{
-				m_vkSamplerAddressMode = item.second;
-			}
-		}
+		m_arrayLayers = arraylayers;
 	}
 
 	void Texture::_createImage()
@@ -389,57 +649,31 @@ namespace vg
 			break;
 		}
 
-		vk::ImageLayout imageLayout = vk::ImageLayout::eUndefined;
-
-		vk::ImageCreateInfo createInfo = {
+		ImageInfo info = {
 			flags,
 			vkImageType,
-			m_vkFormat,
+			m_format,
 			{
 				m_width,
 				m_height,
 				m_depth
 			},
-			m_mipMapLevels,
-			m_arrayLayer,
+			m_mipLevels,
+			m_arrayLayers,
 			vk::SampleCountFlagBits::e1,
 			vk::ImageTiling::eOptimal,
-			m_vkImageUsageFlags,
+			m_usageFlags | vk::ImageUsageFlagBits::eTransferDst,
 			vk::SharingMode::eExclusive,
-			0U,
-			nullptr,
-			imageLayout
+			m_layout,
+			m_allAspectFlags,
 		};
 
-		auto pDevice = pApp->getDevice();
-		m_pImage = fd::createImage(pDevice, createInfo);
-
-		const auto &memRequirements = pDevice->getImageMemoryRequirements(*m_pImage);
-
-		vk::MemoryAllocateInfo allocInfo = {
-			memRequirements.size,
-			vg::findMemoryType(pApp->getPhysicalDevice(), memRequirements.memoryTypeBits, vk::MemoryPropertyFlagBits::eDeviceLocal)
-		};
-
-		m_pImageMemory = fd::allocateMemory(pDevice, allocInfo);
-
-		pDevice->bindImageMemory(*m_pImage, *m_pImageMemory, vk::DeviceSize(0));
-
-		m_usingVkImageLayout = imageLayout;
+		m_pImage = std::shared_ptr<Image>{new Image(info)};
 	}
 
 	void Texture::_createImageView()
 	{
-
-		vk::Format vkFormat = m_format;
-
-#ifdef DEBUG
-		if (vkFormat == vk::Format::eUndefined)
-		{
-			throw std::invalid_argument("Invalid format argument at creating image for texture.");
-		}
-#endif // DEBUG
-
+	   if (m_isCreateDefaultImageView == VG_FALSE) return;
 #ifdef DEBUG
 		Bool32 isFind;
 #endif // DEBUG
@@ -465,55 +699,29 @@ namespace vg
 			throw std::invalid_argument("Invalid type argument at creating image view for texture.");
 		}
 #endif // DEBUG
-
-		vk::ImageViewCreateInfo createInfo = {
+        ImageViewInfo info = {
 			vk::ImageViewCreateFlags(),
-			*m_pImage,
+			*(m_pImage->getImage()),
 			vkImageViewType,
-			vkFormat,
+			m_format,
+			vk::ComponentMapping(),
 			{
-				vk::ComponentSwizzle::eIdentity,
-				vk::ComponentSwizzle::eIdentity,
-				vk::ComponentSwizzle::eIdentity,
-				vk::ComponentSwizzle::eIdentity
+				m_allAspectFlags,
+				uint32_t(0),
+				m_mipLevels,
+				uint32_t(0),
+				m_arrayLayers,
 			},
-			{
-				m_vkImageAspectFlags,
-				uint32_t(0),
-				m_mipMapLevels,
-				uint32_t(0),
-				m_arrayLayer
-			}
 		};
 
-		auto pDevice = pApp->getDevice();
-		m_pImageView = fd::createImageView(pDevice, createInfo);
+		m_pImageView = std::shared_ptr<ImageView>{new ImageView(info)};
 	}
 
 	void Texture::_createSampler()
 	{
-
-		vk::SamplerCreateInfo createInfo = {
-			vk::SamplerCreateFlags(),                //flags
-			m_vkFilter,                              //magFilter
-			m_vkFilter,                              //minFilter
-			m_vkSamplerMipmapMode,                   //mipmapMode
-			m_vkSamplerAddressMode,                  //addressModeU
-			m_vkSamplerAddressMode,                  //addressModeV
-			m_vkSamplerAddressMode,                  //addressModeW
-			0.0f,                                    //mipLodBias
-			m_anisotropy <= 0.0f ? VkBool32(VK_FALSE) : VkBool32(VK_TRUE),      //anisotropyEnable
-			m_anisotropy <= 0.0f ? 1.0f : m_anisotropy, //maxAnisotropy
-			VkBool32(VK_FALSE),                      //compareEnable
-			vk::CompareOp::eNever,                   //compareOp
-			0.0f,                                    //minLod
-			m_mipMap ? m_mipMapLevels : 0.0f,        //maxLod
-			vk::BorderColor::eFloatTransparentBlack, //borderColor
-			VkBool32(VK_FALSE)                       //unnormalizedCoordinates
-		};
-
-		auto pDevice = pApp->getDevice();
-		m_pSampler = fd::createSampler(pDevice, createInfo);
+		if (m_isCreateDefaultSampler == VG_FALSE) return;
+		SamplerInfo info = {};
+		m_pSampler = std::shared_ptr<Sampler>{new Sampler(info)};
 	}
 
 	void Texture::_applyData(const TextureDataInfo &layoutInfo
@@ -522,6 +730,7 @@ namespace vg
 		, Bool32 cacheMemory
 		, Bool32 createMipmaps)
 	{
+		vk::Image image = *(m_pImage->getImage());
 		if (cacheMemory)
 		{
 			m_components.resize(layoutInfo.componentCount);
@@ -566,16 +775,16 @@ namespace vg
 			{
 				//transfer image from initial current image layout to dst layout.
 				//here use undefined layout not to use curr layout of image, it can clear image old data.
-				_tranImageLayout(pCommandBuffer, *m_pImage, m_usingVkImageLayout, vk::ImageLayout::eTransferDstOptimal,
-					0, 1, 0, m_arrayLayer);
+				_tranImageLayout(pCommandBuffer, image, m_layout, vk::ImageLayout::eTransferDstOptimal,
+					0, 1, 0, m_arrayLayers);
 
 				//copy the first mip of the chain.
-				_copyBufferToImage(pCommandBuffer, *pStagingBuffer, *m_pImage, m_width, m_height, m_depth, 0, 0, m_arrayLayer);
+				_copyBufferToImage(pCommandBuffer, *pStagingBuffer, image, m_width, m_height, m_depth, 0, 0, m_arrayLayers);
 
 #ifdef DEBUG
 				//check format.
 				const auto &pPhysicalDevice = pApp->getPhysicalDevice();
-				const auto &formatProperties = pPhysicalDevice->getFormatProperties(m_vkFormat);
+				const auto &formatProperties = pPhysicalDevice->getFormatProperties(m_format);
 				if ((formatProperties.optimalTilingFeatures & vk::FormatFeatureFlagBits::eBlitSrc) == vk::FormatFeatureFlags())
 				{
 					throw std::runtime_error("The texture format don't support for blit source, mip-chain generation requires it.");
@@ -587,18 +796,19 @@ namespace vg
 #endif // DEBUG
 
 				//transition first mip level to transfer source for read during blit.
-				_tranImageLayout(pCommandBuffer, *m_pImage, vk::ImageLayout::eTransferDstOptimal, vk::ImageLayout::eTransferSrcOptimal, 0, 1, 0, m_arrayLayer);
+				_tranImageLayout(pCommandBuffer, image, vk::ImageLayout::eTransferDstOptimal, 
+				vk::ImageLayout::eTransferSrcOptimal, 0, 1, 0, m_arrayLayers);
 
-				for (uint32_t i = 1; i < m_mipMapLevels; ++i)
+				for (uint32_t i = 1; i < m_mipLevels; ++i)
 				{
 					vk::ImageBlit blit;
-					blit.srcSubresource.aspectMask = m_vkImageAspectFlags;
+					blit.srcSubresource.aspectMask = m_allAspectFlags;
 					blit.srcSubresource.baseArrayLayer = 0;
-					blit.srcSubresource.layerCount = m_arrayLayer;
+					blit.srcSubresource.layerCount = m_arrayLayers;
 					blit.srcSubresource.mipLevel = i - 1;
-					blit.dstSubresource.aspectMask = m_vkImageAspectFlags;
+					blit.dstSubresource.aspectMask = m_allAspectFlags;
 					blit.dstSubresource.baseArrayLayer = 0;
-					blit.dstSubresource.layerCount = m_arrayLayer;
+					blit.dstSubresource.layerCount = m_arrayLayers;
 					blit.dstSubresource.mipLevel = i;
 
 					// each mipmap is the size divided by two
@@ -611,20 +821,20 @@ namespace vg
 						caculateImageSizeWithMipmapLevel(m_depth, i));
 
 					// transferDst go to transferSrc because this mipmap will be the source for the next iteration (the next level)
-					_tranImageLayout(pCommandBuffer, *m_pImage, vk::ImageLayout::eUndefined, vk::ImageLayout::eTransferDstOptimal,
-						i, 1, 0, m_arrayLayer);
+					_tranImageLayout(pCommandBuffer, image, vk::ImageLayout::eUndefined, vk::ImageLayout::eTransferDstOptimal,
+						i, 1, 0, m_arrayLayers);
 
-					pCommandBuffer->blitImage(*m_pImage, vk::ImageLayout::eTransferSrcOptimal,
-						*m_pImage, vk::ImageLayout::eTransferDstOptimal, blit,
+					pCommandBuffer->blitImage(image, vk::ImageLayout::eTransferSrcOptimal,
+						image, vk::ImageLayout::eTransferDstOptimal, blit,
 						vk::Filter::eLinear);
 
-					_tranImageLayout(pCommandBuffer, *m_pImage, vk::ImageLayout::eTransferDstOptimal, vk::ImageLayout::eTransferSrcOptimal,
-						i, 1, 0, m_arrayLayer);
+					_tranImageLayout(pCommandBuffer, image, vk::ImageLayout::eTransferDstOptimal, vk::ImageLayout::eTransferSrcOptimal,
+						i, 1, 0, m_arrayLayers);
 				}
 
 				//transfer all level and all layer to shader read layout.
-				_tranImageLayout(pCommandBuffer, *m_pImage, vk::ImageLayout::eTransferSrcOptimal, m_vkImageLayout,
-					0, m_mipMapLevels, 0, m_arrayLayer);
+				_tranImageLayout(pCommandBuffer, image, vk::ImageLayout::eTransferSrcOptimal, m_layout,
+					0, m_mipLevels, 0, m_arrayLayers);
 			}
 			else
 			{
@@ -651,7 +861,7 @@ namespace vg
 						depth = caculateImageSizeWithMipmapLevel(m_depth, component.mipLevel);
 					}
 					vk::ImageSubresourceLayers subresourceLayers = {
-						m_vkImageAspectFlags,              //aspectMask
+						m_allAspectFlags,              //aspectMask
 						component.mipLevel,            //mipLevel
 						component.baseArrayLayer,      //baseArrayLayer
 						component.layerCount           //layerCount
@@ -670,20 +880,49 @@ namespace vg
 				}
 				//transfer image from initial current image layout to dst layout.
 				//here use undefined layout not to use curr layout of image, it can clear image old data.
-				_tranImageLayout(pCommandBuffer, *m_pImage, m_usingVkImageLayout, vk::ImageLayout::eTransferDstOptimal,
-					0, m_mipMapLevels, 0, m_arrayLayer);
+				_tranImageLayout(pCommandBuffer, image, m_layout, vk::ImageLayout::eTransferDstOptimal,
+					0, m_mipLevels, 0, m_arrayLayers);
 				
-				pCommandBuffer->copyBufferToImage(*pStagingBuffer, *m_pImage, vk::ImageLayout::eTransferDstOptimal, bufferCopyRegions);
+				pCommandBuffer->copyBufferToImage(*pStagingBuffer, image, vk::ImageLayout::eTransferDstOptimal, bufferCopyRegions);
 
 				//transfer to shader read layout.
-				_tranImageLayout(pCommandBuffer, *m_pImage, vk::ImageLayout::eTransferDstOptimal, m_vkImageLayout,
-					0, m_mipMapLevels, 0, m_arrayLayer);
+				_tranImageLayout(pCommandBuffer, image, vk::ImageLayout::eTransferDstOptimal, m_layout,
+					0, m_mipLevels, 0, m_arrayLayers);
 
 			}
 
 			endSingleTimeCommands(pCommandBuffer);
-			m_usingVkImageLayout = m_vkImageLayout;
 		}
+	}
+
+	vk::ImageViewType Texture::_getImageViewType() const
+	{
+#ifdef DEBUG
+		Bool32 isFind;
+#endif // DEBUG
+		vk::ImageViewType vkImageViewType;
+#ifdef DEBUG
+		isFind = VG_FALSE;
+#endif // DEBUG
+
+		for (const auto& item : arrTextureTypeToVKImageViewType)
+		{
+			if (item.first == m_type)
+			{
+				vkImageViewType = item.second;
+#ifdef DEBUG
+				isFind = VG_TRUE;
+#endif // DEBUG
+			}
+		}
+
+#ifdef DEBUG
+		if (isFind == VG_FALSE)
+		{
+			throw std::invalid_argument("Invalid type argument at creating image view for texture.");
+		}
+#endif // DEBUG
+        return vkImageViewType;
 	}
 
 	void Texture::_createBuffer(vk::DeviceSize size, vk::BufferUsageFlags usage, vk::MemoryPropertyFlags properties,
@@ -722,7 +961,7 @@ namespace vg
 		barrier.dstQueueFamilyIndex = VK_QUEUE_FAMILY_IGNORED;
 		barrier.image = image;
 
-		barrier.subresourceRange.aspectMask = m_vkImageAspectFlags;
+		barrier.subresourceRange.aspectMask = m_allAspectFlags;
 		barrier.subresourceRange.baseMipLevel = baseMipLevel;
 		barrier.subresourceRange.levelCount = levelCount;
 		barrier.subresourceRange.baseArrayLayer = baseArrayLayer;
@@ -791,7 +1030,7 @@ namespace vg
 		uint32_t baseArrayLayer, uint32_t layerCount)
 	{
 		vk::BufferImageCopy copyInfo = { 0, 0, 0, vk::ImageSubresourceLayers(
-			m_vkImageAspectFlags, mipLevel, baseArrayLayer, layerCount),
+			m_allAspectFlags, mipLevel, baseArrayLayer, layerCount),
 			vk::Offset3D(0, 0, 0),
 			vk::Extent3D(width, height, depth)
 		};

@@ -8,7 +8,14 @@ namespace vg
 	class Texture3D : public Texture
 	{
 	public:
-		Texture3D(vk::Format format, Bool32 mipmap, uint32_t width, uint32_t height, uint32_t depth);
+		Texture3D(vk::Format format
+		    , Bool32 mipmap
+			, uint32_t width
+			, uint32_t height
+			, uint32_t depth
+			, Bool32 defaultImageView = VG_TRUE
+			, Bool32 defaultSampler = VG_TRUE
+			);
 		~Texture3D();
 		uint32_t getWidth() const;
 		uint32_t getHeight() const;

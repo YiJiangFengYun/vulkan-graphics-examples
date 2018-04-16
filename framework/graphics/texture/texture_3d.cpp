@@ -2,13 +2,27 @@
 
 namespace vg
 {
-	Texture3D::Texture3D(vk::Format format, Bool32 mipMap, uint32_t width, uint32_t height, uint32_t depth)
-		:Texture(format, mipMap)
+	Texture3D::Texture3D(vk::Format format
+	    , Bool32 mipMap
+		, uint32_t width
+		, uint32_t height
+		, uint32_t depth
+		, Bool32 defaultImageView
+		, Bool32 defaultSampler
+		)
+		:Texture(format
+		, mipMap
+		, defaultImageView
+		, defaultSampler
+		)
 	{
 		m_type = TextureType::TEX_3D;
 		m_width = width;
 		m_height = height;
 		m_depth = depth;
+		m_allAspectFlags = vk::ImageAspectFlagBits::eColor;
+		m_usageFlags = vk::ImageUsageFlagBits::eSampled;
+		m_layout = vk::ImageLayout::eShaderReadOnlyOptimal;
 		_init();
 	}
 

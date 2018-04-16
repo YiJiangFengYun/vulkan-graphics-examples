@@ -41,73 +41,219 @@ namespace vg
 	class Texture : public Base
 	{
 	public:
-		Texture(vk::Format format, Bool32 mipMap);
+	    struct ImageInfo {
+			vk::ImageCreateFlags flags;
+		    vk::ImageType imageType;
+		    vk::Format format;			
+		    vk::Extent3D extent;
+		    uint32_t mipLevels;			
+		    uint32_t arrayLayers;
+		    vk::SampleCountFlagBits samples;
+		    vk::ImageTiling tiling;
+		    vk::ImageUsageFlags usage;
+		    vk::SharingMode sharingMode;
+		    vk::ImageLayout layout;
+			vk::ImageAspectFlags allAspect;
+
+			ImageInfo(vk::ImageCreateFlags flags = vk::ImageCreateFlags()
+				, vk::ImageType imageType = vk::ImageType()
+			    , vk::Format format = vk::Format()
+			    , vk::Extent3D extent = vk::Extent3D()
+			    , uint32_t mipLevels = 1u
+			    , uint32_t arrayLayers = 1u
+                , vk::SampleCountFlagBits samples = vk::SampleCountFlagBits()
+			    , vk::ImageTiling tiling = vk::ImageTiling()
+			    , vk::ImageUsageFlags usage = vk::ImageUsageFlags()
+			    , vk::SharingMode sharingMode = vk::SharingMode()
+			    , vk::ImageLayout layout = vk::ImageLayout()
+				, vk::ImageAspectFlags allAspect = vk::ImageAspectFlags()
+				);			
+		};
+
+
+	    struct Image {
+		public:
+		    Image(ImageInfo info);
+			ImageInfo getInfo() const;
+			const vk::Image *getImage() const;
+			const vk::DeviceMemory *getImageMemory() const;
+
+		private:
+		    Image() = delete;
+		    ImageInfo m_info;
+		    std::shared_ptr<vk::Image> m_pImage;
+		    std::shared_ptr<vk::DeviceMemory> m_pImageMemory;
+			void _create();
+		};
+
+		struct ImageViewInfo {
+			vk::ImageViewCreateFlags flags;
+			vk::Image image;
+			vk::ImageViewType viewType;
+			vk::Format format;
+			vk::ComponentMapping coponents;
+			vk::ImageSubresourceRange subResourceRange;
+
+			ImageViewInfo(vk::ImageViewCreateFlags flags = vk::ImageViewCreateFlags()
+			    , vk::Image image = vk::Image()
+			    , vk::ImageViewType viewType = vk::ImageViewType()
+			    , vk::Format format = vk::Format()
+			    , vk::ComponentMapping coponents = vk::ComponentMapping()
+        		, vk::ImageSubresourceRange subResourceRange = vk::ImageSubresourceRange()
+				);
+		};
+
+		struct ImageViewCreateInfo {
+			vk::ComponentMapping coponents;
+			vk::ImageSubresourceRange subResourceRange;
+
+			ImageViewCreateInfo(vk::ComponentMapping coponents = vk::ComponentMapping()
+        		, vk::ImageSubresourceRange subResourceRange = vk::ImageSubresourceRange()
+				);
+		};
+
+		struct ImageView {
+		public:
+		    ImageView(ImageViewInfo info);
+			ImageViewInfo getInfo() const;
+			const vk::ImageView *getImageView() const;
+		private:
+		    ImageView() = delete;
+			ImageViewInfo m_info;
+		    std::shared_ptr<vk::ImageView> m_pImageView;
+			void _create();
+		};
+
+		struct SamplerInfo {
+			vk::SamplerCreateFlags flags;
+			vk::Filter magFilter;
+			vk::Filter minFilter;
+			vk::SamplerMipmapMode mipmapMode;
+			vk::SamplerAddressMode addressModeU;
+			vk::SamplerAddressMode addressModeV;
+			vk::SamplerAddressMode addressModeW;
+			float mipLodBias;
+			vk::Bool32 anisotropyEnable;
+			float maxAnisotropy;
+			vk::Bool32 compareEnable;
+			vk::CompareOp compareOp;
+			float minLod;
+			float maxLod;
+			vk::BorderColor borderColor;
+			vk::Bool32 unnormalizedCoordinates;
+
+			SamplerInfo(vk::SamplerCreateFlags flags = vk::SamplerCreateFlags()
+			    , vk::Filter magFilter = vk::Filter()
+			    , vk::Filter minFilter = vk::Filter()
+			    , vk::SamplerMipmapMode mipmapMode = vk::SamplerMipmapMode()
+			    , vk::SamplerAddressMode addressModeU = vk::SamplerAddressMode()
+			    , vk::SamplerAddressMode addressModeV = vk::SamplerAddressMode()
+			    , vk::SamplerAddressMode addressModeW = vk::SamplerAddressMode()
+			    , float mipLodBias = 0.0f
+			    , vk::Bool32 anisotropyEnable = VK_FALSE
+			    , float maxAnisotropy = 0.0f
+			    , vk::Bool32 compareEnable = VK_FALSE
+			    , vk::CompareOp compareOp = vk::CompareOp()
+			    , float minLod = 0.0f
+			    , float maxLod = 0.0f
+			    , vk::BorderColor borderColor = vk::BorderColor()
+			    , vk::Bool32 unnormalizedCoordinates = VK_FALSE
+			);
+		};
+		
+		struct SamplerCreateInfo {
+			vk::SamplerCreateFlags flags;
+			vk::Filter magFilter;
+			vk::Filter minFilter;
+			vk::SamplerMipmapMode mipmapMode;
+			vk::SamplerAddressMode addressModeU;
+			vk::SamplerAddressMode addressModeV;
+			vk::SamplerAddressMode addressModeW;
+			float mipLodBias;
+			vk::Bool32 anisotropyEnable;
+			float maxAnisotropy;
+			float minLod;
+			float maxLod;
+			vk::BorderColor borderColor;
+
+			SamplerCreateInfo(vk::SamplerCreateFlags flags = vk::SamplerCreateFlags()
+			    , vk::Filter magFilter = vk::Filter()
+			    , vk::Filter minFilter = vk::Filter()
+			    , vk::SamplerMipmapMode mipmapMode = vk::SamplerMipmapMode()
+			    , vk::SamplerAddressMode addressModeU = vk::SamplerAddressMode()
+			    , vk::SamplerAddressMode addressModeV = vk::SamplerAddressMode()
+			    , vk::SamplerAddressMode addressModeW = vk::SamplerAddressMode()
+			    , float mipLodBias = 0.0f
+			    , vk::Bool32 anisotropyEnable = VK_FALSE
+			    , float maxAnisotropy = 0.0f
+			    , float minLod = 0.0f
+			    , float maxLod = 0.0f
+				, vk::BorderColor borderColor = vk::BorderColor()
+			);
+		};
+
+		struct Sampler {
+		public:
+		    Sampler(SamplerInfo info);
+			SamplerInfo getInfo() const;
+			const vk::Sampler *getSampler() const;
+
+		private:
+		    Sampler() = delete;
+			SamplerInfo m_info;
+			std::shared_ptr<vk::Sampler> m_pSampler;
+			void _create();
+		};
+
+		Texture(vk::Format format
+		    , Bool32 mipMap
+			, Bool32 defaultImageView = VG_TRUE
+			, Bool32 defaultSampler = VG_TRUE
+			);
 		~Texture();
-		float getAnisotropy() const;
-		void setAnisotropy(float value);
-		FilterMode getFilterMode() const;
-		void setFilterMode(FilterMode value);
-		SamplerAddressMode getSamplerAddressMode() const;
-		void setSamplerAddressMode(SamplerAddressMode value);
 
 		TextureType getType() const;
-		vk::Format getFormat() const;
 		Bool32 getIsMipmap() const;
-		uint32_t getMipmapLevels() const;
-		uint32_t getArrayLayerCount() const;
+		const Image *getImage() const;
+		const ImageView *getImageView() const;
+		const Sampler *getSampler() const;
 
-		vk::Format getVKFormat() const;
-		vk::ImageLayout getImageLayout() const;
-		vk::Image* getImage() const;
-		vk::DeviceMemory *getImageMemory() const;
-		vk::ImageView *getImageView() const;
-		vk::Sampler *getSampler() const;
-		vk::ImageAspectFlags getImageAspectFlags() const;
+		const ImageView *createImageView(std::string name, ImageViewCreateInfo createInfo);
+		const ImageView *getImageView(std::string name) const;
+		const Sampler *createSampler(std::string name, SamplerCreateInfo createInfo);
+		const Sampler *getSampler(std::string name) const;
 	protected:
-		//--compositions
+		TextureType m_type;		
 		uint32_t m_width;
 		uint32_t m_height;
 		uint32_t m_depth;
 		uint32_t m_arrayLength;
-		TextureType m_type;
-		vk::Format m_format;
-		FilterMode m_filterMode;
-		float m_anisotropy;
+		vk::Format m_format;	
 		Bool32 m_mipMap;
-		SamplerAddressMode m_samplerAddressMode;
-		vk::ImageUsageFlags m_vkImageUsageFlags;
-		vk::ImageLayout m_vkImageLayout;
-		vk::ImageAspectFlags m_vkImageAspectFlags;
+		uint32_t m_mipLevels;
+		uint32_t m_arrayLayers;
+		vk::ImageAspectFlags m_allAspectFlags;
+		vk::ImageUsageFlags m_usageFlags;
+		vk::ImageLayout m_layout;		
+		Bool32 m_isCreateDefaultImageView;
+		Bool32 m_isCreateDefaultSampler;
 
-		uint32_t m_mipMapLevels;
-		uint32_t m_arrayLayer;
-		vk::Format m_vkFormat;
-		vk::ImageLayout m_usingVkImageLayout; //record texture current image layout state.
-		vk::Filter m_vkFilter;
-		vk::SamplerMipmapMode m_vkSamplerMipmapMode;
-		vk::SamplerAddressMode m_vkSamplerAddressMode;
-
-		//optional storage
 		TextureDataInfo m_dataLayout;
 		std::vector<TextureDataInfo::Component> m_components;
 		void *m_pMemory;
 		uint32_t m_memorySize;
 		uint32_t m_realSize;
+		std::shared_ptr<Image> m_pImage;
+		std::shared_ptr<ImageView> m_pImageView;
+		std::shared_ptr<Sampler> m_pSampler;
 
-		//--aggregations
+		std::unordered_map<std::string, std::shared_ptr<ImageView>> m_mapPOtherImageViews;
+		std::unordered_map<std::string, std::shared_ptr<Sampler>> m_mapPOtherSamplers;
 
-		std::shared_ptr<vk::Image> m_pImage;
-		std::shared_ptr<vk::DeviceMemory> m_pImageMemory;
-		std::shared_ptr<vk::ImageView> m_pImageView;
-		std::shared_ptr<vk::Sampler> m_pSampler;
-		
 		virtual void _init();
 
 		void _updateMipMapLevels();
 		void _updateArrayLayer();
-		void _updateVkFormat();
-		void _updateVkFilter();
-		void _updateVkSamplerAddressMode();
 		void _createImage();
 		void _createImageView();
 		void _createSampler();
@@ -117,6 +263,8 @@ namespace vg
 			, uint32_t size
 			, Bool32 cacheMemory = VG_FALSE
 		    , Bool32 createMipmaps = VG_FALSE);
+
+		vk::ImageViewType _getImageViewType() const;
 
 		void _createBuffer(vk::DeviceSize size, vk::BufferUsageFlags usage, vk::MemoryPropertyFlags properties,
 			std::shared_ptr<vk::Buffer>& pBuffer, std::shared_ptr<vk::DeviceMemory>& pBufferMemory);

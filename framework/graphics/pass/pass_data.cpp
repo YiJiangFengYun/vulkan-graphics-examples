@@ -2,14 +2,25 @@
 
 namespace vg
 {
-    const Texture *PassData::getTexture(std::string name) const
+	PassData::TexData::TexData(const Texture *pTexture
+	    , const Texture::ImageView *pImageView
+		, const Texture::Sampler *pSampler
+		)
+		: pTexture(pTexture)
+		, pImageView(pImageView)
+		, pSampler(pSampler)
+	{
+
+	}
+
+    PassData::TexData PassData::getTexture(std::string name) const
 	{
 		return getValue(name, mapTextures);
 	}
 
-	void PassData::setTexture(std::string name, const Texture *pTex)
+	void PassData::setTexture(std::string name, TexData texData)
 	{
-		setValue(name, pTex, mapTextures, arrTexNames);
+		setValue(name, texData, mapTextures, arrTexNames);
 	}
 
 	uint32_t PassData::getDataBaseSize(const std::string name) const

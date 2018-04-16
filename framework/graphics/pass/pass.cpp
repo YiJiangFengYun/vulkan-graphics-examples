@@ -373,16 +373,23 @@ namespace vg
 
 	const Texture *Pass::getTexture(std::string name) const
 	{
-		return m_pData->getTexture(name);
+		return m_pData->getTexture(name).pTexture;
 	}
 	void Pass::setTexture(std::string name
 		, const Texture *pTex
 		, uint32_t binding
 		, ShaderStageFlags stageFlags
 		, DescriptorType descriptorType
+		, const Texture::ImageView *pImageView
+		, const Texture::Sampler *pSampler
 	)
 	{
-		m_pData->setTexture(name, pTex);
+		PassData::TexData data = {
+			pTex,
+			pImageView,
+			pSampler,
+		};
+		m_pData->setTexture(name, data);
 		//update layout binding information.
 		uint32_t descriptorCount = 1u;
 		LayoutBindingInfo info(
@@ -432,9 +439,21 @@ namespace vg
 		return getTexture(VG_M_MAIN_TEXTURE_NAME);
 	}
 
-	void Pass::setMainTexture(const Texture *value)
+	void Pass::setMainTexture(const Texture *value
+	    , ShaderStageFlags stageFlags
+		, DescriptorType descriptorType
+	    , const Texture::ImageView *pImageView
+		, const Texture::Sampler *pSampler
+		)
 	{
-		setTexture(VG_M_MAIN_TEXTURE_NAME, value, VG_M_MAIN_TEXTURE_BINDING, ShaderStageFlagBits::FRAGMENT);
+		setTexture(VG_M_MAIN_TEXTURE_NAME
+		    , value
+			, VG_M_MAIN_TEXTURE_BINDING
+			, stageFlags
+			, descriptorType
+			, pImageView
+			, pSampler
+			);
 	}
 
 	Color Pass::getMainColor() const
@@ -1226,12 +1245,24 @@ namespace vg
 				if (item.descriptorCount != 1u)
 					throw std::runtime_error("The descriptor count of binding shoubld be 1 when its type is COMBINED_IMAGE_SAMPLER");
 #endif // DEBUG
-				const Texture * pTexture = getTexture(item.name);
-				if (pTexture != nullptr)
+				PassData::TexData texData = m_pData->getTexture(item.name);
+				if (texData.pTexture != nullptr)
 				{
-					imageInfos[index].sampler = *pTexture->getSampler();
-					imageInfos[index].imageView = *pTexture->getImageView();
-					imageInfos[index].imageLayout = pTexture->getImageLayout();
+					vk::ImageView imageView;
+					if (texData.pImageView != nullptr) {
+						imageView = *(texData.pImageView->getImageView());
+					} else {
+						imageView = *(texData.pTexture->getImageView()->getImageView());
+					}
+					vk::Sampler sampler;
+					if (texData.pSampler != nullptr) {
+					    sampler = *(texData.pSampler->getSampler());
+					} else {
+						sampler = *(texData.pTexture->getSampler()->getSampler());
+					}
+					imageInfos[index].sampler = sampler;
+					imageInfos[index].imageView = imageView;
+					imageInfos[index].imageLayout = texData.pTexture->getImage()->getInfo().layout;
 				}
 
 				writes[index].dstSet = *m_pDescriptorSet;

@@ -8,7 +8,14 @@ namespace vg
 	class Texture2DArray : public Texture
 	{
 	public:
-		Texture2DArray(vk::Format format, Bool32 mipmap, uint32_t width, uint32_t height, uint32_t arraylength);
+		Texture2DArray(vk::Format format
+		    , Bool32 mipmap
+			, uint32_t width
+			, uint32_t height
+			, uint32_t arraylength
+			, Bool32 defaultImageView = VG_TRUE
+			, Bool32 defaultSampler = VG_TRUE
+			);
 		~Texture2DArray();
 		uint32_t getWidth() const;
 		uint32_t getHeight() const;

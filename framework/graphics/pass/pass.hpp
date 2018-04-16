@@ -216,8 +216,10 @@ namespace vg
 		void setTexture(std::string name
 			, const Texture *pTex
 			, uint32_t binding = VG_M_OTHER_MIN_BINDING
-			, ShaderStageFlags stageFlags = ShaderStageFlagBits::VERTEX
-			, DescriptorType descriptorType = DescriptorType::COMBINED_IMAGE_SAMPLER 
+			, ShaderStageFlags stageFlags = ShaderStageFlagBits::FRAGMENT
+			, DescriptorType descriptorType = DescriptorType::COMBINED_IMAGE_SAMPLER
+			, const Texture::ImageView *pImageView = nullptr
+			, const Texture::Sampler *pSampler = nullptr
 		);
 
 		template <typename T>
@@ -252,7 +254,12 @@ namespace vg
 			, uint32_t descriptorCount = 1u);
 
 		const Texture *getMainTexture() const;
-		void setMainTexture(const Texture *value);
+		void setMainTexture(const Texture *value
+		    , ShaderStageFlags stageFlags = ShaderStageFlagBits::FRAGMENT
+			, DescriptorType descriptorType = DescriptorType::COMBINED_IMAGE_SAMPLER
+		    , const Texture::ImageView *pImageView = nullptr
+			, const Texture::Sampler *pSampler = nullptr
+			);
 
 		Color getMainColor() const;
 		void setMainColor(Color color);

@@ -92,7 +92,7 @@ void Window::_createSceneOffScreen()
 void Window::_createOffscreenTex()
 {
 	m_pOffScreenTex = std::shared_ptr<vg::Texture2DColorAttachment>{
-		new vg::Texture2DColorAttachment(FB_COLOR_FORMAT, false, FB_DIM, FB_DIM),
+		new vg::Texture2DColorAttachment(FB_COLOR_FORMAT, FB_DIM, FB_DIM),
 	};
 }
 
@@ -157,16 +157,31 @@ void Window::_createTexture()
 	textureLayout.pComponent = components.data();
 	m_pTexturePlane->applyData(textureLayout, gliTex.data(), gliTex.size());
 
-	m_pTexturePlane->setFilterMode(vg::FilterMode::TRILINEAR);
-	m_pTexturePlane->setSamplerAddressMode(vg::SamplerAddressMode::REPEAT);
-
 	auto pDevice = pApp->getDevice();
 	auto pPhysicalDevice = pApp->getPhysicalDevice();
+	vk::Bool32 enableAnisotropy = VK_FALSE;
+	float anisotropy = 0.0f;
 	if (pApp->getPhysicalDeviceFeatures().samplerAnisotropy)
 	{
-		auto anisotropy = pPhysicalDevice->getProperties().limits.maxSamplerAnisotropy;
-		m_pTexturePlane->setAnisotropy(anisotropy);
+		enableAnisotropy = VK_TRUE;
+		anisotropy = pPhysicalDevice->getProperties().limits.maxSamplerAnisotropy;
 	}
+
+	vg::Texture::SamplerCreateInfo info = {
+		vk::SamplerCreateFlags(),
+		vk::Filter::eLinear,
+		vk::Filter::eLinear,
+		vk::SamplerMipmapMode::eLinear,
+		vk::SamplerAddressMode::eRepeat,
+		vk::SamplerAddressMode::eRepeat,
+		vk::SamplerAddressMode::eRepeat,
+		0.0f,
+		enableAnisotropy,
+		anisotropy,
+		0.0f,
+		(float)(m_pTexturePlane->getImage()->getInfo().mipLevels),
+	};
+	m_pTexturePlane->createSampler("other_sampler", info);
 }
 
 void Window::_createMaterial()
@@ -268,7 +283,12 @@ void Window::_createMaterial()
 	    depthStencilState.depthWriteEnable = VG_TRUE;
 	    depthStencilState.depthCompareOp = vk::CompareOp::eLessOrEqual;
 	    pPass->setDepthStencilInfo(depthStencilState);
-		pPass->setMainTexture(m_pTexturePlane.get());
+		pPass->setMainTexture(m_pTexturePlane.get(),
+			vg::ShaderStageFlagBits::FRAGMENT,
+			vg::DescriptorType::COMBINED_IMAGE_SAMPLER,
+			nullptr,
+			m_pTexturePlane->getSampler("other_sampler")
+			);
 		pPass->setTexture("offscreen_tex", m_pOffScreenTex.get(), 2u, vg::ShaderStageFlagBits::FRAGMENT);
 	    pPass->apply();
 		

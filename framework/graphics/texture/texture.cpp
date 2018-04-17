@@ -401,6 +401,15 @@ namespace vg
 			return pImageView.get();
 		}
 
+#ifdef DEBUG
+        auto allAspect = m_pImage->getInfo().allAspect;
+		if ((allAspect & createInfo.subResourceRange.aspectMask) != createInfo.subResourceRange.aspectMask) {
+			auto errorStr = "All aspect of the image don't contain all need aspect to create this image view.";
+			VG_LOG(plog::error) << errorStr << std::endl;
+			throw std::invalid_argument(errorStr);
+		}
+#endif //DEBUG
+
 		ImageViewInfo info = {
 			vk::ImageViewCreateFlags(),
 			*(m_pImage->getImage()),

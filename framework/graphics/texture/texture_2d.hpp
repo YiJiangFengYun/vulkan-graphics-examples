@@ -79,8 +79,8 @@ namespace vg
 		virtual uint32_t getDepthStencilAttachmentHeight() const override;
 		virtual uint32_t getDepthStencilAttachmentLayers() const override;
 		virtual const vk::Format getDepthStencilAttachmentFormat() const override;
-		virtual const vk::ImageLayout getDepthStencilAttachmentLayout() const = 0;
-		virtual const vk::ImageView *getDepthStencilAttachmentImageView() const = 0;
+		virtual const vk::ImageLayout getDepthStencilAttachmentLayout() const override;
+		virtual const vk::ImageView *getDepthStencilAttachmentImageView() const override;
 	private:
 	   Texture2DDepthStencilAttachment() = delete;
 	   virtual void _init() override;

@@ -96,6 +96,34 @@ namespace vg
 
     }
 
+    CmdDraw::CmdDraw(uint32_t vertexCount
+        , uint32_t instanceCount
+        , uint32_t firstVertex
+        , uint32_t firstInstance
+        )
+        : vertexCount(vertexCount)
+        , instanceCount(instanceCount)
+        , firstVertex(firstVertex)
+        , firstInstance(firstInstance)
+    {
+
+    }
+
+    CmdDrawIndexed::CmdDrawIndexed(uint32_t indexCount
+        , uint32_t instanceCount
+        , uint32_t firstIndex
+        , uint32_t vertexOffset
+        , uint32_t firstInstance
+        )
+        : indexCount(indexCount)
+        , instanceCount(instanceCount)
+        , firstIndex(firstIndex)
+        , vertexOffset(vertexOffset)
+        , firstInstance(firstInstance)
+    {
+
+    }
+
     RenderPassInfo::RenderPassInfo( vk::RenderPass *pRenderPass
         , uint32_t subPassIndex
         , vk::Framebuffer *pFrameBuffer
@@ -112,6 +140,8 @@ namespace vg
         , uint32_t subMeshIndex
         , fd::Viewport viewport
         , fd::Rect2D scissor
+        , CmdDraw *pCmdDraw
+        , CmdDrawIndexed *pCmdDrawIndexed
 #if defined(DEBUG) && defined(VG_ENABLE_COST_TIMER)
         , fd::CostTimer *pPreparingBuildInDataCostTimer
         , fd::CostTimer *pPreparingPipelineCostTimer
@@ -134,6 +164,8 @@ namespace vg
         , subMeshIndex(subMeshIndex)
         , viewport(viewport)
         , scissor(scissor)
+        , pCmdDraw(pCmdDraw)
+        , pCmdDrawIndexed(pCmdDrawIndexed)
 #if defined(DEBUG) && defined(VG_ENABLE_COST_TIMER)
         , pPreparingBuildInDataCostTimer(pPreparingBuildInDataCostTimer)
         , pPreparingPipelineCostTimer(pPreparingPipelineCostTimer)
@@ -152,6 +184,16 @@ namespace vg
         , m_renderPassInfoCapacity(0u)
         , m_renderPassInfos()
 		, m_renderPassInfoToCmdInfoIndices()
+
+        , m_cmdDrawCount(0u)
+        , m_cmdDrawCapacity(0u)
+        , m_cmdDraws()
+		, m_cmdDrawToRenderPassInfoIndices()
+
+        , m_cmdDrawIndexedCount(0u)
+        , m_cmdDrawIndexedCapacity(0u)
+        , m_cmdDrawIndexeds()
+		, m_cmdDrawIndexedToRenderPassInfoIndices()
 
         , m_barrierInfoCount(0u)
         , m_barrierInfosCapacity(0u)
@@ -182,8 +224,15 @@ namespace vg
     void CmdBuffer::begin()
     {
         m_cmdInfoCount =  0u;
+
         m_renderPassInfoCount = 0u;
+        m_cmdDrawCount = 0u;
+        m_cmdDrawIndexedCount = 0u;
+
         m_barrierInfoCount = 0u;
+        m_memoryBarrierCount = 0u;
+        m_bufferMemoryBarrierCount = 0u;
+        m_imageMemoryBarrierCount = 0u;
     }    
     void CmdBuffer::addCmd(CmdInfo cmdInfo)
     {
@@ -208,6 +257,30 @@ namespace vg
 				m_cmdInfoCount,
                 *(cmdInfo.pRenderPassInfo)
             );
+
+            auto &renderPassInfo = *(cmdInfo.pRenderPassInfo);
+            if (renderPassInfo.pCmdDraw != nullptr) {
+                addData<CmdDraw, RenderPassInfo, offsetof(RenderPassInfo, pCmdDraw)>(
+                    m_cmdDrawCount,
+                    m_cmdDrawCapacity,
+                    m_cmdDraws,
+                    &m_cmdDrawToRenderPassInfoIndices,
+                    &m_renderPassInfos,
+                    m_renderPassInfoCount,
+                    *(renderPassInfo.pCmdDraw)
+                );
+            }
+            if (renderPassInfo.pCmdDrawIndexed != nullptr) {
+                addData<CmdDrawIndexed, RenderPassInfo, offsetof(RenderPassInfo, pCmdDrawIndexed)>(
+                    m_cmdDrawIndexedCount,
+                    m_cmdDrawIndexedCapacity,
+                    m_cmdDrawIndexeds,
+                    &m_cmdDrawIndexedToRenderPassInfoIndices,
+                    &m_renderPassInfos,
+                    m_renderPassInfoCount,
+                    *(renderPassInfo.pCmdDrawIndexed)
+                );
+            }
         }
 
         //copy barrier info

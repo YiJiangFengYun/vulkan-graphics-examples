@@ -62,7 +62,10 @@ namespace vg
 		    uint32_t subMeshIndex,
 		    Pass *pPass,
             const fd::Viewport viewport,
-		    const fd::Rect2D scissor);
+		    const fd::Rect2D scissor,
+            CmdDraw * pCmdDraw,
+            CmdDrawIndexed * pCmdDrawIndexed
+        );
     };
 } //vg
 

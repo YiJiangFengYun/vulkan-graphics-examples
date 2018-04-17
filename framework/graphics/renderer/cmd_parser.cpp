@@ -279,7 +279,9 @@ namespace vg
 				subMeshIndex, 
 				pPass, 
 				renderPassInfo.viewport,
-				renderPassInfo.scissor
+				renderPassInfo.scissor,
+				renderPassInfo.pCmdDraw,
+				renderPassInfo.pCmdDrawIndexed
 			);
 #if defined(DEBUG) && defined(VG_ENABLE_COST_TIMER)
 			renderPassInfo.pPreparingCommandBufferCostTimer->end();
@@ -318,9 +320,11 @@ namespace vg
 		uint32_t subMeshIndex,
 		Pass *pPass,
 		const fd::Viewport viewport,
-		const fd::Rect2D scissor)
+		const fd::Rect2D scissor,
+		CmdDraw * pCmdDraw,
+        CmdDrawIndexed * pCmdDrawIndexed
+		)
 	{
-		VG_LOG(plog::debug) << "Pre begin command buffer for render." << std::endl;
 		auto pContentMesh = dynamic_cast<const ContentMesh *>(pMesh);
         
         const auto& viewportOfPass = pPass->getViewport();
@@ -347,11 +351,6 @@ namespace vg
 
 		pCommandBuffer->setViewport(0, vkViewport);
 
-		const auto &pVertexData = pContentMesh->getVertexData();
-		const auto &subVertexDatas = pVertexData->getSubVertexDatas();
-		const auto &pIndexData = pContentMesh->getIndexData();
-		const auto &subIndexDatas = pIndexData->getSubIndexDatas();
-		const auto &subIndexData = subIndexDatas[subMeshIndex];
 		fd::Rect2D finalScissor = scissorOfPass;
 		glm::vec2 minOfClipRect(scissor.x, scissor.y);
 		glm::vec2 maxOfclipRect(scissor.x + scissor.width, scissor.y + scissor.height);
@@ -385,7 +384,7 @@ namespace vg
 
 		pCommandBuffer->setScissor(0, vkScissor);
 
-		auto pPipelineLayout = pPass->getPipelineLayout();		
+		auto pPipelineLayout = pPass->getPipelineLayout();	
 
 		//push constants
 		auto pushConstantUpdates = pPass->getPushconstantUpdates();
@@ -412,29 +411,59 @@ namespace vg
 		//dynamic line width
 		pCommandBuffer->setLineWidth(pPass->getLineWidth());
 
-        vertexDataToCommandBuffer(*pCommandBuffer, pVertexData, subIndexData.vertexDataIndex);
-		indexDataToCommandBuffer(*pCommandBuffer, pIndexData, subMeshIndex);
+		if (pMesh != nullptr) {
+		    auto pContentMesh = dynamic_cast<const ContentMesh *>(pMesh);
+		    const auto &pVertexData = pContentMesh->getVertexData();
+		    const auto &subVertexDatas = pVertexData->getSubVertexDatas();
+		    const auto &pIndexData = pContentMesh->getIndexData();
+		    const auto &subIndexDatas = pIndexData->getSubIndexDatas();
+		    const auto &subIndexData = subIndexDatas[subMeshIndex];
+    
+            vertexDataToCommandBuffer(*pCommandBuffer, pVertexData, subIndexData.vertexDataIndex);
+		    indexDataToCommandBuffer(*pCommandBuffer, pIndexData, subMeshIndex);
+		}
 
-		uint32_t indexOffset = 0u;
-		// for (uint32_t i = 0; i < subMeshIndex; ++i)
-		// {
-		// 	indexOffset += subIndexDatas[i].indexCount;
-		// }
+		if (pCmdDraw != nullptr) {
+			pCommandBuffer->draw(pCmdDraw->vertexCount, 
+			    pCmdDraw->instanceCount,
+				pCmdDraw->firstVertex,
+				pCmdDraw->firstInstance
+				);
+		} else if (pCmdDraw != nullptr) {
+			pCommandBuffer->drawIndexed(pCmdDrawIndexed->indexCount,
+			    pCmdDrawIndexed->instanceCount,
+				pCmdDrawIndexed->firstIndex,
+				pCmdDrawIndexed->vertexOffset,
+				pCmdDrawIndexed->firstInstance
+				);
+		} else if (pMesh != nullptr) {
+			const auto &pIndexData = pContentMesh->getIndexData();
+		    const auto &subIndexDatas = pIndexData->getSubIndexDatas();
+		    const auto &subIndexData = subIndexDatas[subMeshIndex];
 
-		uint32_t vertexOffset = 0u;
-		// for (uint32_t i = 0; i < subIndexData.vertexDataIndex; ++i)
-		// {
-		// 	vertexOffset += subVertexDatas[i].vertexCount;
-		// }
+		    uint32_t indexOffset = 0u;
+		    // for (uint32_t i = 0; i < subMeshIndex; ++i)
+		    // {
+		    // 	indexOffset += subIndexDatas[i].indexCount;
+		    // }
+    
+		    uint32_t vertexOffset = 0u;
+		    // for (uint32_t i = 0; i < subIndexData.vertexDataIndex; ++i)
+		    // {
+		    // 	vertexOffset += subVertexDatas[i].vertexCount;
+		    // }
+    
+		    uint32_t instanceOffset = 0u;
+		    uint32_t instanceCount = pPass->getInstanceCount();
+    
+		    pCommandBuffer->drawIndexed(subIndexData.indexCount, 
+		        instanceCount, 
+		    	indexOffset, 
+		    	vertexOffset, 
+		    	instanceOffset);
+		} else {
 
-		uint32_t instanceOffset = 0u;
-		uint32_t instanceCount = pPass->getInstanceCount();
-
-		pCommandBuffer->drawIndexed(subIndexData.indexCount, 
-		    instanceCount, 
-			indexOffset, 
-			vertexOffset, 
-			instanceOffset);
+		}
 		//m_pCommandBuffer->draw(3, 1, 0, 0);
 	}
 

@@ -31,6 +31,34 @@ namespace vg
             );
     };
 
+    struct CmdDraw {
+        uint32_t vertexCount;
+        uint32_t instanceCount;
+        uint32_t firstVertex;
+        uint32_t firstInstance;
+
+        CmdDraw(uint32_t vertexCount = 0u
+            , uint32_t instanceCount = 0u
+            , uint32_t firstVertex = 0u
+            , uint32_t firstInstance = 0u
+        );
+    };
+
+    struct CmdDrawIndexed {
+        uint32_t indexCount;
+        uint32_t instanceCount;
+        uint32_t firstIndex;
+        uint32_t vertexOffset;
+        uint32_t firstInstance;
+
+        CmdDrawIndexed(uint32_t indexCount = 0u
+            , uint32_t instanceCount = 0u
+            , uint32_t firstIndex = 0u
+            , uint32_t vertexOffset = 0u
+            , uint32_t firstInstance = 0u
+        );
+    };
+
     struct RenderPassInfo
     {
         vk::RenderPass *pRenderPass;
@@ -50,6 +78,8 @@ namespace vg
 		uint32_t subMeshIndex;
         fd::Viewport viewport;
         fd::Rect2D scissor;
+        CmdDraw *pCmdDraw;
+        CmdDrawIndexed *pCmdDrawIndexed;
 #if defined(DEBUG) && defined(VG_ENABLE_COST_TIMER)
         fd::CostTimer *pPreparingBuildInDataCostTimer;
         fd::CostTimer *pPreparingPipelineCostTimer;
@@ -72,6 +102,8 @@ namespace vg
             , uint32_t subMeshIndex = 0u
             , fd::Viewport viewport = fd::Viewport()
             , fd::Rect2D scissor = fd::Rect2D()
+            , CmdDraw *pCmdDraw = nullptr
+            , CmdDrawIndexed *pCmdDrawIndexed = nullptr
 #if defined(DEBUG) && defined(VG_ENABLE_COST_TIMER)
             , fd::CostTimer *pPreparingBuildInDataCostTimer = nullptr
             , fd::CostTimer *pPreparingPipelineCostTimer = nullptr
@@ -106,6 +138,16 @@ namespace vg
         uint32_t m_renderPassInfoCapacity;
         std::vector<RenderPassInfo> m_renderPassInfos;
 		std::vector<uint32_t> m_renderPassInfoToCmdInfoIndices;
+
+        uint32_t m_cmdDrawCount;
+        uint32_t m_cmdDrawCapacity;
+        std::vector<CmdDraw> m_cmdDraws;
+		std::vector<uint32_t> m_cmdDrawToRenderPassInfoIndices;
+
+        uint32_t m_cmdDrawIndexedCount;
+        uint32_t m_cmdDrawIndexedCapacity;
+        std::vector<CmdDrawIndexed> m_cmdDrawIndexeds;
+		std::vector<uint32_t> m_cmdDrawIndexedToRenderPassInfoIndices;
 
         uint32_t m_barrierInfoCount;
         uint32_t m_barrierInfosCapacity;

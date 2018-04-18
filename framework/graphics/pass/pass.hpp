@@ -220,6 +220,7 @@ namespace vg
 			, DescriptorType descriptorType = DescriptorType::COMBINED_IMAGE_SAMPLER
 			, const Texture::ImageView *pImageView = nullptr
 			, const Texture::Sampler *pSampler = nullptr
+			, vk::ImageLayout imageLayout = vk::ImageLayout::eUndefined
 		);
 
 		template <typename T>
@@ -259,6 +260,7 @@ namespace vg
 			, DescriptorType descriptorType = DescriptorType::COMBINED_IMAGE_SAMPLER
 		    , const Texture::ImageView *pImageView = nullptr
 			, const Texture::Sampler *pSampler = nullptr
+			, vk::ImageLayout imageLayout = vk::ImageLayout::eUndefined
 			);
 
 		Color getMainColor() const;

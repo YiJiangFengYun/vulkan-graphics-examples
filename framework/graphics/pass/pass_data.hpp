@@ -20,10 +20,12 @@ namespace vg
 			const Texture *pTexture;
 			const Texture::ImageView *pImageView;
 			const Texture::Sampler *pSampler;
+			const vk::ImageLayout imageLayout;
 
 			TexData(const Texture *pTexture = nullptr
 			    , const Texture::ImageView *pImageView = nullptr
 				, const Texture::Sampler *pSampler = nullptr
+				, const vk::ImageLayout imageLayout = vk::ImageLayout::eUndefined
 				);
 		};
 		

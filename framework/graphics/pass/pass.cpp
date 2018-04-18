@@ -382,24 +382,26 @@ namespace vg
 		, DescriptorType descriptorType
 		, const Texture::ImageView *pImageView
 		, const Texture::Sampler *pSampler
+		, vk::ImageLayout imageLayout = vk::ImageLayout::eUndefined
 	)
 	{
 		PassData::TexData data = {
 			pTex,
 			pImageView,
 			pSampler,
+			imageLayout,
 		};
 		m_pData->setTexture(name, data);
 		//update layout binding information.
 		uint32_t descriptorCount = 1u;
-		LayoutBindingInfo info(
+		LayoutBindingInfo info = {
 			name,
 			VG_TRUE,
 			binding,
 			descriptorType,
 			descriptorCount,
-			stageFlags
-		);
+			stageFlags,
+		};
 		info.updateSize(m_pData.get());
 		setValue(name, info, m_mapLayoutBinds, m_arrLayoutBindNames);
 		m_applied = VG_FALSE;
@@ -444,6 +446,7 @@ namespace vg
 		, DescriptorType descriptorType
 	    , const Texture::ImageView *pImageView
 		, const Texture::Sampler *pSampler
+		, vk::ImageLayout imageLayout
 		)
 	{
 		setTexture(VG_M_MAIN_TEXTURE_NAME
@@ -453,6 +456,7 @@ namespace vg
 			, descriptorType
 			, pImageView
 			, pSampler
+			, imageLayout
 			);
 	}
 
@@ -1260,9 +1264,15 @@ namespace vg
 					} else {
 						sampler = *(texData.pTexture->getSampler()->getSampler());
 					}
+					vk::ImageLayout imageLayout;
+					if (texData.imageLayout != vk::ImageLayout::eUndefined) {
+						imageLayout = texData.imageLayout;
+					} else {
+						imageLayout = texData.pTexture->getImage()->getInfo().layout;
+					}
 					imageInfos[index].sampler = sampler;
 					imageInfos[index].imageView = imageView;
-					imageInfos[index].imageLayout = texData.pTexture->getImage()->getInfo().layout;
+					imageInfos[index].imageLayout = imageLayout;
 				}
 
 				writes[index].dstSet = *m_pDescriptorSet;

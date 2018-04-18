@@ -5,10 +5,12 @@ namespace vg
 	PassData::TexData::TexData(const Texture *pTexture
 	    , const Texture::ImageView *pImageView
 		, const Texture::Sampler *pSampler
+		, const vk::ImageLayout imageLayout
 		)
 		: pTexture(pTexture)
 		, pImageView(pImageView)
 		, pSampler(pSampler)
+		, imageLayout(imageLayout)
 	{
 
 	}

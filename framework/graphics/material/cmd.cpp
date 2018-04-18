@@ -185,6 +185,10 @@ namespace vg
         , m_renderPassInfos()
 		, m_renderPassInfoToCmdInfoIndices()
 
+        , m_clearValuesCount(0u)
+        , m_clearValuesCapacity(0u)
+        , m_clearValues()
+
         , m_cmdDrawCount(0u)
         , m_cmdDrawCapacity(0u)
         , m_cmdDraws()
@@ -259,6 +263,19 @@ namespace vg
             );
 
             auto &renderPassInfo = *(cmdInfo.pRenderPassInfo);
+            
+            auto clearValueCount = renderPassInfo.clearValueCount;
+            auto pClearValues = renderPassInfo.pClearValues;
+            addData<vk::ClearValue, RenderPassInfo, offsetof(RenderPassInfo, pClearValues)>(
+                m_clearValuesCount,
+                m_clearValuesCapacity,
+                m_clearValues,
+                &m_renderPassInfos,
+				m_renderPassInfoCount,
+                clearValueCount,
+                pClearValues
+            );
+
             if (renderPassInfo.pCmdDraw != nullptr) {
                 addData<CmdDraw, RenderPassInfo, offsetof(RenderPassInfo, pCmdDraw)>(
                     m_cmdDrawCount,

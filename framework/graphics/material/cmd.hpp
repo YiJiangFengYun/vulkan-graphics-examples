@@ -139,6 +139,10 @@ namespace vg
         std::vector<RenderPassInfo> m_renderPassInfos;
 		std::vector<uint32_t> m_renderPassInfoToCmdInfoIndices;
 
+        uint32_t m_clearValuesCount;
+        uint32_t m_clearValuesCapacity;
+        std::vector<std::vector<vk::ClearValue>> m_clearValues;
+
         uint32_t m_cmdDrawCount;
         uint32_t m_cmdDrawCapacity;
         std::vector<CmdDraw> m_cmdDraws;

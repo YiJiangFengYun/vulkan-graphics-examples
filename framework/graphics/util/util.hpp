@@ -35,6 +35,12 @@ namespace vg
 	}
 
 	template <typename T>
+	inline void removeValue(std::string name, std::unordered_map<std::string, T>& map)
+	{
+		map.erase(name);
+	}
+
+	template <typename T>
 	inline void setValue(std::string name, const T& value, std::unordered_map<std::string, T>& map, std::vector<std::string>& arr)
 	{
 		map[name] = value;
@@ -43,6 +49,18 @@ namespace vg
 		if (iterator == arr.end())
 		{
 			arr.push_back(name);
+		}
+	}
+
+	template <typename T>
+	inline void removeValue(std::string name, std::unordered_map<std::string, T>& map, std::vector<std::string>& arr)
+	{
+		map.erase(name);
+
+		auto iterator = std::find(arr.begin(), arr.end(), name);
+		if (iterator != arr.end())
+		{
+			arr.erase(iterator);
 		}
 	}
 

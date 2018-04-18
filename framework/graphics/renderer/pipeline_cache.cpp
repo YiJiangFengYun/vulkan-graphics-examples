@@ -82,10 +82,10 @@ namespace vg
         std::size_t seed = 0;
         boost::hash_combine(seed, info.renderPass);
         boost::hash_combine(seed, info.pPass->getID());
-        boost::hash_combine(seed, info.pVertexData->getID());
-        boost::hash_combine(seed, info.vertexSubIndex);
-        boost::hash_combine(seed, info.pIndexData->getID());
-        boost::hash_combine(seed, info.indexSubIndex);
+        boost::hash_combine(seed, info.pVertexData != nullptr ? info.pVertexData->getID() : 0);
+        boost::hash_combine(seed, info.pVertexData != nullptr ? info.vertexSubIndex : 0);
+        boost::hash_combine(seed, info.pIndexData != nullptr ? info.pIndexData->getID() : 0);
+        boost::hash_combine(seed, info.pIndexData != nullptr ? info.indexSubIndex : 0);
 
         return seed;
 	}
@@ -93,8 +93,8 @@ namespace vg
     size_t PipelineCache::HashFull::operator()(const Info& info) const {
         std::size_t seed = HashNoState()(info);
         boost::hash_combine(seed, info.pPass->getPipelineStateID());
-        boost::hash_combine(seed, info.pVertexData->getPipelineStateID());
-        boost::hash_combine(seed, info.pIndexData->getPipelineStateID());
+        boost::hash_combine(seed, info.pVertexData != nullptr ? info.pVertexData->getPipelineStateID() : 0);
+        boost::hash_combine(seed, info.pIndexData != nullptr ? info.pIndexData->getPipelineStateID() : 0);
 
         return seed;
 	}
@@ -187,13 +187,25 @@ namespace vg
 		createInfo.stageCount = shaderStages.size();
 		createInfo.pStages = shaderStages.data();
 
-        const auto &pVertexData = info.pVertexData;
-		const VertexData::SubVertexData &subVertexData = pVertexData->getSubVertexDatas()[info.vertexSubIndex];
-        const auto &pIndexData = info.pIndexData;
-		const IndexData::SubIndexData &subIndexData = pIndexData->getSubIndexDatas()[info.indexSubIndex];
+        if (info.pVertexData != nullptr) {
+            const auto &pVertexData = info.pVertexData;
+		    const VertexData::SubVertexData &subVertexData = pVertexData->getSubVertexDatas()[info.vertexSubIndex];
+            createInfo.pVertexInputState = &subVertexData.vertexInputStateInfo;
+        } else {
+            vk::PipelineVertexInputStateCreateInfo emptyInputState{};
+            createInfo.pVertexInputState = &emptyInputState;
+        }
 
-		createInfo.pVertexInputState = &subVertexData.vertexInputStateInfo;
-		createInfo.pInputAssemblyState = &subIndexData.inputAssemblyStateInfo;
+        if (info.pIndexData != nullptr) {
+            const auto &pIndexData = info.pIndexData;
+		    const IndexData::SubIndexData &subIndexData = pIndexData->getSubIndexDatas()[info.indexSubIndex];
+		    createInfo.pInputAssemblyState = &subIndexData.inputAssemblyStateInfo;            
+        } else {
+            vk::PipelineInputAssemblyStateCreateInfo emptyAssemblyState{};
+            createInfo.pInputAssemblyState = &emptyAssemblyState;
+        }
+
+		
 
         auto polygonMode = tranPolygonModeToVK(pPass->getPolygonMode());
         auto cullMode = tranCullModeFlagsToVK(pPass->getCullMode());
@@ -236,7 +248,8 @@ namespace vg
 			| vk::ColorComponentFlagBits::eA  //colorWriteMask
 		};
 
-		uint32_t attachmentCount = 1u;
+		uint32_t attachmentCount = colorBlendInfoOfPass.attachmentCount;
+		if (attachmentCount <= 0) attachmentCount = 1u;
 		std::vector<vk::PipelineColorBlendAttachmentState> colorBlendAttachmentStates(attachmentCount);
 		for (uint32_t i = 0; i < attachmentCount; ++i)
 		{

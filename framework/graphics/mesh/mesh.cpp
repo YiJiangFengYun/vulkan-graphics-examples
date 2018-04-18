@@ -181,8 +181,19 @@ namespace vg
 
 	SepMesh::SepMesh()
 		: InternalContentMesh()
+		, m_vertexCount(0u)
+		, m_pData()
+	    , m_arrLayoutBindingInfoNames()
+	    , m_mapLayoutBindingInfos()
+	    , m_subMeshCount()
+	    , m_subMeshInfos()
 		, m_multipliedColor(COLOR_WHITE) //default multiplied color should be (1, 1, 1, 1)
+	    , m_addedColor()
 		, m_applied(VG_FALSE)
+	    , m_appliedVertexCount(0u)
+	    , m_appliedSubMeshCount(0u)
+	    , m_layoutBindingInfos()
+	    , m_usingSubMeshInfos()
 	{
 		_createMeshData();
 		setSubMeshCount(1u);
@@ -190,8 +201,19 @@ namespace vg
 
 	SepMesh::SepMesh(MemoryPropertyFlags bufferMemoryPropertyFlags)
 		: InternalContentMesh(bufferMemoryPropertyFlags)
+		, m_vertexCount(0u)
+		, m_pData()
+		, m_arrLayoutBindingInfoNames()
+		, m_mapLayoutBindingInfos()
+		, m_subMeshCount()
+		, m_subMeshInfos()
 		, m_multipliedColor(COLOR_WHITE) //default multiplied color should be (1, 1, 1, 1)
+		, m_addedColor()
 		, m_applied(VG_FALSE)
+		, m_appliedVertexCount(0u)
+		, m_appliedSubMeshCount(0u)
+		, m_layoutBindingInfos()
+		, m_usingSubMeshInfos()
 	{
 		_createMeshData();
 		setSubMeshCount(1u);

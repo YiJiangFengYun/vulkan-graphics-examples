@@ -77,7 +77,7 @@ namespace vg
 						throw std::runtime_error("Error of start of subpass index of render pass for cmd info.");
 					}
 					recordItemRenderPassBegin(pRenderPassInfo, pCommandBuffer);
-				} else if (pRenderPassInfo->subPassIndex - lastSubPassIndex != 1u) {
+				} else if (pRenderPassInfo->subPassIndex - lastSubPassIndex == 1u) {
 					recordItemNextSubpass(pCommandBuffer);
 				} else if (pRenderPassInfo->subPassIndex - lastSubPassIndex > 1u) {
 					throw std::runtime_error("Error of increasing of subpass index of render pass for cmd info.");
@@ -300,13 +300,16 @@ namespace vg
 		PipelineCache *pPipelineCache,
 		std::shared_ptr<vk::Pipeline> &pPipeline)
 	{
-		auto pContentMesh = dynamic_cast<const ContentMesh *>(pMesh);
+		const vg::ContentMesh *pContentMesh = nullptr;
+		if (pMesh != nullptr) {
+			pContentMesh = dynamic_cast<const ContentMesh *>(pMesh);
+		} 
 		PipelineCache::Info info(
 			*pRenderPass,
 			pPass,
-			pContentMesh->getVertexData(),
+			pContentMesh != nullptr ? pContentMesh->getVertexData() : nullptr,
 			0u,
-			pContentMesh->getIndexData(),
+			pContentMesh != nullptr ? pContentMesh->getIndexData() : nullptr,
 			subMeshIndex
 		);
 		pPipeline = pPipelineCache->caching(info);
@@ -324,9 +327,7 @@ namespace vg
 		CmdDraw * pCmdDraw,
         CmdDrawIndexed * pCmdDrawIndexed
 		)
-	{
-		auto pContentMesh = dynamic_cast<const ContentMesh *>(pMesh);
-        
+	{        
         const auto& viewportOfPass = pPass->getViewport();
 		const auto& scissorOfPass = pPass->getScissor();
 
@@ -437,6 +438,7 @@ namespace vg
 				pCmdDrawIndexed->firstInstance
 				);
 		} else if (pMesh != nullptr) {
+			auto pContentMesh = dynamic_cast<const ContentMesh *>(pMesh);
 			const auto &pIndexData = pContentMesh->getIndexData();
 		    const auto &subIndexDatas = pIndexData->getSubIndexDatas();
 		    const auto &subIndexData = subIndexDatas[subMeshIndex];

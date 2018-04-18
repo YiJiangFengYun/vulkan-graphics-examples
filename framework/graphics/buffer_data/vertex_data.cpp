@@ -387,7 +387,7 @@ namespace vg
 		++m_pipelineStateID;
 		if ( m_pipelineStateID == std::numeric_limits<PipelineStateID>::max())
 		{
-			m_pipelineStateID = 0;
+			m_pipelineStateID = 1;
 		}
 	}
 

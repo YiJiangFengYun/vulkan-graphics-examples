@@ -1375,7 +1375,7 @@ namespace vg
 		++m_pipelineStateID;
 		if ( m_pipelineStateID == std::numeric_limits<PipelineStateID>::max())
 		{
-			m_pipelineStateID = 0;
+			m_pipelineStateID = 1;
 		}
 	}
 
@@ -1432,18 +1432,23 @@ namespace vg
 		    }
 			offset1 += buildInDataTypeSizes[static_cast<uint32_t>(type)];
 		}
-		//update layout binding information.
-		uint32_t descriptorCount = 1u;
-		LayoutBindingInfo info(
-			VG_M_BUILDIN_NAME,
-			VG_FALSE,
-			VG_M_BUILDIN_BINDING,
-			DescriptorType::UNIFORM_BUFFER,
-			descriptorCount,
-			ShaderStageFlagBits::VERTEX
-		);
-		info.updateSize(size);
-		setValue(VG_M_BUILDIN_NAME, info, m_mapLayoutBinds, m_arrLayoutBindNames);
+
+		if (size > 0) {
+		    //update layout binding information.
+		    uint32_t descriptorCount = 1u;
+		    LayoutBindingInfo info(
+		    	VG_M_BUILDIN_NAME,
+		    	VG_FALSE,
+		    	VG_M_BUILDIN_BINDING,
+		    	DescriptorType::UNIFORM_BUFFER,
+		    	descriptorCount,
+		    	ShaderStageFlagBits::VERTEX
+		    );
+		    info.updateSize(size);
+		    setValue(VG_M_BUILDIN_NAME, info, m_mapLayoutBinds, m_arrLayoutBindNames);
+		} else {
+			removeValue(VG_M_BUILDIN_NAME, m_mapLayoutBinds, m_arrLayoutBindNames);
+		}
 		m_applied = VG_FALSE;
 		m_dataChanged = VG_TRUE;
 	}

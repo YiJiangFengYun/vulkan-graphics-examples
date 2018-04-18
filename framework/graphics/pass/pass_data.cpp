@@ -5,7 +5,7 @@ namespace vg
 	PassData::TexData::TexData(const Texture *pTexture
 	    , const Texture::ImageView *pImageView
 		, const Texture::Sampler *pSampler
-		, const vk::ImageLayout imageLayout
+		, vk::ImageLayout imageLayout
 		)
 		: pTexture(pTexture)
 		, pImageView(pImageView)
@@ -13,6 +13,24 @@ namespace vg
 		, imageLayout(imageLayout)
 	{
 
+	}
+
+	PassData::TexData::TexData(const TexData &target)
+	    : pTexture(target.pTexture)
+		, pImageView(target.pImageView)
+		, pSampler(target.pSampler)
+		, imageLayout(target.imageLayout)
+	{
+		
+	}
+
+	PassData::TexData &PassData::TexData::operator=(const TexData &target)
+	{
+		pTexture = target.pTexture;
+		pImageView = target.pImageView;
+		pSampler = target.pSampler;
+		imageLayout = target.imageLayout;
+		return *this;
 	}
 
     PassData::TexData PassData::getTexture(std::string name) const

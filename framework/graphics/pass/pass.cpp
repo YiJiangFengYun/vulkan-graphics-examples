@@ -382,7 +382,7 @@ namespace vg
 		, DescriptorType descriptorType
 		, const Texture::ImageView *pImageView
 		, const Texture::Sampler *pSampler
-		, vk::ImageLayout imageLayout = vk::ImageLayout::eUndefined
+		, vk::ImageLayout imageLayout
 	)
 	{
 		PassData::TexData data = {

@@ -27,77 +27,203 @@ Window::Window(std::shared_ptr<GLFWwindow> pWindow
 void Window::_init()
 {
 	ParentWindowType::_init();
-	m_cameraZoom = -5.0f;
-	_loadModel();
-	_createMesh();
-	_createMaterial();
 	_createModel();
+	// _createTexture();
+	_createMaterial();
+	_initScene();
 }
 
-void Window::_loadModel()
+void Window::_initState()
 {
-	m_tempPositions = { vg::Vector3(1.0f, 1.0f, 0.0f)
-	, vg::Vector3(-1.0f, 1.0f, 0.0f)
-	, vg::Vector3(0.0f, -1.0f, 0.0f)
-	};
-	m_tempColors = { vg::Color32(255, 0, 0, 255)
-	, vg::Color32(0, 255, 0, 255)
-	, vg::Color32(0, 0, 255, 255)
-	};
-	m_tempIndices = {
-		0, 1, 2
-	};
+	ParentWindowType::_initState();
+	m_cameraZoom = -0.0f;
+	/// Build a quaternion from euler angles (pitch, yaw, roll), in radians.
+	m_cameraRotation = vg::Vector3(glm::radians(0.0f), glm::radians(0.0f), glm::radians(0.0f));
 }
-void Window::_createMesh()
-{
-	m_pMesh = static_cast<std::shared_ptr<vg::DimSepMesh3>>(new vg::DimSepMesh3());
-	m_pMesh->setVertexCount(static_cast<uint32_t>(m_tempPositions.size()));
-	m_pMesh->setPositions(m_tempPositions);
-	m_pMesh->setColor32s(m_tempColors);
-	m_pMesh->setIndices(m_tempIndices, vg::PrimitiveTopology::TRIANGLE_LIST, 0u);
-	m_pMesh->apply(VG_TRUE);
-}
-void Window::_createMaterial()
-{
-	//material
-	m_pMaterial = std::shared_ptr<vg::Material>(new vg::Material());
-	m_pMaterial->setRenderPriority(0u);
-	m_pMaterial->setRenderQueueType(vg::MaterialShowType::OPAQUE);
 
-	auto pShader = m_pMaterial->getMainShader();
-	auto pPass = m_pMaterial->getMainPass();
-	//shader
-	pShader->load("shaders/triangle/triangle.vert.spv", 
-	    "shaders/triangle/triangle.frag.spv");
-	//pass
-	pPass->setMainColor(vg::Color(1.0f, 1.0f, 1.0f, 1.0f));
-	pPass->setPolygonMode(vg::PolygonMode::FILL);
-	pPass->setCullMode(vg::CullModeFlagBits::NONE);
-	pPass->setFrontFace(vg::FrontFaceType::COUNTER_CLOCKWISE);
-	vk::PipelineColorBlendAttachmentState attachmentState[1] = {};
-	attachmentState[0].colorWriteMask = vk::ColorComponentFlagBits::eR
-		| vk::ColorComponentFlagBits::eG
-		| vk::ColorComponentFlagBits::eB
-		| vk::ColorComponentFlagBits::eA;
-	attachmentState[0].blendEnable = VG_FALSE;
-	vk::PipelineColorBlendStateCreateInfo colorBlendState = {};
-	colorBlendState.attachmentCount = 1;
-	colorBlendState.pAttachments = attachmentState;
-	pPass->setColorBlendInfo(colorBlendState);
-	vk::PipelineDepthStencilStateCreateInfo depthStencilState = {};
-	depthStencilState.depthTestEnable = VG_TRUE;
-	depthStencilState.depthWriteEnable = VG_TRUE;
-	depthStencilState.depthCompareOp = vk::CompareOp::eLessOrEqual;
-	pPass->setDepthStencilInfo(depthStencilState);
-	
-	m_pMaterial->apply();
-}
 void Window::_createModel()
 {
-	m_pModel = std::shared_ptr<vg::VisualObject3>(new vg::VisualObject3());
-	m_pModel->setMesh(m_pMesh.get());
-	m_pModel->setMaterial(m_pMaterial.get());
-	m_pScene->addVisualObject(m_pModel.get());
+	const uint32_t layoutCount = 4u;
+	sampleslib::AssimpScene::VertexLayoutComponent layouts[layoutCount] = {
+		sampleslib::AssimpScene::VertexLayoutComponent::VERTEX_COMPONENT_POSITION,
+		sampleslib::AssimpScene::VertexLayoutComponent::VERTEX_COMPONENT_COLOR,		
+		sampleslib::AssimpScene::VertexLayoutComponent::VERTEX_COMPONENT_NORMAL,
+		sampleslib::AssimpScene::VertexLayoutComponent::VERTEX_COMPONENT_UV,
+	};
+	sampleslib::AssimpScene::CreateInfo createInfo;
+	createInfo.fileName = "models/samplebuilding.dae";
+	createInfo.isCreateObject = VG_TRUE;
+	createInfo.layoutComponentCount = layoutCount;
+	createInfo.pLayoutComponent = layouts;
+	createInfo.offset = vg::Vector3(0.0f, 0.0f, 0.0f);
+	m_assimpScene.init(createInfo);
+}
+
+// void Window::_createTexture()
+// {
+// 	//load texture
+// 	auto &pApp = vg::pApp;
+// 	auto deviceFeatures = pApp->getPhysicalDeviceFeatures();
+// 	std::string fileName;
+// 	vk::Format format;
+// 	if (deviceFeatures.textureCompressionBC) 
+// 	{
+// 		fileName = "models/voyager/voyager_bc3_unorm.ktx";
+// 		format = vk::Format::eBc2UnormBlock;
+// 	}
+// 	else if (deviceFeatures.textureCompressionASTC_LDR)
+// 	{
+// 		fileName = "models/voyager/voyager_astc_8x8_unorm.ktx";
+// 		format = vk::Format::eAstc8x8UnormBlock;
+// 	}
+// 	else if (deviceFeatures.textureCompressionETC2)
+// 	{
+// 		fileName = "models/voyager/voyager_etc2_unorm.ktx";
+// 		format = vk::Format::eEtc2R8G8B8UnormBlock;
+// 	}
+// 	else
+// 	{
+// 		throw std::runtime_error("Device does not support any compressed texture format!");
+// 	}
+
+// 	gli::texture2d gliTex(gli::load(fileName));
+// 	if (gliTex.empty()) {
+// 		throw std::runtime_error("The texture do't exist! path: " + fileName);
+// 	}
+
+// 	auto pTex = new vg::Texture2D(format, VG_TRUE,
+// 		gliTex[0].extent().x,
+// 		gliTex[0].extent().y
+// 	);
+// 	m_pTexture = std::shared_ptr<vg::Texture2D>(pTex);
+// 	uint32_t mipLevels = static_cast<uint32_t>(gliTex.levels());
+// 	uint32_t count = mipLevels;
+// 	vg::TextureDataInfo textureLayout;
+// 	std::vector<vg::TextureDataInfo::Component> components(count);
+// 	for (uint32_t level = 0; level < mipLevels; ++level) {
+// 		uint32_t index = level;
+// 		components[index].mipLevel = level;
+// 	    components[index].baseArrayLayer = 0u;
+// 	    components[index].layerCount = 1u;
+// 	    components[index].size = gliTex[level].size();
+// 	    components[index].hasImageExtent = VG_TRUE;
+// 	    components[index].width = gliTex[level].extent().x;
+// 	    components[index].height = gliTex[level].extent().y;
+// 	    components[index].depth = 1u;
+// 	}
+// 	textureLayout.componentCount = components.size();
+// 	textureLayout.pComponent = components.data();
+// 	m_pTexture->applyData(textureLayout, gliTex.data(), gliTex.size());
+
+// 	auto pDevice = pApp->getDevice();
+// 	auto pPhysicalDevice = pApp->getPhysicalDevice();
+// 	vk::Bool32 enableAnisotropy = VK_FALSE;
+// 	float anisotropy = 0.0f;
+// 	if (pApp->getPhysicalDeviceFeatures().samplerAnisotropy)
+// 	{
+// 		enableAnisotropy = VK_TRUE;
+// 		anisotropy = pPhysicalDevice->getProperties().limits.maxSamplerAnisotropy;
+// 	}
+
+// 	vg::Texture::SamplerCreateInfo info = {
+// 		vk::SamplerCreateFlags(),
+// 		vk::Filter::eLinear,
+// 		vk::Filter::eLinear,
+// 		vk::SamplerMipmapMode::eLinear,
+// 		vk::SamplerAddressMode::eRepeat,
+// 		vk::SamplerAddressMode::eRepeat,
+// 		vk::SamplerAddressMode::eRepeat,
+// 		0.0f,
+// 		enableAnisotropy,
+// 		anisotropy,
+// 		0.0f,
+// 		(float)(m_pTexture->getImage()->getInfo().mipLevels),
+// 	};
+// 	m_pTexture->createSampler("other_sampler", info);
+// }
+
+void Window::_createMaterial()
+{
+	{
+		//material
+	    m_pMaterialOfScene = std::shared_ptr<MaterialDeferred>(new MaterialDeferred());
+	    m_pMaterialOfScene->setRenderPriority(0u);
+	    m_pMaterialOfScene->setRenderQueueType(vg::MaterialShowType::OPAQUE);
+		{
+	        auto pPass = m_pMaterialOfScene->getPassDeferred();
+			auto pShader = pPass->getShader();
+
+			//shader
+	        pShader->load("shaders/passes/gbuffer.vert.spv", 
+	            "shaders/passes/gbuffer.frag.spv");
+
+			//pass
+			pPass->setPolygonMode(vg::PolygonMode::FILL);
+	        pPass->setCullMode(vg::CullModeFlagBits::BACK);
+	        pPass->setFrontFace(vg::FrontFaceType::COUNTER_CLOCKWISE);
+			vg::Pass::BuildInDataInfo::Component buildInDataCmps[2] = {
+	    		{vg::Pass::BuildInDataType::MATRIX_OBJECT_TO_NDC},
+	    		{vg::Pass::BuildInDataType::MATRIX_OBJECT_TO_WORLD}
+	    	};
+	        vg::Pass::BuildInDataInfo buildInDataInfo;
+	        buildInDataInfo.componentCount = 2u;
+	        buildInDataInfo.pComponent = buildInDataCmps;
+	        pPass->setBuildInDataInfo(buildInDataInfo);
+			vk::PipelineDepthStencilStateCreateInfo depthStencilState = {};
+	        depthStencilState.depthTestEnable = VG_TRUE;
+	        depthStencilState.depthWriteEnable = VG_TRUE;
+	        depthStencilState.depthCompareOp = vk::CompareOp::eLessOrEqual;
+	        pPass->setDepthStencilInfo(depthStencilState);
+		}
+		{
+			auto pPass = m_pMaterialOfScene->getPassComposition();
+			auto pShader = pPass->getShader();
+			//shader
+	        pShader->load("shaders/passes/composition.vert.spv", 
+	            "shaders/passes/composition.frag.spv");
+
+		    vk::SpecializationMapEntry specializationMapEntriy;
+    
+		    specializationMapEntriy.constantID = 0;
+		    specializationMapEntriy.size = sizeof(uint32_t);
+		    specializationMapEntriy.offset = 0;
+
+			uint32_t specializationData = NUM_LIGHTS;
+    
+		    // Prepare specialization info block for the shader stage
+		    vk::SpecializationInfo specializationInfo{};
+		    specializationInfo.mapEntryCount = 1u;
+		    specializationInfo.pMapEntries = &specializationMapEntriy;
+		    specializationInfo.dataSize = sizeof(specializationData);			
+		    specializationInfo.pData = &specializationData;
+    
+		    pPass->setSpecializationData(vg::ShaderStageFlagBits::FRAGMENT, specializationInfo);
+    
+			//pass
+			pPass->setDataValue("other_info", m_otherInfo, 3u);
+		}
+		{
+			auto pShader = m_pMaterialOfScene->getMainShader();
+	        auto pPass = m_pMaterialOfScene->getMainPass();
+	        //shader
+	        pShader->load("shaders/passes/to_trunk.vert.spv", 
+	            "shaders/passes/to_trunk.frag.spv");
+	        //pass
+		}
+    
+	    m_pMaterialOfScene->apply();
+	}
+	
+}
+
+void Window::_initScene()
+{
+	const auto &objects = m_assimpScene.getObjects();
+	for (const auto &object : objects)
+	{
+		object->setMaterial(m_pMaterialOfScene.get());
+	    m_pScene->addVisualObject(object.get());		
+	}
 }
 
 void Window::_onUpdate()

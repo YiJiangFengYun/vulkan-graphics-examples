@@ -9,7 +9,13 @@ int main() {
 	static plog::DebugOutputAppender<plog::TxtFormatter> debugOutputAppender;
 	plog::init(plog::debug, &debugOutputAppender);
 
-	vg::setVulkanLogSeverity(plog::debug);
+	vg::PhysicalDeviceFeatures requiredFeatures;
+
+    vg::PhysicalDeviceFeaturePriorities optionalFeatures;
+	optionalFeatures.samplerAnisotropy = 1u;
+	optionalFeatures.textureCompressionBC = 1u;
+	optionalFeatures.textureCompressionASTC_LDR = 1u;
+	optionalFeatures.textureCompressionETC2 = 1u;
 
 	App app;
 	app.init<Window>(WINDOW_WIDTH, WINDOW_HEIGHT, "passes");

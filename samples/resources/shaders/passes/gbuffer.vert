@@ -7,12 +7,10 @@ layout (location = 0) in vec4 inPos;
 layout (location = 1) in vec3 inColor;
 layout (location = 2) in vec3 inNormal;
 
-layout (binding = 0) uniform UBO 
-{
-	mat4 projection;
-	mat4 model;
-	mat4 view;
-} ubo;
+layout(binding = 0) uniform BuildIn {
+    mat4 matrixObjectToNDC;
+	mat4 matrixObjectToWorld;	
+} _buildIn;
 
 layout (location = 0) out vec3 outNormal;
 layout (location = 1) out vec3 outColor;
@@ -26,16 +24,16 @@ out gl_PerVertex
 
 void main() 
 {
-	gl_Position = ubo.projection * ubo.view * ubo.model * inPos;
+	gl_Position = _buildIn.matrixObjectToNDC * inPos;
 	
 	// Vertex position in world space
-	outWorldPos = vec3(ubo.model * inPos);
-	// GL to Vulkan coord space
-	outWorldPos.y = -outWorldPos.y;
+	outWorldPos = vec3(_buildIn.matrixObjectToWorld * inPos);
+	// // GL to Vulkan coord space
+	// outWorldPos.y = -outWorldPos.y;
 	
 	// Normal in world space
-	mat3 mNormal = transpose(inverse(mat3(ubo.model)));
-	outNormal = mNormal * normalize(inNormal);	
+	// mat3 mNormal = transpose(inverse(mat3(_buildIn.matrixObjectToWorld)));
+	outNormal = mat3(_buildIn.matrixObjectToWorld) * normalize(inNormal);	
 	
 	// Currently just vertex color
 	outColor = inColor;

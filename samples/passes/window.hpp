@@ -2,7 +2,10 @@
 #define WINDOW_H
 
 #include "sampleslib/window.hpp"
+#include "sampleslib/scene_assimp.hpp"
+#include "passes/material_deferred.hpp"
 
+#define NUM_LIGHTS 64
 
 class Window : public sampleslib::Window<vg::SpaceType::SPACE_3>
 {
@@ -17,19 +20,29 @@ public:
 		, std::shared_ptr<vk::SurfaceKHR> pSurface
 	);
 private:
-	std::vector<vg::Vector3> m_tempPositions;
-	std::vector<vg::Color32> m_tempColors;
-	std::vector<uint32_t> m_tempIndices;
-	std::shared_ptr<vg::VisualObject3> m_pModel;
-	std::shared_ptr<vg::DimSepMesh3> m_pMesh;
-	std::shared_ptr<vg::Material> m_pMaterial;
+    sampleslib::AssimpScene m_assimpScene;
+	std::shared_ptr<MaterialDeferred> m_pMaterialOfScene;
+
+	struct Light {
+		vg::Vector4 position;
+		vg::Vector4 color;
+		float radius;
+	};
+	struct OtherInfo 
+	{
+		vg::Vector4 vewPos;
+		Light lights[NUM_LIGHTS];
+	} m_otherInfo;
 
 	virtual void _init() override;
 	
-	void _loadModel();
-	void _createMesh();
-	void _createMaterial();
+	virtual void _init() override;
+	virtual void _initState() override;
 	void _createModel();
+	void _createTexture();
+	void _createMaterial();
+	void _initScene();
+
 	virtual void _onUpdate() override;
 };
 

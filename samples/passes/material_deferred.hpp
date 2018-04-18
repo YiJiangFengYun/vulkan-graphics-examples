@@ -10,17 +10,21 @@ public:
     MaterialDeferred(uint32_t trunkFrameBufferWidth, uint32_t trunkFrameBufferHeight);
 
     virtual void beginBindToRender(const BindInfo info, BindResult *pResult) override;
-    virtual void endBindToRender(const EndBindInfo info) override;   
+    virtual void endBindToRender(const EndBindInfo info) override;
+
+    vg::Pass * getPassDeferred() const;
+    vg::Pass * getPassComposition() const;
+
 private:
     uint32_t m_frameBufferWidth;
     uint32_t m_frameBufferHeight;
     uint32_t m_trunkFramebufferWidth;
     uint32_t m_trunkFramebufferHeight;    
-    std::shared_ptr<vg::TextureColorAttachment> m_pAttachmentColor;
+    std::shared_ptr<vg::Texture2DColorAttachment> m_pAttachmentColor;
     std::shared_ptr<vg::TextureColorAttachment> m_pAttachmentPos;
     std::shared_ptr<vg::TextureColorAttachment> m_pAttachmentNormal;
     std::shared_ptr<vg::TextureColorAttachment> m_pAttachmentAlbedo;
-    std::shared_ptr<vg::TextureDepthStencilAttachment> m_pAttachmentDepthStencil;
+    std::shared_ptr<vg::Texture2DDepthStencilAttachment> m_pAttachmentDepthStencil;
     std::shared_ptr<vk::RenderPass> m_pRenderPass;
     std::shared_ptr<vk::Framebuffer> m_pFrameBuffer;
     std::shared_ptr<vg::Shader> m_pShaderDeferred;

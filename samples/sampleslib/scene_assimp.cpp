@@ -408,21 +408,15 @@ namespace sampleslib
                 //Filling the visual object.
                 if (createInfo.isCreateObject)
                 {
+                    auto &pMeshes = m_pMeshes;                    
+                    uint32_t count = static_cast<uint32_t>(pMeshes.size());
                     auto &pObjects = m_pObjects;
-                    auto &pMeshes = m_pMeshes;
-                    pObjects.resize(meshCount);
+                    pObjects.resize(count);
 
-                    for (uint32_t i = 0; i < meshCount; ++i)
+                    for (uint32_t i = 0; i < count; ++i)
                     {
 						pObjects[i] = std::shared_ptr<vg::VisualObject3>(new vg::VisualObject3());
-						if (createInfo.separateMesh)
-						{
-							pObjects[i]->setMesh(pMeshes[i].get());
-						}
-						else
-						{
-							pObjects[i]->setMesh(pMeshes[0].get());
-						}
+						pObjects[i]->setMesh(pMeshes[i].get());
                     }
                 }
                 else

@@ -31,7 +31,8 @@ namespace vg
 
 	private:
 		//compositions
-		uint32_t m_renderQueueId;
+		std::string m_vertShaderPath;
+		std::string m_fragShaderPath;
 		std::shared_ptr<vk::ShaderModule> m_pVertShaderModule;
 		std::shared_ptr<vk::ShaderModule> m_pFragShaderModule;
 

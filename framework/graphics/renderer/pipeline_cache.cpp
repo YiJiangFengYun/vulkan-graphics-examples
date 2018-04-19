@@ -46,17 +46,35 @@ namespace vg
         return *this;
     }
 
-    bool PipelineCache::Info::operator==(const Info &rhs) const
+    Bool32 PipelineCache::Info::operator==(const Info &rhs) const
     {
-        return renderPass == rhs.renderPass &&
-            pPass->getID() == rhs.pPass->getID() &&
-            pVertexData->getID() == rhs.pVertexData->getID() &&
-            vertexSubIndex ==  rhs.vertexSubIndex &&
-            pIndexData->getID() == rhs.pIndexData->getID() &&
-            indexSubIndex == rhs.indexSubIndex;
+		if (renderPass != rhs.renderPass) return VG_FALSE;
+		if (pPass->getID() != rhs.pPass->getID()) return VG_FALSE;
+		if (pVertexData != nullptr && rhs.pVertexData != nullptr)
+		{
+			if (pVertexData->getID() != rhs.pVertexData->getID()) return VG_FALSE;
+			if (vertexSubIndex != rhs.vertexSubIndex) return VG_FALSE;
+		} 
+		else
+		{
+			if (pVertexData != rhs.pVertexData) return VG_FALSE;
+		}
+
+		if (pIndexData != nullptr && rhs.pIndexData != nullptr)
+		{
+			if (pIndexData->getID() != rhs.pIndexData->getID()) return VG_FALSE;
+			if (indexSubIndex != rhs.indexSubIndex) return VG_FALSE;
+		}
+		else
+		{
+			if (pIndexData != rhs.pIndexData) return VG_FALSE;
+		}
+
+
+		return VG_TRUE;
     }
 
-	bool PipelineCache::Info::operator!=(const Info &rhs) const
+	Bool32 PipelineCache::Info::operator!=(const Info &rhs) const
     {
         return !operator==(rhs);
     }

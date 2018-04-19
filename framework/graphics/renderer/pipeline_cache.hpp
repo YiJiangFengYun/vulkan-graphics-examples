@@ -33,8 +33,8 @@ namespace vg {
             Info(const Info &);
 			Info(const Info &&);
 			Info& operator=(const Info &);
-            bool operator==(const Info &) const;
-	        bool operator!=(const Info &) const;
+			Bool32 operator==(const Info &) const;
+			Bool32 operator!=(const Info &) const;
     
             Info(vk::RenderPass renderPass
                 , Pass *pPass

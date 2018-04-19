@@ -50,9 +50,11 @@ namespace vg
 
 		virtual ~BaseVisualObject();
 
-		Material *getMaterial() const;
+		Material *getMaterial(uint32_t index = 0) const;
 
-		void setMaterial(Material *pMaterial);
+		void setMaterialCount(uint32_t count);
+		void setMaterial(fd::ArrayProxy<Material *> pMaterials, uint32_t count = 1u, uint32_t offset = 0);
+		void setMaterial(Material * pMaterial);
 
 		BaseMesh *getMesh() const;
 
@@ -75,7 +77,8 @@ namespace vg
 		void endBindToRender();
 
 	protected:
-		Material *m_pMaterial;
+	    uint32_t m_materialCount;
+		std::vector<Material *> m_pMaterials;
 		BaseMesh *m_pMesh;
 		int32_t m_subMeshOffset;
 		int32_t m_subMeshCount;

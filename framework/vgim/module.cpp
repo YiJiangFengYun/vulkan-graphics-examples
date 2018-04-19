@@ -284,6 +284,11 @@ namespace vgim
         fd::Rect2D scissor(0.0f, 0.0f, ImGui::GetIO().DisplaySize.x / static_cast<float>(m_canvasWidth), 
             ImGui::GetIO().DisplaySize.y / static_cast<float>(m_canvasHeight));
 		pPass->setScissor(scissor);
+
+		m_pUIObject->setMaterialCount(m_pMesh->getSubMeshCount());
+
+		m_pUIObject->setMaterial(m_pMaterial.get());
+		
     }
 
 	void _createMaterial()
@@ -380,6 +385,7 @@ namespace vgim
     {
         m_pUIObject = std::shared_ptr<vg::VisualObject2>(new vg::VisualObject2());
         m_pUIObject->setMesh(m_pMesh.get());
+		m_pUIObject->setMaterialCount(1u);
         m_pUIObject->setMaterial(m_pMaterial.get());
     }
 

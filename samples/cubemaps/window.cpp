@@ -277,7 +277,9 @@ void Window::_initScene()
 		auto &objects = m_skyBoxObject.getObjects();
 		for (auto &object : objects)
 		{
-			object->setMaterial(m_pMaterialSkybox.get());
+			auto pMaterial = m_pMaterialSkybox.get();
+			object->setMaterialCount(1u);
+			object->setMaterial(pMaterial);
 			object->setIsVisibilityCheck(VG_FALSE);
 			m_pScene->addVisualObject(object.get());
 		}
@@ -290,7 +292,9 @@ void Window::_initScene()
 			auto &objects = objectScene.getObjects();
 			for (auto &object : objects)
 			{
-				object->setMaterial(m_pMaterialReflect.get());
+				auto pMaterial = m_pMaterialReflect.get();
+				object->setMaterialCount(1u);
+				object->setMaterial(pMaterial);
 				if (i == m_objectIndex) 
 					m_pScene->addVisualObject(object.get());
 			}

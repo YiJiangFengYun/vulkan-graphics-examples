@@ -233,7 +233,9 @@ void Window::_createModel()
 	{
 		m_pModels[i] = std::shared_ptr<vg::VisualObject3>(new vg::VisualObject3());
 		m_pModels[i]->setMesh(m_pMesh.get());
-		m_pModels[i]->setMaterial(m_pMaterials[i].get());
+		auto pMaterial = m_pMaterials[i].get();
+		m_pModels[i]->setMaterialCount(1u);
+		m_pModels[i]->setMaterial(pMaterial);
 		//m_pModels[i]->setIsVisibilityCheck(VG_FALSE);
 		m_pScene->addVisualObject(m_pModels[i].get());
 	}

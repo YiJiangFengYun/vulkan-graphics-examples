@@ -38,7 +38,8 @@ namespace vg
 
 	BaseVisualObject::BaseVisualObject()
 	    : Base(BaseType::SCENE_OBJECT)
-		, m_pMaterial()
+		, m_materialCount(0)
+		, m_pMaterials()
 		, m_pMesh()
 		, m_subMeshOffset(-1)
 		, m_subMeshCount(-1)
@@ -54,14 +55,33 @@ namespace vg
 
 	}
 
-	Material *BaseVisualObject::getMaterial() const
+	Material *BaseVisualObject::getMaterial(uint32_t index) const
 	{
-		return m_pMaterial;
+		return m_pMaterials[index];
 	}
 
-	void BaseVisualObject::setMaterial(Material *pMaterial)
+	void BaseVisualObject::setMaterialCount(uint32_t count)
 	{
-		m_pMaterial = pMaterial;
+		if (m_materialCount != count) {
+			m_materialCount = count;
+		    m_pMaterials.resize(count);
+		}
+	}
+
+	void BaseVisualObject::setMaterial(fd::ArrayProxy<Material *> pMaterials, uint32_t count, uint32_t offset)
+	{
+		for (uint32_t i = 0; i < count; ++i)
+        {
+            m_pMaterials[offset] = *(pMaterials.data() + i);
+            ++offset;
+        }
+	}
+
+	void BaseVisualObject::setMaterial(Material * pMaterial)
+	{
+		for (uint32_t i = 0; i < m_materialCount; ++i) {
+		    m_pMaterials[i] = pMaterial;
+		}
 	}
 
 	BaseMesh *BaseVisualObject::getMesh() const
@@ -147,67 +167,63 @@ namespace vg
 	void BaseVisualObject::beginBindToRender(const BindInfo info, BindResult *pResult)
 	{
 		auto &result = *pResult;
-		if (m_pMaterial != nullptr)
+		uint32_t subMeshCount = getSubMeshCount();
+		auto modelMatrix = _getModelMatrix();		
+		uint32_t subMeshOffset = getSubMeshOffset();		
+		uint32_t materialCount = m_materialCount;
+		for (uint32_t i = 0; i < subMeshCount; ++i)
 		{
-			auto modelMatrix = _getModelMatrix();
-
-			uint32_t subMeshCount = getSubMeshCount();
-			uint32_t subMeshOffset = getSubMeshOffset();
-			
-			for (uint32_t i = 0; i < subMeshCount; ++i)
-			{
-				uint32_t subMeshIndex = subMeshOffset + i;
-				Material::BindInfo infoForVisualizer = {
-			        info.pProjMatrix,
-			        info.pViewMatrix,
-				    info.trunkFramebufferWidth,
-				    info.trunkFramebufferHeight,
-					m_id,
-                    &modelMatrix,
-			        m_pMesh,
-			        subMeshIndex,
-			        m_hasClipRect,
-					m_hasClipRect ? *(m_clipRects.data() + i) : fd::Rect2D(),
+			if (i >= materialCount) continue;
+			auto pMaterial = m_pMaterials[i];
+			if (pMaterial == nullptr) continue;
+			uint32_t subMeshIndex = subMeshOffset + i;
+			Material::BindInfo infoForVisualizer = {
+			    info.pProjMatrix,
+			    info.pViewMatrix,
+			    info.trunkFramebufferWidth,
+			    info.trunkFramebufferHeight,
+				m_id,
+                &modelMatrix,
+			    m_pMesh,
+			    subMeshIndex,
+			    m_hasClipRect,
+				m_hasClipRect ? *(m_clipRects.data() + i) : fd::Rect2D(),
 #if defined(DEBUG) && defined(VG_ENABLE_COST_TIMER)
-                    info.pPreparingBuildInDataCostTimer,
-                    info.pPreparingPipelineCostTimer,
-                    info.pPreparingCommandBufferCostTimer,
+                info.pPreparingBuildInDataCostTimer,
+                info.pPreparingPipelineCostTimer,
+                info.pPreparingCommandBufferCostTimer,
 #endif //DEBUG and VG_ENABLE_COST_TIMER
-		            };
+		        };
     
-		        Material::BindResult resultForVisualizer;
-				
-				if (result.pBranchCmdBuffer != nullptr)
-					resultForVisualizer.pBranchCmdBuffer = result.pBranchCmdBuffer;
-				if (result.pTrunkRenderPassCmdBuffer != nullptr)
-					resultForVisualizer.pTrunkRenderPassCmdBuffer = result.pTrunkRenderPassCmdBuffer;
-				if (result.pTrunkWaitBarrierCmdBuffer != nullptr)
-				    resultForVisualizer.pTrunkWaitBarrierCmdBuffer = result.pTrunkWaitBarrierCmdBuffer;
-
-		        m_pMaterial->beginBindToRender(infoForVisualizer, &resultForVisualizer);
-
-			}
+		    Material::BindResult resultForVisualizer;
+			
+			if (result.pBranchCmdBuffer != nullptr)
+				resultForVisualizer.pBranchCmdBuffer = result.pBranchCmdBuffer;
+			if (result.pTrunkRenderPassCmdBuffer != nullptr)
+				resultForVisualizer.pTrunkRenderPassCmdBuffer = result.pTrunkRenderPassCmdBuffer;
+			if (result.pTrunkWaitBarrierCmdBuffer != nullptr)
+			    resultForVisualizer.pTrunkWaitBarrierCmdBuffer = result.pTrunkWaitBarrierCmdBuffer;
+		    pMaterial->beginBindToRender(infoForVisualizer, &resultForVisualizer);
 		}
 		
 	}
 
 	void BaseVisualObject::endBindToRender()
 	{
-		if (m_pMaterial != nullptr)
+		uint32_t subMeshCount = getSubMeshCount();
+		uint32_t subMeshOffset = getSubMeshOffset();
+		uint32_t materialCount = m_materialCount;	
+		for (uint32_t i = 0; i < subMeshCount; ++i)
 		{
-			uint32_t subMeshCount = getSubMeshCount();
-			uint32_t subMeshOffset = getSubMeshOffset();
-			
-			for (uint32_t i = 0; i < subMeshCount; ++i)
-			{
-				uint32_t subMeshIndex = subMeshOffset + i;
-				Material::EndBindInfo info = {
-					m_id,
-					subMeshIndex,
-				};
-				m_pMaterial->endBindToRender(info);
-			}
-			
+			if (i >= materialCount) continue;
+			auto pMaterial = m_pMaterials[i];
+			if (pMaterial == nullptr) continue;
+			uint32_t subMeshIndex = subMeshOffset + i;
+			Material::EndBindInfo info = {
+				m_id,
+				subMeshIndex,
+			};
+			pMaterial->endBindToRender(info);
 		}
 	}
 

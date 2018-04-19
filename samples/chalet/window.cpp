@@ -149,7 +149,9 @@ namespace chalet
 	{
 		m_pModel = std::shared_ptr<vg::VisualObject3>(new vg::VisualObject3());
 		m_pModel->setMesh(m_pMesh.get());
-		m_pModel->setMaterial(m_pMaterial.get());
+		auto pMaterial = m_pMaterial.get();
+		m_pModel->setMaterialCount(1u);
+		m_pModel->setMaterial(pMaterial);
 		m_pScene->addVisualObject(m_pModel.get());
 	}
 
@@ -244,7 +246,9 @@ namespace chalet
 	{
 		m_pModelOfBounds = std::shared_ptr<vg::VisualObject3>(new vg::VisualObject3());
 		m_pModelOfBounds->setMesh(m_pMeshOfBounds.get());
-		m_pModelOfBounds->setMaterial(m_pMaterialOfBounds.get());
+		auto pMaterial = m_pMaterialOfBounds.get();
+		m_pModelOfBounds->setMaterialCount(1u);
+		m_pModelOfBounds->setMaterial(pMaterial);
 		m_pScene->addVisualObject(m_pModelOfBounds.get());
 	}
 

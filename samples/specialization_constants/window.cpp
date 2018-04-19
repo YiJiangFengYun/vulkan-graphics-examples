@@ -237,7 +237,9 @@ void Window::_createVisualObjects()
 	{
 		m_pVisualObjects[i] = std::shared_ptr<vg::VisualObject3>{new vg::VisualObject3()};
 		m_pVisualObjects[i]->setMesh(meshes[0].get());
-		m_pVisualObjects[i]->setMaterial(m_pMaterials[i].get());
+		auto pMaterial = m_pMaterials[i].get();
+		m_pVisualObjects[i]->setMaterialCount(1u);
+		m_pVisualObjects[i]->setMaterial(pMaterial);
 	}
 }
 

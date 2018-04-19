@@ -310,11 +310,15 @@ void Window::_createVisualObjects()
 		auto &mesh = meshes[index];
 		m_pVisualObjects[index] = std::shared_ptr<vg::VisualObject3>{ new vg::VisualObject3() };
 		m_pVisualObjects[index]->setMesh(mesh.get());
-		m_pVisualObjects[index]->setMaterial(m_pMaterialModel.get());
+		auto pMaterial = m_pMaterialModel.get();
+		m_pVisualObjects[index]->setMaterialCount(1u);
+		m_pVisualObjects[index]->setMaterial(pMaterial);
 
 		m_pVisualObjectOffscreens[index] = std::shared_ptr<vg::VisualObject3>{ new vg::VisualObject3() };
 		m_pVisualObjectOffscreens[index]->setMesh(mesh.get());
-		m_pVisualObjectOffscreens[index]->setMaterial(m_pMaterialModelOffscreen.get());
+		pMaterial = m_pMaterialModelOffscreen.get();
+		m_pVisualObjectOffscreens[index]->setMaterialCount(1U);
+		m_pVisualObjectOffscreens[index]->setMaterial(pMaterial);
 		m_pVisualObjectOffscreens[index]->setIsVisibilityCheck(VG_FALSE);
 	}
 }
@@ -341,7 +345,9 @@ void Window::_initScene()
 	    const auto &objects = m_assimpScenePlane.getObjects();
 	    for (const auto &object : objects)
 	    {
-	    	object->setMaterial(m_pMaterialPlane.get());
+			auto pMaterial = m_pMaterialPlane.get();
+			object->setMaterialCount(1u);
+	    	object->setMaterial(pMaterial);
 	        m_pScene->addVisualObject(object.get());
 			// object->setIsVisibilityCheck(VG_FALSE);	
 	    }

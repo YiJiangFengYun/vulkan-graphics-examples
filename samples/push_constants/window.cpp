@@ -109,7 +109,9 @@ void Window::_fillScene()
 	const auto &objects = m_assimpScene.getObjects();
 	for (const auto &object : objects)
 	{
-		object->setMaterial(m_pMaterial.get());
+		object->setMaterialCount(1u);
+		auto pMaterial = m_pMaterial.get();
+		object->setMaterial(pMaterial);
 	    m_pScene->addVisualObject(object.get());		
 	}
 }

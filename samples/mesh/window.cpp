@@ -248,6 +248,7 @@ void Window::_initScene()
 	const auto &objects = m_assimpScene.getObjects();
 	for (const auto &object : objects)
 	{
+		object->setMaterialCount(1u);
 		object->setMaterial(m_pMaterialSolid.get());
 	    m_pScene->addVisualObject(object.get());		
 	}
@@ -266,6 +267,7 @@ void Window::_onUpdate()
 		const auto &objects = m_assimpScene.getObjects();
 	    for (const auto &object : objects)
 	    {
+			object->setMaterialCount(1u);
 			if (m_wireFrame) 
 			{
 				object->setMaterial(m_pMaterialWireframe.get());

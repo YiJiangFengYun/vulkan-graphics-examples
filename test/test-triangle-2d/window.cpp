@@ -78,6 +78,7 @@ namespace testTriangle2D
 	{
 		m_pModel = std::shared_ptr<vg::VisualObject2>(new vg::VisualObject2());
 		m_pModel->setMesh(m_pMesh.get());
+		m_pModel->setMaterialCount(1u);
 		m_pModel->setMaterial(m_pMaterial.get());
 		m_pScene->addVisualObject(m_pModel.get());
 	}

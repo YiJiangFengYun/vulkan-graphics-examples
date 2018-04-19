@@ -330,8 +330,11 @@ namespace vg
 			, vk::ShaderStageFlags stageFlags 
 			, uint32_t offset);
 
-		const uint32_t getInstanceCount() const;
+		uint32_t getInstanceCount() const;
 		void setInstanceCount(uint32_t count);
+
+		uint32_t getSubpass() const;
+		void setSubpass(uint32_t subpass);
 
 		const ExternalUniformBufferInfo getExternalUniformBufferInfo() const;
 		void setExternalUniformBufferData(ExternalUniformBufferInfo value);
@@ -377,6 +380,8 @@ namespace vg
 		float m_lineWidth;
 
 		uint32_t m_instanceCount;
+
+		uint32_t m_subpass;
 		//todo
 		//each stage may own a specilization constant data.
 		std::unordered_map<vk::ShaderStageFlagBits, std::shared_ptr<SpecializationData>> m_mapSpecilizationDatas;

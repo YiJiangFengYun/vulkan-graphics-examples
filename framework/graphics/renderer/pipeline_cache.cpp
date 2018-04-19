@@ -93,6 +93,7 @@ namespace vg
     size_t PipelineCache::HashFull::operator()(const Info& info) const {
         std::size_t seed = HashNoState()(info);
         boost::hash_combine(seed, info.pPass->getPipelineStateID());
+        boost::hash_combine(seed, info.pPass->getSubpass());
         boost::hash_combine(seed, info.pVertexData != nullptr ? info.pVertexData->getPipelineStateID() : 0);
         boost::hash_combine(seed, info.pIndexData != nullptr ? info.pIndexData->getPipelineStateID() : 0);
 
@@ -305,7 +306,7 @@ namespace vg
 		createInfo.layout = *pPass->getPipelineLayout();
 
 		createInfo.renderPass = info.renderPass;
-		createInfo.subpass = 0;
+		createInfo.subpass = pPass->getSubpass();
 		createInfo.basePipelineHandle = nullptr;
 		createInfo.basePipelineIndex = -1;
         

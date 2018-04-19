@@ -307,6 +307,7 @@ namespace vg
 		, m_usingDescriptorSets()
 		, m_usingDynamicOffsets()
 		, m_instanceCount(1u)
+		, m_subpass(0u)
 		, m_uniformBufferSize(0u)
 	{
 		_initDefaultBuildInDataInfo();
@@ -349,6 +350,7 @@ namespace vg
 		, m_usingDescriptorSets()
 		, m_usingDynamicOffsets()
 		, m_instanceCount(1u)
+		, m_subpass(0u)
 		, m_uniformBufferSize(0u)
 	{
 		_initDefaultBuildInDataInfo();
@@ -768,7 +770,7 @@ namespace vg
         return m_pipelineStateID;
     }
 
-	const uint32_t Pass::getInstanceCount() const
+	uint32_t Pass::getInstanceCount() const
 	{
 		return m_instanceCount;
 	}
@@ -776,6 +778,16 @@ namespace vg
 	void Pass::setInstanceCount(uint32_t count)
 	{
 		m_instanceCount = count;
+	}
+
+	uint32_t Pass::getSubpass() const
+	{
+		return m_subpass;
+	}
+
+    void Pass::setSubpass(uint32_t subpass)
+	{
+		m_subpass = subpass;
 	}
 
 	const Pass::ExternalUniformBufferInfo Pass::getExternalUniformBufferInfo() const

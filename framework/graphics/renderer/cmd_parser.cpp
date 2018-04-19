@@ -79,7 +79,7 @@ namespace vg
 					recordItemRenderPassBegin(pRenderPassInfo, pCommandBuffer);
 				} else if (pRenderPassInfo->subPassIndex - lastSubPassIndex == 1u) {
 					recordItemNextSubpass(pCommandBuffer);
-				} else if (pRenderPassInfo->subPassIndex - lastSubPassIndex > 1u) {
+				} else if (pRenderPassInfo->subPassIndex - lastSubPassIndex != 0u) {
 					throw std::runtime_error("Error of increasing of subpass index of render pass for cmd info.");
 				} //else it is inner sub pass.
 				

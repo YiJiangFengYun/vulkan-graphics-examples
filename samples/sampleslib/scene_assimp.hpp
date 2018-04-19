@@ -29,7 +29,8 @@ namespace sampleslib
             vg::Vector2 uvScale;
             vg::Bool32 isCreateObject;
             vg::Bool32 isRightHand;
-            vg::Bool32 separateMesh;
+            vg::Bool32 multipleObject;
+            vg::Bool32 multipleMesh;
             CreateInfo(const char* fileName = nullptr
                 , uint32_t layoutComponentCount = 0u
                 , const VertexLayoutComponent *pLayoutComponent = nullptr
@@ -38,7 +39,8 @@ namespace sampleslib
                 , vg::Vector2 uvScale = vg::Vector2(1.0f)
                 , vg::Bool32 isCreateObject = VG_FALSE
                 , vg::Bool32 isRightHand = VG_FALSE
-                , vg::Bool32 separateMesh = VG_FALSE
+                , vg::Bool32 multipleObject = VG_FALSE
+                , vg::Bool32 multipleMesh = VG_FALSE
                 );
         };
 

@@ -11,5 +11,6 @@
     "${workspaceRoot}/libs/plog/include",
     "${workspaceRoot}/libs/stb",
     "${workspaceRoot}/samples/libs/assimp/include",
-    "${workspaceRoot}/samples"
+    "${workspaceRoot}/samples",
+    "${workspaceFolder}/build/samples/libs/assimp/include"
 ]

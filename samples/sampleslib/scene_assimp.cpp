@@ -8,24 +8,26 @@
 namespace sampleslib
 {
     AssimpScene::CreateInfo::CreateInfo(const char* fileName
-                , uint32_t layoutComponentCount
-                , const VertexLayoutComponent *pLayoutComponent
-                , vg::Vector3 offset
-                , vg::Vector3 scale
-                , vg::Vector2 uvScale
-                , vg::Bool32 isCreateObject
-                , vg::Bool32 isRightHand
-                , vg::Bool32 separateMesh
-                )
-                : fileName(fileName)
-                , layoutComponentCount(layoutComponentCount)
-                , pLayoutComponent(pLayoutComponent)
-                , offset(offset)
-                , scale(scale)
-                , uvScale(uvScale)
-                , isCreateObject(isCreateObject)
-                , isRightHand(isRightHand)
-                , separateMesh(separateMesh)
+        , uint32_t layoutComponentCount
+        , const VertexLayoutComponent *pLayoutComponent
+        , vg::Vector3 offset
+        , vg::Vector3 scale
+        , vg::Vector2 uvScale
+        , vg::Bool32 isCreateObject
+        , vg::Bool32 isRightHand
+        , vg::Bool32 multipleObject
+        , vg::Bool32 multipleMesh
+        )
+        : fileName(fileName)
+        , layoutComponentCount(layoutComponentCount)
+        , pLayoutComponent(pLayoutComponent)
+        , offset(offset)
+        , scale(scale)
+        , uvScale(uvScale)
+        , isCreateObject(isCreateObject)
+        , isRightHand(isRightHand)
+        , multipleObject(multipleObject)
+        , multipleMesh(multipleMesh)
     {
     }
 
@@ -328,33 +330,112 @@ namespace sampleslib
                     static_cast<uint32_t>(vertexBuffer.size() * sizeof(float)),
                     VG_FALSE);
 
+                if (createInfo.multipleMesh == false) {
+                    uint32_t base = 0u;
+                    uint32_t indexOffset = 0u;
+                    if (vertexSubDataCount != indexSubDataCount) throw std::runtime_error("Logic error!");
+                    for (uint32_t i = 0; i < meshCount; ++i) {
+                        uint32_t indexCount = indexCounts[i];
+                        for (uint32_t j = 0; j < indexCount; ++j) {
+                            indexBuffer[indexOffset + j] += base;
+                        }
+                        base += vertexCounts[i];
+                        indexOffset += indexCount;
+                    }
+                }
+
                 pSharedIndexData->updateBuffer(indexBuffer.data(),
                     static_cast<uint32_t>(indexBuffer.size() * sizeof(uint32_t)),
                     VG_FALSE);
-        
-                pSharedVertexData->updateSubDataCount(vertexSubDataCount);
-		        if (vertexSubDataCount)
-		        {
-		        	const auto &firstSubVertexData = pSharedVertexData->getSubVertexDatas()[0];
-		        	pSharedVertexData->updateDesData(firstSubVertexData.vertexInputStateInfo);
-		        	pSharedVertexData->updateVertexCount(vertexCounts, vertexSubDataCount);
-		        	pSharedVertexData->updateBufferSize(vertexBufferSizes, vertexSubDataCount);
-		        }
-        
-                pSharedIndexData->updateSubDataCount(indexSubDataCount);
-		        if (indexSubDataCount)
-		        {
-		        	const auto &firstSubIndexData = pSharedIndexData->getSubIndexDatas()[0];
-		        	pSharedIndexData->updateDesData(firstSubIndexData.indexType, firstSubIndexData.inputAssemblyStateInfo);
-		        	pSharedIndexData->updateIndexCount(indexCounts, indexSubDataCount);
-		        	pSharedIndexData->updateBufferSize(indexBufferSizes, indexSubDataCount);
-		        	pSharedIndexData->updateVertexDataIndex(indexVertexDataIndices, indexSubDataCount);
-		        }
+
+                if (createInfo.multipleMesh)
+                {
+                    pSharedVertexData->updateSubDataCount(vertexSubDataCount);
+		            if (vertexSubDataCount)
+		            {
+		            	const auto &firstSubVertexData = pSharedVertexData->getSubVertexDatas()[0];
+		            	pSharedVertexData->updateDesData(firstSubVertexData.vertexInputStateInfo);
+		            	pSharedVertexData->updateVertexCount(vertexCounts, vertexSubDataCount);
+		            	pSharedVertexData->updateBufferSize(vertexBufferSizes, vertexSubDataCount);
+		            }
+            
+                    pSharedIndexData->updateSubDataCount(indexSubDataCount);
+		            if (indexSubDataCount)
+		            {
+		            	const auto &firstSubIndexData = pSharedIndexData->getSubIndexDatas()[0];
+		            	pSharedIndexData->updateDesData(firstSubIndexData.indexType, firstSubIndexData.inputAssemblyStateInfo);
+		            	pSharedIndexData->updateIndexCount(indexCounts, indexSubDataCount);
+		            	pSharedIndexData->updateBufferSize(indexBufferSizes, indexSubDataCount);
+		            	pSharedIndexData->updateVertexDataIndex(indexVertexDataIndices, indexSubDataCount);
+		            }
+                } 
+                else
+                {
+                    pSharedVertexData->updateSubDataCount(1u);
+                    uint32_t vertexCount = 0u;
+                    for (auto count : vertexCounts) {
+                        vertexCount += count;
+                    }
+                    pSharedVertexData->updateVertexCount(vertexCount, 1u);
+                    
+                    uint32_t vertexBufferSize = 0u;
+                    for (auto size : vertexBufferSizes) {
+                        vertexBufferSize += size;
+                    }
+                    pSharedVertexData->updateBufferSize(vertexBufferSize, 1u);
+
+                    pSharedIndexData->updateSubDataCount(1u);
+                    uint32_t indexCount = 0u;
+                    for (auto count : indexCounts) {
+                        indexCount += count;
+                    }
+                    pSharedIndexData->updateIndexCount(indexCount, 1u);
+
+                    uint32_t indexBufferSize = 0u;
+                    for (auto size : indexBufferSizes) {
+                        indexBufferSize += size;
+                    }
+                    pSharedIndexData->updateBufferSize(indexBufferSize, 1u);
+
+					std::array<uint32_t, 1> vertexDataIndex = { 0u };
+                    pSharedIndexData->updateVertexDataIndex(vertexDataIndex, 1u);
+                }
+            }
+
+            fd::Bounds<vg::Vector3> integrateBounds;
+            if (createInfo.multipleMesh == false || createInfo.multipleObject == false) 
+            {
+                vg::Vector3 minOfBounds(std::numeric_limits<typename vg::Vector3::value_type>::max());
+                vg::Vector3 maxOfBounds(std::numeric_limits<typename vg::Vector3::value_type>::lowest());
+                for (uint32_t i = 0; i < meshCount; ++i)
+                {
+                    //bounds...
+                    float x = boundses[i].getMin().x;
+                    float y = boundses[i].getMin().y;
+                    float z = boundses[i].getMin().z;
+					if (minOfBounds.x > x)minOfBounds.x = x;
+					if (minOfBounds.y > y)minOfBounds.y = y;
+					if (minOfBounds.z > z)minOfBounds.z = z;
+                    x = boundses[i].getMax().x;
+                    y = boundses[i].getMax().y;
+                    z = boundses[i].getMax().z;
+					if (maxOfBounds.x < x)maxOfBounds.x = x;
+					if (maxOfBounds.y < y)maxOfBounds.y = y;
+					if (maxOfBounds.z < z)maxOfBounds.z = z;
+                }
+                integrateBounds.setMinMax(minOfBounds, maxOfBounds);
+            }
+
+            if (createInfo.multipleMesh == false)
+            {
+                meshCount = 1u;
+                boundses.resize(1u);
+                boundses[0] = integrateBounds;
             }
 
             {
                 //Filling the meshes vertex buffer data.
-                if (createInfo.separateMesh)
+                if (createInfo.multipleObject)
                 {
                     auto &pMeshes = m_pMeshes;
                     pMeshes.resize(meshCount);
@@ -373,33 +454,11 @@ namespace sampleslib
                     auto &pMeshes = m_pMeshes;
                     pMeshes.resize(1u);
 
-                    vg::Vector3 minOfBounds(std::numeric_limits<typename vg::Vector3::value_type>::max());
-                    vg::Vector3 maxOfBounds(std::numeric_limits<typename vg::Vector3::value_type>::lowest());
-                    for (uint32_t i = 0; i < meshCount; ++i)
-                    {
-                        //bounds...
-                        float x = boundses[i].getMin().x;
-                        float y = boundses[i].getMin().y;
-                        float z = boundses[i].getMin().z;
-						if (minOfBounds.x > x)minOfBounds.x = x;
-						if (minOfBounds.y > y)minOfBounds.y = y;
-						if (minOfBounds.z > z)minOfBounds.z = z;
-
-                        x = boundses[i].getMax().x;
-                        y = boundses[i].getMax().y;
-                        z = boundses[i].getMax().z;
-						if (maxOfBounds.x < x)maxOfBounds.x = x;
-						if (maxOfBounds.y < y)maxOfBounds.y = y;
-						if (maxOfBounds.z < z)maxOfBounds.z = z;
-                    }
-
-                    fd::Bounds<vg::Vector3> bounds(minOfBounds, maxOfBounds);
-
                     auto &pMesh = pMeshes[0];
                     pMesh = std::shared_ptr<vg::DimSharedContentMesh3>(new vg::DimSharedContentMesh3());
                     pMesh->init(pSharedVertexData, pSharedIndexData, 0, meshCount);
                     pMesh->setIsHasBounds(VG_TRUE);
-                    pMesh->setBounds(bounds);
+                    pMesh->setBounds(integrateBounds);
                 }
                 
             }

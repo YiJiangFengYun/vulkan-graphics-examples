@@ -37,8 +37,9 @@ void Window::_initState()
 {
 	ParentWindowType::_initState();
 	m_cameraZoom = -0.0f;
+	m_cameraPosition = vg::Vector3(0.0f, 2.0f, -2.0f);
 	/// Build a quaternion from euler angles (pitch, yaw, roll), in radians.
-	m_cameraRotation = vg::Vector3(glm::radians(0.0f), glm::radians(0.0f), glm::radians(0.0f));
+	m_cameraRotation = vg::Vector3(glm::radians(-30.0f), glm::radians(0.0f), glm::radians(0.0f));
 }
 
 void Window::_initLights()
@@ -183,7 +184,7 @@ void Window::_createMaterial()
 			//pass
 			pPass->setPolygonMode(vg::PolygonMode::FILL);
 	        pPass->setCullMode(vg::CullModeFlagBits::BACK);
-	        pPass->setFrontFace(vg::FrontFaceType::COUNTER_CLOCKWISE);
+	        pPass->setFrontFace(vg::FrontFaceType::CLOCKWISE);
 			vg::Pass::BuildInDataInfo::Component buildInDataCmps[2] = {
 	    		{vg::Pass::BuildInDataType::MATRIX_OBJECT_TO_NDC},
 	    		{vg::Pass::BuildInDataType::MATRIX_OBJECT_TO_WORLD}
@@ -237,6 +238,34 @@ void Window::_createMaterial()
     
 	    m_pMaterialOfScene->apply();
 	}
+
+	{
+		m_pMaterialOfSceneTest = std::shared_ptr<vg::Material>{new vg::Material()};
+		m_pMaterialOfSceneTest->setRenderPriority(0u);
+	    m_pMaterialOfSceneTest->setRenderQueueType(vg::MaterialShowType::OPAQUE);
+		auto pPass = m_pMaterialOfSceneTest->getMainPass();
+		auto pShader = pPass->getShader();
+		//shader
+	    pShader->load("shaders/only_color.vert.spv", 
+	        "shaders/only_color.frag.spv");
+		//pass
+		pPass->setPolygonMode(vg::PolygonMode::FILL);
+	    pPass->setCullMode(vg::CullModeFlagBits::BACK);
+	    pPass->setFrontFace(vg::FrontFaceType::CLOCKWISE);
+		vg::Pass::BuildInDataInfo::Component buildInDataCmps[2] = {
+	    	{vg::Pass::BuildInDataType::MATRIX_OBJECT_TO_NDC},
+	    	{vg::Pass::BuildInDataType::MAIN_CLOLOR}
+	    };
+	    vg::Pass::BuildInDataInfo buildInDataInfo;
+	    buildInDataInfo.componentCount = 2u;
+	    buildInDataInfo.pComponent = buildInDataCmps;
+	    pPass->setBuildInDataInfo(buildInDataInfo);
+		vk::PipelineDepthStencilStateCreateInfo depthStencilState = {};
+	    depthStencilState.depthTestEnable = VG_TRUE;
+	    depthStencilState.depthWriteEnable = VG_TRUE;
+	    depthStencilState.depthCompareOp = vk::CompareOp::eLessOrEqual;
+	    pPass->setDepthStencilInfo(depthStencilState);
+	}
 	
 }
 
@@ -246,6 +275,7 @@ void Window::_initScene()
 	for (const auto &object : objects)
 	{
 		auto pMaterial = m_pMaterialOfScene.get();
+		// auto pMaterial = m_pMaterialOfSceneTest.get();
 		object->setMaterialCount(1u);
 		object->setMaterial(pMaterial);
 	    m_pScene->addVisualObject(object.get());		

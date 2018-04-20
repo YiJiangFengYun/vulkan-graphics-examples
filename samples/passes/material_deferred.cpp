@@ -17,8 +17,8 @@ MaterialDeferred::MaterialDeferred()
 
 MaterialDeferred::MaterialDeferred(uint32_t trunkFrameBufferWidth, uint32_t trunkFrameBufferHeight)
     : vg::Material()
-    , m_frameBufferWidth(1024)
-    , m_frameBufferHeight(1024)
+    , m_frameBufferWidth(trunkFrameBufferWidth)
+    , m_frameBufferHeight(trunkFrameBufferHeight)
     , m_trunkFramebufferWidth(trunkFrameBufferWidth)
     , m_trunkFramebufferHeight(trunkFrameBufferHeight)
     , m_mapRectMeshes()
@@ -167,46 +167,55 @@ void MaterialDeferred::beginBindToRender(const BindInfo info, BindResult *pResul
 
     //trunk barrier for trunk pass sampling from attachment textures.
     {
-        vk::ImageMemoryBarrier imageMemoryBarriers[2];
+        vg::BarrierInfo barrierInfo;
+        vg::CmdInfo cmdInfo;
+        vk::ImageMemoryBarrier imageMemoryBarrier;
 
         //color texture.
         auto pImage = m_pAttachmentColor->getImage();
-        imageMemoryBarriers[0].srcAccessMask = vk::AccessFlagBits::eColorAttachmentWrite;
-        imageMemoryBarriers[0].dstAccessMask = vk::AccessFlagBits::eShaderRead;
-        imageMemoryBarriers[0].oldLayout = vk::ImageLayout::eShaderReadOnlyOptimal;
-        imageMemoryBarriers[0].newLayout = vk::ImageLayout::eShaderReadOnlyOptimal;
-        imageMemoryBarriers[0].subresourceRange = {
+        imageMemoryBarrier.srcAccessMask = vk::AccessFlagBits::eColorAttachmentWrite;
+        imageMemoryBarrier.dstAccessMask = vk::AccessFlagBits::eShaderRead;
+        imageMemoryBarrier.oldLayout = vk::ImageLayout::eShaderReadOnlyOptimal;
+        imageMemoryBarrier.newLayout = vk::ImageLayout::eShaderReadOnlyOptimal;
+        imageMemoryBarrier.subresourceRange = {
             pImage->getInfo().allAspect,
             0u,
             pImage->getInfo().mipLevels,
             0u,
             pImage->getInfo().arrayLayers,
         };
-        imageMemoryBarriers[0].image = *(pImage->getImage());
+        imageMemoryBarrier.image = *(pImage->getImage());
+
+        barrierInfo.srcStageMask = vk::PipelineStageFlagBits::eColorAttachmentOutput;
+        barrierInfo.dstStageMask = vk::PipelineStageFlagBits::eFragmentShader;
+        barrierInfo.imageMemoryBarrierCount = 1;
+        barrierInfo.pImageMemoryBarriers = &imageMemoryBarrier;
+        barrierInfo.dependencyFlags = vk::DependencyFlagBits::eByRegion;
+        
+        cmdInfo.pBarrierInfo = &barrierInfo;
+        result.pTrunkWaitBarrierCmdBuffer->addCmd(cmdInfo);
 
         //depth texture.
         pImage = m_pAttachmentDepthStencil->getImage();
-        imageMemoryBarriers[1].srcAccessMask = vk::AccessFlagBits::eDepthStencilAttachmentWrite;
-        imageMemoryBarriers[1].dstAccessMask = vk::AccessFlagBits::eShaderRead;
-        imageMemoryBarriers[1].oldLayout = vk::ImageLayout::eDepthStencilReadOnlyOptimal;
-        imageMemoryBarriers[1].newLayout = vk::ImageLayout::eDepthStencilReadOnlyOptimal;
-        imageMemoryBarriers[1].subresourceRange = {
+        imageMemoryBarrier.srcAccessMask = vk::AccessFlagBits::eDepthStencilAttachmentWrite;
+        imageMemoryBarrier.dstAccessMask = vk::AccessFlagBits::eShaderRead;
+        imageMemoryBarrier.oldLayout = vk::ImageLayout::eDepthStencilReadOnlyOptimal;
+        imageMemoryBarrier.newLayout = vk::ImageLayout::eDepthStencilReadOnlyOptimal;
+        imageMemoryBarrier.subresourceRange = {
             pImage->getInfo().allAspect,
             0u,
             pImage->getInfo().mipLevels,
             0u,
             pImage->getInfo().arrayLayers,
         };
-        imageMemoryBarriers[1].image = *(pImage->getImage());
+        imageMemoryBarrier.image = *(pImage->getImage());
 
-        vg::BarrierInfo barrierInfo;
-        barrierInfo.srcStageMask = vk::PipelineStageFlagBits::eColorAttachmentOutput;
+        barrierInfo.srcStageMask = vk::PipelineStageFlagBits::eEarlyFragmentTests | vk::PipelineStageFlagBits::eLateFragmentTests;
         barrierInfo.dstStageMask = vk::PipelineStageFlagBits::eFragmentShader;
-        barrierInfo.imageMemoryBarrierCount = 2;
-        barrierInfo.pImageMemoryBarriers = imageMemoryBarriers;
+        barrierInfo.imageMemoryBarrierCount = 1;
+        barrierInfo.pImageMemoryBarriers = &imageMemoryBarrier;
         barrierInfo.dependencyFlags = vk::DependencyFlagBits::eByRegion;
-        
-        vg::CmdInfo cmdInfo;
+
         cmdInfo.pBarrierInfo = &barrierInfo;
         result.pTrunkWaitBarrierCmdBuffer->addCmd(cmdInfo);
     }

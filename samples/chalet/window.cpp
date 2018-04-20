@@ -233,6 +233,14 @@ namespace chalet
 		pShader->load("shaders/only_color.vert.spv", 
 			"shaders/only_color.frag.spv");
 		pPass->setCullMode(vg::CullModeFlagBits::NONE);
+		vg::Pass::BuildInDataInfo::Component buildInDataCmps[2] = {
+	    	{vg::Pass::BuildInDataType::MATRIX_OBJECT_TO_NDC},
+	    	{vg::Pass::BuildInDataType::MAIN_CLOLOR}
+	    };
+	    vg::Pass::BuildInDataInfo buildInDataInfo;
+	    buildInDataInfo.componentCount = 2u;
+	    buildInDataInfo.pComponent = buildInDataCmps;
+	    pPass->setBuildInDataInfo(buildInDataInfo);
 		vk::PipelineDepthStencilStateCreateInfo depthStencilStateInfo;
 		depthStencilStateInfo.depthTestEnable = VG_FALSE;
 		depthStencilStateInfo.depthWriteEnable = VG_FALSE;

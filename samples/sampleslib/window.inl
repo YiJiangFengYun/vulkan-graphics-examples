@@ -81,7 +81,7 @@ namespace sampleslib
 	{
 		m_cameraZoom = 0.0f;
 		m_cameraZoomSpeed = 0.1f;
-		m_rotationSpeed = 0.05f;
+		m_rotationSpeed = 0.01f;
 		m_cameraAspect = (float)m_width / (float)m_height;
 		m_sceneCount = 1u;
 		m_cameraPosition = PointType(0.0f);

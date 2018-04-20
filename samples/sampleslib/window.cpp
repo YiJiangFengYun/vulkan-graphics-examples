@@ -93,9 +93,9 @@ namespace sampleslib
 		matrix = glm::translate(matrix, glm::vec3(0.0f, 0.0f, m_cameraZoom));
 
 		auto rotationMatrix = glm::mat4(1.0f);
-		rotationMatrix = glm::rotate(rotationMatrix, glm::radians(m_cameraRotation.x), glm::vec3(1.0f, 0.0f, 0.0f));
-		rotationMatrix = glm::rotate(rotationMatrix, glm::radians(m_cameraRotation.y), glm::vec3(0.0f, 1.0f, 0.0f));
-		rotationMatrix = glm::rotate(rotationMatrix, glm::radians(m_cameraRotation.z), glm::vec3(0.0f, 1.0f, 0.0f));
+		rotationMatrix = glm::rotate(rotationMatrix, m_cameraRotation.x, glm::vec3(1.0f, 0.0f, 0.0f));
+		rotationMatrix = glm::rotate(rotationMatrix, m_cameraRotation.y, glm::vec3(0.0f, 1.0f, 0.0f));
+		rotationMatrix = glm::rotate(rotationMatrix, m_cameraRotation.z, glm::vec3(0.0f, 0.0f, 1.0f));
 
 		auto lookAtRotationMatrix = vg::Matrix4x4(1.0f);
 		auto epsilon = std::numeric_limits<float>::epsilon();
@@ -106,9 +106,9 @@ namespace sampleslib
 		auto translateMatrix = glm::translate(glm::mat4(1.0f), m_cameraPosition);
 
 		auto worldRotationMatrix = glm::mat4(1.0f);
-		worldRotationMatrix = glm::rotate(worldRotationMatrix, glm::radians(m_worldRotation.x), glm::vec3(1.0f, 0.0f, 0.0f));
-		worldRotationMatrix = glm::rotate(worldRotationMatrix, glm::radians(m_worldRotation.y), glm::vec3(0.0f, 1.0f, 0.0f));
-		worldRotationMatrix = glm::rotate(worldRotationMatrix, glm::radians(m_worldRotation.z), glm::vec3(0.0f, 1.0f, 0.0f));
+		worldRotationMatrix = glm::rotate(worldRotationMatrix, m_worldRotation.x, glm::vec3(1.0f, 0.0f, 0.0f));
+		worldRotationMatrix = glm::rotate(worldRotationMatrix, m_worldRotation.y, glm::vec3(0.0f, 1.0f, 0.0f));
+		worldRotationMatrix = glm::rotate(worldRotationMatrix, m_worldRotation.z, glm::vec3(0.0f, 1.0f, 0.0f));
 
 		vg::Matrix4x4 localMatrix = worldRotationMatrix * translateMatrix * lookAtRotationMatrix * rotationMatrix * matrix;
 		

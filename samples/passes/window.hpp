@@ -22,6 +22,7 @@ public:
 private:
     sampleslib::AssimpScene m_assimpScene;
 	std::shared_ptr<MaterialDeferred> m_pMaterialOfScene;
+	std::shared_ptr<vg::Material> m_pMaterialOfSceneTest;
 
 	struct Light {
 		vg::Vector4 position;

@@ -3,3 +3,4 @@ format (COLLADA).
 //2.Mesh bounds is not applicable at sample texture array.
 3.Move pipeline state of VertexData and IndexData to their sub datas.
 4.Change one material to multiply material for visual object.
+5.Shared defered render resource.

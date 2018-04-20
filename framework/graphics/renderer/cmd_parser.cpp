@@ -39,23 +39,33 @@ namespace vg
 			if (cmdInfo.pRenderPassInfo != nullptr) 
 			    VG_LOG(plog::warning) << "The render pass info in trunk wait barrier cmd buffer is invalid." << std::endl;
 			const auto &trunkWaitBarrierInfo = *(cmdInfo.pBarrierInfo);
-			if (trunkWaitBarrierInfo.memoryBarrierCount > 0) 
-			    VG_LOG(plog::warning) << "The memory barrier in trunk wait barrier cmd buffer is invalid." << std::endl;
-			if (trunkWaitBarrierInfo.bufferMemoryBarrierCount > 0) 
-			    VG_LOG(plog::warning) << "The buffer memory barrier in trunk wait barrier cmd buffer is invalid." << std::endl;
-			if (trunkWaitBarrierInfo.imageMemoryBarrierCount > 0) 
-			    VG_LOG(plog::warning) << "The image memory barrier in trunk wait barrier cmd buffer is invalid." << std::endl;
-			srcStageMask |= trunkWaitBarrierInfo.srcStageMask;
-			dstStageMask |= trunkWaitBarrierInfo.dstStageMask;
-			dependencyFlags |= trunkWaitBarrierInfo.dependencyFlags;
+			// if (trunkWaitBarrierInfo.memoryBarrierCount > 0) 
+			//     VG_LOG(plog::warning) << "The memory barrier in trunk wait barrier cmd buffer is invalid." << std::endl;
+			// if (trunkWaitBarrierInfo.bufferMemoryBarrierCount > 0) 
+			//     VG_LOG(plog::warning) << "The buffer memory barrier in trunk wait barrier cmd buffer is invalid." << std::endl;
+			// if (trunkWaitBarrierInfo.imageMemoryBarrierCount > 0) 
+			//     VG_LOG(plog::warning) << "The image memory barrier in trunk wait barrier cmd buffer is invalid." << std::endl;
+			// srcStageMask |= trunkWaitBarrierInfo.srcStageMask;
+			// dstStageMask |= trunkWaitBarrierInfo.dstStageMask;
+			// dependencyFlags |= trunkWaitBarrierInfo.dependencyFlags;
+			pCommandBuffer->pipelineBarrier(trunkWaitBarrierInfo.srcStageMask, 
+		        trunkWaitBarrierInfo.dstStageMask, 
+			    trunkWaitBarrierInfo.dependencyFlags,
+			    trunkWaitBarrierInfo.memoryBarrierCount,
+				trunkWaitBarrierInfo.pMemoryBarriers,
+			    trunkWaitBarrierInfo.bufferMemoryBarrierCount,
+				trunkWaitBarrierInfo.pBufferMemoryBarriers,
+				trunkWaitBarrierInfo.imageMemoryBarrierCount,
+			    trunkWaitBarrierInfo.pImageMemoryBarriers
+				);
 		}
 
-		pCommandBuffer->pipelineBarrier(srcStageMask, 
-		    dstStageMask, 
-			dependencyFlags,
-			nullptr,
-			nullptr,
-			nullptr);
+		// pCommandBuffer->pipelineBarrier(srcStageMask, 
+		//     dstStageMask, 
+		// 	dependencyFlags,
+		// 	nullptr,
+		// 	nullptr,
+		// 	nullptr);
 	}
 
 	void CMDParser::recordBranch(CmdBuffer *pCmdBuffer

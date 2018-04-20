@@ -1242,7 +1242,8 @@ namespace vg
 		for (const auto& name : m_arrLayoutBindNames)
 		{
 			const auto& item = m_mapLayoutBinds[name];
-			if (item.descriptorType == DescriptorType::COMBINED_IMAGE_SAMPLER)
+			if (item.descriptorType == DescriptorType::COMBINED_IMAGE_SAMPLER ||
+				item.descriptorType == DescriptorType::INPUT_ATTACHMENT)
 				++count;
 		}
 
@@ -1253,7 +1254,8 @@ namespace vg
 		for (const auto& name : m_arrLayoutBindNames)
 		{
 			const auto& item = m_mapLayoutBinds[name];
-			if (item.descriptorType == DescriptorType::COMBINED_IMAGE_SAMPLER)
+			if (item.descriptorType == DescriptorType::COMBINED_IMAGE_SAMPLER ||
+				item.descriptorType == DescriptorType::INPUT_ATTACHMENT)
 			{
 #ifdef DEBUG
 				if (item.isTexture == VG_FALSE)

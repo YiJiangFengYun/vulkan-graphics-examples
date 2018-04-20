@@ -118,10 +118,6 @@ namespace vg
 			}
 			
 		}
-
-		if (lastRenderPass != vk::RenderPass()) {
-			recordItemRenderPassEnd(pCommandBuffer);
-		}
 	}
 
 	void CMDParser::recordItemRenderPassBegin(const RenderPassInfo *pRenderPassInfo

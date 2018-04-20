@@ -32,7 +32,7 @@ void main()
 	vec3 fragPos = subpassLoad(samplerposition).rgb;
 	vec3 normal = subpassLoad(samplerNormal).rgb;
 	vec4 albedo = subpassLoad(samplerAlbedo);
-	
+
 	#define ambient 0.15
 	
 	// Ambient part

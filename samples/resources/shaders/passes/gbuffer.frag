@@ -29,7 +29,8 @@ void main()
 	// N.y = -N.y;
 	outNormal = vec4(N, 1.0);
 
-	outAlbedo.rgb = inColor;
+	// outAlbedo.rgb = inColor;
+	outAlbedo = vec4(inColor, 1.0);
 
 	// Store linearized depth in alpha component
 	// outPosition.a = linearDepth(gl_FragCoord.z);

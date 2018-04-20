@@ -27,6 +27,7 @@ Window::Window(std::shared_ptr<GLFWwindow> pWindow
 void Window::_init()
 {
 	ParentWindowType::_init();
+	_initLights();
 	_createModel();
 	// _createTexture();
 	_createMaterial();

@@ -90,6 +90,7 @@ void MaterialDeferred::beginBindToRender(const BindInfo info, BindResult *pResul
     std::vector<uint32_t> indices = {
         0, 1, 3, 3, 1, 2
     };
+
 	pRectMesh->setVertexCount(static_cast<uint32_t>(rectPoses.size()));
     pRectMesh->setPositions(rectPoses);
     pRectMesh->setTextureCoordinates<vg::TextureCoordinateType::VECTOR_2, vg::TextureCoordinateIndex::TextureCoordinate_0>(
@@ -166,59 +167,59 @@ void MaterialDeferred::beginBindToRender(const BindInfo info, BindResult *pResul
     }
 
     //trunk barrier for trunk pass sampling from attachment textures.
-    {
-        vg::BarrierInfo barrierInfo;
-        vg::CmdInfo cmdInfo;
-        vk::ImageMemoryBarrier imageMemoryBarrier;
+    // {
+    //     vg::BarrierInfo barrierInfo;
+    //     vg::CmdInfo cmdInfo;
+    //     vk::ImageMemoryBarrier imageMemoryBarrier;
 
-        //color texture.
-        auto pImage = m_pAttachmentColor->getImage();
-        imageMemoryBarrier.srcAccessMask = vk::AccessFlagBits::eColorAttachmentWrite;
-        imageMemoryBarrier.dstAccessMask = vk::AccessFlagBits::eShaderRead;
-        imageMemoryBarrier.oldLayout = vk::ImageLayout::eShaderReadOnlyOptimal;
-        imageMemoryBarrier.newLayout = vk::ImageLayout::eShaderReadOnlyOptimal;
-        imageMemoryBarrier.subresourceRange = {
-            pImage->getInfo().allAspect,
-            0u,
-            pImage->getInfo().mipLevels,
-            0u,
-            pImage->getInfo().arrayLayers,
-        };
-        imageMemoryBarrier.image = *(pImage->getImage());
+    //     //color texture.
+    //     auto pImage = m_pAttachmentColor->getImage();
+    //     imageMemoryBarrier.srcAccessMask = vk::AccessFlagBits::eColorAttachmentWrite;
+    //     imageMemoryBarrier.dstAccessMask = vk::AccessFlagBits::eShaderRead;
+    //     imageMemoryBarrier.oldLayout = vk::ImageLayout::eShaderReadOnlyOptimal;
+    //     imageMemoryBarrier.newLayout = vk::ImageLayout::eShaderReadOnlyOptimal;
+    //     imageMemoryBarrier.subresourceRange = {
+    //         pImage->getInfo().allAspect,
+    //         0u,
+    //         pImage->getInfo().mipLevels,
+    //         0u,
+    //         pImage->getInfo().arrayLayers,
+    //     };
+    //     imageMemoryBarrier.image = *(pImage->getImage());
 
-        barrierInfo.srcStageMask = vk::PipelineStageFlagBits::eColorAttachmentOutput;
-        barrierInfo.dstStageMask = vk::PipelineStageFlagBits::eFragmentShader;
-        barrierInfo.imageMemoryBarrierCount = 1;
-        barrierInfo.pImageMemoryBarriers = &imageMemoryBarrier;
-        barrierInfo.dependencyFlags = vk::DependencyFlagBits::eByRegion;
+    //     barrierInfo.srcStageMask = vk::PipelineStageFlagBits::eColorAttachmentOutput;
+    //     barrierInfo.dstStageMask = vk::PipelineStageFlagBits::eFragmentShader;
+    //     barrierInfo.imageMemoryBarrierCount = 1;
+    //     barrierInfo.pImageMemoryBarriers = &imageMemoryBarrier;
+    //     barrierInfo.dependencyFlags = vk::DependencyFlagBits::eByRegion;
         
-        cmdInfo.pBarrierInfo = &barrierInfo;
-        result.pTrunkWaitBarrierCmdBuffer->addCmd(cmdInfo);
+    //     cmdInfo.pBarrierInfo = &barrierInfo;
+    //     result.pTrunkWaitBarrierCmdBuffer->addCmd(cmdInfo);
 
-        //depth texture.
-        pImage = m_pAttachmentDepthStencil->getImage();
-        imageMemoryBarrier.srcAccessMask = vk::AccessFlagBits::eDepthStencilAttachmentWrite;
-        imageMemoryBarrier.dstAccessMask = vk::AccessFlagBits::eShaderRead;
-        imageMemoryBarrier.oldLayout = vk::ImageLayout::eDepthStencilReadOnlyOptimal;
-        imageMemoryBarrier.newLayout = vk::ImageLayout::eDepthStencilReadOnlyOptimal;
-        imageMemoryBarrier.subresourceRange = {
-            pImage->getInfo().allAspect,
-            0u,
-            pImage->getInfo().mipLevels,
-            0u,
-            pImage->getInfo().arrayLayers,
-        };
-        imageMemoryBarrier.image = *(pImage->getImage());
+    //     //depth texture.
+    //     pImage = m_pAttachmentDepthStencil->getImage();
+    //     imageMemoryBarrier.srcAccessMask = vk::AccessFlagBits::eDepthStencilAttachmentWrite;
+    //     imageMemoryBarrier.dstAccessMask = vk::AccessFlagBits::eShaderRead;
+    //     imageMemoryBarrier.oldLayout = vk::ImageLayout::eDepthStencilReadOnlyOptimal;
+    //     imageMemoryBarrier.newLayout = vk::ImageLayout::eDepthStencilReadOnlyOptimal;
+    //     imageMemoryBarrier.subresourceRange = {
+    //         pImage->getInfo().allAspect,
+    //         0u,
+    //         pImage->getInfo().mipLevels,
+    //         0u,
+    //         pImage->getInfo().arrayLayers,
+    //     };
+    //     imageMemoryBarrier.image = *(pImage->getImage());
 
-        barrierInfo.srcStageMask = vk::PipelineStageFlagBits::eEarlyFragmentTests | vk::PipelineStageFlagBits::eLateFragmentTests;
-        barrierInfo.dstStageMask = vk::PipelineStageFlagBits::eFragmentShader;
-        barrierInfo.imageMemoryBarrierCount = 1;
-        barrierInfo.pImageMemoryBarriers = &imageMemoryBarrier;
-        barrierInfo.dependencyFlags = vk::DependencyFlagBits::eByRegion;
+    //     barrierInfo.srcStageMask = vk::PipelineStageFlagBits::eEarlyFragmentTests | vk::PipelineStageFlagBits::eLateFragmentTests;
+    //     barrierInfo.dstStageMask = vk::PipelineStageFlagBits::eFragmentShader;
+    //     barrierInfo.imageMemoryBarrierCount = 1;
+    //     barrierInfo.pImageMemoryBarriers = &imageMemoryBarrier;
+    //     barrierInfo.dependencyFlags = vk::DependencyFlagBits::eByRegion;
 
-        cmdInfo.pBarrierInfo = &barrierInfo;
-        result.pTrunkWaitBarrierCmdBuffer->addCmd(cmdInfo);
-    }
+    //     cmdInfo.pBarrierInfo = &barrierInfo;
+    //     result.pTrunkWaitBarrierCmdBuffer->addCmd(cmdInfo);
+    // }
 
     //final pass is trunk pass.
     {
@@ -356,7 +357,7 @@ void MaterialDeferred::_createRenderPass()
         subpassDescs[1].pipelineBindPoint = vk::PipelineBindPoint::eGraphics;
         subpassDescs[1].colorAttachmentCount = 1;
         subpassDescs[1].pColorAttachments = &colorAttachmentRef;
-        subpassDescs[1].pDepthStencilAttachment = nullptr;
+        subpassDescs[1].pDepthStencilAttachment = nullptr;;
         subpassDescs[1].inputAttachmentCount = static_cast<uint32_t>(inputAttachmentRefs.size());
         subpassDescs[1].pInputAttachments = inputAttachmentRefs.data();
     }
@@ -469,6 +470,13 @@ void MaterialDeferred::_initPasses()
 	    buildInDataInfo.componentCount = 0u;
 	    buildInDataInfo.pComponent = nullptr;
 	    pPass->setBuildInDataInfo(buildInDataInfo);
+
+        vk::PipelineInputAssemblyStateCreateInfo inputAssemblyState = {
+            vk::PipelineInputAssemblyStateCreateFlags(),
+            vk::PrimitiveTopology::eTriangleList
+        };
+
+        pPass->setDefaultInputAssemblyState(inputAssemblyState);
         
 	    vk::PipelineColorBlendAttachmentState attachmentStates[1] = {};
         for (uint32_t i = 0; i < 1; ++i)

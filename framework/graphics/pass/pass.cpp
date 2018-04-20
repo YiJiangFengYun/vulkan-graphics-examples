@@ -286,6 +286,7 @@ namespace vg
 		, m_depthStencilInfo()
 		, m_colorBlendAttachmentStates()
 		, m_colorBlendInfo()
+		, m_defaultInputAssemblyState()
 		, m_mapSpecilizationDatas()
 		, m_mapPushConstantRanges()
 		, m_arrPushConstantRangeNames()
@@ -655,6 +656,16 @@ namespace vg
 		m_colorBlendInfo.pAttachments = m_colorBlendAttachmentStates.data();
 		m_colorBlendInfo.pNext = nullptr;
 		_updatePipelineStateID();
+	}
+
+	const vk::PipelineInputAssemblyStateCreateInfo &Pass::getDefaultInputAssemblyState() const
+	{
+		return m_defaultInputAssemblyState;
+	}
+
+	void Pass::setDefaultInputAssemblyState(vk::PipelineInputAssemblyStateCreateInfo value)
+	{
+		m_defaultInputAssemblyState = value;
 	}
 
 	const Bool32 Pass::IsHasSpecializationData(ShaderStageFlagBits shaderStage) const

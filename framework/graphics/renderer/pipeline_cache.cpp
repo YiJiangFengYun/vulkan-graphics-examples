@@ -220,7 +220,7 @@ namespace vg
 		    const IndexData::SubIndexData &subIndexData = pIndexData->getSubIndexDatas()[info.indexSubIndex];
 		    createInfo.pInputAssemblyState = &subIndexData.inputAssemblyStateInfo;            
         } else {
-            vk::PipelineInputAssemblyStateCreateInfo emptyAssemblyState{};
+            vk::PipelineInputAssemblyStateCreateInfo emptyAssemblyState = pPass->getDefaultInputAssemblyState();
             createInfo.pInputAssemblyState = &emptyAssemblyState;
         }
 

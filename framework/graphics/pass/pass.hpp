@@ -300,6 +300,9 @@ namespace vg
 		const vk::PipelineColorBlendStateCreateInfo &getColorBlendInfo() const;
 		void setColorBlendInfo(const vk::PipelineColorBlendStateCreateInfo &value);
 
+		const vk::PipelineInputAssemblyStateCreateInfo &getDefaultInputAssemblyState() const;
+		void setDefaultInputAssemblyState(vk::PipelineInputAssemblyStateCreateInfo value);
+
 		const Bool32 IsHasSpecializationData(ShaderStageFlagBits shaderStage) const;
 		const Bool32 IsHasSpecializationData(vk::ShaderStageFlagBits shaderStage) const;
 
@@ -378,6 +381,7 @@ namespace vg
 		std::vector<vk::PipelineColorBlendAttachmentState> m_colorBlendAttachmentStates;
 		vk::PipelineColorBlendStateCreateInfo m_colorBlendInfo;
 		float m_lineWidth;
+		vk::PipelineInputAssemblyStateCreateInfo m_defaultInputAssemblyState;
 
 		uint32_t m_instanceCount;
 

@@ -436,7 +436,7 @@ namespace vg
 				pCmdDraw->firstVertex,
 				pCmdDraw->firstInstance
 				);
-		} else if (pCmdDraw != nullptr) {
+		} else if (pCmdDrawIndexed != nullptr) {
 			pCommandBuffer->drawIndexed(pCmdDrawIndexed->indexCount,
 			    pCmdDrawIndexed->instanceCount,
 				pCmdDrawIndexed->firstIndex,

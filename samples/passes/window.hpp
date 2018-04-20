@@ -25,7 +25,7 @@ private:
 
 	struct Light {
 		vg::Vector4 position;
-		vg::Vector4 color;
+		vg::Vector3 color;
 		float radius;
 	};
 	struct OtherInfo 
@@ -35,9 +35,8 @@ private:
 	} m_otherInfo;
 
 	virtual void _init() override;
-	
-	virtual void _init() override;
 	virtual void _initState() override;
+	void _initLights();
 	void _createModel();
 	void _createTexture();
 	void _createMaterial();

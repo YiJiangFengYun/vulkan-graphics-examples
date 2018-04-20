@@ -15,7 +15,7 @@ layout(binding = 0) uniform BuildIn {
 layout (location = 0) out vec3 outNormal;
 layout (location = 1) out vec3 outColor;
 layout (location = 2) out vec3 outWorldPos;
-layout (location = 3) out vec3 outTangent;
+// layout (location = 3) out vec3 outTangent;
 
 out gl_PerVertex
 {

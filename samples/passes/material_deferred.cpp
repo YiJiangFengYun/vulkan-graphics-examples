@@ -1,4 +1,4 @@
-#include "samples/passes/material_deferred.hpp"
+#include "passes/material_deferred.hpp"
 
 MaterialDeferred::MaterialDeferred()
     : vg::Material()
@@ -23,7 +23,11 @@ MaterialDeferred::MaterialDeferred(uint32_t trunkFrameBufferWidth, uint32_t trun
     , m_trunkFramebufferHeight(trunkFrameBufferHeight)
     , m_mapRectMeshes()
 {
-
+    _createAttachments();
+    _createRenderPass();
+    _createFramebuffer();
+    _createOtherPasses();
+    _initPasses();
 }
 
 void MaterialDeferred::beginBindToRender(const BindInfo info, BindResult *pResult)
@@ -86,6 +90,7 @@ void MaterialDeferred::beginBindToRender(const BindInfo info, BindResult *pResul
     std::vector<uint32_t> indices = {
         0, 1, 3, 3, 1, 2
     };
+	pRectMesh->setVertexCount(static_cast<uint32_t>(rectPoses.size()));
     pRectMesh->setPositions(rectPoses);
     pRectMesh->setTextureCoordinates<vg::TextureCoordinateType::VECTOR_2, vg::TextureCoordinateIndex::TextureCoordinate_0>(
         rectUVs
@@ -100,6 +105,7 @@ void MaterialDeferred::beginBindToRender(const BindInfo info, BindResult *pResul
         vg::RenderPassInfo renderPassInfo;
         renderPassInfo.pRenderPass = m_pRenderPass.get();
         renderPassInfo.subPassIndex = 0u;
+		renderPassInfo.pFrameBuffer = m_pFrameBuffer.get();
         renderPassInfo.framebufferWidth = m_frameBufferWidth;
         renderPassInfo.framebufferHeight = m_frameBufferHeight;
         renderPassInfo.projMatrix = *(info.pProjMatrix);
@@ -111,6 +117,23 @@ void MaterialDeferred::beginBindToRender(const BindInfo info, BindResult *pResul
         renderPassInfo.viewport = viewport;
         renderPassInfo.scissor = scissor;
 
+        vk::ClearValue clearValueColor = {
+			std::array<float, 4>{0.0f, 0.0f, 0.0f, 0.0f}
+		};
+		vk::ClearValue clearValueDepthStencil = {
+			vk::ClearDepthStencilValue(1.0f, 0)
+		};
+
+        vk::ClearValue clearValues[5];
+		clearValues[0] = clearValueColor;
+		clearValues[1] = clearValueColor;
+		clearValues[2] = clearValueColor;
+		clearValues[3] = clearValueColor;
+		clearValues[4] = clearValueDepthStencil;
+
+        renderPassInfo.clearValueCount = 5;
+        renderPassInfo.pClearValues = clearValues;
+
         vg::CmdInfo cmdInfo;
         cmdInfo.pRenderPassInfo = &renderPassInfo;
         result.pBranchCmdBuffer->addCmd(cmdInfo);
@@ -121,6 +144,7 @@ void MaterialDeferred::beginBindToRender(const BindInfo info, BindResult *pResul
         vg::RenderPassInfo renderPassInfo;
         renderPassInfo.pRenderPass = m_pRenderPass.get();
         renderPassInfo.subPassIndex = 1u;
+		renderPassInfo.pFrameBuffer = m_pFrameBuffer.get();
         renderPassInfo.framebufferWidth = m_frameBufferWidth;
         renderPassInfo.framebufferHeight = m_frameBufferHeight;
         renderPassInfo.projMatrix = vg::Matrix4x4(1.0f);
@@ -191,6 +215,7 @@ void MaterialDeferred::beginBindToRender(const BindInfo info, BindResult *pResul
     {
         vg::RenderPassInfo trunkRenderPassInfo;
         trunkRenderPassInfo.pRenderPass = nullptr;
+		trunkRenderPassInfo.pFrameBuffer = nullptr;
         trunkRenderPassInfo.framebufferWidth = info.trunkFramebufferWidth;
         trunkRenderPassInfo.framebufferHeight = info.trunkFramebufferHeight;
         trunkRenderPassInfo.projMatrix = vg::Matrix4x4(1.0f);
@@ -229,20 +254,20 @@ void MaterialDeferred::_createAttachments()
         new vg::Texture2DColorAttachment(vk::Format::eR8G8B8A8Unorm, m_frameBufferWidth, m_frameBufferHeight)
     };
 
-    m_pAttachmentPos = std::shared_ptr<vg::TextureColorAttachment>{
-        new vg::TextureColorAttachment(vk::Format::eR16G16B16A16Sfloat, m_frameBufferWidth, m_frameBufferHeight, VG_TRUE)
+    m_pAttachmentPos = std::shared_ptr<vg::Texture2DColorAttachment>{
+        new vg::Texture2DColorAttachment(vk::Format::eR16G16B16A16Sfloat, m_frameBufferWidth, m_frameBufferHeight, VG_TRUE)
     };
     
-    m_pAttachmentNormal = std::shared_ptr<vg::TextureColorAttachment>{
-       new vg::TextureColorAttachment(vk::Format::eR16G16B16A16Sfloat, m_frameBufferWidth, m_frameBufferHeight, VG_TRUE)
+    m_pAttachmentNormal = std::shared_ptr<vg::Texture2DColorAttachment>{
+       new vg::Texture2DColorAttachment(vk::Format::eR16G16B16A16Sfloat, m_frameBufferWidth, m_frameBufferHeight, VG_TRUE)
     };
     
-    m_pAttachmentAlbedo = std::shared_ptr<vg::TextureColorAttachment>{
-       new vg::TextureColorAttachment(vk::Format::eR8G8B8A8Unorm, m_frameBufferWidth, m_frameBufferHeight, VG_TRUE)
+    m_pAttachmentAlbedo = std::shared_ptr<vg::Texture2DColorAttachment>{
+       new vg::Texture2DColorAttachment(vk::Format::eR8G8B8A8Unorm, m_frameBufferWidth, m_frameBufferHeight, VG_TRUE)
     };
 
     m_pAttachmentDepthStencil = std::shared_ptr<vg::Texture2DDepthStencilAttachment>{
-       new vg::Texture2DDepthStencilAttachment(vk::Format::eR8G8B8A8Unorm, m_frameBufferWidth, m_frameBufferHeight)
+       new vg::Texture2DDepthStencilAttachment(vk::Format::eD32SfloatS8Uint, m_frameBufferWidth, m_frameBufferHeight)
     };
 
     //Create depth only image view for sampling from shader in trunk pass.
@@ -262,24 +287,22 @@ void MaterialDeferred::_createAttachments()
 
 void MaterialDeferred::_createRenderPass()
 {
-#define COLOR_ATTACHMENT_COUNT 4
-#define ATTACHMENT_COUNT COLOR_ATTACHMENT_COUNT + 1
-    std::array<vk::AttachmentDescription, ATTACHMENT_COUNT> attachmentDescs;
-    std::array<vk::Format, ATTACHMENT_COUNT> attachmentFormats = {
+    std::array<vk::AttachmentDescription, 5> attachmentDescs;
+    std::array<vk::Format, 5> attachmentFormats = {
         m_pAttachmentColor->getImage()->getInfo().format,
         m_pAttachmentPos->getImage()->getInfo().format,
         m_pAttachmentNormal->getImage()->getInfo().format,
         m_pAttachmentAlbedo->getImage()->getInfo().format,
         m_pAttachmentDepthStencil->getImage()->getInfo().format,
     };
-    std::array<vk::ImageLayout, ATTACHMENT_COUNT> attachmentLayouts = {
+    std::array<vk::ImageLayout, 5> attachmentLayouts = {
         m_pAttachmentColor->getImage()->getInfo().layout,
         m_pAttachmentPos->getImage()->getInfo().layout,
         m_pAttachmentNormal->getImage()->getInfo().layout,
         m_pAttachmentAlbedo->getImage()->getInfo().layout,
         m_pAttachmentDepthStencil->getImage()->getInfo().layout,
     };
-    for (uint32_t i = 0; i < ATTACHMENT_COUNT; ++i) {
+    for (uint32_t i = 0; i < 5; ++i) {
         attachmentDescs[i].format = attachmentFormats[i];
         attachmentDescs[i].samples = vk::SampleCountFlagBits::e1;
         attachmentDescs[i].loadOp = vk::AttachmentLoadOp::eClear;
@@ -290,26 +313,14 @@ void MaterialDeferred::_createRenderPass()
         attachmentDescs[i].finalLayout = attachmentLayouts[i];
     }
 
-    //color attachment will be sample by trunk pass and trunsfer layout to eShaderReadOnlyOptimal.
-    // attachmentDescs[0].initialLayout = vk::ImageLayout::eUndefined;
+    attachmentDescs[0].storeOp = vk::AttachmentStoreOp::eStore;
+    attachmentDescs[4].storeOp = vk::AttachmentStoreOp::eStore;
 
-    vk::AttachmentDescription &depthStencilAttachmentDesc = attachmentDescs[ATTACHMENT_COUNT - 1];
-    depthStencilAttachmentDesc.format = m_pAttachmentDepthStencil->getImage()->getInfo().format;
-    depthStencilAttachmentDesc.samples = vk::SampleCountFlagBits::e1;
-    depthStencilAttachmentDesc.loadOp = vk::AttachmentLoadOp::eClear;
-    depthStencilAttachmentDesc.storeOp = vk::AttachmentStoreOp::eDontCare;
-    depthStencilAttachmentDesc.stencilLoadOp = vk::AttachmentLoadOp::eDontCare;
-    depthStencilAttachmentDesc.stencilStoreOp = vk::AttachmentStoreOp::eDontCare;
-    //depth stencil attachment will be sample by trunk and trunsfer layout to eShaderReadOnlyOptimal.
-    depthStencilAttachmentDesc.initialLayout = m_pAttachmentDepthStencil->getImage()->getInfo().layout;
-    depthStencilAttachmentDesc.finalLayout = m_pAttachmentDepthStencil->getImage()->getInfo().layout;
-
-#define SUB_PASS_COUNT 2
-    std::array<vk::SubpassDescription, SUB_PASS_COUNT> subpassDescs;
+    std::array<vk::SubpassDescription, 2> subpassDescs;
 
     {
         //first subpass: fill G-Buffer components
-        std::array<vk::AttachmentReference, COLOR_ATTACHMENT_COUNT> attachmentRefs = {
+        std::array<vk::AttachmentReference, 4> attachmentRefs = {
             vk::AttachmentReference{0, vk::ImageLayout::eColorAttachmentOptimal},
             vk::AttachmentReference{1, vk::ImageLayout::eColorAttachmentOptimal},
             vk::AttachmentReference{2, vk::ImageLayout::eColorAttachmentOptimal},
@@ -319,7 +330,7 @@ void MaterialDeferred::_createRenderPass()
         vk::AttachmentReference depthAttachmentRef = {4, vk::ImageLayout::eDepthStencilAttachmentOptimal};
 
         subpassDescs[0].pipelineBindPoint = vk::PipelineBindPoint::eGraphics;
-        subpassDescs[0].colorAttachmentCount = COLOR_ATTACHMENT_COUNT;
+        subpassDescs[0].colorAttachmentCount = 4;
         subpassDescs[0].pColorAttachments = attachmentRefs.data();
         subpassDescs[0].pDepthStencilAttachment = &depthAttachmentRef;
     }
@@ -346,7 +357,7 @@ void MaterialDeferred::_createRenderPass()
     dependencies[0].srcSubpass = VK_SUBPASS_EXTERNAL;
     dependencies[0].dstSubpass = 0;
     dependencies[0].srcStageMask = vk::PipelineStageFlagBits::eTopOfPipe;
-    dependencies[0].srcStageMask = vk::PipelineStageFlagBits::eColorAttachmentOutput;
+    dependencies[0].dstStageMask = vk::PipelineStageFlagBits::eColorAttachmentOutput;
     dependencies[0].srcAccessMask = vk::AccessFlagBits::eMemoryRead;
     dependencies[0].dstAccessMask = vk::AccessFlagBits::eColorAttachmentRead | vk::AccessFlagBits::eColorAttachmentWrite;
     dependencies[0].dependencyFlags = vk::DependencyFlagBits::eByRegion;
@@ -384,7 +395,6 @@ void MaterialDeferred::_createRenderPass()
 
 void MaterialDeferred::_createFramebuffer()
 {
-#define ATTACHMENT_COUNT 5
     std::array<vk::ImageView, 5> attachments = { 
         *(m_pAttachmentColor->getImageView()->getImageView()), 
         *(m_pAttachmentPos->getImageView()->getImageView()),
@@ -421,9 +431,9 @@ void MaterialDeferred::_initPasses()
     //deferred pass
     {
         auto pPass = m_pPassDeferred.get();
-#define ATTACHMENT_STATE_COUNT 4
-	    vk::PipelineColorBlendAttachmentState attachmentStates[ATTACHMENT_STATE_COUNT] = {};
-        for (uint32_t i = 0; i < ATTACHMENT_STATE_COUNT; ++i)
+        pPass->setSubpass(0u);
+	    vk::PipelineColorBlendAttachmentState attachmentStates[4] = {};
+        for (uint32_t i = 0; i < 4; ++i)
         {
             attachmentStates[i].colorWriteMask = vk::ColorComponentFlagBits::eR | 
                 vk::ColorComponentFlagBits::eG | 
@@ -433,7 +443,7 @@ void MaterialDeferred::_initPasses()
         }
 	    
 	    vk::PipelineColorBlendStateCreateInfo colorBlendState = {};
-	    colorBlendState.attachmentCount = ATTACHMENT_STATE_COUNT;
+	    colorBlendState.attachmentCount = 4;
 	    colorBlendState.pAttachments = attachmentStates;
 	    pPass->setColorBlendInfo(colorBlendState);
         pPass->apply();
@@ -442,6 +452,7 @@ void MaterialDeferred::_initPasses()
     //composition pass
     {
         auto pPass = m_pPassComposition.get();
+        pPass->setSubpass(1u);
         pPass->setPolygonMode(vg::PolygonMode::FILL);
 	    pPass->setCullMode(vg::CullModeFlagBits::NONE);
 	    pPass->setFrontFace(vg::FrontFaceType::COUNTER_CLOCKWISE);
@@ -450,19 +461,18 @@ void MaterialDeferred::_initPasses()
 	    buildInDataInfo.pComponent = nullptr;
 	    pPass->setBuildInDataInfo(buildInDataInfo);
         
-#define ATTACHMENT_STATE_COUNT 1
-	    vk::PipelineColorBlendAttachmentState attachmentStates[ATTACHMENT_STATE_COUNT] = {};
-        for (uint32_t i = 0; i < ATTACHMENT_STATE_COUNT; ++i)
+	    vk::PipelineColorBlendAttachmentState attachmentStates[1] = {};
+        for (uint32_t i = 0; i < 1; ++i)
         {
             attachmentStates[i].colorWriteMask = vk::ColorComponentFlagBits::eR | 
                 vk::ColorComponentFlagBits::eG | 
                 vk::ColorComponentFlagBits::eB | 
                 vk::ColorComponentFlagBits::eA;
-	        attachmentStates[0].blendEnable = VG_FALSE;
+	        attachmentStates[i].blendEnable = VG_FALSE;
         }
 	    
 	    vk::PipelineColorBlendStateCreateInfo colorBlendState = {};
-	    colorBlendState.attachmentCount = ATTACHMENT_STATE_COUNT;
+	    colorBlendState.attachmentCount = 1;
 	    colorBlendState.pAttachments = attachmentStates;
 	    pPass->setColorBlendInfo(colorBlendState);
 
@@ -472,9 +482,12 @@ void MaterialDeferred::_initPasses()
 	    depthStencilState.depthCompareOp = vk::CompareOp::eAlways;
 	    pPass->setDepthStencilInfo(depthStencilState);
 
-        pPass->setTexture("pos_input", m_pAttachmentPos.get(), 0u, vg::ShaderStageFlagBits::FRAGMENT, vg::DescriptorType::INPUT_ATTACHMENT);
-        pPass->setTexture("normal_input", m_pAttachmentNormal.get(), 1u, vg::ShaderStageFlagBits::FRAGMENT, vg::DescriptorType::INPUT_ATTACHMENT);
-        pPass->setTexture("albedo_input", m_pAttachmentAlbedo.get(), 2u, vg::ShaderStageFlagBits::FRAGMENT, vg::DescriptorType::INPUT_ATTACHMENT);
+        pPass->setTexture("pos_input", m_pAttachmentPos.get(), 0u, vg::ShaderStageFlagBits::FRAGMENT, 
+            vg::DescriptorType::INPUT_ATTACHMENT);
+        pPass->setTexture("normal_input", m_pAttachmentNormal.get(), 1u, vg::ShaderStageFlagBits::FRAGMENT, 
+            vg::DescriptorType::INPUT_ATTACHMENT);
+        pPass->setTexture("albedo_input", m_pAttachmentAlbedo.get(), 2u, vg::ShaderStageFlagBits::FRAGMENT, 
+            vg::DescriptorType::INPUT_ATTACHMENT);
         pPass->apply();
     }
 

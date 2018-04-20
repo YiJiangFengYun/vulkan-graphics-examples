@@ -1,7 +1,7 @@
 #include "passes/window.hpp"
 
 #include <iostream>
-
+#include <random>
 
 Window::Window(uint32_t width
 	, uint32_t height
@@ -41,14 +41,37 @@ void Window::_initState()
 	m_cameraRotation = vg::Vector3(glm::radians(0.0f), glm::radians(0.0f), glm::radians(0.0f));
 }
 
+void Window::_initLights()
+{
+	std::vector<vg::Vector3> colors =
+	{
+		glm::vec3(1.0f, 1.0f, 1.0f),
+		glm::vec3(1.0f, 0.0f, 0.0f),
+		glm::vec3(0.0f, 1.0f, 0.0f),
+		glm::vec3(0.0f, 0.0f, 1.0f),
+		glm::vec3(1.0f, 1.0f, 0.0f),
+	};
+
+	std::default_random_engine rndGen((unsigned)time(nullptr));
+	std::uniform_real_distribution<float> rndDist(-1.0f, 1.0f);
+	std::uniform_int_distribution<uint32_t> rndCol(0, static_cast<uint32_t>(colors.size()-1));
+
+	for (auto& light : m_otherInfo.lights)
+	{
+		light.position = glm::vec4(rndDist(rndGen) * 6.0f, 0.25f + std::abs(rndDist(rndGen)) * 4.0f, rndDist(rndGen) * 6.0f, 1.0f);
+		light.color = colors[rndCol(rndGen)];
+		light.radius = 1.0f + std::abs(rndDist(rndGen));			
+	}
+}
+
 void Window::_createModel()
 {
-	const uint32_t layoutCount = 4u;
+	const uint32_t layoutCount = 3u;
 	sampleslib::AssimpScene::VertexLayoutComponent layouts[layoutCount] = {
 		sampleslib::AssimpScene::VertexLayoutComponent::VERTEX_COMPONENT_POSITION,
 		sampleslib::AssimpScene::VertexLayoutComponent::VERTEX_COMPONENT_COLOR,		
 		sampleslib::AssimpScene::VertexLayoutComponent::VERTEX_COMPONENT_NORMAL,
-		sampleslib::AssimpScene::VertexLayoutComponent::VERTEX_COMPONENT_UV,
+		// sampleslib::AssimpScene::VertexLayoutComponent::VERTEX_COMPONENT_UV,
 	};
 	sampleslib::AssimpScene::CreateInfo createInfo;
 	createInfo.fileName = "models/samplebuilding.dae";
@@ -146,7 +169,7 @@ void Window::_createMaterial()
 {
 	{
 		//material
-	    m_pMaterialOfScene = std::shared_ptr<MaterialDeferred>(new MaterialDeferred());
+	    m_pMaterialOfScene = std::shared_ptr<MaterialDeferred>(new MaterialDeferred(m_width, m_height));
 	    m_pMaterialOfScene->setRenderPriority(0u);
 	    m_pMaterialOfScene->setRenderQueueType(vg::MaterialShowType::OPAQUE);
 		{
@@ -200,7 +223,8 @@ void Window::_createMaterial()
 		    pPass->setSpecializationData(vg::ShaderStageFlagBits::FRAGMENT, specializationInfo);
     
 			//pass
-			pPass->setDataValue("other_info", m_otherInfo, 3u);
+			pPass->setDataValue("other_info", m_otherInfo, 3u, vg::DescriptorType::UNIFORM_BUFFER,
+			    vg::ShaderStageFlagBits::FRAGMENT);
 		}
 		{
 			auto pShader = m_pMaterialOfScene->getMainShader();
@@ -221,7 +245,9 @@ void Window::_initScene()
 	const auto &objects = m_assimpScene.getObjects();
 	for (const auto &object : objects)
 	{
-		object->setMaterial(m_pMaterialOfScene.get());
+		auto pMaterial = m_pMaterialOfScene.get();
+		object->setMaterialCount(1u);
+		object->setMaterial(pMaterial);
 	    m_pScene->addVisualObject(object.get());		
 	}
 }
@@ -229,4 +255,6 @@ void Window::_initScene()
 void Window::_onUpdate()
 {
 	ParentWindowType::_onUpdate();
+
+	m_otherInfo.vewPos = vg::Vector4(m_pCamera->getTransform()->getLocalPosition(), 1.0f);
 }

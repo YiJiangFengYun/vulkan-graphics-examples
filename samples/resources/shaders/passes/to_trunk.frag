@@ -13,8 +13,8 @@ layout (location = 0) out vec4 outColor;
 void main() 
 {
 	vec4 color = texture(color, inUV);
-	float depth = texture2D(depth, inUV).r;
+	float depth = texture(depth, inUV).r;
 
-	gl_FragCoord.z = depth;
+	gl_FragDepth = depth;
 	outColor = color;
 }

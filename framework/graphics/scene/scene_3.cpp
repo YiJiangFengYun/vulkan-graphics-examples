@@ -63,7 +63,7 @@ namespace vg
 		, BoundsType bounds
 		, fd::Rect2D *viewRect) const
 	{
-		if (pCamera->getIsOrthographic() == VG_FALSE) 
+		if (pCamera->getIsOrthographic() == VG_TRUE) 
 		{
 			//get MVP matrix.
 		    auto mvpMatrix = getProjMatrix(pCamera) * pCamera->getTransform()->getMatrixWorldToLocal() * pTransform->getMatrixLocalToWorld();
@@ -100,8 +100,16 @@ namespace vg
 			const Camera3 *pCamera3 = dynamic_cast<const Camera3 *>(pCamera);
 			auto zNear = pCamera3->getZNear();
 			auto zFar = pCamera3->getZFar();
-			if (min.z < zNear) min.z = zNear;
-			if (max.z > zFar) max.z = zFar;
+			if (min.z < zNear)
+			{
+				min.z = zNear;
+				if (max.z < zNear) max.z = zNear;
+			}
+			if (max.z > zFar)
+			{
+				max.z = zFar;
+				if (min.z > zFar) min.z = zFar;
+			}
 			boundsInCamera.setMinMax(min, max);
 			//3. final, we get bounds in normalize device space.
 			auto projMatrx = getProjMatrix(pCamera);

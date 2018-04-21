@@ -15,7 +15,8 @@ namespace vg
     public:
         struct ResultInfo
         {
-			ResultInfo();
+			uint32_t drawCount;
+			ResultInfo(uint32_t drawCount = 0u);
         };
 
         static void recordTrunk(CmdBuffer *pCmdBuffer

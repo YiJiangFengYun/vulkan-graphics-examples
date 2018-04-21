@@ -280,17 +280,20 @@ namespace vg
 		_recordCommandBufferForBegin();
 
 		//branch render pass.
+		CMDParser::ResultInfo cmdParseResult;
 		CMDParser::recordBranch(&m_branchCmdBuffer,
 			m_pCommandBuffer.get(),
-			&m_pipelineCache
+			&m_pipelineCache,
+			&cmdParseResult
 			);
+		resultInfo.drawCount += cmdParseResult.drawCount;
 
 		//trunk wait barrier
 		CMDParser::recordTrunkWaitBarrier(&m_trunkWaitBarrierCmdBuffer,
 			m_pCommandBuffer.get());
 
         //trunk render pass.
-		resultInfo.drawCount = m_trunkRenderPassCmdBuffer.getCmdCount();
+		resultInfo.drawCount += m_trunkRenderPassCmdBuffer.getCmdCount();
 		_recordTrunkRenderPassForBegin();
 		CMDParser::recordTrunk(&m_trunkRenderPassCmdBuffer,
 			m_pCommandBuffer.get(),

@@ -2,7 +2,8 @@
 
 namespace vg
 {
-    CMDParser::ResultInfo::ResultInfo()
+    CMDParser::ResultInfo::ResultInfo(uint32_t drawCount)
+		: drawCount(drawCount)
     {
     }
 	
@@ -74,6 +75,7 @@ namespace vg
         , ResultInfo *pResult
         )
     {
+		uint32_t drawCount = 0u;
 		auto cmdInfoCount = pCmdBuffer->getCmdCount();
 		vk::RenderPass lastRenderPass = vk::RenderPass();
         uint32_t lastSubPassIndex = 0u;
@@ -108,6 +110,7 @@ namespace vg
 
 				lastRenderPass = *(pRenderPassInfo->pRenderPass);
 				lastSubPassIndex = pRenderPassInfo->subPassIndex;
+				++drawCount;
 			}
 			else 
 		    {
@@ -128,6 +131,8 @@ namespace vg
 			}
 			
 		}
+
+		if (pResult != nullptr)pResult->drawCount = drawCount;
 	}
 
 	void CMDParser::recordItemRenderPassBegin(const RenderPassInfo *pRenderPassInfo

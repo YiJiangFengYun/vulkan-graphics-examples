@@ -331,7 +331,7 @@ void MaterialDeferred::_createAttachments()
     };
 
     m_pAttachmentDepthStencil = std::shared_ptr<vg::Texture2DDepthStencilAttachment>{
-       new vg::Texture2DDepthStencilAttachment(vk::Format::eD16UnormS8Uint, m_frameBufferWidth, m_frameBufferHeight, VG_TRUE)
+       new vg::Texture2DDepthStencilAttachment(vk::Format::eD32SfloatS8Uint, m_frameBufferWidth, m_frameBufferHeight)
     };
 
     //Create depth only image view for sampling from shader in trunk pass.

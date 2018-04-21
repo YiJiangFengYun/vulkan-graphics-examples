@@ -7,10 +7,10 @@ layout (location = 0) in vec3 inNormal;
 layout (location = 1) in vec3 inColor;
 layout (location = 2) in vec3 inWorldPos;
 
-layout (location = 0) out vec4 outColor;
-layout (location = 1) out vec4 outPosition;
-layout (location = 2) out vec4 outNormal;
-layout (location = 3) out vec4 outAlbedo;
+// layout (location = 0) out vec4 outColor;
+layout (location = 0) out vec4 outPosition;
+layout (location = 1) out vec4 outNormal;
+layout (location = 2) out vec4 outAlbedo;
 
 // layout (constant_id = 0) const float NEAR_PLANE = 0.1f;
 // layout (constant_id = 1) const float FAR_PLANE = 256.0f;
@@ -36,5 +36,5 @@ void main()
 	// outPosition.a = linearDepth(gl_FragCoord.z);
 
 	// Write color attachments to avoid undefined behaviour (validation error)
-	outColor = vec4(0.0);
+	// outColor = vec4(0.0);
 }

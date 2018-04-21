@@ -227,7 +227,12 @@ namespace vg
 		if ((props.optimalTilingFeatures & vk::FormatFeatureFlagBits::eDepthStencilAttachment) !=
 			vk::FormatFeatureFlagBits::eDepthStencilAttachment)
 		{
-			throw std::runtime_error("Depth format is not supported!");
+			throw std::runtime_error("The format don't support as depth stencil attachment!");
+		}
+		if ((props.optimalTilingFeatures & vk::FormatFeatureFlagBits::eSampledImage) !=
+			vk::FormatFeatureFlagBits::eSampledImage) 
+		{
+			throw std::runtime_error("The format don't support to sample from this image!");
 		}
 	}
 }

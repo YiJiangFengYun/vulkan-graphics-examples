@@ -91,23 +91,23 @@ namespace vg
 			vk::Image image;
 			vk::ImageViewType viewType;
 			vk::Format format;
-			vk::ComponentMapping coponents;
+			vk::ComponentMapping components;
 			vk::ImageSubresourceRange subResourceRange;
 
 			ImageViewInfo(vk::ImageViewCreateFlags flags = vk::ImageViewCreateFlags()
 			    , vk::Image image = vk::Image()
 			    , vk::ImageViewType viewType = vk::ImageViewType()
 			    , vk::Format format = vk::Format()
-			    , vk::ComponentMapping coponents = vk::ComponentMapping()
+			    , vk::ComponentMapping components = vk::ComponentMapping()
         		, vk::ImageSubresourceRange subResourceRange = vk::ImageSubresourceRange()
 				);
 		};
 
 		struct ImageViewCreateInfo {
-			vk::ComponentMapping coponents;
+			vk::ComponentMapping components;
 			vk::ImageSubresourceRange subResourceRange;
 
-			ImageViewCreateInfo(vk::ComponentMapping coponents = vk::ComponentMapping()
+			ImageViewCreateInfo(vk::ComponentMapping components = vk::ComponentMapping()
         		, vk::ImageSubresourceRange subResourceRange = vk::ImageSubresourceRange()
 				);
 		};

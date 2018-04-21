@@ -165,23 +165,23 @@ namespace vg
 	    , vk::Image image
 	    , vk::ImageViewType viewType
 	    , vk::Format format
-	    , vk::ComponentMapping coponents
+	    , vk::ComponentMapping components
         , vk::ImageSubresourceRange subResourceRange
 	    )
 		: flags(flags)
 		, image(image)
 		, viewType(viewType)
 		, format(format)
-		, coponents(coponents)
+		, components(components)
 		, subResourceRange(subResourceRange)
 	{
 
 	}
 
-	Texture::ImageViewCreateInfo::ImageViewCreateInfo(vk::ComponentMapping coponents
+	Texture::ImageViewCreateInfo::ImageViewCreateInfo(vk::ComponentMapping components
         , vk::ImageSubresourceRange subResourceRange
 		)
-		: coponents(coponents)
+		: components(components)
 		, subResourceRange(subResourceRange)
 	{
 
@@ -212,7 +212,7 @@ namespace vg
 			info.image,
 			info.viewType,
 			info.format,
-			info.coponents,
+			info.components,
 			info.subResourceRange,
 		};
 
@@ -415,7 +415,7 @@ namespace vg
 			*(m_pImage->getImage()),
 			_getImageViewType(),
 			m_format,
-			createInfo.coponents,
+			createInfo.components,
 			createInfo.subResourceRange,
 		};
 

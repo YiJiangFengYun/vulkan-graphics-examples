@@ -194,11 +194,6 @@ void Window::_createMaterial()
 	        buildInDataInfo.componentCount = 2u;
 	        buildInDataInfo.pComponent = buildInDataCmps;
 	        pPass->setBuildInDataInfo(buildInDataInfo);
-			vk::PipelineDepthStencilStateCreateInfo depthStencilState = {};
-	        depthStencilState.depthTestEnable = VG_TRUE;
-	        depthStencilState.depthWriteEnable = VG_TRUE;
-	        depthStencilState.depthCompareOp = vk::CompareOp::eLessOrEqual;
-	        pPass->setDepthStencilInfo(depthStencilState);
 		}
 		{
 			auto pPass = m_pMaterialOfScene->getPassComposition();

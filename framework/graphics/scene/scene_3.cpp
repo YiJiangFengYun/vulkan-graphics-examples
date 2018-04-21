@@ -63,28 +63,68 @@ namespace vg
 		, BoundsType bounds
 		, fd::Rect2D *viewRect) const
 	{
-		//get MVP matrix.
-		auto mvpMatrix = getProjMatrix(pCamera) * pCamera->getTransform()->getMatrixWorldToLocal() * pTransform->getMatrixLocalToWorld();
-		auto boundsInView = tranBoundsToNewSpace<PointType>(bounds, mvpMatrix, pCamera->getIsOrthographic() == VG_FALSE);
-		BoundsType boundsOfView(PointType(-1.0f, -1.0f, 0.0f), PointType(1.0f, 1.0f, 1.0f));
-		BoundsType intersectionInView;		
-		Bool32 isInsideCameraView = VG_FALSE;
-		////check if it is inside camera view.
-		if (boundsOfView.intersects(boundsInView, &intersectionInView))
+		if (pCamera->getIsOrthographic() == VG_FALSE) 
 		{
-			isInsideCameraView = VG_TRUE;
-			if (viewRect != nullptr)
+			//get MVP matrix.
+		    auto mvpMatrix = getProjMatrix(pCamera) * pCamera->getTransform()->getMatrixWorldToLocal() * pTransform->getMatrixLocalToWorld();
+		    auto boundsInView = tranBoundsToNewSpace<PointType>(bounds, mvpMatrix, VG_FALSE);
+		    BoundsType boundsOfView(PointType(-1.0f, -1.0f, 0.0f), PointType(1.0f, 1.0f, 1.0f));
+		    BoundsType intersectionInView;		
+		    Bool32 isInsideCameraView = VG_FALSE;
+		    ////check if it is inside camera view.
+		    if (boundsOfView.intersects(boundsInView, &intersectionInView))
 		    {
-		    	auto min = intersectionInView.getMin();
-		    	auto size = intersectionInView.getSize();
-		    	(*viewRect).x = min.x;
-		    	(*viewRect).y = min.y;
-		    	(*viewRect).width = size.x;
-		    	(*viewRect).height = size.y;
+		    	isInsideCameraView = VG_TRUE;
+		    	if (viewRect != nullptr)
+		        {
+		        	auto min = intersectionInView.getMin();
+		        	auto size = intersectionInView.getSize();
+		        	(*viewRect).x = min.x;
+		        	(*viewRect).y = min.y;
+		        	(*viewRect).width = size.x;
+		        	(*viewRect).height = size.y;
+		        }
 		    }
+			return isInsideCameraView;
 		}
-
-		return isInsideCameraView;
+		else 
+		{
+			//avoid error of calculating result projected bounds when bounds cross with z = 0 plane,
+			//we should separate to multiply step to caluclate result bounds.
+		    //1.first, we should get mv matrix to calculate bounds in camera space.
+		    auto mvMatrix = pCamera->getTransform()->getMatrixWorldToLocal() * pTransform->getMatrixLocalToWorld();
+		    auto boundsInCamera = tranBoundsToNewSpace<PointType>(bounds, mvMatrix, VG_FALSE);
+			//2.then, we clip bounds by z far and z near planes.
+			auto min = boundsInCamera.getMin();
+			auto max = boundsInCamera.getMax();
+			const Camera3 *pCamera3 = dynamic_cast<const Camera3 *>(pCamera);
+			auto zNear = pCamera3->getZNear();
+			auto zFar = pCamera3->getZFar();
+			if (min.z < zNear) min.z = zNear;
+			if (max.z > zFar) max.z = zFar;
+			boundsInCamera.setMinMax(min, max);
+			//3. final, we get bounds in normalize device space.
+			auto projMatrx = getProjMatrix(pCamera);
+			auto boundsInView = tranBoundsToNewSpace<PointType>(boundsInCamera, projMatrx, VG_TRUE);
+			BoundsType boundsOfView(PointType(-1.0f, -1.0f, 0.0f), PointType(1.0f, 1.0f, 1.0f));
+			BoundsType intersectionInView;		
+		    Bool32 isInsideCameraView = VG_FALSE;
+		    ////check if it is inside camera view.
+		    if (boundsOfView.intersects(boundsInView, &intersectionInView))
+		    {
+		    	isInsideCameraView = VG_TRUE;
+		    	if (viewRect != nullptr)
+		        {
+		        	auto min = intersectionInView.getMin();
+		        	auto size = intersectionInView.getSize();
+		        	(*viewRect).x = min.x;
+		        	(*viewRect).y = min.y;
+		        	(*viewRect).width = size.x;
+		        	(*viewRect).height = size.y;
+		        }
+		    }
+			return isInsideCameraView;		    
+		}
 	}
 
 	Bool32 Scene3::isInView(const CameraType *pCamera

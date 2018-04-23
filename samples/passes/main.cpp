@@ -18,7 +18,8 @@ int main() {
 	optionalFeatures.textureCompressionETC2 = 1u;
 
 	App app;
-	app.init<Window>(WINDOW_WIDTH, WINDOW_HEIGHT, "passes");
+	app.init<Window>(WINDOW_WIDTH, WINDOW_HEIGHT, "passes",
+		requiredFeatures, optionalFeatures);
 
 	LOG(plog::debug) << "Initialization completed." << std::endl;
 

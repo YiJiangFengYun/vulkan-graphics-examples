@@ -25,6 +25,7 @@ private:
     std::shared_ptr<vg::Texture2DColorAttachment> m_pAttachmentNormal;
     std::shared_ptr<vg::Texture2DColorAttachment> m_pAttachmentAlbedo;
     std::shared_ptr<vg::Texture2DDepthStencilAttachment> m_pAttachmentDepthStencil;
+    const vg::Texture::ImageView * m_pImageViewDepth;
     std::shared_ptr<vk::RenderPass> m_pRenderPass;
     std::shared_ptr<vk::Framebuffer> m_pFrameBuffer;
     std::shared_ptr<vg::Shader> m_pShaderDeferred;

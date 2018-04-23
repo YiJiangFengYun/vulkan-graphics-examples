@@ -24,6 +24,11 @@ private:
 	std::shared_ptr<MaterialDeferred> m_pMaterialOfScene;
 	std::shared_ptr<vg::Material> m_pMaterialOfSceneTest;
 
+	sampleslib::AssimpScene m_assimpSceneGlass;
+	std::shared_ptr<vg::Texture2D> m_pTextureOfSceneGlass;
+	const vg::Texture::Sampler *m_pSamplerOfSceneGlass;
+	std::shared_ptr<vg::Material> m_pMaterialOfSceneGlass;
+
 	struct Light {
 		vg::Vector4 position;
 		vg::Vector3 color;

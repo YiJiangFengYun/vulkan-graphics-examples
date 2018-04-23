@@ -101,60 +101,6 @@ void MaterialDeferred::beginBindToRender(const BindInfo info, BindResult *pResul
 
     auto &result = *pResult;
 
-    // {
-    //     vg::BarrierInfo barrierInfo;
-    //     vg::CmdInfo cmdInfo;
-    //     vk::ImageMemoryBarrier imageMemoryBarrier;
-
-    //     //color texture.
-    //     auto pImage = m_pAttachmentColor->getImage();
-    //     imageMemoryBarrier.srcAccessMask = vk::AccessFlagBits::eShaderRead;
-    //     imageMemoryBarrier.dstAccessMask = vk::AccessFlagBits::eColorAttachmentWrite;
-    //     imageMemoryBarrier.oldLayout = vk::ImageLayout::eShaderReadOnlyOptimal;
-    //     imageMemoryBarrier.newLayout = vk::ImageLayout::eShaderReadOnlyOptimal;
-    //     imageMemoryBarrier.subresourceRange = {
-    //         pImage->getInfo().allAspect,
-    //         0u,
-    //         pImage->getInfo().mipLevels,
-    //         0u,
-    //         pImage->getInfo().arrayLayers,
-    //     };
-    //     imageMemoryBarrier.image = *(pImage->getImage());
-
-    //     barrierInfo.srcStageMask = vk::PipelineStageFlagBits::eFragmentShader;
-    //     barrierInfo.dstStageMask = vk::PipelineStageFlagBits::eColorAttachmentOutput;
-    //     barrierInfo.imageMemoryBarrierCount = 1;
-    //     barrierInfo.pImageMemoryBarriers = &imageMemoryBarrier;
-    //     barrierInfo.dependencyFlags = vk::DependencyFlagBits::eByRegion;
-        
-    //     cmdInfo.pBarrierInfo = &barrierInfo;
-    //     result.pBranchCmdBuffer->addCmd(cmdInfo);
-
-    //     //depth texture.
-    //     pImage = m_pAttachmentDepthStencil->getImage();
-    //     imageMemoryBarrier.srcAccessMask = vk::AccessFlagBits::eShaderRead;
-    //     imageMemoryBarrier.dstAccessMask = vk::AccessFlagBits::eDepthStencilAttachmentWrite;
-    //     imageMemoryBarrier.oldLayout = vk::ImageLayout::eDepthStencilReadOnlyOptimal;
-    //     imageMemoryBarrier.newLayout = vk::ImageLayout::eDepthStencilReadOnlyOptimal;
-    //     imageMemoryBarrier.subresourceRange = {
-    //         pImage->getInfo().allAspect,
-    //         0u,
-    //         pImage->getInfo().mipLevels,
-    //         0u,
-    //         pImage->getInfo().arrayLayers,
-    //     };
-    //     imageMemoryBarrier.image = *(pImage->getImage());
-
-    //     barrierInfo.srcStageMask = vk::PipelineStageFlagBits::eFragmentShader;
-    //     barrierInfo.dstStageMask = vk::PipelineStageFlagBits::eEarlyFragmentTests | vk::PipelineStageFlagBits::eLateFragmentTests;
-    //     barrierInfo.imageMemoryBarrierCount = 1;
-    //     barrierInfo.pImageMemoryBarriers = &imageMemoryBarrier;
-    //     barrierInfo.dependencyFlags = vk::DependencyFlagBits::eByRegion;
-
-    //     cmdInfo.pBarrierInfo = &barrierInfo;
-    //     result.pBranchCmdBuffer->addCmd(cmdInfo);
-    // }
-
     //frist pass
     {
         vg::RenderPassInfo renderPassInfo;
@@ -219,61 +165,6 @@ void MaterialDeferred::beginBindToRender(const BindInfo info, BindResult *pResul
         result.pBranchCmdBuffer->addCmd(cmdInfo);
 
     }
-
-    //trunk barrier for trunk pass sampling from attachment textures.
-    // {
-    //     vg::BarrierInfo barrierInfo;
-    //     vg::CmdInfo cmdInfo;
-    //     vk::ImageMemoryBarrier imageMemoryBarrier;
-
-    //     //color texture.
-    //     auto pImage = m_pAttachmentColor->getImage();
-    //     imageMemoryBarrier.srcAccessMask = vk::AccessFlagBits::eColorAttachmentWrite;
-    //     imageMemoryBarrier.dstAccessMask = vk::AccessFlagBits::eShaderRead;
-    //     imageMemoryBarrier.oldLayout = vk::ImageLayout::eShaderReadOnlyOptimal;
-    //     imageMemoryBarrier.newLayout = vk::ImageLayout::eShaderReadOnlyOptimal;
-    //     imageMemoryBarrier.subresourceRange = {
-    //         pImage->getInfo().allAspect,
-    //         0u,
-    //         pImage->getInfo().mipLevels,
-    //         0u,
-    //         pImage->getInfo().arrayLayers,
-    //     };
-    //     imageMemoryBarrier.image = *(pImage->getImage());
-
-    //     barrierInfo.srcStageMask = vk::PipelineStageFlagBits::eColorAttachmentOutput;
-    //     barrierInfo.dstStageMask = vk::PipelineStageFlagBits::eFragmentShader;
-    //     barrierInfo.imageMemoryBarrierCount = 1;
-    //     barrierInfo.pImageMemoryBarriers = &imageMemoryBarrier;
-    //     barrierInfo.dependencyFlags = vk::DependencyFlagBits::eByRegion;
-        
-    //     cmdInfo.pBarrierInfo = &barrierInfo;
-    //     result.pTrunkWaitBarrierCmdBuffer->addCmd(cmdInfo);
-
-    //     //depth texture.
-    //     pImage = m_pAttachmentDepthStencil->getImage();
-    //     imageMemoryBarrier.srcAccessMask = vk::AccessFlagBits::eDepthStencilAttachmentWrite;
-    //     imageMemoryBarrier.dstAccessMask = vk::AccessFlagBits::eShaderRead;
-    //     imageMemoryBarrier.oldLayout = vk::ImageLayout::eDepthStencilReadOnlyOptimal;
-    //     imageMemoryBarrier.newLayout = vk::ImageLayout::eDepthStencilReadOnlyOptimal;
-    //     imageMemoryBarrier.subresourceRange = {
-    //         pImage->getInfo().allAspect,
-    //         0u,
-    //         pImage->getInfo().mipLevels,
-    //         0u,
-    //         pImage->getInfo().arrayLayers,
-    //     };
-    //     imageMemoryBarrier.image = *(pImage->getImage());
-
-    //     barrierInfo.srcStageMask = vk::PipelineStageFlagBits::eEarlyFragmentTests | vk::PipelineStageFlagBits::eLateFragmentTests;
-    //     barrierInfo.dstStageMask = vk::PipelineStageFlagBits::eFragmentShader;
-    //     barrierInfo.imageMemoryBarrierCount = 1;
-    //     barrierInfo.pImageMemoryBarriers = &imageMemoryBarrier;
-    //     barrierInfo.dependencyFlags = vk::DependencyFlagBits::eByRegion;
-
-    //     cmdInfo.pBarrierInfo = &barrierInfo;
-    //     result.pTrunkWaitBarrierCmdBuffer->addCmd(cmdInfo);
-    // }
 
     //final pass is trunk pass.
     {
@@ -346,7 +237,7 @@ void MaterialDeferred::_createAttachments()
             pImage->getInfo().arrayLayers,
         },
     };
-    m_pAttachmentDepthStencil->createImageView("only_depth", info);
+    m_pImageViewDepth = m_pAttachmentDepthStencil->createImageView("only_depth", info);
 }
 
 void MaterialDeferred::_createRenderPass()
@@ -421,18 +312,16 @@ void MaterialDeferred::_createRenderPass()
 
     dependencies[0].srcSubpass = VK_SUBPASS_EXTERNAL;
     dependencies[0].dstSubpass = 0;
-    dependencies[0].srcStageMask = vk::PipelineStageFlagBits::eTopOfPipe | vk::PipelineStageFlagBits::eFragmentShader;
-    dependencies[0].dstStageMask = vk::PipelineStageFlagBits::eColorAttachmentOutput | 
-        vk::PipelineStageFlagBits::eEarlyFragmentTests | vk::PipelineStageFlagBits::eLateFragmentTests;
-    dependencies[0].srcAccessMask = vk::AccessFlagBits::eMemoryWrite | vk::AccessFlagBits::eMemoryRead | vk::AccessFlagBits::eShaderRead;
+    dependencies[0].srcStageMask = vk::PipelineStageFlagBits::eTopOfPipe;
+    dependencies[0].dstStageMask = vk::PipelineStageFlagBits::eColorAttachmentOutput | vk::PipelineStageFlagBits::eLateFragmentTests;
+    dependencies[0].srcAccessMask = vk::AccessFlagBits::eShaderRead;
     dependencies[0].dstAccessMask = vk::AccessFlagBits::eColorAttachmentRead | vk::AccessFlagBits::eColorAttachmentWrite |
         vk::AccessFlagBits::eDepthStencilAttachmentRead | vk::AccessFlagBits::eDepthStencilAttachmentWrite;
     dependencies[0].dependencyFlags = vk::DependencyFlagBits::eByRegion;
 
     dependencies[1].srcSubpass = 0;
     dependencies[1].dstSubpass = 1;
-    dependencies[1].srcStageMask = vk::PipelineStageFlagBits::eColorAttachmentOutput |
-        vk::PipelineStageFlagBits::eEarlyFragmentTests | vk::PipelineStageFlagBits::eLateFragmentTests;
+    dependencies[1].srcStageMask = vk::PipelineStageFlagBits::eColorAttachmentOutput | vk::PipelineStageFlagBits::eLateFragmentTests;
     dependencies[1].dstStageMask = vk::PipelineStageFlagBits::eFragmentShader;
     dependencies[1].srcAccessMask = vk::AccessFlagBits::eColorAttachmentRead | vk::AccessFlagBits::eColorAttachmentWrite |
         vk::AccessFlagBits::eDepthStencilAttachmentRead | vk::AccessFlagBits::eDepthStencilAttachmentWrite;
@@ -442,9 +331,9 @@ void MaterialDeferred::_createRenderPass()
     dependencies[2].srcSubpass = 1;
     dependencies[2].dstSubpass = VK_SUBPASS_EXTERNAL;
     dependencies[2].srcStageMask = vk::PipelineStageFlagBits::eColorAttachmentOutput;
-    dependencies[2].dstStageMask = vk::PipelineStageFlagBits::eBottomOfPipe | vk::PipelineStageFlagBits::eFragmentShader;
+    dependencies[2].dstStageMask = vk::PipelineStageFlagBits::eBottomOfPipe;
     dependencies[2].srcAccessMask = vk::AccessFlagBits::eColorAttachmentRead | vk::AccessFlagBits::eColorAttachmentWrite;
-    dependencies[2].dstAccessMask = vk::AccessFlagBits::eShaderRead | vk::AccessFlagBits::eMemoryRead | vk::AccessFlagBits::eMemoryWrite;
+    dependencies[2].dstAccessMask = vk::AccessFlagBits::eShaderRead;
     dependencies[2].dependencyFlags = vk::DependencyFlagBits::eByRegion;
 
     
@@ -464,7 +353,7 @@ void MaterialDeferred::_createRenderPass()
 
 void MaterialDeferred::_createFramebuffer()
 {
-    std::array<vk::ImageView, 5> attachments = { 
+    std::array<const vk::ImageView, 5> attachments = { 
         *(m_pAttachmentColor->getImageView()->getImageView()), 
         *(m_pAttachmentPos->getImageView()->getImageView()),
         *(m_pAttachmentNormal->getImageView()->getImageView()),
@@ -591,7 +480,7 @@ void MaterialDeferred::_initPasses()
         pPass->setDepthStencilInfo(depthStencilState);
         pPass->setTexture("color", m_pAttachmentColor.get(), 0u, vg::ShaderStageFlagBits::FRAGMENT);
         pPass->setTexture("depth", m_pAttachmentDepthStencil.get(), 1u, vg::ShaderStageFlagBits::FRAGMENT,
-            vg::DescriptorType::COMBINED_IMAGE_SAMPLER, m_pAttachmentDepthStencil->getImageView("only_depth"));
+            vg::DescriptorType::COMBINED_IMAGE_SAMPLER, m_pImageViewDepth);
         
         pPass->apply();
     }

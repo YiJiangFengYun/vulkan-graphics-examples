@@ -99,7 +99,7 @@ void Window::_createTexture()
 	if (deviceFeatures.textureCompressionBC) 
 	{
 		fileName = "textures/colored_glass_bc3_unorm.ktx";
-		format = vk::Format::eBc2UnormBlock;
+		format = vk::Format::eBc3UnormBlock;
 	}
 	else if (deviceFeatures.textureCompressionASTC_LDR)
 	{
@@ -162,14 +162,15 @@ void Window::_createTexture()
 		vk::Filter::eLinear,
 		vk::Filter::eLinear,
 		vk::SamplerMipmapMode::eLinear,
-		vk::SamplerAddressMode::eClampToEdge,
-		vk::SamplerAddressMode::eClampToEdge,
-		vk::SamplerAddressMode::eClampToEdge,
+		vk::SamplerAddressMode::eRepeat,
+		vk::SamplerAddressMode::eRepeat,
+		vk::SamplerAddressMode::eRepeat,
 		0.0f,
 		enableAnisotropy,
 		anisotropy,
 		0.0f,
 		(float)(m_pTextureOfSceneGlass->getImage()->getInfo().mipLevels),
+		vk::BorderColor::eFloatTransparentBlack,
 	};
 	m_pSamplerOfSceneGlass = m_pTextureOfSceneGlass->createSampler("other_sampler", info);
 }
@@ -311,7 +312,7 @@ void Window::_createMaterial()
 			attachmentStates[i].dstColorBlendFactor = vk::BlendFactor::eOneMinusSrcAlpha;
 			attachmentStates[i].colorBlendOp = vk::BlendOp::eAdd;
 			attachmentStates[i].srcAlphaBlendFactor = vk::BlendFactor::eOne;
-			attachmentStates[i].dstAlphaBlendFactor = vk::BlendFactor::eZero;
+			attachmentStates[i].dstAlphaBlendFactor = vk::BlendFactor::eOne;
 			attachmentStates[i].alphaBlendOp = vk::BlendOp::eAdd;
         }
 	    

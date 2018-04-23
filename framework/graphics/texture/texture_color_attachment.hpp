@@ -28,7 +28,7 @@ namespace vg
 		virtual const vk::ImageView *getColorAttachmentImageView() const override;
 	private:
 		TextureColorAttachment() = delete;
-		virtual void _init() override;
+		virtual void _init(Bool32 importContent) override;
 	};
 } //namespace kgs
 

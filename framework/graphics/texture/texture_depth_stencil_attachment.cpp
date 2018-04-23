@@ -26,7 +26,7 @@ namespace vg
 		{
 			m_usageFlags |= vk::ImageUsageFlagBits::eInputAttachment;
 		}
-		_init();
+		_init(VG_FALSE);
 	}
 
 	TextureDepthStencilAttachment::~TextureDepthStencilAttachment()
@@ -73,10 +73,10 @@ namespace vg
 		return m_pImageView->getImageView();
 	}
 
-	void TextureDepthStencilAttachment::_init()
+	void TextureDepthStencilAttachment::_init(Bool32 importContent)
 	{
 		_checkDepthFormat();
-		Texture::_init();
+		Texture::_init(importContent);
 	}
 
 	void TextureDepthStencilAttachment::_checkDepthFormat()

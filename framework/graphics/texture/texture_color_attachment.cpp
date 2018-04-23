@@ -27,7 +27,7 @@ namespace vg
 		{
 			m_usageFlags |= vk::ImageUsageFlagBits::eInputAttachment;
 		}
-		_init();
+		_init(VG_FALSE);
 	}
 
 	TextureColorAttachment::~TextureColorAttachment()
@@ -74,8 +74,8 @@ namespace vg
 		return m_pImageView->getImageView();
 	}
 
-	void TextureColorAttachment::_init()
+	void TextureColorAttachment::_init(Bool32 importContent)
 	{
-		Texture::_init();
+		Texture::_init(importContent);
 	}
 } //namespace kgs

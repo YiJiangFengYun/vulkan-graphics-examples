@@ -482,11 +482,11 @@ namespace vg
 		}
 	}
 
-	void Texture::_init()
+	void Texture::_init(Bool32 importContent)
 	{
 		_updateMipMapLevels();
 		_updateArrayLayer();
-		_createImage();
+		_createImage(importContent);
 		_createImageView();
 		_createSampler();
 	}
@@ -545,7 +545,7 @@ namespace vg
 		m_arrayLayers = arraylayers;
 	}
 
-	void Texture::_createImage()
+	void Texture::_createImage(Bool32 importContent)
 	{
 #ifdef DEBUG
 		Bool32 isFind;
@@ -658,6 +658,10 @@ namespace vg
 			break;
 		}
 
+		vk::ImageUsageFlags usage = m_usageFlags;
+		if (importContent)
+		    usage |= vk::ImageUsageFlagBits::eTransferDst;
+
 		ImageInfo info = {
 			flags,
 			vkImageType,
@@ -671,7 +675,7 @@ namespace vg
 			m_arrayLayers,
 			vk::SampleCountFlagBits::e1,
 			vk::ImageTiling::eOptimal,
-			m_usageFlags | vk::ImageUsageFlagBits::eTransferDst,
+			usage,
 			vk::SharingMode::eExclusive,
 			m_layout,
 			m_allAspectFlags,

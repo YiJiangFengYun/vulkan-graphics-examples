@@ -21,7 +21,7 @@ namespace vg
 		m_allAspectFlags = vk::ImageAspectFlagBits::eColor;
 		m_usageFlags = vk::ImageUsageFlagBits::eSampled;
 		m_layout = vk::ImageLayout::eShaderReadOnlyOptimal;
-		_init();
+		_init(VG_TRUE);
 	}
 
 	Texture2D::~Texture2D()
@@ -72,7 +72,7 @@ namespace vg
 		{
 			m_usageFlags |= vk::ImageUsageFlagBits::eInputAttachment;
 		}
-		_init();
+		_init(VG_FALSE);
 	}
 
 	Texture2DColorAttachment::~Texture2DColorAttachment()
@@ -129,9 +129,9 @@ namespace vg
 		return m_pImageView->getImageView();
 	}
 
-	void Texture2DColorAttachment::_init()
+	void Texture2DColorAttachment::_init(Bool32 importContent)
 	{
-		Texture::_init();
+		Texture::_init(importContent);
 	}
 
 	Texture2DDepthStencilAttachment::Texture2DDepthStencilAttachment(vk::Format format
@@ -159,7 +159,7 @@ namespace vg
 			m_usageFlags |= vk::ImageUsageFlagBits::eInputAttachment;
 		}
 		_checkDepthFormat();
-		_init();
+		_init(VG_FALSE);
 	}
 
 	Texture2DDepthStencilAttachment::~Texture2DDepthStencilAttachment()
@@ -215,9 +215,9 @@ namespace vg
 		_applyData(layoutInfo, memory, size, cacheMemory, createMipmaps);
 	}
 
-	void Texture2DDepthStencilAttachment::_init()
+	void Texture2DDepthStencilAttachment::_init(Bool32 importContent)
 	{
-		Texture::_init();
+		Texture::_init(importContent);
 	}
 
 	void Texture2DDepthStencilAttachment::_checkDepthFormat()

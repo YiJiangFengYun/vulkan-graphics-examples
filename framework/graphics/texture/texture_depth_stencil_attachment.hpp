@@ -27,7 +27,7 @@ namespace vg
 		virtual const vk::ImageView *getDepthStencilAttachmentImageView() const override;
 	private:
 		TextureDepthStencilAttachment() = delete;
-		virtual void _init() override;
+		virtual void _init(Bool32 importContent) override;
 		void _checkDepthFormat();
 	};
 } //namespace kgs

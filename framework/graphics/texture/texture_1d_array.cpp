@@ -21,7 +21,7 @@ namespace vg
 		m_allAspectFlags = vk::ImageAspectFlagBits::eColor;
 		m_usageFlags = vk::ImageUsageFlagBits::eSampled;
 		m_layout = vk::ImageLayout::eShaderReadOnlyOptimal;
-		_init();
+		_init(VG_TRUE);
 	}
 
 	Texture1DArray::~Texture1DArray()

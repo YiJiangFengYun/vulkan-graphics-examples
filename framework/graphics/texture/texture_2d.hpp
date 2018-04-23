@@ -54,7 +54,7 @@ namespace vg
 		virtual const vk::ImageView *getColorAttachmentImageView() const override;
 	private:
 	   Texture2DColorAttachment() = delete;
-	   virtual void _init() override;
+	   virtual void _init(Bool32 importContent) override;
 	};
 
 	class Texture2DDepthStencilAttachment : public Texture, public BaseDepthStencilAttachment
@@ -83,7 +83,7 @@ namespace vg
 		virtual const vk::ImageView *getDepthStencilAttachmentImageView() const override;
 	private:
 	   Texture2DDepthStencilAttachment() = delete;
-	   virtual void _init() override;
+	   virtual void _init(Bool32 importContent) override;
 	   void _checkDepthFormat();
 	};
 }

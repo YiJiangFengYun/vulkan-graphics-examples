@@ -250,11 +250,11 @@ namespace vg
 		std::unordered_map<std::string, std::shared_ptr<ImageView>> m_mapPOtherImageViews;
 		std::unordered_map<std::string, std::shared_ptr<Sampler>> m_mapPOtherSamplers;
 
-		virtual void _init();
+		virtual void _init(Bool32 importContent);
 
 		void _updateMipMapLevels();
 		void _updateArrayLayer();
-		void _createImage();
+		void _createImage(Bool32 importContent);
 		void _createImageView();
 		void _createSampler();
 

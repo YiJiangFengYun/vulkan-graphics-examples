@@ -6,8 +6,7 @@
 class MaterialDeferred : public vg::Material
 {
 public:
-    MaterialDeferred();
-    MaterialDeferred(uint32_t trunkFrameBufferWidth, uint32_t trunkFrameBufferHeight);
+    MaterialDeferred(uint32_t trunkFrameBufferWidth = 0u, uint32_t trunkFrameBufferHeight = 0u);
 
     virtual void beginBindToRender(const BindInfo info, BindResult *pResult) override;
     virtual void endBindToRender(const EndBindInfo info) override;

@@ -37,6 +37,7 @@
 
 #include <graphics/util/queue_family.hpp>
 #include <graphics/util/swapchain_info.hpp>
+#include <graphics/util/util.hpp>
 
 
 namespace vg

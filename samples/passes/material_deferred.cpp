@@ -1,20 +1,5 @@
 #include "passes/material_deferred.hpp"
 
-MaterialDeferred::MaterialDeferred()
-    : vg::Material()
-    , m_frameBufferWidth(1024)
-    , m_frameBufferHeight(1024)
-    , m_trunkFramebufferWidth(0u)
-    , m_trunkFramebufferHeight(0u)
-    , m_mapRectMeshes()
-{
-    _createAttachments();
-    _createRenderPass();
-    _createFramebuffer();
-    _createOtherPasses();
-    _initPasses();
-}
-
 MaterialDeferred::MaterialDeferred(uint32_t trunkFrameBufferWidth, uint32_t trunkFrameBufferHeight)
     : vg::Material()
     , m_frameBufferWidth(trunkFrameBufferWidth)

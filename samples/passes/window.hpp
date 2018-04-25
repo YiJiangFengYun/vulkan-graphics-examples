@@ -4,7 +4,6 @@
 #include <graphics_ext/graphics_ext.hpp>
 #include "sampleslib/window.hpp"
 #include "sampleslib/scene_assimp.hpp"
-#include "passes/material_deferred.hpp"
 
 #define NUM_LIGHTS 64
 

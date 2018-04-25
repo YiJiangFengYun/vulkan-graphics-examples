@@ -38,7 +38,7 @@ void Window::_init()
 void Window::_initState()
 {
 	ParentWindowType::_initState();
-	m_cameraZoom = -28.0f;
+	m_cameraZoom = -0.0f;
 	m_cameraPosition = vg::Vector3(0.0f, 2.0f, -2.0f);
 	/// Build a quaternion from euler angles (pitch, yaw, roll), in radians.
 	m_cameraRotation = vg::Vector3(glm::radians(-30.0f), glm::radians(0.0f), glm::radians(0.0f));

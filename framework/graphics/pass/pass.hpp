@@ -359,6 +359,7 @@ namespace vg
 		//compositons
 		std::shared_ptr<PassData> m_pData;
 		Bool32 m_dataChanged;
+		Bool32 m_textureChanged;
 		std::vector<std::string> m_arrLayoutBindNames;
 		std::unordered_map<std::string, LayoutBindingInfo> m_mapLayoutBinds;
 		std::shared_ptr<vk::Buffer> m_pUniformBuffer;

@@ -277,6 +277,7 @@ namespace vg
 		, m_applied(VG_FALSE)		
 		, m_pData(new PassData())
 		, m_dataChanged(VG_FALSE)
+		, m_textureChanged(VG_FALSE)
 		, m_polygonMode(PolygonMode::FILL)
 		, m_cullMode(CullModeFlagBits::BACK)
 		, m_frontFace(FrontFaceType::COUNTER_CLOCKWISE)
@@ -320,6 +321,7 @@ namespace vg
 		, m_applied(VG_FALSE)		
 		, m_pData(new PassData())
 		, m_dataChanged(VG_FALSE)
+		, m_textureChanged(VG_FALSE)
 		, m_pShader(pShader)
 		, m_polygonMode(PolygonMode::FILL)
 		, m_cullMode(CullModeFlagBits::BACK)
@@ -408,6 +410,7 @@ namespace vg
 		info.updateSize(m_pData.get());
 		setValue(name, info, m_mapLayoutBinds, m_arrLayoutBindNames);
 		m_applied = VG_FALSE;
+		m_textureChanged = VG_TRUE;
 	}
 
 	void Pass::getDataValue(const std::string name, void *dst, uint32_t size, uint32_t offset) const
@@ -505,6 +508,11 @@ namespace vg
 			if (m_needUpdateDescriptorInfo == VG_TRUE) {
 			    _updateDescriptorBufferInfo();
 			    _updateDescriptorImageInfo();
+			}
+			if (m_needUpdateDescriptorInfo == VG_TRUE ||
+			    m_textureChanged == VG_TRUE) {
+				_updateDescriptorImageInfo();
+				m_textureChanged = VG_FALSE;
 			}
 			_endCheckNeedUpdateDescriptorInfo();
 			m_applied = VG_TRUE;

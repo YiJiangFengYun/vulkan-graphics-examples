@@ -69,7 +69,7 @@ namespace vg
 			    , uint32_t subMeshIndex = 0u);
 		};
 
-		Material();
+		Material(Bool32 onlyOnce = VG_FALSE);
 		~Material();
 
 		uint32_t getPassCount() const;
@@ -90,17 +90,15 @@ namespace vg
 		virtual void beginBindToRender(const BindInfo info, BindResult *pResult);
 		virtual void endBindToRender(const EndBindInfo info);
 	protected:
-		//--compositions
+	    Bool32 m_onlyOnce;
+		InstanceID m_bindTargetID; 
 		MaterialShowType m_renderQueueType;
 		uint32_t m_renderPriority;
 		std::shared_ptr<Shader> m_pMainShader; 
 		std::shared_ptr<Pass> m_pMainPass;
-		//--compositions
 
-		//--aggregations
 		std::vector<Pass *> m_arrPasses;
 		std::unordered_map<InstanceID, Pass *> m_mapPasses;
-		//--aggregations
 
 		virtual void _addPass(Pass *pPass);
 		virtual void _removePass(Pass *pPass);

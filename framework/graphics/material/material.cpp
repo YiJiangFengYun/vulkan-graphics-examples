@@ -56,8 +56,10 @@ namespace vg
 
 	}
 
-	Material::Material()
+	Material::Material(Bool32 onlyOnce)
 		: Base(BaseType::MATERIAL)
+		, m_onlyOnce(onlyOnce)
+		, m_bindTargetID(0)
 		, m_renderQueueType()
 		, m_renderPriority()
 		, m_arrPasses()
@@ -135,6 +137,12 @@ namespace vg
 
 	void Material::beginBindToRender(const BindInfo info, BindResult *pResult)
     {
+		if (m_onlyOnce == VG_TRUE) {
+			if (m_bindTargetID != 0) 
+			    throw std::runtime_error("The material binding is only once, but it was used to repeatedly bind.");
+			m_bindTargetID = info.objectID;
+		}
+
 		auto &result = *pResult;
 
         if (result.pTrunkRenderPassCmdBuffer != nullptr)
@@ -162,7 +170,10 @@ namespace vg
 
 	void Material::endBindToRender(const EndBindInfo info)
 	{
-
+		if (m_onlyOnce == VG_TRUE) {
+			m_bindTargetID = 0;
+		}
+		
 	}
 
 	void Material::_addPass(Pass *pPass)

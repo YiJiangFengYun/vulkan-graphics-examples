@@ -1,6 +1,7 @@
 #ifndef WINDOW_H
 #define WINDOW_H
 
+#include <graphics_ext/graphics_ext.hpp>
 #include "sampleslib/window.hpp"
 #include "sampleslib/scene_assimp.hpp"
 #include "passes/material_deferred.hpp"
@@ -21,7 +22,7 @@ public:
 	);
 private:
     sampleslib::AssimpScene m_assimpScene;
-	std::shared_ptr<MaterialDeferred> m_pMaterialOfScene;
+	std::shared_ptr<vge::MaterialDeferred> m_pMaterialOfScene;
 	std::shared_ptr<vg::Material> m_pMaterialOfSceneTest;
 
 	sampleslib::AssimpScene m_assimpSceneGlass;

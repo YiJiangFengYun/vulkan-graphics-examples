@@ -1,7 +1,7 @@
 #include "passes/material_deferred.hpp"
 
 MaterialDeferred::MaterialDeferred(uint32_t trunkFrameBufferWidth, uint32_t trunkFrameBufferHeight)
-    : vg::Material()
+    : vg::Material(VG_TRUE)
     , m_frameBufferWidth(trunkFrameBufferWidth)
     , m_frameBufferHeight(trunkFrameBufferHeight)
     , m_trunkFramebufferWidth(trunkFrameBufferWidth)

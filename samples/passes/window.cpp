@@ -38,7 +38,7 @@ void Window::_init()
 void Window::_initState()
 {
 	ParentWindowType::_initState();
-	m_cameraZoom = -0.0f;
+	m_cameraZoom = -28.0f;
 	m_cameraPosition = vg::Vector3(0.0f, 2.0f, -2.0f);
 	/// Build a quaternion from euler angles (pitch, yaw, roll), in radians.
 	m_cameraRotation = vg::Vector3(glm::radians(-30.0f), glm::radians(0.0f), glm::radians(0.0f));
@@ -179,7 +179,18 @@ void Window::_createMaterial()
 {
 	{
 		//material
-	    m_pMaterialOfScene = std::shared_ptr<MaterialDeferred>(new MaterialDeferred(m_width, m_height));
+		uint32_t deferredAttachmentInfoCount = 3u;
+		std::vector<vge::MaterialDeferred::DeferredAttachmentInfo> deferredAttachmentInfos(deferredAttachmentInfoCount);
+		deferredAttachmentInfos[0].format = vk::Format::eR16G16B16A16Sfloat;
+		deferredAttachmentInfos[1].format = vk::Format::eR16G16B16A16Sfloat;
+		deferredAttachmentInfos[2].format = vk::Format::eR8G8B8A8Unorm;
+		vge::MaterialDeferred::CreateInfo createInfo = {
+			vk::Format::eR8G8B8A8Unorm,
+			vk::Format::eD32SfloatS8Uint,
+			deferredAttachmentInfoCount,
+			deferredAttachmentInfos.data(),
+		};
+	    m_pMaterialOfScene = std::shared_ptr<vge::MaterialDeferred>(new vge::MaterialDeferred(createInfo));
 	    m_pMaterialOfScene->setRenderPriority(0u);
 	    m_pMaterialOfScene->setRenderQueueType(vg::MaterialShowType::OPAQUE);
 		{

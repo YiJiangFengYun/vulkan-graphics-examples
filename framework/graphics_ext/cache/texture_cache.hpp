@@ -7,11 +7,13 @@ namespace vge
 {
     struct TextureCacheAllocInfo {
         vk::Format format;
-        uint32_t size;
+        uint32_t width;
+        uint32_t height;
         vg::Bool32 isInputUsage;
 
         TextureCacheAllocInfo( vk::Format format = vk::Format::eUndefined
-            , uint32_t size = 0u
+            , uint32_t width = 0u
+            , uint32_t height = 0u
             , vg::Bool32 isInputUsage = VG_FALSE
             );
         TextureCacheAllocInfo(const TextureCacheAllocInfo &);
@@ -42,7 +44,7 @@ namespace vge
         std::unordered_map<TextureCacheAllocInfo, std::vector<TextureType *>, TextureCacheAllocInfoHash> m_mapIdleTextures;
         std::unordered_map<TextureCacheAllocInfo, uint32_t, TextureCacheAllocInfoHash> m_mapIdleTextureCount;
 
-        std::shared_ptr<TextureType> _createTexture(vk::Format format, uint32_t size, vg::Bool32 isInputUsage);
+        std::shared_ptr<TextureType> _createTexture(vk::Format format, uint32_t width, uint32_t height, vg::Bool32 isInputUsage);
     };
 } //vge
 

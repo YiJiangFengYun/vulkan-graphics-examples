@@ -16,10 +16,14 @@ namespace vge
         };
         struct CreateInfo 
         {
+            vk::Format colorAttachmentFormat;
+            vk::Format depthStencilAttachmentFormat;
             uint32_t deferredAttachmentCount;
             const DeferredAttachmentInfo *pDeferredAttachments;
 
-            CreateInfo(uint32_t deferredAttachmentCount = 0u
+            CreateInfo(vk::Format colorAttachmentFormat = vk::Format::eUndefined
+                , vk::Format depthStencilAttachmentFormat = vk::Format::eUndefined
+                , uint32_t deferredAttachmentCount = 0u
                 , const DeferredAttachmentInfo *pDeferredAttachments = nullptr);
         };
 
@@ -34,16 +38,20 @@ namespace vge
         vg::Pass * getPassComposition() const;
 
     private:
+        CreateInfo m_info;
+        std::vector<vge::MaterialDeferred::DeferredAttachmentInfo> m_deferredAttachmentInfos;
+
         TextureCache<vg::Texture2DColorAttachment> *m_pColorAttachmentCache;
         TextureCache<vg::Texture2DDepthStencilAttachment> *m_pDepthStencilAttachmentCache;
 
         std::shared_ptr<TextureCache<vg::Texture2DColorAttachment>> m_pMyColorAttachmentCache;
         std::shared_ptr<TextureCache<vg::Texture2DDepthStencilAttachment>> m_pMyDepthStencilAttachmentCache;
 
-        vg::Texture2DColorAttachment *m_pColorAttachment;
-        std::vector<vg::Texture2DColorAttachment *> m_pDeferredAttachments;
-        vg::Texture2DDepthStencilAttachment *m_pDepthStencilAttachment;
-        const vg::Texture::ImageView * m_pImageViewDepth;
+        uint32_t m_attachmentSize;
+        vg::Texture2DColorAttachment * m_pColorAttachment;
+        vg::Texture2DDepthStencilAttachment * m_pDepthStencilAttachment;
+        std::vector<vg::Texture2DColorAttachment *> m_arrPDeferredAttachments;
+
         std::shared_ptr<vk::RenderPass> m_pRenderPass;
         std::shared_ptr<vk::Framebuffer> m_pFrameBuffer;
         std::shared_ptr<vg::Shader> m_pShaderDeferred;
@@ -51,15 +59,19 @@ namespace vge
         std::shared_ptr<vg::Pass> m_pPassDeferred;
         std::shared_ptr<vg::Pass> m_pPassComposition;
 
-        std::unordered_map<vg::InstanceID, std::shared_ptr<vg::DimSepMesh2>> m_mapRectMeshes;
+        std::shared_ptr<vg::DimSepMesh2> m_pRectMesh;
 
-        void _createAttachments(CreateInfo createInfo);
+        void _createDeferredAttachments(CreateInfo createInfo);
         void _createRenderPass(CreateInfo createInfo);
-        void _createFramebuffer(CreateInfo createInfo);
         void _createOtherPasses(CreateInfo createInfo);
-        void _initPasses(CreateInfo createInfo);
+        void _initPasses(CreateInfo createInfo);              
 
-        vg::DimSepMesh2 *_getRectMesh(vg::InstanceID id);
+        vg::Bool32 _updateResultAttachments(uint32_t targetSize);
+        void _updateFramebuffer();
+        void _updatePasses();
+
+         vg::DimSepMesh2 *_getRectMesh();
+
     };
 } //vge
 

@@ -13,10 +13,10 @@ namespace vge
 
     template <typename TextureType>
     std::shared_ptr<typename TextureCache<TextureType>::TextureType> 
-        TextureCache<TextureType>::_createTexture(vk::Format format, uint32_t size, vg::Bool32 isInputUsage)
+        TextureCache<TextureType>::_createTexture(vk::Format format, uint32_t width, uint32_t height, vg::Bool32 isInputUsage)
     {
         auto pTex = std::shared_ptr<TextureType>{
-            new TextureType(format, size, size, isInputUsage)
+            new TextureType(format, width, height, isInputUsage)
         };
         return pTex;
     }
@@ -30,12 +30,12 @@ namespace vge
         } else {
             if (m_mapAllTextureCount[info] == m_mapAllTextureCapacity[info])
             {
-                uint32_t nextCapacity = getNextCapacity(m_mapAllTextureCapacity[info]);
+                uint32_t nextCapacity = vg::getNextCapacity(m_mapAllTextureCapacity[info]);
                 m_mapAllTextures[info].resize(nextCapacity);
                 m_mapIdleTextures[info].resize(nextCapacity);
                 m_mapAllTextureCapacity[info] = nextCapacity;
             }
-            auto pNewTexture = _createTexture(info.size);
+            auto pNewTexture = _createTexture(info.format, info.width, info.height, info.isInputUsage);
             m_mapAllTextures[info][m_mapAllTextureCount[info] ++] = pNewTexture;
             pTexture = pNewTexture.get();
         }

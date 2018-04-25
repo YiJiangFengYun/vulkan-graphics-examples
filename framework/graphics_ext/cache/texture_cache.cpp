@@ -3,11 +3,13 @@
 namespace vge
 {
      TextureCacheAllocInfo::TextureCacheAllocInfo( vk::Format format
-        , uint32_t size
+        , uint32_t width
+        , uint32_t height
         , vg::Bool32 isInputUsage
         )
         : format(format)
-        , size(size)
+        , width(width)
+        , height(height)
         , isInputUsage(isInputUsage)
     {
 
@@ -15,7 +17,8 @@ namespace vge
 
     TextureCacheAllocInfo::TextureCacheAllocInfo(const TextureCacheAllocInfo &target)
         : format(target.format)
-        , size(target.size)
+        , width(target.width)
+        , height(target.height)
         , isInputUsage(target.isInputUsage)
     {
 
@@ -24,14 +27,15 @@ namespace vge
 	TextureCacheAllocInfo& TextureCacheAllocInfo::operator=(const TextureCacheAllocInfo &target)
     {
         format = target.format;
-        size = target.size;
+        width = target.width;
+        height = target.height;
         isInputUsage = target.isInputUsage;
 		return *this;
     }
 
 	vg::Bool32 TextureCacheAllocInfo::operator==(const TextureCacheAllocInfo &target) const
     {
-        return format == target.format && size == target.size && isInputUsage == target.isInputUsage;
+        return format == target.format && width == target.width && height == target.height && isInputUsage == target.isInputUsage;
     }
 
 	vg::Bool32 TextureCacheAllocInfo::operator!=(const TextureCacheAllocInfo &target) const
@@ -43,7 +47,8 @@ namespace vge
     {
         std::size_t seed = 0;
         boost::hash_combine(seed, target.format);
-        boost::hash_combine(seed, target.size);
+        boost::hash_combine(seed, target.width);
+        boost::hash_combine(seed, target.height);
         boost::hash_combine(seed, target.isInputUsage);
         return seed;
     }

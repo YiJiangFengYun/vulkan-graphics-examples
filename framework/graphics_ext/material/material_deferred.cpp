@@ -59,7 +59,7 @@ namespace vge
         _initPasses(info);
     }
 
-    void MaterialDeferred::beginBindToRender(const BindInfo info, BindResult *pResult)
+    void MaterialDeferred::_beginBindToRender(const BindInfo info, BindResult *pResult)
     {
 		uint32_t trunkFramebufferWidth = info.trunkFramebufferWidth;
 		uint32_t trunkFramebufferHeight = info.trunkFramebufferHeight;
@@ -229,11 +229,6 @@ namespace vge
             cmdInfo.pRenderPassInfo = &trunkRenderPassInfo;
             result.pTrunkRenderPassCmdBuffer->addCmd(cmdInfo);
         }
-    
-    }
-
-    void MaterialDeferred::endBindToRender(const EndBindInfo info)
-    {
     
     }
 

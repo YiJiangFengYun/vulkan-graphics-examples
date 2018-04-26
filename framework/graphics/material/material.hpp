@@ -87,8 +87,8 @@ namespace vg
 		/*Call the apply methods of all passes in the material.*/
 		virtual void apply();
 
-		virtual void beginBindToRender(const BindInfo info, BindResult *pResult);
-		virtual void endBindToRender(const EndBindInfo info);
+		void beginBindToRender(const BindInfo info, BindResult *pResult);
+		void endBindToRender(const EndBindInfo info);
 	protected:
 	    Bool32 m_onlyOnce;
 		InstanceID m_bindTargetID; 
@@ -102,6 +102,9 @@ namespace vg
 
 		virtual void _addPass(Pass *pPass);
 		virtual void _removePass(Pass *pPass);
+
+		virtual void _beginBindToRender(const BindInfo info, BindResult *pResult);
+		virtual void _endBindToRender(const EndBindInfo info);
 	};
 }
 

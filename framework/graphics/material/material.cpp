@@ -143,6 +143,36 @@ namespace vg
 			m_bindTargetID = info.objectID;
 		}
 
+		_beginBindToRender(info, pResult);
+
+    }
+
+	void Material::endBindToRender(const EndBindInfo info)
+	{
+		if (m_onlyOnce == VG_TRUE) {
+			m_bindTargetID = 0;
+		}
+
+		_endBindToRender(info);
+		
+	}
+
+	void Material::_addPass(Pass *pPass)
+	{
+		if (isHas(pPass)) return;
+		m_arrPasses.push_back(pPass);
+		m_mapPasses[pPass->getID()] = pPass;
+	}
+
+	void Material::_removePass(Pass *pPass)
+	{
+		if (isHas(pPass) == VG_FALSE) return;
+		m_arrPasses.erase(std::remove(m_arrPasses.begin(), m_arrPasses.end(), pPass));
+		m_mapPasses.erase(pPass->getID());
+	}
+
+    void Material::_beginBindToRender(const BindInfo info, BindResult *pResult)
+    {
 		auto &result = *pResult;
 
         if (result.pTrunkRenderPassCmdBuffer != nullptr)
@@ -165,28 +195,10 @@ namespace vg
 
             result.pTrunkRenderPassCmdBuffer->addCmd(cmdInfo);
         }
-
-    }
-
-	void Material::endBindToRender(const EndBindInfo info)
-	{
-		if (m_onlyOnce == VG_TRUE) {
-			m_bindTargetID = 0;
-		}
-		
 	}
-
-	void Material::_addPass(Pass *pPass)
+	
+	void Material::_endBindToRender(const EndBindInfo info)
 	{
-		if (isHas(pPass)) return;
-		m_arrPasses.push_back(pPass);
-		m_mapPasses[pPass->getID()] = pPass;
-	}
 
-	void Material::_removePass(Pass *pPass)
-	{
-		if (isHas(pPass) == VG_FALSE) return;
-		m_arrPasses.erase(std::remove(m_arrPasses.begin(), m_arrPasses.end(), pPass));
-		m_mapPasses.erase(pPass->getID());
 	}
 }

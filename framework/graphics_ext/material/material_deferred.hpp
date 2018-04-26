@@ -1,8 +1,8 @@
 #ifndef VGE_MATERIAL_DEFERRED_HPP
 #define VGE_MATERIAL_DEFERRED_HPP
 
-#include <graphics_ext/global.hpp>
-#include <graphics_ext/cache/texture_cache.hpp>
+#include "graphics_ext/global.hpp"
+#include "graphics_ext/cache/texture_cache.hpp"
 
 namespace vge
 {
@@ -30,9 +30,6 @@ namespace vge
         MaterialDeferred(CreateInfo info = CreateInfo()
                 , TextureCache<vg::Texture2DColorAttachment> *pColorAttachmentCache = nullptr
                 , TextureCache<vg::Texture2DDepthStencilAttachment> *pDepthStencilAttachmentCache = nullptr);
-
-        virtual void beginBindToRender(const BindInfo info, BindResult *pResult) override;
-        virtual void endBindToRender(const EndBindInfo info) override;
     
         vg::Pass * getPassDeferred() const;
         vg::Pass * getPassComposition() const;
@@ -60,6 +57,8 @@ namespace vge
         std::shared_ptr<vg::Pass> m_pPassComposition;
 
         std::shared_ptr<vg::DimSepMesh2> m_pRectMesh;
+
+        virtual void _beginBindToRender(const BindInfo info, BindResult *pResult) override;
 
         void _createDeferredAttachments(CreateInfo createInfo);
         void _createRenderPass(CreateInfo createInfo);

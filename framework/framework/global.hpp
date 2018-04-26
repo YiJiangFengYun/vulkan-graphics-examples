@@ -9,6 +9,7 @@
 
 #include <foundation/foundation.hpp>
 #include <graphics/graphics.hpp>
+#include <graphics_ext/graphics_ext.hpp>
 
 #include <framework/config.hpp>
 

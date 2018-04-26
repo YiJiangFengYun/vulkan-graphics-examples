@@ -4,6 +4,7 @@
 #include "graphics_ext/global.hpp"
 #include "graphics_ext/cache/texture_cache.hpp"
 #include "graphics_ext/material/material_deferred.hpp"
+#include "graphics_ext/material/material_outline.hpp"
 
 namespace vge {
 

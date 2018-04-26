@@ -179,6 +179,7 @@ namespace vg
         {
             RenderPassInfo trunkRenderPassInfo;
             trunkRenderPassInfo.pRenderPass = nullptr;
+            trunkRenderPassInfo.pFrameBuffer = nullptr;			
             trunkRenderPassInfo.framebufferWidth = info.trunkFramebufferWidth;
             trunkRenderPassInfo.framebufferHeight = info.trunkFramebufferHeight;
             trunkRenderPassInfo.projMatrix = *(info.pProjMatrix);

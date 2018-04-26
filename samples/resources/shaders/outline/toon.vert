@@ -1,15 +1,22 @@
 #version 450
 
+#extension GL_ARB_separate_shader_objects : enable
+#extension GL_ARB_shading_language_420pack : enable
+
 layout (location = 0) in vec3 inPos;
 layout (location = 1) in vec3 inColor;
 layout (location = 2) in vec3 inNormal;
 
-layout (binding = 0) uniform UBO 
+layout (binding = 0) uniform BuildIn 
 {
-	mat4 projection;
-	mat4 model;
+	mat4 matrixToNDC;
+	mat4 matrixToWorld;
+} _buildIn;
+
+layout (binding = 1) uniform OtherInfo
+{
 	vec4 lightPos;
-} ubo;
+} otherInfo;
 
 layout (location = 0) out vec3 outNormal;
 layout (location = 1) out vec3 outColor;
@@ -23,9 +30,9 @@ out gl_PerVertex
 void main() 
 {
 	outColor = vec3(1.0, 0.0, 0.0);
-	gl_Position = ubo.projection * ubo.model * vec4(inPos.xyz, 1.0);
-	outNormal = mat3(ubo.model) * inNormal;
-	vec4 pos = ubo.model * vec4(inPos, 1.0);
-	vec3 lPos = mat3(ubo.model) * ubo.lightPos.xyz;
-	outLightVec = lPos - pos.xyz;
+	gl_Position = _buildIn.matrixToNDC * vec4(inPos.xyz, 1.0);
+	outNormal = mat3(_buildIn.matrixToWorld) * inNormal;
+	vec4 pos = _buildIn.matrixToWorld * vec4(inPos, 1.0);
+	vec4 lPos = _buildIn.matrixToWorld * otherInfo.lightPos;
+	outLightVec = vec3(lPos - pos);
 }

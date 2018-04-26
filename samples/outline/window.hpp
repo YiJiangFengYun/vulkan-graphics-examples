@@ -17,29 +17,24 @@ public:
 		, std::shared_ptr<vk::SurfaceKHR> pSurface
 	);
 private:
-    bool m_wireFrame;
 	sampleslib::AssimpScene m_assimpScene;
-	std::shared_ptr<vg::Texture2D> m_pTexture;
-	
-	std::shared_ptr<vg::Material> m_pMaterialSolid;
+	std::shared_ptr<vge::MaterialOutline> m_pMaterial;
 
-	std::shared_ptr<vg::Material> m_pMaterialWireframe;
+	struct OtherInfo
+    {
+    	vg::Vector4 lightPos;
+    } m_otherInfo;
 
-	struct OtherInfo 
-	{
-		vg::Vector4 lightPos;
-	} m_otherInfo;
+	float m_outlineWidth;
+	vg::Color m_outlineColor;
 
 	virtual void _init() override;
 	virtual void _initState() override;
 	void _createModel();
-	void _createTexture();
 	void _createMaterial();
 	void _initScene();
 
 	virtual void _onUpdate() override;
-	virtual void _render(const vg::Renderer::RenderInfo &info
-			, vg::Renderer::RenderResultInfo &resultInfo) override;
 };
 
 #endif // !WINDOW_

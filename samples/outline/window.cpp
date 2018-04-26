@@ -184,6 +184,10 @@ void Window::_onUpdate()
 	if (ImGui::InputFloat("Outline width", &m_outlineWidth, 0.05f, 2)) {
 		auto pMaterial = m_pMaterial;
 		pMaterial->setOutlineWidth(m_outlineWidth);
+		pMaterial->apply();
+	}
+	if (ImGui::ColorPicker4("Outline color", reinterpret_cast<float *>(&m_outlineColor))) {
+		auto pMaterial = m_pMaterial;
 		pMaterial->setOutlineColor(m_outlineColor);
 		pMaterial->apply();
 	}

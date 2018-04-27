@@ -89,6 +89,8 @@ namespace vg
 
 		void beginBindToRender(const BindInfo info, BindResult *pResult);
 		void endBindToRender(const EndBindInfo info);
+
+		std::string name;
 	protected:
 	    Bool32 m_onlyOnce;
 		InstanceID m_bindTargetID; 

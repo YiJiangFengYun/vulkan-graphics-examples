@@ -58,6 +58,7 @@ namespace vg
 
 	Material::Material(Bool32 onlyOnce)
 		: Base(BaseType::MATERIAL)
+		, name()
 		, m_onlyOnce(onlyOnce)
 		, m_bindTargetID(0)
 		, m_renderQueueType()

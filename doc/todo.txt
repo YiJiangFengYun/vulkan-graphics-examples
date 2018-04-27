@@ -1,3 +1,4 @@
 1.The Module of new own model format and The tool application transfer the new model format to the standardised model
 format (COLLADA).
 2.Renderer add pre z render for entire screen.
+3.Minimize vertex input with vertex data and pass attribute.

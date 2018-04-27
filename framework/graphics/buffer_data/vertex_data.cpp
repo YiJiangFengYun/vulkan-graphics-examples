@@ -36,7 +36,6 @@ namespace vg
         , m_memorySize()
         , m_pMemory(nullptr)
         , m_pMmemoryForHostVisible(nullptr)
-        , m_pipelineStateID()
     {
         //default is device local.
         if (! m_bufferMemoryPropertyFlags) 
@@ -57,7 +56,6 @@ namespace vg
         , m_memorySize()
         , m_pMemory(nullptr)
         , m_pMmemoryForHostVisible(nullptr)
-        , m_pipelineStateID()
     {
         //default is device local.
         if (! m_bufferMemoryPropertyFlags) 
@@ -120,11 +118,6 @@ namespace vg
         }
     }
 
-    VertexData::PipelineStateID VertexData::getPipelineStateID() const
-    {
-        return m_pipelineStateID;
-    }
-
     void VertexData::init(uint32_t subDataCount, 
             const SubVertexData *pSubDatas
             , const void *memory
@@ -173,7 +166,6 @@ namespace vg
 
             }
 		    
-            _updatePipelineStateID();            
         }
     }
 
@@ -208,10 +200,6 @@ namespace vg
                 
                 isChange = VG_TRUE;            
             }
-        }
-
-        if (isChange) {
-            _updatePipelineStateID();
         }
     }
 
@@ -258,10 +246,6 @@ namespace vg
                 
                 isChange = VG_TRUE;            
             }
-        }
-
-        if (isChange) {
-            _updatePipelineStateID();
         }
     }
 
@@ -319,7 +303,6 @@ namespace vg
 
             ++offset;
         }
-        _updatePipelineStateID();
     }
 
     void VertexData::updateBuffer(const void *memory, uint32_t size, Bool32 cacheMemory)
@@ -381,15 +364,6 @@ namespace vg
             m_pBufferMemory,
             &m_pMmemoryForHostVisible);
     }
-
-    void VertexData::_updatePipelineStateID()
-	{
-		++m_pipelineStateID;
-		if ( m_pipelineStateID == std::numeric_limits<PipelineStateID>::max())
-		{
-			m_pipelineStateID = 1;
-		}
-	}
 
     Bool32 VertexData::_isEqual(uint32_t subDataCount1, const SubVertexData *pSubDatas1, 
             uint32_t subDataCount2, const SubVertexData *pSubDatas2)

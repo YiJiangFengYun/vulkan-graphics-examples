@@ -25,7 +25,6 @@ namespace vg {
             vk::RenderPass renderPass;
             Pass *pPass;
             VertexData *pVertexData;
-            uint32_t vertexSubIndex;
             IndexData *pIndexData;
             uint32_t indexSubIndex;
 
@@ -39,12 +38,27 @@ namespace vg {
             Info(vk::RenderPass renderPass
                 , Pass *pPass
                 , VertexData *pVertexData
-                , uint32_t vertexSubIndex
                 , IndexData *pIndexData
                 , uint32_t indexSubIndex
                 );
             
 
+        };
+
+        struct VertexInputBindingDescriptionHash {
+            size_t operator()(const vk::VertexInputBindingDescription & vertexInputBindingDes) const;
+        };
+
+        struct VertexInputAttributeDescriptionHash {
+            size_t operator()(const vk::VertexInputAttributeDescription & vertexInputAttrDes) const;
+        };
+
+        struct PipelineVertexInputStateCreateInfoHash {
+            size_t operator()(const vk::PipelineVertexInputStateCreateInfo & pipelineVertexInputStateCreateInfo) const;
+        };
+
+        struct PipelineInputAssemblyStateCreateInfoHash {
+            size_t operator()(const vk::PipelineInputAssemblyStateCreateInfo & pipelineInputAssemblyStateCreateInfo) const;
         };
 
         struct HashFull {

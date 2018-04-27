@@ -319,7 +319,6 @@ namespace vg
 			*pRenderPass,
 			pPass,
 			pContentMesh != nullptr ? pContentMesh->getVertexData() : nullptr,
-			0u,
 			pContentMesh != nullptr ? pContentMesh->getIndexData() : nullptr,
 			subMeshIndex
 		);

@@ -74,10 +74,8 @@ namespace vg {
         template<typename IndexType>
         std::vector<IndexType> getIndices(uint32_t offset, uint32_t count) const;
         
-        PipelineStateID getPipelineStateID() const;
      private:
         MemoryPropertyFlags m_bufferMemoryPropertyFlags;
-        PipelineStateID m_pipelineStateID;
         std::vector<SubIndexData> m_subDatas;
         uint32_t m_subDataCount;
         uint32_t m_bufferSize;
@@ -90,7 +88,6 @@ namespace vg {
         
         Bool32 _isDeviceMemoryLocal() const;
         void _createBuffer(fd::ArrayProxy<MemorySlice> memories, uint32_t memorySize);
-        void _updatePipelineStateID();
         Bool32 _isEqual(uint32_t subDataCount1, const SubIndexData *pSubDatas1, 
             uint32_t subDataCount2, const SubIndexData *pSubDatas2);
      };

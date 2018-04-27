@@ -6,7 +6,6 @@ namespace vg
         : renderPass()
         , pPass()
         , pVertexData()
-        , vertexSubIndex()
         , pIndexData()
         , indexSubIndex()
     {
@@ -17,7 +16,6 @@ namespace vg
         : renderPass(target.renderPass)
         , pPass(target.pPass)
         , pVertexData(target.pVertexData)
-        , vertexSubIndex(target.vertexSubIndex)
         , pIndexData(target.pIndexData)
         , indexSubIndex(target.indexSubIndex) 
     {
@@ -28,7 +26,6 @@ namespace vg
         : renderPass(std::move(target.renderPass))
         , pPass(std::move(target.pPass))
         , pVertexData(std::move(target.pVertexData))
-        , vertexSubIndex(std::move(target.vertexSubIndex))
         , pIndexData(std::move(target.pIndexData))
         , indexSubIndex(std::move(target.indexSubIndex))
     {
@@ -40,7 +37,6 @@ namespace vg
         renderPass = target.renderPass;
         pPass = target.pPass;
         pVertexData = target.pVertexData;
-        vertexSubIndex = target.vertexSubIndex;
         pIndexData = target.pIndexData;
         indexSubIndex = target.indexSubIndex;
         return *this;
@@ -53,7 +49,6 @@ namespace vg
 		if (pVertexData != nullptr && rhs.pVertexData != nullptr)
 		{
 			if (pVertexData->getID() != rhs.pVertexData->getID()) return VG_FALSE;
-			if (vertexSubIndex != rhs.vertexSubIndex) return VG_FALSE;
 		} 
 		else
 		{
@@ -82,18 +77,63 @@ namespace vg
     PipelineCache::Info::Info(vk::RenderPass renderPass
         , Pass *pPass
         , VertexData *pVertexData
-        , uint32_t vertexSubIndex
         , IndexData *pIndexData
         , uint32_t indexSubIndex
         )
         : renderPass(renderPass)
         , pPass(pPass)
         , pVertexData(pVertexData)
-        , vertexSubIndex(vertexSubIndex)
         , pIndexData(pIndexData)
         , indexSubIndex(indexSubIndex)
     {
 
+    }
+
+    size_t PipelineCache::VertexInputBindingDescriptionHash::operator()(const vk::VertexInputBindingDescription & vertexInputBindingDes) const
+    {
+        std::size_t seed = 0;
+        boost::hash_combine(seed, vertexInputBindingDes.binding);
+        boost::hash_combine(seed, vertexInputBindingDes.inputRate);
+        boost::hash_combine(seed, vertexInputBindingDes.stride);
+        return seed;
+    }
+
+    size_t PipelineCache::VertexInputAttributeDescriptionHash::operator()(const vk::VertexInputAttributeDescription & vertexInputAttrDes) const
+    {
+        std::size_t seed = 0;
+        boost::hash_combine(seed, vertexInputAttrDes.binding);
+        boost::hash_combine(seed, vertexInputAttrDes.format);
+        boost::hash_combine(seed, vertexInputAttrDes.location);
+        boost::hash_combine(seed, vertexInputAttrDes.offset);
+        return seed;
+    }
+
+    size_t PipelineCache::PipelineVertexInputStateCreateInfoHash::operator()(const vk::PipelineVertexInputStateCreateInfo & pipelineVertexInputStateCreateInfo) const
+    {
+        std::size_t seed = 0;
+        boost::hash_combine(seed, VkPipelineVertexInputStateCreateFlags(pipelineVertexInputStateCreateInfo.flags));
+        boost::hash_combine(seed, pipelineVertexInputStateCreateInfo.vertexBindingDescriptionCount);
+        boost::hash_combine(seed, pipelineVertexInputStateCreateInfo.vertexAttributeDescriptionCount);
+        VertexInputBindingDescriptionHash vertexInputBindingDescriptionHash;
+        for (uint32_t i = 0; i < pipelineVertexInputStateCreateInfo.vertexBindingDescriptionCount; ++i)
+        {
+            boost::hash_combine(seed, vertexInputBindingDescriptionHash(*(pipelineVertexInputStateCreateInfo.pVertexBindingDescriptions + i)));
+        }
+        VertexInputAttributeDescriptionHash vertexInputAttributeDescriptionHash;
+        for (uint32_t i = 0; i < pipelineVertexInputStateCreateInfo.vertexAttributeDescriptionCount; ++i)
+        {
+            boost::hash_combine(seed, vertexInputAttributeDescriptionHash(*(pipelineVertexInputStateCreateInfo.pVertexAttributeDescriptions + i)));
+        }
+        return seed;
+    }
+
+    size_t PipelineCache::PipelineInputAssemblyStateCreateInfoHash::operator()(const vk::PipelineInputAssemblyStateCreateInfo & pipelineInputAssemblyStateCreateInfo) const
+    {
+        std::size_t seed = 0;
+        boost::hash_combine(seed, VkPipelineInputAssemblyStateCreateFlags(pipelineInputAssemblyStateCreateInfo.flags));
+        boost::hash_combine(seed, pipelineInputAssemblyStateCreateInfo.topology);
+        boost::hash_combine(seed, pipelineInputAssemblyStateCreateInfo.primitiveRestartEnable);
+        return seed;
     }
 
     size_t PipelineCache::HashNoState::operator()(const Info& info) const {
@@ -101,9 +141,7 @@ namespace vg
         boost::hash_combine(seed, info.renderPass);
         boost::hash_combine(seed, info.pPass->getID());
         boost::hash_combine(seed, info.pVertexData != nullptr ? info.pVertexData->getID() : 0);
-        boost::hash_combine(seed, info.pVertexData != nullptr ? info.vertexSubIndex : 0);
         boost::hash_combine(seed, info.pIndexData != nullptr ? info.pIndexData->getID() : 0);
-        boost::hash_combine(seed, info.pIndexData != nullptr ? info.indexSubIndex : 0);
 
         return seed;
 	}
@@ -112,9 +150,17 @@ namespace vg
         std::size_t seed = HashNoState()(info);
         boost::hash_combine(seed, info.pPass->getPipelineStateID());
         boost::hash_combine(seed, info.pPass->getSubpass());
-        boost::hash_combine(seed, info.pVertexData != nullptr ? info.pVertexData->getPipelineStateID() : 0);
-        boost::hash_combine(seed, info.pIndexData != nullptr ? info.pIndexData->getPipelineStateID() : 0);
+        if (info.pIndexData != nullptr) {
+            const auto & subIndexDatas = info.pIndexData->getSubIndexDatas();
+            const auto & subIndexData = subIndexDatas[info.indexSubIndex];
+            boost::hash_combine(seed, PipelineInputAssemblyStateCreateInfoHash()(subIndexData.inputAssemblyStateInfo));
 
+            if (info.pVertexData != nullptr) {
+                const auto & subVertexDatas = info.pVertexData->getSubVertexDatas();
+                const auto & subVertexData = subVertexDatas[subIndexData.vertexDataIndex];
+                boost::hash_combine(seed, PipelineVertexInputStateCreateInfoHash()(subVertexData.vertexInputStateInfo));
+            }
+        }
         return seed;
 	}
 
@@ -206,25 +252,26 @@ namespace vg
 		createInfo.stageCount = shaderStages.size();
 		createInfo.pStages = shaderStages.data();
 
-        if (info.pVertexData != nullptr) {
-            const auto &pVertexData = info.pVertexData;
-		    const VertexData::SubVertexData &subVertexData = pVertexData->getSubVertexDatas()[info.vertexSubIndex];
-            createInfo.pVertexInputState = &subVertexData.vertexInputStateInfo;
-        } else {
-            vk::PipelineVertexInputStateCreateInfo emptyInputState{};
-            createInfo.pVertexInputState = &emptyInputState;
-        }
+        uint32_t vertexSubIndex = 0u;
 
         if (info.pIndexData != nullptr) {
             const auto &pIndexData = info.pIndexData;
 		    const IndexData::SubIndexData &subIndexData = pIndexData->getSubIndexDatas()[info.indexSubIndex];
-		    createInfo.pInputAssemblyState = &subIndexData.inputAssemblyStateInfo;            
+		    createInfo.pInputAssemblyState = &subIndexData.inputAssemblyStateInfo;
+            vertexSubIndex = subIndexData.vertexDataIndex;         
         } else {
             vk::PipelineInputAssemblyStateCreateInfo emptyAssemblyState = pPass->getDefaultInputAssemblyState();
             createInfo.pInputAssemblyState = &emptyAssemblyState;
         }
 
-		
+        if (info.pVertexData != nullptr) {
+            const auto &pVertexData = info.pVertexData;
+		    const VertexData::SubVertexData &subVertexData = pVertexData->getSubVertexDatas()[vertexSubIndex];
+            createInfo.pVertexInputState = &subVertexData.vertexInputStateInfo;
+        } else {
+            vk::PipelineVertexInputStateCreateInfo emptyInputState{};
+            createInfo.pVertexInputState = &emptyInputState;
+        }
 
         auto polygonMode = tranPolygonModeToVK(pPass->getPolygonMode());
         auto cullMode = tranCullModeFlagsToVK(pPass->getCullMode());

@@ -32,7 +32,6 @@ namespace vg
         , m_pBufferMemory()
         , m_memorySize()
         , m_pMemory(nullptr)
-        , m_pipelineStateID()
     {
          //default is device local.
         if (! m_bufferMemoryPropertyFlags) 
@@ -52,7 +51,6 @@ namespace vg
         , m_pBufferMemory()
         , m_memorySize()
         , m_pMemory(nullptr)
-        , m_pipelineStateID()
     {
         //default is device local.
         if (! m_bufferMemoryPropertyFlags) 
@@ -115,11 +113,6 @@ namespace vg
         }
     }
 
-    IndexData::PipelineStateID IndexData::getPipelineStateID() const
-    {
-        return m_pipelineStateID;
-    }
-
     void IndexData::init(uint32_t subDataCount
             , const SubIndexData *pSubDatas
             , const void *memory
@@ -152,7 +145,6 @@ namespace vg
             m_subDataCount = subDataCount;
             m_subDatas.resize(subDataCount);
             memcpy(m_subDatas.data(), pSubDatas, sizeof(SubIndexData) * subDataCount);
-            _updatePipelineStateID();            
         }
     }
 
@@ -196,10 +188,6 @@ namespace vg
                 isChange = VG_TRUE;            
             }
         }
-
-        if (isChange) {
-            _updatePipelineStateID();
-        }
     }
 
     void IndexData::updateDesData(vk::IndexType indexType
@@ -227,10 +215,6 @@ namespace vg
                 subData.inputAssemblyStateInfo.pNext = nullptr;
                 isChange = VG_TRUE;            
             }
-        }
-
-        if (isChange) {
-            _updatePipelineStateID();
         }
     }
 
@@ -275,7 +259,6 @@ namespace vg
             m_subDatas[offset].inputAssemblyStateInfo.pNext = nullptr;
             ++offset;
         }
-        _updatePipelineStateID();
     }
 
     void IndexData::updateBuffer(const void *memory, uint32_t size, Bool32 cacheMemory)
@@ -338,15 +321,6 @@ namespace vg
             m_pBufferMemory,
             &m_pMmemoryForHostVisible);
     }
-
-    void IndexData::_updatePipelineStateID()
-	{
-		++m_pipelineStateID;
-		if ( m_pipelineStateID == std::numeric_limits<PipelineStateID>::max())
-		{
-			m_pipelineStateID = 1;
-		}
-	}
 
     Bool32 IndexData::_isEqual(uint32_t subDataCount1, const SubIndexData *pSubDatas1, 
             uint32_t subDataCount2, const SubIndexData *pSubDatas2)

@@ -82,7 +82,6 @@ namespace vg
         template<typename VertexType>
         std::vector<VertexType> getVertices(uint32_t offset, uint32_t count) const;
         
-        PipelineStateID getPipelineStateID() const;
     private:
         struct _SubVertexData {
             std::vector<vk::VertexInputBindingDescription> bindingDescs;
@@ -90,7 +89,6 @@ namespace vg
             _SubVertexData();
         };
         MemoryPropertyFlags m_bufferMemoryPropertyFlags;
-        PipelineStateID m_pipelineStateID;
         std::vector<SubVertexData> m_subDatas;
         std::vector<_SubVertexData> m__subDatas;
         uint32_t m_subDataCount;
@@ -104,7 +102,6 @@ namespace vg
 
         Bool32 _isDeviceMemoryLocal() const;
         void _createBuffer(fd::ArrayProxy<MemorySlice> memories, uint32_t memorySize);
-        void _updatePipelineStateID();
         Bool32 _isEqual(uint32_t subDataCount1, const SubVertexData *pSubDatas1, 
             uint32_t subDataCount2, const SubVertexData *pSubDatas2);
         Bool32 _isEqual(const vk::PipelineVertexInputStateCreateInfo &vertexInputStateInfo1, 

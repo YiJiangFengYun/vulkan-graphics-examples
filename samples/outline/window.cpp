@@ -59,7 +59,7 @@ void Window::_createModel()
 		sampleslib::AssimpScene::VertexLayoutComponent::VERTEX_COMPONENT_POSITION,
 		sampleslib::AssimpScene::VertexLayoutComponent::VERTEX_COMPONENT_COLOR,		
 		sampleslib::AssimpScene::VertexLayoutComponent::VERTEX_COMPONENT_NORMAL,
-		// sampleslib::AssimpScene::VertexLayoutComponent::VERTEX_COMPONENT_UV,
+		sampleslib::AssimpScene::VertexLayoutComponent::VERTEX_COMPONENT_UV,
 	};
 	sampleslib::AssimpScene::CreateInfo createInfo;
 	createInfo.fileName = "models/venus.fbx";
@@ -117,6 +117,16 @@ void Window::_createMaterial()
 		    depthStencilState.back.reference = 1;
 		    depthStencilState.front = depthStencilState.back;
 	        pPass->setDepthStencilInfo(depthStencilState);
+			vg::Pass::VertexInputFilterInfo vertexInputFilter;
+			vertexInputFilter.filterEnable = VG_TRUE;
+			std::vector<uint32_t> filterLocations = {
+				0,
+				1,
+				2,
+			};
+			vertexInputFilter.locationCount = static_cast<uint32_t>(filterLocations.size());
+			vertexInputFilter.pLocations = filterLocations.data();
+			pPass->setVertexInputFilterInfo(vertexInputFilter);
 	        pPass->setDataValue("other_info", m_otherInfo, 1u);
 	        pPass->apply();
 	        
@@ -154,6 +164,16 @@ void Window::_createMaterial()
 		    depthStencilState.back.reference = 1;
 		    depthStencilState.front = depthStencilState.back;
 	        pPass->setDepthStencilInfo(depthStencilState);
+
+			vg::Pass::VertexInputFilterInfo vertexInputFilter;
+			vertexInputFilter.filterEnable = VG_TRUE;
+			std::vector<uint32_t> filterLocations = {
+				0,
+				2,
+			};
+			vertexInputFilter.locationCount = static_cast<uint32_t>(filterLocations.size());
+			vertexInputFilter.pLocations = filterLocations.data();
+			pPass->setVertexInputFilterInfo(vertexInputFilter);
 	        pPass->apply();
 		}
 

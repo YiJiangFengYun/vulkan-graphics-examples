@@ -264,10 +264,43 @@ namespace vg
             createInfo.pInputAssemblyState = &emptyAssemblyState;
         }
 
+        vk::PipelineVertexInputStateCreateInfo newVertexInputStateInfo;
+        std::vector<vk::VertexInputAttributeDescription> newAttrDeses;
         if (info.pVertexData != nullptr) {
             const auto &pVertexData = info.pVertexData;
 		    const VertexData::SubVertexData &subVertexData = pVertexData->getSubVertexDatas()[vertexSubIndex];
-            createInfo.pVertexInputState = &subVertexData.vertexInputStateInfo;
+
+            //pass filter
+            const auto &vertexInputFilter = pPass->getVertexInputFilter();
+            if (vertexInputFilter.filterEnable == VG_TRUE)
+            {
+                const vk::PipelineVertexInputStateCreateInfo & originVertexInputStateInfo = subVertexData.vertexInputStateInfo;
+                newVertexInputStateInfo = originVertexInputStateInfo;
+                uint32_t attrDesCount = originVertexInputStateInfo.vertexAttributeDescriptionCount;                
+                newAttrDeses.resize(attrDesCount); //allocate enough space and use its part.;
+                uint32_t newAttrDesIndex = 0u;
+                uint32_t filterDesCount = vertexInputFilter.locationCount;
+                for (uint32_t attrDesIndex = 0u; attrDesIndex < attrDesCount; ++attrDesIndex)
+                {
+                    for (uint32_t filterDesIndex = 0u; filterDesIndex < filterDesCount; ++filterDesIndex)
+                    {
+                        if ((originVertexInputStateInfo.pVertexAttributeDescriptions + attrDesIndex)->location == 
+                            *(vertexInputFilter.pLocations + filterDesIndex))
+                        {
+                            newAttrDeses[newAttrDesIndex] = *(originVertexInputStateInfo.pVertexAttributeDescriptions + attrDesIndex);
+                            ++newAttrDesIndex;
+                            break;
+                        }
+                    }
+                }
+                newVertexInputStateInfo.vertexAttributeDescriptionCount = newAttrDesIndex;
+                newVertexInputStateInfo.pVertexAttributeDescriptions = newAttrDeses.data();
+                createInfo.pVertexInputState = &newVertexInputStateInfo;
+            }
+            else
+            {
+                createInfo.pVertexInputState = &subVertexData.vertexInputStateInfo;
+            }
         } else {
             vk::PipelineVertexInputStateCreateInfo emptyInputState{};
             createInfo.pVertexInputState = &emptyInputState;

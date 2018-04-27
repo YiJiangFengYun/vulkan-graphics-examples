@@ -29,7 +29,7 @@ out gl_PerVertex
 
 void main() 
 {
-	outColor = vec3(1.0, 0.0, 0.0);
+	outColor = inColor;
 	gl_Position = _buildIn.matrixToNDC * vec4(inPos.xyz, 1.0);
 	outNormal = mat3(_buildIn.matrixToWorld) * inNormal;
 	vec4 pos = _buildIn.matrixToWorld * vec4(inPos, 1.0);

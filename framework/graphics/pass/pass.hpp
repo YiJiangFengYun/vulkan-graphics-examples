@@ -204,6 +204,17 @@ namespace vg
 			void updateSize(const uint32_t dataSize);
 		};
 
+		struct VertexInputFilterInfo
+		{
+			Bool32 filterEnable;
+			uint32_t locationCount;
+			uint32_t * pLocations;
+
+			VertexInputFilterInfo(Bool32 filterEnable = VG_FALSE
+			    , uint32_t locationCount = 0u
+				, uint32_t * pLocations = nullptr);
+		};
+
 		Pass();
 		Pass(Shader *pShader);
 		~Pass();
@@ -339,6 +350,9 @@ namespace vg
 		uint32_t getSubpass() const;
 		void setSubpass(uint32_t subpass);
 
+		const VertexInputFilterInfo &getVertexInputFilter() const;
+		void setVertexInputFilterInfo(const VertexInputFilterInfo &value);
+
 		const ExternalUniformBufferInfo getExternalUniformBufferInfo() const;
 		void setExternalUniformBufferData(ExternalUniformBufferInfo value);
 
@@ -398,6 +412,9 @@ namespace vg
 		BuildInDataInfo m_buildInDataInfo;		
 		std::vector<BuildInDataInfo::Component> m_buildInDataInfoComponents;
 		_BuildInDataCache m_buildInDataCache;
+
+		VertexInputFilterInfo m_vertexInputFilterInfo;
+		std::vector<uint32_t> m_vertexInputFilterLocations;
 
 		//external uniform buffer data.
 		ExternalUniformBufferInfo m_externalUniformBufferInfo;

@@ -271,6 +271,17 @@ namespace vg
 		return ! (*this == target);
 	}
 
+	Pass::VertexInputFilterInfo::VertexInputFilterInfo(Bool32 filterEnable
+		, uint32_t locationCount
+		, uint32_t * pBindings
+		)
+		: filterEnable(filterEnable)
+		, locationCount(locationCount)
+		, pLocations(pLocations)
+	{
+
+	}
+
 
 	Pass::Pass() 
 		: Base(BaseType::PASS)
@@ -310,6 +321,8 @@ namespace vg
 		, m_usingDynamicOffsets()
 		, m_instanceCount(1u)
 		, m_subpass(0u)
+		, m_vertexInputFilterInfo()
+		, m_vertexInputFilterLocations()
 		, m_uniformBufferSize(0u)
 	{
 		_initDefaultBuildInDataInfo();
@@ -354,6 +367,8 @@ namespace vg
 		, m_usingDynamicOffsets()
 		, m_instanceCount(1u)
 		, m_subpass(0u)
+		, m_vertexInputFilterInfo()
+		, m_vertexInputFilterLocations()
 		, m_uniformBufferSize(0u)
 	{
 		_initDefaultBuildInDataInfo();
@@ -807,6 +822,39 @@ namespace vg
     void Pass::setSubpass(uint32_t subpass)
 	{
 		m_subpass = subpass;
+	}
+
+	const Pass::VertexInputFilterInfo &Pass::getVertexInputFilter() const
+	{
+		return m_vertexInputFilterInfo;
+	}
+
+	void Pass::setVertexInputFilterInfo(const VertexInputFilterInfo &value)
+	{
+		if (m_vertexInputFilterInfo.filterEnable == value.filterEnable && 
+		    m_vertexInputFilterInfo.locationCount == value.locationCount)
+		{
+			uint32_t count = value.locationCount;
+			Bool32 isAllSame = VG_TRUE;
+			for (uint32_t i = 0; i < count; ++i)
+			{
+				if (*(m_vertexInputFilterInfo.pLocations + i) != *(value.pLocations + i))
+				{
+					isAllSame = VG_FALSE;
+					break;
+				}
+			}
+			if (isAllSame == VG_FALSE)
+			{
+				return;
+			}
+		}
+		uint32_t locationCount = value.locationCount;
+		m_vertexInputFilterLocations.resize(locationCount);
+		memcpy(m_vertexInputFilterLocations.data(), value.pLocations, locationCount * sizeof(uint32_t));
+		m_vertexInputFilterInfo = value;
+		m_vertexInputFilterInfo.pLocations = m_vertexInputFilterLocations.data();
+		_updatePipelineStateID();
 	}
 
 	const Pass::ExternalUniformBufferInfo Pass::getExternalUniformBufferInfo() const

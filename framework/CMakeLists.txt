@@ -8,9 +8,6 @@ set(VG_COST_TIME_PLOG_ID 203)
 set(VGF_PLOG_ID 301)
 set(VGIM_PLOG_ID 401)
 
-# framework include.
-set(INCLUDE_DIRS ${INCLUDE_DIRS} ${PROJECT_FRAMEWORK_DIR})
-
 add_subdirectory(foundation)
 add_subdirectory(graphics)
 add_subdirectory(graphics_ext)

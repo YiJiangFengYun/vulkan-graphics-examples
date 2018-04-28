@@ -5,18 +5,15 @@ set(VGF_VERSION_EXTRA "")
 set(VGF_VERSION "${VGF_VERSION_MAJOR}.${VGF_VERSION_MINOR}")
 set(VGF_VERSION_FULL "${VGF_VERSION}.${VGF_VERSION_PATCH}${VGF_VERSION_EXTRA}")
 
-# add the binary tree directory to the search path for include files
-# include_directories( ${CMAKE_CURRENT_BINARY_DIR} )
+set(LIBRARY_NAME "framework")
 
 configure_file(
-	"${CMAKE_CURRENT_SOURCE_DIR}/config.hpp.in"
-	"${PROJECT_CONFIG_HEADER_DIR}/framework/config.hpp"
+	"${CMAKE_CURRENT_SOURCE_DIR}/config/config.hpp.in"
+	"${CMAKE_CURRENT_SOURCE_DIR}/${LIBRARY_NAME}/config.hpp"
 )
-
-set(LIBRARY_NAME "framework")
-file(GLOB_RECURSE HEADERS *.hpp *.inl)
-file(GLOB_RECURSE SOURCES *.cpp)
-set(HEADERS ${HEADERS} "${PROJECT_CONFIG_HEADER_DIR}/framework/config.hpp")
+set(INCLUDE_DIRS ${INCLUDE_DIRS} "${CMAKE_CURRENT_SOURCE_DIR}")
+file(GLOB_RECURSE HEADERS "${LIBRARY_NAME}/*.hpp" "${LIBRARY_NAME}/*.inl")
+file(GLOB_RECURSE SOURCES "${LIBRARY_NAME}/*.cpp")
 include_directories(${INCLUDE_DIRS})
 add_library(${LIBRARY_NAME} STATIC ${HEADERS} ${SOURCES})
 set_property(TARGET ${LIBRARY_NAME} PROPERTY FOLDER ${FOLDER_NAME})

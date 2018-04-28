@@ -13,7 +13,7 @@ set(LIBRARY_NAME "graphics")
 compile_shader("${CMAKE_CURRENT_SOURCE_DIR}/shader" "pre_z")
 add_custom_command (
   OUTPUT "${CMAKE_CURRENT_SOURCE_DIR}/${LIBRARY_NAME}/pre_z_pass/pre_z_shader_code.cpp"
-  COMMAND "embed_file_to_code" "codePreZVert" "${CMAKE_CURRENT_SOURCE_DIR}/shader/pre_z.vert.spv" "${CMAKE_CURRENT_SOURCE_DIR}/${LIBRARY_NAME}/pre_z_pass/pre_z_shader_code.cpp"
+  COMMAND "embed_file_to_code" "vg" "codePreZVert" "${CMAKE_CURRENT_SOURCE_DIR}/shader/pre_z.vert.spv" "${CMAKE_CURRENT_SOURCE_DIR}/${LIBRARY_NAME}/pre_z_pass/pre_z_shader_code.cpp"
   MAIN_DEPENDENCY "${CMAKE_CURRENT_SOURCE_DIR}/shader/pre_z.vert.spv"
   DEPENDS "embed_file_to_code"
 )

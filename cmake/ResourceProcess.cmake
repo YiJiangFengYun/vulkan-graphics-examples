@@ -35,4 +35,29 @@ macro(res_process target res_output_dir res_dir shader_dir shader_names )
     endif(RESOURCES_OUTPUT_DIR)
 endmacro(res_process)
 
+macro(compile_shader shader_dir shader_names)
+    set(SHADER_NAMES ${shader_names})
+    # Compile shaders
+    if(SHADER_NAMES)
+        foreach(SHADER_NAME ${SHADER_NAMES})
+            file(GLOB 
+            SHADERS 
+            "${shader_dir}/${SHADER_NAME}.vert" 
+            "${shader_dir}/${SHADER_NAME}.frag" 
+            "${shader_dir}/${SHADER_NAME}.geom" 
+            "${shader_dir}/${SHADER_NAME}.tesc" 
+            "${shader_dir}/${SHADER_NAME}.tese")                                 
+            foreach(SHADER ${SHADERS})
+               set(SHADER_SPV "${SHADER}.spv")
+               if(WIN32)
+                   add_custom_command(OUTPUT "${SHADER_SPV}"
+                       COMMAND "${Vulkan_BIN_DIR}/glslangValidator.exe" "-V" "${SHADER}" "-o" "${SHADER_SPV}"
+                       MAIN_DEPENDENCY "${SHADER}"
+                   )
+               endif(WIN32)
+            endforeach(SHADER ${SHADERS})
+        endforeach(SHADER_NAME ${SHADER_NAMES})
+    endif(SHADER_NAMES)
+endmacro(compile_shader)
+
 

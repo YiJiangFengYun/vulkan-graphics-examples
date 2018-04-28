@@ -9,6 +9,15 @@ option(VG_ENABLE_VALIDATION_LAYERS "Enable features of vulkan validation layers.
 option(VG_ENABLE_COST_TIMER "Enable cost timer for the important step." OFF)
 
 set(LIBRARY_NAME "graphics")
+
+compile_shader("${CMAKE_CURRENT_SOURCE_DIR}/shader" "pre_z")
+add_custom_command (
+  OUTPUT "${CMAKE_CURRENT_SOURCE_DIR}/${LIBRARY_NAME}/pre_z_pass/pre_z_shader_code.cpp"
+  COMMAND "embed_file_to_code" "codePreZVert" "${CMAKE_CURRENT_SOURCE_DIR}/shader/pre_z.vert.spv" "${CMAKE_CURRENT_SOURCE_DIR}/${LIBRARY_NAME}/pre_z_pass/pre_z_shader_code.cpp"
+  MAIN_DEPENDENCY "${CMAKE_CURRENT_SOURCE_DIR}/shader/pre_z.vert.spv"
+  DEPENDS "embed_file_to_code"
+)
+
 configure_file(
 	"${CMAKE_CURRENT_SOURCE_DIR}/config/config.hpp.in"
 	"${CMAKE_CURRENT_SOURCE_DIR}/${LIBRARY_NAME}/config.hpp"
@@ -16,6 +25,7 @@ configure_file(
 set(INCLUDE_DIRS ${INCLUDE_DIRS} "${CMAKE_CURRENT_SOURCE_DIR}")
 file(GLOB_RECURSE HEADERS "${LIBRARY_NAME}/*.hpp" "${LIBRARY_NAME}/*.inl")
 file(GLOB_RECURSE SOURCES "${LIBRARY_NAME}/*.cpp")
+set(SOURCES ${SOURCES} "${CMAKE_CURRENT_SOURCE_DIR}/${LIBRARY_NAME}/pre_z_pass/pre_z_shader_code.cpp")
 include_directories(${INCLUDE_DIRS})
 add_library(${LIBRARY_NAME} STATIC ${HEADERS} ${SOURCES})
 set_property(TARGET ${LIBRARY_NAME} PROPERTY FOLDER ${FOLDER_NAME})

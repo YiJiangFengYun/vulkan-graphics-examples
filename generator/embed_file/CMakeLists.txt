@@ -1,0 +1,5 @@
+set(GEN_NAME "embed_file_to_code")
+set(GEN_FOLDER_NAME "generator")
+file(GLOB_RECURSE SOURCES "*.cpp")
+add_executable(${GEN_NAME} ${SOURCES})
+set_property(TARGET ${GEN_NAME} PROPERTY FOLDER ${GEN_FOLDER_NAME})

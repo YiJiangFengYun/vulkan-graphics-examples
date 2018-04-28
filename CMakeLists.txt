@@ -149,11 +149,16 @@ else()
 	message(STATUS "Boost_VERSION: ${Boost_VERSION}")
 endif()
 
+list(APPEND CMAKE_MODULE_PATH "${CMAKE_CURRENT_SOURCE_DIR}/cmake")
+include(ResourceProcess)
 
 # add the binary tree to the search path for include files
 # so that we will find config header files.
 set(PROJECT_CONFIG_HEADER_DIR "${PROJECT_BINARY_DIR}/config_headers")
 set(INCLUDE_DIRS ${INCLUDE_DIRS} ${PROJECT_CONFIG_HEADER_DIR})
+
+# generators
+add_subdirectory(generator)
 
 # global third party library include and link directories
 # set(INCLUDE_DIRS ${INCLUDE_DIRS} "${LIBUV_DIR}/include")
@@ -163,9 +168,6 @@ add_subdirectory(framework)
 
 # enable test
 enable_testing ()
-
-list(APPEND CMAKE_MODULE_PATH "${CMAKE_CURRENT_SOURCE_DIR}/cmake")
-include(ResourceProcess)
 
 # samples generation
 if(BUILD_SAMPLES)

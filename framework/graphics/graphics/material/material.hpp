@@ -5,6 +5,7 @@
 #include "graphics/global.hpp"
 #include "graphics/util/util.hpp"
 #include "graphics/pass/pass.hpp"
+#include "graphics/pre_z_pass/pre_z_pass.hpp"
 #include "graphics/texture/texture.hpp"
 #include "graphics/material/material_data.hpp"
 #include "graphics/material/cmd.hpp"
@@ -69,7 +70,15 @@ namespace vg
 			    , uint32_t subMeshIndex = 0u);
 		};
 
+		struct MaterialCreateInfo
+		{
+			Bool32 onlyOnce;
+			Bool32 createPreZPass;
+			MaterialCreateInfo(Bool32 onlyOnce = VG_FALSE, Bool32 createPreZPass = VG_FALSE);
+		};
+
 		Material(Bool32 onlyOnce = VG_FALSE);
+		Material(MaterialCreateInfo createInfo);
 		~Material();
 
 		uint32_t getPassCount() const;
@@ -80,6 +89,8 @@ namespace vg
 		Shader *getMainShader() const;
 		Pass *getMainPass() const;
 
+		PreZPass * getPreZPass() const;
+
 		MaterialShowType getShowType();
 		void setRenderQueueType(MaterialShowType type);
 		uint32_t getRenderPriority();
@@ -87,6 +98,7 @@ namespace vg
 		/*Call the apply methods of all passes in the material.*/
 		virtual void apply();
 
+		void beginBindToPreZRender(const BindInfo info, BindResult * pResult);
 		void beginBindToRender(const BindInfo info, BindResult *pResult);
 		void endBindToRender(const EndBindInfo info);
 
@@ -98,6 +110,8 @@ namespace vg
 		uint32_t m_renderPriority;
 		std::shared_ptr<Shader> m_pMainShader; 
 		std::shared_ptr<Pass> m_pMainPass;
+
+		std::shared_ptr<PreZPass> m_pPreZPass;
 
 		std::vector<Pass *> m_arrPasses;
 		std::unordered_map<InstanceID, Pass *> m_mapPasses;

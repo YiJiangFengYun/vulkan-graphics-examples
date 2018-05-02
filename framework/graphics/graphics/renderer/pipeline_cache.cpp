@@ -75,9 +75,9 @@ namespace vg
     }
 
     PipelineCache::Info::Info(vk::RenderPass renderPass
-        , Pass *pPass
-        , VertexData *pVertexData
-        , IndexData *pIndexData
+        , const Pass *pPass
+        , const VertexData *pVertexData
+        , const IndexData *pIndexData
         , uint32_t indexSubIndex
         )
         : renderPass(renderPass)

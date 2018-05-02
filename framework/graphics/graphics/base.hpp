@@ -9,19 +9,25 @@ namespace vg
 	{
 		UNDEFINED,
 		APP,
+
 		TEXTURE,
-		MATERIAL,
-		PASS,
+
 		SHADER,
+		PASS,
+		PRE_Z_PASS,
+		MATERIAL,
+
 		VERTEX_DATA,
 		INDEX_DATA,
 		UNIFORM_BUFFER_DATA,
+
 		MESH,
-		RENDERER,
+
 		SCENE,
 		SCENE_OBJECT,
 		TRANSFORM,
-		VISUALIZER,
+
+		RENDERER,
 	};
 
 	using InstanceID = uint32_t;

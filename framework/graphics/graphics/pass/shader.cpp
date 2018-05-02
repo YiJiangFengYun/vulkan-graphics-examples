@@ -9,6 +9,8 @@ namespace vg
 		, m_pFragShaderModule()
 		, m_vertShaderPath()
 		, m_fragShaderPath()
+		, m_pMyVertShaderModule()
+		, m_pMyFragShaderModule()
 	{
 
 	}
@@ -19,6 +21,8 @@ namespace vg
 		, m_pFragShaderModule()
 		, m_vertShaderPath()
 		, m_fragShaderPath()
+		, m_pMyVertShaderModule()
+		, m_pMyFragShaderModule()
 	{
 		load(vertShaderPath, fragShaderPath);
 	}
@@ -29,6 +33,8 @@ namespace vg
 		, m_pFragShaderModule()
 		, m_vertShaderPath()
 		, m_fragShaderPath()
+		, m_pMyVertShaderModule()
+		, m_pMyFragShaderModule()
 	{
 		load(codeVertShader, sizeVertShader, codeFragShader, sizeFragShader);
 	}
@@ -39,8 +45,22 @@ namespace vg
 		, m_pFragShaderModule()
 		, m_vertShaderPath()
 		, m_fragShaderPath()
+		, m_pMyVertShaderModule()
+		, m_pMyFragShaderModule()
 	{
 		load(codeVertShader, sizeVertShader, codeFragShader, sizeFragShader);
+	}
+
+	Shader::Shader(vk::ShaderModule * pVertShaderModule, vk::ShaderModule * pFragShaderModule)
+	    : Base(BaseType::SHADER)
+		, m_pVertShaderModule(pVertShaderModule)
+		, m_pFragShaderModule(pFragShaderModule)
+		, m_vertShaderPath()
+		, m_fragShaderPath()
+		, m_pMyVertShaderModule()
+		, m_pMyFragShaderModule()
+	{
+
 	}
 
 	Shader::~Shader()
@@ -53,36 +73,56 @@ namespace vg
 		auto fragShaderCode = _readFile(fragShaderPath);
 		m_vertShaderPath = vertShaderPath;
 		m_fragShaderPath = fragShaderPath;
-		m_pVertShaderModule = _createShaderModule(vertShaderCode);
-		m_pFragShaderModule = _createShaderModule(fragShaderCode);
+		m_pMyVertShaderModule = _createShaderModule(vertShaderCode);
+		m_pMyFragShaderModule = _createShaderModule(fragShaderCode);
+		m_pVertShaderModule = m_pMyVertShaderModule.get();
+		m_pFragShaderModule = m_pMyFragShaderModule.get();
 	}
 
 	void Shader::load(const void *codeVertShader, uint32_t sizeVertShader, 
 	    const void *codeFragShader, uint32_t sizeFragShader)
 	{
-		m_pVertShaderModule = _createShaderModule(codeVertShader, sizeVertShader);
-		m_pFragShaderModule = _createShaderModule(codeFragShader, sizeFragShader);
+		m_pMyVertShaderModule = _createShaderModule(codeVertShader, sizeVertShader);
+		m_pMyFragShaderModule = _createShaderModule(codeFragShader, sizeFragShader);
 		m_vertShaderPath = "";
 		m_fragShaderPath = "";
+		m_pVertShaderModule = m_pMyVertShaderModule.get();
+		m_pFragShaderModule = m_pMyFragShaderModule.get();
 	}
 
 	void Shader::load(const uint32_t *codeVertShader, uint32_t sizeVertShader, 
 	    const uint32_t *codeFragShader, uint32_t sizeFragShader)
 	{
-		m_pVertShaderModule = _createShaderModule(codeVertShader, sizeVertShader);
-		m_pFragShaderModule = _createShaderModule(codeFragShader, sizeFragShader);
+		m_pMyVertShaderModule = _createShaderModule(codeVertShader, sizeVertShader);
+		m_pMyFragShaderModule = _createShaderModule(codeFragShader, sizeFragShader);
 		m_vertShaderPath = "";
 		m_fragShaderPath = "";
+		m_pVertShaderModule = m_pMyVertShaderModule.get();
+		m_pFragShaderModule = m_pMyFragShaderModule.get();
 	}
 
 	const vk::ShaderModule *Shader::getVertShaderModule() const
 	{
-		return m_pVertShaderModule.get();
+		return m_pVertShaderModule;
+	}
+
+	void Shader::setVertShaderModule(vk::ShaderModule * pVertShaderModule)
+	{
+		m_pVertShaderModule = pVertShaderModule;
+		m_vertShaderPath = nullptr;
+		m_pMyVertShaderModule = nullptr;
 	}
 
 	const vk::ShaderModule *Shader::getFragShaderModule() const
 	{
-		return m_pFragShaderModule.get();
+		return m_pFragShaderModule;
+	}
+
+	void Shader::setFragShaderModule(vk::ShaderModule * pFragShaderModule)
+	{
+		m_pFragShaderModule = pFragShaderModule;
+		m_fragShaderPath = nullptr;
+		m_pMyFragShaderModule = nullptr;
 	}
 
 	std::vector<vk::PipelineShaderStageCreateInfo> Shader::getShaderStageInfos() const

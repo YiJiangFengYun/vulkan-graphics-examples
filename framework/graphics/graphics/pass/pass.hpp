@@ -312,7 +312,7 @@ namespace vg
 		void setColorBlendInfo(const vk::PipelineColorBlendStateCreateInfo &value);
 
 		const vk::PipelineInputAssemblyStateCreateInfo &getDefaultInputAssemblyState() const;
-		void setDefaultInputAssemblyState(vk::PipelineInputAssemblyStateCreateInfo value);
+		void setDefaultInputAssemblyState(vk::PipelineInputAssemblyStateCreateInfo & value);
 
 		const Bool32 IsHasSpecializationData(ShaderStageFlagBits shaderStage) const;
 		const Bool32 IsHasSpecializationData(vk::ShaderStageFlagBits shaderStage) const;

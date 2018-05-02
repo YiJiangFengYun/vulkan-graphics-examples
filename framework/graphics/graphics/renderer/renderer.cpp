@@ -19,6 +19,12 @@ namespace vg
 #endif
 		);
 
+	void setBuildInData(BaseVisualObject * pVisualObject, Matrix4x4 modelMatrix, Matrix4x4 viewMatrix, Matrix4x4 projMatrix
+#if defined(DEBUG) && defined(VG_ENABLE_COST_TIMER)
+	    , fd::CostTimer * pPreparingBuildInDataCostTimer
+#endif //DEBUG and VG_ENABLE_COST_TIMER
+		);
+
 	Renderer::RenderInfo::RenderInfo(uint32_t sceneAndCameraCount
 		, const SceneAndCamera *pSceneAndCameras
 		, uint32_t waitSemaphoreCount
@@ -540,14 +546,18 @@ namespace vg
 		for (uint32_t i = 0u; i < validVisualObjectCount; ++i)
 		{
 			auto pVisualObject = validVisualObjects[i];
-
+			auto modelMatrix = tranMat3ToMat4(pVisualObject->getTransform()->getMatrixLocalToWorld());
+			setBuildInData(pVisualObject, modelMatrix, viewMatrix, projMatrix
+#if defined(DEBUG) && defined(VG_ENABLE_COST_TIMER)
+			    , preparingBuildInDataCostTimer
+#endif //DEBUG and VG_ENABLE_COST_TIMER	
+				);
 			BaseVisualObject::BindInfo info = {
                 m_framebufferWidth,
 				m_framebufferHeight,
 				&projMatrix,
 				&viewMatrix,
 #if defined(DEBUG) && defined(VG_ENABLE_COST_TIMER)
-                &preparingBuildInDataCostTimer,
                 &preparingPipelineCostTimer,
                 &preparingCommandBufferCostTimer,
 #endif //DEBUG and VG_ENABLE_COST_TIMER	
@@ -821,14 +831,18 @@ namespace vg
 			for (uint32_t objectIndex = 0u; objectIndex < queueLength; ++objectIndex)
 			{
 				auto pVisualObject = queues[typeIndex][objectIndex];
-
+				auto modelMatrix = pVisualObject->getTransform()->getMatrixLocalToWorld();
+				setBuildInData(pVisualObject, modelMatrix, viewMatrix, projMatrix
+#if defined(DEBUG) && defined(VG_ENABLE_COST_TIMER)
+				    , preparingBuildInDataCostTimer
+#endif //DEBUG and VG_ENABLE_COST_TIMER	
+				);
 				BaseVisualObject::BindInfo info = {
                     m_framebufferWidth,
 				    m_framebufferHeight,
 				    &projMatrix,
 				    &viewMatrix,
 #if defined(DEBUG) && defined(VG_ENABLE_COST_TIMER)
-                    &preparingBuildInDataCostTimer,
                     &preparingPipelineCostTimer,
                     &preparingCommandBufferCostTimer,
 #endif //DEBUG and VG_ENABLE_COST_TIMER	
@@ -895,6 +909,102 @@ namespace vg
 			m_bindedObjects[i]->endBindToRender();
 		}
 		m_bindedObjectCount = 0u;
+	}
+
+	void setBuildInData(BaseVisualObject * pVisualObject, Matrix4x4 modelMatrix, Matrix4x4 viewMatrix, Matrix4x4 projMatrix
+#if defined(DEBUG) && defined(VG_ENABLE_COST_TIMER)
+	    , fd::CostTimer * pPreparingBuildInDataCostTimer
+#endif //DEBUG and VG_ENABLE_COST_TIMER
+	)
+	{
+		uint32_t materialCount = pVisualObject->getMaterialCount();
+		for (uint32_t materialIndex = 0u; materialIndex < materialCount; ++materialIndex)
+		{
+			auto pMaterial = pVisualObject->getMaterial(materialIndex);
+			auto passCount = pMaterial->getPassCount();
+			for (uint32_t passIndex = 0u; passIndex < passCount; ++passIndex)
+			{
+				auto pPass = pMaterial->getPassWithIndex(passIndex);
+#if defined(DEBUG) && defined(VG_ENABLE_COST_TIMER)
+		        pPreparingBuildInDataCostTimer->begin();
+#endif //DEBUG and VG_ENABLE_COST_TIMER
+		        Bool32 hasMatrixObjectToNDC = VG_FALSE;
+		        Bool32 hasMatrixObjectToWorld = VG_FALSE;
+		        Bool32 hasMatrixObjectToView = VG_FALSE;
+		        Bool32 hasMatrixView = VG_FALSE;
+		        Bool32 hasMatrixProjection = VG_FALSE;
+		        //update building in matrix variable.
+		        auto info = pPass->getBuildInDataInfo();
+		        uint32_t componentCount = info.componentCount;
+		        for (uint32_t componentIndex = 0u; componentIndex < componentCount; ++componentIndex)
+		        {
+		        	Pass::BuildInDataType type = (*(info.pComponent + componentIndex)).type;
+		        	if (type == Pass::BuildInDataType::MATRIX_OBJECT_TO_NDC)
+		        	{
+		        		hasMatrixObjectToNDC = VG_TRUE;
+		        	}
+		        	else if (type == Pass::BuildInDataType::MATRIX_OBJECT_TO_WORLD)
+		        	{
+		        		hasMatrixObjectToWorld = VG_TRUE;
+		        	}
+		        	else if (type == Pass::BuildInDataType::MATRIX_OBJECT_TO_VIEW)
+		        	{
+		        		hasMatrixObjectToView = VG_TRUE;
+		        	}
+		        	else if (type == Pass::BuildInDataType::MATRIX_VIEW)
+		        	{
+		        		hasMatrixView = VG_TRUE;
+		        	}
+		        	else if (type == Pass::BuildInDataType::MATRIX_PROJECTION)
+		        	{
+		        		hasMatrixProjection = VG_TRUE;
+		        	}
+		        }
+		        
+		        Matrix4x4 mvMatrix;
+		        Matrix4x4 mvpMatrix;
+		        if (hasMatrixObjectToView || hasMatrixObjectToNDC)
+		        {
+		        	mvMatrix = viewMatrix * modelMatrix;
+                }
+		        
+		        if (hasMatrixObjectToNDC)
+		        {
+		        	mvpMatrix = projMatrix * mvMatrix;
+		        }
+		        //update building in matrix variable.
+		        for (uint32_t componentIndex = 0u; componentIndex < componentCount; ++componentIndex)
+		        {
+		        	Pass::BuildInDataType type = (*(info.pComponent + componentIndex)).type;
+		        	if (type == Pass::BuildInDataType::MATRIX_OBJECT_TO_NDC)
+		        	{
+		        		pPass->_setBuildInMatrixData(type, mvpMatrix);
+		        	}
+		        	else if (type == Pass::BuildInDataType::MATRIX_OBJECT_TO_WORLD)
+		        	{
+		        		pPass->_setBuildInMatrixData(type, modelMatrix);
+		        	}
+		        	else if (type == Pass::BuildInDataType::MATRIX_OBJECT_TO_VIEW)
+		        	{
+		        		pPass->_setBuildInMatrixData(type, mvMatrix);
+		        	}
+		        	else if (type == Pass::BuildInDataType::MATRIX_VIEW)
+		        	{
+		        		pPass->_setBuildInMatrixData(type, viewMatrix);
+		        	}
+		        	else if (type == Pass::BuildInDataType::MATRIX_PROJECTION)
+		        	{
+		        		pPass->_setBuildInMatrixData(type, projMatrix);
+		        	}
+		        }
+		        pPass->apply();
+		        
+        
+#if defined(DEBUG) && defined(VG_ENABLE_COST_TIMER)
+		        pPreparingBuildInDataCostTimer->end();
+#endif //DEBUG and VG_ENABLE_COST_TIMER
+			}
+		}
 	}
 
 }

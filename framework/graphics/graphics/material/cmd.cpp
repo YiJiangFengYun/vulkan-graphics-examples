@@ -134,7 +134,7 @@ namespace vg
         , vk::ClearValue *pClearValues
         , Matrix4x4 projMatrix
         , Matrix4x4 viewMatrix
-        , Pass *pPass
+        , const Pass *pPass
         , Matrix4x4 modelMatrix
         , const BaseMesh *pMesh
         , uint32_t subMeshIndex

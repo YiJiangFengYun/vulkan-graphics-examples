@@ -23,9 +23,9 @@ namespace vg {
     public:
         struct Info {
             vk::RenderPass renderPass;
-            Pass *pPass;
-            VertexData *pVertexData;
-            IndexData *pIndexData;
+            const Pass *pPass;
+            const VertexData *pVertexData;
+            const IndexData *pIndexData;
             uint32_t indexSubIndex;
 
             Info();
@@ -36,9 +36,9 @@ namespace vg {
 			Bool32 operator!=(const Info &) const;
     
             Info(vk::RenderPass renderPass
-                , Pass *pPass
-                , VertexData *pVertexData
-                , IndexData *pIndexData
+                , const Pass *pPass
+                , const VertexData *pVertexData
+                , const IndexData *pIndexData
                 , uint32_t indexSubIndex
                 );
             

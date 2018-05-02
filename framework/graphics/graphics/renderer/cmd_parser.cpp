@@ -181,89 +181,11 @@ namespace vg
         , ResultInfo *pResult)
 	{
 
-		const auto &renderPassInfo = *pRenderPassInfo; 
-#if defined(DEBUG) && defined(VG_ENABLE_COST_TIMER)
-		renderPassInfo.pPreparingBuildInDataCostTimer->begin();
-#endif //DEBUG and VG_ENABLE_COST_TIMER
-		Bool32 hasMatrixObjectToNDC = VG_FALSE;
-		Bool32 hasMatrixObjectToWorld = VG_FALSE;
-		Bool32 hasMatrixObjectToView = VG_FALSE;
-		Bool32 hasMatrixView = VG_FALSE;
-		Bool32 hasMatrixProjection = VG_FALSE;
-		//update building in matrix variable.
-		auto pPass = renderPassInfo.pPass;
-		auto info = pPass->getBuildInDataInfo();
-		uint32_t componentCount = info.componentCount;
-		for (uint32_t componentIndex = 0u; componentIndex < componentCount; ++componentIndex)
-		{
-			Pass::BuildInDataType type = (*(info.pComponent + componentIndex)).type;
-			if (type == Pass::BuildInDataType::MATRIX_OBJECT_TO_NDC)
-			{
-				hasMatrixObjectToNDC = VG_TRUE;
-			}
-			else if (type == Pass::BuildInDataType::MATRIX_OBJECT_TO_WORLD)
-			{
-				hasMatrixObjectToWorld = VG_TRUE;
-			}
-			else if (type == Pass::BuildInDataType::MATRIX_OBJECT_TO_VIEW)
-			{
-				hasMatrixObjectToView = VG_TRUE;
-			}
-			else if (type == Pass::BuildInDataType::MATRIX_VIEW)
-			{
-				hasMatrixView = VG_TRUE;
-			}
-			else if (type == Pass::BuildInDataType::MATRIX_PROJECTION)
-			{
-				hasMatrixProjection = VG_TRUE;
-			}
-		}
-		
-		Matrix4x4 mvMatrix;
-		Matrix4x4 mvpMatrix;
-		if (hasMatrixObjectToView || hasMatrixObjectToNDC)
-		{
-			mvMatrix = renderPassInfo.viewMatrix * renderPassInfo.modelMatrix;
-        }
-		
-		if (hasMatrixObjectToNDC)
-		{
-			mvpMatrix = renderPassInfo.projMatrix * mvMatrix;
-		}
+		const auto &renderPassInfo = *pRenderPassInfo;
 		auto pMesh = renderPassInfo.pMesh;
 		auto pContentMesh = dynamic_cast<const ContentMesh *>(pMesh);
 		auto subMeshIndex = renderPassInfo.subMeshIndex;
-		//update building in matrix variable.
-		for (uint32_t componentIndex = 0u; componentIndex < componentCount; ++componentIndex)
-		{
-			Pass::BuildInDataType type = (*(info.pComponent + componentIndex)).type;
-			if (type == Pass::BuildInDataType::MATRIX_OBJECT_TO_NDC)
-			{
-				pPass->_setBuildInMatrixData(type, mvpMatrix);
-			}
-			else if (type == Pass::BuildInDataType::MATRIX_OBJECT_TO_WORLD)
-			{
-				pPass->_setBuildInMatrixData(type, renderPassInfo.modelMatrix);
-			}
-			else if (type == Pass::BuildInDataType::MATRIX_OBJECT_TO_VIEW)
-			{
-				pPass->_setBuildInMatrixData(type, mvMatrix);
-			}
-			else if (type == Pass::BuildInDataType::MATRIX_VIEW)
-			{
-				pPass->_setBuildInMatrixData(type, renderPassInfo.viewMatrix);
-			}
-			else if (type == Pass::BuildInDataType::MATRIX_PROJECTION)
-			{
-				pPass->_setBuildInMatrixData(type, renderPassInfo.projMatrix);
-			}
-		}
-		pPass->apply();
-		
-
-#if defined(DEBUG) && defined(VG_ENABLE_COST_TIMER)
-		renderPassInfo.pPreparingBuildInDataCostTimer->end();
-#endif //DEBUG and VG_ENABLE_COST_TIMER
+		auto pPass = renderPassInfo.pPass;
 		auto pShader = pPass->getShader();
 		auto stageInfos = pShader->getShaderStageInfos();
 		if (stageInfos.size() != 0)
@@ -307,7 +229,7 @@ namespace vg
     void CMDParser::_createPipeline(vk::RenderPass *pRenderPass,
 		const BaseMesh *pMesh,
 		uint32_t subMeshIndex,
-		Pass *pPass,
+		const Pass *pPass,
 		PipelineCache *pPipelineCache,
 		std::shared_ptr<vk::Pipeline> &pPipeline)
 	{
@@ -331,7 +253,7 @@ namespace vg
 		uint32_t framebufferHeight,
 		const BaseMesh *pMesh,
 		uint32_t subMeshIndex,
-		Pass *pPass,
+		const Pass *pPass,
 		const fd::Viewport viewport,
 		const fd::Rect2D scissor,
 		CmdDraw * pCmdDraw,

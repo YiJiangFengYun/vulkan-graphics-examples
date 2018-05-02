@@ -7,7 +7,6 @@ namespace vg
 		, const Matrix4x4 *pProjMatrix
         , const Matrix4x4 *pViewMatrix
 #if defined(DEBUG) && defined(VG_ENABLE_COST_TIMER)
-        , fd::CostTimer *pPreparingBuildInDataCostTimer
         , fd::CostTimer *pPreparingPipelineCostTimer
         , fd::CostTimer *pPreparingCommandBufferCostTimer
 #endif //DEBUG and VG_ENABLE_COST_TIMER
@@ -18,7 +17,6 @@ namespace vg
         , pViewMatrix(pViewMatrix)
 		
 #if defined(DEBUG) && defined(VG_ENABLE_COST_TIMER)
-        , pPreparingBuildInDataCostTimer(pPreparingBuildInDataCostTimer)
         , pPreparingPipelineCostTimer(pPreparingPipelineCostTimer)
         , pPreparingCommandBufferCostTimer(pPreparingCommandBufferCostTimer)
 #endif //DEBUG and VG_ENABLE_COST_TIMER
@@ -53,6 +51,11 @@ namespace vg
 	BaseVisualObject::~BaseVisualObject()
 	{
 
+	}
+
+	uint32_t BaseVisualObject::getMaterialCount() const
+	{
+		return m_materialCount;
 	}
 
 	Material *BaseVisualObject::getMaterial(uint32_t index) const

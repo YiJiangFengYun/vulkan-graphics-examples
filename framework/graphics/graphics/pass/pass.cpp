@@ -686,7 +686,7 @@ namespace vg
 		return m_defaultInputAssemblyState;
 	}
 
-	void Pass::setDefaultInputAssemblyState(vk::PipelineInputAssemblyStateCreateInfo value)
+	void Pass::setDefaultInputAssemblyState(vk::PipelineInputAssemblyStateCreateInfo & value)
 	{
 		m_defaultInputAssemblyState = value;
 	}

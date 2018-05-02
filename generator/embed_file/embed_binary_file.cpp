@@ -15,13 +15,12 @@ FILE* open_or_exit(const char* fname, const char* mode)
 int main(int argc, char** argv)
 {
     if (argc < 3) {
-    	fprintf(stderr, "Please specify namespace name and variable name to save embed value in code, input file to embed and out file to create code.");
+    	fprintf(stderr, "Please specify variable name to save embed value in code, input file to embed and out file to create code.");
     	return 4;
     }    
-    const char * namespaceName = argv[1];
-    const char * variableName = argv[2];
-    const char * inputFilePath = argv[3];
-    const char * outputFilePath = argv[4];
+    const char * variableName = argv[1];
+    const char * inputFilePath = argv[2];
+    const char * outputFilePath = argv[3];
     FILE* in = open_or_exit(inputFilePath, "rb");    
     FILE* out = open_or_exit(outputFilePath, "w");   
     size_t lSize;
@@ -49,16 +48,14 @@ int main(int argc, char** argv)
     size_t linecount = 0;
     size_t i;
 		fprintf(out, "#include <stdint.h>\n");
-		fprintf(out, "namespace %s {\n", namespaceName);
-    fprintf(out, "    const unsigned char %s[] = {\n    ", variableName);
+    fprintf(out, "const unsigned char %s[] = {\n", variableName);
     for (i = 0; i < lSize; ++i) {
     	fprintf(out, "0x%02x, ", *(buffer + i));
-    	if (++linecount == 10) { fprintf(out, "\n    "); linecount = 0; }
+    	if (++linecount == 10) { fprintf(out, "\n"); linecount = 0; }
     }
-    if (linecount > 0) fprintf(out, "\n    ");
+    if (linecount > 0) fprintf(out, "\n");
     fprintf(out, "};\n");
-    fprintf(out, "const size_t %sLen = sizeof(%s);\n\n", variableName, variableName);    
-		fprintf(out, "} //%s", namespaceName);
+    fprintf(out, "const size_t %s_LEN = sizeof(%s);\n\n", variableName, variableName);    
     fclose(in);
     fclose(out);
     free(buffer);

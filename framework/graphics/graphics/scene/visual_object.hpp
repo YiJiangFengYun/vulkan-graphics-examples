@@ -18,7 +18,6 @@ namespace vg
             const Matrix4x4 *pProjMatrix;
             const Matrix4x4 *pViewMatrix;
 #if defined(DEBUG) && defined(VG_ENABLE_COST_TIMER)
-            fd::CostTimer *pPreparingBuildInDataCostTimer;
             fd::CostTimer *pPreparingPipelineCostTimer;
             fd::CostTimer *pPreparingCommandBufferCostTimer;
 #endif //DEBUG and VG_ENABLE_COST_TIMER
@@ -28,7 +27,6 @@ namespace vg
 				, const Matrix4x4 *pProjMatrix = nullptr
                 , const Matrix4x4 *pViewMatrix = nullptr
 #if defined(DEBUG) && defined(VG_ENABLE_COST_TIMER)
-                , fd::CostTimer *pPreparingBuildInDataCostTimer = nullptr
                 , fd::CostTimer *pPreparingPipelineCostTimer = nullptr
                 , fd::CostTimer *pPreparingCommandBufferCostTimer = nullptr
 #endif //DEBUG and VG_ENABLE_COST_TIMER
@@ -50,8 +48,9 @@ namespace vg
 
 		virtual ~BaseVisualObject();
 
+		uint32_t getMaterialCount() const;
 		Material *getMaterial(uint32_t index = 0) const;
-
+		
 		void setMaterialCount(uint32_t count);
 		void setMaterial(fd::ArrayProxy<Material *> pMaterials, uint32_t count = 1u, uint32_t offset = 0);
 		void setMaterial(Material * pMaterial);

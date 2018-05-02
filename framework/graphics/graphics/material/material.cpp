@@ -56,6 +56,16 @@ namespace vg
 
 	}
 
+	Material::MaterialCreateInfo::MaterialCreateInfo(Bool32 onlyOnce
+	    , Bool32 createPreZPass
+	    )
+		: onlyOnce(onlyOnce)
+		, createPreZPass(createPreZPass) 
+
+	{
+
+	}
+
 	Material::Material(Bool32 onlyOnce)
 		: Base(BaseType::MATERIAL)
 		, name()
@@ -67,10 +77,19 @@ namespace vg
 		, m_mapPasses()
 		, m_pMainShader()
 		, m_pMainPass()
+		, m_pPreZPass()
 	{
 		m_pMainShader = std::shared_ptr<vg::Shader>{new vg::Shader()};
 		m_pMainPass = std::shared_ptr<vg::Pass>{ new vg::Pass(m_pMainShader.get())};
 		_addPass(m_pMainPass.get());
+	}
+
+	Material::Material(MaterialCreateInfo createInfo)
+	    : Material(createInfo.onlyOnce)
+	{
+		if (createInfo.createPreZPass) {
+			m_pPreZPass = std::shared_ptr<PreZPass>{new PreZPass()};
+		}
 	}
 
 	Material::~Material()
@@ -108,6 +127,11 @@ namespace vg
 		return m_pMainPass.get();
 	}
 
+	PreZPass * Material::getPreZPass() const
+	{
+		return m_pPreZPass.get();
+	}
+
 	void Material::apply()
 	{
 		for (const auto& item : m_mapPasses)
@@ -134,6 +158,28 @@ namespace vg
 	void Material::setRenderPriority(uint32_t priority)
 	{
 		m_renderPriority = priority;
+	}
+
+	void Material::beginBindToPreZRender(const BindInfo info, BindResult * pResult)
+	{
+		auto &result = *pResult;
+        RenderPassInfo trunkRenderPassInfo;
+        trunkRenderPassInfo.pRenderPass = nullptr;
+        trunkRenderPassInfo.pFrameBuffer = nullptr;			
+        trunkRenderPassInfo.framebufferWidth = info.trunkFramebufferWidth;
+        trunkRenderPassInfo.framebufferHeight = info.trunkFramebufferHeight;
+        trunkRenderPassInfo.projMatrix = *(info.pProjMatrix);
+        trunkRenderPassInfo.viewMatrix = *(info.pViewMatrix);
+        trunkRenderPassInfo.pPass = m_pPreZPass->getPass();
+        trunkRenderPassInfo.modelMatrix = *(info.pModelMatrix);
+        trunkRenderPassInfo.pMesh = info.pMesh;
+        trunkRenderPassInfo.subMeshIndex = info.subMeshIndex;
+        trunkRenderPassInfo.viewport = fd::Viewport();
+        trunkRenderPassInfo.scissor = info.hasClipRect ? info.clipRect : fd::Rect2D();
+        CmdInfo cmdInfo;
+        cmdInfo.pRenderPassInfo = &trunkRenderPassInfo;
+        result.pTrunkRenderPassCmdBuffer->addCmd(cmdInfo);
+        
 	}
 
 	void Material::beginBindToRender(const BindInfo info, BindResult *pResult)
@@ -175,28 +221,23 @@ namespace vg
     void Material::_beginBindToRender(const BindInfo info, BindResult *pResult)
     {
 		auto &result = *pResult;
-
-        if (result.pTrunkRenderPassCmdBuffer != nullptr)
-        {
-            RenderPassInfo trunkRenderPassInfo;
-            trunkRenderPassInfo.pRenderPass = nullptr;
-            trunkRenderPassInfo.pFrameBuffer = nullptr;			
-            trunkRenderPassInfo.framebufferWidth = info.trunkFramebufferWidth;
-            trunkRenderPassInfo.framebufferHeight = info.trunkFramebufferHeight;
-            trunkRenderPassInfo.projMatrix = *(info.pProjMatrix);
-            trunkRenderPassInfo.viewMatrix = *(info.pViewMatrix);
-            trunkRenderPassInfo.pPass = *m_arrPasses.data();
-            trunkRenderPassInfo.modelMatrix = *(info.pModelMatrix);
-            trunkRenderPassInfo.pMesh = info.pMesh;
-            trunkRenderPassInfo.subMeshIndex = info.subMeshIndex;
-            trunkRenderPassInfo.viewport = fd::Viewport();
-            trunkRenderPassInfo.scissor = info.hasClipRect ? info.clipRect : fd::Rect2D();
-
-            CmdInfo cmdInfo;
-            cmdInfo.pRenderPassInfo = &trunkRenderPassInfo;
-
-            result.pTrunkRenderPassCmdBuffer->addCmd(cmdInfo);
-        }
+        RenderPassInfo trunkRenderPassInfo;
+        trunkRenderPassInfo.pRenderPass = nullptr;
+        trunkRenderPassInfo.pFrameBuffer = nullptr;			
+        trunkRenderPassInfo.framebufferWidth = info.trunkFramebufferWidth;
+        trunkRenderPassInfo.framebufferHeight = info.trunkFramebufferHeight;
+        trunkRenderPassInfo.projMatrix = *(info.pProjMatrix);
+        trunkRenderPassInfo.viewMatrix = *(info.pViewMatrix);
+        trunkRenderPassInfo.pPass = *m_arrPasses.data();
+        trunkRenderPassInfo.modelMatrix = *(info.pModelMatrix);
+        trunkRenderPassInfo.pMesh = info.pMesh;
+        trunkRenderPassInfo.subMeshIndex = info.subMeshIndex;
+        trunkRenderPassInfo.viewport = fd::Viewport();
+        trunkRenderPassInfo.scissor = info.hasClipRect ? info.clipRect : fd::Rect2D();
+        CmdInfo cmdInfo;
+        cmdInfo.pRenderPassInfo = &trunkRenderPassInfo;
+        result.pTrunkRenderPassCmdBuffer->addCmd(cmdInfo);
+        
 	}
 	
 	void Material::_endBindToRender(const EndBindInfo info)

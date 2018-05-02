@@ -44,14 +44,14 @@ namespace vg
         static void recordItemNextSubpass(vk::CommandBuffer *pCommandBuffer);
 
         static void recordItem(const RenderPassInfo *pRenderPassInfo
-            ,  vk::CommandBuffer *pCommandBuffer
+            , vk::CommandBuffer *pCommandBuffer
             , PipelineCache *pPipelineCache
             , ResultInfo *pResult = nullptr);
 
 		static void _createPipeline(vk::RenderPass *pRenderPass,
 		    const BaseMesh *pMesh,
 		    uint32_t subMeshIndex,
-		    Pass *pPass,
+		    const Pass *pPass,
 		    PipelineCache *pPipelineCache,
 		    std::shared_ptr<vk::Pipeline> &pPipeline);
 
@@ -61,7 +61,7 @@ namespace vg
 		    uint32_t framebufferHeight,
 		    const BaseMesh *pMesh,
 		    uint32_t subMeshIndex,
-		    Pass *pPass,
+		    const Pass *pPass,
             const fd::Viewport viewport,
 		    const fd::Rect2D scissor,
             CmdDraw * pCmdDraw,

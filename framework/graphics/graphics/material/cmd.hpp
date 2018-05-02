@@ -72,7 +72,7 @@ namespace vg
 
         Matrix4x4 projMatrix;
         Matrix4x4 viewMatrix;
-        Pass *pPass;
+        const Pass *pPass;
         Matrix4x4 modelMatrix;
         const BaseMesh *pMesh;
 		uint32_t subMeshIndex;
@@ -96,7 +96,7 @@ namespace vg
             , vk::ClearValue *pClearValues = nullptr
             , Matrix4x4 projMatrix = Matrix4x4(1.0f)
             , Matrix4x4 viewMatrix = Matrix4x4(1.0f)
-            , Pass *pPass = nullptr
+            , const Pass *pPass = nullptr
             , Matrix4x4 modelMatrix = Matrix4x4(1.0f)
             , const BaseMesh *pMesh = nullptr
             , uint32_t subMeshIndex = 0u

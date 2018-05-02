@@ -124,14 +124,14 @@ namespace vg
 
     }
 
-    RenderPassInfo::RenderPassInfo( vk::RenderPass *pRenderPass
+    RenderPassInfo::RenderPassInfo(const vk::RenderPass *pRenderPass
         , uint32_t subPassIndex
-        , vk::Framebuffer *pFrameBuffer
+        , const vk::Framebuffer *pFrameBuffer
         , uint32_t framebufferWidth
         , uint32_t framebufferHeight
         , fd::Rect2D renderArea
         , uint32_t clearValueCount
-        , vk::ClearValue *pClearValues
+        , const vk::ClearValue *pClearValues
         , Matrix4x4 projMatrix
         , Matrix4x4 viewMatrix
         , const Pass *pPass
@@ -140,8 +140,8 @@ namespace vg
         , uint32_t subMeshIndex
         , fd::Viewport viewport
         , fd::Rect2D scissor
-        , CmdDraw *pCmdDraw
-        , CmdDrawIndexed *pCmdDrawIndexed
+        , const CmdDraw *pCmdDraw
+        , const CmdDrawIndexed *pCmdDrawIndexed
 #if defined(DEBUG) && defined(VG_ENABLE_COST_TIMER)
         , fd::CostTimer *pPreparingBuildInDataCostTimer
         , fd::CostTimer *pPreparingPipelineCostTimer

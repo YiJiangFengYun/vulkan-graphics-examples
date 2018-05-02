@@ -61,14 +61,14 @@ namespace vg
 
     struct RenderPassInfo
     {
-        vk::RenderPass *pRenderPass;
+        const vk::RenderPass *pRenderPass;
         uint32_t subPassIndex;
-        vk::Framebuffer *pFrameBuffer;
+        const vk::Framebuffer *pFrameBuffer;
         uint32_t framebufferWidth;
 		uint32_t framebufferHeight;
         fd::Rect2D renderArea;
         uint32_t clearValueCount;
-        vk::ClearValue *pClearValues;
+        const vk::ClearValue *pClearValues;
 
         Matrix4x4 projMatrix;
         Matrix4x4 viewMatrix;
@@ -78,22 +78,22 @@ namespace vg
 		uint32_t subMeshIndex;
         fd::Viewport viewport;
         fd::Rect2D scissor;
-        CmdDraw *pCmdDraw;
-        CmdDrawIndexed *pCmdDrawIndexed;
+        const CmdDraw *pCmdDraw;
+        const CmdDrawIndexed *pCmdDrawIndexed;
 #if defined(DEBUG) && defined(VG_ENABLE_COST_TIMER)
         fd::CostTimer *pPreparingBuildInDataCostTimer;
         fd::CostTimer *pPreparingPipelineCostTimer;
         fd::CostTimer *pPreparingCommandBufferCostTimer;
 #endif //DEBUG and VG_ENABLE_COST_TIMER
             
-        RenderPassInfo(vk::RenderPass *pRenderPass = nullptr
+        RenderPassInfo(const vk::RenderPass *pRenderPass = nullptr
             , uint32_t subPassIndex = 0u
-            , vk::Framebuffer *pFrameBuffer = nullptr
+            , const vk::Framebuffer *pFrameBuffer = nullptr
 			, uint32_t framebufferWidth = 0u
 			, uint32_t framebufferHeight = 0u
             , fd::Rect2D renderArea = fd::Rect2D()
             , uint32_t clearValueCount = 0u
-            , vk::ClearValue *pClearValues = nullptr
+            , const vk::ClearValue *pClearValues = nullptr
             , Matrix4x4 projMatrix = Matrix4x4(1.0f)
             , Matrix4x4 viewMatrix = Matrix4x4(1.0f)
             , const Pass *pPass = nullptr
@@ -102,8 +102,8 @@ namespace vg
             , uint32_t subMeshIndex = 0u
             , fd::Viewport viewport = fd::Viewport()
             , fd::Rect2D scissor = fd::Rect2D()
-            , CmdDraw *pCmdDraw = nullptr
-            , CmdDrawIndexed *pCmdDrawIndexed = nullptr
+            , const CmdDraw *pCmdDraw = nullptr
+            , const CmdDrawIndexed *pCmdDrawIndexed = nullptr
 #if defined(DEBUG) && defined(VG_ENABLE_COST_TIMER)
             , fd::CostTimer *pPreparingBuildInDataCostTimer = nullptr
             , fd::CostTimer *pPreparingPipelineCostTimer = nullptr

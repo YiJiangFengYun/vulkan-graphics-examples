@@ -86,6 +86,36 @@ namespace vg
 	   virtual void _init(Bool32 importContent) override;
 	   void _checkDepthFormat();
 	};
+
+	class Texture2DDepthAttachment : public Texture, public BaseDepthStencilAttachment
+	{
+	public:
+	    Texture2DDepthAttachment(vk::Format format
+		    , uint32_t width
+			, uint32_t height
+			, Bool32 isInputUsage = VG_FALSE
+			, Bool32 defaultImageView = VG_TRUE
+			, Bool32 defaultSampler = VG_TRUE
+			);
+		~Texture2DDepthAttachment();
+		uint32_t getWidth() const;
+		uint32_t getHeight() const;
+		void applyData(const TextureDataInfo &layoutInfo
+			, const void *memory
+			, uint32_t size
+			, Bool32 cacheMemory = VG_FALSE
+		    , Bool32 createMipmaps = VG_FALSE);
+		virtual uint32_t getDepthStencilAttachmentWidth() const override;
+		virtual uint32_t getDepthStencilAttachmentHeight() const override;
+		virtual uint32_t getDepthStencilAttachmentLayers() const override;
+		virtual const vk::Format getDepthStencilAttachmentFormat() const override;
+		virtual const vk::ImageLayout getDepthStencilAttachmentLayout() const override;
+		virtual const vk::ImageView *getDepthStencilAttachmentImageView() const override;
+	private:
+	   Texture2DDepthAttachment() = delete;
+	   virtual void _init(Bool32 importContent) override;
+	   void _checkDepthFormat();
+	};
 }
 
 #endif // !VG_TEXTURE_2D_H

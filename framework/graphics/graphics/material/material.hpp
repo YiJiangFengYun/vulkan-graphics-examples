@@ -27,7 +27,6 @@ namespace vg
             Bool32 hasClipRect;
             const fd::Rect2D clipRect;
 #if defined(DEBUG) && defined(VG_ENABLE_COST_TIMER)
-            fd::CostTimer *pPreparingBuildInDataCostTimer;
             fd::CostTimer *pPreparingPipelineCostTimer;
             fd::CostTimer *pPreparingCommandBufferCostTimer;
 #endif //DEBUG and VG_ENABLE_COST_TIMER
@@ -37,7 +36,6 @@ namespace vg
 			    , uint32_t trunkFramebufferWidth = 0u
 			    , uint32_t trunkFramebufferHeight = 0u
 #if defined(DEBUG) && defined(VG_ENABLE_COST_TIMER)
-                , fd::CostTimer *pPreparingBuildInDataCostTimer = nullptr
                 , fd::CostTimer *pPreparingPipelineCostTimer = nullptr
                 , fd::CostTimer *pPreparingCommandBufferCostTimer = nullptr
 #endif //DEBUG and VG_ENABLE_COST_TIMER
@@ -52,10 +50,12 @@ namespace vg
     
         struct BindResult
         {
+			CmdBuffer *pPreZCmdBuffer;
             CmdBuffer *pBranchCmdBuffer;
             CmdBuffer *pTrunkRenderPassCmdBuffer;
             CmdBuffer *pTrunkWaitBarrierCmdBuffer;
-            BindResult(CmdBuffer *pBranchCmdBuffer = nullptr
+            BindResult(CmdBuffer *pPreZCmdBuffer = nullptr
+			    , CmdBuffer *pBranchCmdBuffer = nullptr
                 , CmdBuffer *pTrunkRenderPassCmdBuffer = nullptr
                 , CmdBuffer *pTrunkWaitBarrierCmdBuffer = nullptr
                 );
@@ -98,7 +98,6 @@ namespace vg
 		/*Call the apply methods of all passes in the material.*/
 		virtual void apply();
 
-		void beginBindToPreZRender(const BindInfo info, BindResult * pResult);
 		void beginBindToRender(const BindInfo info, BindResult *pResult);
 		void endBindToRender(const EndBindInfo info);
 

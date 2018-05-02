@@ -21,6 +21,7 @@ namespace vg
 	{
 	public:
 		static const vk::Format DEFAULT_DEPTH_STENCIL_FORMAT;
+		static const vk::Format DEFAULT_PRE_Z_DEPTH_FORMAT;
 
 		struct SceneAndCamera {
 			const BaseScene *pScene;
@@ -55,8 +56,10 @@ namespace vg
 		};
 
 		Renderer();
-
 		~Renderer();
+
+		void enablePreZ();
+		void disablePreZ();
 
 		Bool32 isValidForRender() const;
 
@@ -96,6 +99,14 @@ namespace vg
 		std::shared_ptr<vk::CommandPool> m_pCommandPool;
 		std::shared_ptr<vk::CommandBuffer> m_pCommandBuffer;
 		PipelineCache m_pipelineCache;
+
+		//pre z pass
+		Bool32 m_preZEnable;
+		vk::Format m_preZDepthImageFormat;
+		std::shared_ptr<Texture2DDepthAttachment> m_pPreZDepthAttachment;		
+		std::shared_ptr<vk::RenderPass> m_pPreZRenderPass;
+		std::shared_ptr<vk::Framebuffer> m_pPreZFrameBuffer;
+		CmdBuffer m_preZRenderPassCmdBuffer;
 		
 		CmdBuffer m_trunkRenderPassCmdBuffer;
 		CmdBuffer m_trunkWaitBarrierCmdBuffer;
@@ -122,14 +133,16 @@ namespace vg
 		//void _createFence();
 
 		void _recordCommandBufferForBegin();
+		void _recordPreZRenderPassForBegin();
+		void _recordPreZRenderPassForEnd();
 		void _recordTrunkRenderPassForBegin();
-
 		void _recordTrunkRenderPassForEnd();
 		void _recordCommandBufferForEnd();
 
 	    void _renderScene2(const Scene<SpaceType::SPACE_2> *pScene
 		    , const Camera<SpaceType::SPACE_2> *pCamera
 	        , const RenderInfo &info
+			, CmdBuffer *pPreZCmdBuffer = nullptr
 			, CmdBuffer *pBranchCmdBuffer = nullptr
             , CmdBuffer *pTrunkRenderPassCmdBuffer = nullptr
             , CmdBuffer *pTrunkWaitBarrierCmdBuffer = nullptr
@@ -138,6 +151,7 @@ namespace vg
 		void _renderScene3(const Scene<SpaceType::SPACE_3> *pScene
 		    , const Camera<SpaceType::SPACE_3> *pCamera
 	        , const RenderInfo &info
+			, CmdBuffer *pPreZCmdBuffer = nullptr
 			, CmdBuffer *pBranchCmdBuffer = nullptr
             , CmdBuffer *pTrunkRenderPassCmdBuffer = nullptr
             , CmdBuffer *pTrunkWaitBarrierCmdBuffer = nullptr
@@ -147,7 +161,8 @@ namespace vg
 		void _bind(BaseVisualObject *pVisublObject, BaseVisualObject::BindInfo & bindInfo, BaseVisualObject::BindResult *pResult);
 		void _endBind();
         
-
+		void _createPreZObjs();
+		void _destroyPreZObjs();
 	private:
 	};
 

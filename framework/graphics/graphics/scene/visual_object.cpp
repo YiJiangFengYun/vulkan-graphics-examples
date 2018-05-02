@@ -23,11 +23,13 @@ namespace vg
     {
     }
 
-    BaseVisualObject::BindResult::BindResult(CmdBuffer *pBranchCmdBuffer
+    BaseVisualObject::BindResult::BindResult(CmdBuffer *pPreZCmdBuffer
+	    , CmdBuffer *pBranchCmdBuffer
         , CmdBuffer *pTrunkRenderPassCmdBuffer
         , CmdBuffer *pTrunkWaitBarrierCmdBuffer
         )
-	    : pBranchCmdBuffer(pBranchCmdBuffer)
+	    : pPreZCmdBuffer(pPreZCmdBuffer)
+		, pBranchCmdBuffer(pBranchCmdBuffer)
         , pTrunkRenderPassCmdBuffer(pTrunkRenderPassCmdBuffer)
         , pTrunkWaitBarrierCmdBuffer(pTrunkWaitBarrierCmdBuffer)
     {
@@ -176,7 +178,7 @@ namespace vg
 		uint32_t materialCount = m_materialCount;
 		for (uint32_t i = 0; i < subMeshCount; ++i)
 		{
-			if (i >= materialCount) continue;
+			if (i >= materialCount) break;
 			auto pMaterial = m_pMaterials[i];
 			if (pMaterial == nullptr) continue;
 			uint32_t subMeshIndex = subMeshOffset + i;
@@ -192,14 +194,15 @@ namespace vg
 			    m_hasClipRect,
 				m_hasClipRect ? *(m_clipRects.data() + i) : fd::Rect2D(),
 #if defined(DEBUG) && defined(VG_ENABLE_COST_TIMER)
-                info.pPreparingBuildInDataCostTimer,
                 info.pPreparingPipelineCostTimer,
                 info.pPreparingCommandBufferCostTimer,
 #endif //DEBUG and VG_ENABLE_COST_TIMER
 		        };
     
 		    Material::BindResult resultForVisualizer;
-			
+
+			if (result.pPreZCmdBuffer != nullptr)
+			    resultForVisualizer.pPreZCmdBuffer = result.pPreZCmdBuffer;
 			if (result.pBranchCmdBuffer != nullptr)
 				resultForVisualizer.pBranchCmdBuffer = result.pBranchCmdBuffer;
 			if (result.pTrunkRenderPassCmdBuffer != nullptr)
@@ -218,7 +221,7 @@ namespace vg
 		uint32_t materialCount = m_materialCount;	
 		for (uint32_t i = 0; i < subMeshCount; ++i)
 		{
-			if (i >= materialCount) continue;
+			if (i >= materialCount) break;
 			auto pMaterial = m_pMaterials[i];
 			if (pMaterial == nullptr) continue;
 			uint32_t subMeshIndex = subMeshOffset + i;

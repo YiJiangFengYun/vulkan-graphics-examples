@@ -13,7 +13,6 @@ namespace vg
         , Bool32 hasClipRect
         , const fd::Rect2D clipRect
 #if defined(DEBUG) && defined(VG_ENABLE_COST_TIMER)
-        , fd::CostTimer *pPreparingBuildInDataCostTimer
         , fd::CostTimer *pPreparingPipelineCostTimer
         , fd::CostTimer *pPreparingCommandBufferCostTimer
 #endif //DEBUG and VG_ENABLE_COST_TIMER
@@ -29,18 +28,19 @@ namespace vg
         , hasClipRect(hasClipRect)
         , clipRect(clipRect)
 #if defined(DEBUG) && defined(VG_ENABLE_COST_TIMER)
-        , pPreparingBuildInDataCostTimer(pPreparingBuildInDataCostTimer)
         , pPreparingPipelineCostTimer(pPreparingPipelineCostTimer)
         , pPreparingCommandBufferCostTimer(pPreparingCommandBufferCostTimer)
 #endif //DEBUG and VG_ENABLE_COST_TIMER
     {
     }
 
-    Material::BindResult::BindResult(CmdBuffer *pBranchCmdBuffer
+    Material::BindResult::BindResult(CmdBuffer *pPreZCmdBuffer
+	    , CmdBuffer *pBranchCmdBuffer
         , CmdBuffer *pTrunkRenderPassCmdBuffer
         , CmdBuffer *pTrunkWaitBarrierCmdBuffer
         )
-	    : pBranchCmdBuffer(pBranchCmdBuffer)
+	    : pPreZCmdBuffer(pPreZCmdBuffer)
+		, pBranchCmdBuffer(pBranchCmdBuffer)
         , pTrunkRenderPassCmdBuffer(pTrunkRenderPassCmdBuffer)
         , pTrunkWaitBarrierCmdBuffer(pTrunkWaitBarrierCmdBuffer)
     {
@@ -160,34 +160,33 @@ namespace vg
 		m_renderPriority = priority;
 	}
 
-	void Material::beginBindToPreZRender(const BindInfo info, BindResult * pResult)
-	{
-		auto &result = *pResult;
-        RenderPassInfo trunkRenderPassInfo;
-        trunkRenderPassInfo.pRenderPass = nullptr;
-        trunkRenderPassInfo.pFrameBuffer = nullptr;			
-        trunkRenderPassInfo.framebufferWidth = info.trunkFramebufferWidth;
-        trunkRenderPassInfo.framebufferHeight = info.trunkFramebufferHeight;
-        trunkRenderPassInfo.projMatrix = *(info.pProjMatrix);
-        trunkRenderPassInfo.viewMatrix = *(info.pViewMatrix);
-        trunkRenderPassInfo.pPass = m_pPreZPass->getPass();
-        trunkRenderPassInfo.modelMatrix = *(info.pModelMatrix);
-        trunkRenderPassInfo.pMesh = info.pMesh;
-        trunkRenderPassInfo.subMeshIndex = info.subMeshIndex;
-        trunkRenderPassInfo.viewport = fd::Viewport();
-        trunkRenderPassInfo.scissor = info.hasClipRect ? info.clipRect : fd::Rect2D();
-        CmdInfo cmdInfo;
-        cmdInfo.pRenderPassInfo = &trunkRenderPassInfo;
-        result.pTrunkRenderPassCmdBuffer->addCmd(cmdInfo);
-        
-	}
-
 	void Material::beginBindToRender(const BindInfo info, BindResult *pResult)
     {
 		if (m_onlyOnce == VG_TRUE) {
 			if (m_bindTargetID != 0) 
 			    throw std::runtime_error("The material binding is only once, but it was used to repeatedly bind.");
 			m_bindTargetID = info.objectID;
+		}
+
+		auto &result = *pResult;
+		if (m_pPreZPass != nullptr && result.pPreZCmdBuffer != nullptr)
+		{
+            RenderPassInfo trunkRenderPassInfo;
+            trunkRenderPassInfo.pRenderPass = nullptr;
+            trunkRenderPassInfo.pFrameBuffer = nullptr;			
+            trunkRenderPassInfo.framebufferWidth = info.trunkFramebufferWidth;
+            trunkRenderPassInfo.framebufferHeight = info.trunkFramebufferHeight;
+            trunkRenderPassInfo.projMatrix = *(info.pProjMatrix);
+            trunkRenderPassInfo.viewMatrix = *(info.pViewMatrix);
+            trunkRenderPassInfo.pPass = m_pPreZPass->getPass();
+            trunkRenderPassInfo.modelMatrix = *(info.pModelMatrix);
+            trunkRenderPassInfo.pMesh = info.pMesh;
+            trunkRenderPassInfo.subMeshIndex = info.subMeshIndex;
+            trunkRenderPassInfo.viewport = fd::Viewport();
+            trunkRenderPassInfo.scissor = info.hasClipRect ? info.clipRect : fd::Rect2D();
+            CmdInfo cmdInfo;
+            cmdInfo.pRenderPassInfo = &trunkRenderPassInfo;
+            result.pPreZCmdBuffer->addCmd(cmdInfo);
 		}
 
 		_beginBindToRender(info, pResult);

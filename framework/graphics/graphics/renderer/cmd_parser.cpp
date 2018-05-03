@@ -226,7 +226,7 @@ namespace vg
 		}
     }
 
-    void CMDParser::_createPipeline(vk::RenderPass *pRenderPass,
+    void CMDParser::_createPipeline(const vk::RenderPass *pRenderPass,
 		const BaseMesh *pMesh,
 		uint32_t subMeshIndex,
 		const Pass *pPass,
@@ -256,8 +256,8 @@ namespace vg
 		const Pass *pPass,
 		const fd::Viewport viewport,
 		const fd::Rect2D scissor,
-		CmdDraw * pCmdDraw,
-        CmdDrawIndexed * pCmdDrawIndexed
+		const CmdDraw * pCmdDraw,
+        const CmdDrawIndexed * pCmdDrawIndexed
 		)
 	{        
         const auto& viewportOfPass = pPass->getViewport();

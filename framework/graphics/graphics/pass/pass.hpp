@@ -173,7 +173,7 @@ namespace vg
 		{
 			std::string name;
 			Bool32 isTexture;
-			uint32_t binding;
+			uint32_t bindingPriority;
 			DescriptorType descriptorType;
 			uint32_t descriptorCount;
 			ShaderStageFlags stageFlags;
@@ -181,24 +181,21 @@ namespace vg
 			uint32_t size;
 			uint32_t bufferSize;
 
-			LayoutBindingInfo();
-
-			LayoutBindingInfo(std::string name
-				, Bool32 isTexture
-				, uint32_t binding
-				, DescriptorType descriptorType
-				, uint32_t descriptorCount
-				, ShaderStageFlags stageFlags
+			LayoutBindingInfo(std::string name = nullptr
+				, Bool32 isTexture = VG_FALSE
+				, uint32_t bindingPriority = 0u
+				, DescriptorType descriptorType = DescriptorType::UNIFORM_BUFFER
+				, uint32_t descriptorCount = 0u
+				, ShaderStageFlags stageFlags = ShaderStageFlags()
 			);
 
 			LayoutBindingInfo(const LayoutBindingInfo &);
 
-			LayoutBindingInfo(const LayoutBindingInfo &&);
-
 			LayoutBindingInfo& operator=(const LayoutBindingInfo &);
 
-			Bool32 operator ==(const LayoutBindingInfo& target) const;
-			Bool32 operator !=(const LayoutBindingInfo& target) const;
+			Bool32 operator ==(const LayoutBindingInfo & target) const;
+			Bool32 operator !=(const LayoutBindingInfo & target) const;
+			Bool32 operator<(const LayoutBindingInfo & target) const;
 
 			void updateSize(const PassData *pPassData);
 			void updateSize(const uint32_t dataSize);
@@ -226,7 +223,7 @@ namespace vg
 
 		void setTexture(std::string name
 			, const Texture *pTex
-			, uint32_t binding = VG_M_OTHER_MIN_BINDING
+			, uint32_t binding = VG_M_OTHER_MAX_BINDING_PRIORITY
 			, ShaderStageFlags stageFlags = ShaderStageFlagBits::FRAGMENT
 			, DescriptorType descriptorType = DescriptorType::COMBINED_IMAGE_SAMPLER
 			, const Texture::ImageView *pImageView = nullptr
@@ -260,7 +257,7 @@ namespace vg
 
 		void setDataValue(const std::string name
 		    , void *src, uint32_t size, uint32_t offset
-			, uint32_t binding = VG_M_OTHER_MIN_BINDING
+			, uint32_t binding = VG_M_OTHER_MAX_BINDING_PRIORITY
 			, DescriptorType descriptorType = DescriptorType::UNIFORM_BUFFER
 			, ShaderStageFlags stageFlags = ShaderStageFlagBits::VERTEX
 			, uint32_t descriptorCount = 1u);
@@ -420,6 +417,7 @@ namespace vg
 		ExternalUniformBufferInfo m_externalUniformBufferInfo;
 
 		//cache
+		std::set<LayoutBindingInfo> m_lastLayoutBindingInfos;
 		std::vector<vk::DescriptorSetLayoutBinding> m_lastBindings;
 		std::vector<std::string> m_lastLayoutBindNames;
 		std::unordered_map<std::string, LayoutBindingInfo> m_lastLayoutBinds;

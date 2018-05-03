@@ -166,20 +166,16 @@ namespace vg
 		return m_size;
 	}
 
-	Pass::LayoutBindingInfo::LayoutBindingInfo()
-	{
-	}
-
 	Pass::LayoutBindingInfo::LayoutBindingInfo(std::string name
 		, Bool32 isTexture
-		, uint32_t binding
+		, uint32_t bindingPriority
 		, DescriptorType descriptorType
 		, uint32_t descriptorCount
 		, ShaderStageFlags stageFlags
 	) 
 		: name(name)
 		, isTexture(isTexture)
-		, binding(binding)
+		, bindingPriority(bindingPriority)
 		, descriptorType(descriptorType)
 		, descriptorCount(descriptorCount)
 		, stageFlags(stageFlags)
@@ -189,7 +185,7 @@ namespace vg
 	Pass::LayoutBindingInfo::LayoutBindingInfo(const LayoutBindingInfo & target)
 		: name(target.name)
 		, isTexture(target.isTexture)
-		, binding(target.binding)
+		, bindingPriority(target.bindingPriority)
 		, descriptorType(target.descriptorType)
 		, descriptorCount(target.descriptorCount)
 		, stageFlags(target.stageFlags)
@@ -203,7 +199,7 @@ namespace vg
 	{
 		name = target.name;
 		isTexture = target.isTexture;
-		binding = target.binding;
+		bindingPriority = target.bindingPriority;
 		descriptorType = target.descriptorType;
 		descriptorCount = target.descriptorCount;
 		stageFlags = target.stageFlags;
@@ -211,19 +207,6 @@ namespace vg
 		bufferSize = target.bufferSize;
 
 		return *this;
-	}
-
-	Pass::LayoutBindingInfo::LayoutBindingInfo(const LayoutBindingInfo &&target)
-		: name(target.name)
-		, isTexture(target.isTexture)
-		, binding(target.binding)
-		, descriptorType(target.descriptorType)
-		, descriptorCount(target.descriptorCount)
-		, stageFlags(target.stageFlags)
-		, size(target.size)
-		, bufferSize(target.bufferSize)
-	{
-
 	}
 
 	void Pass::LayoutBindingInfo::updateSize(const PassData *pPassData)
@@ -260,7 +243,7 @@ namespace vg
 	{
 		return name == target.name 
 			&& isTexture == target.isTexture 
-			&& binding == target.binding 
+			&& bindingPriority == target.bindingPriority 
 			&& descriptorType == target.descriptorType 
 			&& descriptorCount == target.descriptorCount 
 			&& stageFlags == target.stageFlags;
@@ -269,6 +252,11 @@ namespace vg
 	Bool32 Pass::LayoutBindingInfo::operator !=(const LayoutBindingInfo& target) const
 	{
 		return ! (*this == target);
+	}
+
+	Bool32 Pass::LayoutBindingInfo::operator<(const LayoutBindingInfo & target) const
+	{
+		return bindingPriority < target.bindingPriority;
 	}
 
 	Pass::VertexInputFilterInfo::VertexInputFilterInfo(Bool32 filterEnable
@@ -285,6 +273,15 @@ namespace vg
 
 	Pass::Pass() 
 		: Base(BaseType::PASS)
+		, m_arrLayoutBindNames()
+		, m_mapLayoutBinds()
+		, m_pUniformBuffer()
+		, m_pUniformBufferMemory()
+		, m_uniformBufferSize(0u)
+		, m_pDescriptorSetLayout()
+		, m_pPipelineLayout()
+		, m_pDescriptorPool()
+		, m_pDescriptorSet()
 		, m_applied(VG_FALSE)		
 		, m_pData(new PassData())
 		, m_dataChanged(VG_FALSE)
@@ -323,7 +320,6 @@ namespace vg
 		, m_subpass(0u)
 		, m_vertexInputFilterInfo()
 		, m_vertexInputFilterLocations()
-		, m_uniformBufferSize(0u)
 	{
 		_initDefaultBuildInDataInfo();
 		_initBuildInData();
@@ -472,7 +468,7 @@ namespace vg
 	{
 		setTexture(VG_M_MAIN_TEXTURE_NAME
 		    , value
-			, VG_M_MAIN_TEXTURE_BINDING
+			, VG_M_MAIN_TEXTURE_BINDING_PRIORITY
 			, stageFlags
 			, descriptorType
 			, pImageView
@@ -981,12 +977,18 @@ namespace vg
 
 	void Pass::_createPipelineLayout()
 	{
-		std::vector<vk::DescriptorSetLayoutBinding> bindings(m_arrLayoutBindNames.size());
-		size_t index = 0;
+		m_lastLayoutBindingInfos.clear();
 		for (const auto& name : m_arrLayoutBindNames)
 		{
 			const auto& item = m_mapLayoutBinds[name];
-			bindings[index].binding = item.binding;
+			m_lastLayoutBindingInfos.insert(item);
+		}
+
+		std::vector<vk::DescriptorSetLayoutBinding> bindings(m_arrLayoutBindNames.size());
+		size_t index = 0;
+		for (const auto& item : m_lastLayoutBindingInfos)
+		{
+			bindings[index].binding = index;
 			bindings[index].descriptorCount = item.descriptorCount;
 			bindings[index].descriptorType = tranDescriptorTypeToVK(item.descriptorType);
 			bindings[index].stageFlags = tranShaderStageFlagsToVK(item.stageFlags);
@@ -1261,9 +1263,8 @@ namespace vg
 	{
 		//get total number of unimform buffer variables.
 		int32_t count = 0u;
-		for (const auto& name : m_arrLayoutBindNames)
+		for (const auto& item : m_lastLayoutBindingInfos)
 		{
-			const auto& item = m_mapLayoutBinds[name];
 			if (item.descriptorType == DescriptorType::UNIFORM_BUFFER)
 				++count;
 		}
@@ -1272,9 +1273,9 @@ namespace vg
 		std::vector<std::vector<vk::DescriptorBufferInfo>> bufferInfoss(count);
 		uint32_t offset = 0u;
 		uint32_t index = 0u;
-		for (const auto& name : m_arrLayoutBindNames)
+		uint32_t itemIndex = 0;
+		for (const auto& item : m_lastLayoutBindingInfos)
 		{
-			const auto& item = m_mapLayoutBinds[name];
 			if (item.descriptorType == DescriptorType::UNIFORM_BUFFER)
 			{
 				bufferInfoss[index].resize(item.descriptorCount);
@@ -1286,13 +1287,14 @@ namespace vg
 					offset += item.bufferSize;
 				}
 				writes[index].dstSet = *m_pDescriptorSet;
-				writes[index].dstBinding = item.binding;
+				writes[index].dstBinding = itemIndex;
 				writes[index].descriptorType = tranDescriptorTypeToVK(item.descriptorType);
 				writes[index].dstArrayElement = 0;
 				writes[index].descriptorCount = item.descriptorCount;
 				writes[index].pBufferInfo = bufferInfoss[index].data();
 				++index;
 			}
+			++itemIndex;
 		}
 
 		if (writes.size())
@@ -1306,9 +1308,8 @@ namespace vg
 	{
 		//get total number of unimform buffer variables.
 		int32_t count = 0u;
-		for (const auto& name : m_arrLayoutBindNames)
+		for (const auto& item : m_lastLayoutBindingInfos)
 		{
-			const auto& item = m_mapLayoutBinds[name];
 			if (item.descriptorType == DescriptorType::COMBINED_IMAGE_SAMPLER ||
 				item.descriptorType == DescriptorType::INPUT_ATTACHMENT)
 				++count;
@@ -1318,9 +1319,9 @@ namespace vg
 		std::vector<vk::DescriptorImageInfo> imageInfos(count);
 
 		uint32_t index = 0u;
-		for (const auto& name : m_arrLayoutBindNames)
+		uint32_t itemIndex = 0u;
+		for (const auto& item : m_lastLayoutBindingInfos)
 		{
-			const auto& item = m_mapLayoutBinds[name];
 			if (item.descriptorType == DescriptorType::COMBINED_IMAGE_SAMPLER ||
 				item.descriptorType == DescriptorType::INPUT_ATTACHMENT)
 			{
@@ -1357,13 +1358,14 @@ namespace vg
 				}
 
 				writes[index].dstSet = *m_pDescriptorSet;
-				writes[index].dstBinding = item.binding;
+				writes[index].dstBinding = itemIndex;
 				writes[index].descriptorType = tranDescriptorTypeToVK(item.descriptorType);
 				writes[index].dstArrayElement = 0u;
 				writes[index].descriptorCount = item.descriptorCount;
 				writes[index].pImageInfo = &imageInfos[index];
 				++index;
 			}
+			++itemIndex;
 		}
 
 		auto pDevice = pApp->getDevice();
@@ -1520,7 +1522,7 @@ namespace vg
 		    LayoutBindingInfo info(
 		    	VG_M_BUILDIN_NAME,
 		    	VG_FALSE,
-		    	VG_M_BUILDIN_BINDING,
+		    	VG_M_BUILDIN_BINDING_PRIORITY,
 		    	DescriptorType::UNIFORM_BUFFER,
 		    	descriptorCount,
 		    	ShaderStageFlagBits::VERTEX

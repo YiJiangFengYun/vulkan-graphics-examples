@@ -124,6 +124,7 @@ void Window::_createTexture()
 	auto pTex = new vg::Texture2D(format, VG_TRUE,
 		gliTex[0].extent().x,
 		gliTex[0].extent().y,
+		vk::ImageUsageFlags(),
 		VG_TRUE,
 		VG_FALSE
 	);

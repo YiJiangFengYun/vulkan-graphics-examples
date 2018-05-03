@@ -48,7 +48,7 @@ namespace vg
             , PipelineCache *pPipelineCache
             , ResultInfo *pResult = nullptr);
 
-		static void _createPipeline(vk::RenderPass *pRenderPass,
+		static void _createPipeline(const vk::RenderPass *pRenderPass,
 		    const BaseMesh *pMesh,
 		    uint32_t subMeshIndex,
 		    const Pass *pPass,
@@ -64,8 +64,8 @@ namespace vg
 		    const Pass *pPass,
             const fd::Viewport viewport,
 		    const fd::Rect2D scissor,
-            CmdDraw * pCmdDraw,
-            CmdDrawIndexed * pCmdDrawIndexed
+            const CmdDraw * pCmdDraw,
+            const CmdDrawIndexed * pCmdDrawIndexed
         );
     };
 } //vg

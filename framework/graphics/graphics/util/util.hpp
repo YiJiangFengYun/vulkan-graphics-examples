@@ -43,12 +43,23 @@ namespace vg
 	template <typename T>
 	inline void setValue(std::string name, const T& value, std::unordered_map<std::string, T>& map, std::vector<std::string>& arr)
 	{
-		map[name] = value;
-
-		auto iterator = std::find(arr.begin(), arr.end(), name);
-		if (iterator == arr.end())
 		{
-			arr.push_back(name);
+			const auto& iterator = map.find(name);
+			if (iterator == map.cend())
+			{
+				map.insert({ name, value });
+			}
+			else
+			{
+				iterator->second = value;
+			}
+		}
+		{
+			auto iterator = std::find(arr.begin(), arr.end(), name);
+			if (iterator == arr.end())
+			{
+				arr.push_back(name);
+			}
 		}
 	}
 

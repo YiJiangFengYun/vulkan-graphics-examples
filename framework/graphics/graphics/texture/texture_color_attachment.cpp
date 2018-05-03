@@ -6,11 +6,13 @@ namespace vg
 	    , uint32_t width
 		, uint32_t height
 		, Bool32 isInputUsage
+		, vk::ImageUsageFlags additionalUsage
 		, Bool32 defaultImageView
 		, Bool32 defaultSampler
 		)
 		:Texture(format
 		, VG_FALSE
+		, additionalUsage
 		, defaultImageView
 		, defaultSampler
 		)

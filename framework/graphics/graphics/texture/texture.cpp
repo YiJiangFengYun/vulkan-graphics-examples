@@ -331,7 +331,12 @@ namespace vg
 		m_pSampler = fd::createSampler(pDevice, createInfo);
 	}
 
-	Texture::Texture(vk::Format format, Bool32 mipMap, Bool32 defaultImageView, Bool32 defaultSampler)
+	Texture::Texture(vk::Format format
+	    , Bool32 mipMap
+		, vk::ImageUsageFlags additionalUsage
+		, Bool32 defaultImageView
+		, Bool32 defaultSampler
+		)
 		: Base(BaseType::TEXTURE)
 		, m_type()
 		, m_width(1U)
@@ -343,7 +348,7 @@ namespace vg
 		, m_mipLevels()
 		, m_arrayLayers()
 		, m_allAspectFlags()
-		, m_usageFlags()
+		, m_usageFlags(additionalUsage)
 		, m_layout()
 		, m_isCreateDefaultImageView(defaultImageView)
 		, m_isCreateDefaultSampler(defaultSampler)

@@ -5,11 +5,13 @@ namespace vg
 	Texture1D::Texture1D(vk::Format format
 	    , Bool32 mipMap
 		, uint32_t width
+		, vk::ImageUsageFlags additionalUsage
 		, Bool32 defaultImageView
 		, Bool32 defaultSampler
 		)
 		:Texture(format
 		, mipMap
+		, additionalUsage
 		, defaultImageView
 		, defaultSampler
 		)

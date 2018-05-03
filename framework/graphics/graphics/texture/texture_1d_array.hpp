@@ -12,6 +12,7 @@ namespace vg
 		    , Bool32 mipmap
 			, uint32_t width
 			, uint32_t arraylength
+			, vk::ImageUsageFlags additionalUsage = vk::ImageUsageFlags()
 			, Bool32 defaultImageView = VG_TRUE
 			, Bool32 defaultSampler = VG_TRUE
 			);

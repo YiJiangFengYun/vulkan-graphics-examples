@@ -11,6 +11,7 @@ namespace vg
 		Texture1D(vk::Format format
 		    , Bool32 mipmap
 			, uint32_t width
+			, vk::ImageUsageFlags additionalUsage = vk::ImageUsageFlags()
 			, Bool32 defaultImageView = VG_TRUE
 			, Bool32 defaultSampler = VG_TRUE
 			);

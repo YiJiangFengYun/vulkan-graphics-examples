@@ -6,11 +6,13 @@ namespace vg
 	    , Bool32 mipMap
 		, uint32_t width
 		, uint32_t height
+		, vk::ImageUsageFlags additionalUsage
 		, Bool32 cacheMemory
 		, Bool32 createMipmaps
 		)
 		: Texture(format
 		, mipMap
+		, additionalUsage
 		, cacheMemory
 		, createMipmaps
 		)
@@ -52,11 +54,13 @@ namespace vg
 	    , uint32_t width
 		, uint32_t height
 		, Bool32 isInputUsage
+		, vk::ImageUsageFlags additionalUsage
 		, Bool32 defaultImageView
 		, Bool32 defaultSampler
 		)
 		: Texture(format
 		, false
+		, additionalUsage
 		, defaultImageView
 		, defaultSampler
 		)
@@ -138,11 +142,13 @@ namespace vg
 	    , uint32_t width
 		, uint32_t height
 		, Bool32 isInputUsage
+		, vk::ImageUsageFlags additionalUsage
 		, Bool32 defaultImageView
 		, Bool32 defaultSampler
 		)
-		:Texture(format
-		,  false
+		: Texture(format
+		, false
+		, additionalUsage
 		, defaultImageView
 		, defaultSampler
 		)
@@ -240,11 +246,13 @@ namespace vg
 	    , uint32_t width
 		, uint32_t height
 		, Bool32 isInputUsage
+		, vk::ImageUsageFlags additionalUsage
 		, Bool32 defaultImageView
 		, Bool32 defaultSampler
 		)
-		:Texture(format
-		,  false
+		: Texture(format
+		, false
+		, additionalUsage
 		, defaultImageView
 		, defaultSampler
 		)

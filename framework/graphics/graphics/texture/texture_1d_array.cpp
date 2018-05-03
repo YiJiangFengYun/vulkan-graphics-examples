@@ -6,11 +6,13 @@ namespace vg
 	    , Bool32 mipMap
 		, uint32_t width
 		, uint32_t arraylength
+		, vk::ImageUsageFlags additionalUsage
 		, Bool32 defaultImageView
 		, Bool32 defaultSampler
 		)
 		:Texture(format
 		, mipMap
+		, additionalUsage
 		, defaultImageView
 		, defaultSampler
 		)

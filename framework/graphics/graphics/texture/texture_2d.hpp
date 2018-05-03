@@ -13,6 +13,7 @@ namespace vg
 		    , Bool32 mipmap
 			, uint32_t width
 			, uint32_t height
+			, vk::ImageUsageFlags additionalUsage = vk::ImageUsageFlags()
 			, Bool32 defaultImageView = VG_TRUE
 			, Bool32 defaultSampler = VG_TRUE
 			);
@@ -35,6 +36,7 @@ namespace vg
 		    , uint32_t width
 			, uint32_t height
 			, Bool32 isInputUsage = VG_FALSE
+			, vk::ImageUsageFlags additionalUsage = vk::ImageUsageFlags()
 			, Bool32 defaultImageView = VG_TRUE
 			, Bool32 defaultSampler = VG_TRUE
 			);
@@ -64,6 +66,7 @@ namespace vg
 		    , uint32_t width
 			, uint32_t height
 			, Bool32 isInputUsage = VG_FALSE
+			, vk::ImageUsageFlags additionalUsage = vk::ImageUsageFlags()
 			, Bool32 defaultImageView = VG_TRUE
 			, Bool32 defaultSampler = VG_TRUE
 			);
@@ -94,6 +97,7 @@ namespace vg
 		    , uint32_t width
 			, uint32_t height
 			, Bool32 isInputUsage = VG_FALSE
+			, vk::ImageUsageFlags additionalUsage = vk::ImageUsageFlags()
 			, Bool32 defaultImageView = VG_TRUE
 			, Bool32 defaultSampler = VG_TRUE
 			);

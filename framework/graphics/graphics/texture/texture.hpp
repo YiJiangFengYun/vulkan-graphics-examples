@@ -207,6 +207,7 @@ namespace vg
 
 		Texture(vk::Format format
 		    , Bool32 mipMap
+			, vk::ImageUsageFlags additionalUsage
 			, Bool32 defaultImageView = VG_TRUE
 			, Bool32 defaultSampler = VG_TRUE
 			);

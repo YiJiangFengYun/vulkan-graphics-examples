@@ -1,15 +1,9 @@
-[submodule "libs/imgui/imgui"]
-	path = libs/imgui/imgui
-	url = https://github.com/ocornut/imgui.git
 [submodule "libs/plog"]
 	path = libs/plog
 	url = https://github.com/SergiusTheBest/plog.git
 [submodule "libs/libuv"]
 	path = libs/libuv
 	url = https://github.com/libuv/libuv.git
-[submodule "libs/glfw"]
-	path = libs/glfw
-	url = https://github.com/glfw/glfw.git
 [submodule "samples/libs/assimp"]
 	path = samples/libs/assimp
 	url = https://github.com/assimp/assimp.git

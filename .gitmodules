@@ -19,3 +19,6 @@
 [submodule "libs/gli"]
 	path = libs/gli
 	url = https://github.com/g-truc/gli.git
+[submodule "libs/glfw"]
+	path = libs/glfw
+	url = https://github.com/glfw/glfw.git

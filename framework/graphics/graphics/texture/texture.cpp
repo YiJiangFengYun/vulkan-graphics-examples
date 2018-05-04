@@ -752,7 +752,7 @@ namespace vg
 			VK_FALSE,
 			vk::CompareOp::eNever,
 			0.0f,
-			0.0f,
+			static_cast<float>(m_mipLevels),
 			vk::BorderColor::eFloatTransparentBlack,
 			VK_FALSE,
 		};

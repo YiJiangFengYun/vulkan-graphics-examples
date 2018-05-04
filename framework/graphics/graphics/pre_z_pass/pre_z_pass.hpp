@@ -45,6 +45,8 @@ namespace vg
 
         void setVertexInputFilterInfo(const Pass::VertexInputFilterInfo &value);
 
+        void apply();
+
         const Shader * getShader() const;
         const Pass * getPass() const;
 

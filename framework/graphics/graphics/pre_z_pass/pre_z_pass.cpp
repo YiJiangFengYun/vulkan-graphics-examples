@@ -12,9 +12,10 @@ namespace vg
         , m_pShader()
         , m_pPass()
     {
+		m_pShader = std::shared_ptr<Shader>{ new Shader() };
+		m_pPass = std::shared_ptr<Pass>{ new Pass(m_pShader.get()) };
         m_pShader->load(DEFAULT_VERT_SHADER_CODE, DEFAULT_VERT_SHADER_CODE_SIZE,
             DEFAULT_FRAG_SHADER_CODE, DEFAULT_FRAG_SHADER_CODE_SIZE);
-        m_pPass->setShader(m_pShader.get());
         _init();
     }
 
@@ -76,6 +77,11 @@ namespace vg
     void PreZPass::setVertexInputFilterInfo(const Pass::VertexInputFilterInfo &value)
     {
         m_pPass->setVertexInputFilterInfo(value);
+    }
+
+    void PreZPass::apply()
+    {
+        m_pPass->apply();
     }
 
     const Shader * PreZPass::getShader() const

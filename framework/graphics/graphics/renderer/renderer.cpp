@@ -1001,6 +1001,9 @@ namespace vg
 #endif //DEBUG and VG_ENABLE_COST_TIMER
 	)
 	{
+#if defined(DEBUG) && defined(VG_ENABLE_COST_TIMER)
+		        pPreparingBuildInDataCostTimer->begin();
+#endif //DEBUG and VG_ENABLE_COST_TIMER
 		uint32_t materialCount = pVisualObject->getMaterialCount();
 		for (uint32_t materialIndex = 0u; materialIndex < materialCount; ++materialIndex)
 		{
@@ -1009,9 +1012,7 @@ namespace vg
 			for (uint32_t passIndex = 0u; passIndex < passCount; ++passIndex)
 			{
 				auto pPass = pMaterial->getPassWithIndex(passIndex);
-#if defined(DEBUG) && defined(VG_ENABLE_COST_TIMER)
-		        pPreparingBuildInDataCostTimer->begin();
-#endif //DEBUG and VG_ENABLE_COST_TIMER
+
 		        Bool32 hasMatrixObjectToNDC = VG_FALSE;
 		        Bool32 hasMatrixObjectToWorld = VG_FALSE;
 		        Bool32 hasMatrixObjectToView = VG_FALSE;
@@ -1088,13 +1089,90 @@ namespace vg
 				}
 
 		        pPass->apply();
+			}
+
+			//pre z pass.
+			if (m_preZEnable == VG_TRUE || 
+				pMaterial->getPreZPass() != nullptr)
+			{
+				auto pPreZPass = pMaterial->getPreZPass();
+				auto pPassOfPreZPass = pPreZPass->getPass();
+				Bool32 hasMatrixObjectToNDC = VG_FALSE;
+		        Bool32 hasMatrixObjectToWorld = VG_FALSE;
+		        Bool32 hasMatrixObjectToView = VG_FALSE;
+		        Bool32 hasMatrixView = VG_FALSE;
+		        Bool32 hasMatrixProjection = VG_FALSE;
+		        //update building in matrix variable.
+		        auto info = pPassOfPreZPass->getBuildInDataInfo();
+		        uint32_t componentCount = info.componentCount;
+		        for (uint32_t componentIndex = 0u; componentIndex < componentCount; ++componentIndex)
+		        {
+		        	Pass::BuildInDataType type = (*(info.pComponent + componentIndex)).type;
+		        	if (type == Pass::BuildInDataType::MATRIX_OBJECT_TO_NDC)
+		        	{
+		        		hasMatrixObjectToNDC = VG_TRUE;
+		        	}
+		        	else if (type == Pass::BuildInDataType::MATRIX_OBJECT_TO_WORLD)
+		        	{
+		        		hasMatrixObjectToWorld = VG_TRUE;
+		        	}
+		        	else if (type == Pass::BuildInDataType::MATRIX_OBJECT_TO_VIEW)
+		        	{
+		        		hasMatrixObjectToView = VG_TRUE;
+		        	}
+		        	else if (type == Pass::BuildInDataType::MATRIX_VIEW)
+		        	{
+		        		hasMatrixView = VG_TRUE;
+		        	}
+		        	else if (type == Pass::BuildInDataType::MATRIX_PROJECTION)
+		        	{
+		        		hasMatrixProjection = VG_TRUE;
+		        	}
+		        }
 		        
-        
+		        Matrix4x4 mvMatrix;
+		        Matrix4x4 mvpMatrix;
+		        if (hasMatrixObjectToView || hasMatrixObjectToNDC)
+		        {
+		        	mvMatrix = viewMatrix * modelMatrix;
+                }
+		        
+		        if (hasMatrixObjectToNDC)
+		        {
+		        	mvpMatrix = projMatrix * mvMatrix;
+		        }
+		        //update building in matrix variable.
+		        for (uint32_t componentIndex = 0u; componentIndex < componentCount; ++componentIndex)
+		        {
+		        	Pass::BuildInDataType type = (*(info.pComponent + componentIndex)).type;
+		        	if (type == Pass::BuildInDataType::MATRIX_OBJECT_TO_NDC)
+		        	{
+		        		pPreZPass->_setBuildInMatrixData(type, mvpMatrix);
+		        	}
+		        	else if (type == Pass::BuildInDataType::MATRIX_OBJECT_TO_WORLD)
+		        	{
+		        		pPreZPass->_setBuildInMatrixData(type, modelMatrix);
+		        	}
+		        	else if (type == Pass::BuildInDataType::MATRIX_OBJECT_TO_VIEW)
+		        	{
+		        		pPreZPass->_setBuildInMatrixData(type, mvMatrix);
+		        	}
+		        	else if (type == Pass::BuildInDataType::MATRIX_VIEW)
+		        	{
+		        		pPreZPass->_setBuildInMatrixData(type, viewMatrix);
+		        	}
+		        	else if (type == Pass::BuildInDataType::MATRIX_PROJECTION)
+		        	{
+		        		pPreZPass->_setBuildInMatrixData(type, projMatrix);
+		        	}
+		        }
+				pPreZPass->apply();
+			}
+		}
+
 #if defined(DEBUG) && defined(VG_ENABLE_COST_TIMER)
 		        pPreparingBuildInDataCostTimer->end();
 #endif //DEBUG and VG_ENABLE_COST_TIMER
-			}
-		}
 	}
 
 	void Renderer::_createPreZObjs()

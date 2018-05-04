@@ -138,6 +138,10 @@ namespace vg
 		{
 			item.second->apply();
 		}
+		if (m_pPreZPass != nullptr)
+		{
+			m_pPreZPass->apply();
+		}
 	}
 
 	MaterialShowType Material::getShowType()

@@ -431,7 +431,7 @@ namespace vg
 
 	void Pass::setDataValue(const std::string name
 		    , void *src, uint32_t size, uint32_t offset
-			, uint32_t binding
+			, uint32_t bindingPriority
 			, DescriptorType descriptorType
 			, ShaderStageFlags stageFlags
 			, uint32_t descriptorCount)
@@ -441,7 +441,7 @@ namespace vg
 		LayoutBindingInfo info(
 			name,
 			VG_FALSE,
-			binding,
+			bindingPriority,
 			descriptorType,
 			descriptorCount,
 			stageFlags

@@ -519,6 +519,7 @@ namespace vg
 		case TextureType::TEX_2D:
 		case TextureType::TEX_2D_COLOR_ATTACHMENT:
 		case TextureType::TEX_2D_DEPTH_STENCIL_ATTACHMENT:
+		case TextureType::TEX_2D_DEPTH_ATTACHMENT:
 		case TextureType::TEX_3D:
 		case TextureType::COLOR_ATTACHMENT:
 		case TextureType::DEPTH_STENCIL_ATTACHMENT:
@@ -598,6 +599,7 @@ namespace vg
 		case TextureType::DEPTH_STENCIL_ATTACHMENT:
 		case TextureType::TEX_2D_COLOR_ATTACHMENT:
 		case TextureType::TEX_2D_DEPTH_STENCIL_ATTACHMENT:
+		case TextureType::TEX_2D_DEPTH_ATTACHMENT:
 		{
 			if (m_width == 0) throw std::invalid_argument("Invalid width argument at creating image for texture.");
 			if (m_height == 0) throw std::invalid_argument("Invalid height argument at creating image for texture.");
@@ -634,6 +636,7 @@ namespace vg
 		case TextureType::TEX_2D:
 		case TextureType::TEX_2D_COLOR_ATTACHMENT:
 		case TextureType::TEX_2D_DEPTH_STENCIL_ATTACHMENT:
+		case TextureType::TEX_2D_DEPTH_ATTACHMENT:
 		case TextureType::TEX_3D:
 		{
 			break;

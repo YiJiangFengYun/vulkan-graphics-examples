@@ -15,7 +15,7 @@ namespace vg
 		{TextureType::DEPTH_STENCIL_ATTACHMENT, "Texture Depth Stencil Attachment"},
 		{TextureType::TEX_2D_COLOR_ATTACHMENT, "Texture 2D And Color Attachment"},
 		{TextureType::TEX_2D_DEPTH_STENCIL_ATTACHMENT, "Texture 2D and Depth Stencil Attachment"},
-
+		{TextureType::TEX_2D_DEPTH_ATTACHMENT, "Texture 2D and Depth Attachment"},
 	};
 
 	std::array<std::pair<TextureType, vk::ImageType>, static_cast<size_t>(TextureType::RANGE_SIZE)> arrTextureTypeToVKImageType = {
@@ -30,6 +30,7 @@ namespace vg
 		std::pair<TextureType, vk::ImageType>(TextureType::DEPTH_STENCIL_ATTACHMENT, vk::ImageType::e2D),
 		std::pair<TextureType, vk::ImageType>(TextureType::TEX_2D_COLOR_ATTACHMENT, vk::ImageType::e2D),
 		std::pair<TextureType, vk::ImageType>(TextureType::TEX_2D_DEPTH_STENCIL_ATTACHMENT, vk::ImageType::e2D),
+		std::pair<TextureType, vk::ImageType>(TextureType::TEX_2D_DEPTH_ATTACHMENT, vk::ImageType::e2D),
 	};
 
 	std::array<std::pair<TextureType, vk::ImageViewType>, static_cast<size_t>(TextureType::RANGE_SIZE)> arrTextureTypeToVKImageViewType = {
@@ -44,5 +45,6 @@ namespace vg
 		std::pair<TextureType, vk::ImageViewType>(TextureType::DEPTH_STENCIL_ATTACHMENT, vk::ImageViewType::e2D),
 		std::pair<TextureType, vk::ImageViewType>(TextureType::TEX_2D_COLOR_ATTACHMENT, vk::ImageViewType::e2D),
 		std::pair<TextureType, vk::ImageViewType>(TextureType::TEX_2D_DEPTH_STENCIL_ATTACHMENT, vk::ImageViewType::e2D),
+		std::pair<TextureType, vk::ImageViewType>(TextureType::TEX_2D_DEPTH_ATTACHMENT, vk::ImageViewType::e2D),
 	};
 }

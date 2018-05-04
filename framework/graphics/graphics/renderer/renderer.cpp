@@ -1092,7 +1092,7 @@ namespace vg
 			}
 
 			//pre z pass.
-			if (m_preZEnable == VG_TRUE || 
+			if (m_preZEnable == VG_TRUE && 
 				pMaterial->getPreZPass() != nullptr)
 			{
 				auto pPreZPass = pMaterial->getPreZPass();

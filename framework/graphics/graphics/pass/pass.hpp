@@ -223,7 +223,7 @@ namespace vg
 
 		void setTexture(std::string name
 			, const Texture *pTex
-			, uint32_t binding = VG_M_OTHER_MAX_BINDING_PRIORITY
+			, uint32_t bindingPriority = VG_M_OTHER_MAX_BINDING_PRIORITY
 			, ShaderStageFlags stageFlags = ShaderStageFlagBits::FRAGMENT
 			, DescriptorType descriptorType = DescriptorType::COMBINED_IMAGE_SAMPLER
 			, const Texture::ImageView *pImageView = nullptr
@@ -242,7 +242,7 @@ namespace vg
 		template<typename T>
 		void setDataValue(std::string name
 			, const T &value
-			, uint32_t binding = VG_M_OTHER_MIN_BINDING
+			, uint32_t bindingPriority = VG_M_OTHER_MAX_BINDING_PRIORITY
 			, DescriptorType descriptorType = DescriptorType::UNIFORM_BUFFER
 			, ShaderStageFlags stageFlags = ShaderStageFlagBits::VERTEX
 		);
@@ -250,14 +250,14 @@ namespace vg
 		template<typename T>
 		void setDataValue(std::string name
 			, const std::vector<T> &values
-			, uint32_t binding = VG_M_OTHER_MIN_BINDING
+			, uint32_t bindingPriority = VG_M_OTHER_MAX_BINDING_PRIORITY
 			, DescriptorType descriptorType = DescriptorType::UNIFORM_BUFFER
 			, ShaderStageFlags stageFlags = ShaderStageFlagBits::VERTEX
 		);
 
 		void setDataValue(const std::string name
 		    , void *src, uint32_t size, uint32_t offset
-			, uint32_t binding = VG_M_OTHER_MAX_BINDING_PRIORITY
+			, uint32_t bindingPriority = VG_M_OTHER_MAX_BINDING_PRIORITY
 			, DescriptorType descriptorType = DescriptorType::UNIFORM_BUFFER
 			, ShaderStageFlags stageFlags = ShaderStageFlagBits::VERTEX
 			, uint32_t descriptorCount = 1u);

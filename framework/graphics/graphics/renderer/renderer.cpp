@@ -19,12 +19,6 @@ namespace vg
 #endif
 		);
 
-	void setBuildInData(BaseVisualObject * pVisualObject, Matrix4x4 modelMatrix, Matrix4x4 viewMatrix, Matrix4x4 projMatrix
-#if defined(DEBUG) && defined(VG_ENABLE_COST_TIMER)
-	    , fd::CostTimer * pPreparingBuildInDataCostTimer
-#endif //DEBUG and VG_ENABLE_COST_TIMER
-		);
-
 	Renderer::RenderInfo::RenderInfo(uint32_t sceneAndCameraCount
 		, const SceneAndCamera *pSceneAndCameras
 		, uint32_t waitSemaphoreCount
@@ -630,7 +624,7 @@ namespace vg
 		{
 			auto pVisualObject = validVisualObjects[i];
 			auto modelMatrix = tranMat3ToMat4(pVisualObject->getTransform()->getMatrixLocalToWorld());
-			setBuildInData(pVisualObject, modelMatrix, viewMatrix, projMatrix
+			_setBuildInData(pVisualObject, modelMatrix, viewMatrix, projMatrix
 #if defined(DEBUG) && defined(VG_ENABLE_COST_TIMER)
 			    , preparingBuildInDataCostTimer
 #endif //DEBUG and VG_ENABLE_COST_TIMER	
@@ -917,7 +911,7 @@ namespace vg
 			{
 				auto pVisualObject = queues[typeIndex][objectIndex];
 				auto modelMatrix = pVisualObject->getTransform()->getMatrixLocalToWorld();
-				setBuildInData(pVisualObject, modelMatrix, viewMatrix, projMatrix
+				_setBuildInData(pVisualObject, modelMatrix, viewMatrix, projMatrix
 #if defined(DEBUG) && defined(VG_ENABLE_COST_TIMER)
 				    , preparingBuildInDataCostTimer
 #endif //DEBUG and VG_ENABLE_COST_TIMER	
@@ -1001,7 +995,7 @@ namespace vg
 		m_bindedObjectCount = 0u;
 	}
 
-	void setBuildInData(BaseVisualObject * pVisualObject, Matrix4x4 modelMatrix, Matrix4x4 viewMatrix, Matrix4x4 projMatrix
+	void Renderer::_setBuildInData(BaseVisualObject * pVisualObject, Matrix4x4 modelMatrix, Matrix4x4 viewMatrix, Matrix4x4 projMatrix
 #if defined(DEBUG) && defined(VG_ENABLE_COST_TIMER)
 	    , fd::CostTimer * pPreparingBuildInDataCostTimer
 #endif //DEBUG and VG_ENABLE_COST_TIMER
@@ -1087,6 +1081,12 @@ namespace vg
 		        		pPass->_setBuildInMatrixData(type, projMatrix);
 		        	}
 		        }
+
+				if (m_preZEnable == VG_TRUE)
+				{
+					pPass->setTexture("_pre_z_depth", m_pPreZDepthAttachment.get(), VG_M_PRE_Z_TEXTURE_BINDING_PRIORITY);
+				}
+
 		        pPass->apply();
 		        
         

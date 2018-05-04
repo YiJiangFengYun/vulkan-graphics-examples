@@ -163,6 +163,12 @@ namespace vg
         
 		void _createPreZObjs();
 		void _destroyPreZObjs();
+
+		void _setBuildInData(BaseVisualObject * pVisualObject, Matrix4x4 modelMatrix, Matrix4x4 viewMatrix, Matrix4x4 projMatrix
+#if defined(DEBUG) && defined(VG_ENABLE_COST_TIMER)
+	    , fd::CostTimer * pPreparingBuildInDataCostTimer
+#endif //DEBUG and VG_ENABLE_COST_TIMER
+		);
 	private:
 	};
 

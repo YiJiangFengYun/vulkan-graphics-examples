@@ -24,6 +24,7 @@ add_subdirectory(specialization_constants)
 add_subdirectory(off_screen)
 add_subdirectory(passes)
 add_subdirectory(outline)
+add_subdirectory(pre_z_tex)
 
 # sampler include directories and libraries is used by itself
 # set(INCLUDE_DIRS ${INCLUDE_DIRS} PARENT_SCOPE)

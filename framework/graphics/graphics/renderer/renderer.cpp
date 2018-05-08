@@ -46,22 +46,15 @@ namespace vg
 
 	}
 
-	const vk::Format Renderer::DEFAULT_DEPTH_STENCIL_FORMAT(vk::Format::eD32SfloatS8Uint);
-	const vk::Format Renderer::DEFAULT_PRE_Z_DEPTH_FORMAT(vk::Format::eD32Sfloat);
+	const vk::Format Renderer::DEFAULT_PRE_Z_DEPTH_FORMAT(vk::Format::eD32Sfloat);	
 
-	Renderer::Renderer()
+	Renderer::Renderer(const RenderTarget * pRenderTarget)
 		: Base(BaseType::RENDERER)
-		, m_colorImageFormat(vk::Format::eUndefined)
-		, m_depthStencilImageFormat(DEFAULT_DEPTH_STENCIL_FORMAT)
-		, m_framebufferWidth(0)
-		, m_framebufferHeight(0)
+		, m_pRenderTarget(pRenderTarget)
 		, m_clearValueColor(0.0f)
 		, m_clearValueDepth(1.0f)
 		, m_clearValueStencil(0u)
-		, m_renderArea(0.0f, 0.0f, 1.0f, 1.0f)
 		, m_pipelineCache()
-		, m_pCurrRenderPass()
-		, m_pCurrFrameBuffer()
 		, m_trunkRenderPassCmdBuffer()
 		, m_trunkWaitBarrierCmdBuffer()
 		, m_branchCmdBuffer()
@@ -85,6 +78,16 @@ namespace vg
 
 	Renderer::~Renderer()
 	{
+	}
+
+	const RenderTarget * Renderer::getRenderTarget() const
+	{
+		return m_pRenderTarget;
+	}
+
+	void Renderer::setRenderTarget(const RenderTarget * pRenderTarget)
+	{
+		m_pRenderTarget = pRenderTarget;
 	}
 
 	void Renderer::enablePreZ()
@@ -120,26 +123,6 @@ namespace vg
 		_postRender();
 	}
 
-	uint32_t Renderer::getFramebufferWidth() const
-	{
-		return m_framebufferWidth;
-	}
-
-	uint32_t Renderer::getFramebufferHeight() const
-	{
-		return m_framebufferHeight;
-	}
-
-	vk::Format Renderer::getColorImageFormat() const
-	{
-		return m_colorImageFormat;
-	}
-
-	vk::Format Renderer::getDepthStencilImageFormat() const
-	{
-		return m_depthStencilImageFormat;
-	}
-
 	const Color &Renderer::getClearValueColor() const
 	{
 		return m_clearValueColor;
@@ -168,35 +151,6 @@ namespace vg
 	void Renderer::setClearValueStencil(uint32_t value)
 	{
 		m_clearValueStencil = value;
-	}
-
-	const fd::Rect2D &Renderer::getClearArea() const
-	{
-		return m_renderArea;
-	}
-
-	void Renderer::setClearArea(fd::Rect2D area)
-	{
-#ifdef DEBUG
-		if (area.width < 0)
-			throw std::invalid_argument("The width of area is smaller than 0!");
-		else if (area.width > 1)
-			throw std::invalid_argument("The width of area is bigger than 1!");
-		if (area.height < 0)
-			throw std::invalid_argument("The height of area is smaller than 0!");
-		else if (area.height > 1)
-			throw std::invalid_argument("The height of area is bigger than 1!");
-		if (area.x < 0)
-			throw std::invalid_argument("the x of area is smaller than 0!");
-		else if (area.x > area.width)
-			throw std::invalid_argument("The x of area is bigger than the width of area!");
-		if (area.y < 0)
-			throw std::invalid_argument("the y of area is smaller than 0!");
-		else if (area.y > area.height)
-			throw std::invalid_argument("The y of area is bigger than the height of area!");
-#endif // DEBUG
-
-		m_renderArea = area;
 	}
 
 	// Renderer::PreObjectRecordingFun Renderer::setPreObjectRecordingCallBack(PreObjectRecordingFun cbFun)
@@ -339,7 +293,7 @@ namespace vg
 		CMDParser::recordTrunk(&m_trunkRenderPassCmdBuffer,
 			m_pCommandBuffer.get(),
 			&m_pipelineCache,
-			m_pCurrRenderPass
+			m_pRenderTarget->getRenderPass()
 			);
 		_recordTrunkRenderPassForEnd();
 
@@ -430,17 +384,19 @@ namespace vg
 		   clearValueDepthStencil,
 		};
 
-		const auto& renderArea = m_renderArea;
+		const auto framebufferWidth = m_pRenderTarget->getFramebufferWidth();
+		const auto framebufferHeight = m_pRenderTarget->getFramebufferHeight();
+		const auto renderArea = m_pRenderTarget->getRenderArea();
 
 		vk::RenderPassBeginInfo renderPassBeginInfo = {
 			*m_pPreZRenderPass,                                   //renderPass
 			*m_pPreZFrameBuffer,                                  //framebuffer
 			vk::Rect2D(                                       //renderArea
-				vk::Offset2D(static_cast<int32_t>(std::round(m_framebufferWidth * renderArea.x))
-					, static_cast<int32_t>(std::round(m_framebufferHeight * renderArea.y))
+				vk::Offset2D(static_cast<int32_t>(std::round(framebufferWidth * renderArea.x))
+					, static_cast<int32_t>(std::round(framebufferHeight * renderArea.y))
 				),
-				vk::Extent2D(static_cast<uint32_t>(std::round(m_framebufferWidth * renderArea.width)),
-					static_cast<uint32_t>(std::round(m_framebufferHeight * renderArea.height))
+				vk::Extent2D(static_cast<uint32_t>(std::round(framebufferWidth * renderArea.width)),
+					static_cast<uint32_t>(std::round(framebufferHeight * renderArea.height))
 				)
 			),
 			static_cast<uint32_t>(clearValues.size()),      //clearValueCount
@@ -475,17 +431,21 @@ namespace vg
 		};
 
 
-		const auto& renderArea = m_renderArea;
+        const auto framebufferWidth = m_pRenderTarget->getFramebufferWidth();
+		const auto framebufferHeight = m_pRenderTarget->getFramebufferHeight();
+		const auto renderArea = m_pRenderTarget->getRenderArea();
+		const auto pRenderPass = m_pRenderTarget->getRenderPass();
+		const auto pFramebuffer = m_pRenderTarget->getFramebuffer();
 
 		vk::RenderPassBeginInfo renderPassBeginInfo = {
-			*m_pCurrRenderPass,                                   //renderPass
-			*m_pCurrFrameBuffer,                                  //framebuffer
+			*pRenderPass,                                   //renderPass
+			*pFramebuffer,                                  //framebuffer
 			vk::Rect2D(                                       //renderArea
-				vk::Offset2D(static_cast<int32_t>(std::round(m_framebufferWidth * renderArea.x))
-					, static_cast<int32_t>(std::round(m_framebufferHeight * renderArea.y))
+				vk::Offset2D(static_cast<int32_t>(std::round(framebufferWidth * renderArea.x))
+					, static_cast<int32_t>(std::round(framebufferHeight * renderArea.y))
 				),
-				vk::Extent2D(static_cast<uint32_t>(std::round(m_framebufferWidth * renderArea.width)),
-					static_cast<uint32_t>(std::round(m_framebufferHeight * renderArea.height))
+				vk::Extent2D(static_cast<uint32_t>(std::round(framebufferWidth * renderArea.width)),
+					static_cast<uint32_t>(std::round(framebufferHeight * renderArea.height))
 				)
 			),
 			static_cast<uint32_t>(clearValues.size()),      //clearValueCount
@@ -619,7 +579,9 @@ namespace vg
 		fd::CostTimer preparingCommandBufferCostTimer(fd::CostTimer::TimerType::ACCUMULATION);
 #endif //DEBUG and VG_ENABLE_COST_TIMER
 
-		//------Doing render.		
+		//------Doing render.
+		const auto framebufferWidth = m_pRenderTarget->getFramebufferWidth();
+		const auto framebufferHeight = m_pRenderTarget->getFramebufferHeight();	
 		for (uint32_t i = 0u; i < validVisualObjectCount; ++i)
 		{
 			auto pVisualObject = validVisualObjects[i];
@@ -630,8 +592,8 @@ namespace vg
 #endif //DEBUG and VG_ENABLE_COST_TIMER	
 				);
 			BaseVisualObject::BindInfo info = {
-                m_framebufferWidth,
-				m_framebufferHeight,
+                framebufferWidth,
+				framebufferHeight,
 				&projMatrix,
 				&viewMatrix,
 #if defined(DEBUG) && defined(VG_ENABLE_COST_TIMER)
@@ -904,6 +866,8 @@ namespace vg
 	        });
 
 		//-----Doing render
+		const auto framebufferWidth = m_pRenderTarget->getFramebufferWidth();
+		const auto framebufferHeight = m_pRenderTarget->getFramebufferHeight();
 		for (uint32_t typeIndex = 0u; typeIndex < queueTypeCount; ++typeIndex)
 		{
 			auto queueLength = queueLengths[typeIndex];
@@ -917,8 +881,8 @@ namespace vg
 #endif //DEBUG and VG_ENABLE_COST_TIMER	
 				);
 				BaseVisualObject::BindInfo info = {
-                    m_framebufferWidth,
-				    m_framebufferHeight,
+                    framebufferWidth,
+				    framebufferHeight,
 				    &projMatrix,
 				    &viewMatrix,
 #if defined(DEBUG) && defined(VG_ENABLE_COST_TIMER)
@@ -1178,12 +1142,13 @@ namespace vg
 	void Renderer::_createPreZObjs()
 	{
 		auto pDevice = pApp->getDevice();
-		
+		const auto framebufferWidth = m_pRenderTarget->getFramebufferWidth();
+		const auto framebufferHeight = m_pRenderTarget->getFramebufferHeight();
 		//depth attachment
 		auto pTex = new Texture2DDepthAttachment(
 			    m_preZDepthImageFormat,
-				m_framebufferWidth,
-				m_framebufferHeight
+				framebufferWidth,
+				framebufferHeight
 			    );
 		m_pPreZDepthAttachment = std::shared_ptr<Texture2DDepthAttachment>(pTex);
 
@@ -1264,8 +1229,8 @@ namespace vg
 			*m_pPreZRenderPass,                                
 			static_cast<uint32_t>(attachments.size()),      
 			attachments.data(),                             
-			m_framebufferWidth,                             
-			m_framebufferHeight,                            
+			framebufferWidth,                             
+			framebufferHeight,                            
 			1u,                                  
 		};
 

@@ -208,14 +208,19 @@ namespace vgf {
 	void Window::_createRenderer()
 	{
 		size_t num = m_swapchainImages.size();
-		m_pRenderer = std::shared_ptr<vg::SurfaceRenderer>{ new vg::SurfaceRenderer(
-			    static_cast<uint32_t>(m_swapchainImageViews.size()),
+		m_pRenderTarget = std::shared_ptr<vg::SurfaceRenderTarget> {new vg::SurfaceRenderTarget{
+			static_cast<uint32_t>(m_swapchainImageViews.size()),
 			    m_swapchainImageViews.data(),
 			    m_swapchainImageFormat,
 			    m_swapchainExtent.width,
-			    m_swapchainExtent.height
-		       )
-		   };
+			    m_swapchainExtent.height,
+		    }
+		};
+
+		m_pRenderer = std::shared_ptr<vg::Renderer>{ new vg::Renderer{
+			    m_pRenderTarget.get()  
+		    }
+		};
 	}
 
 	void Window::_render( const vg::Renderer::RenderInfo &info
@@ -409,7 +414,7 @@ namespace vgf {
 			imageIndex = m_currImageIndex;
 		}
 
-		m_pRenderer->setImageIndex(imageIndex);
+		m_pRenderTarget->setImageIndex(imageIndex);
 
 		if (m_pRenderer->isValidForRender())
 		{

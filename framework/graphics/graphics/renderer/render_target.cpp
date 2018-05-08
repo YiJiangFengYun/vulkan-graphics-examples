@@ -1,0 +1,77 @@
+#include "graphics/renderer/render_target.hpp"
+
+namespace vg
+{
+    const vk::Format RenderTarget::DEFAULT_DEPTH_STENCIL_FORMAT(vk::Format::eD32SfloatS8Uint);
+
+    RenderTarget::RenderTarget()
+        : m_colorImageFormat(vk::Format::eUndefined)
+		, m_depthStencilImageFormat(DEFAULT_DEPTH_STENCIL_FORMAT)
+		, m_framebufferWidth(0)
+		, m_framebufferHeight(0)
+        , m_renderArea(0.0f, 0.0f, 1.0f, 1.0f)
+        , m_pRenderPass()
+		, m_pFramebuffer()
+    {
+
+    }
+
+    uint32_t RenderTarget::getFramebufferWidth() const
+    {
+        return m_framebufferWidth;
+    }
+
+    uint32_t RenderTarget::getFramebufferHeight() const
+    {
+        return m_framebufferHeight;
+    }
+
+    vk::Format RenderTarget::getColorImageFormat() const
+    {
+        return m_colorImageFormat;
+    }
+
+    vk::Format RenderTarget::getDepthStencilImageFormat() const
+    {
+        return m_depthStencilImageFormat;
+    }
+
+    const fd::Rect2D & RenderTarget::getRenderArea() const
+    {
+        return m_renderArea;
+    }
+
+    void RenderTarget::setRenderArea(const fd::Rect2D & area)
+	{
+#ifdef DEBUG
+		if (area.width < 0)
+			throw std::invalid_argument("The width of area is smaller than 0!");
+		else if (area.width > 1)
+			throw std::invalid_argument("The width of area is bigger than 1!");
+		if (area.height < 0)
+			throw std::invalid_argument("The height of area is smaller than 0!");
+		else if (area.height > 1)
+			throw std::invalid_argument("The height of area is bigger than 1!");
+		if (area.x < 0)
+			throw std::invalid_argument("the x of area is smaller than 0!");
+		else if (area.x > area.width)
+			throw std::invalid_argument("The x of area is bigger than the width of area!");
+		if (area.y < 0)
+			throw std::invalid_argument("the y of area is smaller than 0!");
+		else if (area.y > area.height)
+			throw std::invalid_argument("The y of area is bigger than the height of area!");
+#endif // DEBUG
+
+		m_renderArea = area;
+	}
+
+    const vk::RenderPass *RenderTarget::getRenderPass() const
+    {
+        return m_pRenderPass;
+    }
+
+    const vk::Framebuffer *RenderTarget::getFramebuffer() const
+    {
+        return m_pFramebuffer;
+    }
+} //vg

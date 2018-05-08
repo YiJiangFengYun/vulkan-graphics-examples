@@ -8,9 +8,9 @@ namespace vg
     }
 	
     void CMDParser::recordTrunk(CmdBuffer *pCmdBuffer
-        ,  vk::CommandBuffer *pCommandBuffer
+        , vk::CommandBuffer *pCommandBuffer
         , PipelineCache *pPipelineCache
-		, vk::RenderPass *pRenderPass
+		, const vk::RenderPass *pRenderPass
         , ResultInfo *pResult
         )
     {

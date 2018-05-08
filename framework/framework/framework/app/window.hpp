@@ -46,7 +46,8 @@ namespace vgf
 		std::vector<vk::ImageView> m_swapchainImageViews;
 		//vk::Queue m_presentQueue;
 		//uint32_t m_presentQueueIndex;
-		std::shared_ptr<vg::SurfaceRenderer> m_pRenderer;
+		std::shared_ptr<vg::SurfaceRenderTarget> m_pRenderTarget;
+		std::shared_ptr<vg::Renderer> m_pRenderer;
 		std::shared_ptr<vk::Semaphore> m_pImageAvailableSemaphore;
 		vk::PipelineStageFlags m_renderWaitStageMask;
 		std::shared_ptr<vk::Semaphore> m_pRenderFinishedSemaphore;		

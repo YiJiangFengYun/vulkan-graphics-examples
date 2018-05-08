@@ -1,34 +1,24 @@
-#include "graphics/renderer/renderer_surface.hpp"
+#include "graphics/renderer/render_target_color_texture.hpp"
+
+#include "graphics/app/app.hpp"
+#include "graphics/texture/texture_depth_stencil_attachment.hpp"
 
 namespace vg
 {
-    SurfaceRenderer::SurfaceRenderer(uint32_t swapchainImageViewCount
-		, vk::ImageView *pSwapchainImageViews
-		, vk::Format swapchainImageFormat
-		, uint32_t swapchainImageWidth
-		, uint32_t swapchainImageHeight)
-        : Renderer()
-        , m_swapchainImageViewCount(swapchainImageViewCount)
-        , m_pSwapchainImageViews(pSwapchainImageViews)
-        , m_imageIndex(0u)
+    ColorTexRenderTarget::ColorTexRenderTarget(BaseColorAttachment *pColorAttachmentTex)
+        : RenderTarget()
+        , m_pColorAttchment(pColorAttachmentTex)
     {
-        m_framebufferWidth = swapchainImageWidth;
-		m_framebufferHeight = swapchainImageHeight;
-        m_colorImageFormat = swapchainImageFormat;
+        m_framebufferWidth = pColorAttachmentTex->getColorAttachmentWidth();
+		m_framebufferHeight = pColorAttachmentTex->getColorAttachmentHeight();
+        m_colorImageFormat = pColorAttachmentTex->getColorAttachmentFormat();
 		m_depthStencilImageFormat = DEFAULT_DEPTH_STENCIL_FORMAT;
-
         _createRenderPass();
 		_createDepthStencilTex();
-		_createFramebuffers();
+		_createFramebuffer();
     }
 
-	void SurfaceRenderer::setImageIndex(uint32_t imageIndex)
-    {
-        m_imageIndex = imageIndex;
-		m_pCurrFrameBuffer = m_pFrameBuffers[m_imageIndex].get();
-    }
-
-    void SurfaceRenderer::_createRenderPass()
+    void ColorTexRenderTarget::_createRenderPass()
     {
         vk::AttachmentDescription colorAttachment = {
 			vk::AttachmentDescriptionFlags(),     //flags
@@ -38,8 +28,8 @@ namespace vg
 			vk::AttachmentStoreOp::eStore,        //storeOp
 			vk::AttachmentLoadOp::eDontCare,      //stencilLoadOp
 			vk::AttachmentStoreOp::eDontCare,     //stencilStoreOp
-			vk::ImageLayout::eUndefined,          //initialLayout
-			vk::ImageLayout::ePresentSrcKHR       //finalLayout
+			m_pColorAttchment->getColorAttachmentLayout(),    //initialLayout
+			m_pColorAttchment->getColorAttachmentLayout()     //finalLayout
 		};
 
 		vk::AttachmentDescription depthAttachment = {
@@ -114,44 +104,40 @@ namespace vg
 		};
 
 		auto pDevice = pApp->getDevice();
-		m_pRenderPass = fd::createRenderPass(pDevice, createInfo);
+		m_pColorTexRenderPass = fd::createRenderPass(pDevice, createInfo);
 
-        m_pCurrRenderPass = m_pRenderPass.get();
+        m_pRenderPass = m_pColorTexRenderPass.get();
     }
 
-	void SurfaceRenderer::_createDepthStencilTex()
+	void ColorTexRenderTarget::_createDepthStencilTex()
     {
-		auto pTex = new TextureDepthStencilAttachment(
+        auto pTex = new TextureDepthStencilAttachment(
 			    m_depthStencilImageFormat,
 				m_framebufferWidth,
 				m_framebufferHeight
 			    );
 		m_pDepthStencilAttachment = std::shared_ptr<BaseDepthStencilAttachment>(pTex);
     }
-
-	void SurfaceRenderer::_createFramebuffers()
+		
+    void ColorTexRenderTarget::_createFramebuffer()
     {
 		auto pDevice = pApp->getDevice();
-		m_pFrameBuffers.resize(m_swapchainImageViewCount);    
-        for (uint32_t imageIndex = 0; imageIndex < m_swapchainImageViewCount; ++imageIndex)
-        {
-            std::array<vk::ImageView, 2> attachments;
-		    attachments = { *(m_pSwapchainImageViews + imageIndex), *m_pDepthStencilAttachment->getDepthStencilAttachmentImageView() };
-    
-		    vk::FramebufferCreateInfo createInfo = {
-		    	vk::FramebufferCreateFlags(),                   //flags
-		    	*m_pRenderPass,                                 //renderPass
-		    	static_cast<uint32_t>(attachments.size()),      //attachmentCount
-		    	attachments.data(),                             //pAttachments
-		    	m_framebufferWidth,                             //width
-		    	m_framebufferHeight,                            //height
-		    	1u                                              //layers
-		    };
-    
-		    m_pFrameBuffers[imageIndex] = fd::createFrameBuffer(pDevice, createInfo);
-        }
+        std::array<vk::ImageView, 2> attachments;
+		attachments = { *m_pColorAttchment->getColorAttachmentImageView(), *m_pDepthStencilAttachment->getDepthStencilAttachmentImageView() };
 
-        m_pCurrFrameBuffer = m_pFrameBuffers[m_imageIndex].get();
-       
+		vk::FramebufferCreateInfo createInfo = {
+			vk::FramebufferCreateFlags(),                   //flags
+			*m_pRenderPass,                                 //renderPass
+			static_cast<uint32_t>(attachments.size()),      //attachmentCount
+			attachments.data(),                             //pAttachments
+			m_framebufferWidth,                             //width
+			m_framebufferHeight,                            //height
+			1u                                              //layers
+		};
+
+		m_pColorTexFramebuffer = fd::createFrameBuffer(pDevice, createInfo);
+        m_pFramebuffer = m_pColorTexFramebuffer.get();
     }
+
+
 } //vg

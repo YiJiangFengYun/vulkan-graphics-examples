@@ -22,7 +22,7 @@ namespace vg
         static void recordTrunk(CmdBuffer *pCmdBuffer
             , vk::CommandBuffer *pCommandBuffer
             , PipelineCache *pPipelineCache
-            , vk::RenderPass *pRenderPass
+            , const vk::RenderPass *pRenderPass
             , ResultInfo *pResult = nullptr
             );
         static void recordTrunkWaitBarrier(CmdBuffer *pTrunkWaitBarrierCmdBuffer

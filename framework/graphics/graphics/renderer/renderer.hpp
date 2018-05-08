@@ -10,6 +10,7 @@
 #include "graphics/texture/texture_depth_stencil_attachment.hpp"
 #include "graphics/texture/texture_2d.hpp"
 #include "graphics/renderer/pipeline_cache.hpp"
+#include "graphics/renderer/render_target.hpp"
 
 //todo: batch mesh,
 //todo: cache graphics pipeline.
@@ -20,9 +21,6 @@ namespace vg
 	class Renderer : public Base
 	{
 	public:
-		static const vk::Format DEFAULT_DEPTH_STENCIL_FORMAT;
-		static const vk::Format DEFAULT_PRE_Z_DEPTH_FORMAT;
-
 		struct SceneAndCamera {
 			const BaseScene *pScene;
 			const BaseCamera *pCamera;
@@ -55,8 +53,13 @@ namespace vg
 				, uint32_t drawCount = 0u);
 		};
 
-		Renderer();
+		static const vk::Format DEFAULT_PRE_Z_DEPTH_FORMAT;
+
+		Renderer(const RenderTarget * pRenderTarget = nullptr);
 		~Renderer();
+
+        const RenderTarget * getRenderTarget() const;
+		void setRenderTarget(const RenderTarget * pRenderTarget);
 
 		void enablePreZ();
 		void disablePreZ();
@@ -67,35 +70,22 @@ namespace vg
 		void render(const RenderInfo &info, RenderResultInfo &resultInfo);
 		// void renderEnd(const RenderInfo &info);
 
-		uint32_t getFramebufferWidth() const ;
-		uint32_t getFramebufferHeight() const;
-		vk::Format getColorImageFormat() const;
-		vk::Format getDepthStencilImageFormat() const;
-
 		const Color &getClearValueColor() const;
 		void setClearValueColor(Color color);
 		float getClearValueDepth() const;
 		void setClearValueDepth(float value);
 		uint32_t getClearValueStencil() const;
 		void setClearValueStencil(uint32_t value);
-		const fd::Rect2D &getClearArea() const;
-		void setClearArea(fd::Rect2D area);
 
 #if defined(DEBUG) && defined(VG_ENABLE_COST_TIMER)
         const fd::CostTimer &getPreparingRenderCostTimer() const;
 #endif //DEBUG and VG_ENABLE_COST_TIMER
 	protected:
-		//compositions
-		uint32_t m_framebufferWidth;
-		uint32_t m_framebufferHeight;
-		vk::Format m_colorImageFormat;
-		vk::Format m_depthStencilImageFormat;
+		const RenderTarget *m_pRenderTarget;
+
 		Color m_clearValueColor;
 		float m_clearValueDepth;
 		uint32_t m_clearValueStencil;
-		fd::Rect2D m_renderArea;
-		vk::RenderPass *m_pCurrRenderPass;
-		vk::Framebuffer* m_pCurrFrameBuffer;
 		std::shared_ptr<vk::CommandPool> m_pCommandPool;
 		std::shared_ptr<vk::CommandBuffer> m_pCommandBuffer;
 		PipelineCache m_pipelineCache;

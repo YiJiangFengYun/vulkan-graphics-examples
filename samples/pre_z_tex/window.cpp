@@ -46,6 +46,7 @@ void Window::_initState()
 	m_cameraRotation = vg::Vector3(glm::radians(0.0f), glm::radians(0.0f), glm::radians(0.0f));
 	m_otherInfo.zNear = 0.01f;
 	m_otherInfo.zFar = 100.0f;
+	m_preZScene = VG_TRUE;
 }
 
 void Window::_createModel()

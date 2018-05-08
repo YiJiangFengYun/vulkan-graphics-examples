@@ -10,8 +10,10 @@ namespace vg
 		, m_framebufferWidth(0)
 		, m_framebufferHeight(0)
         , m_renderArea(0.0f, 0.0f, 1.0f, 1.0f)
-        , m_pRenderPass()
-		, m_pFramebuffer()
+        , m_pFirstRenderPass()
+        , m_pSecondRenderPass()
+		, m_pFirstFramebuffer()
+        , m_pSecondFramebuffer()
     {
 
     }
@@ -65,13 +67,24 @@ namespace vg
 		m_renderArea = area;
 	}
 
-    const vk::RenderPass *RenderTarget::getRenderPass() const
+    const vk::RenderPass *RenderTarget::getFirstRenderPass() const
     {
-        return m_pRenderPass;
+        return m_pFirstRenderPass;
     }
 
-    const vk::Framebuffer *RenderTarget::getFramebuffer() const
+    const vk::RenderPass *RenderTarget::getSecondRenderPass() const
     {
-        return m_pFramebuffer;
+        return m_pSecondRenderPass;
     }
+
+    const vk::Framebuffer *RenderTarget::getFirstFramebuffer() const
+    {
+        return m_pFirstFramebuffer;
+    }
+
+    const vk::Framebuffer *RenderTarget::getSecondFramebuffer() const
+    {
+        return m_pSecondFramebuffer;
+    }
+
 } //vg

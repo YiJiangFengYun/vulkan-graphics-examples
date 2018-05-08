@@ -28,7 +28,8 @@ namespace vg
 	void SurfaceRenderTarget::setImageIndex(uint32_t imageIndex)
     {
         m_imageIndex = imageIndex;
-		m_pFramebuffer = m_pFramebuffers[m_imageIndex].get();
+		m_pFirstFramebuffer = m_pFirstFramebuffers[m_imageIndex].get();
+		m_pSecondFramebuffer = m_pSecondFramebuffers[m_imageIndex].get();
     }
 
     void SurfaceRenderTarget::_createRenderPass()
@@ -117,9 +118,15 @@ namespace vg
 		};
 
 		auto pDevice = pApp->getDevice();
-		m_pSurfaceRenderPass = fd::createRenderPass(pDevice, createInfo);
 
-        m_pRenderPass = m_pSurfaceRenderPass.get();
+		m_pFirstSurfaceRenderPass = fd::createRenderPass(pDevice, createInfo);
+        m_pFirstRenderPass = m_pFirstSurfaceRenderPass.get();
+
+		colorAttachment.loadOp = vk::AttachmentLoadOp::eLoad;
+		attachments = { colorAttachment, depthAttachment };
+
+		m_pSecondSurfaceRenderPass = fd::createRenderPass(pDevice, createInfo);
+		m_pSecondRenderPass = m_pSecondSurfaceRenderPass.get(); 
     }
 
 	void SurfaceRenderTarget::_createDepthStencilTex()
@@ -135,26 +142,53 @@ namespace vg
 	void SurfaceRenderTarget::_createFramebuffers()
     {
 		auto pDevice = pApp->getDevice();
-		m_pFramebuffers.resize(m_swapchainImageViewCount);    
-        for (uint32_t imageIndex = 0; imageIndex < m_swapchainImageViewCount; ++imageIndex)
-        {
-            std::array<vk::ImageView, 2> attachments;
-		    attachments = { *(m_pSwapchainImageViews + imageIndex), *m_pDepthStencilAttachment->getDepthStencilAttachmentImageView() };
+		{
+			m_pFirstFramebuffers.resize(m_swapchainImageViewCount);    
+            for (uint32_t imageIndex = 0; imageIndex < m_swapchainImageViewCount; ++imageIndex)
+            {
+                std::array<vk::ImageView, 2> attachments;
+		        attachments = { *(m_pSwapchainImageViews + imageIndex), *m_pDepthStencilAttachment->getDepthStencilAttachmentImageView() };
+        
+		        vk::FramebufferCreateInfo createInfo = {
+		        	vk::FramebufferCreateFlags(),                   //flags
+		        	*m_pFirstRenderPass,                            //renderPass
+		        	static_cast<uint32_t>(attachments.size()),      //attachmentCount
+		        	attachments.data(),                             //pAttachments
+		        	m_framebufferWidth,                             //width
+		        	m_framebufferHeight,                            //height
+		        	1u                                              //layers
+		        };
+        
+		        m_pFirstFramebuffers[imageIndex] = fd::createFrameBuffer(pDevice, createInfo);
+            }
     
-		    vk::FramebufferCreateInfo createInfo = {
-		    	vk::FramebufferCreateFlags(),                   //flags
-		    	*m_pRenderPass,                                 //renderPass
-		    	static_cast<uint32_t>(attachments.size()),      //attachmentCount
-		    	attachments.data(),                             //pAttachments
-		    	m_framebufferWidth,                             //width
-		    	m_framebufferHeight,                            //height
-		    	1u                                              //layers
-		    };
-    
-		    m_pFramebuffers[imageIndex] = fd::createFrameBuffer(pDevice, createInfo);
-        }
+            m_pFirstFramebuffer = m_pFirstFramebuffers[m_imageIndex].get();
+		}
 
-        m_pFramebuffer = m_pFramebuffers[m_imageIndex].get();
+		{
+			m_pSecondFramebuffers.resize(m_swapchainImageViewCount);    
+            for (uint32_t imageIndex = 0; imageIndex < m_swapchainImageViewCount; ++imageIndex)
+            {
+                std::array<vk::ImageView, 2> attachments;
+		        attachments = { *(m_pSwapchainImageViews + imageIndex), *m_pDepthStencilAttachment->getDepthStencilAttachmentImageView() };
+        
+		        vk::FramebufferCreateInfo createInfo = {
+		        	vk::FramebufferCreateFlags(),                   //flags
+		        	*m_pSecondRenderPass,                            //renderPass
+		        	static_cast<uint32_t>(attachments.size()),      //attachmentCount
+		        	attachments.data(),                             //pAttachments
+		        	m_framebufferWidth,                             //width
+		        	m_framebufferHeight,                            //height
+		        	1u                                              //layers
+		        };
+        
+		        m_pSecondFramebuffers[imageIndex] = fd::createFrameBuffer(pDevice, createInfo);
+            }
+    
+            m_pSecondFramebuffer = m_pSecondFramebuffers[m_imageIndex].get();
+		}
+		
+		
        
     }
 } //vg

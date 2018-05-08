@@ -227,18 +227,18 @@ namespace vgf {
 			, vg::Renderer::RenderResultInfo &resultInfo)
 	{
 #ifdef USE_IMGUI_BIND
-        vg::Renderer::SceneAndCamera sceneAndCamera;
-		sceneAndCamera.pScene = vgim::getScene();
-		sceneAndCamera.pCamera = vgim::getCamera();
+        vg::Renderer::SceneInfo sceneInfo;
+		sceneInfo.pScene = vgim::getScene();
+		sceneInfo.pCamera = vgim::getCamera();
 		auto addedInfo = info;
-		addedInfo.sceneAndCameraCount = info.sceneAndCameraCount + 1u;
-		std::vector<vg::Renderer::SceneAndCamera> sceneAndCameras(addedInfo.sceneAndCameraCount);
-		for (uint32_t i = 0; i < info.sceneAndCameraCount; ++i)
+		addedInfo.sceneInfoCount = info.sceneInfoCount + 1u;
+		std::vector<vg::Renderer::SceneInfo> sceneInfos(addedInfo.sceneInfoCount);
+		for (uint32_t i = 0; i < info.sceneInfoCount; ++i)
 		{
-			sceneAndCameras[i] = *(info.pSceneAndCameras + i);
+			sceneInfos[i] = *(info.pSceneInfos + i);
 		}
-		sceneAndCameras[info.sceneAndCameraCount] = sceneAndCamera;
-		addedInfo.pSceneAndCameras = sceneAndCameras.data();
+		sceneInfos[info.sceneInfoCount] = sceneInfo;
+		addedInfo.pSceneInfos = sceneInfos.data();
         m_pRenderer->render(addedInfo, resultInfo);
 #else
         pRenderer->render(info, resultInfo); 		
@@ -419,8 +419,8 @@ namespace vgf {
 		if (m_pRenderer->isValidForRender())
 		{
 			vg::Renderer::RenderInfo info;
-			info.sceneAndCameraCount = 0;
-			info.pSceneAndCameras = nullptr;
+			info.sceneInfoCount = 0;
+			info.pSceneInfos = nullptr;
 			info.waitSemaphoreCount = 1u;
 			info.pWaitSemaphores = m_pImageAvailableSemaphore.get();
 			info.pWaitDstStageMask = &m_renderWaitStageMask;

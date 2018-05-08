@@ -19,16 +19,26 @@ namespace vg
 #endif
 		);
 
-	Renderer::RenderInfo::RenderInfo(uint32_t sceneAndCameraCount
-		, const SceneAndCamera *pSceneAndCameras
+	Renderer::SceneInfo::SceneInfo(const BaseScene *pScene
+		, const BaseCamera *pCamera
+		, Bool32 preZ)
+		: pScene(pScene)
+		, pCamera(pCamera)
+		, preZ(preZ)
+	{
+
+	}
+
+	Renderer::RenderInfo::RenderInfo(uint32_t sceneInfoCount
+		, const SceneInfo *pSceneInfos
 		, uint32_t waitSemaphoreCount
 		, const vk::Semaphore* pWaitSemaphores
 		, const vk::PipelineStageFlags* pWaitDstStageMask
 		, uint32_t signalSemaphoreCount
 		, const vk::Semaphore* pSignalSemaphores
 		)
-		: sceneAndCameraCount(sceneAndCameraCount)
-		, pSceneAndCameras(pSceneAndCameras)
+		: sceneInfoCount(sceneInfoCount)
+		, pSceneInfos(pSceneInfos)
 		, waitSemaphoreCount(waitSemaphoreCount)
 		, pWaitSemaphores(pWaitSemaphores)
 		, pWaitDstStageMask(pWaitDstStageMask)
@@ -207,20 +217,25 @@ namespace vg
 	{
 		resultInfo.drawCount = 0u;
 
-		m_preZRenderPassCmdBuffer.begin();
-		m_trunkRenderPassCmdBuffer.begin();
-		m_trunkWaitBarrierCmdBuffer.begin();
-		m_branchCmdBuffer.begin();
-		_beginBind();
-		uint32_t count = info.sceneAndCameraCount;
+		//command buffer begin
+		_recordCommandBufferForBegin();
+
+		uint32_t count = info.sceneInfoCount;
 		for (uint32_t i = 0; i < count; ++i)
 		{
-			const auto &pScene = (*(info.pSceneAndCameras + i)).pScene;
-			const auto &pCamera = (*(info.pSceneAndCameras + i)).pCamera;
+			if (i == 0) resultInfo.isRendered = VG_TRUE;
+			const auto & sceneInfo = *(info.pSceneInfos + i);
+			const auto pScene = sceneInfo.pScene;
+			const auto pCamera = sceneInfo.pCamera;
 #if defined(DEBUG) && defined(VG_ENABLE_COST_TIMER)
             fd::CostTimer preparingSceneCostTimer(fd::CostTimer::TimerType::ONCE);
 			preparingSceneCostTimer.begin();
 #endif //DEBUG and VG_ENABLE_COST_TIMER
+            m_preZRenderPassCmdBuffer.begin();
+		    m_trunkRenderPassCmdBuffer.begin();
+		    m_trunkWaitBarrierCmdBuffer.begin();
+		    m_branchCmdBuffer.begin();
+		    _beginBind();
             
 			if (pScene->getSpaceType() == SpaceType::SPACE_2)
 			{
@@ -246,8 +261,49 @@ namespace vg
 				//todo
 			}
 
-			resultInfo.isRendered = VG_TRUE;
+			// pre z
+		    if (m_preZEnable == VG_TRUE && sceneInfo.preZ == VG_TRUE)
+		    {
+		    	resultInfo.drawCount += m_preZRenderPassCmdBuffer.getCmdCount();
+		    	_recordPreZRenderPassForBegin();
+		    	CMDParser::recordTrunk(&m_preZRenderPassCmdBuffer,
+		    	    m_pCommandBuffer.get(),
+		    		&m_pipelineCache,
+		    		m_pPreZRenderPass.get()
+		    		);
+		    	_recordPreZRenderPassForEnd();
+		    }
 
+			//branch render pass.
+		    CMDParser::ResultInfo cmdParseResult;
+		    CMDParser::recordBranch(&m_branchCmdBuffer,
+		    	m_pCommandBuffer.get(),
+		    	&m_pipelineCache,
+		    	&cmdParseResult
+		    	);
+		    resultInfo.drawCount += cmdParseResult.drawCount;
+
+			//trunk wait barrier
+		    CMDParser::recordTrunkWaitBarrier(&m_trunkWaitBarrierCmdBuffer,
+		    	m_pCommandBuffer.get());
+    
+            //trunk render pass.
+		    resultInfo.drawCount += m_trunkRenderPassCmdBuffer.getCmdCount();
+		    auto pRenderPass = _recordTrunkRenderPassForBegin(i == 0);
+		    CMDParser::recordTrunk(&m_trunkRenderPassCmdBuffer,
+		    	m_pCommandBuffer.get(),
+		    	&m_pipelineCache,
+		    	pRenderPass
+		    	);
+		    _recordTrunkRenderPassForEnd();
+
+		    _endBind();			
+
+			m_preZRenderPassCmdBuffer.end();
+		    m_trunkRenderPassCmdBuffer.end();
+		    m_trunkWaitBarrierCmdBuffer.end();
+		    m_branchCmdBuffer.end();
+    
 #if defined(DEBUG) && defined(VG_ENABLE_COST_TIMER)
 			preparingSceneCostTimer.end();
 			VG_COST_TIME_LOG(plog::debug) << "Preparing scene cost time: " 
@@ -258,54 +314,9 @@ namespace vg
 #endif //DEBUG and VG_ENABLE_COST_TIMER
 		}
 
-		//command buffer begin
-		_recordCommandBufferForBegin();
-
-		// pre z
-		if (m_preZEnable == VG_TRUE)
-		{
-			resultInfo.drawCount += m_preZRenderPassCmdBuffer.getCmdCount();
-			_recordPreZRenderPassForBegin();
-			CMDParser::recordTrunk(&m_preZRenderPassCmdBuffer,
-			    m_pCommandBuffer.get(),
-				&m_pipelineCache,
-				m_pPreZRenderPass.get()
-				);
-			_recordPreZRenderPassForEnd();
-		}
-
-		//branch render pass.
-		CMDParser::ResultInfo cmdParseResult;
-		CMDParser::recordBranch(&m_branchCmdBuffer,
-			m_pCommandBuffer.get(),
-			&m_pipelineCache,
-			&cmdParseResult
-			);
-		resultInfo.drawCount += cmdParseResult.drawCount;
-
-		//trunk wait barrier
-		CMDParser::recordTrunkWaitBarrier(&m_trunkWaitBarrierCmdBuffer,
-			m_pCommandBuffer.get());
-
-        //trunk render pass.
-		resultInfo.drawCount += m_trunkRenderPassCmdBuffer.getCmdCount();
-		_recordTrunkRenderPassForBegin();
-		CMDParser::recordTrunk(&m_trunkRenderPassCmdBuffer,
-			m_pCommandBuffer.get(),
-			&m_pipelineCache,
-			m_pRenderTarget->getRenderPass()
-			);
-		_recordTrunkRenderPassForEnd();
-
 		//command buffer end
 		_recordCommandBufferForEnd();
 
-		_endBind();
-
-		m_preZRenderPassCmdBuffer.end();
-		m_trunkRenderPassCmdBuffer.end();
-		m_trunkWaitBarrierCmdBuffer.end();
-		m_branchCmdBuffer.end();
 	}
 
 	void Renderer::_renderEnd(const RenderInfo &info)
@@ -411,7 +422,7 @@ namespace vg
 		m_pCommandBuffer->endRenderPass();
 	}
 
-	void Renderer::_recordTrunkRenderPassForBegin()
+	const vk::RenderPass *  Renderer::_recordTrunkRenderPassForBegin(Bool32 isFirst)
 	{
 		vk::ClearValue clearValueColor = {
 			std::array<float, 4>{
@@ -434,8 +445,19 @@ namespace vg
         const auto framebufferWidth = m_pRenderTarget->getFramebufferWidth();
 		const auto framebufferHeight = m_pRenderTarget->getFramebufferHeight();
 		const auto renderArea = m_pRenderTarget->getRenderArea();
-		const auto pRenderPass = m_pRenderTarget->getRenderPass();
-		const auto pFramebuffer = m_pRenderTarget->getFramebuffer();
+		const vk::RenderPass * pRenderPass;
+		const vk::Framebuffer * pFramebuffer;
+
+		if (isFirst == VG_TRUE)
+		{
+			pRenderPass = m_pRenderTarget->getFirstRenderPass();
+		    pFramebuffer = m_pRenderTarget->getFirstFramebuffer();
+		}
+		else
+		{
+			pRenderPass = m_pRenderTarget->getSecondRenderPass();
+		    pFramebuffer = m_pRenderTarget->getSecondFramebuffer();
+		}
 
 		vk::RenderPassBeginInfo renderPassBeginInfo = {
 			*pRenderPass,                                   //renderPass
@@ -453,6 +475,8 @@ namespace vg
 		};
 
 		m_pCommandBuffer->beginRenderPass(renderPassBeginInfo, vk::SubpassContents::eInline);
+
+		return pRenderPass;
 	}
 
 	void Renderer::_recordTrunkRenderPassForEnd()

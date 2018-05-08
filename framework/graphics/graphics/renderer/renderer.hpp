@@ -21,22 +21,26 @@ namespace vg
 	class Renderer : public Base
 	{
 	public:
-		struct SceneAndCamera {
+		struct SceneInfo {
 			const BaseScene *pScene;
 			const BaseCamera *pCamera;
+			Bool32 preZ;
+			SceneInfo(const BaseScene *pScene = nullptr
+			    , const BaseCamera *pCamera = nullptr
+				, Bool32 preZ = VG_FALSE);
 		};
 
 		struct RenderInfo {
-			const SceneAndCamera *pSceneAndCameras;
-			uint32_t sceneAndCameraCount;
+			const SceneInfo *pSceneInfos;
+			uint32_t sceneInfoCount;
 			uint32_t waitSemaphoreCount;
 			const vk::Semaphore* pWaitSemaphores;
 			const vk::PipelineStageFlags* pWaitDstStageMask;
 			uint32_t signalSemaphoreCount;
 			const vk::Semaphore* pSignalSemaphores;
 
-			RenderInfo(uint32_t sceneAndCameraCount = 0u
-				, const SceneAndCamera *pSceneAndCameras = nullptr
+			RenderInfo(uint32_t sceneInfoCount = 0u
+				, const SceneInfo *pSceneInfos = nullptr
 				, uint32_t waitSemaphoreCount = 0u
 				, const vk::Semaphore* pWaitSemaphores = nullptr
 			    , const vk::PipelineStageFlags* pWaitDstStageMask = nullptr
@@ -125,7 +129,7 @@ namespace vg
 		void _recordCommandBufferForBegin();
 		void _recordPreZRenderPassForBegin();
 		void _recordPreZRenderPassForEnd();
-		void _recordTrunkRenderPassForBegin();
+		const vk::RenderPass * _recordTrunkRenderPassForBegin(Bool32 isFirst);
 		void _recordTrunkRenderPassForEnd();
 		void _recordCommandBufferForEnd();
 

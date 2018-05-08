@@ -31,6 +31,7 @@ namespace sampleslib
 		, m_lastFPS(0u)
 		, m_lastDrawCount(0u)
 		, m_sceneCount(1u)
+		, m_preZScene(VG_FALSE)
 	{
 		
 	}
@@ -238,30 +239,31 @@ namespace sampleslib
 	{
 		
 		uint32_t sceneCount = m_sceneCount;
-		std::vector<vg::Renderer::SceneAndCamera> sceneAndCameras(sceneCount);
+		std::vector<vg::Renderer::SceneInfo> sceneInfos(sceneCount);
 		for (uint32_t i = 0; i < sceneCount; ++i)
 		{
-			sceneAndCameras[i].pScene = m_pScenes[i].get();
-		    sceneAndCameras[i].pCamera = m_pCamera.get();
+			sceneInfos[i].pScene = m_pScenes[i].get();
+		    sceneInfos[i].pCamera = m_pCamera.get();
+			sceneInfos[i].preZ = m_preZScene;
 		}
 		
 		auto myInfo = info;
-		myInfo.sceneAndCameraCount = myInfo.sceneAndCameraCount + sceneCount;
-		std::vector<vg::Renderer::SceneAndCamera> mySceneAndCameras(myInfo.sceneAndCameraCount);
+		myInfo.sceneInfoCount = myInfo.sceneInfoCount + sceneCount;
+		std::vector<vg::Renderer::SceneInfo> mySceneInfos(myInfo.sceneInfoCount);
 		uint32_t index = 0u;
-		for (uint32_t i = 0; i < info.sceneAndCameraCount; ++i)
+		for (uint32_t i = 0; i < info.sceneInfoCount; ++i)
 		{
-			mySceneAndCameras[index] = *(info.pSceneAndCameras + i);
+			mySceneInfos[index] = *(info.pSceneInfos + i);
 			++index;
 		}
 
 		for (uint32_t i = 0; i < sceneCount; ++i)
 		{
-			mySceneAndCameras[index] = sceneAndCameras[i];
+			mySceneInfos[index] = sceneInfos[i];
 			++index;
 		}
 		
-		myInfo.pSceneAndCameras = mySceneAndCameras.data();
+		myInfo.pSceneInfos = mySceneInfos.data();
 		vgf::Window::_render(myInfo, resultInfo);
 		m_lastDrawCount += resultInfo.drawCount;
 	}

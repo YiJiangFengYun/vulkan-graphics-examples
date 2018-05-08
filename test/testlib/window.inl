@@ -126,18 +126,18 @@ namespace testlib
 	void Window<SPACE_TYPE>::_render(const vg::Renderer::RenderInfo &info
 			, vg::Renderer::RenderResultInfo &resultInfo)
 	{
-		vg::Renderer::SceneAndCamera sceneAndCamera;
-		sceneAndCamera.pScene = m_pScene.get();
-		sceneAndCamera.pCamera = m_pCamera.get();
+		vg::Renderer::SceneInfo sceneInfo;
+		sceneInfo.pScene = m_pScene.get();
+		sceneInfo.pCamera = m_pCamera.get();
 		auto myInfo = info;
-		myInfo.sceneAndCameraCount = myInfo.sceneAndCameraCount + 1u;
-		std::vector<vg::Renderer::SceneAndCamera> sceneAndCameras(myInfo.sceneAndCameraCount);
-		for (uint32_t i = 0; i < info.sceneAndCameraCount; ++i)
+		myInfo.sceneInfoCount = myInfo.sceneInfoCount + 1u;
+		std::vector<vg::Renderer::SceneInfo> sceneInfos(myInfo.sceneInfoCount);
+		for (uint32_t i = 0; i < info.sceneInfoCount; ++i)
 		{
-			sceneAndCameras[i] = *(info.pSceneAndCameras + i);
+			sceneInfos[i] = *(info.pSceneInfos + i);
 		}
-		sceneAndCameras[info.sceneAndCameraCount] = sceneAndCamera;
-		myInfo.pSceneAndCameras = sceneAndCameras.data();
+		sceneInfos[info.sceneInfoCount] = sceneInfo;
+		myInfo.pSceneInfos = sceneInfos.data();
 		vgf::Window::_render(myInfo, resultInfo);
 	}
 }

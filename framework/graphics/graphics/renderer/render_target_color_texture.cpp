@@ -104,9 +104,13 @@ namespace vg
 		};
 
 		auto pDevice = pApp->getDevice();
-		m_pColorTexRenderPass = fd::createRenderPass(pDevice, createInfo);
+		m_pFirstColorTexRenderPass = fd::createRenderPass(pDevice, createInfo);
+        m_pFirstRenderPass = m_pFirstColorTexRenderPass.get();
 
-        m_pRenderPass = m_pColorTexRenderPass.get();
+		colorAttachment.loadOp = vk::AttachmentLoadOp::eLoad;
+		attachments = { colorAttachment, depthAttachment };
+		m_pSecondColorTexRenderPass = fd::createRenderPass(pDevice, createInfo);
+        m_pSecondRenderPass = m_pSecondColorTexRenderPass.get();
     }
 
 	void ColorTexRenderTarget::_createDepthStencilTex()
@@ -122,21 +126,42 @@ namespace vg
     void ColorTexRenderTarget::_createFramebuffer()
     {
 		auto pDevice = pApp->getDevice();
-        std::array<vk::ImageView, 2> attachments;
-		attachments = { *m_pColorAttchment->getColorAttachmentImageView(), *m_pDepthStencilAttachment->getDepthStencilAttachmentImageView() };
+		{
+			std::array<vk::ImageView, 2> attachments;
+		    attachments = { *m_pColorAttchment->getColorAttachmentImageView(), *m_pDepthStencilAttachment->getDepthStencilAttachmentImageView() };
+    
+		    vk::FramebufferCreateInfo createInfo = {
+		    	vk::FramebufferCreateFlags(),                   //flags
+		    	*m_pFirstRenderPass,                            //renderPass
+		    	static_cast<uint32_t>(attachments.size()),      //attachmentCount
+		    	attachments.data(),                             //pAttachments
+		    	m_framebufferWidth,                             //width
+		    	m_framebufferHeight,                            //height
+		    	1u                                              //layers
+		    };
+    
+		    m_pFirstColorTexFramebuffer = fd::createFrameBuffer(pDevice, createInfo);
+            m_pFirstFramebuffer = m_pFirstColorTexFramebuffer.get();
+		}
 
-		vk::FramebufferCreateInfo createInfo = {
-			vk::FramebufferCreateFlags(),                   //flags
-			*m_pRenderPass,                                 //renderPass
-			static_cast<uint32_t>(attachments.size()),      //attachmentCount
-			attachments.data(),                             //pAttachments
-			m_framebufferWidth,                             //width
-			m_framebufferHeight,                            //height
-			1u                                              //layers
-		};
-
-		m_pColorTexFramebuffer = fd::createFrameBuffer(pDevice, createInfo);
-        m_pFramebuffer = m_pColorTexFramebuffer.get();
+		{
+			std::array<vk::ImageView, 2> attachments;
+		    attachments = { *m_pColorAttchment->getColorAttachmentImageView(), *m_pDepthStencilAttachment->getDepthStencilAttachmentImageView() };
+    
+		    vk::FramebufferCreateInfo createInfo = {
+		    	vk::FramebufferCreateFlags(),                   //flags
+		    	*m_pSecondRenderPass,                                 //renderPass
+		    	static_cast<uint32_t>(attachments.size()),      //attachmentCount
+		    	attachments.data(),                             //pAttachments
+		    	m_framebufferWidth,                             //width
+		    	m_framebufferHeight,                            //height
+		    	1u                                              //layers
+		    };
+    
+		    m_pSecondColorTexFramebuffer = fd::createFrameBuffer(pDevice, createInfo);
+            m_pSecondFramebuffer = m_pSecondColorTexFramebuffer.get();
+		}
+        
     }
 
 

@@ -375,11 +375,11 @@ void Window::_render(const vg::Renderer::RenderInfo &info
 	uint32_t drawCount = 0u;
 
 	vg::Renderer::RenderInfo infoOffscreen;
-	vg::Renderer::SceneAndCamera tempSceneAndCamera;
-	tempSceneAndCamera.pCamera = m_pCameraOffScreen.get();
-	tempSceneAndCamera.pScene = m_pSceneOffScreen.get();
-	infoOffscreen.sceneAndCameraCount = 1u;
-	infoOffscreen.pSceneAndCameras = &tempSceneAndCamera;
+	vg::Renderer::SceneInfo tempSceneInfo;
+	tempSceneInfo.pCamera = m_pCameraOffScreen.get();
+	tempSceneInfo.pScene = m_pSceneOffScreen.get();
+	infoOffscreen.sceneInfoCount = 1u;
+	infoOffscreen.pSceneInfos = &tempSceneInfo;
 	vg::Renderer::RenderResultInfo offscreenResultInfo;
 	
 

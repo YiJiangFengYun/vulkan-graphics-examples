@@ -16,9 +16,11 @@ namespace vg
 			, uint32_t swapchainImageHeight);
 		void setImageIndex(uint32_t imageIndex);
 	private:
-	    std::shared_ptr<vk::RenderPass> m_pSurfaceRenderPass;
-		std::shared_ptr<BaseDepthStencilAttachment> m_pDepthStencilAttachment;
-		std::vector<std::shared_ptr<vk::Framebuffer>> m_pFramebuffers;
+		std::shared_ptr<BaseDepthStencilAttachment> m_pDepthStencilAttachment;	
+	    std::shared_ptr<vk::RenderPass> m_pFirstSurfaceRenderPass;
+		std::shared_ptr<vk::RenderPass> m_pSecondSurfaceRenderPass;
+		std::vector<std::shared_ptr<vk::Framebuffer>> m_pFirstFramebuffers;		
+		std::vector<std::shared_ptr<vk::Framebuffer>> m_pSecondFramebuffers;
 		//Renderer will use swapchain image when color attachment texture is null.
 		uint32_t m_swapchainImageViewCount;
 		vk::ImageView *m_pSwapchainImageViews;

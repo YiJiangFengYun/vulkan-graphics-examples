@@ -36,7 +36,6 @@ namespace vg
 		void endBindToRender();
 
     private:
-       std::shared_ptr<vg::DimSepMesh2> m_pMesh;
        const Material * m_pMaterial;
     };
 } //vg

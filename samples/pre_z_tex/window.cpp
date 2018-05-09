@@ -102,7 +102,7 @@ void Window::_createMaterial()
 		pPreZPass->setDepthStencilInfo(depthStencilState);
 		
 		vg::Pass::BuildInDataInfo::Component buildInDataCmps[1] = {
-	    	{vg::Pass::BuildInDataType::PRE_Z_DEPTH},
+	    	{vg::Pass::BuildInDataType::PRE_Z_DEPTH_RESULT},
 	    };
 		vg::Pass::BuildInDataInfo buildInData;
 		buildInData.componentCount = 1u;

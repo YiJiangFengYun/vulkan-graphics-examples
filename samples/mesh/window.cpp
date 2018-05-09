@@ -193,7 +193,7 @@ void Window::_createMaterial()
 			nullptr,
 			m_pTexture->getSampler("other_sampler")
 			);
-	    pPass->setDataValue("other_info", m_otherInfo, 2u);
+	    pPass->setDataValue("other_info", m_otherInfo, VG_M_OTHER_MAX_BINDING_PRIORITY);
 	    pPass->apply();
 	    
 	    pMaterial->apply();
@@ -235,7 +235,7 @@ void Window::_createMaterial()
 	    depthStencilState.depthCompareOp = vk::CompareOp::eLessOrEqual;
 	    pPass->setDepthStencilInfo(depthStencilState);
 	    pPass->setMainTexture(m_pTexture.get());
-	    pPass->setDataValue("other_info", m_otherInfo, 2u);
+	    pPass->setDataValue("other_info", m_otherInfo, VG_M_OTHER_MAX_BINDING_PRIORITY);
 	    pPass->apply();
 	    
 	    pMaterial->apply();
@@ -281,11 +281,4 @@ void Window::_onUpdate()
 	    }
 	}
 	ImGui::End();
-}
-
-void Window::_render(const vg::Renderer::RenderInfo &info
-			, vg::Renderer::RenderResultInfo &resultInfo)
-{
-
-	ParentWindowType::_render(info, resultInfo);	
 }

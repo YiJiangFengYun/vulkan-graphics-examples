@@ -28,7 +28,8 @@ private:
     std::shared_ptr<vg::Scene3> m_pSceneOffScreen;
 	std::shared_ptr<vg::Camera3> m_pCameraOffScreen;
 	std::shared_ptr<vg::Texture2DColorAttachment> m_pOffScreenTex;
-	std::shared_ptr<vg::ColorTexRenderer> m_pOffScreenRenderer;
+	std::shared_ptr<vg::ColorTexRenderTarget> m_pOffScreenRenderTarget;
+	std::shared_ptr<vg::Renderer> m_pOffScreenRenderer;
 	
 	std::shared_ptr<vg::Material> m_pMaterialModelOffscreen;
 
@@ -61,7 +62,7 @@ private:
 
 	virtual void _onUpdate() override;
 
-	virtual void _render(const vg::Renderer::RenderInfo &info
+	virtual void _doRender(vg::Renderer::RenderInfo &info
 			, vg::Renderer::RenderResultInfo &resultInfo) override;
 };
 

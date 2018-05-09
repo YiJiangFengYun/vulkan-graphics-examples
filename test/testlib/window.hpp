@@ -58,11 +58,15 @@ namespace testlib
 		virtual void _onUpdate() override;
 		virtual void _onPostUpdate() override;
 
-		virtual void _onPreRender() override;
-		virtual void _onRender() override;
-		virtual void _onPostRender() override;
+		virtual void _onPreDraw() override;
+		virtual void _onDraw() override;
+		virtual void _onPostDraw() override;
 
-		virtual void _render(const vg::Renderer::RenderInfo &info
+		virtual void _onPreRender(vg::Renderer::RenderInfo &info
+			, vg::Renderer::RenderResultInfo &resultInfo) override;
+		virtual void _onRender(vg::Renderer::RenderInfo &info
+			, vg::Renderer::RenderResultInfo &resultInfo) override;
+		virtual void _onPostRender(vg::Renderer::RenderInfo &info
 			, vg::Renderer::RenderResultInfo &resultInfo) override;
 	private:
 		void _initZoom();

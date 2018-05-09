@@ -294,11 +294,3 @@ void Window::_onUpdate()
 	// ImGui::Begin("Settings", nullptr, ImGuiWindowFlags_AlwaysAutoResize | ImGuiWindowFlags_NoResize | ImGuiWindowFlags_NoMove);
 	// ImGui::End();
 }
-
-
-
-void Window::_render(const vg::Renderer::RenderInfo &info
-			, vg::Renderer::RenderResultInfo &resultInfo)
-{
-	ParentWindowType::_render(info, resultInfo);	
-}

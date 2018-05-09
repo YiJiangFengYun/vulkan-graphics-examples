@@ -19,40 +19,8 @@ namespace vg
     }
 
     PostRender::PostRender()
-        : m_pMesh()
-        , m_pMaterial()
+        : m_pMaterial()
     {
-        std::shared_ptr<vg::DimSepMesh2> pRectMesh = std::shared_ptr<vg::DimSepMesh2>{
-            new vg::DimSepMesh2(vg::MemoryPropertyFlagBits::HOST_VISIBLE)
-        };
-        m_pMesh = pRectMesh;
-        const uint32_t VertexCount = 0u;
-        //rect pos
-        std::vector<vg::Vector2> rectPoses(VertexCount);
-        //rect uv
-        std::vector<vg::Vector2> rectUVs(VertexCount);
-        rectPoses = {
-            vg::Vector2{-1.0f, -1.0f},
-            vg::Vector2{1.0f, -1.0f},
-            vg::Vector2{1.0f, 1.0f},
-            vg::Vector2{-1.0f, 1.0f},
-        };
-        rectUVs = {
-            vg::Vector2{0.0f, 0.0f},
-            vg::Vector2{1.0f, 0.0f},
-            vg::Vector2{1.0f, 1.0f},
-            vg::Vector2{0.0f, 1.0f},
-        };
-        std::vector<uint32_t> indices = {
-            0, 1, 3, 3, 1, 2
-        };
-        pRectMesh->setVertexCount(VertexCount);
-        pRectMesh->setPositions(rectPoses);
-        pRectMesh->setTextureCoordinates<vg::TextureCoordinateType::VECTOR_2, vg::TextureCoordinateIndex::TextureCoordinate_0>(
-            rectUVs
-        );
-        pRectMesh->setIndices(indices, vg::PrimitiveTopology::TRIANGLE_LIST, 0u);
-        pRectMesh->apply(VG_TRUE);
     }
 
     const Material * PostRender::getMaterial() const
@@ -83,6 +51,12 @@ namespace vg
             m_pMaterial != nullptr
             ) 
         {
+            CmdDraw cmdDraw = {
+                3,
+                1,
+                0,
+                0,
+            };
             vg::RenderPassInfo renderPassInfo;
             renderPassInfo.pRenderPass = nullptr;
 	        renderPassInfo.pFrameBuffer = nullptr;
@@ -92,10 +66,11 @@ namespace vg
             renderPassInfo.viewMatrix = vg::Matrix4x4(1.0f);
             renderPassInfo.pPass = m_pMaterial->getMainPass();
             renderPassInfo.modelMatrix = vg::Matrix4x4(1.0f);
-            renderPassInfo.pMesh = m_pMesh.get();
+            renderPassInfo.pMesh = nullptr;
             renderPassInfo.subMeshIndex = 0u;
             renderPassInfo.viewport = fd::Viewport();
             renderPassInfo.scissor = fd::Rect2D();
+            renderPassInfo.pCmdDraw = &cmdDraw;
     
             vg::CmdInfo cmdInfo;
             cmdInfo.pRenderPassInfo = &renderPassInfo;

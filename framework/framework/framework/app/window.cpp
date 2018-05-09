@@ -81,7 +81,7 @@ namespace vgf {
 	{
 		VGF_LOG(plog::debug) << "Window run" << std::endl;
 		_doUpdate();
-		_doRender();
+		_doDraw();
 	}
 
 	void Window::windowSetShouldClose(Bool32 value)
@@ -223,7 +223,7 @@ namespace vgf {
 		};
 	}
 
-	void Window::_render( const vg::Renderer::RenderInfo &info
+	void Window::_doRender(vg::Renderer::RenderInfo &info
 			, vg::Renderer::RenderResultInfo &resultInfo)
 	{
 #ifdef USE_IMGUI_BIND
@@ -231,13 +231,14 @@ namespace vgf {
 		sceneInfo.pScene = vgim::getScene();
 		sceneInfo.pCamera = vgim::getCamera();
 		auto addedInfo = info;
+		uint32_t oldSceneInfoCount = info.sceneInfoCount;
 		addedInfo.sceneInfoCount = info.sceneInfoCount + 1u;
 		std::vector<vg::Renderer::SceneInfo> sceneInfos(addedInfo.sceneInfoCount);
-		for (uint32_t i = 0; i < info.sceneInfoCount; ++i)
+		for (uint32_t i = 0; i < oldSceneInfoCount; ++i)
 		{
 			sceneInfos[i] = *(info.pSceneInfos + i);
 		}
-		sceneInfos[info.sceneInfoCount] = sceneInfo;
+		sceneInfos[oldSceneInfoCount] = sceneInfo;
 		addedInfo.pSceneInfos = sceneInfos.data();
         m_pRenderer->render(addedInfo, resultInfo);
 #else
@@ -385,9 +386,9 @@ namespace vgf {
 		_onPostUpdate();
 	}
 
-	void Window::_doRender()
+	void Window::_doDraw()
 	{
-		_onPreRender();
+		_onPreDraw();
 		uint32_t imageIndex;
 		if (m_currImageIndex < 0)
 		{
@@ -429,8 +430,10 @@ namespace vgf {
 
 			vg::Renderer::RenderResultInfo resultInfo;
 			resultInfo.isRendered = VG_FALSE;
-
-			_render(info, resultInfo);
+			_onPreRender(info, resultInfo);
+			_doRender(info, resultInfo);
+			_onRender(info, resultInfo);
+			_onPostRender(info, resultInfo);
 			//if (resultInfo.isRendered == VG_FALSE) throw std::runtime_error("No content was rendered.");
 			if (resultInfo.isRendered)
 			{
@@ -473,8 +476,8 @@ namespace vgf {
 		{
 			throw std::runtime_error("Renderer is invalid for render.");
 		}
-		_onRender();
-		_onPostRender();
+		_onDraw();
+		_onPostDraw();
 	}
 
 	void Window::_doReCreateSwapchain()

@@ -212,7 +212,7 @@ void Window::_createMaterial()
 		vg::DescriptorType::COMBINED_IMAGE_SAMPLER,
 		nullptr,
 		m_pTexture->getSampler("other_sampler"));
-	pPass->setDataValue("other_info", m_otherInfo, 2u);
+	pPass->setDataValue("other_info", m_otherInfo, VG_M_OTHER_MAX_BINDING_PRIORITY);
 	pPass->setInstanceCount(m_instanceCount);
 	pPass->apply();
 	
@@ -249,7 +249,7 @@ void Window::_onUpdate()
 		otherInfo.instance[i].arrayIndex.x = static_cast<float>(i);
 	}
 	auto pPass = m_pMaterial->getMainPass();
-	pPass->setDataValue("other_info", m_otherInfo, 2u);
+	pPass->setDataValue("other_info", m_otherInfo, VG_M_OTHER_MAX_BINDING_PRIORITY);
 	pPass->apply();
 
 	// auto pos = m_lastWinPos;
@@ -258,11 +258,4 @@ void Window::_onUpdate()
 	// ImGui::SetNextWindowSize(ImVec2(0, 0));
 	// ImGui::Begin("Settings", nullptr, ImGuiWindowFlags_AlwaysAutoResize | ImGuiWindowFlags_NoResize | ImGuiWindowFlags_NoMove);
 	// ImGui::End();
-}
-
-void Window::_render(const vg::Renderer::RenderInfo &info
-			, vg::Renderer::RenderResultInfo &resultInfo)
-{
-
-	ParentWindowType::_render(info, resultInfo);	
 }

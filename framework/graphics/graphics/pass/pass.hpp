@@ -36,8 +36,9 @@ namespace vg
 			MATRIX_OBJECT_TO_VIEW = 3,
 			MATRIX_VIEW = 4,
 			MATRIX_PROJECTION = 5,
-			PRE_Z_DEPTH = 6,
-			COUNT = 7
+			PRE_Z_DEPTH_RESULT = 6,
+			POST_RENDER_RESULT = 7,
+			COUNT = 8
 		};
 
         template<BuildInDataType type>

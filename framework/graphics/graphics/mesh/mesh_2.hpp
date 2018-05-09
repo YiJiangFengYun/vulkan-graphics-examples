@@ -1,4 +1,5 @@
 #ifndef VG_MESH_2_H
+#define VG_MESH_2_H
 
 #include "graphics/mesh/mesh.hpp"
 namespace vg

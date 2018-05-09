@@ -69,11 +69,20 @@ namespace vgf
 		virtual void _onUpdate() = 0;
 		virtual void _onPostUpdate() = 0;
 
-		virtual void _onPreRender() = 0;
-		virtual void _onRender() = 0;
-		virtual void _onPostRender() = 0;
+		virtual void _onPreDraw() = 0;
+		virtual void _onDraw() = 0;
+		virtual void _onPostDraw() = 0;
 
-		virtual void _render(const vg::Renderer::RenderInfo &info
+        virtual void _onPreRender(vg::Renderer::RenderInfo &info
+			, vg::Renderer::RenderResultInfo &resultInfo) = 0;
+		virtual void _onRender(vg::Renderer::RenderInfo &info
+			, vg::Renderer::RenderResultInfo &resultInfo) = 0;
+		virtual void _onPostRender(vg::Renderer::RenderInfo &info
+			, vg::Renderer::RenderResultInfo &resultInfo) = 0;
+
+		virtual void _doUpdate();
+		virtual void _doDraw();
+		virtual void _doRender(vg::Renderer::RenderInfo &info
 			, vg::Renderer::RenderResultInfo &resultInfo);
 
 		// tool methods
@@ -95,10 +104,6 @@ namespace vgf
 		Bool32 m_mousePressed[3];
         void _initIMGUI();
 #endif //USE_IMGUI_BIND
-
-
-		void _doUpdate();
-		void _doRender();
 
 		void _doReCreateSwapchain();
 		void _reCreateSwapchain();

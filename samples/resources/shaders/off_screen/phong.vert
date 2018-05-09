@@ -13,7 +13,7 @@ layout(binding = 0) uniform BuildIn {
 	mat4 matrixObjectToView;
 } _buildIn;
 
-layout (binding = 2) uniform OtherInfo 
+layout (binding = 1) uniform OtherInfo 
 {
 	vec4 lightPos;
 } otherInfo;

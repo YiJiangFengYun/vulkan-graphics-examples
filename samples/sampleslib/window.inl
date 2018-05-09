@@ -202,19 +202,19 @@ namespace sampleslib
 	}
 
 	template <vg::SpaceType SPACE_TYPE>
-	void Window<SPACE_TYPE>::_onPreRender()
+	void Window<SPACE_TYPE>::_onPreDraw()
 	{
 		m_lastDrawCount = 0u;		
 	}
 
 	template <vg::SpaceType SPACE_TYPE>
-	void Window<SPACE_TYPE>::_onRender()
+	void Window<SPACE_TYPE>::_onDraw()
 	{
 
 	}
 
 	template <vg::SpaceType SPACE_TYPE>
-	void Window<SPACE_TYPE>::_onPostRender()
+	void Window<SPACE_TYPE>::_onPostDraw()
 	{
 		auto now = std::chrono::high_resolution_clock::now();
 		m_endTimeFrame = now;
@@ -233,11 +233,13 @@ namespace sampleslib
 		}
 	}
 
-	template <vg::SpaceType SPACE_TYPE>
-	void Window<SPACE_TYPE>::_render(const vg::Renderer::RenderInfo &info
-			, vg::Renderer::RenderResultInfo &resultInfo)
+    template <vg::SpaceType SPACE_TYPE>
+	std::vector<vg::Renderer::SceneInfo> Window<SPACE_TYPE>::mySceneInfos = {};
+
+    template <vg::SpaceType SPACE_TYPE>
+	void Window<SPACE_TYPE>::_onPreRender(vg::Renderer::RenderInfo &info
+		, vg::Renderer::RenderResultInfo &resultInfo)
 	{
-		
 		uint32_t sceneCount = m_sceneCount;
 		std::vector<vg::Renderer::SceneInfo> sceneInfos(sceneCount);
 		for (uint32_t i = 0; i < sceneCount; ++i)
@@ -246,12 +248,11 @@ namespace sampleslib
 		    sceneInfos[i].pCamera = m_pCamera.get();
 			sceneInfos[i].preZ = m_preZScene;
 		}
-		
-		auto myInfo = info;
-		myInfo.sceneInfoCount = myInfo.sceneInfoCount + sceneCount;
-		std::vector<vg::Renderer::SceneInfo> mySceneInfos(myInfo.sceneInfoCount);
+		uint32_t oldSceneCount = info.sceneInfoCount;
+		info.sceneInfoCount = info.sceneInfoCount + sceneCount;
+		Window<SPACE_TYPE>::mySceneInfos.resize(info.sceneInfoCount);
 		uint32_t index = 0u;
-		for (uint32_t i = 0; i < info.sceneInfoCount; ++i)
+		for (uint32_t i = 0; i < oldSceneCount; ++i)
 		{
 			mySceneInfos[index] = *(info.pSceneInfos + i);
 			++index;
@@ -263,8 +264,20 @@ namespace sampleslib
 			++index;
 		}
 		
-		myInfo.pSceneInfos = mySceneInfos.data();
-		vgf::Window::_render(myInfo, resultInfo);
-		m_lastDrawCount += resultInfo.drawCount;
+		info.pSceneInfos = mySceneInfos.data();
+	}
+
+	template <vg::SpaceType SPACE_TYPE>	
+	void Window<SPACE_TYPE>::_onRender(vg::Renderer::RenderInfo &info
+		, vg::Renderer::RenderResultInfo &resultInfo)
+	{
+
+	}
+
+    template <vg::SpaceType SPACE_TYPE>
+	void Window<SPACE_TYPE>::_onPostRender(vg::Renderer::RenderInfo &info
+		, vg::Renderer::RenderResultInfo &resultInfo)
+	{
+
 	}
 } //sampleslib

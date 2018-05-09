@@ -221,7 +221,7 @@ void Window::_createMaterial()
 			vg::DescriptorType::COMBINED_IMAGE_SAMPLER,
 			nullptr,
 			m_pTexture->getSampler("other_sampler"));
-		pPass->setDataValue("light_info", m_lightInfo, 2u);
+		pPass->setDataValue("light_info", m_lightInfo, VG_M_OTHER_MAX_BINDING_PRIORITY);
 		pPass->apply();
 
 	    pMaterials[i]->apply();
@@ -254,12 +254,4 @@ void Window::_fillScene()
 void Window::_onUpdate()
 {
 	ParentWindowType::_onUpdate();
-}
-
-void Window::_render(const vg::Renderer::RenderInfo &info
-			, vg::Renderer::RenderResultInfo &resultInfo)
-{
-
-    ParentWindowType::_render(info, resultInfo);
-	
 }

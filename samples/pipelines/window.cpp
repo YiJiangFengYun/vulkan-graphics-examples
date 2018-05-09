@@ -119,7 +119,7 @@ void Window::_createMaterial()
 			pPass->setPolygonMode(vg::PolygonMode::LINE);
 		}
 
-		pPass->setDataValue("light_info", m_lightInfo, 2u);
+		pPass->setDataValue("light_info", m_lightInfo, VG_M_OTHER_MAX_BINDING_PRIORITY);
 		pPass->apply();
 
 	    
@@ -164,11 +164,4 @@ void Window::_onUpdate()
 	    ImGui::TextUnformatted("Non solid fill modes not supported!");
 	    ImGui::End();
 	}
-}
-
-void Window::_render(const vg::Renderer::RenderInfo &info
-			, vg::Renderer::RenderResultInfo &resultInfo)
-{
-
-	ParentWindowType::_render(info, resultInfo);	
 }

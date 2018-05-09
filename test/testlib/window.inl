@@ -105,39 +105,52 @@ namespace testlib
 	}
 
 	template <vg::SpaceType SPACE_TYPE>
-	void Window<SPACE_TYPE>::_onPreRender()
+	void Window<SPACE_TYPE>::_onPreDraw()
 	{
 
 	}
 
 	template <vg::SpaceType SPACE_TYPE>
-	void Window<SPACE_TYPE>::_onRender()
+	void Window<SPACE_TYPE>::_onDraw()
 	{
 
 	}
 
 	template <vg::SpaceType SPACE_TYPE>
-	void Window<SPACE_TYPE>::_onPostRender()
+	void Window<SPACE_TYPE>::_onPostDraw()
 	{
 
 	}
 
 	template <vg::SpaceType SPACE_TYPE>
-	void Window<SPACE_TYPE>::_render(const vg::Renderer::RenderInfo &info
-			, vg::Renderer::RenderResultInfo &resultInfo)
+	void Window<SPACE_TYPE>::_onPreRender(vg::Renderer::RenderInfo &info
+		, vg::Renderer::RenderResultInfo &resultInfo)
 	{
 		vg::Renderer::SceneInfo sceneInfo;
 		sceneInfo.pScene = m_pScene.get();
 		sceneInfo.pCamera = m_pCamera.get();
-		auto myInfo = info;
-		myInfo.sceneInfoCount = myInfo.sceneInfoCount + 1u;
-		std::vector<vg::Renderer::SceneInfo> sceneInfos(myInfo.sceneInfoCount);
-		for (uint32_t i = 0; i < info.sceneInfoCount; ++i)
+		uint32_t oldSceneCount = info.sceneInfoCount;
+		info.sceneInfoCount = info.sceneInfoCount + 1u;
+		std::vector<vg::Renderer::SceneInfo> sceneInfos(info.sceneInfoCount);
+		for (uint32_t i = 0; i < oldSceneCount; ++i)
 		{
 			sceneInfos[i] = *(info.pSceneInfos + i);
 		}
 		sceneInfos[info.sceneInfoCount] = sceneInfo;
-		myInfo.pSceneInfos = sceneInfos.data();
-		vgf::Window::_render(myInfo, resultInfo);
+		info.pSceneInfos = sceneInfos.data();
+	}
+
+	template <vg::SpaceType SPACE_TYPE>
+	void Window<SPACE_TYPE>::_onRender(vg::Renderer::RenderInfo &info
+		, vg::Renderer::RenderResultInfo &resultInfo)
+	{
+
+	}
+
+	template <vg::SpaceType SPACE_TYPE>
+	void Window<SPACE_TYPE>::_onPostRender(vg::Renderer::RenderInfo &info
+		, vg::Renderer::RenderResultInfo &resultInfo)
+	{
+
 	}
 }

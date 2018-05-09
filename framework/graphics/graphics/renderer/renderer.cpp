@@ -341,6 +341,23 @@ namespace vg
 			    sceneInfo.postRender != nullptr &&
 				sceneInfo.postRender->isValidBindToRender() == VG_TRUE)
 			{
+				auto pMaterial = sceneInfo.postRender->getMaterial();
+				auto passCount = pMaterial->getPassCount();
+				for (uint32_t i = 0; i < passCount; ++i)
+				{
+					auto pPass = pMaterial->getPassWithIndex(i);
+					auto buildInDataInfo = pPass->getBuildInDataInfo();
+					auto buildInComponentCount = buildInDataInfo.componentCount;
+					for (uint32_t j = 0; j < buildInComponentCount; ++j)
+					{
+						if ((*(buildInDataInfo.pComponent + j)).type == Pass::BuildInDataType::POST_RENDER_RESULT)
+						{
+							pPass->setTexture("_post_render_tex", m_pPostRenderColorAttachment.get(), VG_M_POST_RENDER_TEXTURE_BINDING_PRIORITY);
+							break;
+						}
+					}
+				}
+
 				PostRender::BindInfo bindInfo = {
 					m_framebufferWidth,
 					m_framebufferHeight,
@@ -385,9 +402,10 @@ namespace vg
 			    sceneInfo.postRender != nullptr &&
 				sceneInfo.postRender->isValidBindToRender() == VG_TRUE)
 			{
+				const vk::RenderPass * pRenderPass;
 				//trunk render pass.
 				resultInfo.drawCount += m_trunkRenderPassCmdBuffer.getCmdCount();
-				auto pRenderPass = _recordTrunkRenderPassForBegin(VG_TRUE, VG_TRUE);
+				pRenderPass = _recordTrunkRenderPassForBegin(VG_TRUE, VG_TRUE);
 				CMDParser::recordTrunk(&m_trunkRenderPassCmdBuffer,
 				    m_pCommandBuffer.get(),
 					&m_pipelineCache,
@@ -397,7 +415,7 @@ namespace vg
 
 				//post render pass.
 				resultInfo.drawCount += m_postRenderCmdbuffer.getCmdCount();
-		        auto pRenderPass = _recordTrunkRenderPassForBegin(VG_FALSE, i == 0);
+		        pRenderPass = _recordTrunkRenderPassForBegin(VG_FALSE, i == 0);
 		        CMDParser::recordTrunk(&m_postRenderCmdbuffer,
 		        	m_pCommandBuffer.get(),
 		        	&m_pipelineCache,
@@ -1203,11 +1221,11 @@ namespace vg
 		        	{
 		        		pPass->_setBuildInMatrixData(type, projMatrix);
 		        	}
-					else if (type == Pass::BuildInDataType::PRE_Z_DEPTH)
+					else if (type == Pass::BuildInDataType::PRE_Z_DEPTH_RESULT)
 					{
 						if (m_preZEnable == VG_TRUE)
 				        {
-				        	pPass->setTexture("_pre_z_depth", m_pPreZDepthAttachment.get(), VG_M_PRE_Z_TEXTURE_BINDING_PRIORITY);
+				        	pPass->setTexture("_pre_z_depth_tex", m_pPreZDepthAttachment.get(), VG_M_PRE_Z_TEXTURE_BINDING_PRIORITY);
 				        }
 					}
 		        }

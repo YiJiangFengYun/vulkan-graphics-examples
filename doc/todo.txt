@@ -3,4 +3,4 @@ format (COLLADA).
 2.Privatize some template code and move them from inl files to cpp files.
 3.Perfect binding priority and Add register feature of binding priority.
 4.Perfect light system and Add some necessary light types.
-5.Post render for entire screen after render.
+5.Post render (post processing) for entire screen after render.

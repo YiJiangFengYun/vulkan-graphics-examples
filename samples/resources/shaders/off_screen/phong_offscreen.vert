@@ -14,7 +14,7 @@ layout(binding = 0) uniform BuildIn {
 	mat4 matrixProj;
 } _buildIn;
 
-layout (binding = 2) uniform OtherInfo 
+layout (binding = 1) uniform OtherInfo 
 {
 	mat4 matrixInverse;
 	vec4 lightPos;

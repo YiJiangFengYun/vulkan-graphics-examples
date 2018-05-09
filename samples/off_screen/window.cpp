@@ -98,7 +98,14 @@ void Window::_createOffscreenTex()
 
 void Window::_createOffscreenRenderer()
 {
-	m_pOffScreenRenderer = std::shared_ptr<vg::ColorTexRenderer>{ new vg::ColorTexRenderer(m_pOffScreenTex.get()) };
+	m_pOffScreenRenderTarget = std::shared_ptr<vg::ColorTexRenderTarget>{
+		new vg::ColorTexRenderTarget(m_pOffScreenTex.get()),
+	};
+	m_pOffScreenRenderer = std::shared_ptr<vg::Renderer>{
+		new vg::Renderer{
+		    m_pOffScreenRenderTarget.get(),
+	    } 
+	};
 }
 
 void Window::_createTexture()
@@ -214,7 +221,7 @@ void Window::_createMaterial()
 	    depthStencilState.depthWriteEnable = VG_TRUE;
 	    depthStencilState.depthCompareOp = vk::CompareOp::eLessOrEqual;
 	    pPass->setDepthStencilInfo(depthStencilState);
-	    pPass->setDataValue("other_info", m_otherInfo, 2u);
+	    pPass->setDataValue("other_info", m_otherInfo, VG_M_OTHER_MAX_BINDING_PRIORITY);
 	    pPass->apply();
 	    
 	    pMaterial->apply();
@@ -249,7 +256,7 @@ void Window::_createMaterial()
 	    depthStencilState.depthWriteEnable = VG_TRUE;
 	    depthStencilState.depthCompareOp = vk::CompareOp::eLessOrEqual;
 	    pPass->setDepthStencilInfo(depthStencilState);
-	    pPass->setDataValue("other_info", m_otherInfoOffScreen, 2u);
+	    pPass->setDataValue("other_info", m_otherInfoOffScreen, VG_M_OTHER_MAX_BINDING_PRIORITY);
 	    pPass->apply();
 	    
 	    pMaterial->apply();
@@ -289,7 +296,7 @@ void Window::_createMaterial()
 			nullptr,
 			m_pTexturePlane->getSampler("other_sampler")
 			);
-		pPass->setTexture("offscreen_tex", m_pOffScreenTex.get(), 2u, vg::ShaderStageFlagBits::FRAGMENT);
+		pPass->setTexture("offscreen_tex", m_pOffScreenTex.get(), VG_M_OTHER_MAX_BINDING_PRIORITY, vg::ShaderStageFlagBits::FRAGMENT);
 	    pPass->apply();
 		
 	    pMaterial->apply();
@@ -369,7 +376,7 @@ void Window::_onUpdate()
 	// ImGui::End();
 }
 
-void Window::_render(const vg::Renderer::RenderInfo &info
+void Window::_doRender(vg::Renderer::RenderInfo &info
 			, vg::Renderer::RenderResultInfo &resultInfo)
 {
 	uint32_t drawCount = 0u;
@@ -389,7 +396,7 @@ void Window::_render(const vg::Renderer::RenderInfo &info
 
     vg::Renderer::RenderResultInfo tempResultInfo;
 
-	ParentWindowType::_render(info, tempResultInfo);
+	ParentWindowType::_doRender(info, tempResultInfo);
 
 	drawCount += tempResultInfo.drawCount;
 	resultInfo = tempResultInfo;

@@ -21,10 +21,13 @@ namespace vg
 
 	Renderer::SceneInfo::SceneInfo(const BaseScene *pScene
 		, const BaseCamera *pCamera
-		, Bool32 preZ)
+		, Bool32 preZ
+		, PostRender * postRender
+		)
 		: pScene(pScene)
 		, pCamera(pCamera)
 		, preZ(preZ)
+		, postRender(postRender)
 	{
 
 	}
@@ -56,11 +59,12 @@ namespace vg
 
 	}
 
-	const vk::Format Renderer::DEFAULT_PRE_Z_DEPTH_FORMAT(vk::Format::eD32Sfloat);	
+	const vk::Format Renderer::DEFAULT_PRE_Z_DEPTH_FORMAT(vk::Format::eD32Sfloat);
+	const vk::Format Renderer::DEFAULT_POST_RENDER_COLOR_FORMAT(vk::Format::eR8G8B8A8Unorm);
 
 	Renderer::Renderer(const RenderTarget * pRenderTarget)
 		: Base(BaseType::RENDERER)
-		, m_pRenderTarget(pRenderTarget)
+		, m_pRenderTarget()
 		, m_clearValueColor(0.0f)
 		, m_clearValueDepth(1.0f)
 		, m_clearValueStencil(0u)
@@ -70,19 +74,30 @@ namespace vg
 		, m_branchCmdBuffer()
 		, m_bindedObjects()
 		, m_bindedObjectCount(0u)
+		, m_framebufferWidth(0u)
+		, m_framebufferHeight(0u)
+        //pre z
 		, m_preZEnable(VG_FALSE)
         , m_preZDepthImageFormat(DEFAULT_PRE_Z_DEPTH_FORMAT)
+	    , m_pPreZDepthAttachment()		
 		, m_pPreZRenderPass()
-	    , m_pPreZDepthAttachment()
-		, m_pPreZFrameBuffer()
-		, m_preZRenderPassCmdBuffer()
+		, m_pPreZFramebuffer()
+		, m_preZCmdBuffer()
+		//post render
+		, m_postRenderEnable(VG_FALSE)
+		, m_postRenderColorImageFormat(DEFAULT_POST_RENDER_COLOR_FORMAT)
+		, m_pPostRenderColorAttachment()
+		, m_pPostRenderRenderPass()
+		, m_pPostRenderFramebuffer()
+		, m_postRenderCmdbuffer()
+
 #if defined(DEBUG) && defined(VG_ENABLE_COST_TIMER)
         , m_preparingRenderCostTimer(fd::CostTimer::TimerType::AVERAGE)
 #endif //DEBUG and VG_ENABLE_COST_TIMER
 	{
+		setRenderTarget(pRenderTarget);
 		_createCommandPool();
 		_createCommandBuffer();
-		
 		//_createFence();
 	}
 
@@ -97,7 +112,32 @@ namespace vg
 
 	void Renderer::setRenderTarget(const RenderTarget * pRenderTarget)
 	{
-		m_pRenderTarget = pRenderTarget;
+		if (m_pRenderTarget != pRenderTarget) {
+		    m_pRenderTarget = pRenderTarget;
+			uint32_t framebufferWidth = 0u;
+			uint32_t framebufferHeight = 0u;
+			if (pRenderTarget != nullptr) {
+				framebufferWidth = pRenderTarget->getFramebufferWidth();
+				framebufferHeight = pRenderTarget->getFramebufferHeight();
+			}
+			if (m_framebufferWidth != framebufferWidth ||
+				    m_framebufferHeight != framebufferHeight)
+			{
+				m_framebufferWidth = framebufferWidth;
+				m_framebufferHeight = framebufferHeight;
+
+				if (m_preZEnable) {
+					if (framebufferWidth != 0 && framebufferHeight != 0u)
+					{
+						_createPreZObjs();
+					}
+					else
+					{
+						_destroyPreZObjs();
+					}
+				}
+			}
+		}
 	}
 
 	void Renderer::enablePreZ()
@@ -105,7 +145,10 @@ namespace vg
 		if (m_preZEnable == VG_FALSE)
 		{
 			m_preZEnable = VG_TRUE;
-			_createPreZObjs();
+			if (m_framebufferWidth != 0u && m_framebufferHeight != 0u)
+			{
+			    _createPreZObjs();
+			}
 		}
 	}
 
@@ -115,6 +158,27 @@ namespace vg
 		{
 			m_preZEnable = VG_FALSE;
 			_destroyPreZObjs();
+		}
+	}
+
+	void Renderer::enablePostRender()
+	{
+		if (m_postRenderEnable == VG_FALSE)
+		{
+			m_postRenderEnable = VG_TRUE;
+			if (m_framebufferWidth != 0u && m_framebufferHeight != 0u)
+			{
+				_createPostRenderObjs();
+			}
+		}
+	}
+
+	void Renderer::disablePostRender()
+	{
+		if (m_postRenderEnable == VG_TRUE)
+		{
+			m_postRenderEnable = VG_FALSE;
+			_destroyPostRenderObjs();
 		}
 	}
 
@@ -231,18 +295,29 @@ namespace vg
             fd::CostTimer preparingSceneCostTimer(fd::CostTimer::TimerType::ONCE);
 			preparingSceneCostTimer.begin();
 #endif //DEBUG and VG_ENABLE_COST_TIMER
-            m_preZRenderPassCmdBuffer.begin();
-		    m_trunkRenderPassCmdBuffer.begin();
-		    m_trunkWaitBarrierCmdBuffer.begin();
+            if (m_preZEnable == VG_TRUE && sceneInfo.preZ == VG_TRUE)
+			{
+                m_preZCmdBuffer.begin();
+			}
 		    m_branchCmdBuffer.begin();
+		    m_trunkWaitBarrierCmdBuffer.begin();						
+		    m_trunkRenderPassCmdBuffer.begin();
+			if (m_postRenderEnable == VG_TRUE && 
+			    sceneInfo.postRender != nullptr &&
+				sceneInfo.postRender->isValidBindToRender() == VG_TRUE
+			    )
+			{
+				m_postRenderCmdbuffer.begin();
+			}
 		    _beginBind();
             
+			//scene make cmds.
 			if (pScene->getSpaceType() == SpaceType::SPACE_2)
 			{
 				_renderScene2(dynamic_cast<const Scene<SpaceType::SPACE_2> *>(pScene), 
 				    dynamic_cast<const Camera<SpaceType::SPACE_2> *>(pCamera), 
 					info,
-					&m_preZRenderPassCmdBuffer,
+					m_preZEnable == VG_TRUE && sceneInfo.preZ == VG_TRUE ? &m_preZCmdBuffer : nullptr,
 					&m_branchCmdBuffer,					
 					&m_trunkRenderPassCmdBuffer,
 					&m_trunkWaitBarrierCmdBuffer
@@ -252,7 +327,7 @@ namespace vg
 				_renderScene3(dynamic_cast<const Scene<SpaceType::SPACE_3> *>(pScene), 
 				    dynamic_cast<const Camera<SpaceType::SPACE_3> *>(pCamera), 
 					info,
-					&m_preZRenderPassCmdBuffer,
+					m_preZEnable == VG_TRUE && sceneInfo.preZ == VG_TRUE ? &m_preZCmdBuffer : nullptr,
 					&m_branchCmdBuffer,					
 					&m_trunkRenderPassCmdBuffer,
 					&m_trunkWaitBarrierCmdBuffer
@@ -261,12 +336,28 @@ namespace vg
 				//todo
 			}
 
+			//post render make cmds.
+			if (m_postRenderEnable == VG_TRUE && 
+			    sceneInfo.postRender != nullptr &&
+				sceneInfo.postRender->isValidBindToRender() == VG_TRUE)
+			{
+				PostRender::BindInfo bindInfo = {
+					m_framebufferWidth,
+					m_framebufferHeight,
+				};
+				PostRender::BindResult result = {
+					&m_postRenderCmdbuffer,
+				};
+				
+				sceneInfo.postRender->beginBindToRender(bindInfo, &result);
+			}
+
 			// pre z
 		    if (m_preZEnable == VG_TRUE && sceneInfo.preZ == VG_TRUE)
 		    {
-		    	resultInfo.drawCount += m_preZRenderPassCmdBuffer.getCmdCount();
+		    	resultInfo.drawCount += m_preZCmdBuffer.getCmdCount();
 		    	_recordPreZRenderPassForBegin();
-		    	CMDParser::recordTrunk(&m_preZRenderPassCmdBuffer,
+		    	CMDParser::recordTrunk(&m_preZCmdBuffer,
 		    	    m_pCommandBuffer.get(),
 		    		&m_pipelineCache,
 		    		m_pPreZRenderPass.get()
@@ -287,19 +378,61 @@ namespace vg
 		    CMDParser::recordTrunkWaitBarrier(&m_trunkWaitBarrierCmdBuffer,
 		    	m_pCommandBuffer.get());
     
-            //trunk render pass.
-		    resultInfo.drawCount += m_trunkRenderPassCmdBuffer.getCmdCount();
-		    auto pRenderPass = _recordTrunkRenderPassForBegin(i == 0);
-		    CMDParser::recordTrunk(&m_trunkRenderPassCmdBuffer,
-		    	m_pCommandBuffer.get(),
-		    	&m_pipelineCache,
-		    	pRenderPass
-		    	);
-		    _recordTrunkRenderPassForEnd();
+            
+
+			//post render record
+			if (m_postRenderEnable == VG_TRUE && 
+			    sceneInfo.postRender != nullptr &&
+				sceneInfo.postRender->isValidBindToRender() == VG_TRUE)
+			{
+				//trunk render pass.
+				resultInfo.drawCount += m_trunkRenderPassCmdBuffer.getCmdCount();
+				auto pRenderPass = _recordTrunkRenderPassForBegin(VG_TRUE, VG_TRUE);
+				CMDParser::recordTrunk(&m_trunkRenderPassCmdBuffer,
+				    m_pCommandBuffer.get(),
+					&m_pipelineCache,
+					pRenderPass
+					);
+				_recordTrunkRenderPassForEnd();
+
+				//post render pass.
+				resultInfo.drawCount += m_postRenderCmdbuffer.getCmdCount();
+		        auto pRenderPass = _recordTrunkRenderPassForBegin(VG_FALSE, i == 0);
+		        CMDParser::recordTrunk(&m_postRenderCmdbuffer,
+		        	m_pCommandBuffer.get(),
+		        	&m_pipelineCache,
+		        	pRenderPass
+		        	);
+		        _recordTrunkRenderPassForEnd();
+			}
+			else
+			{
+				//trunk render pass.
+		        resultInfo.drawCount += m_trunkRenderPassCmdBuffer.getCmdCount();
+		        auto pRenderPass = _recordTrunkRenderPassForBegin(VG_FALSE, i == 0);
+		        CMDParser::recordTrunk(&m_trunkRenderPassCmdBuffer,
+		        	m_pCommandBuffer.get(),
+		        	&m_pipelineCache,
+		        	pRenderPass
+		        	);
+		        _recordTrunkRenderPassForEnd();
+			}
+
+
+			//post render end bind
+			if (m_postRenderEnable == VG_TRUE && 
+			    sceneInfo.postRender != nullptr &&
+				sceneInfo.postRender->isValidBindToRender() == VG_TRUE)
+			{
+				sceneInfo.postRender->endBindToRender();
+			}
 
 		    _endBind();			
 
-			m_preZRenderPassCmdBuffer.end();
+			if (m_preZEnable == VG_TRUE && sceneInfo.preZ == VG_TRUE)
+			{
+			    m_preZCmdBuffer.end();
+			}
 		    m_trunkRenderPassCmdBuffer.end();
 		    m_trunkWaitBarrierCmdBuffer.end();
 		    m_branchCmdBuffer.end();
@@ -395,13 +528,13 @@ namespace vg
 		   clearValueDepthStencil,
 		};
 
-		const auto framebufferWidth = m_pRenderTarget->getFramebufferWidth();
-		const auto framebufferHeight = m_pRenderTarget->getFramebufferHeight();
+		const auto framebufferWidth = m_framebufferWidth;
+		const auto framebufferHeight = m_framebufferHeight;
 		const auto renderArea = m_pRenderTarget->getRenderArea();
 
 		vk::RenderPassBeginInfo renderPassBeginInfo = {
 			*m_pPreZRenderPass,                                   //renderPass
-			*m_pPreZFrameBuffer,                                  //framebuffer
+			*m_pPreZFramebuffer,                                  //framebuffer
 			vk::Rect2D(                                       //renderArea
 				vk::Offset2D(static_cast<int32_t>(std::round(framebufferWidth * renderArea.x))
 					, static_cast<int32_t>(std::round(framebufferHeight * renderArea.y))
@@ -422,7 +555,7 @@ namespace vg
 		m_pCommandBuffer->endRenderPass();
 	}
 
-	const vk::RenderPass *  Renderer::_recordTrunkRenderPassForBegin(Bool32 isFirst)
+	const vk::RenderPass *  Renderer::_recordTrunkRenderPassForBegin(Bool32 isPostRender, Bool32 isFirst)
 	{
 		vk::ClearValue clearValueColor = {
 			std::array<float, 4>{
@@ -442,13 +575,18 @@ namespace vg
 		};
 
 
-        const auto framebufferWidth = m_pRenderTarget->getFramebufferWidth();
-		const auto framebufferHeight = m_pRenderTarget->getFramebufferHeight();
+        const auto framebufferWidth = m_framebufferWidth;
+		const auto framebufferHeight = m_framebufferHeight;
 		const auto renderArea = m_pRenderTarget->getRenderArea();
 		const vk::RenderPass * pRenderPass;
 		const vk::Framebuffer * pFramebuffer;
 
-		if (isFirst == VG_TRUE)
+		if (isPostRender == VG_TRUE)
+		{
+			pRenderPass = m_pPostRenderRenderPass.get();
+			pFramebuffer = m_pPostRenderFramebuffer.get();
+		}
+		else if (isFirst == VG_TRUE)
 		{
 			pRenderPass = m_pRenderTarget->getFirstRenderPass();
 		    pFramebuffer = m_pRenderTarget->getFirstFramebuffer();
@@ -604,8 +742,8 @@ namespace vg
 #endif //DEBUG and VG_ENABLE_COST_TIMER
 
 		//------Doing render.
-		const auto framebufferWidth = m_pRenderTarget->getFramebufferWidth();
-		const auto framebufferHeight = m_pRenderTarget->getFramebufferHeight();	
+		const auto framebufferWidth = m_framebufferWidth;
+		const auto framebufferHeight = m_framebufferHeight;	
 		for (uint32_t i = 0u; i < validVisualObjectCount; ++i)
 		{
 			auto pVisualObject = validVisualObjects[i];
@@ -890,8 +1028,8 @@ namespace vg
 	        });
 
 		//-----Doing render
-		const auto framebufferWidth = m_pRenderTarget->getFramebufferWidth();
-		const auto framebufferHeight = m_pRenderTarget->getFramebufferHeight();
+		const auto framebufferWidth = m_framebufferWidth;
+		const auto framebufferHeight = m_framebufferHeight;
 		for (uint32_t typeIndex = 0u; typeIndex < queueTypeCount; ++typeIndex)
 		{
 			auto queueLength = queueLengths[typeIndex];
@@ -960,10 +1098,6 @@ namespace vg
 		
 	void Renderer::_bind(BaseVisualObject *pVisublObject, BaseVisualObject::BindInfo & bindInfo, BaseVisualObject::BindResult *pResult)
 	{
-		if (m_preZEnable == VG_FALSE)
-	    {
-	        pResult->pPreZCmdBuffer = nullptr;
-	    }
 		pVisublObject->beginBindToRender(bindInfo, pResult);
 		if (static_cast<uint32_t>(m_bindedObjects.size()) == m_bindedObjectCount) {
 			auto newSize = getNextCapacity(static_cast<uint32_t>(m_bindedObjects.size()));
@@ -1069,12 +1203,16 @@ namespace vg
 		        	{
 		        		pPass->_setBuildInMatrixData(type, projMatrix);
 		        	}
+					else if (type == Pass::BuildInDataType::PRE_Z_DEPTH)
+					{
+						if (m_preZEnable == VG_TRUE)
+				        {
+				        	pPass->setTexture("_pre_z_depth", m_pPreZDepthAttachment.get(), VG_M_PRE_Z_TEXTURE_BINDING_PRIORITY);
+				        }
+					}
 		        }
 
-				if (m_preZEnable == VG_TRUE)
-				{
-					pPass->setTexture("_pre_z_depth", m_pPreZDepthAttachment.get(), VG_M_PRE_Z_TEXTURE_BINDING_PRIORITY);
-				}
+				
 
 		        pPass->apply();
 			}
@@ -1166,8 +1304,8 @@ namespace vg
 	void Renderer::_createPreZObjs()
 	{
 		auto pDevice = pApp->getDevice();
-		const auto framebufferWidth = m_pRenderTarget->getFramebufferWidth();
-		const auto framebufferHeight = m_pRenderTarget->getFramebufferHeight();
+		const auto framebufferWidth = m_framebufferWidth;
+		const auto framebufferHeight = m_framebufferHeight;
 		//depth attachment
 		auto pTex = new Texture2DDepthAttachment(
 			    m_preZDepthImageFormat,
@@ -1183,7 +1321,7 @@ namespace vg
 			vk::SampleCountFlagBits::e1,
 			vk::AttachmentLoadOp::eClear,
 			vk::AttachmentStoreOp::eStore,
-			vk::AttachmentLoadOp::eClear,
+			vk::AttachmentLoadOp::eDontCare,
 			vk::AttachmentStoreOp::eDontCare,
 			vk::ImageLayout::eUndefined,
 			m_pPreZDepthAttachment->getDepthStencilAttachmentLayout(),
@@ -1258,14 +1396,121 @@ namespace vg
 			1u,                                  
 		};
 
-		m_pPreZFrameBuffer = fd::createFrameBuffer(pDevice, frameBufferCreateInfo);
+		m_pPreZFramebuffer = fd::createFrameBuffer(pDevice, frameBufferCreateInfo);
 	}
 
 	void Renderer::_destroyPreZObjs()
 	{
-		m_pPreZFrameBuffer = nullptr;
+		m_pPreZFramebuffer = nullptr;
 		m_pPreZRenderPass = nullptr;
 		m_pPreZDepthAttachment = nullptr;
+		m_preZCmdBuffer.clear();
+	}
+
+	void Renderer::_createPostRenderObjs()
+	{
+		auto pDevice = pApp->getDevice();
+		const auto framebufferWidth = m_framebufferWidth;
+		const auto framebufferHeight = m_framebufferHeight;
+		//depth attachment
+		auto pTex = new Texture2DColorAttachment(
+			    m_postRenderColorImageFormat,
+				framebufferWidth,
+				framebufferHeight
+			    );
+		m_pPostRenderColorAttachment = std::shared_ptr<Texture2DColorAttachment>(pTex);
+
+		//render pass.
+		vk::AttachmentDescription colorAttachmentDes = {
+			vk::AttachmentDescriptionFlags(),
+			m_postRenderColorImageFormat,
+			vk::SampleCountFlagBits::e1,
+			vk::AttachmentLoadOp::eClear,
+			vk::AttachmentStoreOp::eStore,
+			vk::AttachmentLoadOp::eDontCare,
+			vk::AttachmentStoreOp::eDontCare,
+			vk::ImageLayout::eUndefined,
+			m_pPostRenderColorAttachment->getColorAttachmentLayout(),
+		};
+
+		vk::AttachmentReference colorAttachmentRef = {
+			uint32_t(0),
+			vk::ImageLayout::eColorAttachmentOptimal
+		};
+
+		vk::SubpassDescription subpass = {
+			vk::SubpassDescriptionFlags(),       //flags
+			vk::PipelineBindPoint::eGraphics,    //pipelineBindPoint
+			0,                                   //inputAttachmentCount
+			nullptr,                             //pInputAttachments
+			1,                                   //colorAttachmentCount
+			&colorAttachmentRef,                 //pColorAttachments
+			nullptr,                             //pResolveAttachments
+			nullptr,                             //pDepthStencilAttachment
+			0,                                   //preserveAttachmentCount
+			nullptr                              //pPreserveAttachments
+		};
+
+		std::array<vk::SubpassDependency, 2> dependencies = { 
+			vk::SubpassDependency 
+		    {
+			    VK_SUBPASS_EXTERNAL,                                  
+			    0,                                                    
+			    vk::PipelineStageFlagBits::eTopOfPipe,                
+			    vk::PipelineStageFlagBits::eColorAttachmentOutput, 
+			    vk::AccessFlagBits::eShaderRead,                                    
+			    vk::AccessFlagBits::eColorAttachmentRead | vk::AccessFlagBits::eColorAttachmentWrite,       
+			    vk::DependencyFlagBits::eByRegion                     
+		    },
+			vk::SubpassDependency
+		    {
+			    0,                                                    
+			    VK_SUBPASS_EXTERNAL,                                  
+			    vk::PipelineStageFlagBits::eColorAttachmentOutput,    
+			    vk::PipelineStageFlagBits::eBottomOfPipe,             
+				vk::AccessFlagBits::eColorAttachmentRead | vk::AccessFlagBits::eColorAttachmentWrite,
+			    vk::AccessFlagBits::eShaderRead,                      
+			    vk::DependencyFlagBits::eByRegion         
+		    }
+		};
+
+		std::array<vk::AttachmentDescription, 1> attachmentDess = { colorAttachmentDes };
+		vk::RenderPassCreateInfo renderPassCreateInfo = {
+			vk::RenderPassCreateFlags(),
+			static_cast<uint32_t>(attachmentDess.size()),
+			attachmentDess.data(),
+			1u,
+			&subpass,
+			static_cast<uint32_t>(dependencies.size()),
+			dependencies.data()
+		};
+
+		m_pPostRenderRenderPass = fd::createRenderPass(pDevice, renderPassCreateInfo);
+
+		//frame buffer.
+        std::array<vk::ImageView, 1> attachments = {
+			 *(m_pPostRenderColorAttachment->getColorAttachmentImageView()),
+		};
+
+		vk::FramebufferCreateInfo frameBufferCreateInfo = {
+			vk::FramebufferCreateFlags(),      
+			*m_pPostRenderRenderPass,                                
+			static_cast<uint32_t>(attachments.size()),      
+			attachments.data(),                             
+			framebufferWidth,                             
+			framebufferHeight,                            
+			1u,                                  
+		};
+
+		m_pPostRenderFramebuffer = fd::createFrameBuffer(pDevice, frameBufferCreateInfo);
+	}
+
+	void Renderer::_destroyPostRenderObjs()
+	{
+		m_pPostRenderFramebuffer = nullptr;
+		m_pPostRenderRenderPass = nullptr;
+		m_pPostRenderColorAttachment = nullptr;
+		m_postRenderCmdbuffer.clear();
 	}
 
 }

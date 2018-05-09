@@ -4,4 +4,3 @@ format (COLLADA).
 3.Perfect binding priority and Add register feature of binding priority.
 4.Perfect light system and Add some necessary light types.
 5.Post render for entire screen after render.
-6.Change render flow for every scene as: pre_z -> render -> post render.

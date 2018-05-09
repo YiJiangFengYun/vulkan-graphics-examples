@@ -100,9 +100,13 @@ void Window::_createMaterial()
 	    depthStencilState.depthWriteEnable = VG_TRUE;
 	    depthStencilState.depthCompareOp = vk::CompareOp::eLessOrEqual;
 		pPreZPass->setDepthStencilInfo(depthStencilState);
-
+		
+		vg::Pass::BuildInDataInfo::Component buildInDataCmps[1] = {
+	    	{vg::Pass::BuildInDataType::PRE_Z_DEPTH},
+	    };
 		vg::Pass::BuildInDataInfo buildInData;
-		buildInData.componentCount = 0u;
+		buildInData.componentCount = 1u;
+		buildInData.pComponent = buildInDataCmps;
 		pPass->setBuildInDataInfo(buildInData);
 
 	    pPass->setDataValue("other_info", m_otherInfo, VG_M_OTHER_MAX_BINDING_PRIORITY, 

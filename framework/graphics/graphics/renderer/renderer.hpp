@@ -11,6 +11,7 @@
 #include "graphics/texture/texture_2d.hpp"
 #include "graphics/renderer/pipeline_cache.hpp"
 #include "graphics/renderer/render_target.hpp"
+#include "graphics/post_render/post_render.hpp"
 
 //todo: batch mesh,
 //todo: cache graphics pipeline.
@@ -25,9 +26,11 @@ namespace vg
 			const BaseScene *pScene;
 			const BaseCamera *pCamera;
 			Bool32 preZ;
+			PostRender * postRender;
 			SceneInfo(const BaseScene *pScene = nullptr
 			    , const BaseCamera *pCamera = nullptr
-				, Bool32 preZ = VG_FALSE);
+				, Bool32 preZ = VG_FALSE
+				, PostRender * postRender = nullptr);
 		};
 
 		struct RenderInfo {
@@ -58,6 +61,7 @@ namespace vg
 		};
 
 		static const vk::Format DEFAULT_PRE_Z_DEPTH_FORMAT;
+		static const vk::Format DEFAULT_POST_RENDER_COLOR_FORMAT;
 
 		Renderer(const RenderTarget * pRenderTarget = nullptr);
 		~Renderer();
@@ -67,6 +71,9 @@ namespace vg
 
 		void enablePreZ();
 		void disablePreZ();
+
+		void enablePostRender();
+		void disablePostRender();
 
 		Bool32 isValidForRender() const;
 
@@ -94,13 +101,24 @@ namespace vg
 		std::shared_ptr<vk::CommandBuffer> m_pCommandBuffer;
 		PipelineCache m_pipelineCache;
 
+		uint32_t m_framebufferWidth;
+		uint32_t m_framebufferHeight;
+
 		//pre z pass
 		Bool32 m_preZEnable;
 		vk::Format m_preZDepthImageFormat;
 		std::shared_ptr<Texture2DDepthAttachment> m_pPreZDepthAttachment;		
 		std::shared_ptr<vk::RenderPass> m_pPreZRenderPass;
-		std::shared_ptr<vk::Framebuffer> m_pPreZFrameBuffer;
-		CmdBuffer m_preZRenderPassCmdBuffer;
+		std::shared_ptr<vk::Framebuffer> m_pPreZFramebuffer;
+		CmdBuffer m_preZCmdBuffer;
+
+		//post render
+		Bool32 m_postRenderEnable;
+		vk::Format m_postRenderColorImageFormat;
+		std::shared_ptr<Texture2DColorAttachment> m_pPostRenderColorAttachment;
+		std::shared_ptr<vk::RenderPass> m_pPostRenderRenderPass;
+		std::shared_ptr<vk::Framebuffer> m_pPostRenderFramebuffer;
+		CmdBuffer m_postRenderCmdbuffer;
 		
 		CmdBuffer m_trunkRenderPassCmdBuffer;
 		CmdBuffer m_trunkWaitBarrierCmdBuffer;
@@ -129,7 +147,7 @@ namespace vg
 		void _recordCommandBufferForBegin();
 		void _recordPreZRenderPassForBegin();
 		void _recordPreZRenderPassForEnd();
-		const vk::RenderPass * _recordTrunkRenderPassForBegin(Bool32 isFirst);
+		const vk::RenderPass * _recordTrunkRenderPassForBegin(Bool32 isPostRender, Bool32 isFirst);
 		void _recordTrunkRenderPassForEnd();
 		void _recordCommandBufferForEnd();
 
@@ -157,6 +175,8 @@ namespace vg
         
 		void _createPreZObjs();
 		void _destroyPreZObjs();
+		void _createPostRenderObjs();
+		void _destroyPostRenderObjs();
 
 		void _setBuildInData(BaseVisualObject * pVisualObject, Matrix4x4 modelMatrix, Matrix4x4 viewMatrix, Matrix4x4 projMatrix
 #if defined(DEBUG) && defined(VG_ENABLE_COST_TIMER)

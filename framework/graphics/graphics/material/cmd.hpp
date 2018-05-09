@@ -128,6 +128,7 @@ namespace vg
         void begin();
         void addCmd(CmdInfo cmdInfo);
         void end();
+        void clear();
     
     private:
         uint32_t m_cmdInfoCount;

@@ -354,4 +354,60 @@ namespace vg
     void CmdBuffer::end()
     {    
     }
+
+    void CmdBuffer::clear()
+    {
+        m_cmdInfoCount = 0u;
+        m_cmdInfoCapacity = 0u;
+        m_cmdInfos.clear();
+        m_cmdInfos.shrink_to_fit();
+
+        m_renderPassInfoCount = 0u;
+        m_renderPassInfoCapacity = 0u;
+        m_renderPassInfos.clear();
+        m_renderPassInfos.shrink_to_fit();
+		m_renderPassInfoToCmdInfoIndices.clear();
+        m_renderPassInfoToCmdInfoIndices.shrink_to_fit();
+
+        m_clearValuesCount = 0u;
+        m_clearValuesCapacity = 0u;
+        m_clearValues.clear();
+        m_clearValues.shrink_to_fit();
+
+        m_cmdDrawCount = 0u;
+        m_cmdDrawCapacity = 0u;
+        m_cmdDraws.clear();
+        m_cmdDraws.shrink_to_fit();
+	    m_cmdDrawToRenderPassInfoIndices.clear();
+        m_cmdDrawToRenderPassInfoIndices.shrink_to_fit();
+
+        m_cmdDrawIndexedCount = 0u;
+        m_cmdDrawIndexedCapacity = 0u;
+        m_cmdDrawIndexeds.clear();
+        m_cmdDrawIndexeds.shrink_to_fit();
+		m_cmdDrawIndexedToRenderPassInfoIndices.clear();
+        m_cmdDrawIndexedToRenderPassInfoIndices.shrink_to_fit();
+
+        m_barrierInfoCount = 0u;
+        m_barrierInfosCapacity = 0u;
+        m_barrierInfos.clear();
+        m_barrierInfos.shrink_to_fit();
+		m_barrierInfoToCmdInfoIndices.clear();
+        m_barrierInfoToCmdInfoIndices.shrink_to_fit();
+
+        m_memoryBarrierCount = 0u;
+        m_memoryBarrierCapacity = 0u;
+        m_memoryBarriers.clear();
+        m_memoryBarriers.shrink_to_fit();
+
+        m_bufferMemoryBarrierCount = 0u;
+        m_bufferMemoryBarrierCapacity = 0u;
+        m_bufferMemoryBarriers.clear();
+        m_bufferMemoryBarriers.shrink_to_fit();
+
+        m_imageMemoryBarrierCount = 0u;
+        m_imageMemoryBarrierCapacity = 0u;
+        m_imageMemoryBarriers.clear();
+        m_imageMemoryBarriers.shrink_to_fit();
+    }
 } //vg

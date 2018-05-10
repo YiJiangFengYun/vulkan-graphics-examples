@@ -18,6 +18,7 @@ Window::Window(uint32_t width
 	, m_pMaterialWireframe()
 	, m_pPostRender()
 	, m_postRenderMaterials()
+	, m_currPostRenderMaterialIndex()
 {
 	_init();
 }
@@ -33,6 +34,9 @@ Window::Window(std::shared_ptr<GLFWwindow> pWindow
 	, m_pTexture()
 	, m_pMaterialSolid()
 	, m_pMaterialWireframe()
+	, m_pPostRender()
+	, m_postRenderMaterials()
+	, m_currPostRenderMaterialIndex()
 {
 	_init();
 }
@@ -54,7 +58,7 @@ void Window::_initState()
 	/// Build a quaternion from euler angles (pitch, yaw, roll), in radians.
 	m_cameraRotation = vg::Vector3(glm::radians(0.0f), glm::radians(0.0f), glm::radians(0.0f));
 	m_otherInfo.lightPos = vg::Vector4(25.0f, -5.0f, 5.0f, 1.0f);
-	m_mutiplyColorInfo.color = vg::Color(1.0f, 1.0f, 1.0f, 1.0f);
+	m_mutiplyColorInfo.color = vg::Color(1.0f, 0.0f, 0.0f, 1.0f);
 }
 
 void Window::_createModel()
@@ -183,7 +187,7 @@ void Window::_createMaterial()
 	    	vg::Pass::BuildInDataInfo buildInDataInfo;
 	    	buildInDataInfo.componentCount = 3u;
 	    	buildInDataInfo.pComponent = buildInDataCmps;
-	    	pPass->setBuildInDataInfo(buildInDataInfo);
+	    pPass->setBuildInDataInfo(buildInDataInfo);
 	    pPass->setCullMode(vg::CullModeFlagBits::BACK);
 	    pPass->setFrontFace(vg::FrontFaceType::CLOCKWISE);
 	    vk::PipelineDepthStencilStateCreateInfo depthStencilState = {};
@@ -287,12 +291,11 @@ void Window::_initPostRender()
 	        vg::Pass::BuildInDataInfo::Component buildInDataCmps[1] = {
 	        		{vg::Pass::BuildInDataType::POST_RENDER_RESULT},
 	        	};
-	        	vg::Pass::BuildInDataInfo buildInDataInfo;
-	        	buildInDataInfo.componentCount = 1u;
-	        	buildInDataInfo.pComponent = buildInDataCmps;
+	        vg::Pass::BuildInDataInfo buildInDataInfo;
+	        buildInDataInfo.componentCount = 1u;
+	        buildInDataInfo.pComponent = buildInDataCmps;
 	        pPass->setBuildInDataInfo(buildInDataInfo);
-	        // pPass->setCullMode(vg::CullModeFlagBits::BACK);
-	        // pPass->setFrontFace(vg::FrontFaceType::CLOCKWISE);
+	        pPass->setCullMode(vg::CullModeFlagBits::NONE);
 	        pPass->setDataValue("mutiply_color_info", m_mutiplyColorInfo, 
 			    VG_M_OTHER_MAX_BINDING_PRIORITY, vg::DescriptorType::UNIFORM_BUFFER,
 				vg::ShaderStageFlagBits::FRAGMENT);
@@ -306,10 +309,16 @@ void Window::_initPostRender()
 	//post render object.
 	{
 		m_pPostRender = std::shared_ptr<vg::PostRender>{new vg::PostRender{}};
-		m_pPostRender->setMaterial(m_postRenderMaterials[0].second.get());
+		m_pPostRender->setMaterial(m_postRenderMaterials[m_currPostRenderMaterialIndex].second.get());
 
 		m_pRenderer->enablePostRender();
 	}
+}
+
+void Window::_onPostReCreateSwapchain()
+{
+	ParentWindowType::_onPostReCreateSwapchain();
+	m_pRenderer->enablePostRender();
 }
 
 void Window::_onUpdate()
@@ -321,7 +330,7 @@ void Window::_onUpdate()
 	ImGui::SetNextWindowPos(ImVec2(pos.x, pos.y + size.y + 10));
 	ImGui::SetNextWindowSize(ImVec2(0, 0));
 	ImGui::Begin("Settings", nullptr, ImGuiWindowFlags_AlwaysAutoResize | ImGuiWindowFlags_NoResize | ImGuiWindowFlags_NoMove);
-	if (ImGui::Checkbox("wireframe", &m_wireFrame)) {
+	if (ImGui::Checkbox("Wireframe", &m_wireFrame)) {
 		const auto &objects = m_assimpScene.getObjects();
 	    for (const auto &object : objects)
 	    {
@@ -336,6 +345,27 @@ void Window::_onUpdate()
 			}
 	    	
 	        m_pScene->addVisualObject(object.get());		
+	    }
+	}
+
+	uint32_t count = static_cast<uint32_t>(MaterialType::MATEERIAL_COUNT);
+	std::vector<const char *> charItems(count);
+	for (size_t i = 0; i < count; ++i)
+	{
+		charItems[i] = MATERIAL_NAMES[i].c_str();
+	}
+	if (ImGui::Combo("Material Type", &m_currPostRenderMaterialIndex,
+		charItems.data(), count, count)) {
+		m_pPostRender->setMaterial(m_postRenderMaterials[m_currPostRenderMaterialIndex].second.get());
+	}
+
+	if (m_currPostRenderMaterialIndex == 0) {
+	    if (ImGui::ColorPicker4("Mutiply Color", reinterpret_cast<float *>(&m_mutiplyColorInfo.color))) {
+	    	auto pMaterial = m_postRenderMaterials[m_currPostRenderMaterialIndex].second.get();
+	    	pMaterial->getMainPass()->setDataValue("mutiply_color_info", m_mutiplyColorInfo, 
+			    VG_M_OTHER_MAX_BINDING_PRIORITY, vg::DescriptorType::UNIFORM_BUFFER,
+				vg::ShaderStageFlagBits::FRAGMENT);
+	    	pMaterial->apply();
 	    }
 	}
 	ImGui::End();

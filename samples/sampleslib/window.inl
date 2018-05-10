@@ -278,6 +278,6 @@ namespace sampleslib
 	void Window<SPACE_TYPE>::_onPostRender(vg::Renderer::RenderInfo &info
 		, vg::Renderer::RenderResultInfo &resultInfo)
 	{
-
+		m_lastDrawCount = resultInfo.drawCount;
 	}
 } //sampleslib

@@ -38,6 +38,8 @@ private:
 
 	std::vector<std::pair<std::string, std::shared_ptr<vg::Material>>> m_postRenderMaterials;
 
+	int32_t m_currPostRenderMaterialIndex;
+
 	struct OtherInfo 
 	{
 		vg::Vector4 lightPos;
@@ -57,6 +59,8 @@ private:
 	void _initPostRender();
 
 	virtual void _onUpdate() override;
+
+	virtual void _onPostReCreateSwapchain() override;
 
 	static std::vector<vg::Renderer::SceneInfo> mySceneInfos;
 	virtual void _onPreRender(vg::Renderer::RenderInfo &info

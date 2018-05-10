@@ -61,6 +61,7 @@ namespace vg
 
 	const vk::Format Renderer::DEFAULT_PRE_Z_DEPTH_FORMAT(vk::Format::eD32Sfloat);
 	const vk::Format Renderer::DEFAULT_POST_RENDER_COLOR_FORMAT(vk::Format::eR8G8B8A8Unorm);
+	const vk::Format Renderer::DEFAULT_POST_RENDER_DEPTH_STENCIL_FORMAT(vk::Format::eD32SfloatS8Uint);
 
 	Renderer::Renderer(const RenderTarget * pRenderTarget)
 		: Base(BaseType::RENDERER)
@@ -86,7 +87,9 @@ namespace vg
 		//post render
 		, m_postRenderEnable(VG_FALSE)
 		, m_postRenderColorImageFormat(DEFAULT_POST_RENDER_COLOR_FORMAT)
+		, m_postRenderDepthStencilImageFormat(DEFAULT_POST_RENDER_DEPTH_STENCIL_FORMAT)
 		, m_pPostRenderColorAttachment()
+		, m_pPostRenderDepthStencilAttachment()
 		, m_pPostRenderRenderPass()
 		, m_pPostRenderFramebuffer()
 		, m_postRenderCmdbuffer()
@@ -455,6 +458,13 @@ namespace vg
 		    m_trunkRenderPassCmdBuffer.end();
 		    m_trunkWaitBarrierCmdBuffer.end();
 		    m_branchCmdBuffer.end();
+			if (m_postRenderEnable == VG_TRUE &&
+				sceneInfo.postRender != nullptr &&
+				sceneInfo.postRender->isValidBindToRender() == VG_TRUE
+				)
+			{
+				m_postRenderCmdbuffer.end();
+			}
     
 #if defined(DEBUG) && defined(VG_ENABLE_COST_TIMER)
 			preparingSceneCostTimer.end();
@@ -1431,13 +1441,22 @@ namespace vg
 		auto pDevice = pApp->getDevice();
 		const auto framebufferWidth = m_framebufferWidth;
 		const auto framebufferHeight = m_framebufferHeight;
-		//depth attachment
-		auto pTex = new Texture2DColorAttachment(
-			    m_postRenderColorImageFormat,
-				framebufferWidth,
-				framebufferHeight
-			    );
-		m_pPostRenderColorAttachment = std::shared_ptr<Texture2DColorAttachment>(pTex);
+		//color attachment
+		auto pColorTex = new Texture2DColorAttachment(
+			m_postRenderColorImageFormat,
+			framebufferWidth,
+			framebufferHeight
+			);
+		m_pPostRenderColorAttachment = std::shared_ptr<Texture2DColorAttachment>(pColorTex);
+
+		auto pDepthStencilTex = new TextureDepthStencilAttachment(
+			m_postRenderDepthStencilImageFormat,
+			framebufferWidth,
+			framebufferHeight
+		    );
+		m_pPostRenderDepthStencilAttachment = std::shared_ptr<TextureDepthStencilAttachment>(pDepthStencilTex);
+
+
 
 		//render pass.
 		auto pImage = m_pPostRenderColorAttachment->getImage();
@@ -1453,9 +1472,27 @@ namespace vg
 			pImage->getInfo().layout,
 		};
 
+		pImage = m_pPostRenderDepthStencilAttachment->getImage();
+		vk::AttachmentDescription depthStencilAttachmentDes = {
+			vk::AttachmentDescriptionFlags(),
+			m_postRenderDepthStencilImageFormat,
+			vk::SampleCountFlagBits::e1,
+			vk::AttachmentLoadOp::eClear,
+			vk::AttachmentStoreOp::eDontCare,
+			vk::AttachmentLoadOp::eDontCare,
+			vk::AttachmentStoreOp::eDontCare,
+			vk::ImageLayout::eUndefined,
+			pImage->getInfo().layout,
+		};
+
 		vk::AttachmentReference colorAttachmentRef = {
-			uint32_t(0),
-			vk::ImageLayout::eColorAttachmentOptimal
+			0u,
+			vk::ImageLayout::eColorAttachmentOptimal,
+		};
+
+		vk::AttachmentReference depthStencilAttachmentRef = {
+			1u,
+			vk::ImageLayout::eDepthStencilAttachmentOptimal,
 		};
 
 		vk::SubpassDescription subpass = {
@@ -1466,7 +1503,7 @@ namespace vg
 			1,                                   //colorAttachmentCount
 			&colorAttachmentRef,                 //pColorAttachments
 			nullptr,                             //pResolveAttachments
-			nullptr,                             //pDepthStencilAttachment
+			&depthStencilAttachmentRef,          //pDepthStencilAttachment
 			0,                                   //preserveAttachmentCount
 			nullptr                              //pPreserveAttachments
 		};
@@ -1494,7 +1531,7 @@ namespace vg
 		    }
 		};
 
-		std::array<vk::AttachmentDescription, 1> attachmentDess = { colorAttachmentDes };
+		std::array<vk::AttachmentDescription, 2> attachmentDess = { colorAttachmentDes, depthStencilAttachmentDes };
 		vk::RenderPassCreateInfo renderPassCreateInfo = {
 			vk::RenderPassCreateFlags(),
 			static_cast<uint32_t>(attachmentDess.size()),
@@ -1508,8 +1545,9 @@ namespace vg
 		m_pPostRenderRenderPass = fd::createRenderPass(pDevice, renderPassCreateInfo);
 
 		//frame buffer.
-        std::array<vk::ImageView, 1> attachments = {
+        std::array<vk::ImageView, 2> attachments = {
 			 *(m_pPostRenderColorAttachment->getColorAttachmentImageView()),
+			 *(m_pPostRenderDepthStencilAttachment->getDepthStencilAttachmentImageView()),
 		};
 
 		vk::FramebufferCreateInfo frameBufferCreateInfo = {
@@ -1530,6 +1568,7 @@ namespace vg
 		m_pPostRenderFramebuffer = nullptr;
 		m_pPostRenderRenderPass = nullptr;
 		m_pPostRenderColorAttachment = nullptr;
+		m_pPostRenderDepthStencilAttachment = nullptr;
 		m_postRenderCmdbuffer.clear();
 	}
 

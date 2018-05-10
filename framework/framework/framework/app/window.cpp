@@ -338,7 +338,6 @@ namespace vgf {
 	{
 		_createSwapchain();
 		_createSwapchainImageViews();
-		_createRenderer();
 	}
 
 	void Window::_doUpdate()
@@ -484,6 +483,7 @@ namespace vgf {
 	{
 		_onPreReCreateSwapchain();
 		_reCreateSwapchain();
+		_createRenderer();		
 		_onPostReCreateSwapchain();
 	}
 

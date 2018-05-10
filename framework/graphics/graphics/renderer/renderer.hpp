@@ -62,6 +62,7 @@ namespace vg
 
 		static const vk::Format DEFAULT_PRE_Z_DEPTH_FORMAT;
 		static const vk::Format DEFAULT_POST_RENDER_COLOR_FORMAT;
+		static const vk::Format DEFAULT_POST_RENDER_DEPTH_STENCIL_FORMAT;
 
 		Renderer(const RenderTarget * pRenderTarget = nullptr);
 		~Renderer();
@@ -115,7 +116,9 @@ namespace vg
 		//post render
 		Bool32 m_postRenderEnable;
 		vk::Format m_postRenderColorImageFormat;
+		vk::Format m_postRenderDepthStencilImageFormat;
 		std::shared_ptr<Texture2DColorAttachment> m_pPostRenderColorAttachment;
+		std::shared_ptr<TextureDepthStencilAttachment> m_pPostRenderDepthStencilAttachment;
 		std::shared_ptr<vk::RenderPass> m_pPostRenderRenderPass;
 		std::shared_ptr<vk::Framebuffer> m_pPostRenderFramebuffer;
 		CmdBuffer m_postRenderCmdbuffer;

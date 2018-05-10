@@ -51,6 +51,13 @@ namespace vg
             m_pMaterial != nullptr
             ) 
         {
+            auto pPass = m_pMaterial->getMainPass();
+            vk::PipelineInputAssemblyStateCreateInfo inputAssemblyState = {
+                vk::PipelineInputAssemblyStateCreateFlags(),
+                vk::PrimitiveTopology::eTriangleList
+            };
+    
+            pPass->setDefaultInputAssemblyState(inputAssemblyState);
             CmdDraw cmdDraw = {
                 3,
                 1,
@@ -64,7 +71,7 @@ namespace vg
             renderPassInfo.framebufferHeight = info.framebufferHeight;
             renderPassInfo.projMatrix = vg::Matrix4x4(1.0f);
             renderPassInfo.viewMatrix = vg::Matrix4x4(1.0f);
-            renderPassInfo.pPass = m_pMaterial->getMainPass();
+            renderPassInfo.pPass = pPass;
             renderPassInfo.modelMatrix = vg::Matrix4x4(1.0f);
             renderPassInfo.pMesh = nullptr;
             renderPassInfo.subMeshIndex = 0u;

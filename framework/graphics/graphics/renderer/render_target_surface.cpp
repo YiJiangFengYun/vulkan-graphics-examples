@@ -123,6 +123,7 @@ namespace vg
         m_pFirstRenderPass = m_pFirstSurfaceRenderPass.get();
 
 		colorAttachment.loadOp = vk::AttachmentLoadOp::eLoad;
+		colorAttachment.initialLayout = vk::ImageLayout::ePresentSrcKHR;
 		attachments = { colorAttachment, depthAttachment };
 
 		m_pSecondSurfaceRenderPass = fd::createRenderPass(pDevice, createInfo);

@@ -74,7 +74,7 @@ namespace vg
 			    0,                                                    //dstSubpass
 			    vk::PipelineStageFlagBits::eTopOfPipe,                //srcStageMask
 			    vk::PipelineStageFlagBits::eColorAttachmentOutput,    //dstStageMask
-			    vk::AccessFlagBits::eMemoryRead,                                    //srcAccessMask
+			    vk::AccessFlagBits::eShaderRead | vk::AccessFlagBits::eMemoryRead,    //srcAccessMask
 			    vk::AccessFlagBits::eColorAttachmentRead |
 				    vk::AccessFlagBits::eColorAttachmentWrite,        //dstAccessMask
 			    vk::DependencyFlagBits::eByRegion                     //dependencyFlags
@@ -87,7 +87,7 @@ namespace vg
 			    vk::PipelineStageFlagBits::eBottomOfPipe,             //dstStageMask
 				vk::AccessFlagBits::eColorAttachmentRead |
 				    vk::AccessFlagBits::eColorAttachmentWrite,        //srcAccessMask
-			    vk::AccessFlagBits::eMemoryRead,                      //dstAccessMask
+			    vk::AccessFlagBits::eShaderRead | vk::AccessFlagBits::eMemoryRead, //dstAccessMask
 			    vk::DependencyFlagBits::eByRegion                     //dependencyFlags
 		    }
 		};

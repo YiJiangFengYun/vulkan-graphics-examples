@@ -353,6 +353,7 @@ namespace vg
 						if ((*(buildInDataInfo.pComponent + j)).type == Pass::BuildInDataType::POST_RENDER_RESULT)
 						{
 							pPass->setTexture("_post_render_tex", m_pPostRenderColorAttachment.get(), VG_M_POST_RENDER_TEXTURE_BINDING_PRIORITY);
+							pPass->apply();
 							break;
 						}
 					}
@@ -1439,6 +1440,7 @@ namespace vg
 		m_pPostRenderColorAttachment = std::shared_ptr<Texture2DColorAttachment>(pTex);
 
 		//render pass.
+		auto pImage = m_pPostRenderColorAttachment->getImage();
 		vk::AttachmentDescription colorAttachmentDes = {
 			vk::AttachmentDescriptionFlags(),
 			m_postRenderColorImageFormat,
@@ -1448,7 +1450,7 @@ namespace vg
 			vk::AttachmentLoadOp::eDontCare,
 			vk::AttachmentStoreOp::eDontCare,
 			vk::ImageLayout::eUndefined,
-			m_pPostRenderColorAttachment->getColorAttachmentLayout(),
+			pImage->getInfo().layout,
 		};
 
 		vk::AttachmentReference colorAttachmentRef = {

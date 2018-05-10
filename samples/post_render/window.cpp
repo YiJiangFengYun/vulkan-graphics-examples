@@ -54,6 +54,7 @@ void Window::_initState()
 	/// Build a quaternion from euler angles (pitch, yaw, roll), in radians.
 	m_cameraRotation = vg::Vector3(glm::radians(0.0f), glm::radians(0.0f), glm::radians(0.0f));
 	m_otherInfo.lightPos = vg::Vector4(25.0f, -5.0f, 5.0f, 1.0f);
+	m_mutiplyColorInfo.color = vg::Color(1.0f, 1.0f, 1.0f, 1.0f);
 }
 
 void Window::_createModel()
@@ -213,7 +214,7 @@ void Window::_createMaterial()
 	    
 	    //shader
 		pShader->load("shaders/post_render/mesh.vert.spv", 
-			"shaders/mesh/post_render.frag.spv");
+			"shaders/post_render/mesh.frag.spv");
 	    //pass
 	    vg::Pass::BuildInDataInfo::Component buildInDataCmps[3] = {
 	    		{vg::Pass::BuildInDataType::MATRIX_OBJECT_TO_NDC},
@@ -281,7 +282,7 @@ void Window::_initPostRender()
 	        
 	        //shader
 		    pShader->load("shaders/post_render/mutlply_color.vert.spv", 
-		    	"shaders/mesh/post_render.frag.spv");
+		    	"shaders/post_render/mutlply_color.frag.spv");
 	        //pass
 	        vg::Pass::BuildInDataInfo::Component buildInDataCmps[1] = {
 	        		{vg::Pass::BuildInDataType::POST_RENDER_RESULT},
@@ -292,7 +293,9 @@ void Window::_initPostRender()
 	        pPass->setBuildInDataInfo(buildInDataInfo);
 	        // pPass->setCullMode(vg::CullModeFlagBits::BACK);
 	        // pPass->setFrontFace(vg::FrontFaceType::CLOCKWISE);
-	        pPass->setDataValue("mutiply_color_info", m_mutiplyColorInfo, VG_M_OTHER_MAX_BINDING_PRIORITY);
+	        pPass->setDataValue("mutiply_color_info", m_mutiplyColorInfo, 
+			    VG_M_OTHER_MAX_BINDING_PRIORITY, vg::DescriptorType::UNIFORM_BUFFER,
+				vg::ShaderStageFlagBits::FRAGMENT);
 	        pPass->apply();
 	        
 	        pMaterial->apply();
@@ -354,5 +357,5 @@ void Window::_onPreRender(vg::Renderer::RenderInfo &info
 	
 	info.pSceneInfos = mySceneInfos.data();
 
-	mySceneInfos[1].postRender = m_pPostRender.get();
+	mySceneInfos[0].postRender = m_pPostRender.get();
 }

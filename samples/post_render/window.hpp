@@ -45,7 +45,7 @@ private:
 
 	struct MutiplyColorInfo
 	{
-		vg::Vector4 color;
+		vg::Color color;
 	} m_mutiplyColorInfo;
 
 	virtual void _init() override;

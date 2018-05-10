@@ -354,7 +354,7 @@ void Window::_onUpdate()
 	{
 		charItems[i] = MATERIAL_NAMES[i].c_str();
 	}
-	if (ImGui::Combo("Material Type", &m_currPostRenderMaterialIndex,
+	if (ImGui::Combo("Post Render Material Type", &m_currPostRenderMaterialIndex,
 		charItems.data(), count, count)) {
 		m_pPostRender->setMaterial(m_postRenderMaterials[m_currPostRenderMaterialIndex].second.get());
 	}

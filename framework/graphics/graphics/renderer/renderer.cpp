@@ -355,7 +355,7 @@ namespace vg
 					{
 						if ((*(buildInDataInfo.pComponent + j)).type == Pass::BuildInDataType::POST_RENDER_RESULT)
 						{
-							pPass->setTexture("_post_render_tex", m_pPostRenderColorAttachment.get(), VG_M_POST_RENDER_TEXTURE_BINDING_PRIORITY);
+							pPass->setTexture(VG_M_POST_RENDER_TEXTURE_NAME, m_pPostRenderColorAttachment.get(), VG_M_POST_RENDER_TEXTURE_BINDING_PRIORITY);
 							pPass->apply();
 							break;
 						}
@@ -1236,7 +1236,7 @@ namespace vg
 					{
 						if (m_preZEnable == VG_TRUE)
 				        {
-				        	pPass->setTexture("_pre_z_depth_tex", m_pPreZDepthAttachment.get(), VG_M_PRE_Z_TEXTURE_BINDING_PRIORITY);
+				        	pPass->setTexture(VG_M_PRE_Z_TEXTURE_NAME, m_pPreZDepthAttachment.get(), VG_M_PRE_Z_TEXTURE_BINDING_PRIORITY);
 				        }
 					}
 		        }

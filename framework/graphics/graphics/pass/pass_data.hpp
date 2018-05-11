@@ -7,6 +7,8 @@
 
 #define VG_M_MAIN_TEXTURE_NAME "_MainTex"
 #define VG_M_BUILDIN_NAME "_BuildIn"
+#define VG_M_PRE_Z_TEXTURE_NAME "_pre_z_depth_tex"
+#define VG_M_POST_RENDER_TEXTURE_NAME "_post_render_tex"
 
 #define VG_M_BUILDIN_BINDING_PRIORITY 0
 #define VG_M_MAIN_TEXTURE_BINDING_PRIORITY 1

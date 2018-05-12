@@ -124,6 +124,27 @@ namespace vg
 			, std::unordered_map<InstanceID, T *> &map
 			, std::unordered_map<InstanceID, T *> &mapTransformToObjs
 		);
+
+		template <typename T>
+		void _addObjectAddSceneDataOnly(T *pTarget
+			, std::vector<T *> &arr
+			, std::unordered_map<InstanceID, T *> &map
+			, std::unordered_map<InstanceID, T *> &mapTransformToObjs
+		);
+
+		template <typename T>
+		void _removeObjectDeleteSceneDataOnly(T *pTarget
+			, std::vector<T *> &arr
+			, std::unordered_map<InstanceID, T *> &map
+			, std::unordered_map<InstanceID, T *> &mapTransformToObjs
+		);
+		
+		void _addObjectSetObjectOnly(ObjectType *pTarget
+		    , TransformType *root
+			, ObjectType *pParent = nullptr
+			);
+		
+		void _removeObjectSetObjectOnly(ObjectType *pTarget);
 	};
 } //namespace kgs
 

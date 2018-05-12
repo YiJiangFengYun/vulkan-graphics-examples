@@ -40,6 +40,4 @@ namespace vg
 	
 } //namespace kgs
 
-#include "graphics/material/material_data.inl"
-
 #endif // !VG_MATERIAL_DATA_H

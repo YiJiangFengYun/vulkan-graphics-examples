@@ -198,6 +198,4 @@ namespace vg
 	};
 }
 
-#include "graphics/mesh/mesh_data.inl"
-
 #endif // !VG_MESH_DATA_H

@@ -22,6 +22,4 @@ namespace vg
 	};
 } //namespace kgs
 
-#include "graphics/scene/camera_op.inl"
-
 #endif // !VG_CAMERA_OP_H

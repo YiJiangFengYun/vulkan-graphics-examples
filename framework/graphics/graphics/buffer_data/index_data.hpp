@@ -10,6 +10,24 @@ namespace vg {
      {
      public:
         using PipelineStateID = uint32_t;
+        template<vk::IndexType indexType>
+        struct IndexTypeInfo 
+        {
+            using ValueType = void;
+        };
+
+        template<>
+        struct IndexTypeInfo<vk::IndexType::eUint16> 
+        {
+            using ValueType = uint16_t;
+        };
+
+        template<>
+        struct IndexTypeInfo<vk::IndexType::eUint32>
+        {
+            using ValueType = uint32_t;
+        };
+
         struct SubIndexData {
             vk::IndexType indexType;           
             uint32_t indexCount;
@@ -68,11 +86,11 @@ namespace vg {
            , Bool32 cacheMemory
            );
 
-        template<typename IndexType>
-        IndexType getIndex(uint32_t index) const;
+        template<vk::IndexType indexType>
+        typename IndexTypeInfo<indexType>::ValueType getIndex(uint32_t index) const;
 
-        template<typename IndexType>
-        std::vector<IndexType> getIndices(uint32_t offset, uint32_t count) const;
+        template<vk::IndexType indexType>
+        std::vector<typename IndexTypeInfo<indexType>::ValueType> getIndices(uint32_t offset, uint32_t count) const;
         
      private:
         MemoryPropertyFlags m_bufferMemoryPropertyFlags;
@@ -92,5 +110,4 @@ namespace vg {
             uint32_t subDataCount2, const SubIndexData *pSubDatas2);
      };
 } //!vg
-#include "graphics/buffer_data/index_data.inl"
 #endif //!VG_INDEX_DATA_H

@@ -142,6 +142,4 @@ namespace vg
 	};
 } //namespace kgs
 
-#include "graphics/scene/transform.inl"
-
 #endif // !VG_TRANSFORM_H

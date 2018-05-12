@@ -304,6 +304,42 @@ namespace vg
 		}
     }
 
+    template<vk::IndexType indexType>
+    typename IndexData::IndexTypeInfo<indexType>::ValueType IndexData::getIndex(uint32_t index) const
+    {
+#ifdef DEBUG
+        if (m_pMemory == nullptr) throw std::runtime_error("Failed to get index when not chache memory.");
+#endif //!DEBUG
+        using IndexType = typename IndexTypeInfo<indexType>::ValueType;
+        IndexType resultIndex;
+        memcpy(&resultIndex, 
+            static_cast<IndexType *>(m_pMemory) + index, 
+            sizeof(IndexType));
+
+        return resultIndex;
+    }
+
+    //template instantiation
+    template typename IndexData::IndexTypeInfo<vk::IndexType::eUint16>::ValueType IndexData::getIndex<vk::IndexType::eUint16>(uint32_t index) const;
+
+    template<vk::IndexType indexType>
+    std::vector<typename IndexData::IndexTypeInfo<indexType>::ValueType> IndexData::getIndices(uint32_t offset, uint32_t count) const
+    {
+#ifdef DEBUG
+        if (m_pMemory == nullptr) throw std::runtime_error("Failed to get indices when not chache memory.");
+#endif //!DEBUG
+        using IndexType = typename IndexTypeInfo<indexType>::ValueType;
+        std::vector<IndexType> indices(count);
+        memcpy(indices.data(), 
+            static_cast<IndexType *>(m_pMemory) + offset, 
+            sizeof(IndexType) * static_cast<size_t>(count));
+        return indices;
+    }
+    
+    //template instantiation
+    template std::vector<typename IndexData::IndexTypeInfo<vk::IndexType::eUint32>::ValueType> IndexData::getIndices<vk::IndexType::eUint32>(uint32_t offset, uint32_t count) const;
+
+
     Bool32 IndexData::_isDeviceMemoryLocal() const
     {
         return (m_bufferMemoryPropertyFlags & MemoryPropertyFlagBits::DEVICE_LOCAL) == MemoryPropertyFlagBits::DEVICE_LOCAL;

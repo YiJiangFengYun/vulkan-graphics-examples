@@ -1,3 +1,0 @@
-namespace vgf
-{
-} //namespace gfw

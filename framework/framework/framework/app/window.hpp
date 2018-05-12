@@ -116,8 +116,5 @@ namespace vgf
 	};
 }  //namespace gfw
 
-#include "framework/app/window.inl"
-
-
 #endif // !VGF_WINDOW_H
 

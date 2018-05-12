@@ -13,7 +13,7 @@ int main() {
 	vg::PhysicalDeviceFeatures requiredFeatures;
 
     vg::PhysicalDeviceFeaturePriorities optionalFeatures;
-	optionalFeatures.samplerAnisotropy = 1u;
+	// optionalFeatures.samplerAnisotropy = 1u;
 	optionalFeatures.textureCompressionBC = 1u;
 	optionalFeatures.textureCompressionASTC_LDR = 1u;
 	optionalFeatures.textureCompressionETC2 = 1u;

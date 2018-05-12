@@ -243,9 +243,10 @@ namespace sampleslib
 								float z = pNormal->z;
 								if (! createInfo.isRightHand) {
 									y = - pNormal->y;
-									vg::Vector4 temp(x, y, z, 1.0f);
+									vg::Vector4 temp(x, y, z, 0.0f);
 									vg::Quaternion tempQ(vg::Vector3(glm::radians(180.0f), glm::radians(0.0f), glm::radians(0.0f)));
 									temp = tempQ * temp;
+                                    temp = glm::normalize(temp);
 									x = temp.x;
 									y = temp.y;
 									z = temp.z;

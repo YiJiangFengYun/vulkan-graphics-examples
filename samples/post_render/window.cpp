@@ -57,7 +57,7 @@ void Window::_initState()
 	m_cameraZoom = -15.0f;
 	/// Build a quaternion from euler angles (pitch, yaw, roll), in radians.
 	m_cameraRotation = vg::Vector3(glm::radians(0.0f), glm::radians(0.0f), glm::radians(0.0f));
-	m_otherInfo.lightPos = vg::Vector4(25.0f, -5.0f, 5.0f, 1.0f);
+	m_otherInfo.lightPos = vg::Vector4(25.0f, 5.0f, 5.0f, 1.0f);
 	m_mutiplyColorInfo.color = vg::Color(1.0f, 0.0f, 0.0f, 1.0f);
 }
 
@@ -89,7 +89,7 @@ void Window::_createTexture()
 	if (deviceFeatures.textureCompressionBC) 
 	{
 		fileName = "models/voyager/voyager_bc3_unorm.ktx";
-		format = vk::Format::eBc2UnormBlock;
+		format = vk::Format::eBc3UnormBlock;
 	}
 	else if (deviceFeatures.textureCompressionASTC_LDR)
 	{
@@ -111,12 +111,12 @@ void Window::_createTexture()
 		throw std::runtime_error("The texture do't exist! path: " + fileName);
 	}
 
-	auto pTex = new vg::Texture2D(format, VG_TRUE,
+	uint32_t mipLevels = static_cast<uint32_t>(gliTex.levels());
+	auto pTex = new vg::Texture2D(format, mipLevels != 1,
 		gliTex[0].extent().x,
 		gliTex[0].extent().y
 	);
 	m_pTexture = std::shared_ptr<vg::Texture2D>(pTex);
-	uint32_t mipLevels = static_cast<uint32_t>(gliTex.levels());
 	uint32_t count = mipLevels;
 	vg::TextureDataInfo textureLayout;
 	std::vector<vg::TextureDataInfo::Component> components(count);
@@ -150,9 +150,9 @@ void Window::_createTexture()
 		vk::Filter::eLinear,
 		vk::Filter::eLinear,
 		vk::SamplerMipmapMode::eLinear,
-		vk::SamplerAddressMode::eRepeat,
-		vk::SamplerAddressMode::eRepeat,
-		vk::SamplerAddressMode::eRepeat,
+		vk::SamplerAddressMode::eClampToEdge,
+		vk::SamplerAddressMode::eClampToEdge,
+		vk::SamplerAddressMode::eClampToEdge,
 		0.0f,
 		enableAnisotropy,
 		anisotropy,
@@ -184,9 +184,9 @@ void Window::_createMaterial()
 	    		{vg::Pass::BuildInDataType::MAIN_CLOLOR},
 	    		{vg::Pass::BuildInDataType::MATRIX_OBJECT_TO_WORLD}
 	    	};
-	    	vg::Pass::BuildInDataInfo buildInDataInfo;
-	    	buildInDataInfo.componentCount = 3u;
-	    	buildInDataInfo.pComponent = buildInDataCmps;
+	    vg::Pass::BuildInDataInfo buildInDataInfo;
+	    buildInDataInfo.componentCount = 3u;
+	    buildInDataInfo.pComponent = buildInDataCmps;
 	    pPass->setBuildInDataInfo(buildInDataInfo);
 	    pPass->setCullMode(vg::CullModeFlagBits::BACK);
 	    pPass->setFrontFace(vg::FrontFaceType::CLOCKWISE);
@@ -223,12 +223,12 @@ void Window::_createMaterial()
 	    vg::Pass::BuildInDataInfo::Component buildInDataCmps[3] = {
 	    		{vg::Pass::BuildInDataType::MATRIX_OBJECT_TO_NDC},
 	    		{vg::Pass::BuildInDataType::MAIN_CLOLOR},
-	    		{vg::Pass::BuildInDataType::MATRIX_OBJECT_TO_WORLD}
+	    		{vg::Pass::BuildInDataType::MATRIX_OBJECT_TO_VIEW}
 	    	};
-	    	vg::Pass::BuildInDataInfo buildInDataInfo;
-	    	buildInDataInfo.componentCount = 3u;
-	    	buildInDataInfo.pComponent = buildInDataCmps;
-	    	pPass->setBuildInDataInfo(buildInDataInfo);
+	    vg::Pass::BuildInDataInfo buildInDataInfo;
+	    buildInDataInfo.componentCount = 3u;
+	    buildInDataInfo.pComponent = buildInDataCmps;
+	    pPass->setBuildInDataInfo(buildInDataInfo);
 	    pPass->setCullMode(vg::CullModeFlagBits::BACK);
 	    pPass->setFrontFace(vg::FrontFaceType::CLOCKWISE);
 
@@ -242,7 +242,12 @@ void Window::_createMaterial()
 	    depthStencilState.depthWriteEnable = VG_TRUE;
 	    depthStencilState.depthCompareOp = vk::CompareOp::eLessOrEqual;
 	    pPass->setDepthStencilInfo(depthStencilState);
-	    pPass->setMainTexture(m_pTexture.get());
+	    pPass->setMainTexture(m_pTexture.get(),
+			vg::ShaderStageFlagBits::FRAGMENT,
+			vg::DescriptorType::COMBINED_IMAGE_SAMPLER,
+			nullptr,
+			m_pTexture->getSampler("other_sampler")
+		);
 	    pPass->setDataValue("other_info", m_otherInfo, VG_M_OTHER_MAX_BINDING_PRIORITY);
 	    pPass->apply();
 	    
@@ -343,8 +348,6 @@ void Window::_onUpdate()
 			{
 				object->setMaterial(m_pMaterialSolid.get());
 			}
-	    	
-	        m_pScene->addVisualObject(object.get());		
 	    }
 	}
 

@@ -11,7 +11,7 @@ layout (location = 3) in vec3 inColor;
 layout(binding = 0) uniform BuildIn {
     mat4 matrixObjectToNDC;
 	vec4 mainColor;
-	mat4 matrixObjectToWorld;
+	mat4 matrixObjectToView;
 } _buildIn;
 
 layout(binding = 2) uniform OtherInfo {
@@ -31,14 +31,14 @@ out gl_PerVertex
 
 void main() 
 {
-	outNormal = inNormal;
-	outColor = vec3(_buildIn.mainColor) * inColor;
+	// outNormal = inNormal;
+	outColor = inColor;
 	outUV = inUV;
 	gl_Position = _buildIn.matrixObjectToNDC * vec4(inPos.xyz, 1.0);
 	
-	vec4 pos = _buildIn.matrixObjectToWorld * vec4(inPos, 1.0);
-	outNormal = mat3(_buildIn.matrixObjectToWorld) * inNormal;
-	vec3 lPos = mat3(_buildIn.matrixObjectToWorld) * otherInfo.lightPos.xyz;
+	vec4 pos = _buildIn.matrixObjectToView * vec4(inPos, 1.0);
+	outNormal = mat3(_buildIn.matrixObjectToView) * inNormal;
+	vec3 lPos = mat3(_buildIn.matrixObjectToView) * otherInfo.lightPos.xyz;
 	outLightVec = lPos - pos.xyz;
 	outViewVec = -pos.xyz;		
 }

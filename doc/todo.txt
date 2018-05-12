@@ -1,3 +1,6 @@
 1.The Module of new own model format and The tool application transfer the new model format to the standardised model
 format (COLLADA).
 2.Perfect light system and Add some necessary light types.
+3.Bug of render of sample "mesh" and "post_render".
+4.Add scene slot cache to renderer for renderring visual objects and lights
+and change deferred material to use this scene slot cache.

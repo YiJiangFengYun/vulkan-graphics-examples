@@ -2,78 +2,6 @@
 
 namespace vg
 {
-    PipelineCache::Info::Info()
-        : renderPass()
-        , pPass()
-        , pVertexData()
-        , pIndexData()
-        , indexSubIndex()
-    {
-
-    }
-
-    PipelineCache::Info::Info(const Info &target)
-        : renderPass(target.renderPass)
-        , pPass(target.pPass)
-        , pVertexData(target.pVertexData)
-        , pIndexData(target.pIndexData)
-        , indexSubIndex(target.indexSubIndex) 
-    {
-        
-    }
-			
-    PipelineCache::Info::Info(const Info &&target)
-        : renderPass(std::move(target.renderPass))
-        , pPass(std::move(target.pPass))
-        , pVertexData(std::move(target.pVertexData))
-        , pIndexData(std::move(target.pIndexData))
-        , indexSubIndex(std::move(target.indexSubIndex))
-    {
-
-    }
-
-	PipelineCache::Info& PipelineCache::Info::operator=(const Info &target)
-    {
-        renderPass = target.renderPass;
-        pPass = target.pPass;
-        pVertexData = target.pVertexData;
-        pIndexData = target.pIndexData;
-        indexSubIndex = target.indexSubIndex;
-        return *this;
-    }
-
-    Bool32 PipelineCache::Info::operator==(const Info &rhs) const
-    {
-		if (renderPass != rhs.renderPass) return VG_FALSE;
-		if (pPass->getID() != rhs.pPass->getID()) return VG_FALSE;
-		if (pVertexData != nullptr && rhs.pVertexData != nullptr)
-		{
-			if (pVertexData->getID() != rhs.pVertexData->getID()) return VG_FALSE;
-		} 
-		else
-		{
-			if (pVertexData != rhs.pVertexData) return VG_FALSE;
-		}
-
-		if (pIndexData != nullptr && rhs.pIndexData != nullptr)
-		{
-			if (pIndexData->getID() != rhs.pIndexData->getID()) return VG_FALSE;
-			if (indexSubIndex != rhs.indexSubIndex) return VG_FALSE;
-		}
-		else
-		{
-			if (pIndexData != rhs.pIndexData) return VG_FALSE;
-		}
-
-
-		return VG_TRUE;
-    }
-
-	Bool32 PipelineCache::Info::operator!=(const Info &rhs) const
-    {
-        return !operator==(rhs);
-    }
-
     PipelineCache::Info::Info(vk::RenderPass renderPass
         , const Pass *pPass
         , const VertexData *pVertexData
@@ -89,80 +17,145 @@ namespace vg
 
     }
 
-    size_t PipelineCache::VertexInputBindingDescriptionHash::operator()(const vk::VertexInputBindingDescription & vertexInputBindingDes) const
-    {
-        std::size_t seed = 0;
-        boost::hash_combine(seed, vertexInputBindingDes.binding);
-        boost::hash_combine(seed, vertexInputBindingDes.inputRate);
-        boost::hash_combine(seed, vertexInputBindingDes.stride);
-        return seed;
-    }
+    PipelineCache::InfoFullKey::InfoFullKey(Info info)
+        : renderPass(info.renderPass)
+        , pPass(info.pPass)
+        , pVertexData(info.pVertexData)
+        , pIndexData(info.pIndexData)
+        , indexSubIndex(info.indexSubIndex)
 
-    size_t PipelineCache::VertexInputAttributeDescriptionHash::operator()(const vk::VertexInputAttributeDescription & vertexInputAttrDes) const
+        , passPipelineStateID(info.pPass->getPipelineStateID())
+        , passSubPass(info.pPass->getSubpass())
+        , inputAssemblyStateInfo()
+        , vertexInputStateInfo()
+        , vertexBindingDeses()
+        , vertexAttributeDeses()
     {
-        std::size_t seed = 0;
-        boost::hash_combine(seed, vertexInputAttrDes.binding);
-        boost::hash_combine(seed, vertexInputAttrDes.format);
-        boost::hash_combine(seed, vertexInputAttrDes.location);
-        boost::hash_combine(seed, vertexInputAttrDes.offset);
-        return seed;
-    }
+        if (info.pIndexData != nullptr) {
+            const auto & subIndexDatas = info.pIndexData->getSubIndexDatas();
+            const auto & subIndexData = subIndexDatas[info.indexSubIndex];
+            inputAssemblyStateInfo = subIndexData.inputAssemblyStateInfo;
 
-    size_t PipelineCache::PipelineVertexInputStateCreateInfoHash::operator()(const vk::PipelineVertexInputStateCreateInfo & pipelineVertexInputStateCreateInfo) const
-    {
-        std::size_t seed = 0;
-        boost::hash_combine(seed, VkPipelineVertexInputStateCreateFlags(pipelineVertexInputStateCreateInfo.flags));
-        boost::hash_combine(seed, pipelineVertexInputStateCreateInfo.vertexBindingDescriptionCount);
-        boost::hash_combine(seed, pipelineVertexInputStateCreateInfo.vertexAttributeDescriptionCount);
-        VertexInputBindingDescriptionHash vertexInputBindingDescriptionHash;
-        for (uint32_t i = 0; i < pipelineVertexInputStateCreateInfo.vertexBindingDescriptionCount; ++i)
-        {
-            boost::hash_combine(seed, vertexInputBindingDescriptionHash(*(pipelineVertexInputStateCreateInfo.pVertexBindingDescriptions + i)));
+            if (info.pVertexData != nullptr) {
+                const auto & subVertexDatas = info.pVertexData->getSubVertexDatas();
+                const auto & subVertexData = subVertexDatas[subIndexData.vertexDataIndex];
+                const auto & targetVertexInputStateInfo = subVertexData.vertexInputStateInfo;
+                vertexInputStateInfo = targetVertexInputStateInfo;
+                vertexBindingDeses.resize(vertexInputStateInfo.vertexBindingDescriptionCount);
+                memcpy(vertexBindingDeses.data(), targetVertexInputStateInfo.pVertexBindingDescriptions, 
+                    vertexInputStateInfo.vertexBindingDescriptionCount * sizeof(vk::VertexInputBindingDescription));
+                vertexAttributeDeses.resize(vertexInputStateInfo.vertexAttributeDescriptionCount);
+                memcpy(vertexAttributeDeses.data(), targetVertexInputStateInfo.pVertexAttributeDescriptions,
+                    vertexInputStateInfo.vertexAttributeDescriptionCount * sizeof(vk::VertexInputAttributeDescription));
+                vertexInputStateInfo.pVertexBindingDescriptions = vertexBindingDeses.data();
+                vertexInputStateInfo.pVertexAttributeDescriptions = vertexAttributeDeses.data();
+            }
         }
-        VertexInputAttributeDescriptionHash vertexInputAttributeDescriptionHash;
-        for (uint32_t i = 0; i < pipelineVertexInputStateCreateInfo.vertexAttributeDescriptionCount; ++i)
-        {
-            boost::hash_combine(seed, vertexInputAttributeDescriptionHash(*(pipelineVertexInputStateCreateInfo.pVertexAttributeDescriptions + i)));
-        }
-        return seed;
     }
 
-    size_t PipelineCache::PipelineInputAssemblyStateCreateInfoHash::operator()(const vk::PipelineInputAssemblyStateCreateInfo & pipelineInputAssemblyStateCreateInfo) const
+    PipelineCache::InfoFullKey::InfoFullKey(const InfoFullKey & target)
+        : renderPass(target.renderPass)
+        , pPass(target.pPass)
+        , pVertexData(target.pVertexData)
+        , pIndexData(target.pIndexData)
+        , indexSubIndex(target.indexSubIndex)
+
+        , passPipelineStateID(target.passPipelineStateID)
+        , passSubPass(target.passSubPass)
+        , inputAssemblyStateInfo(target.inputAssemblyStateInfo)
+        , vertexInputStateInfo(target.vertexInputStateInfo)
+        , vertexBindingDeses(target.vertexBindingDeses)
+        , vertexAttributeDeses(target.vertexAttributeDeses)
     {
-        std::size_t seed = 0;
-        boost::hash_combine(seed, VkPipelineInputAssemblyStateCreateFlags(pipelineInputAssemblyStateCreateInfo.flags));
-        boost::hash_combine(seed, pipelineInputAssemblyStateCreateInfo.topology);
-        boost::hash_combine(seed, pipelineInputAssemblyStateCreateInfo.primitiveRestartEnable);
-        return seed;
+
+        vertexInputStateInfo.pVertexBindingDescriptions = vertexBindingDeses.data();
+        vertexInputStateInfo.pVertexAttributeDescriptions = vertexAttributeDeses.data();
+    }
+			
+    PipelineCache::InfoFullKey & PipelineCache::InfoFullKey::InfoFullKey::operator=(const InfoFullKey & target)
+    {
+        renderPass = target.renderPass;
+        pPass = target.pPass;
+        pVertexData = target.pVertexData;
+        pIndexData = target.pIndexData;
+        indexSubIndex = target.indexSubIndex;
+
+        passPipelineStateID = target.passPipelineStateID;
+        passSubPass = target.passSubPass;
+        inputAssemblyStateInfo = target.inputAssemblyStateInfo;
+        vertexInputStateInfo = target.vertexInputStateInfo;
+        vertexBindingDeses = target.vertexBindingDeses;
+        vertexAttributeDeses = target.vertexAttributeDeses;
+
+        vertexInputStateInfo.pVertexBindingDescriptions = vertexBindingDeses.data();
+        vertexInputStateInfo.pVertexAttributeDescriptions = vertexAttributeDeses.data();
+
+		return *this;
     }
 
-    size_t PipelineCache::HashNoState::operator()(const Info& info) const {
+    size_t PipelineCache::Hash::operator()(const InfoFullKey & info) const {
         std::size_t seed = 0;
         boost::hash_combine(seed, info.renderPass);
         boost::hash_combine(seed, info.pPass->getID());
         boost::hash_combine(seed, info.pVertexData != nullptr ? info.pVertexData->getID() : 0);
         boost::hash_combine(seed, info.pIndexData != nullptr ? info.pIndexData->getID() : 0);
-
+        boost::hash_combine(seed, info.indexSubIndex);
         return seed;
 	}
 
-    size_t PipelineCache::HashFull::operator()(const Info& info) const {
-        std::size_t seed = HashNoState()(info);
-        boost::hash_combine(seed, info.pPass->getPipelineStateID());
-        boost::hash_combine(seed, info.pPass->getSubpass());
-        if (info.pIndexData != nullptr) {
-            const auto & subIndexDatas = info.pIndexData->getSubIndexDatas();
-            const auto & subIndexData = subIndexDatas[info.indexSubIndex];
-            boost::hash_combine(seed, PipelineInputAssemblyStateCreateInfoHash()(subIndexData.inputAssemblyStateInfo));
+    Bool32 PipelineCache::EqualNoState::operator()(const InfoFullKey & lhs, const InfoFullKey & rhs) const
+    {
+        if (lhs.renderPass != rhs.renderPass) return VG_FALSE;
+		if (lhs.pPass->getID() != rhs.pPass->getID()) return VG_FALSE;
+		if (lhs.pVertexData != nullptr && rhs.pVertexData != nullptr)
+		{
+			if (lhs.pVertexData->getID() != rhs.pVertexData->getID()) return VG_FALSE;
+		} 
+		else
+		{
+			if (lhs.pVertexData != rhs.pVertexData) return VG_FALSE;
+		}
 
-            if (info.pVertexData != nullptr) {
-                const auto & subVertexDatas = info.pVertexData->getSubVertexDatas();
-                const auto & subVertexData = subVertexDatas[subIndexData.vertexDataIndex];
-                boost::hash_combine(seed, PipelineVertexInputStateCreateInfoHash()(subVertexData.vertexInputStateInfo));
+		if (lhs.pIndexData != nullptr && rhs.pIndexData != nullptr)
+		{
+			if (lhs.pIndexData->getID() != rhs.pIndexData->getID()) return VG_FALSE;
+			if (lhs.indexSubIndex != rhs.indexSubIndex) return VG_FALSE;
+		}
+		else
+		{
+			if (lhs.pIndexData != rhs.pIndexData) return VG_FALSE;
+		}
+
+
+		return VG_TRUE;
+    }
+
+    Bool32 PipelineCache::EqualFull::operator()(const InfoFullKey & lhs, const InfoFullKey & rhs) const
+    {
+        if (EqualNoState()(lhs, rhs) == VG_FALSE) return VG_FALSE;
+        if (lhs.passPipelineStateID != rhs.passPipelineStateID) return VG_FALSE;
+        if (lhs.passSubPass != rhs.passSubPass) return VG_FALSE;
+        if (lhs.pIndexData != nullptr && rhs.pIndexData != nullptr) {
+            if (lhs.inputAssemblyStateInfo != rhs.inputAssemblyStateInfo) return VG_FALSE;
+        }
+        if (lhs.pVertexData != nullptr && rhs.pVertexData != nullptr) {
+            if (lhs.vertexInputStateInfo.flags != rhs.vertexInputStateInfo.flags) return VG_FALSE;
+            if (lhs.vertexInputStateInfo.vertexBindingDescriptionCount != rhs.vertexInputStateInfo.vertexBindingDescriptionCount) return VG_FALSE;
+            if (lhs.vertexInputStateInfo.vertexAttributeDescriptionCount != rhs.vertexInputStateInfo.vertexAttributeDescriptionCount) return VG_FALSE;
+            for (uint32_t i = 0; i < lhs.vertexInputStateInfo.vertexBindingDescriptionCount; ++i) {
+                const auto & lhsBindingDes = *(lhs.vertexInputStateInfo.pVertexBindingDescriptions + i);
+                const auto & rhsBindingDes = *(rhs.vertexInputStateInfo.pVertexBindingDescriptions + i);
+                if (lhsBindingDes != rhsBindingDes) return VG_FALSE;
+            }
+            for (uint32_t i = 0; i < lhs.vertexInputStateInfo.vertexAttributeDescriptionCount; ++i) {
+                const auto & lhsAttrDes = *(lhs.vertexInputStateInfo.pVertexAttributeDescriptions + i);
+                const auto & rhsAttrDes = *(rhs.vertexInputStateInfo.pVertexAttributeDescriptions + i);
+                if (lhsAttrDes != rhsAttrDes) return VG_FALSE;
             }
         }
-        return seed;
-	}
+
+        return VG_TRUE;
+    }
 
     PipelineCache::PipelineCache()
         : m_mapPipelineNoState()
@@ -183,42 +176,45 @@ namespace vg
         m_mapPipelineFull.clear();
     }
 
-    std::shared_ptr<vk::Pipeline> PipelineCache::caching(const Info &info)
+    std::shared_ptr<vk::Pipeline> PipelineCache::caching(const Info & info)
     {
         //delete old pipeline.
-        auto pOldPipeline1 = m_mapPipelineNoState[info];
 
-        auto pOldPipeline2 = m_mapPipelineFullBack[info];
+        auto fullInfo = InfoFullKey(info);
+
+        auto pOldPipeline1 = m_mapPipelineNoState[fullInfo];
+
+        auto pOldPipeline2 = m_mapPipelineFullBack[fullInfo];
 
         std::shared_ptr<vk::Pipeline> pPipeline;
         if (pOldPipeline1 != nullptr) 
         {
             if (pOldPipeline2 != nullptr) //Pipeline don't change.
             {
-                m_mapPipelineFull[info] = pOldPipeline2;
-                m_mapPipelineFullBack.erase(info);
+                m_mapPipelineFull[fullInfo] = pOldPipeline2;
+                m_mapPipelineFullBack.erase(fullInfo);
                 pPipeline = pOldPipeline2;
             } 
-			else if (m_mapPipelineFull[info] != nullptr) //Pipeline don't change.
+			else if (m_mapPipelineFull[fullInfo] != nullptr) //Pipeline don't change.
 			{
-				pPipeline = m_mapPipelineFull[info];
+				pPipeline = m_mapPipelineFull[fullInfo];
 			}
 			else
             {
 				
                 //has old pipeline. delete it from two map.
-                m_mapPipelineNoState.erase(info);
+                m_mapPipelineNoState.erase(fullInfo);
                 //m_mapPipelineFullBack.erase(info);
                 pPipeline = _createNewPipeline(info);
-                m_mapPipelineNoState[info] = pPipeline;
-                m_mapPipelineFull[info] = pPipeline;
+                m_mapPipelineNoState[fullInfo] = pPipeline;
+                m_mapPipelineFull[fullInfo] = pPipeline;
             }
         }
         else //Old pipeline don't exist.
         {
             pPipeline = _createNewPipeline(info);
-            m_mapPipelineNoState[info] = pPipeline;
-            m_mapPipelineFull[info] = pPipeline;
+            m_mapPipelineNoState[fullInfo] = pPipeline;
+            m_mapPipelineFull[fullInfo] = pPipeline;
         }
 
         return pPipeline;
@@ -230,7 +226,7 @@ namespace vg
         m_mapPipelineFullBack.clear();
     }
 
-    std::shared_ptr<vk::Pipeline> PipelineCache::_createNewPipeline(const Info &info)
+    std::shared_ptr<vk::Pipeline> PipelineCache::_createNewPipeline(const Info & info)
     {
         //Create graphics pipeline create info. 
 		vk::GraphicsPipelineCreateInfo createInfo = {};

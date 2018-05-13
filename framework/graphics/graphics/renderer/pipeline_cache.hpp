@@ -28,45 +28,44 @@ namespace vg {
             const IndexData *pIndexData;
             uint32_t indexSubIndex;
 
-            Info();
-            Info(const Info &);
-			Info(const Info &&);
-			Info& operator=(const Info &);
-			Bool32 operator==(const Info &) const;
-			Bool32 operator!=(const Info &) const;
-    
-            Info(vk::RenderPass renderPass
-                , const Pass *pPass
-                , const VertexData *pVertexData
-                , const IndexData *pIndexData
-                , uint32_t indexSubIndex
+            Info(vk::RenderPass renderPass = vk::RenderPass()
+                , const Pass *pPass = nullptr
+                , const VertexData *pVertexData = nullptr
+                , const IndexData *pIndexData = nullptr
+                , uint32_t indexSubIndex = 0u
                 );
-            
-
         };
 
-        struct VertexInputBindingDescriptionHash {
-            size_t operator()(const vk::VertexInputBindingDescription & vertexInputBindingDes) const;
+        struct InfoFullKey {
+            vk::RenderPass renderPass;
+            const Pass *pPass;
+            const VertexData *pVertexData;
+            const IndexData *pIndexData;
+            uint32_t indexSubIndex;
+
+            Pass::PipelineStateID passPipelineStateID;
+            uint32_t passSubPass;
+            vk::PipelineInputAssemblyStateCreateInfo inputAssemblyStateInfo;
+            vk::PipelineVertexInputStateCreateInfo vertexInputStateInfo;
+            std::vector<vk::VertexInputBindingDescription> vertexBindingDeses;
+            std::vector<vk::VertexInputAttributeDescription> vertexAttributeDeses;
+
+            InfoFullKey(Info info);
+            InfoFullKey(const InfoFullKey &);
+			InfoFullKey& operator=(const InfoFullKey &);
+            InfoFullKey() = delete;
         };
 
-        struct VertexInputAttributeDescriptionHash {
-            size_t operator()(const vk::VertexInputAttributeDescription & vertexInputAttrDes) const;
+        struct Hash {
+             size_t operator()(const InfoFullKey & info) const;
         };
 
-        struct PipelineVertexInputStateCreateInfoHash {
-            size_t operator()(const vk::PipelineVertexInputStateCreateInfo & pipelineVertexInputStateCreateInfo) const;
+        struct EqualNoState {
+            Bool32 operator() (const InfoFullKey & lhs, const InfoFullKey & rhs) const;
         };
 
-        struct PipelineInputAssemblyStateCreateInfoHash {
-            size_t operator()(const vk::PipelineInputAssemblyStateCreateInfo & pipelineInputAssemblyStateCreateInfo) const;
-        };
-
-        struct HashFull {
-            size_t operator()(const Info& info) const;
-        };
-
-        struct HashNoState {
-            size_t operator()(const Info& info) const;
+        struct EqualFull {
+            Bool32 operator() (const InfoFullKey & lhs, const InfoFullKey & rhs) const;
         };
 
         PipelineCache();
@@ -83,9 +82,9 @@ namespace vg {
         void end();
 
     private:
-        std::unordered_map<Info, std::shared_ptr<vk::Pipeline>, HashNoState> m_mapPipelineNoState;
-        std::unordered_map<Info, std::shared_ptr<vk::Pipeline>, HashFull> m_mapPipelineFull;
-        std::unordered_map<Info, std::shared_ptr<vk::Pipeline>, HashFull> m_mapPipelineFullBack;
+        std::unordered_map<InfoFullKey, std::shared_ptr<vk::Pipeline>, Hash, EqualNoState> m_mapPipelineNoState;
+        std::unordered_map<InfoFullKey, std::shared_ptr<vk::Pipeline>, Hash, EqualFull> m_mapPipelineFull;
+        std::unordered_map<InfoFullKey, std::shared_ptr<vk::Pipeline>, Hash, EqualFull> m_mapPipelineFullBack;
         std::shared_ptr<vk::PipelineCache> m_pPipelineCache;
         std::shared_ptr<vk::Pipeline> _createNewPipeline(const Info &info);
         void _createPipelineCache();

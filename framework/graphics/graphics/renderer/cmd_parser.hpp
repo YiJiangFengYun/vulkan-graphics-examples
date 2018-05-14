@@ -2,7 +2,7 @@
 #define VG_CMD_PARSER_HPP
 
 #include "graphics/global.hpp"
-#include "graphics/module.hpp"
+#include "graphics/app/app.hpp"
 #include "graphics/renderer/pipeline_cache.hpp"
 #include "graphics/mesh/mesh.hpp"
 #include "graphics/buffer_data/util.hpp"

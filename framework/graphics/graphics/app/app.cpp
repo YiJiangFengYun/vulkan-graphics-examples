@@ -563,4 +563,6 @@ namespace vg
 		};
 		m_pCommandPoolForResetBuffer = fd::createCommandPool(m_pDevice.get(), createInfoForResetBuffer);
 	}
-} //namespace kgs
+
+	std::shared_ptr<Application> pApp = nullptr;
+} //namespace vg

@@ -7,7 +7,6 @@
 namespace vg
 {
 	extern Bool32 isInited;
-	extern std::shared_ptr<Application> pApp;
 	extern void moduleCreate(plog::Severity severity, plog::IAppender *appender = nullptr);
 	extern void moduleCreateVkinstance(std::string name
 		, uint32_t version

@@ -7,7 +7,7 @@
 #include <vulkan/vulkan.hpp>
 #include <foundation/wrapper.hpp>
 #include "graphics/global.hpp"
-#include "graphics/module.hpp"
+#include "graphics/app/app.hpp"
 
 namespace vg
 {

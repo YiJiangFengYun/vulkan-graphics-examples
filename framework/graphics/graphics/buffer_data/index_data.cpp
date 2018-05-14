@@ -2,7 +2,7 @@
 
 #include "graphics/util/find_memory.hpp"
 #include "graphics/util/single_time_command.hpp"
-#include "graphics/module.hpp"
+#include "graphics/app/app.hpp"
 #include "graphics/buffer_data/util.hpp"
 
 namespace vg

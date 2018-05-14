@@ -120,6 +120,8 @@ namespace vg
 		void _createCommandPool();
 	};
 
+	extern std::shared_ptr<Application> pApp;	
+
 } //namespace kgs
 
 #include "graphics/app/app.inl"

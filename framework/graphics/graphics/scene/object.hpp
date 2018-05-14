@@ -18,35 +18,39 @@ namespace vg
 		RANGE_SIZE = (END_RANGE - BEGIN_RANGE + 1)
 	};
 
+    //This class is used for object base features.
 	class BaseObject
 	{
 	public:
 		BaseObject();
 		ObjectType getObjectType();
+
+		// void beginRender();
+		// void endRender();
 	protected:
 		ObjectType m_objectType;
 	};
 
-	template <SpaceType SPACE_TYPE>
-	class Object : public BaseObject
+    //This class is used for object dimension space features.
+    template <SpaceType SPACE_TYPE>
+    class DimObject
 	{
 	public:
-		using TransformType = typename SpaceTransformTypeInfo<SPACE_TYPE>::TransformType;
+	    using TransformType = typename SpaceTransformTypeInfo<SPACE_TYPE>::TransformType;
+        DimObject();
 
-		Object()
-			: BaseObject()
-			, m_pTransform(new TransformType())
-		{
-
-		}
-
-		TransformType *getTransform() const
-		{
-			return m_pTransform.get();
-		}
-
+		TransformType *getTransform() const;
 	protected:
-		std::shared_ptr<TransformType> m_pTransform;
+	    std::shared_ptr<TransformType> m_pTransform;
+	};
+
+	template <SpaceType SPACE_TYPE>
+	class Object : public BaseObject, public DimObject<SPACE_TYPE>
+	{
+	public:
+		Object();
+	protected:
+		
 	};
 
 } //namespace kgs

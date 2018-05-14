@@ -86,11 +86,11 @@ namespace vg {
            , Bool32 cacheMemory
            );
 
-        template<vk::IndexType indexType>
-        typename IndexTypeInfo<indexType>::ValueType getIndex(uint32_t index) const;
+        template<vk::IndexType INDEX_TYPE>
+        typename IndexTypeInfo<INDEX_TYPE>::ValueType getIndex(uint32_t index) const;
 
-        template<vk::IndexType indexType>
-        std::vector<typename IndexTypeInfo<indexType>::ValueType> getIndices(uint32_t offset, uint32_t count) const;
+        template<vk::IndexType INDEX_TYPE>
+        std::vector<typename IndexTypeInfo<INDEX_TYPE>::ValueType> getIndices(uint32_t offset, uint32_t count) const;
         
      private:
         MemoryPropertyFlags m_bufferMemoryPropertyFlags;

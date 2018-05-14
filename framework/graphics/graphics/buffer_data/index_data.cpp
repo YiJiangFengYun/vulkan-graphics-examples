@@ -304,13 +304,13 @@ namespace vg
 		}
     }
 
-    template<vk::IndexType indexType>
-    typename IndexData::IndexTypeInfo<indexType>::ValueType IndexData::getIndex(uint32_t index) const
+    template<vk::IndexType INDEX_TYPE>
+    typename IndexData::IndexTypeInfo<INDEX_TYPE>::ValueType IndexData::getIndex(uint32_t index) const
     {
 #ifdef DEBUG
         if (m_pMemory == nullptr) throw std::runtime_error("Failed to get index when not chache memory.");
 #endif //!DEBUG
-        using IndexType = typename IndexTypeInfo<indexType>::ValueType;
+        using IndexType = typename IndexTypeInfo<INDEX_TYPE>::ValueType;
         IndexType resultIndex;
         memcpy(&resultIndex, 
             static_cast<IndexType *>(m_pMemory) + index, 
@@ -322,13 +322,13 @@ namespace vg
     //template instantiation
     template typename IndexData::IndexTypeInfo<vk::IndexType::eUint16>::ValueType IndexData::getIndex<vk::IndexType::eUint16>(uint32_t index) const;
 
-    template<vk::IndexType indexType>
-    std::vector<typename IndexData::IndexTypeInfo<indexType>::ValueType> IndexData::getIndices(uint32_t offset, uint32_t count) const
+    template<vk::IndexType INDEX_TYPE>
+    std::vector<typename IndexData::IndexTypeInfo<INDEX_TYPE>::ValueType> IndexData::getIndices(uint32_t offset, uint32_t count) const
     {
 #ifdef DEBUG
         if (m_pMemory == nullptr) throw std::runtime_error("Failed to get indices when not chache memory.");
 #endif //!DEBUG
-        using IndexType = typename IndexTypeInfo<indexType>::ValueType;
+        using IndexType = typename IndexTypeInfo<INDEX_TYPE>::ValueType;
         std::vector<IndexType> indices(count);
         memcpy(indices.data(), 
             static_cast<IndexType *>(m_pMemory) + offset, 

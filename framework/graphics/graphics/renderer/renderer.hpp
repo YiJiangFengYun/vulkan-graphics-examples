@@ -23,12 +23,12 @@ namespace vg
 	{
 	public:
 		struct SceneInfo {
-			const BaseScene *pScene;
-			const BaseCamera *pCamera;
+			BaseScene *pScene;
+			BaseCamera *pCamera;
 			Bool32 preZ;
 			PostRender * postRender;
-			SceneInfo(const BaseScene *pScene = nullptr
-			    , const BaseCamera *pCamera = nullptr
+			SceneInfo(BaseScene *pScene = nullptr
+			    , BaseCamera *pCamera = nullptr
 				, Bool32 preZ = VG_FALSE
 				, PostRender * postRender = nullptr);
 		};
@@ -135,9 +135,9 @@ namespace vg
 #endif //DEBUG and VG_ENABLE_COST_TIMER
 
 		virtual void _preRender();
-		virtual void _renderBegin();
-		virtual void _render(const RenderInfo &info, RenderResultInfo &resultInfo);
-		virtual void _renderEnd(const RenderInfo &info);
+		virtual void _renderBegin(const RenderInfo & info, RenderResultInfo & resultInfo);
+		virtual void _render(const RenderInfo & info, RenderResultInfo & resultInfo);
+		virtual void _renderEnd(const RenderInfo & info, RenderResultInfo & resultInfo);
 		virtual void _postRender();
 		virtual Bool32 _isValidForRender() const;
 

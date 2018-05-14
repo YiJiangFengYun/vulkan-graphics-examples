@@ -25,10 +25,13 @@ namespace vg
 		BaseObject();
 		ObjectType getObjectType();
 
-		// void beginRender();
-		// void endRender();
+		void beginRender();
+		void endRender();
 	protected:
 		ObjectType m_objectType;
+
+		virtual void _beginRender();
+		virtual void _endRender();
 	};
 
     //This class is used for object dimension space features.

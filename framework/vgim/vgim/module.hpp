@@ -11,11 +11,11 @@ namespace vgim {
 	extern void setLogSeverity(plog::Severity severity);
 	extern uint32_t getCanvasWidth();
 	extern uint32_t getCanvasHeight();
-	extern const vg::Material *getMaterial();
-	extern const vg::DimSimpleMesh2 *getMesh();
-	extern const vg::VisualObject2 *getUIObject();
-	extern const vg::CameraOP2 *getCamera();
-	extern const vg::Scene2 *getScene();
+	extern vg::Material *getMaterial();
+	extern vg::DimSimpleMesh2 *getMesh();
+	extern vg::VisualObject2 *getUIObject();
+	extern vg::CameraOP2 *getCamera();
+	extern vg::Scene2 *getScene();
 	extern void setShaderPath(const std::string &vertShaderPath, const std::string &fragShaderPat);
 	extern void updateIMGUI(uint32_t canvasWidth
         , uint32_t canvasHeight

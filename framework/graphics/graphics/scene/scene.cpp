@@ -48,6 +48,25 @@ namespace vg
 		}
 	}
 
+	void BaseScene::beginRender()
+	{
+		_beginRender();
+	}
+	void BaseScene::endRender()
+	{
+		_endRender();
+	}
+
+	void BaseScene::_beginRender()
+	{
+		
+	}
+	
+	void BaseScene::_endRender()
+	{
+		
+	}
+
 //Scene
     template <SpaceType SPACE_TYPE>
 	Scene<SPACE_TYPE>::Scene()
@@ -214,6 +233,42 @@ namespace vg
 			, m_mapPVisualObjects
 			, m_mapTransformIdToVisualObjects
 		);
+	}
+
+    template <SpaceType SPACE_TYPE>
+	void Scene<SPACE_TYPE>::_beginRender()
+	{
+		uint32_t len;
+		len = static_cast<uint32_t>(m_arrPVisualObjects.size());
+		for (uint32_t i = 0; i < len; ++i) {
+			m_arrPVisualObjects[i]->beginRender();
+		}
+		len = static_cast<uint32_t>(m_arrPCameras.size());
+		for (uint32_t i = 0; i < len; ++i) {
+			m_arrPCameras[i]->beginRender();
+		}
+		len = static_cast<uint32_t>(m_arrPLights.size());
+		for (uint32_t i = 0; i < len; ++i) {
+			m_arrPLights[i]->beginRender();
+		}
+	}
+	
+	template <SpaceType SPACE_TYPE>
+	void Scene<SPACE_TYPE>::_endRender()
+	{
+		uint32_t len;
+		len = static_cast<uint32_t>(m_arrPVisualObjects.size());
+		for (uint32_t i = 0; i < len; ++i) {
+			m_arrPVisualObjects[i]->endRender();
+		}
+		len = static_cast<uint32_t>(m_arrPCameras.size());
+		for (uint32_t i = 0; i < len; ++i) {
+			m_arrPCameras[i]->endRender();
+		}
+		len = static_cast<uint32_t>(m_arrPLights.size());
+		for (uint32_t i = 0; i < len; ++i) {
+			m_arrPLights[i]->endRender();
+		}
 	}
 
     template <SpaceType SPACE_TYPE>

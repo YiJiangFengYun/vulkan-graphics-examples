@@ -5,7 +5,7 @@
 #include "graphics/util/gemo_util.hpp"
 #include "graphics/renderer/cmd_parser.hpp"
 
-// #define USE_WORLD_BOUNDS
+#define USE_WORLD_BOUNDS
 
 namespace vg
 {
@@ -19,8 +19,8 @@ namespace vg
 #endif
 		);
 
-	Renderer::SceneInfo::SceneInfo(const BaseScene *pScene
-		, const BaseCamera *pCamera
+	Renderer::SceneInfo::SceneInfo(BaseScene *pScene
+		, BaseCamera *pCamera
 		, Bool32 preZ
 		, PostRender * postRender
 		)
@@ -194,9 +194,9 @@ namespace vg
 		RenderResultInfo &resultInfo)
 	{
 		_preRender();
-		_renderBegin();
+		_renderBegin(info, resultInfo);
 		_render(info, resultInfo);
-		_renderEnd(info);
+		_renderEnd(info, resultInfo);
 		_postRender();
 	}
 
@@ -261,7 +261,7 @@ namespace vg
 		m_pipelineCache.start();
 	}
 
-	void Renderer::_renderBegin()
+	void Renderer::_renderBegin(const RenderInfo & info, RenderResultInfo & resultInfo)
 	{
 #if defined(DEBUG) && defined(VG_ENABLE_COST_TIMER)
 		m_preparingRenderCostTimer.begin();
@@ -269,7 +269,14 @@ namespace vg
 		fd::CostTimer renderBeginCostTimer(fd::CostTimer::TimerType::ONCE);
 		renderBeginCostTimer.begin();
 #endif //DEBUG and VG_ENABLE_COST_TIMER
-		
+
+		uint32_t count = info.sceneInfoCount;
+		for (uint32_t i = 0; i < count; ++i)
+		{
+			const auto & sceneInfo = *(info.pSceneInfos + i);
+			const auto pScene = sceneInfo.pScene;
+			pScene->beginRender();
+		}
 
 #if defined(DEBUG) && defined(VG_ENABLE_COST_TIMER)
 		renderBeginCostTimer.end();
@@ -481,7 +488,7 @@ namespace vg
 
 	}
 
-	void Renderer::_renderEnd(const RenderInfo &info)
+	void Renderer::_renderEnd(const RenderInfo & info, RenderResultInfo & resultInfo)
 	{
 
 #if defined(DEBUG) && defined(VG_ENABLE_COST_TIMER)
@@ -514,15 +521,21 @@ namespace vg
 		//queue.submit(submitInfo, *m_waitFence);
 		pApp->freeGraphicsQueue(queueIndex);
 		VG_LOG(plog::debug) << "Post submit to grahics queue." << std::endl;
+
+		uint32_t count = info.sceneInfoCount;
+		for (uint32_t i = 0; i < count; ++i)
+		{
+			const auto & sceneInfo = *(info.pSceneInfos + i);
+			const auto pScene = sceneInfo.pScene;
+			pScene->endRender();
+		}
 		
 #if defined(DEBUG) && defined(VG_ENABLE_COST_TIMER)
         renderEndCostTimer.end();
 		VG_COST_TIME_LOG(plog::debug) << "Render end cost time: " 
 			    << renderEndCostTimer.costTimer 
 				<< std::endl;
-#endif //DEBUG and VG_ENABLE_COST_TIMER
 
-#if defined(DEBUG) && defined(VG_ENABLE_COST_TIMER)
 		m_preparingRenderCostTimer.end();
 		VG_COST_TIME_LOG(plog::debug) << "Average cost time of preparing render: " << m_preparingRenderCostTimer.costTimer << "ms." << std::endl;
 #endif //DEBUG and VG_ENABLE_COST_TIMER

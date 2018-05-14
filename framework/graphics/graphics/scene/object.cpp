@@ -13,6 +13,26 @@ namespace vg
 		return m_objectType;
 	}
 
+	void BaseObject::beginRender()
+	{
+		_beginRender();
+	}
+
+	void BaseObject::endRender()
+	{
+		_endRender();
+	}
+
+	void BaseObject::_beginRender()
+	{
+
+	}
+	
+	void BaseObject::_endRender()
+	{
+
+	}
+
 
 //DimObject
     template <SpaceType SPACE_TYPE>

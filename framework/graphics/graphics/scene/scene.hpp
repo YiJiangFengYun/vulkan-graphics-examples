@@ -20,9 +20,14 @@ namespace vg
 		Bool32 getIsLeftHand() const;
 		void setIsRightHand(Bool32 isRightHand);
 		void setIsLeftHand(Bool32 isLeftHand);
+		void beginRender();
+		void endRender();
 	protected:
 	    SpaceType m_spaceType;
 		Bool32 m_isRightHand;
+
+		virtual void _beginRender();
+		virtual void _endRender();
 	};
 
 	template <SpaceType SPACE_TYPE>
@@ -82,11 +87,12 @@ namespace vg
 			, fd::Rect2D *viewRect = nullptr) const = 0;
 		
 		/**
-		 * This Bounds is in world coorindate system.
+		 * This bounds is in world coorindate system.
 		 **/
 		virtual Bool32 isInView(const CameraType *pCamera
 		    , BoundsType bounds
 			, fd::Rect2D *viewRect = nullptr) const = 0;
+
 	protected:
 
 		//aggregations
@@ -103,6 +109,9 @@ namespace vg
 		virtual void _addVisualObject(VisualObjectType *pTarget
 			, VisualObjectType *pParent);
 		virtual void _removeVisualObject(VisualObjectType *pTarget);
+
+		virtual void _beginRender() override;
+		virtual void _endRender() override;
 	private:
 		template <typename T>
 		Bool32 _isHasObject(const T *pTarget

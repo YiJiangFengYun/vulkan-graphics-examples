@@ -35,27 +35,27 @@ namespace vgim
         return m_canvasHeight;
     }
 
-    const vg::Material *getMaterial()
+    vg::Material *getMaterial()
 	{
 		return m_pMaterial.get();
 	}
 
-    const vg::DimSimpleMesh2 *getMesh()
+    vg::DimSimpleMesh2 *getMesh()
     {
         return m_pMesh.get();   
     }
 
-    const vg::VisualObject2 *getUIObject()
+    vg::VisualObject2 *getUIObject()
     {
         return m_pUIObject.get();
     }
 
-    const vg::CameraOP2 *getCamera()
+    vg::CameraOP2 *getCamera()
     {
         return m_pCamera.get();
     }
 
-    const vg::Scene2 *getScene()
+    vg::Scene2 *getScene()
     {
         return m_pScene.get();
     }

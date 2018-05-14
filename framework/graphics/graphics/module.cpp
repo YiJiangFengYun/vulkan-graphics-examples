@@ -2,7 +2,6 @@
 
 namespace vg
 {
-	std::shared_ptr<Application> pApp;
 	Bool32 isInited = VG_FALSE;
 	Bool32 isCreated = VG_FALSE;	
 	Bool32 isCreatedVkInstance = VG_FALSE;
@@ -46,11 +45,15 @@ namespace vg
 			, requiredPhysicalDeviceFeatures
 			, optionalPhysicalDeviceFeatures
 			);
+
+		createDefaultTexture();
+		
 		isInited = VG_TRUE;
 	}
 
 	void moduleDestory()
 	{
+		destroyDefaultTexture();
 		pApp = nullptr;
 		//fd::moduleDestroy();
 		isInited = VG_FALSE;

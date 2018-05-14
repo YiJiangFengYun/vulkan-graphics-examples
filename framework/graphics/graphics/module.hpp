@@ -3,6 +3,7 @@
 
 #include "graphics/global.hpp"
 #include "graphics/app/app.hpp"
+#include "graphics/texture/texture_default.hpp"
 
 namespace vg
 {

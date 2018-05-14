@@ -4,7 +4,7 @@
 #include "foundation/wrapper.hpp"
 #include "graphics/util/find_memory.hpp"
 #include "graphics/global.hpp"
-#include "graphics/module.hpp"
+#include "graphics/app/app.hpp"
 #include "graphics/util/single_time_command.hpp"
 #include "graphics/texture/texture_option.hpp"
 
@@ -21,21 +21,24 @@ namespace vg
 			uint32_t width = 0u;
 			uint32_t height = 0u;
 			uint32_t depth = 0u;
-			Component();
-			Component(uint32_t mipLevel
-				, uint32_t baseArrayLayer
-				, uint32_t layerCount
-				, uint32_t size
-				, Bool32 hasImageExtent
-				, uint32_t width
-				, uint32_t height
-				, uint32_t depth
+
+			Component(uint32_t mipLevel = 0u
+				, uint32_t baseArrayLayer = 0u
+				, uint32_t layerCount = 0u
+				, uint32_t size = 0u
+				, Bool32 hasImageExtent = VG_FALSE
+				, uint32_t width = 0u
+				, uint32_t height = 0u
+				, uint32_t depth = 0u
 			);
 		};
+
 		uint32_t componentCount;
 		Component *pComponent;
 
-		TextureDataInfo();
+		TextureDataInfo(uint32_t componentCount = 0u
+		    , Component *pComponent = nullptr
+			);
 	};
 
 	class Texture : public Base

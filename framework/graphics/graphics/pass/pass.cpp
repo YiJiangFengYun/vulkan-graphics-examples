@@ -1332,30 +1332,29 @@ namespace vg
 					throw std::runtime_error("The descriptor count of binding shoubld be 1 when its type is COMBINED_IMAGE_SAMPLER");
 #endif // DEBUG
 				PassData::TexData texData = m_pData->getTexture(item.name);
-				if (texData.pTexture != nullptr)
-				{
-					vk::ImageView imageView;
-					if (texData.pImageView != nullptr) {
-						imageView = *(texData.pImageView->getImageView());
-					} else {
-						imageView = *(texData.pTexture->getImageView()->getImageView());
-					}
-					vk::Sampler sampler;
-					if (texData.pSampler != nullptr) {
-					    sampler = *(texData.pSampler->getSampler());
-					} else {
-						sampler = *(texData.pTexture->getSampler()->getSampler());
-					}
-					vk::ImageLayout imageLayout;
-					if (texData.imageLayout != vk::ImageLayout::eUndefined) {
-						imageLayout = texData.imageLayout;
-					} else {
-						imageLayout = texData.pTexture->getImage()->getInfo().layout;
-					}
-					imageInfos[index].sampler = sampler;
-					imageInfos[index].imageView = imageView;
-					imageInfos[index].imageLayout = imageLayout;
+				const auto pTexture = texData.pTexture != nullptr ? texData.pTexture : pDefaultTexture2D.get();
+				vk::ImageView imageView;
+				if (texData.pImageView != nullptr) {
+					imageView = *(texData.pImageView->getImageView());
+				} else {
+					imageView = *(pTexture->getImageView()->getImageView());
 				}
+				vk::Sampler sampler;
+				if (texData.pSampler != nullptr) {
+				    sampler = *(texData.pSampler->getSampler());
+				} else {
+					sampler = *(pTexture->getSampler()->getSampler());
+				}
+				vk::ImageLayout imageLayout;
+				if (texData.imageLayout != vk::ImageLayout::eUndefined) {
+					imageLayout = texData.imageLayout;
+				} else {
+					imageLayout = pTexture->getImage()->getInfo().layout;
+				}
+				
+				imageInfos[index].sampler = sampler;
+				imageInfos[index].imageView = imageView;
+				imageInfos[index].imageLayout = imageLayout;
 
 				writes[index].dstSet = *m_pDescriptorSet;
 				writes[index].dstBinding = itemIndex;

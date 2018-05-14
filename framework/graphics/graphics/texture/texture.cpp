@@ -4,18 +4,6 @@ namespace vg
 {
 	inline uint32_t caculateImageSizeWithMipmapLevel(uint32_t size, uint32_t mipmapLevel);
 
-	TextureDataInfo::Component::Component()
-		: mipLevel(0u)
-		, baseArrayLayer(0u)
-		, layerCount(0u)
-		, size(0u)
-		, hasImageExtent(VG_FALSE)
-		, width(0u)
-		, height(0u)
-		, depth(0u)
-	{
-	}
-
 	TextureDataInfo::Component::Component(uint32_t mipLevel
 		, uint32_t baseArrayLayer
 		, uint32_t layerCount
@@ -37,9 +25,11 @@ namespace vg
 
 	}
 
-	TextureDataInfo::TextureDataInfo()
-		: componentCount(0u)
-		, pComponent(nullptr)
+	TextureDataInfo::TextureDataInfo(uint32_t componentCount
+		, Component *pComponent
+		)
+		: componentCount(componentCount)
+		, pComponent(pComponent)
 	{
 
 	}

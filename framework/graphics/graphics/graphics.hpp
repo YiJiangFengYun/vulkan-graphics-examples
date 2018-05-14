@@ -2,7 +2,6 @@
 #define VG_GRAPHICS_H
 
 #include <graphics/global.hpp>
-#include <graphics/module.hpp>
 
 #include <graphics/app/app.hpp>
 
@@ -20,6 +19,7 @@
 #include <graphics/texture/texture_cube_array.hpp>
 #include <graphics/texture/texture_color_attachment.hpp>
 #include <graphics/texture/texture_depth_stencil_attachment.hpp>
+#include <graphics/texture/texture_default.hpp>
 
 #include <graphics/mesh/mesh.hpp>
 #include <graphics/mesh/mesh_2.hpp>
@@ -50,6 +50,8 @@
 #include <graphics/util/queue_family.hpp>
 #include <graphics/util/swapchain_info.hpp>
 #include <graphics/util/util.hpp>
+
+#include <graphics/module.hpp>
 
 
 namespace vg

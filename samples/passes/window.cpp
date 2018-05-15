@@ -186,6 +186,8 @@ void Window::_createMaterial()
 		deferredAttachmentInfos[1].format = vk::Format::eR16G16B16A16Sfloat;
 		deferredAttachmentInfos[2].format = vk::Format::eR8G8B8A8Unorm;
 		vge::MaterialDeferred::CreateInfo createInfo = {
+			m_width,
+			m_height,
 			vk::Format::eR8G8B8A8Unorm,
 			vk::Format::eD32SfloatS8Uint,
 			deferredAttachmentInfoCount,

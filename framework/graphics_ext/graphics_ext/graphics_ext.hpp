@@ -2,7 +2,6 @@
 #define VGE_GRAPHICS_EXT_HPP
 
 #include "graphics_ext/global.hpp"
-#include "graphics_ext/cache/texture_cache.hpp"
 #include "graphics_ext/material/material_deferred.hpp"
 #include "graphics_ext/material/material_outline.hpp"
 

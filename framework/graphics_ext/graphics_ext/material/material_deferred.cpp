@@ -6,29 +6,25 @@ namespace vge
         : format(format)
     {}
 
-    MaterialDeferred::CreateInfo::CreateInfo(vk::Format colorAttachmentFormat
+    MaterialDeferred::CreateInfo::CreateInfo(uint32_t framebufferWidth
+        , uint32_t framebufferHeight
+        , vk::Format colorAttachmentFormat
         , vk::Format depthStencilAttachmentFormat
         , uint32_t deferredAttachmentCount
         , const DeferredAttachmentInfo *pDeferredAttachments
         )
-        : colorAttachmentFormat(colorAttachmentFormat)
+        : framebufferWidth(framebufferWidth)
+        , framebufferHeight(framebufferHeight)
+        , colorAttachmentFormat(colorAttachmentFormat)
         , depthStencilAttachmentFormat(depthStencilAttachmentFormat)
         , deferredAttachmentCount(deferredAttachmentCount)
         , pDeferredAttachments(pDeferredAttachments)
     {}
 
-    MaterialDeferred::MaterialDeferred(CreateInfo info
-        , TextureCache<vg::Texture2DColorAttachment> *pColorAttachmentCache
-        , TextureCache<vg::Texture2DDepthStencilAttachment> *pDepthStencilAttachmentCache
-        )
+    MaterialDeferred::MaterialDeferred(CreateInfo info)
         : vg::Material(VG_TRUE)
         , m_info(info)
         , m_deferredAttachmentInfos()
-        , m_pColorAttachmentCache(pColorAttachmentCache)
-        , m_pDepthStencilAttachmentCache(pDepthStencilAttachmentCache)
-        , m_pMyColorAttachmentCache()
-        , m_pMyDepthStencilAttachmentCache()
-        , m_attachmentSize()
         , m_pColorAttachment()
         , m_pDepthStencilAttachment()
         , m_arrPDeferredAttachments()
@@ -40,21 +36,9 @@ namespace vge
             info.deferredAttachmentCount * sizeof(DeferredAttachmentInfo));
         m_info.pDeferredAttachments = m_deferredAttachmentInfos.data();
 
-        if (pColorAttachmentCache == nullptr) {
-            m_pMyColorAttachmentCache = std::shared_ptr<TextureCache<vg::Texture2DColorAttachment>> {
-                new TextureCache<vg::Texture2DColorAttachment>(),
-            };
-            m_pColorAttachmentCache = m_pMyColorAttachmentCache.get();
-        }
-        if (pDepthStencilAttachmentCache == nullptr) {
-            m_pMyDepthStencilAttachmentCache = std::shared_ptr<TextureCache<vg::Texture2DDepthStencilAttachment>> {
-                new TextureCache<vg::Texture2DDepthStencilAttachment>(),
-            };
-            m_pDepthStencilAttachmentCache = m_pMyDepthStencilAttachmentCache.get();
-        }
-
         _createDeferredAttachments(info);
         _createRenderPass(info);
+        _createFramebuffer();
         _createOtherPasses(info);
         _initPasses(info);
     }
@@ -63,6 +47,8 @@ namespace vge
     {
 		uint32_t trunkFramebufferWidth = info.trunkFramebufferWidth;
 		uint32_t trunkFramebufferHeight = info.trunkFramebufferHeight;
+        uint32_t framebufferWidth = m_info.framebufferWidth;
+        uint32_t framebufferHeight = m_info.framebufferHeight;
 
         uint32_t targetSize = static_cast<uint32_t>(
 			std::max(
@@ -70,11 +56,6 @@ namespace vge
 				info.clipRect.height * trunkFramebufferHeight
 			)
 		);
-        if (_updateResultAttachments(targetSize))
-        {
-            _updateFramebuffer();
-            _updatePasses();
-        }
 
         auto pRectMesh = _getRectMesh();
         //rect pos
@@ -85,8 +66,8 @@ namespace vge
         fd::Rect2D scissor;
         if (info.hasClipRect) {
             // in this case, we only draw the part of scene that contain the object of the mesh.
-            auto rateX = static_cast<float>(trunkFramebufferWidth) / static_cast<float>(m_attachmentSize);
-            auto rateY = static_cast<float>(trunkFramebufferHeight) / static_cast<float>(m_attachmentSize);
+            auto rateX = static_cast<float>(trunkFramebufferWidth) / static_cast<float>(framebufferWidth);
+            auto rateY = static_cast<float>(trunkFramebufferHeight) / static_cast<float>(framebufferHeight);
             viewport = fd::Viewport(
                 rateX * (- info.clipRect.x), 
                 rateY * (- info.clipRect.y), 
@@ -150,8 +131,8 @@ namespace vge
             renderPassInfo.pRenderPass = m_pRenderPass.get();
             renderPassInfo.subPassIndex = 0u;
 	    	renderPassInfo.pFrameBuffer = m_pFrameBuffer.get();
-            renderPassInfo.framebufferWidth = m_attachmentSize;
-            renderPassInfo.framebufferHeight = m_attachmentSize;
+            renderPassInfo.framebufferWidth = framebufferWidth;
+            renderPassInfo.framebufferHeight = framebufferHeight;
             renderPassInfo.projMatrix = *(info.pProjMatrix);
             renderPassInfo.viewMatrix = *(info.pViewMatrix);
             renderPassInfo.pPass = m_pPassDeferred.get();
@@ -189,8 +170,8 @@ namespace vge
             renderPassInfo.pRenderPass = m_pRenderPass.get();
             renderPassInfo.subPassIndex = 1u;
 	    	renderPassInfo.pFrameBuffer = m_pFrameBuffer.get();
-            renderPassInfo.framebufferWidth = m_attachmentSize;
-            renderPassInfo.framebufferHeight = m_attachmentSize;
+            renderPassInfo.framebufferWidth = framebufferWidth;
+            renderPassInfo.framebufferHeight = framebufferHeight;
             renderPassInfo.projMatrix = vg::Matrix4x4(1.0f);
             renderPassInfo.viewMatrix = vg::Matrix4x4(1.0f);
             renderPassInfo.pPass = m_pPassComposition.get();
@@ -245,6 +226,43 @@ namespace vge
     void MaterialDeferred::_createDeferredAttachments(CreateInfo createInfo)
     {
         m_arrPDeferredAttachments.resize(createInfo.deferredAttachmentCount);
+        {
+            for (uint32_t i = 0; i < createInfo.deferredAttachmentCount; ++i) {
+                auto deferredAttachmentInfo = *(createInfo.pDeferredAttachments + i);
+                m_arrPDeferredAttachments[i] = std::shared_ptr<vg::Texture2DColorAttachment>{
+                    new vg::Texture2DColorAttachment(deferredAttachmentInfo.format, createInfo.framebufferWidth,
+                        createInfo.framebufferHeight, VG_TRUE)
+                };
+            }
+        }
+        
+        {
+            m_pColorAttachment = std::shared_ptr<vg::Texture2DColorAttachment>{
+                new vg::Texture2DColorAttachment(createInfo.colorAttachmentFormat, createInfo.framebufferWidth,
+                    createInfo.framebufferHeight)
+            };
+        }
+
+        {
+            m_pDepthStencilAttachment = std::shared_ptr<vg::Texture2DDepthStencilAttachment>{
+                new vg::Texture2DDepthStencilAttachment(createInfo.depthStencilAttachmentFormat,
+                    createInfo.framebufferWidth, createInfo.framebufferHeight, VG_FALSE, vk::ImageUsageFlags()
+                )
+            };
+            //Create depth only image view for sampling from shader in trunk pass.
+            auto pImage = m_pDepthStencilAttachment->getImage();
+            vg::Texture::ImageViewCreateInfo info = {
+                vk::ComponentMapping(),
+                {
+                    vk::ImageAspectFlagBits::eDepth,
+                    0u,
+                    pImage->getInfo().mipLevels,
+                    0u,
+                    pImage->getInfo().arrayLayers,
+                },
+            };
+            m_pDepthStencilAttachment->createImageView("only_depth", info);
+        }
     }
         
     void MaterialDeferred::_createRenderPass(CreateInfo createInfo)
@@ -357,6 +375,35 @@ namespace vge
 	    m_pRenderPass = fd::createRenderPass(pDevice, renderPassCreateInfo);
     }
 
+    void MaterialDeferred::_createFramebuffer()
+    {
+        auto info = m_info;
+        uint32_t attachmentCount = info.deferredAttachmentCount;
+        attachmentCount += 2u;
+
+        std::vector<vk::ImageView> attachments(attachmentCount);
+        uint32_t offset = 0u;
+        attachments[offset] = *(m_pColorAttachment->getImageView()->getImageView());
+        ++offset;
+        for (uint32_t i = 0; i < info.deferredAttachmentCount; ++i, ++offset)
+        {
+            attachments[offset] = *(m_arrPDeferredAttachments[i]->getImageView()->getImageView());
+        }
+        attachments[offset] = *(m_pDepthStencilAttachment->getImageView()->getImageView());
+    
+	    vk::FramebufferCreateInfo createInfo = {
+	    	vk::FramebufferCreateFlags(),                   //flags
+	    	*m_pRenderPass,                                 //renderPass
+	    	attachmentCount,                                //attachmentCount
+	    	attachments.data(),                             //pAttachments
+			info.framebufferWidth,                               //width
+			info.framebufferHeight,                               //height
+	    	1u                                              //layers
+	    };
+	    auto pDevice = vg::pApp->getDevice();
+	    m_pFrameBuffer = fd::createFrameBuffer(pDevice, createInfo);
+    }
+
     void MaterialDeferred::_createOtherPasses(CreateInfo createInfo)
     {
         m_pShaderDeferred = std::shared_ptr<vg::Shader>{new vg::Shader()};
@@ -365,6 +412,8 @@ namespace vge
 	    m_pPassComposition = std::shared_ptr<vg::Pass>{ new vg::Pass(m_pShaderComposition.get())};
 	    _addPass(m_pPassDeferred.get());
 	    _addPass(m_pPassComposition.get());
+
+
     }
         
     void MaterialDeferred::_initPasses(CreateInfo createInfo)
@@ -460,156 +509,13 @@ namespace vge
             
             pPass->apply();
         }
-    }
-       
-    vg::Bool32 MaterialDeferred::_updateResultAttachments(uint32_t targetSize)
-    {
-        targetSize = static_cast<uint32_t>(std::pow(2, std::ceil(std::log2(targetSize))));
-        if (m_attachmentSize != targetSize) 
-        {
-            auto info = m_info;
-            //free
-            {
-                for (uint32_t i = 0; i < info.deferredAttachmentCount; ++i) {
-                    if (m_arrPDeferredAttachments[i] != nullptr) {
-                        auto deferredAttachmentInfo = *(info.pDeferredAttachments + i);
-                        vge::TextureCacheAllocInfo allocInfo = {
-                            deferredAttachmentInfo.format,
-                            m_attachmentSize,
-                            m_attachmentSize,
-                            VG_TRUE,
-                        };
-                    
-                        m_pColorAttachmentCache->freeTexture(allocInfo, m_arrPDeferredAttachments[i]);
-                    }
-                }
 
-                {
-                    if (m_pColorAttachment != nullptr) {
-                        vge::TextureCacheAllocInfo allocInfo = {
-                            info.colorAttachmentFormat,
-                            m_attachmentSize,
-                            m_attachmentSize,
-                            VG_FALSE,
-                        };
-                    
-                        m_pColorAttachmentCache->freeTexture(allocInfo, m_pColorAttachment);
-                    }
-                }
-
-                {
-                    if (m_pDepthStencilAttachment != nullptr) {
-                        vge::TextureCacheAllocInfo allocInfo = {
-                            info.depthStencilAttachmentFormat,
-                            m_attachmentSize,
-                            m_attachmentSize,
-                            VG_FALSE,
-                        };
-
-                        m_pDepthStencilAttachmentCache->freeTexture(allocInfo, m_pDepthStencilAttachment);
-                    }
-                }
-            }
-
-            m_attachmentSize = targetSize;
-
-            //allocate
-            {
-                for (uint32_t i = 0; i < info.deferredAttachmentCount; ++i) {
-                    auto deferredAttachmentInfo = *(info.pDeferredAttachments + i);
-                    vge::TextureCacheAllocInfo allocInfo = {
-                        deferredAttachmentInfo.format,
-                        m_attachmentSize,
-                        m_attachmentSize,
-                        VG_TRUE,
-                    };
-                    m_arrPDeferredAttachments[i] = m_pColorAttachmentCache->allocateTexture(allocInfo);
-                }
-
-                {
-                    vge::TextureCacheAllocInfo allocInfo = {
-                        info.colorAttachmentFormat,
-                        m_attachmentSize,
-                        m_attachmentSize,
-                        VG_FALSE,
-                    };
-                    
-                    m_pColorAttachment = m_pColorAttachmentCache->allocateTexture(allocInfo);
-                }
-
-                {
-                    vge::TextureCacheAllocInfo allocInfo = {
-                        info.depthStencilAttachmentFormat,
-                        m_attachmentSize,
-                        m_attachmentSize,
-                        VG_FALSE,
-                    };
-
-                    m_pDepthStencilAttachment = m_pDepthStencilAttachmentCache->allocateTexture(allocInfo);
-
-                    //Create depth only image view for sampling from shader in trunk pass.
-                    if (m_pDepthStencilAttachment->getImageView("only_depth") == nullptr) {
-                        auto pImage = m_pDepthStencilAttachment->getImage();
-                        vg::Texture::ImageViewCreateInfo info = {
-                            vk::ComponentMapping(),
-                            {
-                                vk::ImageAspectFlagBits::eDepth,
-                                0u,
-                                pImage->getInfo().mipLevels,
-                                0u,
-                                pImage->getInfo().arrayLayers,
-                            },
-                        };
-                        m_pDepthStencilAttachment->createImageView("only_depth", info);
-                    }
-                }
-            }
-            
-            return VG_TRUE;
-        }
-        else
-        {
-            return VG_FALSE;
-        }
-    }
-
-    void MaterialDeferred::_updateFramebuffer()
-    {
-        auto info = m_info;
-        uint32_t attachmentCount = info.deferredAttachmentCount;
-        attachmentCount += 2u;
-
-        std::vector<vk::ImageView> attachments(attachmentCount);
-        uint32_t offset = 0u;
-        attachments[offset] = *(m_pColorAttachment->getImageView()->getImageView());
-        ++offset;
-        for (uint32_t i = 0; i < info.deferredAttachmentCount; ++i, ++offset)
-        {
-            attachments[offset] = *(m_arrPDeferredAttachments[i]->getImageView()->getImageView());
-        }
-        attachments[offset] = *(m_pDepthStencilAttachment->getImageView()->getImageView());
-    
-	    vk::FramebufferCreateInfo createInfo = {
-	    	vk::FramebufferCreateFlags(),                   //flags
-	    	*m_pRenderPass,                                 //renderPass
-	    	attachmentCount,                                //attachmentCount
-	    	attachments.data(),                             //pAttachments
-	    	m_attachmentSize,                               //width
-	    	m_attachmentSize,                               //height
-	    	1u                                              //layers
-	    };
-	    auto pDevice = vg::pApp->getDevice();
-	    m_pFrameBuffer = fd::createFrameBuffer(pDevice, createInfo);
-    }
-
-    void MaterialDeferred::_updatePasses()
-    {
         {
             auto pPass = m_pPassComposition.get();
             auto info = m_info;
             for (uint32_t i = 0; i < info.deferredAttachmentCount; ++i) 
             {
-                pPass->setTexture("input_" + std::to_string(i), m_arrPDeferredAttachments[i], i, vg::ShaderStageFlagBits::FRAGMENT, 
+                pPass->setTexture("input_" + std::to_string(i), m_arrPDeferredAttachments[i].get(), i, vg::ShaderStageFlagBits::FRAGMENT, 
                     vg::DescriptorType::INPUT_ATTACHMENT);
             }
             pPass->apply();
@@ -617,8 +523,8 @@ namespace vge
 
         {
             auto pPass = m_pMainPass.get();
-            pPass->setTexture("color", m_pColorAttachment, 0u, vg::ShaderStageFlagBits::FRAGMENT);
-            pPass->setTexture("depth", m_pDepthStencilAttachment, 1u, vg::ShaderStageFlagBits::FRAGMENT,
+            pPass->setTexture("color", m_pColorAttachment.get(), 0u, vg::ShaderStageFlagBits::FRAGMENT);
+            pPass->setTexture("depth", m_pDepthStencilAttachment.get(), 1u, vg::ShaderStageFlagBits::FRAGMENT,
                 vg::DescriptorType::COMBINED_IMAGE_SAMPLER, m_pDepthStencilAttachment->getImageView("only_depth"));
             pPass->apply();
         }

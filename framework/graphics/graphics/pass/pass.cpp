@@ -1334,8 +1334,12 @@ namespace vg
 				PassData::TexData texData = m_pData->getTexture(item.name);
 				const auto pTexture = texData.pTexture != nullptr ? texData.pTexture : pDefaultTexture2D.get();
 				vk::ImageView imageView;
-				if (texData.pImageView != nullptr) {
-					imageView = *(texData.pImageView->getImageView());
+				if (texData.pTexture != nullptr) {
+					if (texData.pImageView != nullptr) {
+					    imageView = *(texData.pImageView->getImageView());
+					} else {
+						imageView = *(pTexture->getImageView()->getImageView());
+					}
 				} else {
 					imageView = *(pTexture->getImageView()->getImageView());
 				}

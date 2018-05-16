@@ -78,6 +78,7 @@ namespace vg
 		, m_pMainShader()
 		, m_pMainPass()
 		, m_pPreZPass()
+		, m_isRuningBinding(VG_FALSE)
 	{
 		m_pMainShader = std::shared_ptr<vg::Shader>{new vg::Shader()};
 		m_pMainPass = std::shared_ptr<vg::Pass>{ new vg::Pass(m_pMainShader.get())};
@@ -193,7 +194,11 @@ namespace vg
             result.pPreZCmdBuffer->addCmd(cmdInfo);
 		}
 
-		_beginBindToRender(info, pResult);
+		if (result.pBranchCmdBuffer != nullptr && result.pTrunkWaitBarrierCmdBuffer != nullptr &&
+		    result.pTrunkRenderPassCmdBuffer != nullptr && m_isRuningBinding == VG_FALSE) {
+		    _beginBindToRender(info, pResult);
+			m_isRuningBinding = VG_TRUE;
+		}
 
     }
 
@@ -202,8 +207,10 @@ namespace vg
 		if (m_onlyOnce == VG_TRUE) {
 			m_bindTargetID = 0;
 		}
-
-		_endBindToRender(info);
+		if (m_isRuningBinding == VG_TRUE) {
+		    _endBindToRender(info);
+			m_isRuningBinding = VG_FALSE;
+		}
 		
 	}
 

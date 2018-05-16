@@ -390,5 +390,5 @@ void Window::_onPreRender(vg::Renderer::RenderInfo &info
 	
 	info.pSceneInfos = mySceneInfos.data();
 
-	mySceneInfos[0].postRender = m_pPostRender.get();
+	mySceneInfos[0].pPostRender = m_pPostRender.get();
 }

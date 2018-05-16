@@ -22,12 +22,12 @@ namespace vg
 	Renderer::SceneInfo::SceneInfo(BaseScene *pScene
 		, BaseCamera *pCamera
 		, Bool32 preZ
-		, PostRender * pPostRender
+		, PostRender * postRender
 		)
 		: pScene(pScene)
 		, pCamera(pCamera)
 		, preZ(preZ)
-		, pPostRender(pPostRender)
+		, postRender(postRender)
 	{
 
 	}
@@ -313,8 +313,8 @@ namespace vg
 		    m_trunkWaitBarrierCmdBuffer.begin();						
 		    m_trunkRenderPassCmdBuffer.begin();
 			if (m_postRenderEnable == VG_TRUE && 
-			    sceneInfo.pPostRender != nullptr &&
-				sceneInfo.pPostRender->isValidBindToRender() == VG_TRUE
+			    sceneInfo.postRender != nullptr &&
+				sceneInfo.postRender->isValidBindToRender() == VG_TRUE
 			    )
 			{
 				m_postRenderCmdbuffer.begin();
@@ -324,8 +324,9 @@ namespace vg
 			//scene make cmds.
 			if (pScene->getSpaceType() == SpaceType::SPACE_2)
 			{
-				_bindScene2(dynamic_cast<const Scene<SpaceType::SPACE_2> *>(pScene), 
+				_renderScene2(dynamic_cast<const Scene<SpaceType::SPACE_2> *>(pScene), 
 				    dynamic_cast<const Camera<SpaceType::SPACE_2> *>(pCamera), 
+					info,
 					m_preZEnable == VG_TRUE && sceneInfo.preZ == VG_TRUE ? &m_preZCmdBuffer : nullptr,
 					&m_branchCmdBuffer,					
 					&m_trunkRenderPassCmdBuffer,
@@ -333,8 +334,9 @@ namespace vg
 					);
 			} else if (pScene->getSpaceType() == SpaceType::SPACE_3)
 			{
-				_bindScene3(dynamic_cast<const Scene<SpaceType::SPACE_3> *>(pScene), 
+				_renderScene3(dynamic_cast<const Scene<SpaceType::SPACE_3> *>(pScene), 
 				    dynamic_cast<const Camera<SpaceType::SPACE_3> *>(pCamera), 
+					info,
 					m_preZEnable == VG_TRUE && sceneInfo.preZ == VG_TRUE ? &m_preZCmdBuffer : nullptr,
 					&m_branchCmdBuffer,					
 					&m_trunkRenderPassCmdBuffer,
@@ -346,10 +348,10 @@ namespace vg
 
 			//post render make cmds.
 			if (m_postRenderEnable == VG_TRUE && 
-			    sceneInfo.pPostRender != nullptr &&
-				sceneInfo.pPostRender->isValidBindToRender() == VG_TRUE)
+			    sceneInfo.postRender != nullptr &&
+				sceneInfo.postRender->isValidBindToRender() == VG_TRUE)
 			{
-				auto pMaterial = sceneInfo.pPostRender->getMaterial();
+				auto pMaterial = sceneInfo.postRender->getMaterial();
 				auto passCount = pMaterial->getPassCount();
 				for (uint32_t i = 0; i < passCount; ++i)
 				{
@@ -375,7 +377,7 @@ namespace vg
 					&m_postRenderCmdbuffer,
 				};
 				
-				sceneInfo.pPostRender->beginBindToRender(bindInfo, &result);
+				sceneInfo.postRender->beginBindToRender(bindInfo, &result);
 			}
 
 			// pre z
@@ -408,8 +410,8 @@ namespace vg
 
 			//post render record
 			if (m_postRenderEnable == VG_TRUE && 
-			    sceneInfo.pPostRender != nullptr &&
-				sceneInfo.pPostRender->isValidBindToRender() == VG_TRUE)
+			    sceneInfo.postRender != nullptr &&
+				sceneInfo.postRender->isValidBindToRender() == VG_TRUE)
 			{
 				const vk::RenderPass * pRenderPass;
 				//trunk render pass.
@@ -448,10 +450,10 @@ namespace vg
 
 			//post render end bind
 			if (m_postRenderEnable == VG_TRUE && 
-			    sceneInfo.pPostRender != nullptr &&
-				sceneInfo.pPostRender->isValidBindToRender() == VG_TRUE)
+			    sceneInfo.postRender != nullptr &&
+				sceneInfo.postRender->isValidBindToRender() == VG_TRUE)
 			{
-				sceneInfo.pPostRender->endBindToRender();
+				sceneInfo.postRender->endBindToRender();
 			}
 
 		    _endBind();			
@@ -464,8 +466,8 @@ namespace vg
 		    m_trunkWaitBarrierCmdBuffer.end();
 		    m_branchCmdBuffer.end();
 			if (m_postRenderEnable == VG_TRUE &&
-				sceneInfo.pPostRender != nullptr &&
-				sceneInfo.pPostRender->isValidBindToRender() == VG_TRUE
+				sceneInfo.postRender != nullptr &&
+				sceneInfo.postRender->isValidBindToRender() == VG_TRUE
 				)
 			{
 				m_postRenderCmdbuffer.end();
@@ -710,8 +712,9 @@ namespace vg
 		VG_LOG(plog::debug) << "Post allocate command buffer from pool." << std::endl;
 	}
 
-	void Renderer::_bindScene2(const Scene<SpaceType::SPACE_2> *pScene
+	void Renderer::_renderScene2(const Scene<SpaceType::SPACE_2> *pScene
 		, const Camera<SpaceType::SPACE_2> *pCamera
+	    , const RenderInfo &info
 		, CmdBuffer *pPreZCmdBuffer
 		, CmdBuffer *pBranchCmdBuffer
         , CmdBuffer *pTrunkRenderPassCmdBuffer
@@ -908,8 +911,9 @@ namespace vg
 		}
 	}
 
-	void Renderer::_bindScene3(const Scene<SpaceType::SPACE_3> *pScene
+	void Renderer::_renderScene3(const Scene<SpaceType::SPACE_3> *pScene
 		, const Camera<SpaceType::SPACE_3> *pCamera
+	    , const RenderInfo &info
 		, CmdBuffer *pPreZCmdBuffer
 		, CmdBuffer *pBranchCmdBuffer
         , CmdBuffer *pTrunkRenderPassCmdBuffer

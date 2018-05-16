@@ -115,8 +115,6 @@ namespace vg
 		std::vector<Pass *> m_arrPasses;
 		std::unordered_map<InstanceID, Pass *> m_mapPasses;
 
-		Bool32 m_isRuningBinding;
-
 		virtual void _addPass(Pass *pPass);
 		virtual void _removePass(Pass *pPass);
 

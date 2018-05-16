@@ -26,11 +26,11 @@ namespace vg
 			BaseScene *pScene;
 			BaseCamera *pCamera;
 			Bool32 preZ;
-			PostRender * postRender;
+			PostRender * pPostRender;
 			SceneInfo(BaseScene *pScene = nullptr
 			    , BaseCamera *pCamera = nullptr
 				, Bool32 preZ = VG_FALSE
-				, PostRender * postRender = nullptr);
+				, PostRender * pPostRender = nullptr);
 		};
 
 		struct RenderInfo {
@@ -154,18 +154,16 @@ namespace vg
 		void _recordTrunkRenderPassForEnd();
 		void _recordCommandBufferForEnd();
 
-	    void _renderScene2(const Scene<SpaceType::SPACE_2> *pScene
+	    void _bindScene2(const Scene<SpaceType::SPACE_2> *pScene
 		    , const Camera<SpaceType::SPACE_2> *pCamera
-	        , const RenderInfo &info
 			, CmdBuffer *pPreZCmdBuffer = nullptr
 			, CmdBuffer *pBranchCmdBuffer = nullptr
             , CmdBuffer *pTrunkRenderPassCmdBuffer = nullptr
             , CmdBuffer *pTrunkWaitBarrierCmdBuffer = nullptr
 			);
 
-		void _renderScene3(const Scene<SpaceType::SPACE_3> *pScene
+		void _bindScene3(const Scene<SpaceType::SPACE_3> *pScene
 		    , const Camera<SpaceType::SPACE_3> *pCamera
-	        , const RenderInfo &info
 			, CmdBuffer *pPreZCmdBuffer = nullptr
 			, CmdBuffer *pBranchCmdBuffer = nullptr
             , CmdBuffer *pTrunkRenderPassCmdBuffer = nullptr

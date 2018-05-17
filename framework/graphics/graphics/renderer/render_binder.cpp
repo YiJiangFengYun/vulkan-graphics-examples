@@ -1,11 +1,6 @@
-#include "graphics/renderer/renderer.hpp"
+#include "graphics/renderer/render_binder.hpp"
 
-#include "graphics/util/util.hpp"
-#include "graphics/buffer_data/util.hpp"
 #include "graphics/util/gemo_util.hpp"
-#include "graphics/renderer/cmd_parser.hpp"
-
-#define USE_WORLD_BOUNDS
 
 namespace vg
 {
@@ -19,694 +14,91 @@ namespace vg
 #endif
 		);
 
-	Renderer::SceneInfo::SceneInfo(BaseScene *pScene
-		, BaseCamera *pCamera
-		, Bool32 preZ
-		, PostRender * pPostRender
-		)
-		: pScene(pScene)
-		, pCamera(pCamera)
-		, preZ(preZ)
-		, pPostRender(pPostRender)
-	{
-
-	}
-
-	Renderer::RenderInfo::RenderInfo(uint32_t sceneInfoCount
-		, const SceneInfo *pSceneInfos
-		, uint32_t waitSemaphoreCount
-		, const vk::Semaphore* pWaitSemaphores
-		, const vk::PipelineStageFlags* pWaitDstStageMask
-		, uint32_t signalSemaphoreCount
-		, const vk::Semaphore* pSignalSemaphores
-		)
-		: sceneInfoCount(sceneInfoCount)
-		, pSceneInfos(pSceneInfos)
-		, waitSemaphoreCount(waitSemaphoreCount)
-		, pWaitSemaphores(pWaitSemaphores)
-		, pWaitDstStageMask(pWaitDstStageMask)
-		, signalSemaphoreCount(signalSemaphoreCount)
-		, pSignalSemaphores(pSignalSemaphores)
-	{
-	}
-
-	Renderer::RenderResultInfo::RenderResultInfo(Bool32 isRendered
-		, uint32_t drawCount
-	    )
-		: isRendered(isRendered)
-		, drawCount(drawCount)
-	{
-
-	}
-
-	Renderer::Renderer(const RenderTarget * pRenderTarget)
-		: Base(BaseType::RENDERER)
-		, m_pRenderTarget()
-		, m_clearValueColor(0.0f)
-		, m_clearValueDepth(1.0f)
-		, m_clearValueStencil(0u)
-		, m_pipelineCache()
-		, m_trunkRenderPassCmdBuffer()
-		, m_trunkWaitBarrierCmdBuffer()
-		, m_branchCmdBuffer()
-		, m_bindedObjects()
+    RenderBinder::RenderBinder(uint32_t framebufferWidth
+        , uint32_t framebufferHeight
+        )
+        : m_framebufferWidth(framebufferWidth)
+        , m_framebufferHeight(framebufferHeight)
+        , m_bindedObjects()
 		, m_bindedObjectCount(0u)
-		, m_framebufferWidth(0u)
-		, m_framebufferHeight(0u)
-        //pre z
-		, m_preZEnable(VG_FALSE)
-		, m_pPreZTarget()
-		, m_pPreZCmdBuffer()
-		//post render
-		, m_postRenderEnable(VG_FALSE)
-		, m_pPostRenderTarget()
-		, m_pPostRenderCmdbuffer()
+    {}
 
-#if defined(DEBUG) && defined(VG_ENABLE_COST_TIMER)
-        , m_preparingRenderCostTimer(fd::CostTimer::TimerType::AVERAGE)
-#endif //DEBUG and VG_ENABLE_COST_TIMER
-	{
-		setRenderTarget(pRenderTarget);
-		_createCommandPool();
-		_createCommandBuffer();
-		//_createFence();
-	}
+     uint32_t RenderBinder::getFramebufferWidth() const
+     {
+         return m_framebufferWidth;
+     }
 
-	Renderer::~Renderer()
-	{
-	}
-
-	const RenderTarget * Renderer::getRenderTarget() const
-	{
-		return m_pRenderTarget;
-	}
-
-	void Renderer::setRenderTarget(const RenderTarget * pRenderTarget)
-	{
-		if (m_pRenderTarget != pRenderTarget) {
-		    m_pRenderTarget = pRenderTarget;
-			uint32_t framebufferWidth = 0u;
-			uint32_t framebufferHeight = 0u;
-			if (pRenderTarget != nullptr) {
-				framebufferWidth = pRenderTarget->getFramebufferWidth();
-				framebufferHeight = pRenderTarget->getFramebufferHeight();
-			}
-			if (m_framebufferWidth != framebufferWidth ||
-				    m_framebufferHeight != framebufferHeight)
-			{
-				m_framebufferWidth = framebufferWidth;
-				m_framebufferHeight = framebufferHeight;
-
-				if (m_preZEnable) {
-					if (framebufferWidth != 0 && framebufferHeight != 0u)
-					{
-						_createPreZObjs();
-					}
-					else
-					{
-						_destroyPreZObjs();
-					}
-				}
-			}
-		}
-	}
-
-	void Renderer::enablePreZ()
-	{
-		if (m_preZEnable == VG_FALSE)
-		{
-			m_preZEnable = VG_TRUE;
-			if (m_framebufferWidth != 0u && m_framebufferHeight != 0u)
-			{
-			    _createPreZObjs();
-			}
-		}
-	}
-
-	void Renderer::disablePreZ()
-	{
-		if (m_preZEnable == VG_TRUE)
-		{
-			m_preZEnable = VG_FALSE;
-			_destroyPreZObjs();
-		}
-	}
-
-	void Renderer::enablePostRender()
-	{
-		if (m_postRenderEnable == VG_FALSE)
-		{
-			m_postRenderEnable = VG_TRUE;
-			if (m_framebufferWidth != 0u && m_framebufferHeight != 0u)
-			{
-				_createPostRenderObjs();
-			}
-		}
-	}
-
-	void Renderer::disablePostRender()
-	{
-		if (m_postRenderEnable == VG_TRUE)
-		{
-			m_postRenderEnable = VG_FALSE;
-			_destroyPostRenderObjs();
-		}
-	}
-
-	Bool32 Renderer::isValidForRender() const
-	{
-		return _isValidForRender();
-	}
-
-	void Renderer::render(const RenderInfo &info, 
-		RenderResultInfo &resultInfo)
-	{
-		_preRender();
-		_renderBegin(info, resultInfo);
-		_render(info, resultInfo);
-		_renderEnd(info, resultInfo);
-		_postRender();
-	}
-
-	const Color &Renderer::getClearValueColor() const
-	{
-		return m_clearValueColor;
-	}
-
-	void Renderer::setClearValueColor(Color color)
-	{
-		m_clearValueColor = color;
-	}
-
-	float Renderer::getClearValueDepth() const
-	{
-		return m_clearValueDepth;
-	}
-
-	void Renderer::setClearValueDepth(float value)
-	{
-		m_clearValueDepth = value;
-	}
-
-	uint32_t Renderer::getClearValueStencil() const
-	{
-		return m_clearValueStencil;
-	}
-
-	void Renderer::setClearValueStencil(uint32_t value)
-	{
-		m_clearValueStencil = value;
-	}
-
-	// Renderer::PreObjectRecordingFun Renderer::setPreObjectRecordingCallBack(PreObjectRecordingFun cbFun)
-	// {
-	// 	auto oldFun = m_preObjectRecordingFun;
-	// 	m_preObjectRecordingFun = cbFun;
-	// 	return oldFun;
-	// }
-		
-	// Renderer::PostObjectRecordingFun Renderer::setPostObjectRecordingCallBack(PostObjectRecordingFun cbFun)
-	// {
-	// 	auto oldFun = m_postObjectRecordingFun;
-	// 	m_postObjectRecordingFun = cbFun;
-	// 	return oldFun;
-	// }
-
-#if defined(DEBUG) && defined(VG_ENABLE_COST_TIMER)
-    const fd::CostTimer &Renderer::getPreparingRenderCostTimer() const
-	{
-		return m_preparingRenderCostTimer;
-	}
-#endif //DEBUG and VG_ENABLE_COST_TIMER
-
-	Bool32 Renderer::_isValidForRender() const
-	{
-		return VG_TRUE;
-	}
-
-	void Renderer::_preRender()
-	{
-		m_pipelineCache.start();
-	}
-
-	void Renderer::_renderBegin(const RenderInfo & info, RenderResultInfo & resultInfo)
-	{
-#if defined(DEBUG) && defined(VG_ENABLE_COST_TIMER)
-		m_preparingRenderCostTimer.begin();
-
-		fd::CostTimer renderBeginCostTimer(fd::CostTimer::TimerType::ONCE);
-		renderBeginCostTimer.begin();
-#endif //DEBUG and VG_ENABLE_COST_TIMER
-
-		uint32_t count = info.sceneInfoCount;
-		for (uint32_t i = 0; i < count; ++i)
-		{
-			const auto & sceneInfo = *(info.pSceneInfos + i);
-			const auto pScene = sceneInfo.pScene;
-			pScene->beginRender();
-		}
-
-#if defined(DEBUG) && defined(VG_ENABLE_COST_TIMER)
-		renderBeginCostTimer.end();
-		VG_COST_TIME_LOG(plog::debug) << "Render begin cost time: "
-			<< renderBeginCostTimer.costTimer
-			<< std::endl;
-#endif //DEBUG and VG_ENABLE_COST_TIMER
-	}
-
-	void Renderer::_render(const RenderInfo &info
-		    , RenderResultInfo &resultInfo)
-	{
-		resultInfo.drawCount = 0u;
-
-		//command buffer begin
-		_recordCommandBufferForBegin();
-
-		uint32_t count = info.sceneInfoCount;
-		for (uint32_t i = 0; i < count; ++i)
-		{
-			if (i == 0) resultInfo.isRendered = VG_TRUE;
-			const auto & sceneInfo = *(info.pSceneInfos + i);
-			const auto pScene = sceneInfo.pScene;
-			const auto pCamera = sceneInfo.pCamera;
-#if defined(DEBUG) && defined(VG_ENABLE_COST_TIMER)
-            fd::CostTimer preparingSceneCostTimer(fd::CostTimer::TimerType::ONCE);
-			preparingSceneCostTimer.begin();
-#endif //DEBUG and VG_ENABLE_COST_TIMER
-            if (m_preZEnable == VG_TRUE && sceneInfo.preZ == VG_TRUE)
-			{
-                m_pPreZCmdBuffer->begin();
-			}
-		    m_branchCmdBuffer.begin();
-		    m_trunkWaitBarrierCmdBuffer.begin();						
-		    m_trunkRenderPassCmdBuffer.begin();
-			if (m_postRenderEnable == VG_TRUE && 
-			    sceneInfo.pPostRender != nullptr &&
-				sceneInfo.pPostRender->isValidBindToRender() == VG_TRUE
-			    )
-			{
-				m_pPostRenderCmdbuffer->begin();
-			}
-		    _beginBind();
-            
-			//scene make cmds.
-			if (pScene->getSpaceType() == SpaceType::SPACE_2)
-			{
-				_bindScene2(dynamic_cast<const Scene<SpaceType::SPACE_2> *>(pScene), 
-				    dynamic_cast<const Camera<SpaceType::SPACE_2> *>(pCamera), 
-					m_preZEnable == VG_TRUE && sceneInfo.preZ == VG_TRUE ? m_pPreZCmdBuffer.get() : nullptr,
-					&m_branchCmdBuffer,					
-					&m_trunkRenderPassCmdBuffer,
-					&m_trunkWaitBarrierCmdBuffer
-					);
-			} else if (pScene->getSpaceType() == SpaceType::SPACE_3)
-			{
-				_bindScene3(dynamic_cast<const Scene<SpaceType::SPACE_3> *>(pScene), 
-				    dynamic_cast<const Camera<SpaceType::SPACE_3> *>(pCamera), 
-					m_preZEnable == VG_TRUE && sceneInfo.preZ == VG_TRUE ? m_pPreZCmdBuffer.get() : nullptr,
-					&m_branchCmdBuffer,					
-					&m_trunkRenderPassCmdBuffer,
-					&m_trunkWaitBarrierCmdBuffer
-					);
-			} else {
-				//todo
-			}
-
-			//post render make cmds.
-			if (m_postRenderEnable == VG_TRUE && 
-			    sceneInfo.pPostRender != nullptr &&
-				sceneInfo.pPostRender->isValidBindToRender() == VG_TRUE)
-			{
-				auto pMaterial = sceneInfo.pPostRender->getMaterial();
-				auto passCount = pMaterial->getPassCount();
-				for (uint32_t i = 0; i < passCount; ++i)
-				{
-					auto pPass = pMaterial->getPassWithIndex(i);
-					auto buildInDataInfo = pPass->getBuildInDataInfo();
-					auto buildInComponentCount = buildInDataInfo.componentCount;
-					for (uint32_t j = 0; j < buildInComponentCount; ++j)
-					{
-						if ((*(buildInDataInfo.pComponent + j)).type == Pass::BuildInDataType::POST_RENDER_RESULT)
-						{
-							auto pColorTex = m_pPostRenderTarget->getColorAttachment();
-							pPass->setTexture(VG_M_POST_RENDER_TEXTURE_NAME, pColorTex, VG_M_POST_RENDER_TEXTURE_BINDING_PRIORITY);
-							pPass->apply();
-							break;
-						}
-					}
-				}
-
-				PostRender::BindInfo bindInfo = {
-					m_framebufferWidth,
-					m_framebufferHeight,
-				};
-				PostRender::BindResult result = {
-					m_pPostRenderCmdbuffer.get(),
-				};
-				
-				sceneInfo.pPostRender->beginBindToRender(bindInfo, &result);
-			}
-
-			// pre z
-		    if (m_preZEnable == VG_TRUE && sceneInfo.preZ == VG_TRUE)
-		    {
-		    	resultInfo.drawCount += m_pPreZCmdBuffer->getCmdCount();
-		    	_recordPreZRenderPassForBegin();
-		    	CMDParser::recordTrunk(m_pPreZCmdBuffer.get(),
-		    	    m_pCommandBuffer.get(),
-		    		&m_pipelineCache,
-		    		m_pPreZTarget->getRenderPass()
-		    		);
-		    	_recordPreZRenderPassForEnd();
-		    }
-
-			//branch render pass.
-		    CMDParser::ResultInfo cmdParseResult;
-		    CMDParser::recordBranch(&m_branchCmdBuffer,
-		    	m_pCommandBuffer.get(),
-		    	&m_pipelineCache,
-		    	&cmdParseResult
-		    	);
-		    resultInfo.drawCount += cmdParseResult.drawCount;
-
-			//trunk wait barrier
-		    CMDParser::recordTrunkWaitBarrier(&m_trunkWaitBarrierCmdBuffer,
-		    	m_pCommandBuffer.get());
-    
-            
-
-			//post render record
-			if (m_postRenderEnable == VG_TRUE && 
-			    sceneInfo.pPostRender != nullptr &&
-				sceneInfo.pPostRender->isValidBindToRender() == VG_TRUE)
-			{
-				const vk::RenderPass * pRenderPass;
-				//trunk render pass.
-				resultInfo.drawCount += m_trunkRenderPassCmdBuffer.getCmdCount();
-				pRenderPass = _recordTrunkRenderPassForBegin(VG_TRUE, VG_TRUE);
-				CMDParser::recordTrunk(&m_trunkRenderPassCmdBuffer,
-				    m_pCommandBuffer.get(),
-					&m_pipelineCache,
-					pRenderPass
-					);
-				_recordTrunkRenderPassForEnd();
-
-				//post render pass.
-				resultInfo.drawCount += m_pPostRenderCmdbuffer->getCmdCount();
-		        pRenderPass = _recordTrunkRenderPassForBegin(VG_FALSE, i == 0);
-		        CMDParser::recordTrunk(m_pPostRenderCmdbuffer.get(),
-		        	m_pCommandBuffer.get(),
-		        	&m_pipelineCache,
-		        	pRenderPass
-		        	);
-		        _recordTrunkRenderPassForEnd();
-			}
-			else
-			{
-				//trunk render pass.
-		        resultInfo.drawCount += m_trunkRenderPassCmdBuffer.getCmdCount();
-		        auto pRenderPass = _recordTrunkRenderPassForBegin(VG_FALSE, i == 0);
-		        CMDParser::recordTrunk(&m_trunkRenderPassCmdBuffer,
-		        	m_pCommandBuffer.get(),
-		        	&m_pipelineCache,
-		        	pRenderPass
-		        	);
-		        _recordTrunkRenderPassForEnd();
-			}
-
-
-			//post render end bind
-			if (m_postRenderEnable == VG_TRUE && 
-			    sceneInfo.pPostRender != nullptr &&
-				sceneInfo.pPostRender->isValidBindToRender() == VG_TRUE)
-			{
-				sceneInfo.pPostRender->endBindToRender();
-			}
-
-		    _endBind();			
-
-			if (m_preZEnable == VG_TRUE && sceneInfo.preZ == VG_TRUE)
-			{
-			    m_pPreZCmdBuffer->end();
-			}
-		    m_trunkRenderPassCmdBuffer.end();
-		    m_trunkWaitBarrierCmdBuffer.end();
-		    m_branchCmdBuffer.end();
-			if (m_postRenderEnable == VG_TRUE &&
-				sceneInfo.pPostRender != nullptr &&
-				sceneInfo.pPostRender->isValidBindToRender() == VG_TRUE
-				)
-			{
-				m_pPostRenderCmdbuffer->end();
-			}
-    
-#if defined(DEBUG) && defined(VG_ENABLE_COST_TIMER)
-			preparingSceneCostTimer.end();
-			VG_COST_TIME_LOG(plog::debug) << "Preparing scene cost time: " 
-			    << preparingSceneCostTimer.costTimer 
-				<< "ms, scene id: " << pScene->getID() 
-				<< ", scene type: " << (pScene->getSpaceType() == SpaceType::SPACE_3 ? "space3" : "space2") 
-				<<  std::endl;
-#endif //DEBUG and VG_ENABLE_COST_TIMER
-		}
-
-		//command buffer end
-		_recordCommandBufferForEnd();
-
-	}
-
-	void Renderer::_renderEnd(const RenderInfo & info, RenderResultInfo & resultInfo)
-	{
-
-#if defined(DEBUG) && defined(VG_ENABLE_COST_TIMER)
-        fd::CostTimer renderEndCostTimer(fd::CostTimer::TimerType::ONCE);
-		renderEndCostTimer.begin();
-#endif //DEBUG and VG_ENABLE_COST_TIMER	
-
-		/*auto pDevice = pApp->getDevice();
-		pDevice->waitForFences(*m_waitFence, VK_TRUE, std::numeric_limits<uint64_t>::max());
-		pDevice->resetFences(*m_waitFence);*/
-		
-
-		vk::PipelineStageFlags waitStages[] = { vk::PipelineStageFlagBits::eColorAttachmentOutput };		
-		//submit		
-		vk::SubmitInfo submitInfo = {
-			info.waitSemaphoreCount,              //waitSemaphoreCount
-			info.pWaitSemaphores,                 //pWaitSemaphores
-			waitStages,                           //pWaitDstStageMask
-			1u,                                   //commandBufferCount
-			m_pCommandBuffer.get(),               //pCommandBuffers
-			info.signalSemaphoreCount,            //signalSemaphoreCount
-			info.pSignalSemaphores,               //pSignalSemaphores
-		};
-
-		VG_LOG(plog::debug) << "Pre submit to grahics queue." << std::endl;
-		vk::Queue queue;
-		uint32_t queueIndex;
-		pApp->allocateGaphicsQueue(queueIndex, queue);
-		queue.submit(submitInfo, nullptr);
-		//queue.submit(submitInfo, *m_waitFence);
-		pApp->freeGraphicsQueue(queueIndex);
-		VG_LOG(plog::debug) << "Post submit to grahics queue." << std::endl;
-
-		uint32_t count = info.sceneInfoCount;
-		for (uint32_t i = 0; i < count; ++i)
-		{
-			const auto & sceneInfo = *(info.pSceneInfos + i);
-			const auto pScene = sceneInfo.pScene;
-			pScene->endRender();
-		}
-		
-#if defined(DEBUG) && defined(VG_ENABLE_COST_TIMER)
-        renderEndCostTimer.end();
-		VG_COST_TIME_LOG(plog::debug) << "Render end cost time: " 
-			    << renderEndCostTimer.costTimer 
-				<< std::endl;
-
-		m_preparingRenderCostTimer.end();
-		VG_COST_TIME_LOG(plog::debug) << "Average cost time of preparing render: " << m_preparingRenderCostTimer.costTimer << "ms." << std::endl;
-#endif //DEBUG and VG_ENABLE_COST_TIMER
-	}
-
-	void Renderer::_postRender()
-	{
-		m_pipelineCache.end();
-	}
-
-	void Renderer::_recordCommandBufferForBegin()
-	{
-		vk::CommandBufferBeginInfo beginInfo = {
-			vk::CommandBufferUsageFlagBits::eSimultaneousUse,  //flags
-			nullptr                                            //pInheritanceInfo
-		};
-
-		m_pCommandBuffer->begin(beginInfo);
-		VG_LOG(plog::debug) << "Post begin command buffer for render." << std::endl;
-
-		
-	}
-
-	void Renderer::_recordPreZRenderPassForBegin()
-	{
-		vk::ClearValue clearValueDepthStencil = {
-			vk::ClearDepthStencilValue(m_clearValueDepth
-				, m_clearValueStencil
-			)
-		};
-		std::array<vk::ClearValue, 1> clearValues = {
-		   clearValueDepthStencil,
-		};
-
-		const auto framebufferWidth = m_framebufferWidth;
-		const auto framebufferHeight = m_framebufferHeight;
-		const auto renderArea = m_pRenderTarget->getRenderArea();
-
-		vk::RenderPassBeginInfo renderPassBeginInfo = {
-			*(m_pPreZTarget->getRenderPass()),                   //renderPass
-			*(m_pPreZTarget->getFramebuffer()),                  //framebuffer
-			vk::Rect2D(                                       //renderArea
-				vk::Offset2D(static_cast<int32_t>(std::round(framebufferWidth * renderArea.x))
-					, static_cast<int32_t>(std::round(framebufferHeight * renderArea.y))
-				),
-				vk::Extent2D(static_cast<uint32_t>(std::round(framebufferWidth * renderArea.width)),
-					static_cast<uint32_t>(std::round(framebufferHeight * renderArea.height))
-				)
-			),
-			static_cast<uint32_t>(clearValues.size()),      //clearValueCount
-			clearValues.data()                              //pClearValues
-		};
-
-		m_pCommandBuffer->beginRenderPass(renderPassBeginInfo, vk::SubpassContents::eInline);
-	}
-		
-	void Renderer::_recordPreZRenderPassForEnd()
-	{
-		m_pCommandBuffer->endRenderPass();
-	}
-
-	const vk::RenderPass *  Renderer::_recordTrunkRenderPassForBegin(Bool32 isPostRender, Bool32 isFirst)
-	{
-		vk::ClearValue clearValueColor = {
-			std::array<float, 4>{
-			    m_clearValueColor[0], 
-				m_clearValueColor[1], 
-				m_clearValueColor[2], 
-				m_clearValueColor[3]
-			}
-		};
-		vk::ClearValue clearValueDepthStencil = {
-			vk::ClearDepthStencilValue(m_clearValueDepth
-				, m_clearValueStencil
-			)
-		};
-		std::array<vk::ClearValue, 2> clearValues = { clearValueColor
-			, clearValueDepthStencil
-		};
-
-
-        const auto framebufferWidth = m_framebufferWidth;
-		const auto framebufferHeight = m_framebufferHeight;
-		const auto renderArea = m_pRenderTarget->getRenderArea();
-		const vk::RenderPass * pRenderPass;
-		const vk::Framebuffer * pFramebuffer;
-
-		if (isPostRender == VG_TRUE)
-		{
-			pRenderPass = m_pPostRenderTarget->getRenderPass();
-			pFramebuffer = m_pPostRenderTarget->getFramebuffer();
-		}
-		else if (isFirst == VG_TRUE)
-		{
-			pRenderPass = m_pRenderTarget->getFirstRenderPass();
-		    pFramebuffer = m_pRenderTarget->getFirstFramebuffer();
-		}
-		else
-		{
-			pRenderPass = m_pRenderTarget->getSecondRenderPass();
-		    pFramebuffer = m_pRenderTarget->getSecondFramebuffer();
-		}
-
-		vk::RenderPassBeginInfo renderPassBeginInfo = {
-			*pRenderPass,                                   //renderPass
-			*pFramebuffer,                                  //framebuffer
-			vk::Rect2D(                                       //renderArea
-				vk::Offset2D(static_cast<int32_t>(std::round(framebufferWidth * renderArea.x))
-					, static_cast<int32_t>(std::round(framebufferHeight * renderArea.y))
-				),
-				vk::Extent2D(static_cast<uint32_t>(std::round(framebufferWidth * renderArea.width)),
-					static_cast<uint32_t>(std::round(framebufferHeight * renderArea.height))
-				)
-			),
-			static_cast<uint32_t>(clearValues.size()),      //clearValueCount
-			clearValues.data()                              //pClearValues
-		};
-
-		m_pCommandBuffer->beginRenderPass(renderPassBeginInfo, vk::SubpassContents::eInline);
-
-		return pRenderPass;
-	}
-
-	void Renderer::_recordTrunkRenderPassForEnd()
+    void RenderBinder::setFramebufferWidth(uint32_t value)
     {
-		m_pCommandBuffer->endRenderPass();
-	}
+        m_framebufferWidth = value;
+    }
 
-	void Renderer::_recordCommandBufferForEnd()
-	{
-		
-		VG_LOG(plog::debug) << "Pre end command buffer." << std::endl;
-		m_pCommandBuffer->end();
-		VG_LOG(plog::debug) << "Post end command buffer." << std::endl;
-	}
+    uint32_t RenderBinder::getFramebufferHeight() const
+    {
+        return m_framebufferHeight;
+    }
 
-	
+    void RenderBinder::setFramebufferHeight(uint32_t value)
+    {
+        m_framebufferHeight = value;
+    }
 
-	/*void Renderer::_createFence()
-	{
-		if (m_waitFence != nullptr) return;
-		auto pDevice = pApp->getDevice();
-		vk::FenceCreateInfo createInfo;
-		createInfo.flags = vk::FenceCreateFlagBits::eSignaled;
-		m_waitFence = fd::createFence(pDevice, createInfo);
-	}*/
+    void RenderBinder::bind(const BaseScene *pScene
+        , const BaseCamera *pCamera
+		, PreZTarget *pPreZTarget
+        , CmdBuffer *pPreZCmdBuffer
+		, CmdBuffer *pBranchCmdBuffer
+        , CmdBuffer *pTrunkWaitBarrierCmdBuffer        
+        , CmdBuffer *pTrunkRenderPassCmdBuffer
+        , PostRender *pPostRender
+		, PostRenderTarget *pPostRenderTarget
+        , CmdBuffer *pPostRenderCmdBuffer
+        )
+    {
+        _beginBind();
+        _bind(pScene, 
+            pCamera,
+			pPreZTarget,
+            pPreZCmdBuffer, 
+            pBranchCmdBuffer, 
+            pTrunkWaitBarrierCmdBuffer, 
+            pTrunkRenderPassCmdBuffer,
+            pPostRender,
+			pPostRenderTarget,
+            pPostRenderCmdBuffer
+            );
+        _endBind();
+    }
 
-	void Renderer::_createCommandPool()
-	{
-		if (m_pCommandPool != nullptr) return;
-		auto pDevice = pApp->getDevice();
-		auto graphicsFamily = pApp->getGraphicsFamily();
-		vk::CommandPoolCreateInfo createInfo = {
-			vk::CommandPoolCreateFlagBits::eResetCommandBuffer,
-			graphicsFamily
-		};
-		m_pCommandPool = fd::createCommandPool(pDevice, createInfo);
-	}
+    void RenderBinder::_beginBind()
+    {
+        m_bindedObjectCount = 0u;
+    }
 
-	void Renderer::_createCommandBuffer()
-	{
-		if (m_pCommandBuffer != nullptr) return;
-		auto pCommandPool = m_pCommandPool;
-		vk::CommandBufferAllocateInfo allocateInfo = {
-			*pCommandPool,                             //commandPool
-			vk::CommandBufferLevel::ePrimary,          //level
-			1u                                         //commandBufferCount
-		};
+    void RenderBinder::_bind(const BaseScene *pScene
+        , const BaseCamera *pCamera
+		, PreZTarget *pPreZTarget
+        , CmdBuffer *pPreZCmdBuffer
+		, CmdBuffer *pBranchCmdBuffer
+        , CmdBuffer *pTrunkWaitBarrierCmdBuffer        
+        , CmdBuffer *pTrunkRenderPassCmdBuffer
+        , PostRender *pPostRender
+		, PostRenderTarget *pPostRenderTarget
+        , CmdBuffer *pPostRenderCmdBuffer
+        )
+    {
 
-		auto pDevice = pApp->getDevice();
+    }
 
-		VG_LOG(plog::debug) << "Pre allocate command buffer from pool." << std::endl;
-		m_pCommandBuffer = fd::allocateCommandBuffer(pDevice, pCommandPool.get(), allocateInfo);
-		VG_LOG(plog::debug) << "Post allocate command buffer from pool." << std::endl;
-	}
-
-	void Renderer::_bindScene2(const Scene<SpaceType::SPACE_2> *pScene
+    void RenderBinder::_bindScene2(const Scene<SpaceType::SPACE_2> *pScene
 		, const Camera<SpaceType::SPACE_2> *pCamera
+		, PreZTarget *pPreZTarget
 		, CmdBuffer *pPreZCmdBuffer
 		, CmdBuffer *pBranchCmdBuffer
         , CmdBuffer *pTrunkRenderPassCmdBuffer
         , CmdBuffer *pTrunkWaitBarrierCmdBuffer
 		)
-	{
+    {
 		uint32_t drawCount = 0u;		
 
 		using SceneType = Scene<SpaceType::SPACE_2>;
@@ -776,7 +168,11 @@ namespace vg
 		{
 			auto pVisualObject = validVisualObjects[i];
 			auto modelMatrix = tranMat3ToMat4(pVisualObject->getTransform()->getMatrixLocalToWorld());
-			_setBuildInData(pVisualObject, modelMatrix, viewMatrix, projMatrix
+			_setBuildInData(pVisualObject
+			    , modelMatrix
+				, viewMatrix
+				, projMatrix
+				, pPreZTarget
 #if defined(DEBUG) && defined(VG_ENABLE_COST_TIMER)
 			    , preparingBuildInDataCostTimer
 #endif //DEBUG and VG_ENABLE_COST_TIMER	
@@ -797,7 +193,7 @@ namespace vg
 			result.pTrunkRenderPassCmdBuffer = pTrunkRenderPassCmdBuffer;
 			result.pBranchCmdBuffer = pBranchCmdBuffer;
 			result.pTrunkWaitBarrierCmdBuffer = pTrunkWaitBarrierCmdBuffer;
-			_bind(pVisualObject, info, &result);
+			_bindVisualObject(pVisualObject, info, &result);
 		}
 		
 #if defined(DEBUG) && defined(VG_ENABLE_COST_TIMER)
@@ -827,7 +223,7 @@ namespace vg
 			<< ", scene type: " << (pScene->getSpaceType() == SpaceType::SPACE_3 ? "space3" : "space2")
 			<< std::endl;
 #endif //DEBUG and VG_ENABLE_COST_TIMER
-	}
+    }
 
 	void fillValidVisualObjects(std::vector<VisualObject<SpaceType::SPACE_2> *> &arrPVObjs
 	    , uint32_t &PVObjIndex
@@ -897,15 +293,16 @@ namespace vg
 		}
 	}
 
-	void Renderer::_bindScene3(const Scene<SpaceType::SPACE_3> *pScene
-		, const Camera<SpaceType::SPACE_3> *pCamera
+	void RenderBinder::_bindScene3(const Scene<SpaceType::SPACE_3> *pScene
+	    , const Camera<SpaceType::SPACE_3> *pCamera
+		, PreZTarget *pPreZTarget
 		, CmdBuffer *pPreZCmdBuffer
 		, CmdBuffer *pBranchCmdBuffer
         , CmdBuffer *pTrunkRenderPassCmdBuffer
         , CmdBuffer *pTrunkWaitBarrierCmdBuffer
 		)
-	{
-		using SceneType = Scene<SpaceType::SPACE_3>;
+    {
+        using SceneType = Scene<SpaceType::SPACE_3>;
 
 		uint32_t drawCount = 0u;	
 
@@ -1064,7 +461,11 @@ namespace vg
 			{
 				auto pVisualObject = queues[typeIndex][objectIndex];
 				auto modelMatrix = pVisualObject->getTransform()->getMatrixLocalToWorld();
-				_setBuildInData(pVisualObject, modelMatrix, viewMatrix, projMatrix
+				_setBuildInData(pVisualObject
+				    , modelMatrix
+					, viewMatrix
+				    , projMatrix
+					, pPreZTarget
 #if defined(DEBUG) && defined(VG_ENABLE_COST_TIMER)
 				    , preparingBuildInDataCostTimer
 #endif //DEBUG and VG_ENABLE_COST_TIMER	
@@ -1085,7 +486,7 @@ namespace vg
 				result.pTrunkRenderPassCmdBuffer = pTrunkRenderPassCmdBuffer;
 			    result.pBranchCmdBuffer = pBranchCmdBuffer;
 				result.pTrunkWaitBarrierCmdBuffer = pTrunkWaitBarrierCmdBuffer;
-			    _bind(pVisualObject, info, &result);
+			    _bindVisualObject(pVisualObject, info, &result);
 			}
 		}
 
@@ -1116,35 +517,13 @@ namespace vg
 			<< ", scene type: " << (pScene->getSpaceType() == SpaceType::SPACE_3 ? "space3" : "space2")
 			<< std::endl;
 #endif //DEBUG and VG_ENABLE_COST_TIMER
-	}
+    }
 
-	void Renderer::_beginBind()
-	{
-		m_bindedObjectCount = 0u;
-	}
-		
-	void Renderer::_bind(BaseVisualObject *pVisublObject, BaseVisualObject::BindInfo & bindInfo, BaseVisualObject::BindResult *pResult)
-	{
-		pVisublObject->beginBindToRender(bindInfo, pResult);
-		if (static_cast<uint32_t>(m_bindedObjects.size()) == m_bindedObjectCount) {
-			auto newSize = getNextCapacity(static_cast<uint32_t>(m_bindedObjects.size()));
-			m_bindedObjects.resize(newSize);
-		}
-
-		m_bindedObjects[m_bindedObjectCount] = pVisublObject;
-
-		++m_bindedObjectCount;
-	}
-
-	void Renderer::_endBind()
-	{
-		for (uint32_t i = 0; i < m_bindedObjectCount; ++i) {
-			m_bindedObjects[i]->endBindToRender();
-		}
-		m_bindedObjectCount = 0u;
-	}
-
-	void Renderer::_setBuildInData(BaseVisualObject * pVisualObject, Matrix4x4 modelMatrix, Matrix4x4 viewMatrix, Matrix4x4 projMatrix
+	void RenderBinder::_setBuildInData(BaseVisualObject * pVisualObject
+	    , Matrix4x4 modelMatrix
+		, Matrix4x4 viewMatrix
+		, Matrix4x4 projMatrix
+		, PreZTarget *pPreZTarget
 #if defined(DEBUG) && defined(VG_ENABLE_COST_TIMER)
 	    , fd::CostTimer * pPreparingBuildInDataCostTimer
 #endif //DEBUG and VG_ENABLE_COST_TIMER
@@ -1232,10 +611,10 @@ namespace vg
 		        	}
 					else if (type == Pass::BuildInDataType::PRE_Z_DEPTH_RESULT)
 					{
-						if (m_preZEnable == VG_TRUE)
+						if (pPreZTarget != nullptr)
 				        {
-							auto pTex = m_pPreZTarget->getDepthAttachment();
-				        	pPass->setTexture(VG_M_PRE_Z_TEXTURE_NAME, pTex, VG_M_PRE_Z_TEXTURE_BINDING_PRIORITY);
+							auto pPreTexture = pPreZTarget->getDepthAttachment();
+				        	pPass->setTexture(VG_M_PRE_Z_TEXTURE_NAME, pPreTexture, VG_M_PRE_Z_TEXTURE_BINDING_PRIORITY);
 				        }
 					}
 		        }
@@ -1246,7 +625,7 @@ namespace vg
 			}
 
 			//pre z pass.
-			if (m_preZEnable == VG_TRUE && 
+			if (pPreZTarget != nullptr && 
 				pMaterial->getPreZPass() != nullptr)
 			{
 				auto pPreZPass = pMaterial->getPreZPass();
@@ -1329,43 +708,27 @@ namespace vg
 #endif //DEBUG and VG_ENABLE_COST_TIMER
 	}
 
-	void Renderer::_createPreZObjs()
-	{
-		m_pPreZTarget = std::shared_ptr<PreZTarget>{
-			new PreZTarget{
-				m_framebufferWidth,
-				m_framebufferHeight,
-			}
-		};
+    void RenderBinder::_bindVisualObject(BaseVisualObject *pVisublObject
+        , BaseVisualObject::BindInfo & bindInfo
+        , BaseVisualObject::BindResult *pResult
+        )
+    {
+        pVisublObject->beginBindToRender(bindInfo, pResult);
+		if (static_cast<uint32_t>(m_bindedObjects.size()) == m_bindedObjectCount) {
+			auto newSize = getNextCapacity(static_cast<uint32_t>(m_bindedObjects.size()));
+			m_bindedObjects.resize(newSize);
+		}
 
-		m_pPreZCmdBuffer = std::shared_ptr<CmdBuffer>{
-			new CmdBuffer{}
-		};
-	}
+		m_bindedObjects[m_bindedObjectCount] = pVisublObject;
 
-	void Renderer::_destroyPreZObjs()
-	{
-		m_pPreZTarget = nullptr;
-		m_pPreZCmdBuffer = nullptr;
-	}
+		++m_bindedObjectCount;
+    }
 
-	void Renderer::_createPostRenderObjs()
-	{
-		m_pPostRenderTarget = std::shared_ptr<PostRenderTarget>{
-			new PostRenderTarget{
-				m_framebufferWidth,
-				m_framebufferHeight,
-			}
-		};
-		m_pPostRenderCmdbuffer = std::shared_ptr<CmdBuffer>{
-			new CmdBuffer{}
-		};
-	}
-
-	void Renderer::_destroyPostRenderObjs()
-	{
-		m_pPostRenderTarget = nullptr;
-		m_pPostRenderCmdbuffer = nullptr;
-	}
-
-}
+    void RenderBinder::_endBind()
+    {
+        for (uint32_t i = 0; i < m_bindedObjectCount; ++i) {
+			m_bindedObjects[i]->endBindToRender();
+		}
+		m_bindedObjectCount = 0u;
+    }
+} //vg

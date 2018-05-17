@@ -6,14 +6,14 @@
 namespace vg
 {
     ColorTexRenderTarget::ColorTexRenderTarget(BaseColorAttachment *pColorAttachmentTex)
-        : RenderTarget()
+        : RenderTarget(pColorAttachmentTex->getColorAttachmentWidth()
+		    , pColorAttachmentTex->getColorAttachmentHeight()
+			, pColorAttachmentTex->getColorAttachmentFormat()
+			, DEFAULT_DEPTH_STENCIL_FORMAT
+			)
         , m_pColorAttchment(pColorAttachmentTex)
     {
-        m_framebufferWidth = pColorAttachmentTex->getColorAttachmentWidth();
-		m_framebufferHeight = pColorAttachmentTex->getColorAttachmentHeight();
-        m_colorImageFormat = pColorAttachmentTex->getColorAttachmentFormat();
-		m_depthStencilImageFormat = DEFAULT_DEPTH_STENCIL_FORMAT;
-        _createRenderPass();
+		_createRenderPass();
 		_createDepthStencilTex();
 		_createFramebuffer();
     }

@@ -4,11 +4,15 @@ namespace vg
 {
     const vk::Format RenderTarget::DEFAULT_DEPTH_STENCIL_FORMAT(vk::Format::eD32SfloatS8Uint);
 
-    RenderTarget::RenderTarget()
-        : m_colorImageFormat(vk::Format::eUndefined)
-		, m_depthStencilImageFormat(DEFAULT_DEPTH_STENCIL_FORMAT)
-		, m_framebufferWidth(0)
-		, m_framebufferHeight(0)
+    RenderTarget::RenderTarget(uint32_t framebufferWidth
+        , uint32_t framebufferHeight
+        , vk::Format colorImageFormat
+        , vk::Format depthStencilImageFormat
+        )
+        : m_colorImageFormat(colorImageFormat)
+		, m_depthStencilImageFormat(depthStencilImageFormat)
+		, m_framebufferWidth(framebufferWidth)
+		, m_framebufferHeight(framebufferHeight)
         , m_renderArea(0.0f, 0.0f, 1.0f, 1.0f)
         , m_pFirstRenderPass()
         , m_pSecondRenderPass()

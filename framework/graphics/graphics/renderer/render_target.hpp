@@ -10,7 +10,10 @@ namespace vg
     public:
         static const vk::Format DEFAULT_DEPTH_STENCIL_FORMAT;
 
-        RenderTarget();
+        RenderTarget(uint32_t framebufferWidth = 0u
+            , uint32_t framebufferHeight = 0u
+            , vk::Format colorImageFormat = vk::Format::eUndefined
+            , vk::Format depthStencilImageFormat = DEFAULT_DEPTH_STENCIL_FORMAT);
         uint32_t getFramebufferWidth() const;
         uint32_t getFramebufferHeight() const;
         vk::Format getColorImageFormat() const;

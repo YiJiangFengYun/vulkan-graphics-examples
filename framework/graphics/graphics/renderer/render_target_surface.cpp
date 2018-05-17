@@ -10,16 +10,15 @@ namespace vg
 		, vk::Format swapchainImageFormat
 		, uint32_t swapchainImageWidth
 		, uint32_t swapchainImageHeight)
-        : RenderTarget()
+        : RenderTarget(swapchainImageWidth
+		    , swapchainImageHeight
+			, swapchainImageFormat
+			, DEFAULT_DEPTH_STENCIL_FORMAT
+			)
         , m_swapchainImageViewCount(swapchainImageViewCount)
         , m_pSwapchainImageViews(pSwapchainImageViews)
         , m_imageIndex(0u)
     {
-        m_framebufferWidth = swapchainImageWidth;
-		m_framebufferHeight = swapchainImageHeight;
-        m_colorImageFormat = swapchainImageFormat;
-		m_depthStencilImageFormat = DEFAULT_DEPTH_STENCIL_FORMAT;
-
         _createRenderPass();
 		_createDepthStencilTex();
 		_createFramebuffers();

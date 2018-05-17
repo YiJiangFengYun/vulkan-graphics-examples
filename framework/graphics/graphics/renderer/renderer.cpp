@@ -59,10 +59,6 @@ namespace vg
 
 	}
 
-	const vk::Format Renderer::DEFAULT_PRE_Z_DEPTH_FORMAT(vk::Format::eD32Sfloat);
-	const vk::Format Renderer::DEFAULT_POST_RENDER_COLOR_FORMAT(vk::Format::eR8G8B8A8Unorm);
-	const vk::Format Renderer::DEFAULT_POST_RENDER_DEPTH_STENCIL_FORMAT(vk::Format::eD32SfloatS8Uint);
-
 	Renderer::Renderer(const RenderTarget * pRenderTarget)
 		: Base(BaseType::RENDERER)
 		, m_pRenderTarget()
@@ -79,20 +75,12 @@ namespace vg
 		, m_framebufferHeight(0u)
         //pre z
 		, m_preZEnable(VG_FALSE)
-        , m_preZDepthImageFormat(DEFAULT_PRE_Z_DEPTH_FORMAT)
-	    , m_pPreZDepthAttachment()		
-		, m_pPreZRenderPass()
-		, m_pPreZFramebuffer()
-		, m_preZCmdBuffer()
+		, m_pPreZTarget()
+		, m_pPreZCmdBuffer()
 		//post render
 		, m_postRenderEnable(VG_FALSE)
-		, m_postRenderColorImageFormat(DEFAULT_POST_RENDER_COLOR_FORMAT)
-		, m_postRenderDepthStencilImageFormat(DEFAULT_POST_RENDER_DEPTH_STENCIL_FORMAT)
-		, m_pPostRenderColorAttachment()
-		, m_pPostRenderDepthStencilAttachment()
-		, m_pPostRenderRenderPass()
-		, m_pPostRenderFramebuffer()
-		, m_postRenderCmdbuffer()
+		, m_pPostRenderTarget()
+		, m_pPostRenderCmdbuffer()
 
 #if defined(DEBUG) && defined(VG_ENABLE_COST_TIMER)
         , m_preparingRenderCostTimer(fd::CostTimer::TimerType::AVERAGE)
@@ -307,7 +295,7 @@ namespace vg
 #endif //DEBUG and VG_ENABLE_COST_TIMER
             if (m_preZEnable == VG_TRUE && sceneInfo.preZ == VG_TRUE)
 			{
-                m_preZCmdBuffer.begin();
+                m_pPreZCmdBuffer->begin();
 			}
 		    m_branchCmdBuffer.begin();
 		    m_trunkWaitBarrierCmdBuffer.begin();						
@@ -317,7 +305,7 @@ namespace vg
 				sceneInfo.pPostRender->isValidBindToRender() == VG_TRUE
 			    )
 			{
-				m_postRenderCmdbuffer.begin();
+				m_pPostRenderCmdbuffer->begin();
 			}
 		    _beginBind();
             
@@ -326,7 +314,7 @@ namespace vg
 			{
 				_bindScene2(dynamic_cast<const Scene<SpaceType::SPACE_2> *>(pScene), 
 				    dynamic_cast<const Camera<SpaceType::SPACE_2> *>(pCamera), 
-					m_preZEnable == VG_TRUE && sceneInfo.preZ == VG_TRUE ? &m_preZCmdBuffer : nullptr,
+					m_preZEnable == VG_TRUE && sceneInfo.preZ == VG_TRUE ? m_pPreZCmdBuffer.get() : nullptr,
 					&m_branchCmdBuffer,					
 					&m_trunkRenderPassCmdBuffer,
 					&m_trunkWaitBarrierCmdBuffer
@@ -335,7 +323,7 @@ namespace vg
 			{
 				_bindScene3(dynamic_cast<const Scene<SpaceType::SPACE_3> *>(pScene), 
 				    dynamic_cast<const Camera<SpaceType::SPACE_3> *>(pCamera), 
-					m_preZEnable == VG_TRUE && sceneInfo.preZ == VG_TRUE ? &m_preZCmdBuffer : nullptr,
+					m_preZEnable == VG_TRUE && sceneInfo.preZ == VG_TRUE ? m_pPreZCmdBuffer.get() : nullptr,
 					&m_branchCmdBuffer,					
 					&m_trunkRenderPassCmdBuffer,
 					&m_trunkWaitBarrierCmdBuffer
@@ -360,7 +348,8 @@ namespace vg
 					{
 						if ((*(buildInDataInfo.pComponent + j)).type == Pass::BuildInDataType::POST_RENDER_RESULT)
 						{
-							pPass->setTexture(VG_M_POST_RENDER_TEXTURE_NAME, m_pPostRenderColorAttachment.get(), VG_M_POST_RENDER_TEXTURE_BINDING_PRIORITY);
+							auto pColorTex = m_pPostRenderTarget->getColorAttachment();
+							pPass->setTexture(VG_M_POST_RENDER_TEXTURE_NAME, pColorTex, VG_M_POST_RENDER_TEXTURE_BINDING_PRIORITY);
 							pPass->apply();
 							break;
 						}
@@ -372,7 +361,7 @@ namespace vg
 					m_framebufferHeight,
 				};
 				PostRender::BindResult result = {
-					&m_postRenderCmdbuffer,
+					m_pPostRenderCmdbuffer.get(),
 				};
 				
 				sceneInfo.pPostRender->beginBindToRender(bindInfo, &result);
@@ -381,12 +370,12 @@ namespace vg
 			// pre z
 		    if (m_preZEnable == VG_TRUE && sceneInfo.preZ == VG_TRUE)
 		    {
-		    	resultInfo.drawCount += m_preZCmdBuffer.getCmdCount();
+		    	resultInfo.drawCount += m_pPreZCmdBuffer->getCmdCount();
 		    	_recordPreZRenderPassForBegin();
-		    	CMDParser::recordTrunk(&m_preZCmdBuffer,
+		    	CMDParser::recordTrunk(m_pPreZCmdBuffer.get(),
 		    	    m_pCommandBuffer.get(),
 		    		&m_pipelineCache,
-		    		m_pPreZRenderPass.get()
+		    		m_pPreZTarget->getRenderPass()
 		    		);
 		    	_recordPreZRenderPassForEnd();
 		    }
@@ -423,9 +412,9 @@ namespace vg
 				_recordTrunkRenderPassForEnd();
 
 				//post render pass.
-				resultInfo.drawCount += m_postRenderCmdbuffer.getCmdCount();
+				resultInfo.drawCount += m_pPostRenderCmdbuffer->getCmdCount();
 		        pRenderPass = _recordTrunkRenderPassForBegin(VG_FALSE, i == 0);
-		        CMDParser::recordTrunk(&m_postRenderCmdbuffer,
+		        CMDParser::recordTrunk(m_pPostRenderCmdbuffer.get(),
 		        	m_pCommandBuffer.get(),
 		        	&m_pipelineCache,
 		        	pRenderPass
@@ -458,7 +447,7 @@ namespace vg
 
 			if (m_preZEnable == VG_TRUE && sceneInfo.preZ == VG_TRUE)
 			{
-			    m_preZCmdBuffer.end();
+			    m_pPreZCmdBuffer->end();
 			}
 		    m_trunkRenderPassCmdBuffer.end();
 		    m_trunkWaitBarrierCmdBuffer.end();
@@ -468,7 +457,7 @@ namespace vg
 				sceneInfo.pPostRender->isValidBindToRender() == VG_TRUE
 				)
 			{
-				m_postRenderCmdbuffer.end();
+				m_pPostRenderCmdbuffer->end();
 			}
     
 #if defined(DEBUG) && defined(VG_ENABLE_COST_TIMER)
@@ -573,8 +562,8 @@ namespace vg
 		const auto renderArea = m_pRenderTarget->getRenderArea();
 
 		vk::RenderPassBeginInfo renderPassBeginInfo = {
-			*m_pPreZRenderPass,                                   //renderPass
-			*m_pPreZFramebuffer,                                  //framebuffer
+			*(m_pPreZTarget->getRenderPass()),                   //renderPass
+			*(m_pPreZTarget->getFramebuffer()),                  //framebuffer
 			vk::Rect2D(                                       //renderArea
 				vk::Offset2D(static_cast<int32_t>(std::round(framebufferWidth * renderArea.x))
 					, static_cast<int32_t>(std::round(framebufferHeight * renderArea.y))
@@ -623,8 +612,8 @@ namespace vg
 
 		if (isPostRender == VG_TRUE)
 		{
-			pRenderPass = m_pPostRenderRenderPass.get();
-			pFramebuffer = m_pPostRenderFramebuffer.get();
+			pRenderPass = m_pPostRenderTarget->getRenderPass();
+			pFramebuffer = m_pPostRenderTarget->getFramebuffer();
 		}
 		else if (isFirst == VG_TRUE)
 		{
@@ -1245,7 +1234,8 @@ namespace vg
 					{
 						if (m_preZEnable == VG_TRUE)
 				        {
-				        	pPass->setTexture(VG_M_PRE_Z_TEXTURE_NAME, m_pPreZDepthAttachment.get(), VG_M_PRE_Z_TEXTURE_BINDING_PRIORITY);
+							auto pTex = m_pPreZTarget->getDepthAttachment();
+				        	pPass->setTexture(VG_M_PRE_Z_TEXTURE_NAME, pTex, VG_M_PRE_Z_TEXTURE_BINDING_PRIORITY);
 				        }
 					}
 		        }
@@ -1341,244 +1331,41 @@ namespace vg
 
 	void Renderer::_createPreZObjs()
 	{
-		auto pDevice = pApp->getDevice();
-		const auto framebufferWidth = m_framebufferWidth;
-		const auto framebufferHeight = m_framebufferHeight;
-		//depth attachment
-		auto pTex = new Texture2DDepthAttachment(
-			    m_preZDepthImageFormat,
-				framebufferWidth,
-				framebufferHeight
-			    );
-		m_pPreZDepthAttachment = std::shared_ptr<Texture2DDepthAttachment>(pTex);
-
-		//render pass.
-		vk::AttachmentDescription depthAttachmentDes = {
-			vk::AttachmentDescriptionFlags(),
-			m_preZDepthImageFormat,
-			vk::SampleCountFlagBits::e1,
-			vk::AttachmentLoadOp::eClear,
-			vk::AttachmentStoreOp::eStore,
-			vk::AttachmentLoadOp::eDontCare,
-			vk::AttachmentStoreOp::eDontCare,
-			vk::ImageLayout::eUndefined,
-			m_pPreZDepthAttachment->getDepthStencilAttachmentLayout(),
+		m_pPreZTarget = std::shared_ptr<PreZTarget>{
+			new PreZTarget{
+				m_framebufferWidth,
+				m_framebufferHeight,
+			}
 		};
 
-		vk::AttachmentReference depthAttachmentRef = {
-			uint32_t(0),
-			vk::ImageLayout::eDepthStencilAttachmentOptimal
+		m_pPreZCmdBuffer = std::shared_ptr<CmdBuffer>{
+			new CmdBuffer{}
 		};
-
-		vk::SubpassDescription subpass = {
-			vk::SubpassDescriptionFlags(),       //flags
-			vk::PipelineBindPoint::eGraphics,    //pipelineBindPoint
-			0,                                   //inputAttachmentCount
-			nullptr,                             //pInputAttachments
-			0,                                   //colorAttachmentCount
-			nullptr,                 //pColorAttachments
-			nullptr,                             //pResolveAttachments
-			&depthAttachmentRef,                 //pDepthStencilAttachment
-			0,                                   //preserveAttachmentCount
-			nullptr                              //pPreserveAttachments
-		};
-
-		std::array<vk::SubpassDependency, 2> dependencies = { 
-			vk::SubpassDependency 
-		    {
-			    VK_SUBPASS_EXTERNAL,                                  
-			    0,                                                    
-			    vk::PipelineStageFlagBits::eTopOfPipe,                
-			    vk::PipelineStageFlagBits::eEarlyFragmentTests | vk::PipelineStageFlagBits::eLateFragmentTests,    
-			    vk::AccessFlagBits::eShaderRead,                                    
-			    vk::AccessFlagBits::eDepthStencilAttachmentRead | vk::AccessFlagBits::eDepthStencilAttachmentWrite,       
-			    vk::DependencyFlagBits::eByRegion                     
-		    },
-			vk::SubpassDependency
-		    {
-			    0,                                                    
-			    VK_SUBPASS_EXTERNAL,                                  
-			    vk::PipelineStageFlagBits::eEarlyFragmentTests | vk::PipelineStageFlagBits::eLateFragmentTests,    
-			    vk::PipelineStageFlagBits::eBottomOfPipe,             
-				vk::AccessFlagBits::eDepthStencilAttachmentRead | vk::AccessFlagBits::eDepthStencilAttachmentWrite,
-			    vk::AccessFlagBits::eShaderRead,                      
-			    vk::DependencyFlagBits::eByRegion         
-		    }
-		};
-
-		std::array<vk::AttachmentDescription, 1> attachmentDess = { depthAttachmentDes };
-		vk::RenderPassCreateInfo renderPassCreateInfo = {
-			vk::RenderPassCreateFlags(),
-			static_cast<uint32_t>(attachmentDess.size()),
-			attachmentDess.data(),
-			1u,
-			&subpass,
-			static_cast<uint32_t>(dependencies.size()),
-			dependencies.data()
-		};
-
-		m_pPreZRenderPass = fd::createRenderPass(pDevice, renderPassCreateInfo);
-
-		//frame buffer.
-        std::array<vk::ImageView, 1> attachments = {
-			 *(m_pPreZDepthAttachment->getDepthStencilAttachmentImageView()),
-		};
-
-		vk::FramebufferCreateInfo frameBufferCreateInfo = {
-			vk::FramebufferCreateFlags(),      
-			*m_pPreZRenderPass,                                
-			static_cast<uint32_t>(attachments.size()),      
-			attachments.data(),                             
-			framebufferWidth,                             
-			framebufferHeight,                            
-			1u,                                  
-		};
-
-		m_pPreZFramebuffer = fd::createFrameBuffer(pDevice, frameBufferCreateInfo);
 	}
 
 	void Renderer::_destroyPreZObjs()
 	{
-		m_pPreZFramebuffer = nullptr;
-		m_pPreZRenderPass = nullptr;
-		m_pPreZDepthAttachment = nullptr;
-		m_preZCmdBuffer.clear();
+		m_pPreZTarget = nullptr;
+		m_pPreZCmdBuffer = nullptr;
 	}
 
 	void Renderer::_createPostRenderObjs()
 	{
-		auto pDevice = pApp->getDevice();
-		const auto framebufferWidth = m_framebufferWidth;
-		const auto framebufferHeight = m_framebufferHeight;
-		//color attachment
-		auto pColorTex = new Texture2DColorAttachment(
-			m_postRenderColorImageFormat,
-			framebufferWidth,
-			framebufferHeight
-			);
-		m_pPostRenderColorAttachment = std::shared_ptr<Texture2DColorAttachment>(pColorTex);
-
-		auto pDepthStencilTex = new TextureDepthStencilAttachment(
-			m_postRenderDepthStencilImageFormat,
-			framebufferWidth,
-			framebufferHeight
-		    );
-		m_pPostRenderDepthStencilAttachment = std::shared_ptr<TextureDepthStencilAttachment>(pDepthStencilTex);
-
-
-
-		//render pass.
-		auto pImage = m_pPostRenderColorAttachment->getImage();
-		vk::AttachmentDescription colorAttachmentDes = {
-			vk::AttachmentDescriptionFlags(),
-			m_postRenderColorImageFormat,
-			vk::SampleCountFlagBits::e1,
-			vk::AttachmentLoadOp::eClear,
-			vk::AttachmentStoreOp::eStore,
-			vk::AttachmentLoadOp::eDontCare,
-			vk::AttachmentStoreOp::eDontCare,
-			vk::ImageLayout::eUndefined,
-			pImage->getInfo().layout,
+		m_pPostRenderTarget = std::shared_ptr<PostRenderTarget>{
+			new PostRenderTarget{
+				m_framebufferWidth,
+				m_framebufferHeight,
+			}
 		};
-
-		pImage = m_pPostRenderDepthStencilAttachment->getImage();
-		vk::AttachmentDescription depthStencilAttachmentDes = {
-			vk::AttachmentDescriptionFlags(),
-			m_postRenderDepthStencilImageFormat,
-			vk::SampleCountFlagBits::e1,
-			vk::AttachmentLoadOp::eClear,
-			vk::AttachmentStoreOp::eDontCare,
-			vk::AttachmentLoadOp::eDontCare,
-			vk::AttachmentStoreOp::eDontCare,
-			vk::ImageLayout::eUndefined,
-			pImage->getInfo().layout,
+		m_pPostRenderCmdbuffer = std::shared_ptr<CmdBuffer>{
+			new CmdBuffer{}
 		};
-
-		vk::AttachmentReference colorAttachmentRef = {
-			0u,
-			vk::ImageLayout::eColorAttachmentOptimal,
-		};
-
-		vk::AttachmentReference depthStencilAttachmentRef = {
-			1u,
-			vk::ImageLayout::eDepthStencilAttachmentOptimal,
-		};
-
-		vk::SubpassDescription subpass = {
-			vk::SubpassDescriptionFlags(),       //flags
-			vk::PipelineBindPoint::eGraphics,    //pipelineBindPoint
-			0,                                   //inputAttachmentCount
-			nullptr,                             //pInputAttachments
-			1,                                   //colorAttachmentCount
-			&colorAttachmentRef,                 //pColorAttachments
-			nullptr,                             //pResolveAttachments
-			&depthStencilAttachmentRef,          //pDepthStencilAttachment
-			0,                                   //preserveAttachmentCount
-			nullptr                              //pPreserveAttachments
-		};
-
-		std::array<vk::SubpassDependency, 2> dependencies = { 
-			vk::SubpassDependency 
-		    {
-			    VK_SUBPASS_EXTERNAL,                                  
-			    0,                                                    
-			    vk::PipelineStageFlagBits::eTopOfPipe,                
-			    vk::PipelineStageFlagBits::eColorAttachmentOutput, 
-			    vk::AccessFlagBits::eShaderRead,                                    
-			    vk::AccessFlagBits::eColorAttachmentRead | vk::AccessFlagBits::eColorAttachmentWrite,       
-			    vk::DependencyFlagBits::eByRegion                     
-		    },
-			vk::SubpassDependency
-		    {
-			    0,                                                    
-			    VK_SUBPASS_EXTERNAL,                                  
-			    vk::PipelineStageFlagBits::eColorAttachmentOutput,    
-			    vk::PipelineStageFlagBits::eBottomOfPipe,             
-				vk::AccessFlagBits::eColorAttachmentRead | vk::AccessFlagBits::eColorAttachmentWrite,
-			    vk::AccessFlagBits::eShaderRead,                      
-			    vk::DependencyFlagBits::eByRegion         
-		    }
-		};
-
-		std::array<vk::AttachmentDescription, 2> attachmentDess = { colorAttachmentDes, depthStencilAttachmentDes };
-		vk::RenderPassCreateInfo renderPassCreateInfo = {
-			vk::RenderPassCreateFlags(),
-			static_cast<uint32_t>(attachmentDess.size()),
-			attachmentDess.data(),
-			1u,
-			&subpass,
-			static_cast<uint32_t>(dependencies.size()),
-			dependencies.data()
-		};
-
-		m_pPostRenderRenderPass = fd::createRenderPass(pDevice, renderPassCreateInfo);
-
-		//frame buffer.
-        std::array<vk::ImageView, 2> attachments = {
-			 *(m_pPostRenderColorAttachment->getColorAttachmentImageView()),
-			 *(m_pPostRenderDepthStencilAttachment->getDepthStencilAttachmentImageView()),
-		};
-
-		vk::FramebufferCreateInfo frameBufferCreateInfo = {
-			vk::FramebufferCreateFlags(),      
-			*m_pPostRenderRenderPass,                                
-			static_cast<uint32_t>(attachments.size()),      
-			attachments.data(),                             
-			framebufferWidth,                             
-			framebufferHeight,                            
-			1u,                                  
-		};
-
-		m_pPostRenderFramebuffer = fd::createFrameBuffer(pDevice, frameBufferCreateInfo);
 	}
 
 	void Renderer::_destroyPostRenderObjs()
 	{
-		m_pPostRenderFramebuffer = nullptr;
-		m_pPostRenderRenderPass = nullptr;
-		m_pPostRenderColorAttachment = nullptr;
-		m_pPostRenderDepthStencilAttachment = nullptr;
-		m_postRenderCmdbuffer.clear();
+		m_pPostRenderTarget = nullptr;
+		m_pPostRenderCmdbuffer = nullptr;
 	}
 
 }

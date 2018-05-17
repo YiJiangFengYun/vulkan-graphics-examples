@@ -12,6 +12,8 @@
 #include "graphics/renderer/pipeline_cache.hpp"
 #include "graphics/renderer/render_target.hpp"
 #include "graphics/post_render/post_render.hpp"
+#include "graphics/renderer/pre_z_target.hpp"
+#include "graphics/renderer/post_render_target.hpp"
 
 //todo: batch mesh,
 //todo: cache graphics pipeline.
@@ -60,10 +62,6 @@ namespace vg
 				, uint32_t drawCount = 0u);
 		};
 
-		static const vk::Format DEFAULT_PRE_Z_DEPTH_FORMAT;
-		static const vk::Format DEFAULT_POST_RENDER_COLOR_FORMAT;
-		static const vk::Format DEFAULT_POST_RENDER_DEPTH_STENCIL_FORMAT;
-
 		Renderer(const RenderTarget * pRenderTarget = nullptr);
 		~Renderer();
 
@@ -107,21 +105,13 @@ namespace vg
 
 		//pre z pass
 		Bool32 m_preZEnable;
-		vk::Format m_preZDepthImageFormat;
-		std::shared_ptr<Texture2DDepthAttachment> m_pPreZDepthAttachment;		
-		std::shared_ptr<vk::RenderPass> m_pPreZRenderPass;
-		std::shared_ptr<vk::Framebuffer> m_pPreZFramebuffer;
-		CmdBuffer m_preZCmdBuffer;
+		std::shared_ptr<PreZTarget> m_pPreZTarget;
+		std::shared_ptr<CmdBuffer> m_pPreZCmdBuffer;
 
 		//post render
 		Bool32 m_postRenderEnable;
-		vk::Format m_postRenderColorImageFormat;
-		vk::Format m_postRenderDepthStencilImageFormat;
-		std::shared_ptr<Texture2DColorAttachment> m_pPostRenderColorAttachment;
-		std::shared_ptr<TextureDepthStencilAttachment> m_pPostRenderDepthStencilAttachment;
-		std::shared_ptr<vk::RenderPass> m_pPostRenderRenderPass;
-		std::shared_ptr<vk::Framebuffer> m_pPostRenderFramebuffer;
-		CmdBuffer m_postRenderCmdbuffer;
+		std::shared_ptr<PostRenderTarget> m_pPostRenderTarget;
+		std::shared_ptr<CmdBuffer> m_pPostRenderCmdbuffer;
 		
 		CmdBuffer m_trunkRenderPassCmdBuffer;
 		CmdBuffer m_trunkWaitBarrierCmdBuffer;

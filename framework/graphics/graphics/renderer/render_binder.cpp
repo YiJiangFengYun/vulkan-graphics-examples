@@ -87,7 +87,72 @@ namespace vg
         , CmdBuffer *pPostRenderCmdBuffer
         )
     {
-
+		_beginBind();
+            
+		//scene make cmds.
+		if (pScene->getSpaceType() == SpaceType::SPACE_2)
+		{
+			_bindScene2(dynamic_cast<const Scene<SpaceType::SPACE_2> *>(pScene), 
+			    dynamic_cast<const Camera<SpaceType::SPACE_2> *>(pCamera),
+				pPreZTarget,
+				pPreZCmdBuffer,
+				pBranchCmdBuffer,					
+				pTrunkWaitBarrierCmdBuffer,
+				pTrunkRenderPassCmdBuffer
+				);
+		} else if (pScene->getSpaceType() == SpaceType::SPACE_3)
+		{
+			_bindScene3(dynamic_cast<const Scene<SpaceType::SPACE_3> *>(pScene), 
+			    dynamic_cast<const Camera<SpaceType::SPACE_3> *>(pCamera), 
+				pPreZTarget,
+				pPreZCmdBuffer,
+				pBranchCmdBuffer,					
+				pTrunkWaitBarrierCmdBuffer,
+				pTrunkRenderPassCmdBuffer
+				);
+		} else {
+			//todo
+		}
+		//post render make cmds.
+		if (pPostRender != nullptr && pPostRenderTarget != nullptr && pPostRenderCmdBuffer != nullptr &&
+			pPostRender->isValidBindToRender() == VG_TRUE
+			)
+		{
+			auto pMaterial = pPostRender->getMaterial();
+			auto passCount = pMaterial->getPassCount();
+			for (uint32_t i = 0; i < passCount; ++i)
+			{
+				auto pPass = pMaterial->getPassWithIndex(i);
+				auto buildInDataInfo = pPass->getBuildInDataInfo();
+				auto buildInComponentCount = buildInDataInfo.componentCount;
+				for (uint32_t j = 0; j < buildInComponentCount; ++j)
+				{
+					if ((*(buildInDataInfo.pComponent + j)).type == Pass::BuildInDataType::POST_RENDER_RESULT)
+					{
+						auto pColorTex = pPostRenderTarget->getColorAttachment();
+						pPass->setTexture(VG_M_POST_RENDER_TEXTURE_NAME, pColorTex, VG_M_POST_RENDER_TEXTURE_BINDING_PRIORITY);
+						pPass->apply();
+						break;
+					}
+				}
+			}
+			PostRender::BindInfo bindInfo = {
+				m_framebufferWidth,
+				m_framebufferHeight,
+			};
+			PostRender::BindResult result = {
+				pPostRenderCmdBuffer,
+			};
+			
+			pPostRender->beginBindToRender(bindInfo, &result);
+		}
+		//post render end bind
+		if (pPostRender != nullptr && pPostRenderTarget != nullptr && pPostRenderCmdBuffer != nullptr &&
+			pPostRender->isValidBindToRender() == VG_TRUE)
+		{
+			pPostRender->endBindToRender();
+		}
+	    _endBind();	
     }
 
     void RenderBinder::_bindScene2(const Scene<SpaceType::SPACE_2> *pScene
@@ -95,8 +160,8 @@ namespace vg
 		, PreZTarget *pPreZTarget
 		, CmdBuffer *pPreZCmdBuffer
 		, CmdBuffer *pBranchCmdBuffer
+        , CmdBuffer *pTrunkWaitBarrierCmdBuffer		
         , CmdBuffer *pTrunkRenderPassCmdBuffer
-        , CmdBuffer *pTrunkWaitBarrierCmdBuffer
 		)
     {
 		uint32_t drawCount = 0u;		
@@ -168,15 +233,30 @@ namespace vg
 		{
 			auto pVisualObject = validVisualObjects[i];
 			auto modelMatrix = tranMat3ToMat4(pVisualObject->getTransform()->getMatrixLocalToWorld());
-			_setBuildInData(pVisualObject
-			    , modelMatrix
-				, viewMatrix
-				, projMatrix
-				, pPreZTarget
+			if (pPreZCmdBuffer != nullptr && pPreZTarget != nullptr) 
+			{
+			    _setPreZBuildInData(pVisualObject
+			        , modelMatrix
+			    	, viewMatrix
+			        , projMatrix
+			    	, pPreZTarget
 #if defined(DEBUG) && defined(VG_ENABLE_COST_TIMER)
-			    , preparingBuildInDataCostTimer
+			        , preparingBuildInDataCostTimer
 #endif //DEBUG and VG_ENABLE_COST_TIMER	
-				);
+			    );	
+			}
+			if (pTrunkRenderPassCmdBuffer != nullptr)
+			{
+    			_setBuildInData(pVisualObject
+    			    , modelMatrix
+    				, viewMatrix
+    				, projMatrix
+    				, pPreZTarget
+#if defined(DEBUG) && defined(VG_ENABLE_COST_TIMER)
+    			    , preparingBuildInDataCostTimer
+#endif //DEBUG and VG_ENABLE_COST_TIMER	
+    				);
+			}
 			BaseVisualObject::BindInfo info = {
                 framebufferWidth,
 				framebufferHeight,
@@ -298,8 +378,8 @@ namespace vg
 		, PreZTarget *pPreZTarget
 		, CmdBuffer *pPreZCmdBuffer
 		, CmdBuffer *pBranchCmdBuffer
+        , CmdBuffer *pTrunkWaitBarrierCmdBuffer		
         , CmdBuffer *pTrunkRenderPassCmdBuffer
-        , CmdBuffer *pTrunkWaitBarrierCmdBuffer
 		)
     {
         using SceneType = Scene<SpaceType::SPACE_3>;
@@ -461,15 +541,31 @@ namespace vg
 			{
 				auto pVisualObject = queues[typeIndex][objectIndex];
 				auto modelMatrix = pVisualObject->getTransform()->getMatrixLocalToWorld();
-				_setBuildInData(pVisualObject
-				    , modelMatrix
-					, viewMatrix
-				    , projMatrix
-					, pPreZTarget
+				if (pPreZCmdBuffer != nullptr && pPreZTarget != nullptr) 
+				{
+				    _setPreZBuildInData(pVisualObject
+				        , modelMatrix
+				    	, viewMatrix
+				        , projMatrix
+				    	, pPreZTarget
 #if defined(DEBUG) && defined(VG_ENABLE_COST_TIMER)
-				    , preparingBuildInDataCostTimer
+				        , preparingBuildInDataCostTimer
 #endif //DEBUG and VG_ENABLE_COST_TIMER	
-				);
+				    );	
+				}
+				if (pTrunkRenderPassCmdBuffer != nullptr)
+				{
+				    _setBuildInData(pVisualObject
+				        , modelMatrix
+				    	, viewMatrix
+				        , projMatrix
+				    	, pPreZTarget
+#if defined(DEBUG) && defined(VG_ENABLE_COST_TIMER)
+				        , preparingBuildInDataCostTimer
+#endif //DEBUG and VG_ENABLE_COST_TIMER	
+				    );
+				}
+
 				BaseVisualObject::BindInfo info = {
                     framebufferWidth,
 				    framebufferHeight,
@@ -518,6 +614,107 @@ namespace vg
 			<< std::endl;
 #endif //DEBUG and VG_ENABLE_COST_TIMER
     }
+
+	void RenderBinder::_setPreZBuildInData(BaseVisualObject * pVisualObject
+        , Matrix4x4 modelMatrix
+        , Matrix4x4 viewMatrix
+        , Matrix4x4 projMatrix
+        , PreZTarget *pPreZTarget
+#if defined(DEBUG) && defined(VG_ENABLE_COST_TIMER)
+	    , fd::CostTimer * pPreparingBuildInDataCostTimer
+#endif //DEBUG and VG_ENABLE_COST_TIMER
+        )
+	{
+#if defined(DEBUG) && defined(VG_ENABLE_COST_TIMER)
+		        pPreparingBuildInDataCostTimer->begin();
+#endif //DEBUG and VG_ENABLE_COST_TIMER
+		uint32_t materialCount = pVisualObject->getMaterialCount();
+		for (uint32_t materialIndex = 0u; materialIndex < materialCount; ++materialIndex)
+		{
+			auto pMaterial = pVisualObject->getMaterial(materialIndex);
+			//pre z pass.
+			if (pPreZTarget != nullptr && 
+				pMaterial->getPreZPass() != nullptr)
+			{
+				auto pPreZPass = pMaterial->getPreZPass();
+				auto pPassOfPreZPass = pPreZPass->getPass();
+				Bool32 hasMatrixObjectToNDC = VG_FALSE;
+		        Bool32 hasMatrixObjectToWorld = VG_FALSE;
+		        Bool32 hasMatrixObjectToView = VG_FALSE;
+		        Bool32 hasMatrixView = VG_FALSE;
+		        Bool32 hasMatrixProjection = VG_FALSE;
+		        //update building in matrix variable.
+		        auto info = pPassOfPreZPass->getBuildInDataInfo();
+		        uint32_t componentCount = info.componentCount;
+		        for (uint32_t componentIndex = 0u; componentIndex < componentCount; ++componentIndex)
+		        {
+		        	Pass::BuildInDataType type = (*(info.pComponent + componentIndex)).type;
+		        	if (type == Pass::BuildInDataType::MATRIX_OBJECT_TO_NDC)
+		        	{
+		        		hasMatrixObjectToNDC = VG_TRUE;
+		        	}
+		        	else if (type == Pass::BuildInDataType::MATRIX_OBJECT_TO_WORLD)
+		        	{
+		        		hasMatrixObjectToWorld = VG_TRUE;
+		        	}
+		        	else if (type == Pass::BuildInDataType::MATRIX_OBJECT_TO_VIEW)
+		        	{
+		        		hasMatrixObjectToView = VG_TRUE;
+		        	}
+		        	else if (type == Pass::BuildInDataType::MATRIX_VIEW)
+		        	{
+		        		hasMatrixView = VG_TRUE;
+		        	}
+		        	else if (type == Pass::BuildInDataType::MATRIX_PROJECTION)
+		        	{
+		        		hasMatrixProjection = VG_TRUE;
+		        	}
+		        }
+		        
+		        Matrix4x4 mvMatrix;
+		        Matrix4x4 mvpMatrix;
+		        if (hasMatrixObjectToView || hasMatrixObjectToNDC)
+		        {
+		        	mvMatrix = viewMatrix * modelMatrix;
+                }
+		        
+		        if (hasMatrixObjectToNDC)
+		        {
+		        	mvpMatrix = projMatrix * mvMatrix;
+		        }
+		        //update building in matrix variable.
+		        for (uint32_t componentIndex = 0u; componentIndex < componentCount; ++componentIndex)
+		        {
+		        	Pass::BuildInDataType type = (*(info.pComponent + componentIndex)).type;
+		        	if (type == Pass::BuildInDataType::MATRIX_OBJECT_TO_NDC)
+		        	{
+		        		pPreZPass->_setBuildInMatrixData(type, mvpMatrix);
+		        	}
+		        	else if (type == Pass::BuildInDataType::MATRIX_OBJECT_TO_WORLD)
+		        	{
+		        		pPreZPass->_setBuildInMatrixData(type, modelMatrix);
+		        	}
+		        	else if (type == Pass::BuildInDataType::MATRIX_OBJECT_TO_VIEW)
+		        	{
+		        		pPreZPass->_setBuildInMatrixData(type, mvMatrix);
+		        	}
+		        	else if (type == Pass::BuildInDataType::MATRIX_VIEW)
+		        	{
+		        		pPreZPass->_setBuildInMatrixData(type, viewMatrix);
+		        	}
+		        	else if (type == Pass::BuildInDataType::MATRIX_PROJECTION)
+		        	{
+		        		pPreZPass->_setBuildInMatrixData(type, projMatrix);
+		        	}
+		        }
+				pPreZPass->apply();
+			}
+		}
+
+#if defined(DEBUG) && defined(VG_ENABLE_COST_TIMER)
+		        pPreparingBuildInDataCostTimer->end();
+#endif //DEBUG and VG_ENABLE_COST_TIMER
+	}
 
 	void RenderBinder::_setBuildInData(BaseVisualObject * pVisualObject
 	    , Matrix4x4 modelMatrix
@@ -619,87 +816,7 @@ namespace vg
 					}
 		        }
 
-				
-
 		        pPass->apply();
-			}
-
-			//pre z pass.
-			if (pPreZTarget != nullptr && 
-				pMaterial->getPreZPass() != nullptr)
-			{
-				auto pPreZPass = pMaterial->getPreZPass();
-				auto pPassOfPreZPass = pPreZPass->getPass();
-				Bool32 hasMatrixObjectToNDC = VG_FALSE;
-		        Bool32 hasMatrixObjectToWorld = VG_FALSE;
-		        Bool32 hasMatrixObjectToView = VG_FALSE;
-		        Bool32 hasMatrixView = VG_FALSE;
-		        Bool32 hasMatrixProjection = VG_FALSE;
-		        //update building in matrix variable.
-		        auto info = pPassOfPreZPass->getBuildInDataInfo();
-		        uint32_t componentCount = info.componentCount;
-		        for (uint32_t componentIndex = 0u; componentIndex < componentCount; ++componentIndex)
-		        {
-		        	Pass::BuildInDataType type = (*(info.pComponent + componentIndex)).type;
-		        	if (type == Pass::BuildInDataType::MATRIX_OBJECT_TO_NDC)
-		        	{
-		        		hasMatrixObjectToNDC = VG_TRUE;
-		        	}
-		        	else if (type == Pass::BuildInDataType::MATRIX_OBJECT_TO_WORLD)
-		        	{
-		        		hasMatrixObjectToWorld = VG_TRUE;
-		        	}
-		        	else if (type == Pass::BuildInDataType::MATRIX_OBJECT_TO_VIEW)
-		        	{
-		        		hasMatrixObjectToView = VG_TRUE;
-		        	}
-		        	else if (type == Pass::BuildInDataType::MATRIX_VIEW)
-		        	{
-		        		hasMatrixView = VG_TRUE;
-		        	}
-		        	else if (type == Pass::BuildInDataType::MATRIX_PROJECTION)
-		        	{
-		        		hasMatrixProjection = VG_TRUE;
-		        	}
-		        }
-		        
-		        Matrix4x4 mvMatrix;
-		        Matrix4x4 mvpMatrix;
-		        if (hasMatrixObjectToView || hasMatrixObjectToNDC)
-		        {
-		        	mvMatrix = viewMatrix * modelMatrix;
-                }
-		        
-		        if (hasMatrixObjectToNDC)
-		        {
-		        	mvpMatrix = projMatrix * mvMatrix;
-		        }
-		        //update building in matrix variable.
-		        for (uint32_t componentIndex = 0u; componentIndex < componentCount; ++componentIndex)
-		        {
-		        	Pass::BuildInDataType type = (*(info.pComponent + componentIndex)).type;
-		        	if (type == Pass::BuildInDataType::MATRIX_OBJECT_TO_NDC)
-		        	{
-		        		pPreZPass->_setBuildInMatrixData(type, mvpMatrix);
-		        	}
-		        	else if (type == Pass::BuildInDataType::MATRIX_OBJECT_TO_WORLD)
-		        	{
-		        		pPreZPass->_setBuildInMatrixData(type, modelMatrix);
-		        	}
-		        	else if (type == Pass::BuildInDataType::MATRIX_OBJECT_TO_VIEW)
-		        	{
-		        		pPreZPass->_setBuildInMatrixData(type, mvMatrix);
-		        	}
-		        	else if (type == Pass::BuildInDataType::MATRIX_VIEW)
-		        	{
-		        		pPreZPass->_setBuildInMatrixData(type, viewMatrix);
-		        	}
-		        	else if (type == Pass::BuildInDataType::MATRIX_PROJECTION)
-		        	{
-		        		pPreZPass->_setBuildInMatrixData(type, projMatrix);
-		        	}
-		        }
-				pPreZPass->apply();
 			}
 		}
 

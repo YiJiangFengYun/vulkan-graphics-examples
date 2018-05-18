@@ -14,6 +14,7 @@
 #include "graphics/post_render/post_render.hpp"
 #include "graphics/renderer/pre_z_target.hpp"
 #include "graphics/renderer/post_render_target.hpp"
+#include "graphics/renderer/render_binder.hpp"
 
 //todo: batch mesh,
 //todo: cache graphics pipeline.
@@ -102,6 +103,8 @@ namespace vg
 
 		uint32_t m_framebufferWidth;
 		uint32_t m_framebufferHeight;
+		
+		RenderBinder m_renderBinder;
 
 		//pre z pass
 		Bool32 m_preZEnable;
@@ -117,12 +120,11 @@ namespace vg
 		CmdBuffer m_trunkWaitBarrierCmdBuffer;
 		CmdBuffer m_branchCmdBuffer;
 
-		std::vector<BaseVisualObject *> m_bindedObjects;
-		uint32_t m_bindedObjectCount;
-
 #if defined(DEBUG) && defined(VG_ENABLE_COST_TIMER)
         fd::CostTimer m_preparingRenderCostTimer;
 #endif //DEBUG and VG_ENABLE_COST_TIMER
+
+        void _resetFramebufferSize(uint32_t width, uint32_t height);
 
 		virtual void _preRender();
 		virtual void _renderBegin(const RenderInfo & info, RenderResultInfo & resultInfo);
@@ -143,37 +145,11 @@ namespace vg
 		const vk::RenderPass * _recordTrunkRenderPassForBegin(Bool32 isPostRender, Bool32 isFirst);
 		void _recordTrunkRenderPassForEnd();
 		void _recordCommandBufferForEnd();
-
-	    void _bindScene2(const Scene<SpaceType::SPACE_2> *pScene
-		    , const Camera<SpaceType::SPACE_2> *pCamera
-			, CmdBuffer *pPreZCmdBuffer = nullptr
-			, CmdBuffer *pBranchCmdBuffer = nullptr
-            , CmdBuffer *pTrunkRenderPassCmdBuffer = nullptr
-            , CmdBuffer *pTrunkWaitBarrierCmdBuffer = nullptr
-			);
-
-		void _bindScene3(const Scene<SpaceType::SPACE_3> *pScene
-		    , const Camera<SpaceType::SPACE_3> *pCamera
-			, CmdBuffer *pPreZCmdBuffer = nullptr
-			, CmdBuffer *pBranchCmdBuffer = nullptr
-            , CmdBuffer *pTrunkRenderPassCmdBuffer = nullptr
-            , CmdBuffer *pTrunkWaitBarrierCmdBuffer = nullptr
-			);
-	    
-		void _beginBind();
-		void _bind(BaseVisualObject *pVisublObject, BaseVisualObject::BindInfo & bindInfo, BaseVisualObject::BindResult *pResult);
-		void _endBind();
         
 		void _createPreZObjs();
 		void _destroyPreZObjs();
 		void _createPostRenderObjs();
 		void _destroyPostRenderObjs();
-
-		void _setBuildInData(BaseVisualObject * pVisualObject, Matrix4x4 modelMatrix, Matrix4x4 viewMatrix, Matrix4x4 projMatrix
-#if defined(DEBUG) && defined(VG_ENABLE_COST_TIMER)
-	    , fd::CostTimer * pPreparingBuildInDataCostTimer
-#endif //DEBUG and VG_ENABLE_COST_TIMER
-		);
 	private:
 	};
 

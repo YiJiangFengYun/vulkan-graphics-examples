@@ -62,8 +62,8 @@ namespace vg
             , PreZTarget *pPreZTarget = nullptr
 			, CmdBuffer *pPreZCmdBuffer = nullptr
 			, CmdBuffer *pBranchCmdBuffer = nullptr
+            , CmdBuffer *pTrunkWaitBarrierCmdBuffer = nullptr            
             , CmdBuffer *pTrunkRenderPassCmdBuffer = nullptr
-            , CmdBuffer *pTrunkWaitBarrierCmdBuffer = nullptr
 			);
 
 		void _bindScene3(const Scene<SpaceType::SPACE_3> *pScene
@@ -71,9 +71,19 @@ namespace vg
             , PreZTarget *pPreZTarget = nullptr
 			, CmdBuffer *pPreZCmdBuffer = nullptr
 			, CmdBuffer *pBranchCmdBuffer = nullptr
+            , CmdBuffer *pTrunkWaitBarrierCmdBuffer = nullptr            
             , CmdBuffer *pTrunkRenderPassCmdBuffer = nullptr
-            , CmdBuffer *pTrunkWaitBarrierCmdBuffer = nullptr
 			);
+
+        void _setPreZBuildInData(BaseVisualObject * pVisualObject
+            , Matrix4x4 modelMatrix
+            , Matrix4x4 viewMatrix
+            , Matrix4x4 projMatrix
+            , PreZTarget *pPreZTarget
+#if defined(DEBUG) && defined(VG_ENABLE_COST_TIMER)
+	        , fd::CostTimer * pPreparingBuildInDataCostTimer
+#endif //DEBUG and VG_ENABLE_COST_TIMER
+            );
 
         void _setBuildInData(BaseVisualObject * pVisualObject
             , Matrix4x4 modelMatrix

@@ -367,6 +367,16 @@ namespace vg
 				sceneInfo.pPostRender->beginBindToRender(bindInfo, &result);
 			}
 
+			//post render end bind
+			if (m_postRenderEnable == VG_TRUE && 
+			    sceneInfo.pPostRender != nullptr &&
+				sceneInfo.pPostRender->isValidBindToRender() == VG_TRUE)
+			{
+				sceneInfo.pPostRender->endBindToRender();
+			}
+
+		    _endBind();	
+
 			// pre z
 		    if (m_preZEnable == VG_TRUE && sceneInfo.preZ == VG_TRUE)
 		    {
@@ -432,18 +442,7 @@ namespace vg
 		        	pRenderPass
 		        	);
 		        _recordTrunkRenderPassForEnd();
-			}
-
-
-			//post render end bind
-			if (m_postRenderEnable == VG_TRUE && 
-			    sceneInfo.pPostRender != nullptr &&
-				sceneInfo.pPostRender->isValidBindToRender() == VG_TRUE)
-			{
-				sceneInfo.pPostRender->endBindToRender();
-			}
-
-		    _endBind();			
+			}		
 
 			if (m_preZEnable == VG_TRUE && sceneInfo.preZ == VG_TRUE)
 			{

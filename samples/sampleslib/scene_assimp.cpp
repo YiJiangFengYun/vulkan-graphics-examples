@@ -173,6 +173,7 @@ namespace sampleslib
                     aiColor3D tempColor(0.0f, 0.0f, 0.0f);
                     pScene->mMaterials[paiMesh->mMaterialIndex]->Get(AI_MATKEY_COLOR_DIFFUSE, tempColor);
                     const aiVector3D zero3D(0.0f, 0.0f, 0.0f);
+                    const aiColor4D whiteColor3D(1.0f, 1.0f, 1.0f, 1.0f);
 
                     vg::Vector3 minOfBounds(std::numeric_limits<typename vg::Vector3::value_type>::max());
                     vg::Vector3 maxOfBounds(std::numeric_limits<typename vg::Vector3::value_type>::lowest());
@@ -190,6 +191,7 @@ namespace sampleslib
                         const aiVector3D *pTexCoord = (paiMesh->HasTextureCoords(0u)) ? &(paiMesh->mTextureCoords[0][j]) : &zero3D;
                         const aiVector3D *pTangent = (paiMesh->HasTangentsAndBitangents()) ? &(paiMesh->mTangents[j]) : &zero3D;
                         const aiVector3D *pBitangent = (paiMesh->HasTangentsAndBitangents()) ? &(paiMesh->mBitangents[j]) : &zero3D;
+                        const aiColor4D *pColor = (paiMesh->HasVertexColors(0)) ? &(paiMesh->mColors[0][j]) : &whiteColor3D;
     
                         uint32_t componentCount = createInfo.layoutComponentCount;
                         const VertexLayoutComponent *pComponent = createInfo.pLayoutComponent;
@@ -267,9 +269,9 @@ namespace sampleslib
 							}
 							case VertexLayoutComponent::VERTEX_COMPONENT_COLOR:
 							{
-								vertexBuffer.push_back(tempColor.r);
-								vertexBuffer.push_back(tempColor.g);
-								vertexBuffer.push_back(tempColor.b);
+								vertexBuffer.push_back(pColor->r);
+								vertexBuffer.push_back(pColor->g);
+								vertexBuffer.push_back(pColor->b);
 								break;
 							}
 							case VertexLayoutComponent::VERTEX_COMPONENT_TANGENT:

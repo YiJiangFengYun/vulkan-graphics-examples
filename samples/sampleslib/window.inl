@@ -112,7 +112,9 @@ namespace sampleslib
 	template <vg::SpaceType SPACE_TYPE>
 	void Window<SPACE_TYPE>::_initUI()
 	{
+#ifdef USE_IMGUI_BIND
 		vgim::setShaderPath("shaders/ui.vert.spv", "shaders/ui.frag.spv");
+#endif //USE_IMGUI_BIND
 	}
 
 	template <vg::SpaceType SPACE_TYPE>
@@ -149,6 +151,7 @@ namespace sampleslib
 				&value, sizeof(vgf::Bool32));
 		}
 
+#ifdef USE_IMGUI_BIND
 		ImGui::SetNextWindowPos(ImVec2(10, 10));
 	    ImGui::SetNextWindowSize(ImVec2(0, 0));
 	    ImGui::Begin("Device Info", nullptr, ImGuiWindowFlags_AlwaysAutoResize | ImGuiWindowFlags_NoResize | ImGuiWindowFlags_NoMove);
@@ -191,8 +194,9 @@ namespace sampleslib
 		pos = ImGui::GetWindowPos();
 		size = ImGui::GetWindowSize();
 		ImGui::End();
-		m_lastWinPos = pos;
-		m_lastWinSize = size;
+		m_lastWinPos = vg::Vector2(pos.x, pos.y);
+		m_lastWinSize = vg::Vector2(size.x, size.y);
+#endif //USE_IMGUI_BIND
 	}
 
 	template <vg::SpaceType SPACE_TYPE>

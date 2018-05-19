@@ -220,6 +220,7 @@ void Window::_onUpdate()
 	ParentWindowType::_onUpdate();
 	m_otherInfo.viewPos = vg::Vector4(m_pCamera->getTransform()->getLocalPosition(), 1.0f);
 
+#ifdef USE_IMGUI_BIND
 	auto pos = m_lastWinPos;
 	auto size = m_lastWinSize;
 	ImGui::SetNextWindowPos(ImVec2(pos.x, pos.y + size.y + 10));
@@ -230,4 +231,5 @@ void Window::_onUpdate()
 	    pPass->apply();
 	}
 	ImGui::End();
+#endif //USE_IMGUI_BIND
 }

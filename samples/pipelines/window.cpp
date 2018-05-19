@@ -156,6 +156,7 @@ void Window::_onUpdate()
 	const auto &pApp = vg::pApp;
 	if (pApp->getPhysicalDeviceFeatures().fillModeNonSolid == VK_FALSE)
 	{
+#ifdef USE_IMGUI_BIND
 	    auto pos = ImGui::GetWindowPos();
 	    auto size = ImGui::GetWindowSize();
 	    ImGui::SetNextWindowPos(ImVec2(pos.x, pos.y + size.y + 10));
@@ -163,5 +164,6 @@ void Window::_onUpdate()
 	    ImGui::Begin("Extra Info", nullptr, ImGuiWindowFlags_AlwaysAutoResize | ImGuiWindowFlags_NoResize | ImGuiWindowFlags_NoMove);
 	    ImGui::TextUnformatted("Non solid fill modes not supported!");
 	    ImGui::End();
+#endif //USE_IMGUI_BIND
 	}
 }

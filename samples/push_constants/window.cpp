@@ -142,11 +142,4 @@ void Window::_onUpdate()
 	auto pPass = m_pMaterial->getMainPass();
 	pPass->setPushConstantUpdate("push_constants", m_pushConstants.data(),
 	    static_cast<uint32_t>(sizeof(m_pushConstants)), vk::ShaderStageFlagBits::eVertex, 0u);
-
-	// auto pos = m_lastWinPos;
-	// auto size = m_lastWinSize;
-	// ImGui::SetNextWindowPos(ImVec2(pos.x, pos.y + size.y + 10));
-	// ImGui::SetNextWindowSize(ImVec2(0, 0));
-	// ImGui::Begin("Settings", nullptr, ImGuiWindowFlags_AlwaysAutoResize | ImGuiWindowFlags_NoResize | ImGuiWindowFlags_NoMove);
-	// ImGui::End();
 }

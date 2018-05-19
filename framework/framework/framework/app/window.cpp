@@ -242,7 +242,7 @@ namespace vgf {
 		addedInfo.pSceneInfos = sceneInfos.data();
         m_pRenderer->render(addedInfo, resultInfo);
 #else
-        pRenderer->render(info, resultInfo); 		
+        m_pRenderer->render(info, resultInfo); 		
 #endif //USE_IMGUI_BIND
 	}
 			

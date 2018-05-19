@@ -41,8 +41,10 @@ namespace sampleslib
 		glfwSetCursorPosCallback(m_pWindow.get(), [](GLFWwindow *glfwWindow, double xPos, double yPos)
 		{
 			bool handledByIM = false;
+#ifdef USE_IMGUI_BIND
 			ImGuiIO& io = ImGui::GetIO();
 		    handledByIM = io.WantCaptureMouse;
+#endif //USE_IMGUI_BIND
 			Window* const instance = (Window*)glfwGetWindowUserPointer(glfwWindow);
 			auto &lastPos = instance->m_mousePos;
 			float dx = static_cast<float>(xPos - lastPos[0]);

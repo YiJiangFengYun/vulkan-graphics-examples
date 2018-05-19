@@ -251,11 +251,4 @@ void Window::_onUpdate()
 	auto pPass = m_pMaterial->getMainPass();
 	pPass->setDataValue("other_info", m_otherInfo, VG_M_OTHER_MAX_BINDING_PRIORITY);
 	pPass->apply();
-
-	// auto pos = m_lastWinPos;
-	// auto size = m_lastWinSize;
-	// ImGui::SetNextWindowPos(ImVec2(pos.x, pos.y + size.y + 10));
-	// ImGui::SetNextWindowSize(ImVec2(0, 0));
-	// ImGui::Begin("Settings", nullptr, ImGuiWindowFlags_AlwaysAutoResize | ImGuiWindowFlags_NoResize | ImGuiWindowFlags_NoMove);
-	// ImGui::End();
 }

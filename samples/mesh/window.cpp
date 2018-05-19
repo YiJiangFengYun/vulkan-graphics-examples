@@ -98,9 +98,13 @@ void Window::_createTexture()
 		throw std::runtime_error("Device does not support any compressed texture format!");
 	}
 
-	gli::texture2d gliTex(gli::load(fileName));
+	auto tempTex = gli::load(fileName);
+	if (tempTex.empty()) {
+		throw std::runtime_error("The texture don't exist! path: " + fileName);		
+	}
+	gli::texture2d gliTex(tempTex);
 	if (gliTex.empty()) {
-		throw std::runtime_error("The texture do't exist! path: " + fileName);
+		throw std::runtime_error("The texture don't exist! path: " + fileName);
 	}
 
 	uint32_t mipLevels = static_cast<uint32_t>(gliTex.levels());
@@ -263,6 +267,7 @@ void Window::_onUpdate()
 {
 	ParentWindowType::_onUpdate();
 
+#ifdef USE_IMGUI_BIND
 	auto pos = m_lastWinPos;
 	auto size = m_lastWinSize;
 	ImGui::SetNextWindowPos(ImVec2(pos.x, pos.y + size.y + 10));
@@ -284,4 +289,5 @@ void Window::_onUpdate()
 	    }
 	}
 	ImGui::End();
+#endif //USE_IMGUI_BIND
 }

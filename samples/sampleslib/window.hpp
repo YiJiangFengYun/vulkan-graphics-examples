@@ -70,8 +70,8 @@ namespace sampleslib
 		uint32_t m_lastFPS;
 		uint32_t m_lastDrawCount;
 
-		ImVec2 m_lastWinPos;
-		ImVec2 m_lastWinSize;
+		vg::Vector2 m_lastWinPos;
+		vg::Vector2 m_lastWinSize;
 
 		float m_cameraZoom;
 		float m_cameraZoomSpeed;

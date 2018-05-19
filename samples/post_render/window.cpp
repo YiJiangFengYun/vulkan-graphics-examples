@@ -330,6 +330,7 @@ void Window::_onUpdate()
 {
 	ParentWindowType::_onUpdate();
 
+#ifdef USE_IMGUI_BIND
 	auto pos = m_lastWinPos;
 	auto size = m_lastWinSize;
 	ImGui::SetNextWindowPos(ImVec2(pos.x, pos.y + size.y + 10));
@@ -372,6 +373,7 @@ void Window::_onUpdate()
 	    }
 	}
 	ImGui::End();
+#endif // USE_IMGUI_BIND
 }
 
 std::vector<vg::Renderer::SceneInfo> Window::mySceneInfos = {};

@@ -85,7 +85,7 @@ void Window::_createTexture()
 	if (deviceFeatures.textureCompressionBC) 
 	{
 		fileName = "textures/cubemap_yokohama_bc3_unorm.ktx";
-		format = vk::Format::eBc2UnormBlock;
+		format = vk::Format::eBc3UnormBlock;
 	}
 	else if (deviceFeatures.textureCompressionASTC_LDR)
 	{
@@ -346,6 +346,7 @@ void Window::_onUpdate()
 {
 	ParentWindowType::_onUpdate();
 
+#ifdef USE_IMGUI_BIND
 	auto pos = m_lastWinPos;
 	auto size = m_lastWinSize;
 	ImGui::SetNextWindowPos(ImVec2(pos.x, pos.y + size.y + 10));
@@ -370,4 +371,5 @@ void Window::_onUpdate()
 		_updateScene();
 	}
 	ImGui::End();
+#endif //USE_IMGUI_BIND
 }

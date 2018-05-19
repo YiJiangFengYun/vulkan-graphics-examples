@@ -145,11 +145,4 @@ void Window::_onUpdate()
 		    vg::DescriptorType::UNIFORM_BUFFER, vg::ShaderStageFlagBits::FRAGMENT);
 	    m_pMaterial->apply();
 	}
-	
-
-	// auto pos = m_lastWinPos;
-	// auto size = m_lastWinSize;
-	// ImGui::SetNextWindowPos(ImVec2(pos.x, pos.y + size.y + 10));
-	// ImGui::SetNextWindowSize(ImVec2(0, 0));
-
 }

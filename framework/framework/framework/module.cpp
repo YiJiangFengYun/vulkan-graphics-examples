@@ -16,13 +16,17 @@ namespace vgf
 		plog::init<VGF_PLOG_ID>(severity, appender);
 		fd::moduleCreate(severity, callerAppender);
 		vg::moduleCreate(severity, callerAppender);
+#ifdef USE_IMGUI_BIND
 		vgim::moduleCreate(severity, callerAppender);
+#endif // USE_IMGUI_BIND
 		isInited = VGF_TRUE;
 	}
 
 	void moduleDestroy()
 	{
+#ifdef USE_IMGUI_BIND
 		vgim::moduleDestory();
+#endif // USE_IMGUI_BIND
 		vg::moduleDestory();
 		fd::moduleDestroy();
 		isInited = VGF_FALSE;

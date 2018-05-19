@@ -118,7 +118,7 @@ void Window::_createTexture()
 	if (deviceFeatures.textureCompressionBC) 
 	{
 		fileName = "textures/darkmetal_bc3_unorm.ktx";
-		format = vk::Format::eBc2UnormBlock;
+		format = vk::Format::eBc3UnormBlock;
 	}
 	else if (deviceFeatures.textureCompressionASTC_LDR)
 	{
@@ -367,13 +367,14 @@ void Window::_onUpdate()
 
 	auto cameraMatrix = m_pCamera->getTransform()->getLocalMatrix();
 	m_pCameraOffScreen->getTransform()->setLocalMatrix(cameraMatrix);
-
+#ifdef USE_IMGUI_BIND
 	// auto pos = m_lastWinPos;
 	// auto size = m_lastWinSize;
 	// ImGui::SetNextWindowPos(ImVec2(pos.x, pos.y + size.y + 10));
 	// ImGui::SetNextWindowSize(ImVec2(0, 0));
 	// ImGui::Begin("Settings", nullptr, ImGuiWindowFlags_AlwaysAutoResize | ImGuiWindowFlags_NoResize | ImGuiWindowFlags_NoMove);
 	// ImGui::End();
+#endif //USE_IMGUI_BIND
 }
 
 void Window::_doRender(vg::Renderer::RenderInfo &info

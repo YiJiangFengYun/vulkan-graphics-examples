@@ -287,10 +287,12 @@ void Window::_onUpdate()
 
 	_updateModelState();
 	_updateExtUniformBuffer();
+#ifdef USE_IMGUI_BIND
 	// auto pos = m_lastWinPos;
 	// auto size = m_lastWinSize;
 	// ImGui::SetNextWindowPos(ImVec2(pos.x, pos.y + size.y + 10));
 	// ImGui::SetNextWindowSize(ImVec2(0, 0));
 	// ImGui::Begin("Settings", nullptr, ImGuiWindowFlags_AlwaysAutoResize | ImGuiWindowFlags_NoResize | ImGuiWindowFlags_NoMove);
 	// ImGui::End();
+#endif //USE_IMGUI_BIND
 }

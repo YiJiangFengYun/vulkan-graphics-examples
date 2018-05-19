@@ -353,6 +353,7 @@ namespace vg
 		const VertexInputFilterInfo &getVertexInputFilter() const;
 		void setVertexInputFilterInfo(const VertexInputFilterInfo &value);
 
+        //external uniform buffer
 		const ExternalUniformBufferInfo getExternalUniformBufferInfo() const;
 		void setExternalUniformBufferData(ExternalUniformBufferInfo value);
 
@@ -369,6 +370,8 @@ namespace vg
 		const vk::DescriptorSet *getUsingDescriptorSets() const;
 		uint32_t getUsingDescriptorDynamicOffsetCount() const;
 		const uint32_t *getUsingDescriptorDynamicOffsets() const;
+
+		// void beginRecord();
 	private:
 		//compositons
 		std::shared_ptr<PassData> m_pData;
@@ -417,7 +420,9 @@ namespace vg
 		std::vector<uint32_t> m_vertexInputFilterLocations;
 
 		//external uniform buffer data.
-		ExternalUniformBufferInfo m_externalUniformBufferInfo;
+		// uint32_t m_extUniformBufferCount;
+		// std::vector<ExternalUniformBufferInfo> m_extUniformBuffers;
+		ExternalUniformBufferInfo m_extUniformBuffer;
 
 		//cache
 		std::set<LayoutBindingInfo> m_lastLayoutBindingInfos;

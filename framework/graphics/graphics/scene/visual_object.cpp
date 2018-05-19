@@ -169,7 +169,7 @@ namespace vg
         }
 	}
 
-	void BaseVisualObject::beginBindToRender(const BindInfo info, BindResult *pResult)
+	void BaseVisualObject::beginBind(const BindInfo info, BindResult *pResult)
 	{
 		auto &result = *pResult;
 		uint32_t subMeshCount = getSubMeshCount();
@@ -209,12 +209,12 @@ namespace vg
 				resultForVisualizer.pTrunkRenderPassCmdBuffer = result.pTrunkRenderPassCmdBuffer;
 			if (result.pTrunkWaitBarrierCmdBuffer != nullptr)
 			    resultForVisualizer.pTrunkWaitBarrierCmdBuffer = result.pTrunkWaitBarrierCmdBuffer;
-		    pMaterial->beginBindToRender(infoForVisualizer, &resultForVisualizer);
+		    pMaterial->beginBind(infoForVisualizer, &resultForVisualizer);
 		}
 		
 	}
 
-	void BaseVisualObject::endBindToRender()
+	void BaseVisualObject::endBind()
 	{
 		uint32_t subMeshCount = getSubMeshCount();
 		uint32_t subMeshOffset = getSubMeshOffset();
@@ -229,7 +229,7 @@ namespace vg
 				m_id,
 				subMeshIndex,
 			};
-			pMaterial->endBindToRender(info);
+			pMaterial->endBind(info);
 		}
 	}
 

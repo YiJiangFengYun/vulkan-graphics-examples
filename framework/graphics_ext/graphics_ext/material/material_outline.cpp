@@ -48,7 +48,7 @@ namespace vge
         m_outlineInfoFrag.outlineColor = value;
     }
 
-    void MaterialOutline::_beginBindToRender(const BindInfo info, BindResult *pResult)
+    void MaterialOutline::_beginBind(const BindInfo info, BindResult *pResult)
     {
         {
             vg::RenderPassInfo trunkRenderPassInfo;

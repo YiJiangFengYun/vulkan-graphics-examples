@@ -98,8 +98,8 @@ namespace vg
 		/*Call the apply methods of all passes in the material.*/
 		virtual void apply();
 
-		void beginBindToRender(const BindInfo info, BindResult *pResult);
-		void endBindToRender(const EndBindInfo info);
+		void beginBind(const BindInfo info, BindResult *pResult);
+		void endBind(const EndBindInfo info);
 
 		std::string name;
 	protected:
@@ -118,8 +118,8 @@ namespace vg
 		virtual void _addPass(Pass *pPass);
 		virtual void _removePass(Pass *pPass);
 
-		virtual void _beginBindToRender(const BindInfo info, BindResult *pResult);
-		virtual void _endBindToRender(const EndBindInfo info);
+		virtual void _beginBind(const BindInfo info, BindResult *pResult);
+		virtual void _endBind(const EndBindInfo info);
 	};
 }
 

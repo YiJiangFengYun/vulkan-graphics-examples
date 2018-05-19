@@ -164,7 +164,7 @@ namespace vg
 		m_renderPriority = priority;
 	}
 
-	void Material::beginBindToRender(const BindInfo info, BindResult *pResult)
+	void Material::beginBind(const BindInfo info, BindResult *pResult)
     {
 		if (m_onlyOnce == VG_TRUE) {
 			if (m_bindTargetID != 0) 
@@ -193,17 +193,17 @@ namespace vg
             result.pPreZCmdBuffer->addCmd(cmdInfo);
 		}
 
-		_beginBindToRender(info, pResult);
+		_beginBind(info, pResult);
 
     }
 
-	void Material::endBindToRender(const EndBindInfo info)
+	void Material::endBind(const EndBindInfo info)
 	{
 		if (m_onlyOnce == VG_TRUE) {
 			m_bindTargetID = 0;
 		}
 
-		_endBindToRender(info);
+		_endBind(info);
 		
 	}
 
@@ -221,7 +221,7 @@ namespace vg
 		m_mapPasses.erase(pPass->getID());
 	}
 
-    void Material::_beginBindToRender(const BindInfo info, BindResult *pResult)
+    void Material::_beginBind(const BindInfo info, BindResult *pResult)
     {
 		auto &result = *pResult;
         RenderPassInfo trunkRenderPassInfo;
@@ -243,7 +243,7 @@ namespace vg
         
 	}
 	
-	void Material::_endBindToRender(const EndBindInfo info)
+	void Material::_endBind(const EndBindInfo info)
 	{
 
 	}

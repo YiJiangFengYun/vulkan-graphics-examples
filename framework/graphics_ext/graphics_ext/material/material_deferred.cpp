@@ -43,7 +43,7 @@ namespace vge
         _initPasses(info);
     }
 
-    void MaterialDeferred::_beginBindToRender(const BindInfo info, BindResult *pResult)
+    void MaterialDeferred::_beginBind(const BindInfo info, BindResult *pResult)
     {
 		uint32_t trunkFramebufferWidth = info.trunkFramebufferWidth;
 		uint32_t trunkFramebufferHeight = info.trunkFramebufferHeight;

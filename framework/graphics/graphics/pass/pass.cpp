@@ -304,7 +304,9 @@ namespace vg
 		, m_buildInDataInfo()
 		, m_buildInDataInfoComponents()
 		, m_buildInDataCache()
-		, m_externalUniformBufferInfo()
+		// , m_extUniformBufferCount()
+		// , m_extUniformBuffers()
+		, m_extUniformBuffer()
 		, m_pipelineStateID()
 		, m_lastBindings()
 		, m_lastLayoutBindNames()
@@ -818,23 +820,23 @@ namespace vg
 
 	const Pass::ExternalUniformBufferInfo Pass::getExternalUniformBufferInfo() const
 	{
-		return m_externalUniformBufferInfo;
+		return m_extUniformBuffer;
 	}
 
 	void Pass::setExternalUniformBufferData(ExternalUniformBufferInfo value)
 	{
-		m_externalUniformBufferInfo = value;
+		m_extUniformBuffer = value;
 		m_applied = VG_FALSE;
 	}
 
 	void Pass::applyUniformBufferDynamicOffsets()
 	{
-		uint32_t subDataOffset = m_externalUniformBufferInfo.subDataOffset;
-		uint32_t subDataCount = m_externalUniformBufferInfo.subDataCount;
+		uint32_t subDataOffset = m_extUniformBuffer.subDataOffset;
+		uint32_t subDataCount = m_extUniformBuffer.subDataCount;
 		uint32_t dynamicCount = 0u;
 		for (uint32_t i = 0; i < subDataCount; ++i)
 		{
-			auto pSubDatas = m_externalUniformBufferInfo.pData->getSubDatas();
+			auto pSubDatas = m_extUniformBuffer.pData->getSubDatas();
 			auto &subData = *(pSubDatas + (i + subDataOffset));
 			if (subData.getDescriptorSetLayout() != nullptr)
 			{
@@ -856,7 +858,7 @@ namespace vg
 
 		for (uint32_t i = 0; i < subDataCount; ++i)
 		{
-			auto pSubDatas = m_externalUniformBufferInfo.pData->getSubDatas();
+			auto pSubDatas = m_extUniformBuffer.pData->getSubDatas();
 			auto &subData = *(pSubDatas + (i + subDataOffset));
 			if (subData.getDescriptorSetLayout() != nullptr)
 			{
@@ -998,11 +1000,11 @@ namespace vg
 
 		auto pLayout = m_pDescriptorSetLayout;
 		uint32_t layoutCount = pLayout != nullptr ? 1 : 0;
-		uint32_t subDataOffset = m_externalUniformBufferInfo.subDataOffset;
-		uint32_t subDataCount = m_externalUniformBufferInfo.subDataCount;
+		uint32_t subDataOffset = m_extUniformBuffer.subDataOffset;
+		uint32_t subDataCount = m_extUniformBuffer.subDataCount;
 		for (uint32_t i = 0; i < subDataCount; ++i)
 		{
-			auto pSubDatas = m_externalUniformBufferInfo.pData->getSubDatas();
+			auto pSubDatas = m_extUniformBuffer.pData->getSubDatas();
 			auto &subData = *(pSubDatas + (i + subDataOffset));
 			if (subData.getDescriptorSetLayout() != nullptr)
 			{
@@ -1029,7 +1031,7 @@ namespace vg
 
 		for (uint32_t i = 0; i < subDataCount; ++i)
 		{
-			auto pSubDatas = m_externalUniformBufferInfo.pData->getSubDatas();
+			auto pSubDatas = m_extUniformBuffer.pData->getSubDatas();
 			auto &subData = *(pSubDatas + (i + subDataOffset));
 			if (subData.getDescriptorSetLayout() != nullptr)
 			{

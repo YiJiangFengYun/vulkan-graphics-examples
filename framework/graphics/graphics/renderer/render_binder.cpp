@@ -144,13 +144,13 @@ namespace vg
 				pPostRenderCmdBuffer,
 			};
 			
-			pPostRender->beginBindToRender(bindInfo, &result);
+			pPostRender->beginBind(bindInfo, &result);
 		}
 		//post render end bind
 		if (pPostRender != nullptr && pPostRenderTarget != nullptr && pPostRenderCmdBuffer != nullptr &&
 			pPostRender->isValidBindToRender() == VG_TRUE)
 		{
-			pPostRender->endBindToRender();
+			pPostRender->endBind();
 		}
 	    _endBind();	
     }
@@ -830,7 +830,7 @@ namespace vg
         , BaseVisualObject::BindResult *pResult
         )
     {
-        pVisublObject->beginBindToRender(bindInfo, pResult);
+        pVisublObject->beginBind(bindInfo, pResult);
 		if (static_cast<uint32_t>(m_bindedObjects.size()) == m_bindedObjectCount) {
 			auto newSize = getNextCapacity(static_cast<uint32_t>(m_bindedObjects.size()));
 			m_bindedObjects.resize(newSize);
@@ -844,7 +844,7 @@ namespace vg
     void RenderBinder::_endBind()
     {
         for (uint32_t i = 0; i < m_bindedObjectCount; ++i) {
-			m_bindedObjects[i]->endBindToRender();
+			m_bindedObjects[i]->endBind();
 		}
 		m_bindedObjectCount = 0u;
     }

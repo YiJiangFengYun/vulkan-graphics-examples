@@ -8,7 +8,7 @@ namespace vg
 
 	}
 
-	Matrix4x4 VisualObject3::_getModelMatrix()
+	Matrix4x4 VisualObject3::_getModelMatrix() const
 	{
 		return m_pTransform->getMatrixLocalToWorld();
 	}

@@ -70,7 +70,7 @@ namespace vg
 		: Base(BaseType::MATERIAL)
 		, name()
 		, m_onlyOnce(onlyOnce)
-		, m_bindTargetID(0)
+		, m_pBindTargetID(std::shared_ptr<InstanceID>{new InstanceID(0)})
 		, m_renderQueueType()
 		, m_renderPriority()
 		, m_arrPasses()
@@ -164,12 +164,12 @@ namespace vg
 		m_renderPriority = priority;
 	}
 
-	void Material::beginBind(const BindInfo info, BindResult *pResult)
+	void Material::beginBind(const BindInfo info, BindResult *pResult) const
     {
 		if (m_onlyOnce == VG_TRUE) {
-			if (m_bindTargetID != 0) 
+			if (*m_pBindTargetID != 0) 
 			    throw std::runtime_error("The material binding is only once, but it was used to repeatedly bind.");
-			m_bindTargetID = info.objectID;
+			*m_pBindTargetID = info.objectID;
 		}
 
 		auto &result = *pResult;
@@ -197,10 +197,10 @@ namespace vg
 
     }
 
-	void Material::endBind(const EndBindInfo info)
+	void Material::endBind(const EndBindInfo info) const
 	{
 		if (m_onlyOnce == VG_TRUE) {
-			m_bindTargetID = 0;
+			*m_pBindTargetID = 0;
 		}
 
 		_endBind(info);
@@ -221,7 +221,7 @@ namespace vg
 		m_mapPasses.erase(pPass->getID());
 	}
 
-    void Material::_beginBind(const BindInfo info, BindResult *pResult)
+    void Material::_beginBind(const BindInfo info, BindResult *pResult) const
     {
 		auto &result = *pResult;
         RenderPassInfo trunkRenderPassInfo;
@@ -243,7 +243,7 @@ namespace vg
         
 	}
 	
-	void Material::_endBind(const EndBindInfo info)
+	void Material::_endBind(const EndBindInfo info) const
 	{
 
 	}

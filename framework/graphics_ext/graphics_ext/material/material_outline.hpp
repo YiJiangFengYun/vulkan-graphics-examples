@@ -43,7 +43,7 @@ namespace vge
         	vg::Color outlineColor = vg::Color(1.0f);
         } m_outlineInfoFrag;
 
-        virtual void _beginBind(const BindInfo info, BindResult *pResult) override;
+        virtual void _beginBind(const BindInfo info, BindResult *pResult) const override;
 
         void _createOtherPasses();
         void _initPasses();

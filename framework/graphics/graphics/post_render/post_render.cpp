@@ -45,7 +45,7 @@ namespace vg
         }
     }
 
-    void PostRender::beginBind(const BindInfo info, BindResult *pResult)
+    void PostRender::beginBind(const BindInfo info, BindResult *pResult) const
     {
         if (pResult->pPostRenderCmdBuffer != nullptr && 
             m_pMaterial != nullptr
@@ -85,7 +85,7 @@ namespace vg
         }
     }
 		
-    void PostRender::endBind()
+    void PostRender::endBind() const
     {
         
     }

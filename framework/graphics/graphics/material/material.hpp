@@ -98,13 +98,13 @@ namespace vg
 		/*Call the apply methods of all passes in the material.*/
 		virtual void apply();
 
-		void beginBind(const BindInfo info, BindResult *pResult);
-		void endBind(const EndBindInfo info);
+		void beginBind(const BindInfo info, BindResult *pResult) const;
+		void endBind(const EndBindInfo info) const;
 
 		std::string name;
 	protected:
 	    Bool32 m_onlyOnce;
-		InstanceID m_bindTargetID; 
+		std::shared_ptr<InstanceID> m_pBindTargetID; 
 		MaterialShowType m_renderQueueType;
 		uint32_t m_renderPriority;
 		std::shared_ptr<Shader> m_pMainShader; 
@@ -118,8 +118,8 @@ namespace vg
 		virtual void _addPass(Pass *pPass);
 		virtual void _removePass(Pass *pPass);
 
-		virtual void _beginBind(const BindInfo info, BindResult *pResult);
-		virtual void _endBind(const EndBindInfo info);
+		virtual void _beginBind(const BindInfo info, BindResult *pResult) const;
+		virtual void _endBind(const EndBindInfo info) const;
 	};
 }
 

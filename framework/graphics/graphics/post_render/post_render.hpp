@@ -32,8 +32,8 @@ namespace vg
         void setMaterial(const Material * pMaterial);
 
         Bool32 isValidBindToRender() const;
-        void beginBind(const BindInfo info, BindResult *pResult);
-		void endBind();
+        void beginBind(const BindInfo info, BindResult *pResult) const;
+		void endBind() const;
 
     private:
        const Material * m_pMaterial;

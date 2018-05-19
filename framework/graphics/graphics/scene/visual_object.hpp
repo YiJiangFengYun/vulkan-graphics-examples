@@ -74,8 +74,8 @@ namespace vg
 		void updateClipRects(fd::ArrayProxy<fd::Rect2D> rects, uint32_t count, uint32_t offset = 0u);
 		void updateClipRects(fd::Rect2D rect, uint32_t count, uint32_t offset = 0u);
 
-		void beginBind(const BindInfo info, BindResult *pResult);
-		void endBind();
+		void beginBind(const BindInfo info, BindResult *pResult) const;
+		void endBind() const;
 
 	protected:
 	    uint32_t m_materialCount;
@@ -88,7 +88,7 @@ namespace vg
 		//Valid range of ClipRect is [(0, 0), (1, 1)]
 		std::vector<fd::Rect2D> m_clipRects;
 		void _asyncMeshData();
-		virtual Matrix4x4 _getModelMatrix() = 0;
+		virtual Matrix4x4 _getModelMatrix() const = 0;
 	};
 
 	template <SpaceType SPACE_TYPE>

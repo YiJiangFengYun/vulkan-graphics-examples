@@ -13,22 +13,22 @@ namespace vg
 		return m_objectType;
 	}
 
-	void BaseObject::beginRender()
+	void BaseObject::beginRender() const
 	{
 		_beginRender();
 	}
 
-	void BaseObject::endRender()
+	void BaseObject::endRender() const
 	{
 		_endRender();
 	}
 
-	void BaseObject::_beginRender()
+	void BaseObject::_beginRender() const
 	{
 
 	}
 	
-	void BaseObject::_endRender()
+	void BaseObject::_endRender() const
 	{
 
 	}

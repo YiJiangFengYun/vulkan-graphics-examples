@@ -22,10 +22,10 @@ namespace vg
         vk::Format getColorImageFormat() const;
         vk::Format getDepthStencilImageFormat() const;
         fd::Rect2D getRenderArea() const;
-        const Texture2DColorAttachment *getColorAttachment();
-        const TextureDepthStencilAttachment *getDepthStencilAttachment();
-        const vk::RenderPass *getRenderPass();
-        const vk::Framebuffer *getFramebuffer();
+        const Texture2DColorAttachment *getColorAttachment() const;
+        const TextureDepthStencilAttachment *getDepthStencilAttachment() const;
+        const vk::RenderPass *getRenderPass() const;
+        const vk::Framebuffer *getFramebuffer() const;
     private:
         uint32_t m_framebufferWidth;
 		uint32_t m_framebufferHeight;

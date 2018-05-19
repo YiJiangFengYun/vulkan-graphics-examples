@@ -18,7 +18,7 @@ namespace vg
 
 		}
 
-		virtual Matrix4x4 _getModelMatrix() override;
+		virtual Matrix4x4 _getModelMatrix() const override;
 	};
 
 } //namespace kgs

@@ -45,13 +45,13 @@ namespace vg
 
     void RenderBinder::bind(const BaseScene *pScene
         , const BaseCamera *pCamera
-		, PreZTarget *pPreZTarget
+		, const PreZTarget *pPreZTarget
         , CmdBuffer *pPreZCmdBuffer
 		, CmdBuffer *pBranchCmdBuffer
         , CmdBuffer *pTrunkWaitBarrierCmdBuffer        
         , CmdBuffer *pTrunkRenderPassCmdBuffer
-        , PostRender *pPostRender
-		, PostRenderTarget *pPostRenderTarget
+        , const PostRender *pPostRender
+		, const PostRenderTarget *pPostRenderTarget
         , CmdBuffer *pPostRenderCmdBuffer
         )
     {
@@ -77,13 +77,13 @@ namespace vg
 
     void RenderBinder::_bind(const BaseScene *pScene
         , const BaseCamera *pCamera
-		, PreZTarget *pPreZTarget
+		, const PreZTarget *pPreZTarget
         , CmdBuffer *pPreZCmdBuffer
 		, CmdBuffer *pBranchCmdBuffer
         , CmdBuffer *pTrunkWaitBarrierCmdBuffer        
         , CmdBuffer *pTrunkRenderPassCmdBuffer
-        , PostRender *pPostRender
-		, PostRenderTarget *pPostRenderTarget
+        , const PostRender *pPostRender
+		, const PostRenderTarget *pPostRenderTarget
         , CmdBuffer *pPostRenderCmdBuffer
         )
     {
@@ -157,7 +157,7 @@ namespace vg
 
     void RenderBinder::_bindScene2(const Scene<SpaceType::SPACE_2> *pScene
 		, const Camera<SpaceType::SPACE_2> *pCamera
-		, PreZTarget *pPreZTarget
+		, const PreZTarget *pPreZTarget
 		, CmdBuffer *pPreZCmdBuffer
 		, CmdBuffer *pBranchCmdBuffer
         , CmdBuffer *pTrunkWaitBarrierCmdBuffer		
@@ -375,7 +375,7 @@ namespace vg
 
 	void RenderBinder::_bindScene3(const Scene<SpaceType::SPACE_3> *pScene
 	    , const Camera<SpaceType::SPACE_3> *pCamera
-		, PreZTarget *pPreZTarget
+		, const PreZTarget *pPreZTarget
 		, CmdBuffer *pPreZCmdBuffer
 		, CmdBuffer *pBranchCmdBuffer
         , CmdBuffer *pTrunkWaitBarrierCmdBuffer		
@@ -619,7 +619,7 @@ namespace vg
         , Matrix4x4 modelMatrix
         , Matrix4x4 viewMatrix
         , Matrix4x4 projMatrix
-        , PreZTarget *pPreZTarget
+        , const PreZTarget *pPreZTarget
 #if defined(DEBUG) && defined(VG_ENABLE_COST_TIMER)
 	    , fd::CostTimer * pPreparingBuildInDataCostTimer
 #endif //DEBUG and VG_ENABLE_COST_TIMER
@@ -720,7 +720,7 @@ namespace vg
 	    , Matrix4x4 modelMatrix
 		, Matrix4x4 viewMatrix
 		, Matrix4x4 projMatrix
-		, PreZTarget *pPreZTarget
+		, const PreZTarget *pPreZTarget
 #if defined(DEBUG) && defined(VG_ENABLE_COST_TIMER)
 	    , fd::CostTimer * pPreparingBuildInDataCostTimer
 #endif //DEBUG and VG_ENABLE_COST_TIMER

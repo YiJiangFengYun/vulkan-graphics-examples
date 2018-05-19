@@ -19,9 +19,9 @@ namespace vg
         uint32_t getFramebufferHeight() const;
         vk::Format getDepthImageFormat() const;
         fd::Rect2D getRenderArea() const;
-        const Texture2DDepthAttachment *getDepthAttachment();
-        const vk::RenderPass *getRenderPass();
-        const vk::Framebuffer *getFramebuffer();
+        const Texture2DDepthAttachment *getDepthAttachment() const;
+        const vk::RenderPass *getRenderPass() const;
+        const vk::Framebuffer *getFramebuffer() const;
     private:
         uint32_t m_framebufferWidth;
 		uint32_t m_framebufferHeight;

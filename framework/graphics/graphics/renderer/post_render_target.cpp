@@ -48,22 +48,22 @@ namespace vg
         return m_renderArea;
     }
         
-    const Texture2DColorAttachment *PostRenderTarget::getColorAttachment()
+    const Texture2DColorAttachment *PostRenderTarget::getColorAttachment() const
     {
         return m_pColorAttachment.get();
     }
 
-    const TextureDepthStencilAttachment *PostRenderTarget::getDepthStencilAttachment()
+    const TextureDepthStencilAttachment *PostRenderTarget::getDepthStencilAttachment() const
     {
         return m_pDepthStencilAttachment.get();
     }
         
-    const vk::RenderPass *PostRenderTarget::getRenderPass()
+    const vk::RenderPass *PostRenderTarget::getRenderPass() const
     {
         return m_pRenderPass.get();
     }
 
-    const vk::Framebuffer *PostRenderTarget::getFramebuffer()
+    const vk::Framebuffer *PostRenderTarget::getFramebuffer() const
     {
         return m_pFramebuffer.get();
     }

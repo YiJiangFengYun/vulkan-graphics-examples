@@ -169,7 +169,7 @@ namespace vg
         }
 	}
 
-	void BaseVisualObject::beginBind(const BindInfo info, BindResult *pResult)
+	void BaseVisualObject::beginBind(const BindInfo info, BindResult *pResult) const
 	{
 		auto &result = *pResult;
 		uint32_t subMeshCount = getSubMeshCount();
@@ -214,7 +214,7 @@ namespace vg
 		
 	}
 
-	void BaseVisualObject::endBind()
+	void BaseVisualObject::endBind() const
 	{
 		uint32_t subMeshCount = getSubMeshCount();
 		uint32_t subMeshOffset = getSubMeshOffset();

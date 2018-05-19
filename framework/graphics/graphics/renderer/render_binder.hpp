@@ -27,13 +27,13 @@ namespace vg
 
         void bind(const BaseScene *pScene
             , const BaseCamera *pCamera
-            , PreZTarget *pPreZTarget = nullptr
+            , const PreZTarget *pPreZTarget = nullptr
             , CmdBuffer *pPreZCmdBuffer = nullptr
 			, CmdBuffer *pBranchCmdBuffer = nullptr
             , CmdBuffer *pTrunkWaitBarrierCmdBuffer = nullptr            
             , CmdBuffer *pTrunkRenderPassCmdBuffer = nullptr
-            , PostRender *pPostRender = nullptr
-            , PostRenderTarget *pPostRenderTarget = nullptr
+            , const PostRender *pPostRender = nullptr
+            , const PostRenderTarget *pPostRenderTarget = nullptr
             , CmdBuffer *pPostRenderCmdBuffer = nullptr
             );
 
@@ -47,19 +47,19 @@ namespace vg
 
         void _bind(const BaseScene *pScene
             , const BaseCamera *pCamera
-            , PreZTarget *pPreZTarget = nullptr
+            , const PreZTarget *pPreZTarget = nullptr
             , CmdBuffer *pPreZCmdBuffer = nullptr
 			, CmdBuffer *pBranchCmdBuffer = nullptr
             , CmdBuffer *pTrunkWaitBarrierCmdBuffer = nullptr            
             , CmdBuffer *pTrunkRenderPassCmdBuffer = nullptr
-            , PostRender *pPostRender = nullptr
-            , PostRenderTarget *pPostRenderTarget = nullptr
+            , const PostRender *pPostRender = nullptr
+            , const PostRenderTarget *pPostRenderTarget = nullptr
             , CmdBuffer *pPostRenderCmdBuffer = nullptr
             );
 
         void _bindScene2(const Scene<SpaceType::SPACE_2> *pScene
 		    , const Camera<SpaceType::SPACE_2> *pCamera
-            , PreZTarget *pPreZTarget = nullptr
+            , const PreZTarget *pPreZTarget = nullptr
 			, CmdBuffer *pPreZCmdBuffer = nullptr
 			, CmdBuffer *pBranchCmdBuffer = nullptr
             , CmdBuffer *pTrunkWaitBarrierCmdBuffer = nullptr            
@@ -68,7 +68,7 @@ namespace vg
 
 		void _bindScene3(const Scene<SpaceType::SPACE_3> *pScene
 		    , const Camera<SpaceType::SPACE_3> *pCamera
-            , PreZTarget *pPreZTarget = nullptr
+            , const PreZTarget *pPreZTarget = nullptr
 			, CmdBuffer *pPreZCmdBuffer = nullptr
 			, CmdBuffer *pBranchCmdBuffer = nullptr
             , CmdBuffer *pTrunkWaitBarrierCmdBuffer = nullptr            
@@ -79,7 +79,7 @@ namespace vg
             , Matrix4x4 modelMatrix
             , Matrix4x4 viewMatrix
             , Matrix4x4 projMatrix
-            , PreZTarget *pPreZTarget
+            , const PreZTarget *pPreZTarget
 #if defined(DEBUG) && defined(VG_ENABLE_COST_TIMER)
 	        , fd::CostTimer * pPreparingBuildInDataCostTimer
 #endif //DEBUG and VG_ENABLE_COST_TIMER
@@ -89,7 +89,7 @@ namespace vg
             , Matrix4x4 modelMatrix
             , Matrix4x4 viewMatrix
             , Matrix4x4 projMatrix
-            , PreZTarget *pPreZTarget
+            , const PreZTarget *pPreZTarget
 #if defined(DEBUG) && defined(VG_ENABLE_COST_TIMER)
 	    , fd::CostTimer * pPreparingBuildInDataCostTimer
 #endif //DEBUG and VG_ENABLE_COST_TIMER

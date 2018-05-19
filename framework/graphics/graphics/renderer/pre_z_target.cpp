@@ -39,17 +39,17 @@ namespace vg
         return m_renderArea;
     }
 
-    const Texture2DDepthAttachment *PreZTarget::getDepthAttachment()
+    const Texture2DDepthAttachment *PreZTarget::getDepthAttachment() const
     {
         return m_pDepthAttachment.get();
     }
 
-    const vk::RenderPass *PreZTarget::getRenderPass()
+    const vk::RenderPass *PreZTarget::getRenderPass() const
     {
         return m_pRenderPass.get();
     }
         
-    const vk::Framebuffer *PreZTarget::getFramebuffer()
+    const vk::Framebuffer *PreZTarget::getFramebuffer() const
     {
         return m_pFramebuffer.get();
     }

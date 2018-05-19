@@ -28,7 +28,9 @@ namespace vge
         , m_pColorAttachment()
         , m_pDepthStencilAttachment()
         , m_arrPDeferredAttachments()
-        , m_pRectMesh()
+        , m_pRectMesh(std::shared_ptr<vg::DimSepMesh2>{
+                new vg::DimSepMesh2(vg::MemoryPropertyFlagBits::HOST_VISIBLE)
+            })
     {
         m_deferredAttachmentInfos.resize(info.deferredAttachmentCount);
         memcpy(m_deferredAttachmentInfos.data(), 
@@ -43,7 +45,7 @@ namespace vge
         _initPasses(info);
     }
 
-    void MaterialDeferred::_beginBind(const BindInfo info, BindResult *pResult)
+    void MaterialDeferred::_beginBind(const BindInfo info, BindResult *pResult) const
     {
 		uint32_t trunkFramebufferWidth = info.trunkFramebufferWidth;
 		uint32_t trunkFramebufferHeight = info.trunkFramebufferHeight;
@@ -530,15 +532,8 @@ namespace vge
         }
     }
 
-    vg::DimSepMesh2 *MaterialDeferred::_getRectMesh()
+    vg::DimSepMesh2 *MaterialDeferred::_getRectMesh() const
     {
-    	if (m_pRectMesh == nullptr)
-    	{
-    		std::shared_ptr<vg::DimSepMesh2> pNewMesh = std::shared_ptr<vg::DimSepMesh2>{
-                new vg::DimSepMesh2(vg::MemoryPropertyFlagBits::HOST_VISIBLE)
-            };
-            m_pRectMesh = pNewMesh;
-    	}
         return m_pRectMesh.get();
     }
 

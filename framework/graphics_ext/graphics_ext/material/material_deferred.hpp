@@ -51,7 +51,7 @@ namespace vge
 
         std::shared_ptr<vg::DimSepMesh2> m_pRectMesh;
 
-        virtual void _beginBind(const BindInfo info, BindResult *pResult) override;
+        virtual void _beginBind(const BindInfo info, BindResult *pResult) const override;
 
         void _createDeferredAttachments(CreateInfo createInfo);
         void _createRenderPass(CreateInfo createInfo);
@@ -59,7 +59,7 @@ namespace vge
         void _createOtherPasses(CreateInfo createInfo);
         void _initPasses(CreateInfo createInfo);              
 
-         vg::DimSepMesh2 *_getRectMesh();
+         vg::DimSepMesh2 *_getRectMesh() const;
 
     };
 } //vge

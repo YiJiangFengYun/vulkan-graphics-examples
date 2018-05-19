@@ -183,9 +183,15 @@ namespace vg
 
 		const auto &renderPassInfo = *pRenderPassInfo;
 		auto pMesh = renderPassInfo.pMesh;
+
+		if (pMesh != nullptr) pMesh->beginRecord();
+
 		auto pContentMesh = dynamic_cast<const ContentMesh *>(pMesh);
 		auto subMeshIndex = renderPassInfo.subMeshIndex;
+
 		auto pPass = renderPassInfo.pPass;
+		if (pPass != nullptr) pPass->beginRecord();
+
 		auto pShader = pPass->getShader();
 		auto stageInfos = pShader->getShaderStageInfos();
 		if (stageInfos.size() != 0)
@@ -224,6 +230,9 @@ namespace vg
 		{
 			VG_LOG(plog::warning) << "No one valid shader module for pass. Pass ID: " << pPass->getID() << std::endl;
 		}
+
+		if (pMesh != nullptr) pMesh->endRecord();
+		if (pPass != nullptr) pPass->endRecord();
     }
 
     void CMDParser::_createPipeline(const vk::RenderPass *pRenderPass,

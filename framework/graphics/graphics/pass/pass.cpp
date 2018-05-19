@@ -940,6 +940,15 @@ namespace vg
 		return m_usingDynamicOffsets.data();
 	}
 
+	void Pass::beginRecord() const
+	{
+	}
+		
+	void Pass::endRecord() const
+	{
+
+	}
+
 	void Pass::_createPipelineLayout()
 	{
 		m_lastLayoutBindingInfos.clear();

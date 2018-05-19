@@ -11,9 +11,24 @@ namespace vg
 
 	}
 
-	BaseMesh::~BaseMesh()
+	void BaseMesh::beginRecord() const
 	{
+		_beginRecord();
+	}
 		
+	void BaseMesh::endRecord() const
+	{
+		_endRecord();
+	}
+
+	void BaseMesh::_beginRecord() const
+	{
+
+	}
+		
+	void BaseMesh::_endRecord() const
+	{
+
 	}
 
 

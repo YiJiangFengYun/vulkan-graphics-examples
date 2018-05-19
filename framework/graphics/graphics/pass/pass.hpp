@@ -371,7 +371,8 @@ namespace vg
 		uint32_t getUsingDescriptorDynamicOffsetCount() const;
 		const uint32_t *getUsingDescriptorDynamicOffsets() const;
 
-		// void beginRecord();
+		void beginRecord() const;
+		void endRecord() const;
 	private:
 		//compositons
 		std::shared_ptr<PassData> m_pData;

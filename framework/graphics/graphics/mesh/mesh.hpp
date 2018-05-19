@@ -22,9 +22,11 @@ namespace vg
 	{
     public:
         BaseMesh();
-		virtual ~BaseMesh();
-
+		void beginRecord() const;
+		void endRecord() const;
     protected:
+	    virtual void _beginRecord() const;
+		virtual void _endRecord() const;
     private:
 	};
 

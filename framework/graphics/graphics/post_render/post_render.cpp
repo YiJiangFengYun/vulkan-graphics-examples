@@ -27,8 +27,13 @@ namespace vg
     {
         return m_pMaterial;
     }
+
+	Material * PostRender::getMaterial()
+	{
+		return m_pMaterial;
+	}
         
-    void PostRender::setMaterial(const Material * pMaterial)
+    void PostRender::setMaterial(Material * pMaterial)
     {
         m_pMaterial = pMaterial;
     }

@@ -25,14 +25,14 @@ namespace vg
         void setFramebufferHeight(uint32_t value);
 
 
-        void bind(const BaseScene *pScene
-            , const BaseCamera *pCamera
+        void bind(BaseScene *pScene
+            , BaseCamera *pCamera
             , const PreZTarget *pPreZTarget = nullptr
             , CmdBuffer *pPreZCmdBuffer = nullptr
 			, CmdBuffer *pBranchCmdBuffer = nullptr
             , CmdBuffer *pTrunkWaitBarrierCmdBuffer = nullptr            
             , CmdBuffer *pTrunkRenderPassCmdBuffer = nullptr
-            , const PostRender *pPostRender = nullptr
+            , PostRender *pPostRender = nullptr
             , const PostRenderTarget *pPostRenderTarget = nullptr
             , CmdBuffer *pPostRenderCmdBuffer = nullptr
             );
@@ -45,20 +45,20 @@ namespace vg
 
         void _beginBind();
 
-        void _bind(const BaseScene *pScene
-            , const BaseCamera *pCamera
+        void _bind(BaseScene *pScene
+            , BaseCamera *pCamera
             , const PreZTarget *pPreZTarget = nullptr
             , CmdBuffer *pPreZCmdBuffer = nullptr
 			, CmdBuffer *pBranchCmdBuffer = nullptr
             , CmdBuffer *pTrunkWaitBarrierCmdBuffer = nullptr            
             , CmdBuffer *pTrunkRenderPassCmdBuffer = nullptr
-            , const PostRender *pPostRender = nullptr
+            , PostRender *pPostRender = nullptr
             , const PostRenderTarget *pPostRenderTarget = nullptr
             , CmdBuffer *pPostRenderCmdBuffer = nullptr
             );
 
-        void _bindScene2(const Scene<SpaceType::SPACE_2> *pScene
-		    , const Camera<SpaceType::SPACE_2> *pCamera
+        void _bindScene2(Scene<SpaceType::SPACE_2> *pScene
+		    , Camera<SpaceType::SPACE_2> *pCamera
             , const PreZTarget *pPreZTarget = nullptr
 			, CmdBuffer *pPreZCmdBuffer = nullptr
 			, CmdBuffer *pBranchCmdBuffer = nullptr
@@ -66,8 +66,8 @@ namespace vg
             , CmdBuffer *pTrunkRenderPassCmdBuffer = nullptr
 			);
 
-		void _bindScene3(const Scene<SpaceType::SPACE_3> *pScene
-		    , const Camera<SpaceType::SPACE_3> *pCamera
+		void _bindScene3(Scene<SpaceType::SPACE_3> *pScene
+		    , Camera<SpaceType::SPACE_3> *pCamera
             , const PreZTarget *pPreZTarget = nullptr
 			, CmdBuffer *pPreZCmdBuffer = nullptr
 			, CmdBuffer *pBranchCmdBuffer = nullptr

@@ -59,7 +59,7 @@ namespace vg
 	}
 
 	Bool32 Scene3::isInView(const CameraType *pCamera
-		, TransformType *pTransform
+		, const TransformType *pTransform
 		, BoundsType bounds
 		, fd::Rect2D *viewRect) const
 	{

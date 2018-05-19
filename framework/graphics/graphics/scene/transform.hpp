@@ -33,11 +33,13 @@ namespace vg
 		//------------hierarchy-----------------------
 		uint32_t getChildCount() const;
 
-		Type *getChildWithIndex(uint32_t index) const;
+		const Type *getChildWithIndex(uint32_t index) const;
+		Type *getChildWithIndex(uint32_t index);
 
 		typename std::vector<Type *>::const_iterator getChildPos(const Type *child) const;
 
-		const std::vector<Type *> &getChildren() const;
+		const Type * const * getChildren() const;
+		Type * const * getChildren();
 
 		void detachChildren();
 
@@ -47,11 +49,13 @@ namespace vg
 		void addChild(Type *pNewChild, typename std::vector<Type *>::const_iterator pos);
 		void removeChild(Type *pChild);
 
-		Type *getParent() const;
+		const Type *getParent() const;
+		Type *getParent();
 
 		void setParent(Type *pParent);
 
-		Type *getRoot() const;
+		const Type *getRoot() const;
+		Type *getRoot();
 
 		//------------state-----------------------
 		Bool32 getIsChanged() const;

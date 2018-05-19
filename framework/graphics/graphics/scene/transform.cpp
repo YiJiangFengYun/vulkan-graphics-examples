@@ -47,7 +47,13 @@ namespace vg
 	}
 
 	template <SpaceType SPACE_TYPE>
-	typename Transform<SPACE_TYPE>::Type *Transform<SPACE_TYPE>::getChildWithIndex(uint32_t index) const
+	const typename Transform<SPACE_TYPE>::Type *Transform<SPACE_TYPE>::getChildWithIndex(uint32_t index) const
+	{
+		return m_arrPChildren[index];
+	}
+
+	template <SpaceType SPACE_TYPE>
+	typename Transform<SPACE_TYPE>::Type *Transform<SPACE_TYPE>::getChildWithIndex(uint32_t index)
 	{
 		return m_arrPChildren[index];
 	}
@@ -62,9 +68,15 @@ namespace vg
 	}
 
 	template <SpaceType SPACE_TYPE>
-	const std::vector<typename Transform<SPACE_TYPE>::Type *> &Transform<SPACE_TYPE>::getChildren() const
+	const typename Transform<SPACE_TYPE>::Type * const * Transform<SPACE_TYPE>::getChildren() const
 	{
-		return m_arrPChildren;
+		return m_arrPChildren.data();
+	}
+
+	template <SpaceType SPACE_TYPE>
+	typename Transform<SPACE_TYPE>::Type * const * Transform<SPACE_TYPE>::getChildren()
+	{
+		return m_arrPChildren.data();
 	}
 
 	template <SpaceType SPACE_TYPE>
@@ -99,7 +111,13 @@ namespace vg
 	}
 
 	template <SpaceType SPACE_TYPE>
-	typename Transform<SPACE_TYPE>::Type *Transform<SPACE_TYPE>::getParent() const
+	const typename Transform<SPACE_TYPE>::Type *Transform<SPACE_TYPE>::getParent() const
+	{
+		return m_pParent;
+	}
+
+	template <SpaceType SPACE_TYPE>
+	typename Transform<SPACE_TYPE>::Type *Transform<SPACE_TYPE>::getParent()
 	{
 		return m_pParent;
 	}
@@ -126,7 +144,25 @@ namespace vg
 	}
 
 	template <SpaceType SPACE_TYPE>
-	typename Transform<SPACE_TYPE>::Type *Transform<SPACE_TYPE>::getRoot() const
+	const typename Transform<SPACE_TYPE>::Type *Transform<SPACE_TYPE>::getRoot() const
+	{
+		if (m_pParent == nullptr)
+		{
+			return nullptr;
+		}
+		else
+		{
+			auto root = m_pParent;
+			while (root->m_pParent != nullptr)
+			{
+				root = root->m_pParent;
+			}
+			return root;
+		}
+	}
+
+	template <SpaceType SPACE_TYPE>
+	typename Transform<SPACE_TYPE>::Type *Transform<SPACE_TYPE>::getRoot()
 	{
 		if (m_pParent == nullptr)
 		{
@@ -286,6 +322,8 @@ namespace vg
 	{
 		if (_isChild(pNewChild))
 		{
+			auto removed = std::remove(m_arrPChildren.begin(), m_arrPChildren.end(), pNewChild);
+			m_arrPChildren.erase(removed, m_arrPChildren.end());
 			m_arrPChildren.insert(pos, pNewChild);
 		}
 		else
@@ -298,7 +336,8 @@ namespace vg
 	template <SpaceType SPACE_TYPE>
 	void Transform<SPACE_TYPE>::_removeChildOnly(Type *pChild)
 	{
-		std::remove(m_arrPChildren.begin(), m_arrPChildren.end(), pChild);
+		auto removed = std::remove(m_arrPChildren.begin(), m_arrPChildren.end(), pChild);
+		m_arrPChildren.erase(removed, m_arrPChildren.end());
 		m_mapPChildren.erase(pChild->getID());
 	}
 

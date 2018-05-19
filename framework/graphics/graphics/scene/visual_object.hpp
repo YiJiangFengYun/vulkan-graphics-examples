@@ -51,13 +51,15 @@ namespace vg
 		virtual ~BaseVisualObject();
 
 		uint32_t getMaterialCount() const;
-		Material *getMaterial(uint32_t index = 0) const;
+		const Material *getMaterial(uint32_t index = 0) const;
+		Material *getMaterial(uint32_t index = 0);
 		
 		void setMaterialCount(uint32_t count);
 		void setMaterial(fd::ArrayProxy<Material *> pMaterials, uint32_t count = 1u, uint32_t offset = 0);
 		void setMaterial(Material * pMaterial);
 
-		BaseMesh *getMesh() const;
+		const BaseMesh *getMesh() const;
+		BaseMesh *getMesh();
 
 		uint32_t getSubMeshOffset() const;
 		uint32_t getSubMeshCount() const;

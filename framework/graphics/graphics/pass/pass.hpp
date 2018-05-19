@@ -219,7 +219,8 @@ namespace vg
 		Pass(Shader *pShader);
 		~Pass();
 
-		Shader *getShader() const;
+		const Shader *getShader() const;
+		Shader *getShader();		
 		void setShader(Shader *pShader);
 
 		const Texture *getTexture(std::string name) const;

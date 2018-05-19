@@ -54,22 +54,28 @@ namespace vg
 		Scene();
 
 		uint32_t getVisualObjectCount() const;
-		VisualObjectType *getVisualObjectWithIndex(uint32_t index) const;
-		VisualObjectType *getVisualObjectWithTransform(const TransformType *pTransform) const;
+		const VisualObjectType *getVisualObjectWithIndex(uint32_t index) const;
+		VisualObjectType *getVisualObjectWithIndex(uint32_t index);
+		const VisualObjectType *getVisualObjectWithTransform(const TransformType *pTransform) const;
+		VisualObjectType *getVisualObjectWithTransform(const TransformType *pTransform);
 		Bool32 isHasVisualObject(const VisualObjectType *pTarget) const;
 		void addVisualObject(VisualObjectType *pTarget, VisualObjectType *pParent = nullptr);
 		void removeVisualObject(VisualObjectType *pTarget);
 
 		uint32_t getCameraCount() const;
-		CameraType *getCameraWithIndex(uint32_t index) const;
-		CameraType *getCameraWithTransform(const TransformType *pTransform) const;
+		const CameraType *getCameraWithIndex(uint32_t index) const;
+		CameraType *getCameraWithIndex(uint32_t index);
+		const CameraType *getCameraWithTransform(const TransformType *pTransform) const;
+		CameraType *getCameraWithTransform(const TransformType *pTransform);
 		Bool32 isHasCamera(const CameraType *pTarget) const;
 		void addCamera(CameraType *pTarget, CameraType *pParent = nullptr);
 		void removeCamera(CameraType *pTarget);
 
 		uint32_t getLightCount() const;
-		LightType *getLightWithIndex(uint32_t index) const;
-		LightType *getLightWithTransform(const TransformType *pTransform) const;
+		const LightType *getLightWithIndex(uint32_t index) const;
+		LightType *getLightWithIndex(uint32_t index);
+		const LightType *getLightWithTransform(const TransformType *pTransform) const;
+		LightType *getLightWithTransform(const TransformType *pTransform);
 		Bool32 isHasLight(const LightType *pTarget) const;
 		void addLight(LightType *pTarget, LightType *pParent = nullptr);
 		void removeLight(LightType *pTarget);
@@ -82,7 +88,7 @@ namespace vg
 		 * This bounds is in object coordinate system. 
 		 **/
 		virtual Bool32 isInView(const CameraType *pCamera
-		    , TransformType *pTransform
+		    , const TransformType *pTransform
 		    , BoundsType bounds
 			, fd::Rect2D *viewRect = nullptr) const = 0;
 		

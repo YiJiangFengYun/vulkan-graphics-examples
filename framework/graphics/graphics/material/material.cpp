@@ -101,12 +101,22 @@ namespace vg
 		return static_cast<uint32_t>(m_arrPasses.size());
 	}
 
-	Pass *Material::getPassWithIndex(uint32_t index) const
+	const Pass *Material::getPassWithIndex(uint32_t index) const
 	{
 		return m_arrPasses[index];
 	}
 
-	Pass * const *Material::getPasses() const
+	Pass *Material::getPassWithIndex(uint32_t index)
+	{
+		return m_arrPasses[index];
+	}
+
+	const Pass * const *Material::getPasses() const
+	{
+		return m_arrPasses.data();
+	}
+
+	Pass * const *Material::getPasses()
 	{
 		return m_arrPasses.data();
 	}
@@ -117,17 +127,32 @@ namespace vg
 	}
 
 
-	Shader *Material::getMainShader() const 
+	const Shader *Material::getMainShader() const 
 	{
 		return m_pMainShader.get();
 	}
 
-	Pass *Material::getMainPass() const
+	Shader *Material::getMainShader()
+	{
+		return m_pMainShader.get();
+	}
+
+	const Pass *Material::getMainPass() const
 	{
 		return m_pMainPass.get();
 	}
 
-	PreZPass * Material::getPreZPass() const
+	Pass *Material::getMainPass()
+	{
+		return m_pMainPass.get();
+	}
+
+	const PreZPass * Material::getPreZPass() const
+	{
+		return m_pPreZPass.get();
+	}
+
+	PreZPass * Material::getPreZPass()
 	{
 		return m_pPreZPass.get();
 	}

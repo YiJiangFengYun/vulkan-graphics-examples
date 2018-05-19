@@ -29,14 +29,15 @@ namespace vg
 
         PostRender();
         const Material * getMaterial() const;
-        void setMaterial(const Material * pMaterial);
+		Material * getMaterial();
+        void setMaterial(Material * pMaterial);
 
         Bool32 isValidBindToRender() const;
         void beginBind(const BindInfo info, BindResult *pResult) const;
 		void endBind() const;
 
     private:
-       const Material * m_pMaterial;
+       Material * m_pMaterial;
     };
 } //vg
 

@@ -85,13 +85,27 @@ namespace vg
 	}
 
 	template <SpaceType SPACE_TYPE>
-	typename Scene<SPACE_TYPE>::VisualObjectType *Scene<SPACE_TYPE>::getVisualObjectWithIndex(uint32_t index) const
+	const typename Scene<SPACE_TYPE>::VisualObjectType *Scene<SPACE_TYPE>::getVisualObjectWithIndex(uint32_t index) const
 	{
 		return m_arrPVisualObjects[index];
 	}
 
 	template <SpaceType SPACE_TYPE>
-	typename Scene<SPACE_TYPE>::VisualObjectType *Scene<SPACE_TYPE>::getVisualObjectWithTransform(const TransformType *pTransform) const
+	typename Scene<SPACE_TYPE>::VisualObjectType *Scene<SPACE_TYPE>::getVisualObjectWithIndex(uint32_t index)
+	{
+		return m_arrPVisualObjects[index];
+	}
+
+	template <SpaceType SPACE_TYPE>
+	const typename Scene<SPACE_TYPE>::VisualObjectType *Scene<SPACE_TYPE>::getVisualObjectWithTransform(const TransformType *pTransform) const
+	{
+		auto iterator = m_mapTransformIdToVisualObjects.find(pTransform->getID());
+		if (iterator == m_mapTransformIdToVisualObjects.cend()) return nullptr;
+		return iterator->second;
+	}
+
+	template <SpaceType SPACE_TYPE>
+	typename Scene<SPACE_TYPE>::VisualObjectType *Scene<SPACE_TYPE>::getVisualObjectWithTransform(const TransformType *pTransform)
 	{
 		auto iterator = m_mapTransformIdToVisualObjects.find(pTransform->getID());
 		if (iterator == m_mapTransformIdToVisualObjects.cend()) return nullptr;
@@ -123,13 +137,27 @@ namespace vg
 	}
 
 	template <SpaceType SPACE_TYPE>
-	typename Scene<SPACE_TYPE>::CameraType *Scene<SPACE_TYPE>::getCameraWithIndex(uint32_t index) const
+	const typename Scene<SPACE_TYPE>::CameraType *Scene<SPACE_TYPE>::getCameraWithIndex(uint32_t index) const
 	{
 		return m_arrPCameras[index];
 	}
 
 	template <SpaceType SPACE_TYPE>
-	typename Scene<SPACE_TYPE>::CameraType *Scene<SPACE_TYPE>::getCameraWithTransform(const TransformType *pTransform) const
+	typename Scene<SPACE_TYPE>::CameraType *Scene<SPACE_TYPE>::getCameraWithIndex(uint32_t index)
+	{
+		return m_arrPCameras[index];
+	}
+
+	template <SpaceType SPACE_TYPE>
+	const typename Scene<SPACE_TYPE>::CameraType *Scene<SPACE_TYPE>::getCameraWithTransform(const TransformType *pTransform) const
+	{
+		auto iterator = m_mapTransformIdToCameras.find(pTransform->getID());
+		if (iterator == m_mapTransformIdToCameras.cend())throw std::runtime_error("Camera don't exist!");
+		return iterator->second;
+	}
+
+	template <SpaceType SPACE_TYPE>
+	typename Scene<SPACE_TYPE>::CameraType *Scene<SPACE_TYPE>::getCameraWithTransform(const TransformType *pTransform)
 	{
 		auto iterator = m_mapTransformIdToCameras.find(pTransform->getID());
 		if (iterator == m_mapTransformIdToCameras.cend())throw std::runtime_error("Camera don't exist!");
@@ -171,13 +199,27 @@ namespace vg
 	}
 
 	template <SpaceType SPACE_TYPE>
-	typename Scene<SPACE_TYPE>::LightType *Scene<SPACE_TYPE>::getLightWithIndex(uint32_t index) const
+	const typename Scene<SPACE_TYPE>::LightType *Scene<SPACE_TYPE>::getLightWithIndex(uint32_t index) const
 	{
 		return m_arrPLights[index];
 	}
 
 	template <SpaceType SPACE_TYPE>
-	typename Scene<SPACE_TYPE>::LightType *Scene<SPACE_TYPE>::getLightWithTransform(const TransformType *pTransform) const
+	typename Scene<SPACE_TYPE>::LightType *Scene<SPACE_TYPE>::getLightWithIndex(uint32_t index)
+	{
+		return m_arrPLights[index];
+	}
+
+	template <SpaceType SPACE_TYPE>
+	const typename Scene<SPACE_TYPE>::LightType *Scene<SPACE_TYPE>::getLightWithTransform(const TransformType *pTransform) const
+	{
+		auto iterator = m_mapTransformIdToLights.find(pTransform->getID());
+		if (iterator == m_mapTransformIdToLights.cend())throw std::runtime_error("Light don't exist!");
+		return iterator->second;
+	}
+
+	template <SpaceType SPACE_TYPE>
+	typename Scene<SPACE_TYPE>::LightType *Scene<SPACE_TYPE>::getLightWithTransform(const TransformType *pTransform)
 	{
 		auto iterator = m_mapTransformIdToLights.find(pTransform->getID());
 		if (iterator == m_mapTransformIdToLights.cend())throw std::runtime_error("Light don't exist!");
@@ -306,14 +348,17 @@ namespace vg
 		auto pParent = pTransform->getParent();
 		auto pos = pParent->getChildPos(pTransform);
 		//copy chilren refs;
+		auto childCount = pTransform->getChildCount();
 		auto children = pTransform->getChildren();
-		//first remove all chilren of target.
-		pTransform->detachChildren();
 		//insert to pos of parent before target
-		for (auto child : children)
-		{
+		for (uint32_t i = 0; i < childCount; ++i) {
+			auto child = *(children + i);
 			pParent->addChild(child, pos);
 		}
+
+		//then remove all chilren of target.
+		pTransform->detachChildren();
+		
 
 		pTransform->setParent(nullptr);
 	}

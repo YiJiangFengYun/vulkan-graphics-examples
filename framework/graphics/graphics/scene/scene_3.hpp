@@ -13,7 +13,7 @@ namespace vg
 		virtual MatrixType getProjMatrix(const CameraType *pCamera) const override;
 		virtual BoundsType getViewBoundsInWorld(const CameraType *pCamera) const override;
 		virtual Bool32 isInView(const CameraType *pCamera
-		    , TransformType *pTransform
+		    , const TransformType *pTransform
 		    , BoundsType bounds
 			, fd::Rect2D *viewRect = nullptr) const override;
 		virtual Bool32 isInView(const CameraType *pCamera

@@ -60,7 +60,12 @@ namespace vg
 		return m_materialCount;
 	}
 
-	Material *BaseVisualObject::getMaterial(uint32_t index) const
+	const Material *BaseVisualObject::getMaterial(uint32_t index) const
+	{
+		return m_pMaterials[index];
+	}
+
+	Material *BaseVisualObject::getMaterial(uint32_t index)
 	{
 		return m_pMaterials[index];
 	}
@@ -89,7 +94,12 @@ namespace vg
 		}
 	}
 
-	BaseMesh *BaseVisualObject::getMesh() const
+	const BaseMesh *BaseVisualObject::getMesh() const
+	{
+		return m_pMesh;
+	}
+
+	BaseMesh *BaseVisualObject::getMesh()
 	{
 		return m_pMesh;
 	}

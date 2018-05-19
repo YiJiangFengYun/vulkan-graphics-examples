@@ -82,14 +82,20 @@ namespace vg
 		~Material();
 
 		uint32_t getPassCount() const;
-		Pass *getPassWithIndex(uint32_t index) const;
-		Pass * const *getPasses() const;
+		const Pass *getPassWithIndex(uint32_t index) const;
+		Pass *getPassWithIndex(uint32_t index);
+		const Pass * const *getPasses() const;
+		Pass * const *getPasses();
 		Bool32 isHas(const Pass *pPass) const;
 
-		Shader *getMainShader() const;
-		Pass *getMainPass() const;
+		const Shader *getMainShader() const;
+		Shader *getMainShader();
+		const Pass *getMainPass() const;
+		Pass *getMainPass();
+		
 
-		PreZPass * getPreZPass() const;
+		const PreZPass * getPreZPass() const;
+		PreZPass * getPreZPass();
 
 		MaterialShowType getShowType();
 		void setRenderQueueType(MaterialShowType type);

@@ -340,7 +340,12 @@ namespace vg
 	{
 	}
 
-	Shader *Pass::getShader() const
+	const Shader *Pass::getShader() const
+	{
+		return m_pShader;
+	}
+	
+	Shader *Pass::getShader()
 	{
 		return m_pShader;
 	}

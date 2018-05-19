@@ -9,10 +9,10 @@
 
 namespace vg
 {
-	Renderer::SceneInfo::SceneInfo(const BaseScene *pScene
-		, const BaseCamera *pCamera
+	Renderer::SceneInfo::SceneInfo(BaseScene *pScene
+		, BaseCamera *pCamera
 		, Bool32 preZ
-		, const PostRender * pPostRender
+		, PostRender * pPostRender
 		)
 		: pScene(pScene)
 		, pCamera(pCamera)

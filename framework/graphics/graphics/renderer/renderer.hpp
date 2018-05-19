@@ -26,14 +26,14 @@ namespace vg
 	{
 	public:
 		struct SceneInfo {
-			const BaseScene *pScene;
-			const BaseCamera *pCamera;
+			BaseScene *pScene;
+			BaseCamera *pCamera;
 			Bool32 preZ;
-			const PostRender * pPostRender;
-			SceneInfo(const BaseScene *pScene = nullptr
-			    , const BaseCamera *pCamera = nullptr
+			PostRender * pPostRender;
+			SceneInfo(BaseScene *pScene = nullptr
+			    , BaseCamera *pCamera = nullptr
 				, Bool32 preZ = VG_FALSE
-				, const PostRender * pPostRender = nullptr);
+				, PostRender * pPostRender = nullptr);
 		};
 
 		struct RenderInfo {

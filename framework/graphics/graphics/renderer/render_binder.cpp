@@ -7,8 +7,8 @@ namespace vg
 	void fillValidVisualObjects(std::vector<VisualObject<SpaceType::SPACE_2> *> &arrPVObjs
 	    , uint32_t &PVObjIndex
 		, const Transform<SpaceType::SPACE_2> *pTransform
-		, const Scene<SpaceType::SPACE_2> *pScene
-		, const Camera<SpaceType::SPACE_2> *pCamera
+		, Scene<SpaceType::SPACE_2> *pScene
+		, Camera<SpaceType::SPACE_2> *pCamera
 #ifdef USE_WORLD_BOUNDS
 		, const fd::Bounds<SpaceTypeInfo<SpaceType::SPACE_2>::PointType> *pBounds
 #endif
@@ -43,14 +43,14 @@ namespace vg
         m_framebufferHeight = value;
     }
 
-    void RenderBinder::bind(const BaseScene *pScene
-        , const BaseCamera *pCamera
+    void RenderBinder::bind(BaseScene *pScene
+        , BaseCamera *pCamera
 		, const PreZTarget *pPreZTarget
         , CmdBuffer *pPreZCmdBuffer
 		, CmdBuffer *pBranchCmdBuffer
         , CmdBuffer *pTrunkWaitBarrierCmdBuffer        
         , CmdBuffer *pTrunkRenderPassCmdBuffer
-        , const PostRender *pPostRender
+        , PostRender *pPostRender
 		, const PostRenderTarget *pPostRenderTarget
         , CmdBuffer *pPostRenderCmdBuffer
         )
@@ -75,14 +75,14 @@ namespace vg
         m_bindedObjectCount = 0u;
     }
 
-    void RenderBinder::_bind(const BaseScene *pScene
-        , const BaseCamera *pCamera
+    void RenderBinder::_bind(BaseScene *pScene
+        , BaseCamera *pCamera
 		, const PreZTarget *pPreZTarget
         , CmdBuffer *pPreZCmdBuffer
 		, CmdBuffer *pBranchCmdBuffer
         , CmdBuffer *pTrunkWaitBarrierCmdBuffer        
         , CmdBuffer *pTrunkRenderPassCmdBuffer
-        , const PostRender *pPostRender
+        , PostRender *pPostRender
 		, const PostRenderTarget *pPostRenderTarget
         , CmdBuffer *pPostRenderCmdBuffer
         )
@@ -92,8 +92,8 @@ namespace vg
 		//scene make cmds.
 		if (pScene->getSpaceType() == SpaceType::SPACE_2)
 		{
-			_bindScene2(dynamic_cast<const Scene<SpaceType::SPACE_2> *>(pScene), 
-			    dynamic_cast<const Camera<SpaceType::SPACE_2> *>(pCamera),
+			_bindScene2(dynamic_cast<Scene<SpaceType::SPACE_2> *>(pScene), 
+			    dynamic_cast<Camera<SpaceType::SPACE_2> *>(pCamera),
 				pPreZTarget,
 				pPreZCmdBuffer,
 				pBranchCmdBuffer,					
@@ -102,8 +102,8 @@ namespace vg
 				);
 		} else if (pScene->getSpaceType() == SpaceType::SPACE_3)
 		{
-			_bindScene3(dynamic_cast<const Scene<SpaceType::SPACE_3> *>(pScene), 
-			    dynamic_cast<const Camera<SpaceType::SPACE_3> *>(pCamera), 
+			_bindScene3(dynamic_cast<Scene<SpaceType::SPACE_3> *>(pScene), 
+			    dynamic_cast<Camera<SpaceType::SPACE_3> *>(pCamera), 
 				pPreZTarget,
 				pPreZCmdBuffer,
 				pBranchCmdBuffer,					
@@ -155,8 +155,8 @@ namespace vg
 	    _endBind();	
     }
 
-    void RenderBinder::_bindScene2(const Scene<SpaceType::SPACE_2> *pScene
-		, const Camera<SpaceType::SPACE_2> *pCamera
+    void RenderBinder::_bindScene2(Scene<SpaceType::SPACE_2> *pScene
+		, Camera<SpaceType::SPACE_2> *pCamera
 		, const PreZTarget *pPreZTarget
 		, CmdBuffer *pPreZCmdBuffer
 		, CmdBuffer *pBranchCmdBuffer
@@ -308,8 +308,8 @@ namespace vg
 	void fillValidVisualObjects(std::vector<VisualObject<SpaceType::SPACE_2> *> &arrPVObjs
 	    , uint32_t &PVObjIndex
 		, const Transform<SpaceType::SPACE_2> *pTransform
-		, const Scene<SpaceType::SPACE_2> *pScene
-		, const Camera<SpaceType::SPACE_2> *pCamera
+		, Scene<SpaceType::SPACE_2> *pScene
+		, Camera<SpaceType::SPACE_2> *pCamera
 #ifdef USE_WORLD_BOUNDS
 		, const fd::Bounds<SpaceTypeInfo<SpaceType::SPACE_2>::PointType> *pViewBoundsInWorld
 #endif
@@ -317,7 +317,7 @@ namespace vg
 	{
 		VisualObject<SpaceType::SPACE_2> *pVisualObjectOfChild;
 		uint32_t childCount = pTransform->getChildCount();
-		Transform<SpaceType::SPACE_2> *pChild;
+		const Transform<SpaceType::SPACE_2> *pChild;
 		for (uint32_t i = 0; i < childCount; ++i)
 		{
 			pChild = pTransform->getChildWithIndex(i);
@@ -373,8 +373,8 @@ namespace vg
 		}
 	}
 
-	void RenderBinder::_bindScene3(const Scene<SpaceType::SPACE_3> *pScene
-	    , const Camera<SpaceType::SPACE_3> *pCamera
+	void RenderBinder::_bindScene3(Scene<SpaceType::SPACE_3> *pScene
+	    , Camera<SpaceType::SPACE_3> *pCamera
 		, const PreZTarget *pPreZTarget
 		, CmdBuffer *pPreZCmdBuffer
 		, CmdBuffer *pBranchCmdBuffer

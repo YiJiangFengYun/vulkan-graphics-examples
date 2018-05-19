@@ -488,6 +488,7 @@ namespace vg
 				m_textureChanged = VG_FALSE;
 			}
 			_endCheckNeedUpdateDescriptorInfo();
+			applyUniformBufferDynamicOffsets();
 			m_applied = VG_TRUE;
 		}
 		if (m_dataChanged == VG_TRUE)
@@ -999,7 +1000,6 @@ namespace vg
 		uint32_t layoutCount = pLayout != nullptr ? 1 : 0;
 		uint32_t subDataOffset = m_externalUniformBufferInfo.subDataOffset;
 		uint32_t subDataCount = m_externalUniformBufferInfo.subDataCount;
-		uint32_t dynamicCount = 0u;
 		for (uint32_t i = 0; i < subDataCount; ++i)
 		{
 			auto pSubDatas = m_externalUniformBufferInfo.pData->getSubDatas();
@@ -1007,23 +1007,12 @@ namespace vg
 			if (subData.getDescriptorSetLayout() != nullptr)
 			{
 				++layoutCount;
-				for (uint32_t bindingIndex = 0u; bindingIndex < subData.getLayoutBindingCount(); ++bindingIndex)
-				{
-					const auto &binding = *(subData.getLayoutBindings() + bindingIndex);
-					if (binding.descriptorType == vk::DescriptorType::eUniformBufferDynamic ||
-						binding.descriptorType == vk::DescriptorType::eStorageBufferDynamic)
-					{
-						dynamicCount += binding.descriptorCount;
-					}
-				}
 			}
 		}
 
 		std::vector<vk::DescriptorSetLayout> setLayouts(layoutCount);
 		m_usingDescriptorSets.resize(layoutCount);
-		m_usingDynamicOffsets.resize(dynamicCount);
 		uint32_t layoutIndex = 0u;
-		uint32_t dynamicIndex = 0u;
 		if (pLayout != nullptr) {
 			setLayouts[layoutIndex] = *pLayout;
 			if (m_needReAllocateDescriptorSet)
@@ -1047,24 +1036,6 @@ namespace vg
 				setLayouts[layoutIndex] = *(subData.getDescriptorSetLayout());
 				m_usingDescriptorSets[layoutIndex] = *(subData.getDescriptorSet());
 				++layoutIndex;
-
-				uint32_t descriptorInfoIndex = 0u;
-				for (uint32_t bindingIndex = 0u; bindingIndex < subData.getLayoutBindingCount(); ++bindingIndex)
-				{
-					const auto &binding = *(subData.getLayoutBindings() + bindingIndex);
-					if (binding.descriptorType == vk::DescriptorType::eUniformBufferDynamic ||
-						binding.descriptorType == vk::DescriptorType::eStorageBufferDynamic)
-					{
-						for (uint32_t descriptorIndex = 0u; descriptorIndex < binding.descriptorCount; ++descriptorIndex)
-						{
-							auto &descriptorInfo = *(subData.getDescriptorInfos() + (descriptorInfoIndex + descriptorIndex));
-							m_usingDynamicOffsets[dynamicIndex] = descriptorInfo.dynamicOffset;
-							++dynamicIndex;
-						}
-					}
-					descriptorInfoIndex += binding.descriptorCount;
-				}
-
 			}
 		}
 

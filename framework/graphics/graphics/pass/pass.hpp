@@ -355,11 +355,12 @@ namespace vg
 		void setVertexInputFilterInfo(const VertexInputFilterInfo &value);
 
         //external uniform buffer
-		const ExternalUniformBufferInfo getExternalUniformBufferInfo() const;
-		void setExternalUniformBufferData(ExternalUniformBufferInfo value);
-
-		void updateExternalUniformBufferData();
-		void applyUniformBufferDynamicOffsets();
+	    uint32_t getExtUniformBufferCount() const;
+		const ExternalUniformBufferInfo * getExtUniformBuffers() const;
+		void setExtUniformBufferCount(uint32_t value);
+		void setExtUniformBuffers(fd::ArrayProxy<ExternalUniformBufferInfo> extUniformBuffers
+			, uint32_t offset = 0u
+			);
 
 		const vk::Buffer *getUniformBuffer() const;
 		const vk::DeviceMemory *getUniformBufferMemory() const;
@@ -422,9 +423,8 @@ namespace vg
 		std::vector<uint32_t> m_vertexInputFilterLocations;
 
 		//external uniform buffer data.
-		// uint32_t m_extUniformBufferCount;
-		// std::vector<ExternalUniformBufferInfo> m_extUniformBuffers;
-		ExternalUniformBufferInfo m_extUniformBuffer;
+		uint32_t m_extUniformBufferCount;
+		std::vector<ExternalUniformBufferInfo> m_extUniformBuffers;
 
 		//cache
 		std::set<LayoutBindingInfo> m_lastLayoutBindingInfos;
@@ -450,6 +450,8 @@ namespace vg
 		void _endCheckNeedUpdateDescriptorInfo();
 		void _applyBufferContent();
 		void _updatePipelineStateID();
+
+		void _applyUniformBufferDynamicOffsets();
 
 		void _initDefaultBuildInDataInfo();
 		void _initBuildInData();

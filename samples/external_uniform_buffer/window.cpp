@@ -217,7 +217,8 @@ void Window::_createMaterial()
 	    externalUniformBufferInfo.pData = m_pExtUniformData.get();
 	    externalUniformBufferInfo.subDataOffset = i;
 	    externalUniformBufferInfo.subDataCount = 1u;
-	    pPass->setExternalUniformBufferData(externalUniformBufferInfo);
+		pPass->setExtUniformBufferCount(1u);
+	    pPass->setExtUniformBuffers(externalUniformBufferInfo);
 	    pPass->apply();
 	    
 	    pMaterial->apply();

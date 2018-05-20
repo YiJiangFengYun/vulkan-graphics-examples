@@ -358,8 +358,8 @@ namespace sampleslib
 		            {
 		            	const auto &firstSubVertexData = pSharedVertexData->getSubVertexDatas()[0];
 		            	pSharedVertexData->updateDesData(firstSubVertexData.vertexInputStateInfo);
-		            	pSharedVertexData->updateVertexCount(vertexCounts, vertexSubDataCount);
-		            	pSharedVertexData->updateBufferSize(vertexBufferSizes, vertexSubDataCount);
+		            	pSharedVertexData->updateVertexCount(vertexCounts);
+		            	pSharedVertexData->updateBufferSize(vertexBufferSizes);
 		            }
             
                     pSharedIndexData->updateSubDataCount(indexSubDataCount);
@@ -367,9 +367,9 @@ namespace sampleslib
 		            {
 		            	const auto &firstSubIndexData = pSharedIndexData->getSubIndexDatas()[0];
 		            	pSharedIndexData->updateDesData(firstSubIndexData.indexType, firstSubIndexData.inputAssemblyStateInfo);
-		            	pSharedIndexData->updateIndexCount(indexCounts, indexSubDataCount);
-		            	pSharedIndexData->updateBufferSize(indexBufferSizes, indexSubDataCount);
-		            	pSharedIndexData->updateVertexDataIndex(indexVertexDataIndices, indexSubDataCount);
+		            	pSharedIndexData->updateIndexCount(indexCounts);
+		            	pSharedIndexData->updateBufferSize(indexBufferSizes);
+		            	pSharedIndexData->updateVertexDataIndex(indexVertexDataIndices);
 		            }
                 } 
                 else
@@ -379,29 +379,29 @@ namespace sampleslib
                     for (auto count : vertexCounts) {
                         vertexCount += count;
                     }
-                    pSharedVertexData->updateVertexCount(vertexCount, 1u);
+                    pSharedVertexData->updateVertexCount(vertexCount);
                     
                     uint32_t vertexBufferSize = 0u;
                     for (auto size : vertexBufferSizes) {
                         vertexBufferSize += size;
                     }
-                    pSharedVertexData->updateBufferSize(vertexBufferSize, 1u);
+                    pSharedVertexData->updateBufferSize(vertexBufferSize);
 
                     pSharedIndexData->updateSubDataCount(1u);
                     uint32_t indexCount = 0u;
                     for (auto count : indexCounts) {
                         indexCount += count;
                     }
-                    pSharedIndexData->updateIndexCount(indexCount, 1u);
+                    pSharedIndexData->updateIndexCount(indexCount);
 
                     uint32_t indexBufferSize = 0u;
                     for (auto size : indexBufferSizes) {
                         indexBufferSize += size;
                     }
-                    pSharedIndexData->updateBufferSize(indexBufferSize, 1u);
+                    pSharedIndexData->updateBufferSize(indexBufferSize);
 
 					std::array<uint32_t, 1> vertexDataIndex = { 0u };
-                    pSharedIndexData->updateVertexDataIndex(vertexDataIndex, 1u);
+                    pSharedIndexData->updateVertexDataIndex(vertexDataIndex);
                 }
             }
 

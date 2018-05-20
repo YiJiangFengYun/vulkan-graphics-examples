@@ -55,7 +55,7 @@ namespace vg
 		Material *getMaterial(uint32_t index = 0);
 		
 		void setMaterialCount(uint32_t count);
-		void setMaterial(fd::ArrayProxy<Material *> pMaterials, uint32_t count = 1u, uint32_t offset = 0);
+		void setMaterial(fd::ArrayProxy<Material *> pMaterials, uint32_t offset = 0);
 		void setMaterial(Material * pMaterial);
 
 		const BaseMesh *getMesh() const;
@@ -73,7 +73,7 @@ namespace vg
 		void setHasClipRect(Bool32 value);
 		uint32_t getClipRectCount() const;
 		const fd::Rect2D *getClipRects() const;
-		void updateClipRects(fd::ArrayProxy<fd::Rect2D> rects, uint32_t count, uint32_t offset = 0u);
+		void updateClipRects(fd::ArrayProxy<fd::Rect2D> rects, uint32_t offset = 0u);
 		void updateClipRects(fd::Rect2D rect, uint32_t count, uint32_t offset = 0u);
 
 		void beginBind(const BindInfo info, BindResult *pResult) const;

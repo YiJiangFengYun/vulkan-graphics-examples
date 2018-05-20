@@ -9,7 +9,6 @@ namespace vg {
      class IndexData : public Base
      {
      public:
-        using PipelineStateID = uint32_t;
         template<vk::IndexType indexType>
         struct IndexTypeInfo 
         {
@@ -75,10 +74,10 @@ namespace vg {
             const vk::PipelineInputAssemblyStateCreateInfo &inputAssemblyStateInfo);
 
         void updateSubDataCount(uint32_t count);
-        void updateIndexCount(fd::ArrayProxy<uint32_t> indexCounts, uint32_t count, uint32_t offset = 0u);
-        void updateBufferSize(fd::ArrayProxy<uint32_t> bufferSizes, uint32_t count, uint32_t offset = 0u);
-        void updateVertexDataIndex(fd::ArrayProxy<uint32_t> vertexDataIndices, uint32_t count, uint32_t offset = 0u);       
-        void updateStateInfo(fd::ArrayProxy<vk::PipelineInputAssemblyStateCreateInfo> stateInfos, uint32_t count, uint32_t offset = 0u);
+        void updateIndexCount(fd::ArrayProxy<uint32_t> indexCounts, uint32_t offset = 0u);
+        void updateBufferSize(fd::ArrayProxy<uint32_t> bufferSizes, uint32_t offset = 0u);
+        void updateVertexDataIndex(fd::ArrayProxy<uint32_t> vertexDataIndices, uint32_t offset = 0u);       
+        void updateStateInfo(fd::ArrayProxy<vk::PipelineInputAssemblyStateCreateInfo> stateInfos, uint32_t offset = 0u);
 
         void updateBuffer(const void *memory, uint32_t size, Bool32 cacheMemory);
         void updateBuffer(fd::ArrayProxy<MemorySlice> memories

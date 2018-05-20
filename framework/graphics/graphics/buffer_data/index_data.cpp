@@ -224,8 +224,9 @@ namespace vg
         m_subDataCount = count;      
     }
 
-    void IndexData::updateIndexCount(fd::ArrayProxy<uint32_t> indexCounts, uint32_t count, uint32_t offset)
+    void IndexData::updateIndexCount(fd::ArrayProxy<uint32_t> indexCounts, uint32_t offset)
     {
+        uint32_t count = static_cast<uint32_t>(indexCounts.size());
         for(uint32_t i = 0; i < count; ++i)
         {
             m_subDatas[offset].indexCount = *(indexCounts.data() + i);
@@ -233,8 +234,9 @@ namespace vg
         }
     }
     
-    void IndexData::updateBufferSize(fd::ArrayProxy<uint32_t> bufferSizes, uint32_t count, uint32_t offset)
+    void IndexData::updateBufferSize(fd::ArrayProxy<uint32_t> bufferSizes, uint32_t offset)
     {
+        uint32_t count = static_cast<uint32_t>(bufferSizes.size());
         for (uint32_t i = 0; i < count; ++i)
         {
             m_subDatas[offset].bufferSize = *(bufferSizes.data() + i);
@@ -242,8 +244,9 @@ namespace vg
         }
     }
 
-    void IndexData::updateVertexDataIndex(fd::ArrayProxy<uint32_t> vertexDataIndices, uint32_t count, uint32_t offset)
+    void IndexData::updateVertexDataIndex(fd::ArrayProxy<uint32_t> vertexDataIndices, uint32_t offset)
     {
+        uint32_t count = static_cast<uint32_t>(vertexDataIndices.size());
         for (uint32_t i = 0; i < count; ++i)
         {
             m_subDatas[offset].vertexDataIndex = *(vertexDataIndices.data() + i);
@@ -251,8 +254,9 @@ namespace vg
         }
     }
 
-    void IndexData::updateStateInfo(fd::ArrayProxy<vk::PipelineInputAssemblyStateCreateInfo> stateInfos, uint32_t count, uint32_t offset)
+    void IndexData::updateStateInfo(fd::ArrayProxy<vk::PipelineInputAssemblyStateCreateInfo> stateInfos, uint32_t offset)
     {
+        uint32_t count = static_cast<uint32_t>(stateInfos.size());
         for(uint32_t i = 0; i < count; ++i)
         {
             m_subDatas[offset].inputAssemblyStateInfo = *(stateInfos.data() + i);

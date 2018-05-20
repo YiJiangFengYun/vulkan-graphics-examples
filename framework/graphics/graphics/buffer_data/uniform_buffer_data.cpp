@@ -271,21 +271,9 @@ namespace vg
     }
         
     UniformBufferData::UniformBufferData(MemoryPropertyFlags bufferMemoryPropertyFlags)
-        : Base(BaseType::UNIFORM_BUFFER_DATA)
-        , m_bufferMemoryPropertyFlags(bufferMemoryPropertyFlags)
-        , m_subDataCount()
-        , m_subDatas()
-        , m_bufferSize()
-        , m_pBuffer()
-        , m_bufferMemorySize()
-        , m_pBufferMemory()
-        , m_memorySize(0u)
-        , m_pMemory(nullptr)
-        , m_pMmemoryForHostVisible(nullptr)
-        , m_poolMaxSetCount()
-        , m_poolSizeInfos(0u)
-        , m_pDescriptorPool()
+        : UniformBufferData()
     {
+        m_bufferMemoryPropertyFlags = bufferMemoryPropertyFlags;
         //default is host visible.
         if (! m_bufferMemoryPropertyFlags) 
         {

@@ -247,8 +247,8 @@ namespace vgim
 		{
 			const auto &firstSubVertexData = pVertexData->getSubVertexDatas()[0];
 			pVertexData->updateDesData(firstSubVertexData.vertexInputStateInfo);
-			pVertexData->updateVertexCount(vertexCounts, vertexSubDataCount);
-			pVertexData->updateBufferSize(vertexBufferSizes, vertexSubDataCount);
+			pVertexData->updateVertexCount(vertexCounts);
+			pVertexData->updateBufferSize(vertexBufferSizes);
 		}
 
         pIndexData->updateSubDataCount(indexSubDataCount);
@@ -256,12 +256,12 @@ namespace vgim
 		{
 			const auto &firstSubIndexData = pIndexData->getSubIndexDatas()[0];
 			pIndexData->updateDesData(firstSubIndexData.indexType, firstSubIndexData.inputAssemblyStateInfo);
-			pIndexData->updateIndexCount(indexCounts, indexSubDataCount);
-			pIndexData->updateBufferSize(indexBufferSizes, indexSubDataCount);
-			pIndexData->updateVertexDataIndex(indexVertexDataIndices, indexSubDataCount);
+			pIndexData->updateIndexCount(indexCounts);
+			pIndexData->updateBufferSize(indexBufferSizes);
+			pIndexData->updateVertexDataIndex(indexVertexDataIndices);
 
             pUIObject->setHasClipRect(VG_TRUE);
-            pUIObject->updateClipRects(indexRects, indexSubDataCount);
+            pUIObject->updateClipRects(indexRects);
 		}
 
 

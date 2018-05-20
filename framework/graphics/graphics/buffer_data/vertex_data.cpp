@@ -262,8 +262,9 @@ namespace vg
 		}
     }
 
-    void VertexData::updateVertexCount(fd::ArrayProxy<uint32_t> vertexCounts, uint32_t count, uint32_t offset)
+    void VertexData::updateVertexCount(fd::ArrayProxy<uint32_t> vertexCounts, uint32_t offset)
     {
+        uint32_t count = static_cast<uint32_t>(vertexCounts.size());
         for(uint32_t i = 0; i < count; ++i)
         {
             m_subDatas[offset].vertexCount = *(vertexCounts.data() + i);
@@ -271,8 +272,9 @@ namespace vg
         }
     }
     
-    void VertexData::updateBufferSize(fd::ArrayProxy<uint32_t> bufferSizes, uint32_t count, uint32_t offset)
+    void VertexData::updateBufferSize(fd::ArrayProxy<uint32_t> bufferSizes, uint32_t offset)
     {
+        uint32_t count = static_cast<uint32_t>(bufferSizes.size());
         for(uint32_t i = 0; i < count; ++i)
         {
             m_subDatas[offset].bufferSize = *(bufferSizes.data() + i);
@@ -280,8 +282,9 @@ namespace vg
         }
     }
 
-    void VertexData::updateStateInfo(fd::ArrayProxy<vk::PipelineVertexInputStateCreateInfo> stateInfos, uint32_t count, uint32_t offset)
+    void VertexData::updateStateInfo(fd::ArrayProxy<vk::PipelineVertexInputStateCreateInfo> stateInfos, uint32_t offset)
     {
+        uint32_t count = static_cast<uint32_t>(stateInfos.size());
         for(uint32_t i = 0; i < count; ++i)
         {
             auto &subData = m_subDatas[offset];

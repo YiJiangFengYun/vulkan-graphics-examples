@@ -78,8 +78,9 @@ namespace vg
 		}
 	}
 
-	void BaseVisualObject::setMaterial(fd::ArrayProxy<Material *> pMaterials, uint32_t count, uint32_t offset)
+	void BaseVisualObject::setMaterial(fd::ArrayProxy<Material *> pMaterials, uint32_t offset)
 	{
+		uint32_t count = static_cast<uint32_t>(pMaterials.size());
 		for (uint32_t i = 0; i < count; ++i)
         {
             m_pMaterials[offset] = *(pMaterials.data() + i);
@@ -159,8 +160,9 @@ namespace vg
 		return m_clipRects.data();
 	}
 
-	void BaseVisualObject::updateClipRects(fd::ArrayProxy<fd::Rect2D> rects, uint32_t count, uint32_t offset)
+	void BaseVisualObject::updateClipRects(fd::ArrayProxy<fd::Rect2D> rects, uint32_t offset)
 	{
+		uint32_t count = static_cast<uint32_t>(rects.size());
 		_asyncMeshData();
 		for (uint32_t i = 0; i < count; ++i)
         {

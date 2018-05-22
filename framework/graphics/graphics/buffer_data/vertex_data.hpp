@@ -4,6 +4,7 @@
 #include <foundation/foundation.hpp>
 #include "graphics/global.hpp"
 #include "graphics/buffer_data/buffer_data_option.hpp"
+#include "graphics/buffer_data/buffer_data.hpp"
 
 namespace vg 
 {
@@ -19,17 +20,9 @@ namespace vg
                 , uint32_t bufferSize = 0u
                 , vk::PipelineVertexInputStateCreateInfo vertexInputStateInfo = vk::PipelineVertexInputStateCreateInfo());
         };
-        uint32_t getSubVertexDataCount() const;
-        const SubVertexData *getSubVertexDatas() const;
-        uint32_t getBuffersize() const;
-        const vk::Buffer *getBuffer() const;
-        uint32_t getBufferMemorySize() const;
-        const vk::DeviceMemory *getBufferMemory() const;
-        uint32_t getMemorySize() const;
-        const void *getMemory() const;
+        
 
-        VertexData();
-        VertexData(MemoryPropertyFlags bufferMemoryPropertyFlags);
+        VertexData(vk::MemoryPropertyFlags bufferMemoryPropertyFlags = vk::MemoryPropertyFlags());
 
         ~VertexData();
 
@@ -80,6 +73,10 @@ namespace vg
 
         template<typename VertexType>
         std::vector<VertexType> getVertices(uint32_t offset, uint32_t count) const;
+
+        uint32_t getSubVertexDataCount() const;
+        const SubVertexData *getSubVertexDatas() const;
+        const BufferData &getBufferData() const;
         
     private:
         struct _SubVertexData {
@@ -87,20 +84,11 @@ namespace vg
             std::vector<vk::VertexInputAttributeDescription> attrDescs;
             _SubVertexData();
         };
-        MemoryPropertyFlags m_bufferMemoryPropertyFlags;
+        BufferData m_bufferData;
         std::vector<SubVertexData> m_subDatas;
         std::vector<_SubVertexData> m__subDatas;
         uint32_t m_subDataCount;
-        uint32_t m_bufferSize;
-        std::shared_ptr<vk::Buffer> m_pBuffer;
-        uint32_t m_bufferMemorySize;
-        std::shared_ptr<vk::DeviceMemory> m_pBufferMemory;
-        uint32_t m_memorySize;
-        void *m_pMemory;
-        void *m_pMmemoryForHostVisible;
 
-        Bool32 _isDeviceMemoryLocal() const;
-        void _createBuffer(fd::ArrayProxy<MemorySlice> memories, uint32_t memorySize);
         Bool32 _isEqual(uint32_t subDataCount1, const SubVertexData *pSubDatas1, 
             uint32_t subDataCount2, const SubVertexData *pSubDatas2);
         Bool32 _isEqual(const vk::PipelineVertexInputStateCreateInfo &vertexInputStateInfo1, 

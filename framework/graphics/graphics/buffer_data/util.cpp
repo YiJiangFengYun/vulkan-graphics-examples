@@ -10,6 +10,7 @@ namespace vg
         , uint32_t memorySize
         , Bool32 isDeviceMemoryLocal
         , vk::BufferUsageFlags targetUsage
+        , vk::MemoryPropertyFlags memoryPropertyFlags
         , uint32_t &resultBufferSize
         , std::shared_ptr<vk::Buffer> &resultBuffer
         , uint32_t &resultBufferMemorySize
@@ -71,7 +72,7 @@ namespace vg
 		        memReqs = pDevice->getBufferMemoryRequirements(*resultBuffer);
                 resultBufferMemorySize = static_cast<uint32_t>(memReqs.size);        
 		        allocateInfo.allocationSize = memReqs.size;
-		        allocateInfo.memoryTypeIndex = vg::findMemoryType(pPhysicalDevice, memReqs.memoryTypeBits, vk::MemoryPropertyFlagBits::eDeviceLocal);
+		        allocateInfo.memoryTypeIndex = vg::findMemoryType(pPhysicalDevice, memReqs.memoryTypeBits, memoryPropertyFlags);
 		        resultBufferMemory = fd::allocateMemory(pDevice, allocateInfo);
 		        pDevice->bindBufferMemory(*resultBuffer, *resultBufferMemory, 0u);
             }
@@ -116,7 +117,7 @@ namespace vg
                 resultBufferMemorySize = static_cast<uint32_t>(memReqs.size);  
 		        vk::MemoryAllocateInfo allocateInfo = {
 		        	memReqs.size,
-		        	vg::findMemoryType(pPhysicalDevice, memReqs.memoryTypeBits, vk::MemoryPropertyFlagBits::eHostVisible)
+		        	vg::findMemoryType(pPhysicalDevice, memReqs.memoryTypeBits, memoryPropertyFlags)
 		        };
         
 		        resultBufferMemory = fd::allocateMemory(pDevice, allocateInfo);

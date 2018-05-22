@@ -4,6 +4,7 @@
 #include <foundation/foundation.hpp>
 #include "graphics/global.hpp"
 #include "graphics/buffer_data/buffer_data_option.hpp"
+#include "graphics/buffer_data/buffer_data.hpp"
 
 namespace vg {
      class IndexData : public Base
@@ -40,17 +41,8 @@ namespace vg {
                 , vk::PipelineInputAssemblyStateCreateInfo inputAssemblyStateInfo = vk::PipelineInputAssemblyStateCreateInfo()
                 , uint32_t vertexDataIndex = 0u);
         };
-        uint32_t getSubIndexDataCount() const;
-        const SubIndexData *getSubIndexDatas() const;
-        uint32_t getBufferSize() const;
-        const vk::Buffer *getBuffer() const;
-        uint32_t getBufferMemorySize() const;
-        const vk::DeviceMemory *getBufferMemory() const;
-        uint32_t getMemorySize() const;
-        const void *getMemory() const;
 
-        IndexData();
-        IndexData(MemoryPropertyFlags bufferMemoryPropertyFlags);
+        IndexData(vk::MemoryPropertyFlags bufferMemoryPropertyFlags = vk::MemoryPropertyFlags());
         ~IndexData();
 
         void init(uint32_t subDataCount
@@ -90,21 +82,16 @@ namespace vg {
 
         template<vk::IndexType INDEX_TYPE>
         std::vector<typename IndexTypeInfo<INDEX_TYPE>::ValueType> getIndices(uint32_t offset, uint32_t count) const;
+
+        uint32_t getSubIndexDataCount() const;
+        const SubIndexData *getSubIndexDatas() const;
+        const BufferData &getBufferData() const;
         
      private:
-        MemoryPropertyFlags m_bufferMemoryPropertyFlags;
         std::vector<SubIndexData> m_subDatas;
         uint32_t m_subDataCount;
-        uint32_t m_bufferSize;
-        std::shared_ptr<vk::Buffer> m_pBuffer;
-        uint32_t m_bufferMemorySize;
-        std::shared_ptr<vk::DeviceMemory> m_pBufferMemory;
-        uint32_t m_memorySize;
-        void *m_pMemory;
-        void *m_pMmemoryForHostVisible;
+        BufferData m_bufferData;
         
-        Bool32 _isDeviceMemoryLocal() const;
-        void _createBuffer(fd::ArrayProxy<MemorySlice> memories, uint32_t memorySize);
         Bool32 _isEqual(uint32_t subDataCount1, const SubIndexData *pSubDatas1, 
             uint32_t subDataCount2, const SubIndexData *pSubDatas2);
      };

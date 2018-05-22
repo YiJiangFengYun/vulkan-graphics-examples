@@ -21,49 +21,17 @@ namespace vg
     {
 
     }
-    IndexData::IndexData()
-        : Base(BaseType::INDEX_DATA)
-        , m_bufferMemoryPropertyFlags()
-        , m_subDatas()
-        , m_subDataCount()
-        , m_bufferSize()
-        , m_pBuffer()
-        , m_bufferMemorySize()
-        , m_pBufferMemory()
-        , m_memorySize()
-        , m_pMemory(nullptr)
-    {
-         //default is device local.
-        if (! m_bufferMemoryPropertyFlags) 
-        {
-            m_bufferMemoryPropertyFlags |= MemoryPropertyFlagBits::DEVICE_LOCAL;
-        }
-    }
 
-    IndexData::IndexData(MemoryPropertyFlags bufferMemoryPropertyFlags)
+    IndexData::IndexData(vk::MemoryPropertyFlags bufferMemoryPropertyFlags)
         : Base(BaseType::INDEX_DATA)
-        , m_bufferMemoryPropertyFlags(bufferMemoryPropertyFlags)
         , m_subDatas()
         , m_subDataCount()
-        , m_bufferSize()
-        , m_pBuffer()
-        , m_bufferMemorySize()
-        , m_pBufferMemory()
-        , m_memorySize()
-        , m_pMemory(nullptr)
+        , m_bufferData(bufferMemoryPropertyFlags ? vk::MemoryPropertyFlagBits::eDeviceLocal : bufferMemoryPropertyFlags)
     {
-        //default is device local.
-        if (! m_bufferMemoryPropertyFlags) 
-        {
-            m_bufferMemoryPropertyFlags |= MemoryPropertyFlagBits::DEVICE_LOCAL;
-        }
     }
 
     IndexData::~IndexData()
     {
-        if (m_pMemory != nullptr) {
-            free(m_pMemory);
-        }
     }
 
     uint32_t IndexData::getSubIndexDataCount() const
@@ -76,41 +44,9 @@ namespace vg
         return m_subDatas.data();
     }
 
-    uint32_t IndexData::getBufferSize() const
+    const BufferData &IndexData::getBufferData() const
     {
-        return m_bufferSize;
-    }
-
-    const vk::Buffer *IndexData::getBuffer() const
-    {
-        return m_pBuffer.get();
-    }
-
-    uint32_t IndexData::getBufferMemorySize() const
-    {
-        return m_bufferMemorySize;
-    }
-
-    const vk::DeviceMemory *IndexData::getBufferMemory() const
-    {
-        return m_pBufferMemory.get();
-    }
-
-    uint32_t IndexData::getMemorySize() const
-    {
-        return m_memorySize;
-    }
-
-    const void *IndexData::getMemory() const
-    {
-        if (_isDeviceMemoryLocal() == VG_TRUE)
-        {
-            return m_pMemory;            
-        }
-        else
-        {
-            return m_pMmemoryForHostVisible;
-        }
+        return m_bufferData;
     }
 
     void IndexData::init(uint32_t subDataCount
@@ -279,33 +215,7 @@ namespace vg
            , Bool32 cacheMemory
            )
     {
-        //Caching memory when memory is device local.
-        cacheMemory = cacheMemory && _isDeviceMemoryLocal();
-        if (m_pMemory != nullptr && (m_memorySize < size || ! cacheMemory)) {
-            free(m_pMemory);
-            m_pMemory = nullptr;
-            m_memorySize = 0;
-        }
-
-		if (size)
-		{
-			if (cacheMemory) {
-				if (m_pMemory == nullptr) {
-					m_pMemory = malloc(size);
-					m_memorySize = size;
-				}
-				uint32_t count = memories.size();
-				uint32_t offset = 0;
-				uint32_t size = 0;
-				for (uint32_t i = 0; i < count; ++i) {
-					offset = (*(memories.data() + i)).offset;
-					size = (*(memories.data() + i)).size;
-					memcpy(((char*)m_pMemory + offset), (*(memories.data() + i)).pMemory, size);
-				}
-			}
-
-			_createBuffer(memories, size);
-		}
+        m_bufferData.updateBuffer(memories, size, cacheMemory);
     }
 
     template<vk::IndexType INDEX_TYPE>
@@ -342,25 +252,6 @@ namespace vg
     
     //template instantiation
     template std::vector<typename IndexData::IndexTypeInfo<vk::IndexType::eUint32>::ValueType> IndexData::getIndices<vk::IndexType::eUint32>(uint32_t offset, uint32_t count) const;
-
-
-    Bool32 IndexData::_isDeviceMemoryLocal() const
-    {
-        return (m_bufferMemoryPropertyFlags & MemoryPropertyFlagBits::DEVICE_LOCAL) == MemoryPropertyFlagBits::DEVICE_LOCAL;
-    }
-    
-    void IndexData::_createBuffer(fd::ArrayProxy<MemorySlice> memories, uint32_t memorySize)
-    {
-        createBufferForBufferData(memories, 
-            memorySize, 
-            _isDeviceMemoryLocal(), 
-            vk::BufferUsageFlagBits::eIndexBuffer,
-            m_bufferSize,
-            m_pBuffer,
-            m_bufferMemorySize,
-            m_pBufferMemory,
-            &m_pMmemoryForHostVisible);
-    }
 
     Bool32 IndexData::_isEqual(uint32_t subDataCount1, const SubIndexData *pSubDatas1, 
             uint32_t subDataCount2, const SubIndexData *pSubDatas2)

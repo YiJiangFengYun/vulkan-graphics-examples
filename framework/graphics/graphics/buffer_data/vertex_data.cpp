@@ -24,51 +24,16 @@ namespace vg
 
     }
 
-    VertexData::VertexData()
+    VertexData::VertexData(vk::MemoryPropertyFlags bufferMemoryPropertyFlags)
         : Base(BaseType::VERTEX_DATA)
-        , m_bufferMemoryPropertyFlags()
+        , m_bufferData(bufferMemoryPropertyFlags ? bufferMemoryPropertyFlags : vk::MemoryPropertyFlagBits::eDeviceLocal)
         , m_subDatas()
         , m_subDataCount()
-        , m_bufferSize(0u)
-        , m_pBuffer()
-        , m_bufferMemorySize()
-        , m_pBufferMemory()
-        , m_memorySize()
-        , m_pMemory(nullptr)
-        , m_pMmemoryForHostVisible(nullptr)
     {
-        //default is device local.
-        if (! m_bufferMemoryPropertyFlags) 
-        {
-            m_bufferMemoryPropertyFlags |= MemoryPropertyFlagBits::DEVICE_LOCAL;
-        }
-    }
-
-    VertexData::VertexData(MemoryPropertyFlags bufferMemoryPropertyFlags)
-        : Base(BaseType::VERTEX_DATA)
-        , m_bufferMemoryPropertyFlags(bufferMemoryPropertyFlags)
-        , m_subDatas()
-        , m_subDataCount()
-        , m_bufferSize(0u)
-        , m_pBuffer()
-        , m_bufferMemorySize()
-        , m_pBufferMemory()
-        , m_memorySize()
-        , m_pMemory(nullptr)
-        , m_pMmemoryForHostVisible(nullptr)
-    {
-        //default is device local.
-        if (! m_bufferMemoryPropertyFlags) 
-        {
-            m_bufferMemoryPropertyFlags |= MemoryPropertyFlagBits::DEVICE_LOCAL;
-        }
     }
 
     VertexData::~VertexData()
     {
-        if (m_pMemory != nullptr) {
-            free(m_pMemory);
-        }
     }
     
     uint32_t VertexData::getSubVertexDataCount() const
@@ -81,41 +46,9 @@ namespace vg
         return m_subDatas.data();
     }
 
-    uint32_t VertexData::getBuffersize() const
+    const BufferData &VertexData::getBufferData() const
     {
-        return m_bufferSize;
-    }
-
-    const vk::Buffer *VertexData::getBuffer() const
-    {
-        return m_pBuffer.get();
-    }
-
-    uint32_t VertexData::getBufferMemorySize() const
-    {
-        return m_bufferMemorySize;
-    }
-
-    const vk::DeviceMemory *VertexData::getBufferMemory() const
-    {
-        return m_pBufferMemory.get();
-    }
-
-    uint32_t VertexData::getMemorySize() const
-    {
-        return m_memorySize;
-    }
-
-    const void *VertexData::getMemory() const
-    {
-        if (_isDeviceMemoryLocal() == VG_TRUE)
-        {
-            return m_pMemory;            
-        }
-        else
-        {
-            return m_pMmemoryForHostVisible;
-        }
+        return m_bufferData;
     }
 
     void VertexData::init(uint32_t subDataCount, 
@@ -322,52 +255,9 @@ namespace vg
            , Bool32 cacheMemory
            )
     {
-        //Caching memory when memory is device local.
-        cacheMemory = cacheMemory && _isDeviceMemoryLocal();
-        if (m_pMemory != nullptr && (m_memorySize < size || ! cacheMemory)) {
-            free(m_pMemory);
-            m_pMemory = nullptr;
-            m_memorySize = 0;
-        }
-
-		if (size)
-		{
-			if (cacheMemory) {
-				if (m_pMemory == nullptr) {
-					m_pMemory = malloc(size);
-					m_memorySize = size;
-				}
-				uint32_t count = memories.size();
-				uint32_t offset = 0;
-				uint32_t size = 0;
-				for (uint32_t i = 0; i < count; ++i) {
-					offset = (*(memories.data() + i)).offset;
-					size = (*(memories.data() + i)).size;
-					memcpy(((char*)m_pMemory + offset), (*(memories.data() + i)).pMemory, size);
-				}
-			}
-			_createBuffer(memories, size);
-		}
+        m_bufferData.updateBuffer(memories, size, cacheMemory);
     }
-
-    Bool32 VertexData::_isDeviceMemoryLocal() const
-    {
-        return (m_bufferMemoryPropertyFlags & MemoryPropertyFlagBits::DEVICE_LOCAL) == MemoryPropertyFlagBits::DEVICE_LOCAL;
-    }
-
-    void VertexData::_createBuffer(fd::ArrayProxy<MemorySlice> memories, uint32_t memorySize)
-    {
-		createBufferForBufferData(memories, 
-            memorySize, 
-            _isDeviceMemoryLocal(), 
-            vk::BufferUsageFlagBits::eVertexBuffer,
-            m_bufferSize,
-            m_pBuffer,
-            m_bufferMemorySize,
-            m_pBufferMemory,
-            &m_pMmemoryForHostVisible);
-    }
-
+    
     Bool32 VertexData::_isEqual(uint32_t subDataCount1, const SubVertexData *pSubDatas1, 
             uint32_t subDataCount2, const SubVertexData *pSubDatas2)
     {

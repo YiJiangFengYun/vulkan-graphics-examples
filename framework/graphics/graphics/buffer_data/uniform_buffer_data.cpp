@@ -53,7 +53,9 @@ namespace vg
 
     }
 
-    UniformBufferData::SubData::SubData(SubDataInfo info, std::shared_ptr<vk::Buffer> pBuffer, std::shared_ptr<vk::DescriptorPool> pDescriptorPool)
+    UniformBufferData::SubData::SubData(SubDataInfo info
+        , const vk::Buffer *pBuffer
+        , const vk::DescriptorPool *pDescriptorPool)
         : m_layoutBindingCount(0u)
         , m_layoutBindings()
         , m_descriptorInfos()
@@ -70,7 +72,9 @@ namespace vg
 	{
 	}
 
-    void UniformBufferData::SubData::init(SubDataInfo info, std::shared_ptr<vk::Buffer> pBuffer, std::shared_ptr<vk::DescriptorPool> pDescriptorPool)
+    void UniformBufferData::SubData::init(SubDataInfo info
+        , const vk::Buffer *pBuffer
+        , const vk::DescriptorPool *pDescriptorPool)
     {
         //Check if layout binding is changed.
         Bool32 layoutBindingChanged = VG_FALSE;
@@ -130,7 +134,7 @@ namespace vg
 		    		1u,
 		    		layouts
 		    	};
-		    	m_pDescriptorSet = fd::allocateDescriptorSet(pDevice, m_pDescriptorPool.get(), allocateInfo);
+		    	m_pDescriptorSet = fd::allocateDescriptorSet(pDevice, m_pDescriptorPool, allocateInfo);
 		    }
 		    else
 		    {
@@ -246,48 +250,20 @@ namespace vg
     {
         return m_pDescriptorSet.get();
     }
-
-    UniformBufferData::UniformBufferData()
+        
+    UniformBufferData::UniformBufferData(vk::MemoryPropertyFlags bufferMemoryPropertyFlags)
         : Base(BaseType::UNIFORM_BUFFER_DATA)
-        , m_bufferMemoryPropertyFlags()
+        , m_bufferData(bufferMemoryPropertyFlags ? bufferMemoryPropertyFlags : vk::MemoryPropertyFlagBits::eHostVisible)
         , m_subDataCount()
         , m_subDatas()
-        , m_bufferSize()
-        , m_pBuffer()
-        , m_bufferMemorySize()
-        , m_pBufferMemory()
-        , m_memorySize(0u)
-        , m_pMemory(nullptr)
-        , m_pMmemoryForHostVisible(nullptr)
         , m_poolMaxSetCount()
         , m_poolSizeInfos(0u)
         , m_pDescriptorPool()
     {
-        //default is host visible.
-        if (! m_bufferMemoryPropertyFlags) 
-        {
-            m_bufferMemoryPropertyFlags |= MemoryPropertyFlagBits::HOST_VISIBLE;
-        }
-    }
-        
-    UniformBufferData::UniformBufferData(MemoryPropertyFlags bufferMemoryPropertyFlags)
-        : UniformBufferData()
-    {
-        m_bufferMemoryPropertyFlags = bufferMemoryPropertyFlags;
-        //default is host visible.
-        if (! m_bufferMemoryPropertyFlags) 
-        {
-            m_bufferMemoryPropertyFlags |= MemoryPropertyFlagBits::HOST_VISIBLE;
-        }
     }
 
     UniformBufferData::~UniformBufferData()
     {
-        if (m_pMemory != nullptr)
-        {
-            free(m_pMemory);
-        }
-
     }
 
     void UniformBufferData::init(uint32_t subDataCount
@@ -318,32 +294,7 @@ namespace vg
         , Bool32 cacheMemory
         )
     {
-        //Caching memory when memory is device local.
-        cacheMemory = cacheMemory && _isDeviceMemoryLocal();
-        if (m_pMemory != nullptr && (m_memorySize < size || ! cacheMemory)) {
-            free(m_pMemory);
-            m_pMemory = nullptr;
-            m_memorySize = 0;
-        }
-
-        if (size)
-		{
-			if (cacheMemory) {
-				if (m_pMemory == nullptr) {
-					m_pMemory = malloc(size);
-					m_memorySize = size;
-				}
-				uint32_t count = memories.size();
-				uint32_t offset = 0;
-				uint32_t size = 0;
-				for (uint32_t i = 0; i < count; ++i) {
-					offset = (*(memories.data() + i)).offset;
-					size = (*(memories.data() + i)).size;
-					memcpy(((char*)m_pMemory + offset), (*(memories.data() + i)).pMemory, size);
-				}
-			}
-			_createBuffer(memories, size);
-		}
+        m_bufferData.updateBuffer(memories, size, cacheMemory);
     }
 
     void UniformBufferData::updateSubDataCount(uint32_t count)
@@ -456,10 +407,11 @@ namespace vg
             }
 
             uint32_t offset = subDataOffset;
+            auto pBuffer = m_bufferData.getBuffer();
             for (uint32_t i = 0; i < subDataCount; ++i, ++offset)
             {
                 auto &subData = m_subDatas[offset];
-                subData.init(*(pSubDataInfos + i), m_pBuffer, m_pDescriptorPool);
+                subData.init(*(pSubDataInfos + i), pBuffer, m_pDescriptorPool.get());
             }
         }
     }
@@ -473,58 +425,15 @@ namespace vg
     {
         return m_subDatas.data();
     }
-        
-    uint32_t UniformBufferData::getBufferSize() const
-    {
-        return m_bufferSize;
-    }
 
-    const vk::Buffer *UniformBufferData::getBuffer() const
+    const BufferData &UniformBufferData::getBufferData() const
     {
-        return m_pBuffer.get();
-    }
-
-    uint32_t UniformBufferData::getBufferMemorySize() const
-    {
-        return m_bufferMemorySize;
-    }
-
-    const vk::DeviceMemory *UniformBufferData::getBufferMemory() const
-    {
-        return m_pBufferMemory.get();
-    }
-
-    uint32_t UniformBufferData::getMemorySize() const
-    {
-        return m_memorySize;
-    }
-
-    const void *UniformBufferData::getMemory() const
-    {
-        return m_pMemory;
+        return m_bufferData;
     }
 
     const vk::DescriptorPool *UniformBufferData::getDescriptorPool() const
     {
         return m_pDescriptorPool.get();
-    }
-
-    Bool32 UniformBufferData::_isDeviceMemoryLocal() const
-    {
-        return (m_bufferMemoryPropertyFlags & MemoryPropertyFlagBits::DEVICE_LOCAL) == MemoryPropertyFlagBits::DEVICE_LOCAL;
-    }
-
-    void UniformBufferData::_createBuffer(fd::ArrayProxy<MemorySlice> memories, uint32_t memorySize)
-    {
-		createBufferForBufferData(memories, 
-            memorySize, 
-            _isDeviceMemoryLocal(), 
-            vk::BufferUsageFlagBits::eUniformBuffer,
-            m_bufferSize,
-            m_pBuffer,
-            m_bufferMemorySize,
-            m_pBufferMemory,
-            &m_pMmemoryForHostVisible);
     }
 
     Bool32 UniformBufferData::_isEqual(uint32_t subDataCount1, const SubData *pSubDatas1, uint32_t subDataOffset1,

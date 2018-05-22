@@ -11,6 +11,7 @@ namespace vg
         , uint32_t memorySize
         , Bool32 isDeviceMemoryLocal
         , vk::BufferUsageFlags targetUsage
+        , vk::MemoryPropertyFlags memoryPropertyFlags
         , uint32_t &resultBufferSize
         , std::shared_ptr<vk::Buffer> &resultBuffer
         , uint32_t &resultBufferMemorySize

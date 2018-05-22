@@ -8,8 +8,9 @@
 
 namespace vg
 {
+//only map
 	template <typename T>
-	inline Bool32 isHas(std::string name, std::unordered_map<std::string, T>& map)
+	inline Bool32 hasValue(std::string name, const std::unordered_map<std::string, T>& map)
 	{
 		return map.count(name) != 0;
 	}
@@ -31,7 +32,26 @@ namespace vg
 	template <typename T>
 	inline void setValue(std::string name, const T& value, std::unordered_map<std::string, T>& map)
 	{
-		map[name] = value;
+		const auto& iterator = map.find(name);
+		if (iterator == map.cend())
+		{
+			throw std::runtime_error("Map don't has item whose key: " + name);
+		}
+		else
+		{
+			iterator->second = value;
+		}
+	}
+
+	template <typename T>
+	inline void addValue(std::string name, const T& value, std::unordered_map<std::string, T>& map)
+	{
+		const auto& iterator = map.find(name);
+		if (iterator != map.cend())
+		{
+			throw std::runtime_error("Map has exist the item whose key: " + name);
+		}
+		map.insert({name, value});
 	}
 
 	template <typename T>
@@ -40,26 +60,62 @@ namespace vg
 		map.erase(name);
 	}
 
+//array and map
+    template <typename T>
+	inline Bool32 hasValue(std::string name, const std::unordered_map<std::string, T>& map, const std::vector<std::string>& arr)
+	{
+		return map.count(name) != 0;
+	}
+
 	template <typename T>
-	inline void setValue(std::string name, const T& value, std::unordered_map<std::string, T>& map, std::vector<std::string>& arr)
+	inline const T& getValue(std::string name, const std::unordered_map<std::string, T>& map, const std::vector<std::string>& arr)
+	{
+		const auto& iterator = map.find(name);
+		if (iterator == map.cend())
+		{
+			throw std::runtime_error("Map don't has item whose key: " + name);
+		}
+		else
+		{
+			return iterator->second;
+		}
+	}
+
+	template <typename T>
+	inline void setValue(std::string name, const T& value, std::unordered_map<std::string, T>& map, 
+	    std::vector<std::string>& arr)
 	{
 		{
 			const auto& iterator = map.find(name);
-			if (iterator == map.cend())
-			{
-				map.insert({ name, value });
-			}
-			else
-			{
-				iterator->second = value;
-			}
+		    if (iterator == map.cend())
+		    {
+		    	throw std::runtime_error("Map don't has item whose key: " + name);
+		    }
+		    else
+		    {
+		    	iterator->second = value;
+		    }
+		}
+	}
+
+	template <typename T>
+	inline void addValue(std::string name, const T& value, std::unordered_map<std::string, T>& map, std::vector<std::string>& arr)
+	{
+		{
+		    const auto& iterator = map.find(name);
+		    if (iterator != map.cend())
+		    {
+		    	throw std::runtime_error("Map has exist the item whose key: " + name);
+		    }
+		    map.insert({name, value});
 		}
 		{
 			auto iterator = std::find(arr.begin(), arr.end(), name);
-			if (iterator == arr.end())
+			if (iterator != arr.end())
 			{
-				arr.push_back(name);
+				throw std::runtime_error("Array has exist the item whose value: " + name);
 			}
+			arr.push_back(name);
 		}
 	}
 
@@ -67,12 +123,8 @@ namespace vg
 	inline void removeValue(std::string name, std::unordered_map<std::string, T>& map, std::vector<std::string>& arr)
 	{
 		map.erase(name);
-
 		auto iterator = std::find(arr.begin(), arr.end(), name);
-		if (iterator != arr.end())
-		{
-			arr.erase(iterator);
-		}
+		arr.erase(iterator);
 	}
 
 	template <typename T>

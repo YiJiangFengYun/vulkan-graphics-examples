@@ -2,45 +2,165 @@
 
 namespace vg
 {
-	PassData::TexData::TexData(const Texture *pTexture
-	    , const Texture::ImageView *pImageView
-		, const Texture::Sampler *pSampler
-		, vk::ImageLayout imageLayout
-		)
-		: pTexture(pTexture)
-		, pImageView(pImageView)
-		, pSampler(pSampler)
-		, imageLayout(imageLayout)
+	PassDataInfo::PassDataInfo(uint32_t layoutPriority
+		, vk::ShaderStageFlags shaderStageFlags
+		, uint32_t size
+	    )
+		: layoutPriority(layoutPriority)
+		, shaderStageFlags(shaderStageFlags)
+		, size(size)
+	{
+		const auto &pPhysicalDevice = pApp->getPhysicalDevice();
+		const auto &properties = pPhysicalDevice->getProperties();
+		const auto &minOffsetAlignment = static_cast<float>(properties.limits.minUniformBufferOffsetAlignment);
+		bufferSize = static_cast<uint32_t>(std::ceil(size / minOffsetAlignment) * minOffsetAlignment);
+	}
+
+	PassDataInfo::PassDataInfo(const PassDataInfo &target)
+	    : layoutPriority(target.layoutPriority)
+		, shaderStageFlags(target.shaderStageFlags)
+		, size(target.size)
+		, bufferSize(target.bufferSize)
 	{
 
 	}
 
-	PassData::TexData::TexData(const TexData &target)
+	PassDataInfo& PassDataInfo::operator=(const PassDataInfo &target)
+	{
+		layoutPriority = target.layoutPriority;
+		shaderStageFlags = target.shaderStageFlags;
+		size = target.size;
+		bufferSize = target.bufferSize;
+	}
+
+	PassTextureInfo::PassTextureInfo(const Texture *pTexture
+	    , const Texture::ImageView *pImageView
+		, const Texture::Sampler *pSampler
+		, vk::ImageLayout imageLayout
+		, uint32_t bindingPriority
+		, ImageDescriptorType descriptorType
+		, vk::ShaderStageFlags stageFlags
+	)
+	    : pTexture(pTexture)
+		, pImageView(pImageView)
+		, pSampler(pSampler)
+		, imageLayout(imageLayout)
+		, bindingPriority(bindingPriority)
+		, descriptorType(descriptorType)
+		, stageFlags(stageFlags)
+	{
+
+	}
+
+	PassTextureInfo::PassTextureInfo(const PassTextureInfo &target)
 	    : pTexture(target.pTexture)
 		, pImageView(target.pImageView)
 		, pSampler(target.pSampler)
 		, imageLayout(target.imageLayout)
+		, bindingPriority(target.bindingPriority)
+		, descriptorType(target.descriptorType)
+		, stageFlags(target.stageFlags)
 	{
-		
+
 	}
 
-	PassData::TexData &PassData::TexData::operator=(const TexData &target)
+	PassTextureInfo& PassTextureInfo::operator=(const PassTextureInfo &target)
 	{
 		pTexture = target.pTexture;
 		pImageView = target.pImageView;
 		pSampler = target.pSampler;
 		imageLayout = target.imageLayout;
+		bindingPriority = target.bindingPriority;
+		descriptorType = target.descriptorType;
+		stageFlags = target.stageFlags;
 		return *this;
 	}
 
-    PassData::TexData PassData::getTexture(std::string name) const
+
+	PassBufferInfo::PassBufferInfo(const BufferData *pBuffer
+		, uint32_t offset
+		, uint32_t range
+		, uint32_t bindingPriority
+		, BufferDescriptorType descriptorType
+		, vk::ShaderStageFlags stageFlags
+		)
+		: bufferData(bufferData)
+		, bindingPriority(bindingPriority)
+		, descriptorType(descriptorType)
+		, stageFlags(stageFlags)
 	{
-		return getValue(name, mapTextures);
+		
 	}
 
-	void PassData::setTexture(std::string name, TexData texData)
+	PassBufferInfo::PassBufferInfo(const PassBufferInfo &target)
+	    : pBuffer(target.pBuffer)
+		, offset(target.offset)
+		, range(target.range)
+		, bindingPriority(target.bindingPriority)
+		, descriptorType(target.descriptorType)
+		, stageFlags(target.stageFlags)
 	{
-		setValue(name, texData, mapTextures, arrTexNames);
+
+	}
+
+	PassBufferInfo& PassBufferInfo::operator=(const PassBufferInfo &target)
+	{
+		pBuffer = target.pBuffer;
+		offset = target.offset;
+		range = target.range;
+		bindingPriority = target.bindingPriority;
+		descriptorType = target.descriptorType;
+		stageFlags = target.stageFlags;
+	}
+
+	Bool32 PassData::hasBuffer(std::string name) const
+	{
+		return hasValue<PassBufferInfo>(name, mapBuffers);
+	}
+
+	void PassData::addBuffer(std::string name, PassBufferInfo bufferInfo)
+	{
+		addValue(name, bufferInfo, mapBuffers, arrBufferNames);
+	}
+
+	void PassData::removeBuffer(std::string name)
+	{
+		removeValue(name, mapBuffers, arrBufferNames);
+	}
+
+	PassBufferInfo PassData::getBuffer(std::string name)
+	{
+		return getValue(name, mapBuffers, arrBufferNames);
+	}
+
+	void PassData::setBuffer(std::string name, PassBufferInfo bufferInfo)
+	{
+		setValue(name, bufferInfo, mapBuffers, arrBufferNames);
+	}
+
+	Bool32 PassData::hasTexture(std::string name) const
+	{
+		return hasValue<PassTextureInfo>(name, mapTextures);
+	}
+		
+	void PassData::addTexture(std::string name, PassTextureInfo texInfo)
+	{
+		addValue(name, texInfo, mapTextures, arrTexNames);
+	}
+		
+	void PassData::removeTexture(std::string name)
+	{
+		removeValue(name, mapTextures, arrTexNames);
+	}
+
+    PassTextureInfo PassData::getTexture(std::string name) const
+	{
+		return getValue(name, mapTextures, arrTexNames);
+	}
+
+	void PassData::setTexture(std::string name, PassTextureInfo texInfo)
+	{
+		setValue(name, texInfo, mapTextures, arrTexNames);
 	}
 
 	uint32_t PassData::getDataBaseSize(const std::string name) const
@@ -56,25 +176,46 @@ namespace vg
 		return static_cast<uint32_t>(bytes.size());
 	}
 
-	void PassData::getDataValue(const std::string name, void *dst, uint32_t size, uint32_t offset) const
+	Bool32 PassData::hasData(std::string name) const
 	{
-		const auto& bytes = getValue(name, mapDatas);		
+		return hasValue<std::vector<Byte>>(name, mapDatas);
+	}
+		
+	void PassData::removeData(std::string name)
+	{
+		removeValue(name, mapDatas);
+		removeValue(name, mapDataCounts);
+	}
+
+	void PassData::addData(const std::string name, void *src, uint32_t size)
+	{
+		std::vector<Byte> temp(size);
+		memcpy(temp.data(), src, size);
+		addValue(name, temp, mapDatas, arrDataNames);
+		addValue(name, 1u, mapDataCounts);
+	}
+
+	void PassData::getData(const std::string name, void *dst, uint32_t size, uint32_t offset) const
+	{
+		const auto &bytes = getValue(name, mapDatas);		
 		if (offset + size > static_cast<uint32_t>(bytes.size()))
 		    throw std::range_error("Out range of the saved material data!");
 		memcpy(dst, (char *)(bytes.data()) + offset, size);
 	}
 
-	void PassData::setDataValue(const std::string name, void *src, uint32_t size, uint32_t offset)
+	void PassData::setData(const std::string name, void *src, uint32_t size, uint32_t offset)
 	{
-		if (offset + size > static_cast<uint32_t>(mapDatas[name].size()))
-		    mapDatas[name].resize(size);
-		if(src) memcpy((char *)(mapDatas[name].data()) + offset, src, size);
-		auto iterator = std::find(arrDataNames.begin(), arrDataNames.end(), name);
-		if (iterator == arrDataNames.end())
+		const auto& iterator = mapDatas.find(name);
+		if (iterator == mapDatas.cend())
 		{
-			arrDataNames.push_back(name);
+			throw std::runtime_error("Map don't has item whose key: " + name);
 		}
-		mapDataCounts[name] = 1u;
+		else
+		{
+			if (offset + size > static_cast<uint32_t>(mapDatas[name].size()))
+		        mapDatas[name].resize(offset + size);
+		    if(src) memcpy((char *)(mapDatas[name].data()) + offset, src, size);
+		}
 	}
 
 	void PassData::memoryCopyData(const std::string name

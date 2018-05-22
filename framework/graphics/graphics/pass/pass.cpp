@@ -166,99 +166,6 @@ namespace vg
 		return m_size;
 	}
 
-	Pass::LayoutBindingInfo::LayoutBindingInfo(std::string name
-		, Bool32 isTexture
-		, uint32_t bindingPriority
-		, DescriptorType descriptorType
-		, uint32_t descriptorCount
-		, ShaderStageFlags stageFlags
-	) 
-		: name(name)
-		, isTexture(isTexture)
-		, bindingPriority(bindingPriority)
-		, descriptorType(descriptorType)
-		, descriptorCount(descriptorCount)
-		, stageFlags(stageFlags)
-	{
-	}
-
-	Pass::LayoutBindingInfo::LayoutBindingInfo(const LayoutBindingInfo & target)
-		: name(target.name)
-		, isTexture(target.isTexture)
-		, bindingPriority(target.bindingPriority)
-		, descriptorType(target.descriptorType)
-		, descriptorCount(target.descriptorCount)
-		, stageFlags(target.stageFlags)
-		, size(target.size)
-		, bufferSize(target.bufferSize)
-	{
-
-	}
-
-	Pass::LayoutBindingInfo& Pass::LayoutBindingInfo::operator=(const LayoutBindingInfo &target)
-	{
-		name = target.name;
-		isTexture = target.isTexture;
-		bindingPriority = target.bindingPriority;
-		descriptorType = target.descriptorType;
-		descriptorCount = target.descriptorCount;
-		stageFlags = target.stageFlags;
-		size = target.size;
-		bufferSize = target.bufferSize;
-
-		return *this;
-	}
-
-	void Pass::LayoutBindingInfo::updateSize(const PassData *pPassData)
-	{
-		if (isTexture)
-		{
-			size = 0u;
-			bufferSize = 0u;
-			return;
-		}
-		const auto &pPhysicalDevice = pApp->getPhysicalDevice();
-		const auto &properties = pPhysicalDevice->getProperties();
-		const auto &minOffsetAlignment = static_cast<float>(properties.limits.minUniformBufferOffsetAlignment);
-		size = pPassData->getDataBaseSize(name) * descriptorCount;
-		bufferSize = static_cast<uint32_t>(std::ceil(size / minOffsetAlignment) * minOffsetAlignment);
-	}
-
-	void Pass::LayoutBindingInfo::updateSize(const uint32_t dataSize)
-	{
-		if (isTexture)
-		{
-			size = 0u;
-			bufferSize = 0u;
-			return;
-		}
-		const auto &pPhysicalDevice = pApp->getPhysicalDevice();
-		const auto &properties = pPhysicalDevice->getProperties();
-		const auto &minOffsetAlignment = static_cast<float>(properties.limits.minUniformBufferOffsetAlignment);
-		size = dataSize;
-		bufferSize = static_cast<uint32_t>(std::ceil(size / minOffsetAlignment) * minOffsetAlignment);
-	}
-
-	Bool32 Pass::LayoutBindingInfo::operator ==(const LayoutBindingInfo& target) const
-	{
-		return name == target.name 
-			&& isTexture == target.isTexture 
-			&& bindingPriority == target.bindingPriority 
-			&& descriptorType == target.descriptorType 
-			&& descriptorCount == target.descriptorCount 
-			&& stageFlags == target.stageFlags;
-	}
-
-	Bool32 Pass::LayoutBindingInfo::operator !=(const LayoutBindingInfo& target) const
-	{
-		return ! (*this == target);
-	}
-
-	Bool32 Pass::LayoutBindingInfo::operator<(const LayoutBindingInfo & target) const
-	{
-		return bindingPriority < target.bindingPriority;
-	}
-
 	Pass::VertexInputFilterInfo::VertexInputFilterInfo(Bool32 filterEnable
 		, uint32_t locationCount
 		, uint32_t * pBindings
@@ -273,28 +180,21 @@ namespace vg
 
 	Pass::Pass() 
 		: Base(BaseType::PASS)
-		, m_arrLayoutBindNames()
-		, m_mapLayoutBinds()
-		, m_pUniformBuffer()
-		, m_pUniformBufferMemory()
-		, m_uniformBufferSize(0u)
-		, m_pDescriptorSetLayout()
-		, m_pPipelineLayout()
-		, m_pDescriptorPool()
-		, m_pDescriptorSet()
-		, m_applied(VG_FALSE)		
-		, m_pData(new PassData())
+		, m_data()
 		, m_dataChanged(VG_FALSE)
 		, m_textureChanged(VG_FALSE)
-		, m_polygonMode(PolygonMode::FILL)
-		, m_cullMode(CullModeFlagBits::BACK)
-		, m_frontFace(FrontFaceType::COUNTER_CLOCKWISE)
-		, m_lineWidth(1.0f)
-		, m_viewport(0.0f, 0.0f, 1.0f, 1.0f, 0.0f, 1.0f)
-		, m_scissor(0.0f, 0.0f, 1.0f, 1.0f)
+		, m_bufferChanged(VG_FALSE)
+		, m_polygonMode()
+		, m_cullMode()
+		, m_frontFace()
+		, m_viewport()
+		, m_scissor()
 		, m_depthStencilInfo()
 		, m_colorBlendAttachmentStates()
 		, m_colorBlendInfo()
+		, m_lineWidth(1.0f)
+		, m_instanceCount(1u)
+		, m_subpass(0u)		
 		, m_defaultInputAssemblyState()
 		, m_mapSpecilizationDatas()
 		, m_mapPushConstantRanges()
@@ -306,21 +206,24 @@ namespace vg
 		, m_buildInDataCache()
 		, m_extUniformBufferCount()
 		, m_extUniformBuffers()
-		, m_pipelineStateID()
-		, m_lastBindings()
-		, m_lastLayoutBindNames()
-		, m_lastLayoutBinds()
-		, m_lastPushConstantRanges()
-		, m_lastsetLayouts()
-		, m_lastPoolSizeInfos()
-		, m_needReAllocateDescriptorSet(VG_FALSE)
-		, m_needUpdateDescriptorInfo(VG_FALSE)
-		, m_usingDescriptorSets()
-		, m_usingDynamicOffsets()
-		, m_instanceCount(1u)
-		, m_subpass(0u)
 		, m_vertexInputFilterInfo()
 		, m_vertexInputFilterLocations()
+
+		, m_dataBuffer()
+	    , m_layoutBindingCount()
+		, m_layoutBindings()
+		, m_pDescriptorSetLayout(nullptr)
+		, m_poolSizeInfos()
+		, m_pDescriptorPool(nullptr)
+		, m_pDescriptorSet(nullptr)
+		, m_descriptorSetsChanged(VG_FALSE)
+		, m_descriptorSetLayouts()
+		, m_descriptorSets()
+		, m_dynamicOffsets()
+		, m_pPipelineLayout(nullptr)
+		, m_pipelineLayoutChanged(VG_FALSE)
+		, m_pipelineStateID()
+		
 	{
 		_initDefaultBuildInDataInfo();
 		_initBuildInData();
@@ -355,94 +258,88 @@ namespace vg
 		_updatePipelineStateID();
 	}
 
-	const Texture *Pass::getTexture(std::string name) const
+	Bool32 Pass::hasBuffer(std::string name) const
 	{
-		return m_pData->getTexture(name).pTexture;
+		return m_data.hasBuffer(name);
 	}
-	void Pass::setTexture(std::string name
-		, const Texture *pTex
-		, uint32_t binding
-		, ShaderStageFlags stageFlags
-		, DescriptorType descriptorType
-		, const Texture::ImageView *pImageView
-		, const Texture::Sampler *pSampler
-		, vk::ImageLayout imageLayout
-	)
+
+	void Pass::addBuffer(std::string name, PassBufferInfo bufferInfo)
 	{
-		PassData::TexData data = {
-			pTex,
-			pImageView,
-			pSampler,
-			imageLayout,
-		};
-		m_pData->setTexture(name, data);
-		//update layout binding information.
-		uint32_t descriptorCount = 1u;
-		LayoutBindingInfo info = {
-			name,
-			VG_TRUE,
-			binding,
-			descriptorType,
-			descriptorCount,
-			stageFlags,
-		};
-		info.updateSize(m_pData.get());
-		setValue(name, info, m_mapLayoutBinds, m_arrLayoutBindNames);
-		m_applied = VG_FALSE;
+		m_data.addBuffer(name, bufferInfo);
+		m_bufferChanged = VG_TRUE;
+	}
+
+	void Pass::removeBuffer(std::string name)
+	{
+		m_data.removeBuffer(name);
+		m_bufferChanged = VG_TRUE;
+	}
+
+	PassBufferInfo Pass::getBuffer(std::string name)
+	{
+		return m_data.getBuffer(name);
+	}
+		
+	void Pass::setBuffer(std::string name, PassBufferInfo bufferInfo)
+	{
+		m_data.setBuffer(name, bufferInfo);
+		m_bufferChanged = VG_TRUE;
+	}
+
+	Bool32 Pass::hasTexture(std::string name) const
+	{
+		return m_data.hasTexture(name);
+	}
+
+	void Pass::addTexture(std::string name, PassTextureInfo texInfo)
+	{
+		m_data.addTexture(name, texInfo);
 		m_textureChanged = VG_TRUE;
 	}
 
-	void Pass::getDataValue(const std::string name, void *dst, uint32_t size, uint32_t offset) const
+	void Pass::removeTexture(std::string name)
 	{
-		m_pData->getDataValue(name, dst, size, offset);
+		m_data.removeTexture(name);
+		m_textureChanged = VG_TRUE;
 	}
 
-	void Pass::setDataValue(const std::string name
-		    , void *src, uint32_t size, uint32_t offset
-			, uint32_t bindingPriority
-			, DescriptorType descriptorType
-			, ShaderStageFlags stageFlags
-			, uint32_t descriptorCount)
+	PassTextureInfo Pass::getTexture(std::string name) const
 	{
-		m_pData->setDataValue(name, src, size, offset);
-		//update layout binding information.
-		LayoutBindingInfo info(
-			name,
-			VG_FALSE,
-			bindingPriority,
-			descriptorType,
-			descriptorCount,
-			stageFlags
-		);
+		return m_data.getTexture(name);
+	}
+	
+	void Pass::setTexture(std::string name, PassTextureInfo texInfo)
+	{
+		m_data.setTexture(name, texInfo);
+		m_textureChanged = VG_TRUE;
+	}
 
-		info.updateSize(m_pData->getDataSize(name));
-		setValue(name, info, m_mapLayoutBinds, m_arrLayoutBindNames);
-		m_applied = VG_FALSE;
+	Bool32 Pass::hasData(std::string name) const
+	{
+		return m_data.hasData(name);
+	}
+
+	void Pass::removeData(std::string name)
+	{
+		m_data.removeData(name);
 		m_dataChanged = VG_TRUE;
 	}
 
-	const Texture *Pass::getMainTexture() const
+	void Pass::addData(const std::string name, const PassDataInfo &info, void *src, uint32_t size)
 	{
-		return getTexture(VG_M_MAIN_TEXTURE_NAME);
+		m_data.addData(name, info, src, size);
+		m_dataChanged = VG_TRUE;
 	}
-
-	void Pass::setMainTexture(const Texture *value
-	    , ShaderStageFlags stageFlags
-		, DescriptorType descriptorType
-	    , const Texture::ImageView *pImageView
-		, const Texture::Sampler *pSampler
-		, vk::ImageLayout imageLayout
-		)
+	
+	void Pass::getData(const std::string name, void *dst, uint32_t size, uint32_t offset) const
 	{
-		setTexture(VG_M_MAIN_TEXTURE_NAME
-		    , value
-			, VG_M_MAIN_TEXTURE_BINDING_PRIORITY
-			, stageFlags
-			, descriptorType
-			, pImageView
-			, pSampler
-			, imageLayout
-			);
+		return m_data.getData(name, dst, size, offset);
+	}
+		
+	void Pass::setData(const std::string name, void *src, uint32_t size, uint32_t offset)
+	{
+		m_data.setData(name, src, size, offset);
+		m_dataChanged = VG_TRUE;
 	}
 
 	Color Pass::getMainColor() const
@@ -471,68 +368,40 @@ namespace vg
 		 return m_buildInDataInfo;
 	 }
 
-	void Pass::_setBuildInMatrixData(BuildInDataType type, Matrix4x4 matrix)
+	void Pass::setBuildInMatrixData(BuildInDataType type, Matrix4x4 matrix)
 	{
 		_updateBuildInData(type, matrix);
 	}
 
-	void Pass::apply()
-	{
-		if (m_applied == VG_FALSE)
-		{
-			_createPipelineLayout();
-			_createUniformBuffer();
-			_createDescriptorSet();
-			_beginCheckNeedUpdateDescriptorInfo();
-			if (m_needUpdateDescriptorInfo == VG_TRUE) {
-			    _updateDescriptorBufferInfo();
-			    _updateDescriptorImageInfo();
-			}
-			if (m_needUpdateDescriptorInfo == VG_TRUE ||
-			    m_textureChanged == VG_TRUE) {
-				_updateDescriptorImageInfo();
-				m_textureChanged = VG_FALSE;
-			}
-			_endCheckNeedUpdateDescriptorInfo();
-			_applyUniformBufferDynamicOffsets();
-			m_applied = VG_TRUE;
-		}
-		if (m_dataChanged == VG_TRUE)
-		{
-			_applyBufferContent();
-			m_dataChanged = VG_FALSE;
-		}
-		
-	}
 
-	PolygonMode Pass::getPolygonMode() const
+	vk::PolygonMode Pass::getPolygonMode() const
 	{
 		return m_polygonMode;
 	}
 
-	void Pass::setPolygonMode(PolygonMode polygonMode)
+	void Pass::setPolygonMode(vk::PolygonMode polygonMode)
 	{
 		m_polygonMode = polygonMode;
 		_updatePipelineStateID();
 	}
 
-	CullModeFlags Pass::getCullMode() const
+	vk::CullModeFlags Pass::getCullMode() const
 	{
 		return m_cullMode;
 	}
 
-	void Pass::setCullMode(CullModeFlags cullMode)
+	void Pass::setCullMode(vk::CullModeFlags cullMode)
 	{
 		m_cullMode = cullMode;
 		_updatePipelineStateID();
 	}
 
-	FrontFaceType Pass::getFrontFace() const
+	vk::FrontFace Pass::getFrontFace() const
 	{
 		return m_frontFace;
 	}
 
-	void Pass::setFrontFace(FrontFaceType frontFace)
+	void Pass::setFrontFace(vk::FrontFace frontFace)
 	{
 		m_frontFace = frontFace;
 		_updatePipelineStateID();
@@ -656,32 +525,10 @@ namespace vg
 		m_defaultInputAssemblyState = value;
 	}
 
-	const Bool32 Pass::IsHasSpecializationData(ShaderStageFlagBits shaderStage) const
-	{
-		auto vkStage = tranShaderStageFlagBitToVK(shaderStage);
-		const auto& map = m_mapSpecilizationDatas;
-		return map.count(vkStage) != 0;
-	}
-
 	const Bool32 Pass::IsHasSpecializationData(vk::ShaderStageFlagBits shaderStage) const
 	{
 		const auto& map = m_mapSpecilizationDatas;
 		return map.count(shaderStage) != 0;
-	}
-
-	const Pass::SpecializationData *Pass::getSpecializationData(ShaderStageFlagBits shaderStage) const
-	{
-		auto vkStage = tranShaderStageFlagBitToVK(shaderStage);
-		const auto& map = m_mapSpecilizationDatas;
-		const auto& iterator = map.find(vkStage);
-		if (iterator == map.cend())
-		{
-			throw std::runtime_error("SpecializationData don't exit.");
-		}
-		else
-		{
-			return iterator->second.get();
-		}
 	}
 
 	const Pass::SpecializationData *Pass::getSpecializationData(vk::ShaderStageFlagBits shaderStage) const
@@ -729,15 +576,14 @@ namespace vg
 		return pPushConstantUpdates;
 	}
 
-	void Pass::setSpecializationData(ShaderStageFlagBits shaderStage
+	void Pass::setSpecializationData(vk::ShaderStageFlagBits shaderStage
 		, const vk::SpecializationInfo &info)
 	{
-		auto vkStage = tranShaderStageFlagBitToVK(shaderStage);
-		std::shared_ptr<SpecializationData> pSpecializationData = m_mapSpecilizationDatas[vkStage];
+		std::shared_ptr<SpecializationData> pSpecializationData = m_mapSpecilizationDatas[shaderStage];
 		if (pSpecializationData == nullptr) 
 		{
 			pSpecializationData = std::shared_ptr<SpecializationData>(new SpecializationData());
-			m_mapSpecilizationDatas[vkStage] = pSpecializationData;
+			m_mapSpecilizationDatas[shaderStage] = pSpecializationData;
 		}
 		pSpecializationData->init(info);
 		_updatePipelineStateID();
@@ -750,7 +596,7 @@ namespace vg
 	{
 		vk::PushConstantRange pushConstantRange(stageFlags, offset, size);
 		setValue(name, pushConstantRange, m_mapPushConstantRanges, m_arrPushConstantRangeNames);
-		m_applied = VG_FALSE;
+		m_pipelineLayoutChanged = VG_TRUE;
 	}
 
 	void Pass::setPushConstantUpdate(std::string name
@@ -763,11 +609,6 @@ namespace vg
 		pPushConstantUpdate->init(pData, size, stageFlags, offset);
 		setValue(name, pPushConstantUpdate, m_mapPPushConstantUpdates, m_arrPushConstantUpdateNames);
 	}
-
-	Pass::PipelineStateID Pass::getPipelineStateID() const
-    {
-        return m_pipelineStateID;
-    }
 
 	uint32_t Pass::getInstanceCount() const
 	{
@@ -847,27 +688,17 @@ namespace vg
 		for (uint32_t i = 0; i < count && offset < total; ++i, ++offset) {
 			m_extUniformBuffers[offset] = *(extUniformBuffers.data() + i);
 		}
-		m_applied = VG_FALSE;
+		m_descriptorSetsChanged = VG_TRUE;
 	}
 
-	const vk::Buffer *Pass::getUniformBuffer() const
+	const BufferData &Pass::getBufferData() const
 	{
-		return m_pUniformBuffer.get();
-	}
-
-	const vk::DeviceMemory *Pass::getUniformBufferMemory() const
-	{
-		return m_pUniformBufferMemory.get();
+		return m_dataBuffer;
 	}
 
 	const vk::DescriptorSetLayout *Pass::getDescriptorSetLayout() const
 	{
 		return m_pDescriptorSetLayout.get();
-	}
-
-	const vk::PipelineLayout *Pass::getPipelineLayout() const
-	{
-		return m_pPipelineLayout.get();
 	}
 
 	const vk::DescriptorPool *Pass::getDescriptorPool() const
@@ -880,24 +711,63 @@ namespace vg
 		return m_pDescriptorSet.get();
 	}
 
+	const vk::PipelineLayout *Pass::getPipelineLayout() const
+	{
+		return m_pPipelineLayout.get();
+	}
+
 	uint32_t Pass::getUsingDescriptorSetCount() const
 	{
-		return static_cast<uint32_t>(m_usingDescriptorSets.size());
+		return static_cast<uint32_t>(m_descriptorSets.size());
 	}
 		
 	const vk::DescriptorSet *Pass::getUsingDescriptorSets() const
 	{
-		return m_usingDescriptorSets.data();
+		return m_descriptorSets.data();
 	}
 
 	uint32_t Pass::getUsingDescriptorDynamicOffsetCount() const
 	{
-		return static_cast<uint32_t>(m_usingDynamicOffsets.size());
+		return static_cast<uint32_t>(m_dynamicOffsets.size());
 	}
 
 	const uint32_t *Pass::getUsingDescriptorDynamicOffsets() const
 	{
-		return m_usingDynamicOffsets.data();
+		return m_dynamicOffsets.data();
+	}
+
+	Pass::PipelineStateID Pass::getPipelineStateID() const
+    {
+        return m_pipelineStateID;
+    }
+
+	void Pass::apply()
+	{
+		if (m_applied == VG_FALSE)
+		{
+			_createPipelineLayout();
+			_createUniformBuffer();
+			_createDescriptorSet();
+			_beginCheckNeedUpdateDescriptorInfo();
+			if (m_needUpdateDescriptorInfo == VG_TRUE) {
+			    _updateDescriptorBufferInfo();
+			    _updateDescriptorImageInfo();
+			}
+			if (m_needUpdateDescriptorInfo == VG_TRUE ||
+			    m_textureChanged == VG_TRUE) {
+				_updateDescriptorImageInfo();
+				m_textureChanged = VG_FALSE;
+			}
+			_endCheckNeedUpdateDescriptorInfo();
+			_applyUniformBufferDynamicOffsets();
+			m_applied = VG_TRUE;
+		}
+		if (m_dataChanged == VG_TRUE)
+		{
+			_applyBufferContent();
+			m_dataChanged = VG_FALSE;
+		}
+		
 	}
 
 	void Pass::beginRecord() const

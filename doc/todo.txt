@@ -2,3 +2,5 @@
 format (COLLADA).
 2.Perfect light system and Add some necessary light types.
 3.Bug of render of sample "mesh" and "post_render".
+4.Optimze data storage of mesh and pass.
+5.Optimze pass and mesh and auto apply when beginning recording.

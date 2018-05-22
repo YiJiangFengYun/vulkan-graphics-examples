@@ -172,38 +172,6 @@ namespace vg
 		   void* m_pData;
 		};
 
-		struct LayoutBindingInfo
-		{
-			std::string name;
-			Bool32 isTexture;
-			uint32_t bindingPriority;
-			DescriptorType descriptorType;
-			uint32_t descriptorCount;
-			ShaderStageFlags stageFlags;
-
-			uint32_t size;
-			uint32_t bufferSize;
-
-			LayoutBindingInfo(std::string name = nullptr
-				, Bool32 isTexture = VG_FALSE
-				, uint32_t bindingPriority = 0u
-				, DescriptorType descriptorType = DescriptorType::UNIFORM_BUFFER
-				, uint32_t descriptorCount = 0u
-				, ShaderStageFlags stageFlags = ShaderStageFlags()
-			);
-
-			LayoutBindingInfo(const LayoutBindingInfo &);
-
-			LayoutBindingInfo& operator=(const LayoutBindingInfo &);
-
-			Bool32 operator ==(const LayoutBindingInfo & target) const;
-			Bool32 operator !=(const LayoutBindingInfo & target) const;
-			Bool32 operator<(const LayoutBindingInfo & target) const;
-
-			void updateSize(const PassData *pPassData);
-			void updateSize(const uint32_t dataSize);
-		};
-
 		struct VertexInputFilterInfo
 		{
 			Bool32 filterEnable;
@@ -223,79 +191,63 @@ namespace vg
 		Shader *getShader();		
 		void setShader(Shader *pShader);
 
-		const Texture *getTexture(std::string name) const;
+		Bool32 hasBuffer(std::string name) const;
+		void addBuffer(std::string name, PassBufferInfo bufferInfo);
+		void removeBuffer(std::string name);
+		PassBufferInfo getBuffer(std::string name);
+		void setBuffer(std::string name, PassBufferInfo bufferInfo);
 
-		void setTexture(std::string name
-			, const Texture *pTex
-			, uint32_t bindingPriority = VG_M_OTHER_MAX_BINDING_PRIORITY
-			, ShaderStageFlags stageFlags = ShaderStageFlagBits::FRAGMENT
-			, DescriptorType descriptorType = DescriptorType::COMBINED_IMAGE_SAMPLER
-			, const Texture::ImageView *pImageView = nullptr
-			, const Texture::Sampler *pSampler = nullptr
-			, vk::ImageLayout imageLayout = vk::ImageLayout::eUndefined
-		);
+		Bool32 hasTexture(std::string name) const;
+		void addTexture(std::string name, PassTextureInfo texInfo);
+		void removeTexture(std::string name);
+		PassTextureInfo getTexture(std::string name) const;
+		void setTexture(std::string name, PassTextureInfo texInfo);
 
+        Bool32 hasData(std::string name) const;
+		void removeData(std::string name);
+
+		void addData(const std::string name, const PassDataInfo &info, void *src, uint32_t size);
+		void getData(const std::string name, void *dst, uint32_t size, uint32_t offset) const;
+		void setData(const std::string name, void *src, uint32_t size, uint32_t offset);
+
+        template<typename T>
+		void addData(const std::string name, const PassDataInfo &info, const T &value);
+		template<typename T>
+		T getData(const std::string name) const;
+		template<typename T>
+		void setData(const std::string name, const T &value);
+        
+		template<typename T>
+		void addData(const std::string name, const PassDataInfo &info, const std::vector<T> &values);
 		template <typename T>
-		T getDataValue(std::string name) const;
-
-		template <typename T>
-		std::vector<T> getDataValue(std::string name, uint32_t count) const;
-
-		void getDataValue(const std::string name, void *dst, uint32_t size, uint32_t offset) const;
+		std::vector<T> getData(const std::string name, const uint32_t count) const;
+		template<typename T>
+		void setData(const std::string name, const std::vector<T> &values);
 
 		template<typename T>
-		void setDataValue(std::string name
-			, const T &value
-			, uint32_t bindingPriority = VG_M_OTHER_MAX_BINDING_PRIORITY
-			, DescriptorType descriptorType = DescriptorType::UNIFORM_BUFFER
-			, ShaderStageFlags stageFlags = ShaderStageFlagBits::VERTEX
-		);
-
+		void addData(const std::string name, const PassDataInfo &info, const T * const pSrc, const uint32_t count);
 		template<typename T>
-		void setDataValue(std::string name
-			, const std::vector<T> &values
-			, uint32_t bindingPriority = VG_M_OTHER_MAX_BINDING_PRIORITY
-			, DescriptorType descriptorType = DescriptorType::UNIFORM_BUFFER
-			, ShaderStageFlags stageFlags = ShaderStageFlagBits::VERTEX
-		);
+		void getData(const std::string name, const T * const pDst, const uint32_t count);
+		template<typename T>
+		void setData(const std::string name, const T * const pSrc, const uint32_t count);
 
-		void setDataValue(const std::string name
-		    , void *src, uint32_t size, uint32_t offset
-			, uint32_t bindingPriority = VG_M_OTHER_MAX_BINDING_PRIORITY
-			, DescriptorType descriptorType = DescriptorType::UNIFORM_BUFFER
-			, ShaderStageFlags stageFlags = ShaderStageFlagBits::VERTEX
-			, uint32_t descriptorCount = 1u);
-
-		const Texture *getMainTexture() const;
-		void setMainTexture(const Texture *value
-		    , ShaderStageFlags stageFlags = ShaderStageFlagBits::FRAGMENT
-			, DescriptorType descriptorType = DescriptorType::COMBINED_IMAGE_SAMPLER
-		    , const Texture::ImageView *pImageView = nullptr
-			, const Texture::Sampler *pSampler = nullptr
-			, vk::ImageLayout imageLayout = vk::ImageLayout::eUndefined
-			);
 
 		Color getMainColor() const;
 		void setMainColor(Color color);
 
-
         void setBuildInDataInfo(BuildInDataInfo info);
 		const BuildInDataInfo &getBuildInDataInfo() const;
 
-		void _setBuildInMatrixData(BuildInDataType type, Matrix4x4 matrix);
+		void setBuildInMatrixData(BuildInDataType type, Matrix4x4 matrix);
 
-		void apply();
-        
-		PipelineStateID getPipelineStateID() const;
+		vk::PolygonMode getPolygonMode() const;
+		void setPolygonMode(vk::PolygonMode polygonMode);
 
-		PolygonMode getPolygonMode() const;
-		void setPolygonMode(PolygonMode polygonMode);
+		vk::CullModeFlags getCullMode() const;
+		void setCullMode(vk::CullModeFlags cullMode);
 
-		CullModeFlags getCullMode() const;
-		void setCullMode(CullModeFlags cullMode);
-
-		FrontFaceType getFrontFace() const;
-		void setFrontFace(FrontFaceType frontFace);
+		vk::FrontFace getFrontFace() const;
+		void setFrontFace(vk::FrontFace frontFace);
 
 		float getLineWidth() const;
 		void setLineWidth(float lineWidth);
@@ -315,17 +267,15 @@ namespace vg
 		const vk::PipelineInputAssemblyStateCreateInfo &getDefaultInputAssemblyState() const;
 		void setDefaultInputAssemblyState(vk::PipelineInputAssemblyStateCreateInfo & value);
 
-		const Bool32 IsHasSpecializationData(ShaderStageFlagBits shaderStage) const;
 		const Bool32 IsHasSpecializationData(vk::ShaderStageFlagBits shaderStage) const;
 
-		const SpecializationData *getSpecializationData(ShaderStageFlagBits shaderStage) const;
 		const SpecializationData *getSpecializationData(vk::ShaderStageFlagBits shaderStage) const;
 
 		const std::unordered_map<vk::ShaderStageFlagBits, std::shared_ptr<Pass::SpecializationData>> &getSpecilizationDatas() const;
 		std::vector<vk::PushConstantRange> getPushConstantRanges() const;
 		std::vector<std::shared_ptr<PushConstantUpdate>> getPushconstantUpdates() const;
 
-		void setSpecializationData(ShaderStageFlagBits shaderStage
+		void setSpecializationData(vk::ShaderStageFlagBits shaderStage
 			, const vk::SpecializationInfo &info);
 
 	    void setPushConstantRange(std::string name
@@ -362,8 +312,7 @@ namespace vg
 			, uint32_t offset = 0u
 			);
 
-		const vk::Buffer *getUniformBuffer() const;
-		const vk::DeviceMemory *getUniformBufferMemory() const;
+		const BufferData &getBufferData() const;
 		const vk::DescriptorSetLayout *getDescriptorSetLayout() const;
 		const vk::DescriptorPool *getDescriptorPool() const;
 		const vk::DescriptorSet *getDescriptorSet() const;
@@ -373,40 +322,34 @@ namespace vg
 		uint32_t getUsingDescriptorDynamicOffsetCount() const;
 		const uint32_t *getUsingDescriptorDynamicOffsets() const;
 
+		PipelineStateID getPipelineStateID() const;
+
+		void apply();
+
 		void beginRecord() const;
 		void endRecord() const;
 	private:
 		//compositons
-		std::shared_ptr<PassData> m_pData;
+		PassData m_data;
 		Bool32 m_dataChanged;
 		Bool32 m_textureChanged;
-		std::vector<std::string> m_arrLayoutBindNames;
-		std::unordered_map<std::string, LayoutBindingInfo> m_mapLayoutBinds;
-		std::shared_ptr<vk::Buffer> m_pUniformBuffer;
-		std::shared_ptr<vk::DeviceMemory> m_pUniformBufferMemory;
-		uint32_t m_uniformBufferSize;
-		std::shared_ptr<vk::DescriptorSetLayout> m_pDescriptorSetLayout;
-		std::shared_ptr<vk::PipelineLayout> m_pPipelineLayout;
-		std::shared_ptr<vk::DescriptorPool> m_pDescriptorPool;
-		std::shared_ptr<vk::DescriptorSet> m_pDescriptorSet;
+		Bool32 m_bufferChanged;
 
-		Bool32 m_applied;
-
-        PipelineStateID m_pipelineStateID;
-		PolygonMode m_polygonMode;
-		CullModeFlags m_cullMode;
-		FrontFaceType m_frontFace;
+		// std::set<std::string> m_sortLayoutBindingNames;		
+		
+		vk::PolygonMode m_polygonMode;
+		vk::CullModeFlags m_cullMode;
+		vk::FrontFace m_frontFace;
 		fd::Viewport m_viewport;
 		fd::Rect2D m_scissor;
 		vk::PipelineDepthStencilStateCreateInfo m_depthStencilInfo;
 		std::vector<vk::PipelineColorBlendAttachmentState> m_colorBlendAttachmentStates;
 		vk::PipelineColorBlendStateCreateInfo m_colorBlendInfo;
 		float m_lineWidth;
-		vk::PipelineInputAssemblyStateCreateInfo m_defaultInputAssemblyState;
-
 		uint32_t m_instanceCount;
-
 		uint32_t m_subpass;
+		vk::PipelineInputAssemblyStateCreateInfo m_defaultInputAssemblyState;
+		
 		//todo
 		//each stage may own a specilization constant data.
 		std::unordered_map<vk::ShaderStageFlagBits, std::shared_ptr<SpecializationData>> m_mapSpecilizationDatas;
@@ -426,25 +369,49 @@ namespace vg
 		uint32_t m_extUniformBufferCount;
 		std::vector<ExternalUniformBufferInfo> m_extUniformBuffers;
 
-		//cache
-		std::set<LayoutBindingInfo> m_lastLayoutBindingInfos;
-		std::vector<vk::DescriptorSetLayoutBinding> m_lastBindings;
-		std::vector<std::string> m_lastLayoutBindNames;
-		std::unordered_map<std::string, LayoutBindingInfo> m_lastLayoutBinds;
-		std::vector<vk::PushConstantRange> m_lastPushConstantRanges;
-	    std::vector<vk::DescriptorSetLayout> m_lastsetLayouts;
-		std::unordered_map<vk::DescriptorType, uint32_t> m_lastPoolSizeInfos;
-		Bool32 m_needReAllocateDescriptorSet;
-		Bool32 m_needUpdateDescriptorInfo;
-		std::vector<vk::DescriptorSet> m_usingDescriptorSets;
-		std::vector<uint32_t> m_usingDynamicOffsets;
+		////////applied data
+
+		//Build in buffer.
+		BufferData m_dataBuffer;
+
+		//build in descriptor set layout.
+		uint32_t m_layoutBindingCount;		
+        std::vector<vk::DescriptorSetLayoutBinding> m_layoutBindings;
+        std::shared_ptr<vk::DescriptorSetLayout> m_pDescriptorSetLayout;
+
+		//build in descriptor pool.
+		std::unordered_map<vk::DescriptorType, uint32_t> m_poolSizeInfos;
+		std::shared_ptr<vk::DescriptorPool> m_pDescriptorPool;
+
+		//build in descriptor set
+        std::shared_ptr<vk::DescriptorSet> m_pDescriptorSet;
+
+		//all descriptor sets and layouts
+		Bool32 m_descriptorSetsChanged;
+        //all descriptor set layouts
+	    std::vector<vk::DescriptorSetLayout> m_descriptorSetLayouts;
+
+		//all descriptor sets.
+		std::vector<vk::DescriptorSet> m_descriptorSets;
+		std::vector<uint32_t> m_dynamicOffsets;
+
+		//pipeline layout
+		std::shared_ptr<vk::PipelineLayout> m_pPipelineLayout;
+		Bool32 m_pipelineLayoutChanged;
+        PipelineStateID m_pipelineStateID;
+
+		void _initDefaultBuildInDataInfo();
+		void _initBuildInData();
+		
+		
+		
 
 		//aggregations
 		Shader *m_pShader;
 		void _createPipelineLayout();  
-		void _createUniformBuffer();
-		void _createDescriptorSet();
-		void _beginCheckNeedUpdateDescriptorInfo();
+		// void _createUniformBuffer();
+		// void _createDescriptorSet();
+		// void _beginCheckNeedUpdateDescriptorInfo();
 		void _updateDescriptorBufferInfo();
 		void _updateDescriptorImageInfo();
 		void _endCheckNeedUpdateDescriptorInfo();
@@ -453,8 +420,7 @@ namespace vg
 
 		void _applyUniformBufferDynamicOffsets();
 
-		void _initDefaultBuildInDataInfo();
-		void _initBuildInData();
+		
 		template <typename T>
 		void _updateBuildInData(BuildInDataType type, T data);
 		//tool methods

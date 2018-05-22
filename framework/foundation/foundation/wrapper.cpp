@@ -14,7 +14,7 @@ namespace fd
 		});
 	}
 
-	std::shared_ptr<vk::Device> createDevice(vk::PhysicalDevice *pPhysicalDevice,
+	std::shared_ptr<vk::Device> createDevice(const const vk::PhysicalDevice *pPhysicalDevice,
 		const vk::DeviceCreateInfo & createInfo, vk::Optional<const vk::AllocationCallbacks> allocator)
 	{
 		auto device = pPhysicalDevice->createDevice(createInfo, allocator);
@@ -25,7 +25,7 @@ namespace fd
 	}
 
 	std::shared_ptr<vk::SwapchainKHR> createSwapchainKHR(
-		vk::Device *pDevice,
+		const vk::Device *pDevice,
 		const vk::SwapchainCreateInfoKHR & createInfo,
 		vk::Optional<const vk::AllocationCallbacks> allocator)
 	{
@@ -39,7 +39,7 @@ namespace fd
 	}
 
 
-	std::shared_ptr<vk::ImageView> createImageView(vk::Device *pDevice,
+	std::shared_ptr<vk::ImageView> createImageView(const vk::Device *pDevice,
 		const vk::ImageViewCreateInfo & createInfo,
 		vk::Optional<const vk::AllocationCallbacks> allocator)
 	{
@@ -51,7 +51,7 @@ namespace fd
 		});
 	}
 
-	std::shared_ptr<vk::CommandPool> createCommandPool(vk::Device *pDevice,
+	std::shared_ptr<vk::CommandPool> createCommandPool(const vk::Device *pDevice,
 		const vk::CommandPoolCreateInfo & createInfo, vk::Optional<const vk::AllocationCallbacks> allocator)
 	{
 		auto commandPool = pDevice->createCommandPool(createInfo, allocator);
@@ -61,7 +61,7 @@ namespace fd
 		});
 	}
 
-	std::shared_ptr<vk::RenderPass> createRenderPass(vk::Device *pDevice,
+	std::shared_ptr<vk::RenderPass> createRenderPass(const vk::Device *pDevice,
 		const vk::RenderPassCreateInfo & createInfo, vk::Optional<const vk::AllocationCallbacks> allocator)
 	{
 		auto renderPass = pDevice->createRenderPass(createInfo, allocator);
@@ -71,7 +71,7 @@ namespace fd
 		});
 	}
 
-	std::shared_ptr<vk::Buffer> createBuffer(vk::Device *pDevice,
+	std::shared_ptr<vk::Buffer> createBuffer(const vk::Device *pDevice,
 		const vk::BufferCreateInfo & createInfo, vk::Optional<const vk::AllocationCallbacks> allocator)
 	{
 		auto buffer = pDevice->createBuffer(createInfo, allocator);
@@ -81,7 +81,7 @@ namespace fd
 		});
 	}
 
-	std::shared_ptr<vk::Image> createImage(vk::Device *pDevice,
+	std::shared_ptr<vk::Image> createImage(const vk::Device *pDevice,
 		const vk::ImageCreateInfo & createInfo, vk::Optional<const vk::AllocationCallbacks> allocator)
 	{
 		auto image = pDevice->createImage(createInfo, allocator);
@@ -91,7 +91,7 @@ namespace fd
 		});
 	}
 
-	std::shared_ptr<vk::DeviceMemory> allocateMemory(vk::Device *pDevice,
+	std::shared_ptr<vk::DeviceMemory> allocateMemory(const vk::Device *pDevice,
 		const vk::MemoryAllocateInfo & allocateInfo, vk::Optional<const vk::AllocationCallbacks> allocator)
 	{
 		auto memory = pDevice->allocateMemory(allocateInfo, allocator);
@@ -101,7 +101,7 @@ namespace fd
 		});
 	}
 
-	std::shared_ptr<vk::Framebuffer> createFrameBuffer(vk::Device *pDevice,
+	std::shared_ptr<vk::Framebuffer> createFrameBuffer(const vk::Device *pDevice,
 		const vk::FramebufferCreateInfo & createInfo, vk::Optional<const vk::AllocationCallbacks> allocator)
 	{
 		auto frameBuffer = pDevice->createFramebuffer(createInfo, allocator);
@@ -111,7 +111,7 @@ namespace fd
 		});
 	}
 
-	std::shared_ptr<vk::Semaphore> createSemaphore(vk::Device *pDevice,
+	std::shared_ptr<vk::Semaphore> createSemaphore(const vk::Device *pDevice,
 		const vk::SemaphoreCreateInfo & createInfo, vk::Optional<const vk::AllocationCallbacks> allocator)
 	{
 		auto semaphore = pDevice->createSemaphore(createInfo, allocator);
@@ -121,21 +121,23 @@ namespace fd
 		});
 	}
 
-	std::shared_ptr<vk::CommandBuffer> allocateCommandBuffer(vk::Device *pDevice,
-		vk::CommandPool *pCommandPool,
-		vk::CommandBufferAllocateInfo & allocateInfo)
+	std::shared_ptr<vk::CommandBuffer> allocateCommandBuffer(const vk::Device *pDevice,
+		const vk::CommandPool *pCommandPool,
+		const vk::CommandBufferAllocateInfo & allocateInfo
+		)
 	{
 		//allocate only one command buffer.
-		allocateInfo.setCommandBufferCount(1U);
-		allocateInfo.setCommandPool(*pCommandPool);
-		auto commandBuffer = pDevice->allocateCommandBuffers(allocateInfo)[0];
+		vk::CommandBufferAllocateInfo tempAllocateInfo = allocateInfo;
+		tempAllocateInfo.setCommandBufferCount(1U);
+		tempAllocateInfo.setCommandPool(*pCommandPool);
+		auto commandBuffer = pDevice->allocateCommandBuffers(tempAllocateInfo)[0];
 		return std::shared_ptr<vk::CommandBuffer>(new vk::CommandBuffer(commandBuffer),
 			[pDevice, pCommandPool](vk::CommandBuffer *p) {
 			pDevice->freeCommandBuffers(*pCommandPool, *p);
 		});
 	}
 
-	std::shared_ptr<vk::Sampler> createSampler(vk::Device *pDevice,
+	std::shared_ptr<vk::Sampler> createSampler(const vk::Device *pDevice,
 		const vk::SamplerCreateInfo & createInfo, vk::Optional<const vk::AllocationCallbacks> allocator)
 	{
 		auto sampler = pDevice->createSampler(createInfo, allocator);
@@ -145,7 +147,7 @@ namespace fd
 		});
 	}
 
-	std::shared_ptr<vk::ShaderModule> createShaderModule(vk::Device *pDevice,
+	std::shared_ptr<vk::ShaderModule> createShaderModule(const vk::Device *pDevice,
 		const vk::ShaderModuleCreateInfo & createInfo, vk::Optional<const vk::AllocationCallbacks> allocator)
 	{
 		auto shaderModule = pDevice->createShaderModule(createInfo, allocator);
@@ -155,7 +157,7 @@ namespace fd
 		});
 	}
 
-	std::shared_ptr<vk::DescriptorSetLayout> createDescriptorSetLayout(vk::Device *pDevice,
+	std::shared_ptr<vk::DescriptorSetLayout> createDescriptorSetLayout(const vk::Device *pDevice,
 		const vk::DescriptorSetLayoutCreateInfo & createInfo, vk::Optional<const vk::AllocationCallbacks> allocator)
 	{
 		auto descriptorSetLayout = pDevice->createDescriptorSetLayout(createInfo, allocator);
@@ -165,7 +167,7 @@ namespace fd
 		});
 	}
 
-	std::shared_ptr<vk::DescriptorPool> createDescriptorPool(vk::Device *pDevice,
+	std::shared_ptr<vk::DescriptorPool> createDescriptorPool(const vk::Device *pDevice,
 		const vk::DescriptorPoolCreateInfo & createInfo, vk::Optional < const vk::AllocationCallbacks > allocator)
 	{
 		auto descriptorPool = pDevice->createDescriptorPool(createInfo, allocator);
@@ -175,19 +177,20 @@ namespace fd
 		});
 	}
 
-	std::shared_ptr<vk::DescriptorSet> allocateDescriptorSet(vk::Device *pDevice,
-		vk::DescriptorPool *pDescriptorPool, vk::DescriptorSetAllocateInfo & allocateInfo)
+	std::shared_ptr<vk::DescriptorSet> allocateDescriptorSet(const vk::Device *pDevice,
+		const vk::DescriptorPool *pDescriptorPool, const vk::DescriptorSetAllocateInfo & allocateInfo)
 	{
-		allocateInfo.setDescriptorPool(*pDescriptorPool);
-		allocateInfo.setDescriptorSetCount(1u);
-		auto descriptorSet = pDevice->allocateDescriptorSets(allocateInfo)[0];
+		vk::DescriptorSetAllocateInfo tempAllocInfo = allocateInfo;
+		tempAllocInfo.setDescriptorPool(*pDescriptorPool);
+		tempAllocInfo.setDescriptorSetCount(1u);
+		auto descriptorSet = pDevice->allocateDescriptorSets(tempAllocInfo)[0];
 		return std::shared_ptr<vk::DescriptorSet>(new vk::DescriptorSet(descriptorSet), 
 			[pDevice, pDescriptorPool](vk::DescriptorSet *p) {
 			pDevice->freeDescriptorSets(*pDescriptorPool, *p);
 		});
 	}
 
-	std::shared_ptr<vk::PipelineLayout> createPipelineLayout(vk::Device *pDevice,
+	std::shared_ptr<vk::PipelineLayout> createPipelineLayout(const vk::Device *pDevice,
 		const vk::PipelineLayoutCreateInfo & createInfo, vk::Optional<const vk::AllocationCallbacks> allocator)
 	{
 		auto pipelineLayout = pDevice->createPipelineLayout(createInfo, allocator);
@@ -197,8 +200,8 @@ namespace fd
 		});
 	}
 
-	std::shared_ptr<vk::Pipeline> createGraphicsPipeline(vk::Device *pDevice,
-		vk::PipelineCache pipelineCache, const vk::GraphicsPipelineCreateInfo & createInfo,
+	std::shared_ptr<vk::Pipeline> createGraphicsPipeline(const vk::Device *pDevice,
+		const vk::PipelineCache pipelineCache, const vk::GraphicsPipelineCreateInfo & createInfo,
 		vk::Optional<const vk::AllocationCallbacks> allocator)
 	{
 		auto pipeline = pDevice->createGraphicsPipeline(pipelineCache, createInfo, allocator);
@@ -208,7 +211,7 @@ namespace fd
 		});
 	}
 
-	std::shared_ptr<vk::PipelineCache> createPipelineCache(vk::Device *pDevice,
+	std::shared_ptr<vk::PipelineCache> createPipelineCache(const vk::Device *pDevice,
 	    const vk::PipelineCacheCreateInfo &createInfo,
 		vk::Optional<const vk::AllocationCallbacks> allocator)
 	{
@@ -219,7 +222,7 @@ namespace fd
 		});
 	}
 
-	std::shared_ptr<vk::Fence> createFence(vk::Device *pDevice,
+	std::shared_ptr<vk::Fence> createFence(const vk::Device *pDevice,
 		const vk::FenceCreateInfo &createInfo, vk::Optional<const vk::AllocationCallbacks> allocator)
 	{
 		auto fence = pDevice->createFence(createInfo, allocator);

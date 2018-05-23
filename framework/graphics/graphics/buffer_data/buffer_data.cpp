@@ -6,6 +6,7 @@ namespace vg
 {
     BufferData::BufferData(vk::MemoryPropertyFlags memoryPropertyFlags)
         : m_memoryPropertyFlags(memoryPropertyFlags)
+        , m_size()
         , m_bufferSize()
         , m_pBuffer()
         , m_bufferMemorySize()
@@ -58,6 +59,8 @@ namespace vg
             m_memorySize = 0;
         }
 
+        m_size = size;
+
         if (size)
 		{
 			if (cacheMemory) {
@@ -81,6 +84,11 @@ namespace vg
     vk::MemoryPropertyFlags BufferData::getMemoryPropertyFlags() const
     {
         return m_memoryPropertyFlags;
+    }
+
+    uint32_t BufferData::getSize() const
+    {
+        return m_size;
     }
 
     uint32_t BufferData::getBufferSize() const

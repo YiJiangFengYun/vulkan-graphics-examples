@@ -28,6 +28,7 @@ namespace vg {
             );
         
         vk::MemoryPropertyFlags getMemoryPropertyFlags() const;
+        uint32_t getSize() const;
         uint32_t getBufferSize() const;
         const vk::Buffer *getBuffer() const;
         uint32_t getBufferMemorySize() const;
@@ -35,6 +36,7 @@ namespace vg {
         uint32_t getMemorySize() const;
         const void *getMemory() const;
     private:
+        uint32_t m_size;
         uint32_t m_bufferSize;
         std::shared_ptr<vk::Buffer> m_pBuffer;
         uint32_t m_bufferMemorySize;

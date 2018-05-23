@@ -80,6 +80,18 @@ namespace vg
 		m_dataContentChanges[name] = VG_TRUE;
 	}
 
+	template<typename T>
+	void Pass::addPushConstantUpdate(std::string name
+	    , const T &data
+		, vk::ShaderStageFlags stageFlags
+		, uint32_t offset
+		)
+	{
+		std::shared_ptr<PushConstantUpdate> pPushConstantUpdate(new PushConstantUpdate());
+		pPushConstantUpdate->init(data, stageFlags, offset);
+		addValue(name, pPushConstantUpdate, m_mapPPushConstantUpdates, m_arrPushConstantUpdateNames);
+	}
+
     template<typename T>
 	void Pass::setPushConstantUpdate(std::string name
 		, const T &data

@@ -291,7 +291,7 @@ namespace vg
 		return m_data.hasBuffer(name);
 	}
 
-	void Pass::addBuffer(std::string name, PassBufferInfo bufferInfo)
+	void Pass::addBuffer(std::string name, const PassBufferInfo &bufferInfo)
 	{
 		m_data.addBuffer(name, bufferInfo);
 		m_bufferChanged = VG_TRUE;
@@ -308,7 +308,7 @@ namespace vg
 		return m_data.getBuffer(name);
 	}
 		
-	void Pass::setBuffer(std::string name, PassBufferInfo bufferInfo)
+	void Pass::setBuffer(std::string name, const PassBufferInfo &bufferInfo)
 	{
 		m_data.setBuffer(name, bufferInfo);
 		m_bufferChanged = VG_TRUE;
@@ -319,7 +319,7 @@ namespace vg
 		return m_data.hasTexture(name);
 	}
 
-	void Pass::addTexture(std::string name, PassTextureInfo texInfo)
+	void Pass::addTexture(std::string name, const PassTextureInfo &texInfo)
 	{
 		m_data.addTexture(name, texInfo);
 		m_textureChanged = VG_TRUE;
@@ -336,7 +336,7 @@ namespace vg
 		return m_data.getTexture(name);
 	}
 	
-	void Pass::setTexture(std::string name, PassTextureInfo texInfo)
+	void Pass::setTexture(std::string name, const PassTextureInfo &texInfo)
 	{
 		m_data.setTexture(name, texInfo);
 		m_textureChanged = VG_TRUE;
@@ -618,6 +618,26 @@ namespace vg
 		_updatePipelineStateID();
 	}
 
+	Bool32 Pass::hasPushConstantRange(std::string name) const
+	{
+		return hasValue(name, m_mapPushConstantRanges);
+	}
+		
+	void Pass::addPushConstantRange(std::string name, vk::ShaderStageFlags stageFlags
+		, uint32_t offset
+		, uint32_t size
+		)
+	{
+		vk::PushConstantRange pushConstantRange(stageFlags, offset, size);
+		addValue(name, pushConstantRange, m_mapPushConstantRanges, m_arrPushConstantRangeNames);
+		m_pushConstantChanged = VG_TRUE;
+	}
+
+	void Pass::removePushConstantRange(std::string name)
+	{
+		removeValue(name, m_mapPushConstantRanges);
+	}
+
 	void Pass::setPushConstantRange(std::string name
 		, vk::ShaderStageFlags stageFlags
 		, uint32_t offset
@@ -625,7 +645,29 @@ namespace vg
 	{
 		vk::PushConstantRange pushConstantRange(stageFlags, offset, size);
 		setValue(name, pushConstantRange, m_mapPushConstantRanges, m_arrPushConstantRangeNames);
-		m_pipelineLayoutChanged = VG_TRUE;
+		m_pushConstantChanged = VG_TRUE;
+	}
+
+	Bool32 Pass::hasPushConstantUpdate(std::string name) const
+	{
+		return hasValue(name, m_mapPPushConstantUpdates);
+	}
+
+	void Pass::addPushConstantUpdate(std::string name
+	    , const void *pData
+		, uint32_t size
+		, vk::ShaderStageFlags stageFlags
+		, uint32_t offset
+		)
+	{
+		std::shared_ptr<PushConstantUpdate> pPushConstantUpdate(new PushConstantUpdate());
+		pPushConstantUpdate->init(pData, size, stageFlags, offset);
+		addValue(name, pPushConstantUpdate, m_mapPPushConstantUpdates, m_arrPushConstantUpdateNames);
+	}
+
+	void Pass::removePushConstantUpdate(std::string name)
+	{
+		removeValue(name, m_mapPPushConstantUpdates);
 	}
 
 	void Pass::setPushConstantUpdate(std::string name
@@ -1225,36 +1267,18 @@ namespace vg
 
 		//Create pipeline layout.
 		if (m_pipelineLayoutChanged) {
-			
+		    vk::PipelineLayoutCreateInfo pipelineLayoutCreateInfo = {
+				vk::PipelineLayoutCreateFlags(),                         //flags
+				static_cast<uint32_t>(m_descriptorSetLayouts.size()),    //setLayoutCount
+				m_descriptorSetLayouts.data(),                           //pSetLayouts
+				static_cast<uint32_t>(m_pushConstantRanges.size()),       //pushConstantRangeCount
+				m_pushConstantRanges.data()                              //pPushConstantRanges
+			};
 
+			auto pDevice = pApp->getDevice();
+			m_pPipelineLayout = fd::createPipelineLayout(pDevice, pipelineLayoutCreateInfo);
+			_updatePipelineStateID();
 		}
-
-
-		if (m_applied == VG_FALSE)
-		{
-			_createPipelineLayout();
-			_createUniformBuffer();
-			_createDescriptorSet();
-			_beginCheckNeedUpdateDescriptorInfo();
-			if (m_needUpdateDescriptorInfo == VG_TRUE) {
-			    _updateDescriptorBufferInfo();
-			    _updateDescriptorImageInfo();
-			}
-			if (m_needUpdateDescriptorInfo == VG_TRUE ||
-			    m_textureChanged == VG_TRUE) {
-				_updateDescriptorImageInfo();
-				m_textureChanged = VG_FALSE;
-			}
-			_endCheckNeedUpdateDescriptorInfo();
-			_applyUniformBufferDynamicOffsets();
-			m_applied = VG_TRUE;
-		}
-		if (m_dataChanged == VG_TRUE)
-		{
-			_applyBufferContent();
-			m_dataChanged = VG_FALSE;
-		}
-		
 	}
 
 	void Pass::beginRecord() const
@@ -1340,441 +1364,6 @@ namespace vg
 		m_dataChanged = VG_TRUE;
 	}
 
-	void Pass::_createPipelineLayout()
-	{
-		m_lastLayoutBindingInfos.clear();
-		for (const auto& name : m_arrLayoutBindNames)
-		{
-			const auto& item = m_mapLayoutBinds[name];
-			m_lastLayoutBindingInfos.insert(item);
-		}
-
-		std::vector<vk::DescriptorSetLayoutBinding> bindings(m_arrLayoutBindNames.size());
-		size_t index = 0;
-		for (const auto& item : m_lastLayoutBindingInfos)
-		{
-			bindings[index].binding = index;
-			bindings[index].descriptorCount = item.descriptorCount;
-			bindings[index].descriptorType = tranDescriptorTypeToVK(item.descriptorType);
-			bindings[index].stageFlags = tranShaderStageFlagsToVK(item.stageFlags);
-			++index;
-
-		}
-
-		Bool32 bindingLayoutChanged = VG_FALSE;
-		if (m_lastBindings != bindings)
-		{
-			bindingLayoutChanged = VG_TRUE;
-		}
-
-		if (bindingLayoutChanged)
-		{
-			auto pDevice = pApp->getDevice();
-			//create descriptor set layout.
-			if (bindings.size())
-			{
-				vk::DescriptorSetLayoutCreateInfo createInfo =
-				{
-					vk::DescriptorSetLayoutCreateFlags(),
-					static_cast<uint32_t>(bindings.size()),
-					bindings.data()
-				};
-
-				m_pDescriptorSetLayout = fd::createDescriptorSetLayout(pDevice, createInfo);
-			}
-			else
-			{
-				m_pDescriptorSetLayout = nullptr;
-			}
-			m_lastBindings = bindings;
-			m_needReAllocateDescriptorSet = VG_TRUE;
-		}
-
-        //push constants
-		auto pushConstantRanges = getPushConstantRanges();
-		Bool32 pushConstantRangesChanged = VG_FALSE;
-		if (m_lastPushConstantRanges != pushConstantRanges) {
-			pushConstantRangesChanged = VG_TRUE;
-			m_lastPushConstantRanges = pushConstantRanges;
-		}
-
-		auto pLayout = m_pDescriptorSetLayout;
-		uint32_t layoutCount = pLayout != nullptr ? 1 : 0;
-		for (const auto &extUniformbuffer : m_extUniformBuffers)
-		{
-		    uint32_t subDataOffset = extUniformbuffer.subDataOffset;
-		    uint32_t subDataCount = extUniformbuffer.subDataCount;
-		    auto pSubDatas = extUniformbuffer.pData->getSubDatas();			
-		    for (uint32_t i = 0; i < subDataCount; ++i)
-		    {
-		    	auto &subData = *(pSubDatas + (i + subDataOffset));
-		    	if (subData.getDescriptorSetLayout() != nullptr)
-		    	{
-		    		++layoutCount;
-		    	}
-		    }
-		}
-
-		std::vector<vk::DescriptorSetLayout> setLayouts(layoutCount);
-		m_usingDescriptorSets.resize(layoutCount);
-		uint32_t layoutIndex = 0u;
-		if (pLayout != nullptr) {
-			setLayouts[layoutIndex] = *pLayout;
-			if (m_needReAllocateDescriptorSet)
-			{
-				//now descriptor set has not be created.
-				m_usingDescriptorSets[layoutIndex] = vk::DescriptorSet();
-			}
-			else
-			{
-				m_usingDescriptorSets[layoutIndex] = *m_pDescriptorSet;
-			}
-			++layoutIndex;
-		}
-
-		for (const auto &extUniformbuffer : m_extUniformBuffers)
-		{
-		    uint32_t subDataOffset = extUniformbuffer.subDataOffset;
-		    uint32_t subDataCount = extUniformbuffer.subDataCount;
-		    auto pSubDatas = extUniformbuffer.pData->getSubDatas();			
-		    for (uint32_t i = 0; i < subDataCount; ++i)
-		    {
-		    	auto &subData = *(pSubDatas + (i + subDataOffset));
-		    	if (subData.getDescriptorSetLayout() != nullptr)
-		    	{
-		    		setLayouts[layoutIndex] = *(subData.getDescriptorSetLayout());
-		    		m_usingDescriptorSets[layoutIndex] = *(subData.getDescriptorSet());
-		    		++layoutIndex;
-		    	}
-		    }
-		}
-
-		Bool32 setLayoutChanged = VG_FALSE;
-		if (m_lastsetLayouts != setLayouts)
-		{
-			setLayoutChanged = VG_TRUE;
-			m_lastsetLayouts = setLayouts;
-		}
-
-
-		if (bindingLayoutChanged || pushConstantRangesChanged || setLayoutChanged)
-		{
-			vk::PipelineLayoutCreateInfo pipelineLayoutCreateInfo = {
-				vk::PipelineLayoutCreateFlags(),             //flags
-				layoutCount,                                 //setLayoutCount
-				setLayouts.data(),                           //pSetLayouts
-				pushConstantRanges.size(),                   //pushConstantRangeCount
-				pushConstantRanges.data()                    //pPushConstantRanges
-			};
-
-			auto pDevice = pApp->getDevice();
-			m_pPipelineLayout = fd::createPipelineLayout(pDevice, pipelineLayoutCreateInfo);
-			_updatePipelineStateID();
-		}
-	}
-
-	void Pass::_createDescriptorSet()
-	{
-		std::unordered_map<vk::DescriptorType, uint32_t> mapTypeCounts;
-		for (const auto& name : m_arrLayoutBindNames)
-		{
-			const auto& item = m_mapLayoutBinds[name];
-			vk::DescriptorType vkDescriptorType = tranDescriptorTypeToVK(item.descriptorType);
-			mapTypeCounts[vkDescriptorType] += item.descriptorCount; //??? + 1.
-		}
-
-		std::unordered_map<vk::DescriptorType, uint32_t> mapAllTypes;
-
-		for (const auto &pair : mapTypeCounts) {
-			mapAllTypes[pair.first] = 1u;
-		}
-
-		for (const auto &pair : m_lastPoolSizeInfos) {
-			mapAllTypes[pair.first] = 1u;
-		}
-
-		Bool32 isSame = VG_TRUE;
-		for (const auto &pair : mapAllTypes) {
-			if (m_lastPoolSizeInfos[pair.first] != mapTypeCounts[pair.first]) {
-				isSame = VG_FALSE;
-				break;
-			}
-		}
-
-		//Save old descriptor pool because it will be used to destory the descriptorset later.
-		std::shared_ptr<vk::DescriptorPool> oldPool = m_pDescriptorPool;
-		if (isSame == VG_FALSE)
-		{
-			m_needReAllocateDescriptorSet = VG_TRUE;
-			m_lastPoolSizeInfos = mapTypeCounts;
-
-			std::vector<vk::DescriptorPoolSize> poolSizeInfos(mapTypeCounts.size());
-		    size_t index = 0;
-		    for (const auto& item : mapTypeCounts)
-		    {
-		    	poolSizeInfos[index].type = item.first;
-		    	poolSizeInfos[index].descriptorCount = item.second;
-		    	++index;
-		    }
-
-			auto pDevice = pApp->getDevice();
-		    //create descriptor pool.
-		    {
-		    	if (poolSizeInfos.size())
-		    	{
-		    		vk::DescriptorPoolCreateInfo createInfo = { vk::DescriptorPoolCreateFlagBits::eFreeDescriptorSet
-		    			, 1u
-		    			, static_cast<uint32_t>(poolSizeInfos.size())
-		    			, poolSizeInfos.data()
-		    		};
-		    		m_pDescriptorPool = fd::createDescriptorPool(pDevice, createInfo);
-		    	}
-		    	else
-		    	{
-		    		m_pDescriptorPool = nullptr;
-		    	}
-		    }
-		}
-
-		if (m_needReAllocateDescriptorSet) {
-			m_needReAllocateDescriptorSet = VG_FALSE;
-			//We must update descriptor information after reallocating descriptor set.
-			m_needUpdateDescriptorInfo = VG_TRUE; 
-			auto pDevice = pApp->getDevice();
-			//create descriptor set.
-		    if (m_pDescriptorSetLayout != nullptr && m_pDescriptorPool != nullptr)
-		    {
-		    	vk::DescriptorSetLayout layouts[] = { *m_pDescriptorSetLayout };
-		    	vk::DescriptorSetAllocateInfo allocateInfo = {
-		    		*m_pDescriptorPool,
-		    		1u,
-		    		layouts
-		    	};
-		    	m_pDescriptorSet = fd::allocateDescriptorSet(pDevice, m_pDescriptorPool.get(), allocateInfo);
-				m_usingDescriptorSets[0] = *m_pDescriptorSet;
-		    }
-		    else
-		    {
-		    	m_pDescriptorSet = nullptr;
-		    }
-		}
-		
-	}
-
-	void Pass::_beginCheckNeedUpdateDescriptorInfo()
-	{
-		if (m_needUpdateDescriptorInfo == VG_TRUE) return;
-		if (m_arrLayoutBindNames != m_lastLayoutBindNames) {
-			m_needUpdateDescriptorInfo = VG_TRUE;
-			return;
-		}
-		for (const auto &name : m_arrLayoutBindNames) {
-			const auto &value1 = m_mapLayoutBinds[name];
-			const auto &value2 = m_lastLayoutBinds[name];
-			if (value1 != value2) {
-				m_needUpdateDescriptorInfo = VG_TRUE;
-				return;
-			}
-		}
-	}
-
-	void Pass::_updateDescriptorBufferInfo()
-	{
-		//get total number of unimform buffer variables.
-		int32_t count = 0u;
-		for (const auto& item : m_lastLayoutBindingInfos)
-		{
-			if (item.descriptorType == DescriptorType::UNIFORM_BUFFER)
-				++count;
-		}
-
-		std::vector<vk::WriteDescriptorSet> writes(count);
-		std::vector<std::vector<vk::DescriptorBufferInfo>> bufferInfoss(count);
-		uint32_t offset = 0u;
-		uint32_t index = 0u;
-		uint32_t itemIndex = 0;
-		for (const auto& item : m_lastLayoutBindingInfos)
-		{
-			if (item.descriptorType == DescriptorType::UNIFORM_BUFFER)
-			{
-				bufferInfoss[index].resize(item.descriptorCount);
-				for (uint32_t i = 0; i < item.descriptorCount; ++i)
-				{
-					bufferInfoss[index][i].buffer = *m_pUniformBuffer;
-					bufferInfoss[index][i].offset = offset;
-					bufferInfoss[index][i].range = item.size;
-					offset += item.bufferSize;
-				}
-				writes[index].dstSet = *m_pDescriptorSet;
-				writes[index].dstBinding = itemIndex;
-				writes[index].descriptorType = tranDescriptorTypeToVK(item.descriptorType);
-				writes[index].dstArrayElement = 0;
-				writes[index].descriptorCount = item.descriptorCount;
-				writes[index].pBufferInfo = bufferInfoss[index].data();
-				++index;
-			}
-			++itemIndex;
-		}
-
-		if (writes.size())
-		{
-			auto pDevice = pApp->getDevice();
-			pDevice->updateDescriptorSets(writes, nullptr);
-		}
-	}
-
-	void Pass::_updateDescriptorImageInfo()
-	{
-		//get total number of unimform buffer variables.
-		int32_t count = 0u;
-		for (const auto& item : m_lastLayoutBindingInfos)
-		{
-			if (item.descriptorType == DescriptorType::COMBINED_IMAGE_SAMPLER ||
-				item.descriptorType == DescriptorType::INPUT_ATTACHMENT)
-				++count;
-		}
-
-		std::vector<vk::WriteDescriptorSet> writes(count);
-		std::vector<vk::DescriptorImageInfo> imageInfos(count);
-
-		uint32_t index = 0u;
-		uint32_t itemIndex = 0u;
-		for (const auto& item : m_lastLayoutBindingInfos)
-		{
-			if (item.descriptorType == DescriptorType::COMBINED_IMAGE_SAMPLER ||
-				item.descriptorType == DescriptorType::INPUT_ATTACHMENT)
-			{
-#ifdef DEBUG
-				if (item.isTexture == VG_FALSE)
-					throw std::runtime_error("The data type of binding should be is TEXTURE when its type is COMBINED_IMAGE_SAMPLER");
-				if (item.descriptorCount != 1u)
-					throw std::runtime_error("The descriptor count of binding shoubld be 1 when its type is COMBINED_IMAGE_SAMPLER");
-#endif // DEBUG
-				PassData::TexData texData = m_pData->getTexture(item.name);
-				const auto pTexture = texData.pTexture != nullptr ? texData.pTexture : pDefaultTexture2D.get();
-				vk::ImageView imageView;
-				if (texData.pTexture != nullptr) {
-					if (texData.pImageView != nullptr) {
-					    imageView = *(texData.pImageView->getImageView());
-					} else {
-						imageView = *(pTexture->getImageView()->getImageView());
-					}
-				} else {
-					imageView = *(pTexture->getImageView()->getImageView());
-				}
-				vk::Sampler sampler;
-				if (texData.pSampler != nullptr) {
-				    sampler = *(texData.pSampler->getSampler());
-				} else {
-					sampler = *(pTexture->getSampler()->getSampler());
-				}
-				vk::ImageLayout imageLayout;
-				if (texData.imageLayout != vk::ImageLayout::eUndefined) {
-					imageLayout = texData.imageLayout;
-				} else {
-					imageLayout = pTexture->getImage()->getInfo().layout;
-				}
-				
-				imageInfos[index].sampler = sampler;
-				imageInfos[index].imageView = imageView;
-				imageInfos[index].imageLayout = imageLayout;
-
-				writes[index].dstSet = *m_pDescriptorSet;
-				writes[index].dstBinding = itemIndex;
-				writes[index].descriptorType = tranDescriptorTypeToVK(item.descriptorType);
-				writes[index].dstArrayElement = 0u;
-				writes[index].descriptorCount = item.descriptorCount;
-				writes[index].pImageInfo = &imageInfos[index];
-				++index;
-			}
-			++itemIndex;
-		}
-
-		auto pDevice = pApp->getDevice();
-		pDevice->updateDescriptorSets(writes, nullptr);
-	}
-
-	void Pass::_endCheckNeedUpdateDescriptorInfo()
-	{
-		if (m_needUpdateDescriptorInfo == VG_TRUE) 
-		{
-			m_lastLayoutBindNames = m_arrLayoutBindNames;
-			m_lastLayoutBinds = m_mapLayoutBinds;
-		}
-		m_needUpdateDescriptorInfo = VG_FALSE;
-		
-	}
-
-	void Pass::_applyBufferContent()
-	{
-		if (m_pUniformBufferMemory != nullptr)
-		{
-			//get total number of unimform buffer variables.
-			int32_t uniformBufferCount = 0u;
-			for (const auto& name : m_arrLayoutBindNames)
-			{
-				const auto& item = m_mapLayoutBinds[name];
-				if (item.descriptorType == DescriptorType::UNIFORM_BUFFER)
-					++uniformBufferCount;
-			}
-
-			//get total size of uniform buffer datas and their offsets and sizes for each one.
-			uint32_t totalSize = 0u;
-			uint32_t offset = 0u;
-			std::vector<uint32_t> offsets(uniformBufferCount);
-			std::vector<std::string> names(uniformBufferCount);
-			std::vector<uint32_t> descriptorCounts(uniformBufferCount);
-			uint32_t index = 0u;
-			for (const auto& name : m_arrLayoutBindNames)
-			{
-				const auto& item = m_mapLayoutBinds[name];
-				if (item.descriptorType == DescriptorType::UNIFORM_BUFFER)
-				{
-					offsets[index] = offset;
-					names[index] = item.name;
-					descriptorCounts[index] = item.descriptorCount;
-					totalSize += item.bufferSize;
-					offset += item.bufferSize;
-					++index;
-				}
-			}
-			//sync buffer data.
-			void *data;
-			auto pDevice = pApp->getDevice();
-			pDevice->mapMemory(*m_pUniformBufferMemory, 0, static_cast<vk::DeviceSize>(totalSize), vk::MemoryMapFlags(), &data);
-			for (int32_t i = 0; i < uniformBufferCount; ++i)
-			{
-				m_pData->memoryCopyData(names[i], data, offsets[i], 0u, descriptorCounts[i]);
-			}
-			pDevice->unmapMemory(*m_pUniformBufferMemory);
-		}
-	}
-
-	void Pass::createBuffer(vk::DeviceSize size, std::shared_ptr<vk::Buffer>& pBuffer, std::shared_ptr<vk::DeviceMemory> &pBufferMemory)
-	{
-		vk::BufferCreateInfo createInfo = {
-			vk::BufferCreateFlags(),
-			size,
-			vk::BufferUsageFlagBits::eUniformBuffer,
-			vk::SharingMode::eExclusive
-		};
-
-		auto pDevice = pApp->getDevice();
-		pBuffer = fd::createBuffer(pDevice, createInfo);
-
-		vk::MemoryRequirements memReqs = pDevice->getBufferMemoryRequirements(*pBuffer);
-		vk::MemoryAllocateInfo allocateInfo = {
-			memReqs.size,
-			vg::findMemoryType(pApp->getPhysicalDevice(),
-			memReqs.memoryTypeBits,
-			vk::MemoryPropertyFlagBits::eHostVisible | vk::MemoryPropertyFlagBits::eHostCoherent)
-		};
-
-		pBufferMemory = fd::allocateMemory(pDevice, allocateInfo);
-
-		pDevice->bindBufferMemory(*pBuffer, *pBufferMemory, 0);
-	}
-
 	void Pass::_updatePipelineStateID()
 	{
 		++m_pipelineStateID;
@@ -1810,8 +1399,8 @@ namespace vg
 		    }
 		}
 
-		if (static_cast<uint32_t>(m_usingDynamicOffsets.size()) != dynamicCount)
-		      m_usingDynamicOffsets.resize(dynamicCount);
+		if (static_cast<uint32_t>(m_dynamicOffsets.size()) != dynamicCount)
+		      m_dynamicOffsets.resize(dynamicCount);
 		uint32_t dynamicIndex = 0u;
 
 		for (const auto &extUniformbuffer : m_extUniformBuffers)
@@ -1834,8 +1423,8 @@ namespace vg
 		    				for (uint32_t descriptorIndex = 0u; descriptorIndex < binding.descriptorCount; ++descriptorIndex)
 		    				{
 		    					auto &descriptorInfo = *(subData.getDescriptorInfos() + (descriptorInfoIndex + descriptorIndex));
-		    					if(m_usingDynamicOffsets[dynamicIndex] != descriptorInfo.dynamicOffset)
-		    					    m_usingDynamicOffsets[dynamicIndex] = descriptorInfo.dynamicOffset;
+		    					if(m_dynamicOffsets[dynamicIndex] != descriptorInfo.dynamicOffset)
+		    					    m_dynamicOffsets[dynamicIndex] = descriptorInfo.dynamicOffset;
 		    					++dynamicIndex;
 		    				}
 		    			}
@@ -1846,9 +1435,6 @@ namespace vg
 		    }
 		}
 	}
-
-	
-
 
 	Pass::_BuildInDataCache::_BuildInDataCache()
 		: matrixObjectToNDC(1.0f)

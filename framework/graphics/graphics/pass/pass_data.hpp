@@ -89,17 +89,17 @@ namespace vg
 
 		const std::vector<std::string> getArrBufferNames() const;
 		Bool32 hasBuffer(std::string name) const;
-		void addBuffer(std::string name, PassBufferInfo bufferInfo);
+		void addBuffer(std::string name, const PassBufferInfo &bufferInfo);
 		void removeBuffer(std::string name);
 		const PassBufferInfo &getBuffer(std::string name) const;
-		void setBuffer(std::string name, PassBufferInfo bufferInfo);
+		void setBuffer(std::string name, const PassBufferInfo &bufferInfo);
 
         const std::vector<std::string> getArrTextureNames() const;
 		Bool32 hasTexture(std::string name) const;
-		void addTexture(std::string name, PassTextureInfo texInfo);
+		void addTexture(std::string name, const PassTextureInfo &texInfo);
 		void removeTexture(std::string name);
 		const PassTextureInfo &getTexture(std::string name) const;
-		void setTexture(std::string name, PassTextureInfo texInfo);
+		void setTexture(std::string name, const PassTextureInfo &texInfo);
 
         const std::vector<std::string> getArrDataNames() const;
 		Bool32 hasData(std::string name) const;

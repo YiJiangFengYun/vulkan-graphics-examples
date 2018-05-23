@@ -128,7 +128,7 @@ namespace vg
 		return hasValue<PassBufferInfo>(name, mapBuffers);
 	}
 
-	void PassData::addBuffer(std::string name, PassBufferInfo bufferInfo)
+	void PassData::addBuffer(std::string name, const PassBufferInfo &bufferInfo)
 	{
 		addValue(name, bufferInfo, mapBuffers, arrBufferNames);
 	}
@@ -143,7 +143,7 @@ namespace vg
 		return getValue(name, mapBuffers, arrBufferNames);
 	}
 
-	void PassData::setBuffer(std::string name, PassBufferInfo bufferInfo)
+	void PassData::setBuffer(std::string name, const PassBufferInfo &bufferInfo)
 	{
 		setValue(name, bufferInfo, mapBuffers, arrBufferNames);
 	}
@@ -158,7 +158,7 @@ namespace vg
 		return hasValue<PassTextureInfo>(name, mapTextures);
 	}
 		
-	void PassData::addTexture(std::string name, PassTextureInfo texInfo)
+	void PassData::addTexture(std::string name, const PassTextureInfo &texInfo)
 	{
 		addValue(name, texInfo, mapTextures, arrTexNames);
 	}
@@ -173,7 +173,7 @@ namespace vg
 		return getValue(name, mapTextures, arrTexNames);
 	}
 
-	void PassData::setTexture(std::string name, PassTextureInfo texInfo)
+	void PassData::setTexture(std::string name, const PassTextureInfo &texInfo)
 	{
 		setValue(name, texInfo, mapTextures, arrTexNames);
 	}

@@ -192,16 +192,16 @@ namespace vg
 		void setShader(Shader *pShader);
 
 		Bool32 hasBuffer(std::string name) const;
-		void addBuffer(std::string name, PassBufferInfo bufferInfo);
+		void addBuffer(std::string name, const PassBufferInfo &bufferInfo);
 		void removeBuffer(std::string name);
 		PassBufferInfo getBuffer(std::string name);
-		void setBuffer(std::string name, PassBufferInfo bufferInfo);
+		void setBuffer(std::string name, const PassBufferInfo &bufferInfo);
 
 		Bool32 hasTexture(std::string name) const;
-		void addTexture(std::string name, PassTextureInfo texInfo);
+		void addTexture(std::string name, const PassTextureInfo &texInfo);
 		void removeTexture(std::string name);
 		PassTextureInfo getTexture(std::string name) const;
-		void setTexture(std::string name, PassTextureInfo texInfo);
+		void setTexture(std::string name, const PassTextureInfo &texInfo);
 
         Bool32 hasData(std::string name) const;
 		void removeData(std::string name);
@@ -274,26 +274,50 @@ namespace vg
 		const std::unordered_map<vk::ShaderStageFlagBits, std::shared_ptr<Pass::SpecializationData>> &getSpecilizationDatas() const;
 		std::vector<vk::PushConstantRange> getPushConstantRanges() const;
 		std::vector<std::shared_ptr<PushConstantUpdate>> getPushconstantUpdates() const;
-
+		
 		void setSpecializationData(vk::ShaderStageFlagBits shaderStage
 			, const vk::SpecializationInfo &info);
 
+		Bool32 hasPushConstantRange(std::string name) const;
+		void addPushConstantRange(std::string name, vk::ShaderStageFlags stageFlags
+			, uint32_t offset
+			, uint32_t size
+			);
+		void removePushConstantRange(std::string name);
 	    void setPushConstantRange(std::string name
 		    , vk::ShaderStageFlags stageFlags
 			, uint32_t offset
-			, uint32_t size);
+			, uint32_t size
+			);
 
+		Bool32 hasPushConstantUpdate(std::string name) const;
+		void addPushConstantUpdate(std::string name
+		    , const void *pData
+			, uint32_t size
+			, vk::ShaderStageFlags stageFlags
+			, uint32_t offset
+			);
+		void removePushConstantUpdate(std::string name);
 		void setPushConstantUpdate(std::string name
 		    , const void *pData
 			, uint32_t size
 			, vk::ShaderStageFlags stageFlags
-			, uint32_t offset);
+			, uint32_t offset
+			);
+        
+		template<typename T>
+		void addPushConstantUpdate(std::string name
+		    , const T &data
+			, vk::ShaderStageFlags stageFlags
+			, uint32_t offset
+			);
 
         template<typename T>
 		void setPushConstantUpdate(std::string name
 		    , const T &data
 			, vk::ShaderStageFlags stageFlags 
-			, uint32_t offset);
+			, uint32_t offset
+			);
 
 		uint32_t getInstanceCount() const;
 		void setInstanceCount(uint32_t count);
@@ -451,8 +475,9 @@ namespace vg
 		
 		template <typename T>
 		void _updateBuildInData(BuildInDataType type, T data);
-
-
+        void _updatePipelineStateID();
+		void _applyUniformBufferDynamicOffsets();
+		
 		
 
 		//aggregations
@@ -464,9 +489,8 @@ namespace vg
 		void _updateDescriptorImageInfo();
 		void _endCheckNeedUpdateDescriptorInfo();
 		void _applyBufferContent();
-		void _updatePipelineStateID();
+		
 
-		void _applyUniformBufferDynamicOffsets();
 
 		
 		

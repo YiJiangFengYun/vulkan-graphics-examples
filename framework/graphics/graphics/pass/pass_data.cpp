@@ -10,17 +10,13 @@ namespace vg
 		, shaderStageFlags(shaderStageFlags)
 		, size(size)
 	{
-		const auto &pPhysicalDevice = pApp->getPhysicalDevice();
-		const auto &properties = pPhysicalDevice->getProperties();
-		const auto &minOffsetAlignment = static_cast<float>(properties.limits.minUniformBufferOffsetAlignment);
-		bufferSize = static_cast<uint32_t>(std::ceil(size / minOffsetAlignment) * minOffsetAlignment);
+		
 	}
 
 	PassDataInfo::PassDataInfo(const PassDataInfo &target)
 	    : layoutPriority(target.layoutPriority)
 		, shaderStageFlags(target.shaderStageFlags)
 		, size(target.size)
-		, bufferSize(target.bufferSize)
 	{
 
 	}
@@ -30,7 +26,14 @@ namespace vg
 		layoutPriority = target.layoutPriority;
 		shaderStageFlags = target.shaderStageFlags;
 		size = target.size;
-		bufferSize = target.bufferSize;
+	}
+
+	uint32_t PassDataInfo::getBufferSize() const
+	{
+		const auto &pPhysicalDevice = pApp->getPhysicalDevice();
+		const auto &properties = pPhysicalDevice->getProperties();
+		const auto &minOffsetAlignment = static_cast<float>(properties.limits.minUniformBufferOffsetAlignment);
+		return static_cast<uint32_t>(std::ceil(size / minOffsetAlignment) * minOffsetAlignment);
 	}
 
 	PassTextureInfo::PassTextureInfo(const Texture *pTexture
@@ -84,7 +87,9 @@ namespace vg
 		, BufferDescriptorType descriptorType
 		, vk::ShaderStageFlags stageFlags
 		)
-		: bufferData(bufferData)
+		: pBuffer(pBuffer)
+		, offset(offset)
+		, range(range)
 		, bindingPriority(bindingPriority)
 		, descriptorType(descriptorType)
 		, stageFlags(stageFlags)
@@ -113,6 +118,11 @@ namespace vg
 		stageFlags = target.stageFlags;
 	}
 
+	const std::vector<std::string> PassData::getArrBufferNames() const
+	{
+		return arrBufferNames;
+	}
+
 	Bool32 PassData::hasBuffer(std::string name) const
 	{
 		return hasValue<PassBufferInfo>(name, mapBuffers);
@@ -128,7 +138,7 @@ namespace vg
 		removeValue(name, mapBuffers, arrBufferNames);
 	}
 
-	PassBufferInfo PassData::getBuffer(std::string name)
+	const PassBufferInfo &PassData::getBuffer(std::string name) const
 	{
 		return getValue(name, mapBuffers, arrBufferNames);
 	}
@@ -136,6 +146,11 @@ namespace vg
 	void PassData::setBuffer(std::string name, PassBufferInfo bufferInfo)
 	{
 		setValue(name, bufferInfo, mapBuffers, arrBufferNames);
+	}
+
+	const std::vector<std::string> PassData::getArrTextureNames() const
+	{
+		return arrTexNames;
 	}
 
 	Bool32 PassData::hasTexture(std::string name) const
@@ -153,7 +168,7 @@ namespace vg
 		removeValue(name, mapTextures, arrTexNames);
 	}
 
-    PassTextureInfo PassData::getTexture(std::string name) const
+    const PassTextureInfo &PassData::getTexture(std::string name) const
 	{
 		return getValue(name, mapTextures, arrTexNames);
 	}
@@ -163,17 +178,9 @@ namespace vg
 		setValue(name, texInfo, mapTextures, arrTexNames);
 	}
 
-	uint32_t PassData::getDataBaseSize(const std::string name) const
+	const std::vector<std::string> PassData::getArrDataNames() const
 	{
-		const auto& bytes = getValue(name, mapDatas);
-		const auto& count = getValue(name, mapDataCounts);
-		return static_cast<uint32_t>(bytes.size()) / count;
-	}
-
-	uint32_t PassData::getDataSize(const std::string name) const
-	{
-		const auto& bytes = getValue(name, mapDatas);
-		return static_cast<uint32_t>(bytes.size());
+		return arrDataNames;
 	}
 
 	Bool32 PassData::hasData(std::string name) const
@@ -185,14 +192,21 @@ namespace vg
 	{
 		removeValue(name, mapDatas);
 		removeValue(name, mapDataCounts);
+		removeValue(name, mapDataInfos);
 	}
 
-	void PassData::addData(const std::string name, void *src, uint32_t size)
+	const PassDataInfo &PassData::getDataInfo(std::string name) const
+	{
+		return getValue(name, mapDataInfos);
+	}
+
+	void PassData::addData(const std::string name, const PassDataInfo &info, void *src, uint32_t size)
 	{
 		std::vector<Byte> temp(size);
-		memcpy(temp.data(), src, size);
+		if (size != 0u && src != nullptr) memcpy(temp.data(), src, size);
 		addValue(name, temp, mapDatas, arrDataNames);
 		addValue(name, 1u, mapDataCounts);
+		addValue(name, info, mapDataInfos);
 	}
 
 	void PassData::getData(const std::string name, void *dst, uint32_t size, uint32_t offset) const
@@ -217,6 +231,23 @@ namespace vg
 		    if(src) memcpy((char *)(mapDatas[name].data()) + offset, src, size);
 		}
 	}
+
+	uint32_t PassData::getDataBaseSize(const std::string name) const
+	{
+		const auto& bytes = getValue(name, mapDatas);
+		const auto& count = getValue(name, mapDataCounts);
+		return static_cast<uint32_t>(bytes.size()) / count;
+	}
+
+	uint32_t PassData::getDataSize(const std::string name) const
+	{
+		const auto& bytes = getValue(name, mapDatas);
+		return static_cast<uint32_t>(bytes.size());
+	}
+
+	
+
+	
 
 	void PassData::memoryCopyData(const std::string name
 		, void* dst

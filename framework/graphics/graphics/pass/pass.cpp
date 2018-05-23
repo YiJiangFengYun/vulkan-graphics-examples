@@ -177,11 +177,31 @@ namespace vg
 
 	}
 
+	Bool32 Pass::_compareDataInfo(const DataSortInfo &item1, const DataSortInfo &item2)
+	{
+		uint32_t shaderStageValue1 = static_cast<uint32_t>(item1.shaderStageFlags);
+		uint32_t shaderStageValue2 = static_cast<uint32_t>(item2.shaderStageFlags);
+		int32_t result = static_cast<int32_t>(shaderStageValue1) - static_cast<int32_t>(shaderStageValue2);
+		if (result > 0) {
+			return VG_FALSE;
+		} else if (result < 0) {
+			return VG_TRUE;
+		} else {
+		    return item1.layoutPriority < item2.layoutPriority;
+		}
+	}
+
+	Bool32 Pass::_compareBufferTextureInfo(const BufferTextureSortInfo &item1, const BufferTextureSortInfo &item2)
+	{
+		return item1.bindingPriority < item2.bindingPriority;
+	}
 
 	Pass::Pass() 
 		: Base(BaseType::PASS)
 		, m_data()
 		, m_dataChanged(VG_FALSE)
+		, m_dataContentChanged(VG_FALSE)
+		, m_dataContentChanges()
 		, m_textureChanged(VG_FALSE)
 		, m_bufferChanged(VG_FALSE)
 		, m_polygonMode()
@@ -209,9 +229,13 @@ namespace vg
 		, m_vertexInputFilterInfo()
 		, m_vertexInputFilterLocations()
 
+		//Applied
+		, m_sortDataSet(_compareDataInfo)
 		, m_dataBuffer()
+		, m_descriptorSetChanged(VG_FALSE)
 	    , m_layoutBindingCount()
-		, m_layoutBindings()
+		, m_descriptorSetLayoutBindings()
+		, m_updateDescriptorSetInfos()
 		, m_pDescriptorSetLayout(nullptr)
 		, m_poolSizeInfos()
 		, m_pDescriptorPool(nullptr)
@@ -223,6 +247,8 @@ namespace vg
 		, m_pPipelineLayout(nullptr)
 		, m_pipelineLayoutChanged(VG_FALSE)
 		, m_pipelineStateID()
+
+		, m_pShader(nullptr)
 		
 	{
 		_initDefaultBuildInDataInfo();
@@ -339,7 +365,8 @@ namespace vg
 	void Pass::setData(const std::string name, void *src, uint32_t size, uint32_t offset)
 	{
 		m_data.setData(name, src, size, offset);
-		m_dataChanged = VG_TRUE;
+		m_dataContentChanged = VG_TRUE;
+		m_dataContentChanges[name] = VG_TRUE;
 	}
 
 	Color Pass::getMainColor() const
@@ -743,6 +770,247 @@ namespace vg
 
 	void Pass::apply()
 	{
+		const auto &data = m_data;
+		if (m_dataChanged) {
+			//Construct data buffer.
+			m_sortDataSet.clear();
+			const auto &arrDataNames = data.arrDataNames;
+			if (arrDataNames.size() > 0) {
+			    uint32_t totalBufferSize = 0u;
+			    for (const auto &name : arrDataNames)
+			    {
+			    	const auto & dataInfo = data.getDataInfo(name);
+					DataSortInfo sortInfo;
+					sortInfo.name = name;
+					sortInfo.layoutPriority = dataInfo.layoutPriority;
+					sortInfo.size = dataInfo.size;
+					sortInfo.bufferSize = dataInfo.getBufferSize();
+					sortInfo.shaderStageFlags = dataInfo.shaderStageFlags;
+					m_sortDataSet.insert(sortInfo);
+			    	totalBufferSize += sortInfo.bufferSize;
+			    }
+
+				std::vector<Byte> memory(totalBufferSize);
+				uint32_t offset = 0u;
+				for (const auto &info : m_sortDataSet) {
+					data.getData(info.name, memory.data() + offset, info.size, 0u);
+					offset += info.bufferSize;
+				}
+			    m_dataBuffer.updateBuffer(memory.data(), totalBufferSize);
+			} else {
+				m_dataBuffer.updateBuffer(nullptr, 0u);
+			}
+
+			//Data change will make build in descriptor set change.
+			m_descriptorSetChanged = VG_TRUE;
+
+			m_dataChanged = VG_FALSE;
+		}
+
+		if (m_dataContentChanged) {
+			//Update data buffer.
+			uint32_t count = 0;
+			for (const auto &info : m_sortDataSet) {
+				if (m_dataContentChanges.count(info.name) != 0) {
+					++count;
+				}
+			}
+			std::vector<std::vector<Byte>> memories(count);			
+			std::vector<MemorySlice> memorySlices(count);
+			uint32_t index = 0u;
+			uint32_t offset = 0u;
+			for (const auto &info : m_sortDataSet) {
+				if (m_dataContentChanges.count(info.name) != 0) {
+					memories[index].resize(info.bufferSize);
+					data.getData(info.name, memories[index].data(), info.size, 0u);
+					memorySlices[index].pMemory = memories[index].data();
+					memorySlices[index].offset = offset;
+					memorySlices[index].size = info.bufferSize;
+					++index;
+				}
+				offset += info.bufferSize;				
+			}
+			m_dataBuffer.updateBuffer(memorySlices, m_dataBuffer.getSize());
+
+			m_dataContentChanged = VG_FALSE;
+			m_dataContentChanges.clear();
+		}
+
+		if (m_bufferChanged) {
+
+		}
+
+		if (m_textureChanged) {
+
+		}
+
+		if (m_descriptorSetChanged) {
+			m_layoutBindingCount = 0u;
+			uint32_t currBinding = 0u;
+
+			//first part descriptors is build data.			
+			uint32_t dataBindingCount = 0u;
+			std::vector<vk::DescriptorSetLayoutBinding> dataBindingInfos;
+			std::vector<UpdateDescriptorSetInfo> dataUpdateDesSetInfos;
+			{
+			    vk::ShaderStageFlags currStageFlags = vk::ShaderStageFlags();
+			    for (const auto &info : m_sortDataSet) {
+			    	if (info.shaderStageFlags != currStageFlags) {
+			    		currStageFlags = info.shaderStageFlags;												
+			    		++dataBindingCount;
+			    	}
+			    }
+				if (dataBindingCount)
+				{
+					dataBindingInfos.resize(dataBindingCount);
+				    dataUpdateDesSetInfos.resize(dataBindingCount);
+			        currStageFlags = vk::ShaderStageFlags();
+				    uint32_t dataBindingIndex = 0u;
+				    auto iterator = m_sortDataSet.begin();
+					uint32_t offset = 0u;
+				    do {
+				    	const auto &info = *iterator;
+						if (info.shaderStageFlags != currStageFlags) {
+			    		    currStageFlags = info.shaderStageFlags;
+			    		    
+			    		    vk::DescriptorSetLayoutBinding dataBindingInfo;
+			                dataBindingInfo.binding = currBinding;
+							++currBinding;
+			                dataBindingInfo.descriptorType = vk::DescriptorType::eUniformBuffer;
+			                dataBindingInfo.descriptorCount = 1u;
+			                dataBindingInfo.stageFlags = info.shaderStageFlags;
+						    dataBindingInfos[dataBindingIndex] = dataBindingInfo;
+
+							UpdateDescriptorSetInfo dataUpdateDesSetInfo;
+						    dataUpdateDesSetInfo.bufferInfos.resize(1u);
+						    dataUpdateDesSetInfo.bufferInfos[0].buffer = *(m_dataBuffer.getBuffer());
+							dataUpdateDesSetInfo.bufferInfos[0].offset = offset;
+
+							uint32_t range = info.bufferSize;
+							auto nextIterator = ++iterator;
+						    while (nextIterator != m_sortDataSet.end() && nextIterator->shaderStageFlags == currStageFlags)
+							{
+								range += nextIterator->bufferSize;
+							}
+
+							dataUpdateDesSetInfo.bufferInfos[0].range = range;
+							dataUpdateDesSetInfos[dataBindingIndex] = dataUpdateDesSetInfo;
+						}
+						offset += info.bufferSize;
+						++iterator;
+				    } while (iterator != m_sortDataSet.end());
+				}
+			}
+
+			//second part is buffer and image bindings.
+			uint32_t bufferTextureBindingCount = 0u;
+			std::vector<vk::DescriptorSetLayoutBinding> bufferTextureBindingInfos;
+			std::vector<UpdateDescriptorSetInfo> bufferTextureUpdateDesSetInfos;
+			{
+				//sort by binding priority.
+				std::set<BufferTextureSortInfo, Bool32(*)(const BufferTextureSortInfo &, const BufferTextureSortInfo &)> sortInfos(_compareBufferTextureInfo);
+				const auto &arrBufferNames = data.arrBufferNames;
+			    for (const auto &name : arrBufferNames)
+			    {
+			    	const auto &bufferInfo = data.getBuffer(name);
+					BufferTextureSortInfo sortInfo;
+					sortInfo.name = name;
+					sortInfo.bindingPriority = bufferInfo.bindingPriority;
+					sortInfo.isTexture = VG_FALSE;
+					sortInfo.pInfo = reinterpret_cast<const void *>(&bufferInfo);
+					sortInfos.insert(sortInfo);
+			    }
+				const auto &arrTextureNames = data.arrTexNames;
+				for (const auto &name : arrTextureNames)
+				{
+					const auto &textureInfo = data.getTexture(name);
+					BufferTextureSortInfo sortInfo;
+					sortInfo.name = name;
+					sortInfo.bindingPriority = textureInfo.bindingPriority;
+					sortInfo.isTexture = VG_TRUE;
+					sortInfo.pInfo = reinterpret_cast<const void *>(&textureInfo);
+					sortInfos.insert(sortInfo);
+				}
+
+				//fill infos for creating descriptor set and its layout.
+				bufferTextureBindingCount = sortInfos.size();
+				bufferTextureBindingInfos.resize(bufferTextureBindingCount);
+				bufferTextureUpdateDesSetInfos.resize(bufferTextureBindingCount);
+				uint32_t bufferTextureBindingIndex = 0u;
+				for (auto iterator = sortInfos.begin(); iterator != sortInfos.end(); ++iterator)
+				{
+					const auto &sortInfo = *iterator;
+					vk::DescriptorSetLayoutBinding bindingInfo;
+					UpdateDescriptorSetInfo updateDesSetInfo;					
+					bindingInfo.binding = currBinding;
+					++currBinding;
+					if (sortInfo.isTexture == VG_TRUE)
+					{
+						const auto &textureInfo = *(reinterpret_cast<const PassTextureInfo *>(sortInfo.pInfo));
+						bindingInfo.descriptorType = tranImageDescriptorTypeToVK(textureInfo.descriptorType);
+						bindingInfo.descriptorCount = 1u;
+						bindingInfo.stageFlags = textureInfo.stageFlags;
+
+				        const auto pTexture = textureInfo.pTexture != nullptr ? textureInfo.pTexture : pDefaultTexture2D.get();
+				        vk::ImageView imageView;
+				        if (textureInfo.pTexture != nullptr) {
+				        	if (textureInfo.pImageView != nullptr) {
+				        	    imageView = *(textureInfo.pImageView->getImageView());
+				        	} else {
+				        		imageView = *(pTexture->getImageView()->getImageView());
+				        	}
+				        } else {
+				        	imageView = *(pTexture->getImageView()->getImageView());
+				        }
+				        vk::Sampler sampler;
+				        if (textureInfo.pSampler != nullptr) {
+				            sampler = *(textureInfo.pSampler->getSampler());
+				        } else {
+				        	sampler = *(pTexture->getSampler()->getSampler());
+				        }
+				        vk::ImageLayout imageLayout;
+				        if (textureInfo.imageLayout != vk::ImageLayout::eUndefined) {
+				        	imageLayout = textureInfo.imageLayout;
+				        } else {
+				        	imageLayout = pTexture->getImage()->getInfo().layout;
+				        }
+
+						updateDesSetInfo.imageInfos.resize(1u);
+						updateDesSetInfo.imageInfos[0].imageView = imageView;
+						updateDesSetInfo.imageInfos[0].sampler = sampler;
+						updateDesSetInfo.imageInfos[0].imageLayout = imageLayout;
+					}
+					else
+					{
+						const auto &bufferInfo = *(reinterpret_cast<const PassBufferInfo *>(sortInfo.pInfo));
+						bindingInfo.descriptorType = tranBufferDescriptorTypeToVK(bufferInfo.descriptorType);
+						bindingInfo.descriptorCount = 1u;
+						bindingInfo.stageFlags = bufferInfo.stageFlags;
+
+						updateDesSetInfo.bufferInfos.resize(1u);
+					    updateDesSetInfo.bufferInfos[0].buffer = *(bufferInfo.pBuffer->getBuffer());
+					    updateDesSetInfo.bufferInfos[0].offset = bufferInfo.offset;
+						updateDesSetInfo.bufferInfos[0].range = bufferInfo.range;
+					}
+					bufferTextureBindingInfos[bufferTextureBindingIndex] = bindingInfo;
+					bufferTextureUpdateDesSetInfos[bufferTextureBindingIndex] = updateDesSetInfo;
+
+					++bufferTextureBindingIndex;
+				}
+			}
+
+			m_layoutBindingCount = dataBindingCount + bufferTextureBindingCount;			
+		}
+
+		if (m_descriptorSetsChanged) {
+
+		}
+
+		if (m_pipelineLayoutChanged) {
+
+		}
+
+
 		if (m_applied == VG_FALSE)
 		{
 			_createPipelineLayout();
@@ -772,12 +1040,85 @@ namespace vg
 
 	void Pass::beginRecord() const
 	{
-		if (m_applied == VG_FALSE) throw std::runtime_error("Pass should apply change before used to render.");
+#ifdef DEBUG
+		if (m_dataChanged || m_dataContentChanged || m_textureChanged || m_bufferChanged || 
+		    m_descriptorSetChanged || m_descriptorSetsChanged || m_pipelineLayoutChanged)
+		    throw std::runtime_error("Pass should apply change before used to render.");
+#endif //DEBUG
 	}
 		
 	void Pass::endRecord() const
 	{
 
+	}
+
+	void Pass::_initDefaultBuildInDataInfo()
+	{
+		m_buildInDataInfoComponents.resize(3);
+		m_buildInDataInfoComponents[0].type = BuildInDataType::MATRIX_OBJECT_TO_NDC;
+		m_buildInDataInfoComponents[1].type = BuildInDataType::MAIN_CLOLOR;
+		m_buildInDataInfoComponents[2].type = BuildInDataType::MATRIX_OBJECT_TO_WORLD;
+
+		m_buildInDataInfo.componentCount = static_cast<uint32_t>(m_buildInDataInfoComponents.size());
+		m_buildInDataInfo.pComponent = m_buildInDataInfoComponents.data();
+	}
+
+	void Pass::_initBuildInData()
+	{
+		uint32_t size = 0u;
+		auto componentCount = m_buildInDataInfo.componentCount;
+		for (uint32_t componentIndex = 0; componentIndex < componentCount; ++componentIndex)
+		{
+			BuildInDataType type = (*(m_buildInDataInfo.pComponent + componentIndex)).type;
+			uint32_t count = static_cast<uint32_t>(BuildInDataType::COUNT);
+		    for (uint32_t i = 0; i < count; ++i)
+		    {
+		    	if (i == static_cast<uint32_t>(type))
+		    	{
+		    		size += buildInDataTypeSizes[i];
+					break;
+		    	}
+		    }
+		}
+
+		if (size > 0)
+		{
+		    PassDataInfo info = {
+		    	VG_PASS_BUILDIN_DATA_LAYOUT_PRIORITY,
+		    	vk::ShaderStageFlagBits::eVertex,
+		    	size
+		    };
+		    m_data.addData(VG_PASS_BUILDIN_DATA_NAME, info, nullptr, 0u);
+		}
+		else if (m_data.hasData(VG_PASS_BUILDIN_DATA_NAME))
+		{
+			m_data.removeData(VG_PASS_BUILDIN_DATA_NAME);
+		}
+		
+		uint32_t offset1 = 0u;
+		for (uint32_t componentIndex = 0; componentIndex < componentCount; ++componentIndex)
+		{
+			BuildInDataType type = (*(m_buildInDataInfo.pComponent + componentIndex)).type;
+			uint32_t count = static_cast<uint32_t>(BuildInDataType::COUNT);
+		    uint32_t offset2= 0u;
+		    for (uint32_t i = 0; i < count; ++i)
+		    {
+		    	if (i == static_cast<uint32_t>(type))
+		    	{
+					m_data.setData(VG_PASS_BUILDIN_DATA_NAME
+				        , ((char *)(&m_buildInDataCache) + offset2)
+					    , buildInDataTypeSizes[static_cast<uint32_t>(type)]
+					    , offset1);
+					break;
+		    	}
+				else
+				{
+					offset2 += buildInDataTypeSizes[i];
+				}
+		    }
+			offset1 += buildInDataTypeSizes[static_cast<uint32_t>(type)];
+		}
+		m_dataChanged = VG_TRUE;
 	}
 
 	void Pass::_createPipelineLayout()
@@ -1311,79 +1652,7 @@ namespace vg
 		}
 	}
 
-	void Pass::_initDefaultBuildInDataInfo()
-	{
-		m_buildInDataInfoComponents.resize(3);
-		m_buildInDataInfoComponents[0].type = BuildInDataType::MATRIX_OBJECT_TO_NDC;
-		m_buildInDataInfoComponents[1].type = BuildInDataType::MAIN_CLOLOR;
-		m_buildInDataInfoComponents[2].type = BuildInDataType::MATRIX_OBJECT_TO_WORLD;
-
-		m_buildInDataInfo.componentCount = static_cast<uint32_t>(m_buildInDataInfoComponents.size());
-		m_buildInDataInfo.pComponent = m_buildInDataInfoComponents.data();
-	}
-
-	void Pass::_initBuildInData()
-	{
-		uint32_t size = 0u;
-		auto componentCount = m_buildInDataInfo.componentCount;
-		for (uint32_t componentIndex = 0; componentIndex < componentCount; ++componentIndex)
-		{
-			BuildInDataType type = (*(m_buildInDataInfo.pComponent + componentIndex)).type;
-			uint32_t count = static_cast<uint32_t>(BuildInDataType::COUNT);
-		    for (uint32_t i = 0; i < count; ++i)
-		    {
-		    	if (i == static_cast<uint32_t>(type))
-		    	{
-		    		size += buildInDataTypeSizes[i];
-					break;
-		    	}
-		    }
-		}
-		m_pData->setDataValue(VG_M_BUILDIN_NAME, nullptr, size, 0u);
-		
-		uint32_t offset1 = 0u;
-		for (uint32_t componentIndex = 0; componentIndex < componentCount; ++componentIndex)
-		{
-			BuildInDataType type = (*(m_buildInDataInfo.pComponent + componentIndex)).type;
-			uint32_t count = static_cast<uint32_t>(BuildInDataType::COUNT);
-		    uint32_t offset2= 0u;
-		    for (uint32_t i = 0; i < count; ++i)
-		    {
-		    	if (i == static_cast<uint32_t>(type))
-		    	{
-					m_pData->setDataValue(VG_M_BUILDIN_NAME
-				    , ((char *)(&m_buildInDataCache) + offset2)
-					, buildInDataTypeSizes[static_cast<uint32_t>(type)]
-					, offset1);
-					break;
-		    	}
-				else
-				{
-					offset2 += buildInDataTypeSizes[i];
-				}
-		    }
-			offset1 += buildInDataTypeSizes[static_cast<uint32_t>(type)];
-		}
-
-		if (size > 0) {
-		    //update layout binding information.
-		    uint32_t descriptorCount = 1u;
-		    LayoutBindingInfo info(
-		    	VG_M_BUILDIN_NAME,
-		    	VG_FALSE,
-		    	VG_M_BUILDIN_BINDING_PRIORITY,
-		    	DescriptorType::UNIFORM_BUFFER,
-		    	descriptorCount,
-		    	ShaderStageFlagBits::VERTEX
-		    );
-		    info.updateSize(size);
-		    setValue(VG_M_BUILDIN_NAME, info, m_mapLayoutBinds, m_arrLayoutBindNames);
-		} else {
-			removeValue(VG_M_BUILDIN_NAME, m_mapLayoutBinds, m_arrLayoutBindNames);
-		}
-		m_applied = VG_FALSE;
-		m_dataChanged = VG_TRUE;
-	}
+	
 
 
 	Pass::_BuildInDataCache::_BuildInDataCache()
@@ -1432,5 +1701,42 @@ namespace vg
 		, matrixView(target.matrixView)
 		, matrixProjection(target.matrixProjection)
 	{
+	}
+
+	Pass::DataSortInfo::DataSortInfo(std::string name
+		, vk::ShaderStageFlags shaderStageFlags
+		, uint32_t layoutPriority
+		, uint32_t size
+		, uint32_t bufferSize
+		)
+        : name(name)
+		, shaderStageFlags(shaderStageFlags)
+		, layoutPriority(layoutPriority)
+		, size(size)
+		, bufferSize(bufferSize)
+	{
+
+	}
+
+	Pass::BufferTextureSortInfo::BufferTextureSortInfo(std::string name
+		, uint32_t bindingPriority	
+		, Bool32 isTexture
+		, const void *pInfo
+		)
+		: name(name)
+		, bindingPriority(bindingPriority)		
+		, isTexture(isTexture)
+		, pInfo(pInfo)
+	{
+
+	}
+
+	Pass::UpdateDescriptorSetInfo::UpdateDescriptorSetInfo(std::vector<vk::DescriptorBufferInfo> bufferInfos
+		, std::vector<vk::DescriptorImageInfo> imageInfos
+	    )
+		:  bufferInfos(bufferInfos)
+		, imageInfos(imageInfos)
+	{
+
 	}
 }

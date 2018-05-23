@@ -34,7 +34,8 @@ namespace vg
 	void Pass::setData(const std::string name, const T &value)
 	{
 		m_data.setData<T>(name, value);
-		m_dataChanged = VG_TRUE;
+		m_dataContentChanged = VG_TRUE;
+		m_dataContentChanges[name] = VG_TRUE;
 	}
     
 	template<typename T>
@@ -54,7 +55,8 @@ namespace vg
 	void Pass::setData(const std::string name, const std::vector<T> &values)
 	{
 		m_data.setData<T>(name, values);
-		m_dataChanged = VG_TRUE;
+		m_dataContentChanged = VG_TRUE;
+		m_dataContentChanges[name] = VG_TRUE;
 	}
 
 	template<typename T>
@@ -74,7 +76,8 @@ namespace vg
 	void Pass::setData(const std::string name, const T * const pSrc, const uint32_t count)
 	{
 		m_data.setData<T>(name, pSrc, count);
-		m_dataChanged = VG_TRUE;
+		m_dataContentChanged = VG_TRUE;
+		m_dataContentChanges[name] = VG_TRUE;
 	}
 
     template<typename T>
@@ -126,11 +129,10 @@ namespace vg
 			size_t size = sizeof(T);
 			if (memcmp((char *)(&m_buildInDataCache) + offset1, &data, size) != 0) {
 				memcpy((char *)(&m_buildInDataCache) + offset1, &data, size);
-				m_pData->setDataValue(VG_M_BUILDIN_NAME
+				setDataValue(VG_M_BUILDIN_NAME
 				    , &data
 					, size
 					, offset2);
-				m_dataChanged = VG_TRUE;
 			}
 		}
 	}

@@ -332,6 +332,8 @@ namespace vg
 		//compositons
 		PassData m_data;
 		Bool32 m_dataChanged;
+		Bool32 m_dataContentChanged;
+		std::unordered_map<std::string, Bool32> m_dataContentChanges;
 		Bool32 m_textureChanged;
 		Bool32 m_bufferChanged;
 
@@ -372,12 +374,51 @@ namespace vg
 		////////applied data
 
 		//Build in buffer.
+		struct DataSortInfo {
+			std::string name;
+			vk::ShaderStageFlags shaderStageFlags;
+			uint32_t layoutPriority;
+			uint32_t size;
+			uint32_t bufferSize;
+
+			DataSortInfo(std::string name = nullptr
+			    , vk::ShaderStageFlags shaderStageFlags = vk::ShaderStageFlags()
+				, uint32_t layoutPriority = 0u
+				, uint32_t size = 0u
+				, uint32_t bufferSize = 0u
+				);
+		};
+		static Bool32 _compareDataInfo(const DataSortInfo &, const DataSortInfo &);
+		std::set<DataSortInfo, Bool32(*)(const DataSortInfo &, const DataSortInfo &)> m_sortDataSet;
 		BufferData m_dataBuffer;
 
 		//build in descriptor set layout.
+		struct BufferTextureSortInfo {
+			std::string name;
+			uint32_t bindingPriority;			
+			Bool32 isTexture;
+			const void *pInfo;
+
+			BufferTextureSortInfo(std::string name = nullptr
+				, uint32_t bindingPriority = 0u			
+			    , Bool32 isTexture = VG_FALSE
+				, const void *pInfo = nullptr
+				);
+		};
+		static Bool32 _compareBufferTextureInfo(const BufferTextureSortInfo &, const BufferTextureSortInfo &);
+		Bool32 m_descriptorSetChanged;
 		uint32_t m_layoutBindingCount;		
-        std::vector<vk::DescriptorSetLayoutBinding> m_layoutBindings;
-        std::shared_ptr<vk::DescriptorSetLayout> m_pDescriptorSetLayout;
+        std::vector<vk::DescriptorSetLayoutBinding> m_descriptorSetLayoutBindings;
+		struct UpdateDescriptorSetInfo {
+			std::vector<vk::DescriptorBufferInfo> bufferInfos;
+			std::vector<vk::DescriptorImageInfo> imageInfos;
+
+			UpdateDescriptorSetInfo(std::vector<vk::DescriptorBufferInfo> bufferInfos = std::vector<vk::DescriptorBufferInfo>()
+				, std::vector<vk::DescriptorImageInfo> imageInfos = std::vector<vk::DescriptorImageInfo>()
+				);
+		};
+		std::vector<UpdateDescriptorSetInfo> m_updateDescriptorSetInfos;
+        std::shared_ptr<vk::DescriptorSetLayout> m_pDescriptorSetLayout;		
 
 		//build in descriptor pool.
 		std::unordered_map<vk::DescriptorType, uint32_t> m_poolSizeInfos;
@@ -400,14 +441,18 @@ namespace vg
 		Bool32 m_pipelineLayoutChanged;
         PipelineStateID m_pipelineStateID;
 
+		Shader *m_pShader;		
+
 		void _initDefaultBuildInDataInfo();
 		void _initBuildInData();
 		
-		
+		template <typename T>
+		void _updateBuildInData(BuildInDataType type, T data);
+
+
 		
 
 		//aggregations
-		Shader *m_pShader;
 		void _createPipelineLayout();  
 		// void _createUniformBuffer();
 		// void _createDescriptorSet();
@@ -421,8 +466,7 @@ namespace vg
 		void _applyUniformBufferDynamicOffsets();
 
 		
-		template <typename T>
-		void _updateBuildInData(BuildInDataType type, T data);
+		
 		//tool methods
 		void createBuffer(vk::DeviceSize size, std::shared_ptr<vk::Buffer> &pBuffer, std::shared_ptr<vk::DeviceMemory> &pBufferMemory);
 	};

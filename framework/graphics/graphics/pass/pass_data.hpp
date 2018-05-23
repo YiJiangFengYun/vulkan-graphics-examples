@@ -2,18 +2,22 @@
 #define VG_PASS_DATA_HPP
 
 #include "graphics/global.hpp"
+#include "graphics/buffer_data/buffer_data.hpp"
 #include "graphics/texture/texture.hpp"
 #include "graphics/pass/pass_option.hpp"
 
 
-#define VG_M_BUILDIN_NAME "_BuildIn"
-#define VG_M_PRE_Z_TEXTURE_NAME "_pre_z_depth_tex"
-#define VG_M_POST_RENDER_TEXTURE_NAME "_post_render_tex"
+#define VG_PASS_BUILDIN_DATA_NAME "_BuildIn"
 
-#define VG_M_BUILDIN_BINDING_PRIORITY 0
-#define VG_M_PRE_Z_TEXTURE_BINDING_PRIORITY 1
-#define VG_M_POST_RENDER_TEXTURE_BINDING_PRIORITY 2
-#define VG_M_OTHER_MAX_BINDING_PRIORITY 3
+#define VG_PASS_PRE_Z_TEXTURE_NAME "_pre_z_depth_tex"
+#define VG_PASS_POST_RENDER_TEXTURE_NAME "_post_render_tex"
+
+#define VG_PASS_BUILDIN_DATA_LAYOUT_PRIORITY 0
+#define VG_PASS_OTHER_DATA_MAX_LAYOUT_PRIORITY 1
+
+#define VG_PASS_PRE_Z_TEXTURE_BINDING_PRIORITY 1
+#define VG_PASS_POST_RENDER_TEXTURE_BINDING_PRIORITY 2
+#define VG_PASS_OTHER_MAX_BINDING_PRIORITY 3
 
 namespace vg
 {
@@ -21,13 +25,13 @@ namespace vg
 		uint32_t layoutPriority;
 		vk::ShaderStageFlags shaderStageFlags;
 		uint32_t size;
-		uint32_t bufferSize;
 		PassDataInfo(uint32_t layoutPriority = 0u
 			, vk::ShaderStageFlags shaderStageFlags = vk::ShaderStageFlags()
 			, uint32_t size = 0u
 		);
 		PassDataInfo(const PassDataInfo &);
 		PassDataInfo& operator=(const PassDataInfo &);
+		uint32_t getBufferSize() const;
 	};
 
 	struct PassTextureInfo {
@@ -75,7 +79,7 @@ namespace vg
 		std::unordered_map<std::string, std::vector<Byte>> mapDatas;
 		std::unordered_map<std::string, uint32_t> mapDataCounts;
 
-		std::vector<std::string, PassDataInfo> mapDataInfos;
+		std::unordered_map<std::string, PassDataInfo> mapDataInfos;
 
 		std::vector<std::string> arrBufferNames;
 		std::unordered_map<std::string, PassBufferInfo> mapBuffers;
@@ -83,21 +87,24 @@ namespace vg
 		std::vector<std::string> arrTexNames;
 		std::unordered_map<std::string, PassTextureInfo> mapTextures;
 
+		const std::vector<std::string> getArrBufferNames() const;
 		Bool32 hasBuffer(std::string name) const;
 		void addBuffer(std::string name, PassBufferInfo bufferInfo);
 		void removeBuffer(std::string name);
-		PassBufferInfo getBuffer(std::string name);
+		const PassBufferInfo &getBuffer(std::string name) const;
 		void setBuffer(std::string name, PassBufferInfo bufferInfo);
 
-
+        const std::vector<std::string> getArrTextureNames() const;
 		Bool32 hasTexture(std::string name) const;
 		void addTexture(std::string name, PassTextureInfo texInfo);
 		void removeTexture(std::string name);
-		PassTextureInfo getTexture(std::string name) const;
+		const PassTextureInfo &getTexture(std::string name) const;
 		void setTexture(std::string name, PassTextureInfo texInfo);
 
+        const std::vector<std::string> getArrDataNames() const;
 		Bool32 hasData(std::string name) const;
 		void removeData(std::string name);
+	    const PassDataInfo &getDataInfo(std::string name) const;
 
 		void addData(const std::string name, const PassDataInfo &info, void *src, uint32_t size);
 		void getData(const std::string name, void *dst, uint32_t size, uint32_t offset) const;

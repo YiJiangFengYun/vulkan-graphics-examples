@@ -244,6 +244,8 @@ namespace vg
 		, m_descriptorSetLayouts()
 		, m_descriptorSets()
 		, m_dynamicOffsets()
+		, m_pushConstantChanged(VG_FALSE)
+		, m_pushConstantRanges()
 		, m_pPipelineLayout(nullptr)
 		, m_pipelineLayoutChanged(VG_FALSE)
 		, m_pipelineStateID()
@@ -999,14 +1001,231 @@ namespace vg
 				}
 			}
 
-			m_layoutBindingCount = dataBindingCount + bufferTextureBindingCount;			
+			//get final total descriptor set info.
+			uint32_t layoutBindingCount = 0u;
+			std::vector<vk::DescriptorSetLayoutBinding> descriptorSetLayoutBindings;
+			std::vector<UpdateDescriptorSetInfo> updateDescriptorSetInfos;	
+			{
+			    layoutBindingCount = dataBindingCount + bufferTextureBindingCount;
+			    descriptorSetLayoutBindings.resize(m_layoutBindingCount);
+			    updateDescriptorSetInfos.resize(m_layoutBindingCount);
+			    uint32_t i = 0;
+			    uint32_t index = 0u;
+			    for (i = 0; i < dataBindingCount; ++i) {
+			    	m_descriptorSetLayoutBindings[index] = dataBindingInfos[i];
+			    	m_updateDescriptorSetInfos[index] = dataUpdateDesSetInfos[i];
+			    	++index;
+			    }
+			    for (i = 0; i < bufferTextureBindingCount; ++i) {
+			        m_descriptorSetLayoutBindings[index] = bufferTextureBindingInfos[i];
+			    	m_updateDescriptorSetInfos[index] = bufferTextureUpdateDesSetInfos[i];
+			    	++index;
+			    }
+			}
+
+			//Create descriptor set layout.
+			Bool32 createdDescriptorSetLayout = VG_FALSE;
+			{
+				if (m_layoutBindingCount != layoutBindingCount || m_descriptorSetLayoutBindings != descriptorSetLayoutBindings)
+				{
+					m_layoutBindingCount = layoutBindingCount;
+			        m_descriptorSetLayoutBindings = descriptorSetLayoutBindings;
+			        auto pDevice = pApp->getDevice();
+			        if (layoutBindingCount != 0u)
+			        {
+			        	vk::DescriptorSetLayoutCreateInfo createInfo =
+			        	{
+			        		vk::DescriptorSetLayoutCreateFlags(),
+			        		layoutBindingCount,
+			        		descriptorSetLayoutBindings.data()
+			        	};
+        
+			        	m_pDescriptorSetLayout = fd::createDescriptorSetLayout(pDevice, createInfo);
+			        }
+			        else
+			        {
+			        	m_pDescriptorSetLayout = nullptr;
+			        }
+					createdDescriptorSetLayout = VG_TRUE;
+					//Create descriptor set layout will make pipeline layout change.
+					m_pipelineLayoutChanged = VG_TRUE;
+					//Create descriptor set layout will make descriptor sets change.
+					m_descriptorSetsChanged = VG_TRUE;
+				}
+			}
+
+			//Create descriptor pool.
+			Bool32 createdPool;
+			{
+				if (createdDescriptorSetLayout == VG_TRUE)
+				{
+					//Check and reCreate descriptor pool.
+                    //Caculate current need pool size info.
+                    std::unordered_map<vk::DescriptorType, uint32_t> poolSizeInfos;
+					for (uint32_t i = 0; i < layoutBindingCount; ++i) {
+						const auto &bindingInfo = descriptorSetLayoutBindings[i];
+						poolSizeInfos[bindingInfo.descriptorType] += bindingInfo.descriptorCount;
+					}
+        
+                    //Check pool size is greater than need. if not, recreating pool.
+                    Bool32 isGreater = VG_TRUE;
+                    for (const auto &pair : poolSizeInfos) {
+                        if (m_poolSizeInfos[pair.first] < poolSizeInfos[pair.first]) {
+                            isGreater = VG_FALSE;
+                            break;
+                        }
+		            }
+        
+			        auto oldPool = m_pDescriptorPool;
+                    if (isGreater == VG_FALSE)
+                    {
+		                //create descriptor pool.                
+                        std::vector<vk::DescriptorPoolSize> arrPoolSizeInfos(poolSizeInfos.size());
+		                size_t index = 0;
+		                for (const auto& item : poolSizeInfos)
+		                {
+		                	arrPoolSizeInfos[index].type = item.first;
+		                	arrPoolSizeInfos[index].descriptorCount = item.second;
+		                	++index;
+		                }
+        
+                        auto pDevice = pApp->getDevice();
+		                {
+		                	if (arrPoolSizeInfos.size())
+		                	{
+		                		vk::DescriptorPoolCreateInfo createInfo = { vk::DescriptorPoolCreateFlagBits::eFreeDescriptorSet
+		                			, 1u
+		                			, static_cast<uint32_t>(arrPoolSizeInfos.size())
+		                			, arrPoolSizeInfos.data()
+		                		};
+		                		m_pDescriptorPool = fd::createDescriptorPool(pDevice, createInfo);
+		                	}
+		                	else
+		                	{
+		                		m_pDescriptorPool = nullptr;
+		                	}
+		                }
+        
+                        m_poolSizeInfos = poolSizeInfos;
+						createdPool = VG_TRUE;
+                    }
+			    }
+			}
+			//Reallocte descriptor set.
+			{
+				if (createdPool == VG_TRUE || createdDescriptorSetLayout == VG_TRUE) {
+			        auto pDevice = pApp->getDevice();
+			        //create descriptor set.
+		            if (m_pDescriptorSetLayout != nullptr && m_pDescriptorPool != nullptr)
+		            {
+		            	vk::DescriptorSetLayout layouts[] = { *m_pDescriptorSetLayout };
+		            	vk::DescriptorSetAllocateInfo allocateInfo = {
+		            		*m_pDescriptorPool,
+		            		1u,
+		            		layouts
+		            	};
+		            	m_pDescriptorSet = fd::allocateDescriptorSet(pDevice, m_pDescriptorPool.get(), allocateInfo);
+			        	// m_usingDescriptorSets[0] = *m_pDescriptorSet;
+		            }
+		            else
+		            {
+		            	m_pDescriptorSet = nullptr;
+		            }
+
+					//Reallocate descriptor set will make descriptor sets change.
+					m_descriptorSetsChanged = VG_TRUE;
+		        }
+			}
+
+			//Update descriptor set
+			{
+				std::vector<vk::WriteDescriptorSet> writes(layoutBindingCount);
+				for (uint32_t i = 0; i < layoutBindingCount; ++i)
+				{
+					writes[i].descriptorType = descriptorSetLayoutBindings[i].descriptorType;
+					writes[i].descriptorCount = descriptorSetLayoutBindings[i].descriptorCount;
+					writes[i].dstArrayElement = 0u;
+					writes[i].dstBinding = descriptorSetLayoutBindings[i].binding;
+					writes[i].dstSet = *(m_pDescriptorSet);
+					writes[i].pBufferInfo = updateDescriptorSetInfos[i].bufferInfos.data();
+					writes[i].pImageInfo = updateDescriptorSetInfos[i].imageInfos.data();
+				}
+				auto pDevice = pApp->getDevice();
+		        pDevice->updateDescriptorSets(writes, nullptr);
+			    m_updateDescriptorSetInfos = updateDescriptorSetInfos;				
+			}
+			
 		}
 
+		//Update descriptor sets and their layouts.
 		if (m_descriptorSetsChanged) {
+			auto pLayout = m_pDescriptorSetLayout;
+		    uint32_t layoutCount = pLayout != nullptr ? 1 : 0;
+		    for (const auto &extUniformbuffer : m_extUniformBuffers)
+		    {
+		        uint32_t subDataOffset = extUniformbuffer.subDataOffset;
+		        uint32_t subDataCount = extUniformbuffer.subDataCount;
+		        auto pSubDatas = extUniformbuffer.pData->getSubDatas();			
+		        for (uint32_t i = 0; i < subDataCount; ++i)
+		        {
+		        	auto &subData = *(pSubDatas + (i + subDataOffset));
+		        	if (subData.getDescriptorSetLayout() != nullptr)
+		        	{
+		        		++layoutCount;
+		        	}
+		        }
+		    }
+    
+		    std::vector<vk::DescriptorSetLayout> setLayouts(layoutCount);
+		    std::vector<vk::DescriptorSet> descriptorSets(layoutCount);
+		    uint32_t layoutIndex = 0u;
+		    if (pLayout != nullptr) {
+		    	setLayouts[layoutIndex] = *pLayout;
+		    	descriptorSets[layoutIndex] = *m_pDescriptorSet;
+		    	++layoutIndex;
+		    }
+    
+		    for (const auto &extUniformbuffer : m_extUniformBuffers)
+		    {
+		        uint32_t subDataOffset = extUniformbuffer.subDataOffset;
+		        uint32_t subDataCount = extUniformbuffer.subDataCount;
+		        auto pSubDatas = extUniformbuffer.pData->getSubDatas();			
+		        for (uint32_t i = 0; i < subDataCount; ++i)
+		        {
+		        	auto &subData = *(pSubDatas + (i + subDataOffset));
+		        	if (subData.getDescriptorSetLayout() != nullptr)
+		        	{
+		        		setLayouts[layoutIndex] = *(subData.getDescriptorSetLayout());
+		        		descriptorSets[layoutIndex] = *(subData.getDescriptorSet());
+		        		++layoutIndex;
+		        	}
+		        }
+		    }
 
+			if (m_descriptorSetLayouts != setLayouts)
+			{
+				//Descriptor layouts change will make pipeline layout change.
+				m_pipelineLayoutChanged = VG_TRUE;
+				m_descriptorSetLayouts = setLayouts;
+			}
+			m_descriptorSets = descriptorSets;
 		}
 
+		//Update push contant.
+		if (m_pushConstantChanged)
+		{
+			//push constants
+		    auto pushConstantRanges = getPushConstantRanges();
+		    if (m_pushConstantRanges != pushConstantRanges) {
+		    	m_pushConstantRanges = pushConstantRanges;
+				//Push constant change will make pipeline layout change.
+				m_pipelineLayoutChanged = VG_TRUE;
+		    }
+		}
+
+		//Create pipeline layout.
 		if (m_pipelineLayoutChanged) {
+			
 
 		}
 
@@ -1252,30 +1471,6 @@ namespace vg
 			m_pPipelineLayout = fd::createPipelineLayout(pDevice, pipelineLayoutCreateInfo);
 			_updatePipelineStateID();
 		}
-	}
-
-	void Pass::_createUniformBuffer()
-	{
-		//get total size of uniform buffer datas and their offsets and sizes for each one.
-		uint32_t totalSize = 0u;
-		for (const auto& name : m_arrLayoutBindNames)
-		{
-			const auto& item = m_mapLayoutBinds[name];
-			if (item.descriptorType == DescriptorType::UNIFORM_BUFFER)
-			{
-				totalSize += item.bufferSize;
-			}
-		}
-		if (totalSize > m_uniformBufferSize)
-		{
-			createBuffer(static_cast<vk::DeviceSize>(totalSize), m_pUniformBuffer, m_pUniformBufferMemory);
-			m_uniformBufferSize = totalSize;
-		}
-		// else
-		// {
-		// 	m_pUniformBuffer = nullptr;
-		// 	m_pUniformBufferMemory = nullptr;
-		// }
 	}
 
 	void Pass::_createDescriptorSet()

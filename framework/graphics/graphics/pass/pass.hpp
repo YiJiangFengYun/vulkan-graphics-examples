@@ -431,10 +431,13 @@ namespace vg
 		Bool32 m_descriptorSetsChanged;
         //all descriptor set layouts
 	    std::vector<vk::DescriptorSetLayout> m_descriptorSetLayouts;
-
 		//all descriptor sets.
 		std::vector<vk::DescriptorSet> m_descriptorSets;
 		std::vector<uint32_t> m_dynamicOffsets;
+
+		//push constant Ranges.
+		Bool32 m_pushConstantChanged;
+		std::vector<vk::PushConstantRange> m_pushConstantRanges;
 
 		//pipeline layout
 		std::shared_ptr<vk::PipelineLayout> m_pPipelineLayout;

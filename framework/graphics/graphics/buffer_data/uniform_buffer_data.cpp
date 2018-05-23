@@ -316,7 +316,7 @@ namespace vg
             {
                 auto &subData = m_subDatas[i];
                 uint32_t bindingCount = subData.getLayoutBindingCount();
-                poolMaxSetCount += bindingCount;                
+                poolMaxSetCount += bindingCount;  //error              
                 for (uint32_t j = 0; j < bindingCount; ++j)
                 {
                     auto &binding = *(subData.getLayoutBindings() + j);
@@ -328,7 +328,7 @@ namespace vg
             {
                 auto &subDataInfo = pSubDataInfos[i];
                 uint32_t bindingCount = subDataInfo.layoutBindingCount;
-                poolMaxSetCount += bindingCount; 
+                poolMaxSetCount += bindingCount; //error
                 for (uint32_t j = 0; j < bindingCount; ++j)
                 {
                     auto &binding = *(subDataInfo.pLayoutBindings + j);
@@ -340,7 +340,7 @@ namespace vg
             {
                 auto &subData = m_subDatas[i];
                 uint32_t bindingCount = subData.getLayoutBindingCount();
-                poolMaxSetCount += bindingCount; 
+                poolMaxSetCount += bindingCount; //error
                 for (uint32_t j = 0; j < bindingCount; ++j)
                 {
                     auto &binding = *(subData.getLayoutBindings() + j);

@@ -353,7 +353,6 @@ namespace vg
 		void beginRecord() const;
 		void endRecord() const;
 	private:
-		//compositons
 		PassData m_data;
 		Bool32 m_dataChanged;
 		Bool32 m_dataContentChanged;
@@ -361,8 +360,6 @@ namespace vg
 		Bool32 m_textureChanged;
 		Bool32 m_bufferChanged;
 
-		// std::set<std::string> m_sortLayoutBindingNames;		
-		
 		vk::PolygonMode m_polygonMode;
 		vk::CullModeFlags m_cullMode;
 		vk::FrontFace m_frontFace;
@@ -376,7 +373,6 @@ namespace vg
 		uint32_t m_subpass;
 		vk::PipelineInputAssemblyStateCreateInfo m_defaultInputAssemblyState;
 		
-		//todo
 		//each stage may own a specilization constant data.
 		std::unordered_map<vk::ShaderStageFlagBits, std::shared_ptr<SpecializationData>> m_mapSpecilizationDatas;
 		std::unordered_map<std::string, vk::PushConstantRange> m_mapPushConstantRanges;
@@ -477,25 +473,6 @@ namespace vg
 		void _updateBuildInData(BuildInDataType type, T data);
         void _updatePipelineStateID();
 		void _applyUniformBufferDynamicOffsets();
-		
-		
-
-		//aggregations
-		void _createPipelineLayout();  
-		// void _createUniformBuffer();
-		// void _createDescriptorSet();
-		// void _beginCheckNeedUpdateDescriptorInfo();
-		void _updateDescriptorBufferInfo();
-		void _updateDescriptorImageInfo();
-		void _endCheckNeedUpdateDescriptorInfo();
-		void _applyBufferContent();
-		
-
-
-		
-		
-		//tool methods
-		void createBuffer(vk::DeviceSize size, std::shared_ptr<vk::Buffer> &pBuffer, std::shared_ptr<vk::DeviceMemory> &pBufferMemory);
 	};
 }
 

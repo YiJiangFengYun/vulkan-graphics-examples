@@ -635,7 +635,7 @@ namespace vg
 
 	void Pass::removePushConstantRange(std::string name)
 	{
-		removeValue(name, m_mapPushConstantRanges);
+		removeValue(name, m_mapPushConstantRanges, m_arrPushConstantRangeNames);
 	}
 
 	void Pass::setPushConstantRange(std::string name
@@ -667,7 +667,7 @@ namespace vg
 
 	void Pass::removePushConstantUpdate(std::string name)
 	{
-		removeValue(name, m_mapPPushConstantUpdates);
+		removeValue(name, m_mapPPushConstantUpdates, m_arrPushConstantUpdateNames);
 	}
 
 	void Pass::setPushConstantUpdate(std::string name

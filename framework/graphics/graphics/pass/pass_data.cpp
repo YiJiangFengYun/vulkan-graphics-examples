@@ -190,7 +190,7 @@ namespace vg
 		
 	void PassData::removeData(std::string name)
 	{
-		removeValue(name, mapDatas);
+		removeValue(name, mapDatas, arrDataNames);
 		removeValue(name, mapDataCounts);
 		removeValue(name, mapDataInfos);
 	}

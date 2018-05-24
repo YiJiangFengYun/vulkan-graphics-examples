@@ -29,7 +29,7 @@ namespace vge
         , m_pDepthStencilAttachment()
         , m_arrPDeferredAttachments()
         , m_pRectMesh(std::shared_ptr<vg::DimSepMesh2>{
-                new vg::DimSepMesh2(vg::MemoryPropertyFlagBits::HOST_VISIBLE)
+                new vg::DimSepMesh2(vk::MemoryPropertyFlagBits::eHostVisible)
             })
     {
         m_deferredAttachmentInfos.resize(info.deferredAttachmentCount);
@@ -451,9 +451,9 @@ namespace vge
         {
             auto pPass = m_pPassComposition.get();
             pPass->setSubpass(1u);
-            pPass->setPolygonMode(vg::PolygonMode::FILL);
-	        pPass->setCullMode(vg::CullModeFlagBits::NONE);
-	        pPass->setFrontFace(vg::FrontFaceType::COUNTER_CLOCKWISE);
+            pPass->setPolygonMode(vk::PolygonMode::eFill);
+	        pPass->setCullMode(vk::CullModeFlagBits::eNone);
+	        pPass->setFrontFace(vk::FrontFace::eCounterClockwise);
 	        vg::Pass::BuildInDataInfo buildInDataInfo;
 	        buildInDataInfo.componentCount = 0u;
 	        buildInDataInfo.pComponent = nullptr;
@@ -496,9 +496,9 @@ namespace vge
         //main pass
         {
             auto pPass = m_pMainPass.get();
-            pPass->setPolygonMode(vg::PolygonMode::FILL);
-	        pPass->setCullMode(vg::CullModeFlagBits::NONE);
-	        pPass->setFrontFace(vg::FrontFaceType::COUNTER_CLOCKWISE);
+            pPass->setPolygonMode(vk::PolygonMode::eFill);
+	        pPass->setCullMode(vk::CullModeFlagBits::eNone);
+	        pPass->setFrontFace(vk::FrontFace::eCounterClockwise);
             vg::Pass::BuildInDataInfo buildInDataInfo;
 	        buildInDataInfo.componentCount = 0u;
 	        buildInDataInfo.pComponent = nullptr;
@@ -517,17 +517,47 @@ namespace vge
             auto info = m_info;
             for (uint32_t i = 0; i < info.deferredAttachmentCount; ++i) 
             {
-                pPass->setTexture("input_" + std::to_string(i), m_arrPDeferredAttachments[i].get(), i, vg::ShaderStageFlagBits::FRAGMENT, 
-                    vg::DescriptorType::INPUT_ATTACHMENT);
+				vg::PassTextureInfo info = {
+					m_arrPDeferredAttachments[i].get(),
+					nullptr,
+					nullptr,
+					vk::ImageLayout::eUndefined,
+					i,
+					vg::ImageDescriptorType::COMBINED_IMAGE_SAMPLER,
+					vk::ShaderStageFlagBits::eFragment,
+				};
+				pPass->addTexture("input_" + std::to_string(i), info);
             }
             pPass->apply();
         }
 
-        {
-            auto pPass = m_pMainPass.get();
-            pPass->setTexture("color", m_pColorAttachment.get(), 0u, vg::ShaderStageFlagBits::FRAGMENT);
-            pPass->setTexture("depth", m_pDepthStencilAttachment.get(), 1u, vg::ShaderStageFlagBits::FRAGMENT,
-                vg::DescriptorType::COMBINED_IMAGE_SAMPLER, m_pDepthStencilAttachment->getImageView("only_depth"));
+		{
+			auto pPass = m_pMainPass.get();
+			{
+				vg::PassTextureInfo info = {
+					m_pColorAttachment.get(),
+					nullptr,
+					nullptr,
+					vk::ImageLayout::eUndefined,
+					0u,
+					vg::ImageDescriptorType::COMBINED_IMAGE_SAMPLER,
+					vk::ShaderStageFlagBits::eFragment,
+				};
+				pPass->addTexture("color", info);
+			}
+
+			{
+				vg::PassTextureInfo info = {
+					m_pDepthStencilAttachment.get(),
+					m_pDepthStencilAttachment->getImageView("only_depth"),
+					nullptr,
+					vk::ImageLayout::eUndefined,
+					1u,
+					vg::ImageDescriptorType::COMBINED_IMAGE_SAMPLER,
+					vk::ShaderStageFlagBits::eFragment,
+				};
+				pPass->addTexture("depth", info);
+			}
             pPass->apply();
         }
     }

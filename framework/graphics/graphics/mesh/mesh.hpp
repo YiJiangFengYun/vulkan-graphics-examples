@@ -130,12 +130,15 @@ namespace vg
 		void setVertexCount(uint32_t value);
 
 		//color
-		const std::vector<Color32> &getColor32s() const;
+		// const std::vector<Color32> &getColor32s() const;
 
-		void setColor32s(const std::vector<Color32> &colors);
+		// void setColor32s(const std::vector<Color32> &colors);
 
+
+        Bool32 hasColors() const;
+		void addColors(const std::vector<Color> &colors);
+		void removeColors();
 		const std::vector<Color> &getColors() const;
-
 		void setColors(const std::vector<Color> &colors);
 
 		//index
@@ -169,22 +172,31 @@ namespace vg
 
 		//texture coordinate
 		template<TextureCoordinateType textureCoordinateType, TextureCoordinateIndex textureCoordinateIndex>
+		Bool32 hasTextureCoordinates() const;
+
+		template<TextureCoordinateType textureCoordinateType, TextureCoordinateIndex textureCoordinateIndex>
+		void addTextureCoordinates(const typename MeshData::DataTypeInfo<TextureCoordinateConstInfo<textureCoordinateType>::ARRAY_TYPE>::ValueType &textureCoordinates);
+
+		template<TextureCoordinateType textureCoordinateType, TextureCoordinateIndex textureCoordinateIndex>
+		void removeTextureCoordinates();
+
+		template<TextureCoordinateType textureCoordinateType, TextureCoordinateIndex textureCoordinateIndex>
 		const typename MeshData::DataTypeInfo<TextureCoordinateConstInfo<textureCoordinateType>::ARRAY_TYPE>::ValueType &getTextureCoordinates() const;
 
 		template<TextureCoordinateType textureCoordinateType, TextureCoordinateIndex textureCoordinateIndex>
 		void setTextureCoordinates(const typename MeshData::DataTypeInfo<TextureCoordinateConstInfo<textureCoordinateType>::ARRAY_TYPE>::ValueType &textureCoordinates);
 
         template<MeshData::DataType dataType>
-		Bool32 &hasData(std::string name) const;
+		Bool32 hasData(std::string name) const;
 
 		template<MeshData::DataType dataType>
-		void &addData(std::string name
+		void addData(std::string name
 		    , const typename MeshData::DataTypeInfo<dataType>::ValueType &value
 			, uint32_t bindingPriority = VG_VERTEX_BINDING_PRIORITY_OTHER_MIN
 			);
 
 		template<MeshData::DataType dataType>
-		void &removeData(std::string name) const;
+		void removeData(std::string name) const;
 
 		template<MeshData::DataType dataType>
 		const typename MeshData::DataTypeInfo<dataType>::ValueType &getData(std::string name) const;
@@ -206,7 +218,7 @@ namespace vg
 		Bool32 m_applied;
 		uint32_t m_appliedVertexCount; //save vertex count to render.
 		uint32_t m_appliedSubMeshCount;
-		std::set<LayoutBindingInfo> m_layoutBindingInfos;
+		std::set<MeshData::DataInfo> m_layoutBindingInfos;
 		std::vector<SubMeshInfo> m_usingSubMeshInfos; //save sub mesh info to render.
 
 		void _createMeshData();
@@ -234,7 +246,7 @@ namespace vg
 		using BaseValueType = typename MeshData::DataTypeInfo<ARRAY_DATA_TYPE>::BaseType;
 		using ArrayValueType = typename MeshData::DataTypeInfo<ARRAY_DATA_TYPE>::ValueType;
 
-		DimSepMesh(MemoryPropertyFlags bufferMemoryPropertyFlags = vk::MemoryPropertyFlagBits::eDeviceLocal);
+		DimSepMesh(vk::MemoryPropertyFlags bufferMemoryPropertyFlags = vk::MemoryPropertyFlagBits::eDeviceLocal);
 
 		virtual ~DimSepMesh();
 
@@ -266,7 +278,7 @@ namespace vg
 	class DimSimpleMesh : public InternalContentMesh, public Mesh<meshDimType>
 	{
 	public: 
-        DimSimpleMesh(MemoryPropertyFlags bufferMemoryPropertyFlags = vk::MemoryPropertyFlagBits::eDeviceLocal);
+        DimSimpleMesh(vk::MemoryPropertyFlags bufferMemoryPropertyFlags = vk::MemoryPropertyFlagBits::eDeviceLocal);
 		void setIsHasBounds(Bool32 isHasBounds);
 		void setBounds(fd::Bounds<PointType> bounds);
 	private:

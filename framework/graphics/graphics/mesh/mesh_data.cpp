@@ -53,29 +53,29 @@ namespace vg
 		return bindingPriority < target.bindingPriority;
 	}
 
-	const std::vector<std::string> MeshData::getArrDataNames() const
+	const std::vector<std::string> MeshData::Data::getArrDataNames() const
 	{
 		return arrDataNames;
 	}
 
-	Bool32 MeshData::hasData(std::string name) const
+	Bool32 MeshData::Data::hasData(std::string name) const
 	{
 		return hasValue<std::vector<Byte>>(name, mapDatas);
 	}
 		
-	void MeshData::removeData(std::string name)
+	void MeshData::Data::removeData(std::string name)
 	{
 		removeValue(name, mapDatas, arrDataNames);
 		removeValue(name, mapDataCounts);
 		removeValue(name, mapDataInfos);
 	}
 
-	const MeshData::DataInfo &MeshData::getDataInfo(std::string name) const
+	const MeshData::DataInfo &MeshData::Data::getDataInfo(std::string name) const
 	{
 		return getValue(name, mapDataInfos);
 	}
 
-	void MeshData::addData(const std::string name, const DataInfo &info, void *src, uint32_t size)
+	void MeshData::Data::addData(const std::string name, const DataInfo &info, void *src, uint32_t size)
 	{
 		std::vector<Byte> temp(size);
 		if (size != 0u && src != nullptr) memcpy(temp.data(), src, size);
@@ -84,7 +84,7 @@ namespace vg
 		addValue(name, info, mapDataInfos);
 	}
 
-	void MeshData::getData(const std::string name, void *dst, uint32_t size, uint32_t offset) const
+	void MeshData::Data::getData(const std::string name, void *dst, uint32_t size, uint32_t offset) const
 	{
 		const auto &bytes = getValue(name, mapDatas);		
 		if (offset + size > static_cast<uint32_t>(bytes.size()))
@@ -92,7 +92,7 @@ namespace vg
 		memcpy(dst, (char *)(bytes.data()) + offset, size);
 	}
 
-	void MeshData::setData(const std::string name, void *src, uint32_t size, uint32_t offset)
+	void MeshData::Data::setData(const std::string name, void *src, uint32_t size, uint32_t offset)
 	{
 		const auto& iterator = mapDatas.find(name);
 		if (iterator == mapDatas.cend())
@@ -105,6 +105,37 @@ namespace vg
 		        mapDatas[name].resize(offset + size);
 		    if(src) memcpy((char *)(mapDatas[name].data()) + offset, src, size);
 		}
+	}
+
+	uint32_t MeshData::Data::getDataBaseSize(const std::string name) const
+	{
+		const auto& bytes = getValue(name, mapDatas);
+		const auto& count = getValue(name, mapDataCounts);
+		return static_cast<uint32_t>(bytes.size()) / count;
+	}
+	
+	uint32_t MeshData::Data::getDataSize(const std::string name) const
+	{
+		const auto& bytes = getValue(name, mapDatas);
+		return static_cast<uint32_t>(bytes.size());
+	}
+
+	void MeshData::Data::memoryCopyData(const std::string name
+		, void* dst
+		, uint32_t offset
+		, uint32_t elementStart
+		, uint32_t maxElementCount) const
+	{
+		const auto& bytes = getValue(name, mapDatas);
+		const auto& count = getValue(name, mapDataCounts);
+		uint32_t baseSize = static_cast<uint32_t>(bytes.size()) / count;
+		char *ptr = static_cast<char *>(dst);
+		ptr += offset;
+		uint32_t finalElementCount = std::max(0u, std::min(count - elementStart, maxElementCount));
+		if (finalElementCount == 0) return;
+		uint32_t srcOffset = elementStart * baseSize;
+		uint32_t srcSize = finalElementCount * baseSize;
+		std::memcpy(ptr, bytes.data() + srcOffset, srcSize);
 	}
 
 	uint32_t MeshData::getDataBaseSize(const DataType dataType)
@@ -144,34 +175,14 @@ namespace vg
 		}
 	}
 
-	uint32_t MeshData::getDataBaseSize(const std::string name) const
+	void MeshData::memoryCopyData(DataType type
+		    , const std::string name
+			, void* dst
+			, uint32_t offset
+			, uint32_t elementStart
+			, uint32_t maxElementCount) const
 	{
-		const auto& bytes = getValue(name, mapDatas);
-		const auto& count = getValue(name, mapDataCounts);
-		return static_cast<uint32_t>(bytes.size()) / count;
+		datas[static_cast<size_t>(type)].memoryCopyData(name, dst, offset, elementStart, maxElementCount);
 	}
-
-	uint32_t MeshData::getDataSize(const std::string name) const
-	{
-		const auto& bytes = getValue(name, mapDatas);
-		return static_cast<uint32_t>(bytes.size());
-	}
-
-	void MeshData::memoryCopyData(const std::string name
-		, void* dst
-		, uint32_t offset
-		, uint32_t elementStart
-		, uint32_t maxElementCount) const
-	{
-		const auto& bytes = getValue(name, mapDatas);
-		const auto& count = getValue(name, mapDataCounts);
-		uint32_t baseSize = static_cast<uint32_t>(bytes.size()) / count;
-		char *ptr = static_cast<char *>(dst);
-		ptr += offset;
-		uint32_t finalElementCount = std::max(0u, std::min(count - elementStart, maxElementCount));
-		if (finalElementCount == 0) return;
-		uint32_t srcOffset = elementStart * baseSize;
-		uint32_t srcSize = finalElementCount * baseSize;
-		std::memcpy(ptr, bytes.data() + srcOffset, srcSize);
-	}
+	
 }

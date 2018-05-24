@@ -27,11 +27,11 @@ namespace vg
         void setBuildInDataInfo(Pass::BuildInDataInfo info);
         void _setBuildInMatrixData(Pass::BuildInDataType type, Matrix4x4 matrix);
 
-		void setPolygonMode(PolygonMode polygonMode);
+		void setPolygonMode(vk::PolygonMode polygonMode);
 
-		void setCullMode(CullModeFlags cullMode);
+		void setCullMode(vk::CullModeFlags cullMode);
 
-		void setFrontFace(FrontFaceType frontFace);
+		void setFrontFace(vk::FrontFace frontFace);
 
 		void setLineWidth(float lineWidth);
 

@@ -208,46 +208,50 @@ namespace vg
 		m_applied = VG_FALSE;
 	}
 
-	const std::vector<Color32> &SepMesh::getColor32s() const
-	{
-		if (hasData<MeshData::DataType::COLOR_32_ARRAY>(VG_VERTEX_COLOR_NAME) == VG_FALSE)
-		{
-			return {};
-		}
-		return getData<MeshData::DataType::COLOR_32_ARRAY>(VG_VERTEX_COLOR_NAME);
-	}
+	// const std::vector<Color32> &SepMesh::getColor32s() const
+	// {
+	// 	if (hasData<MeshData::DataType::COLOR_32_ARRAY>(VG_VERTEX_COLOR_NAME) == VG_FALSE)
+	// 	{
+	// 		return {};
+	// 	}
+	// 	return getData<MeshData::DataType::COLOR_32_ARRAY>(VG_VERTEX_COLOR_NAME);
+	// }
 
-	void SepMesh::setColor32s(const std::vector<Color32> &colors)
+	// void SepMesh::setColor32s(const std::vector<Color32> &colors)
+	// {
+	// 	if (hasData<MeshData::DataType::COLOR_32_ARRAY>(VG_VERTEX_COLOR_NAME) == VG_FALSE)
+	// 	{
+	// 	    addData<MeshData::DataType::COLOR_32_ARRAY>(VG_VERTEX_COLOR_NAME, colors, VG_VERTEX_BINDING_PRIORITY_COLOR);			
+	// 	}
+	// 	else
+	// 	{
+	// 	    setData<MeshData::DataType::COLOR_32_ARRAY>(VG_VERTEX_COLOR_NAME, colors);
+	// 	}
+	// }
+
+	Bool32 SepMesh::hasColors() const
 	{
-		if (hasData<MeshData::DataType::COLOR_32_ARRAY>(VG_VERTEX_COLOR_NAME) == VG_FALSE)
-		{
-		    addData<MeshData::DataType::COLOR_32_ARRAY>(VG_VERTEX_COLOR_NAME, colors, VG_VERTEX_BINDING_PRIORITY_COLOR);			
-		}
-		else
-		{
-		    setData<MeshData::DataType::COLOR_32_ARRAY>(VG_VERTEX_COLOR_NAME, colors);
-		}
+		return hasData<MeshData::DataType::COLOR_ARRAY>(VG_VERTEX_COLOR_NAME);
+	}
+		
+	void SepMesh::addColors(const std::vector<Color> &colors)
+	{
+		addData<MeshData::DataType::COLOR_ARRAY>(VG_VERTEX_COLOR_NAME, colors, VG_VERTEX_BINDING_PRIORITY_COLOR);
+	}
+		
+	void SepMesh::removeColors()
+	{
+		removeData<MeshData::DataType::COLOR_ARRAY>(VG_VERTEX_COLOR_NAME);
 	}
 
 	const std::vector<Color> &SepMesh::getColors() const
 	{
-		if (hasData<MeshData::DataType::COLOR_ARRAY>(VG_VERTEX_COLOR_NAME) == VG_FALSE)
-		{
-			return {};
-		}
 		return getData<MeshData::DataType::COLOR_ARRAY>(VG_VERTEX_COLOR_NAME);
 	}
 
 	void SepMesh::setColors(const std::vector<Color> &colors)
 	{
-		if (hasData<MeshData::DataType::COLOR_ARRAY>(VG_VERTEX_COLOR_NAME) == VG_FALSE)
-		{
-		    addData<MeshData::DataType::COLOR_ARRAY>(VG_VERTEX_COLOR_NAME, colors, VG_VERTEX_BINDING_PRIORITY_COLOR);
-		}
-		else
-		{
-		   setData<MeshData::DataType::COLOR_ARRAY>(VG_VERTEX_COLOR_NAME, colors);
-		}
+		setData<MeshData::DataType::COLOR_ARRAY>(VG_VERTEX_COLOR_NAME, colors);
 	}
 
 	uint32_t SepMesh::getSubMeshCount() const
@@ -365,9 +369,9 @@ namespace vg
 			//clear data with new mesh data.
 			_createMeshData();
 			//clear layout binding info array with reallocate.
-			std::vector<std::string>().swap(m_arrLayoutBindingInfoNames);
+			// std::vector<std::string>().swap(m_arrLayoutBindingInfoNames);
 			//clear layout binding info map with reallocate.
-			std::unordered_map<std::string, LayoutBindingInfo>().swap(m_mapLayoutBindingInfos);
+			// std::unordered_map<std::string, LayoutBindingInfo>().swap(m_mapLayoutBindingInfos);
 			//clear sub mesh info with reallocate.
 			std::vector<SubMeshInfo>().swap(m_subMeshInfos);
 			//reset sub mesh count to 1.
@@ -388,7 +392,7 @@ namespace vg
 		uint32_t size = 0u;
 		for (const auto& layoutInfo : m_layoutBindingInfos)
 		{
-			size += MeshData::getDataBaseTypeSize(layoutInfo.dataType);
+			size += MeshData::getDataBaseSize(layoutInfo.dataType);
 		}
 		//get vertex buffer size.
 		uint32_t vertexBufferSize = size * vertexCount;
@@ -397,7 +401,7 @@ namespace vg
 		for (const auto& info : m_layoutBindingInfos)
 		{
 			bindingdescs[index].binding = index;
-			bindingdescs[index].stride = MeshData::getDataBaseTypeSize(info.dataType);
+			bindingdescs[index].stride = MeshData::getDataBaseSize(info.dataType);
 			bindingdescs[index].inputRate = vk::VertexInputRate::eVertex;
 			++index;
 		}
@@ -422,8 +426,8 @@ namespace vg
 		uint32_t offset = 0u;
 		for (const auto& layoutInfo : m_layoutBindingInfos)
 		{
-			m_pData->memCopyDataValue(layoutInfo.name, layoutInfo.dataType, stagingMemory, offset, 0u, vertexCount);
-			offset += MeshData::getDataBaseTypeSize(layoutInfo.dataType) * vertexCount;
+			m_pData->memoryCopyData(layoutInfo.dataType, layoutInfo.name, stagingMemory, offset, 0u, vertexCount);
+			offset += MeshData::getDataBaseSize(layoutInfo.dataType) * vertexCount;
 		}
 
 		m_pVertexData->init(vertexCount, stagingMemory, vertexBufferSize, VG_FALSE, createInfo);
@@ -466,10 +470,16 @@ namespace vg
 	void SepMesh::_sortLayoutBindingInfos()
 	{
 		m_layoutBindingInfos.clear();
-		for (const auto& name : m_arrLayoutBindingInfoNames)
-		{
-			const auto& item = m_mapLayoutBindingInfos[name];
-			m_layoutBindingInfos.insert(item);
+		
+		const auto &datas = m_pData->datas;
+	    uint32_t dataSize = datas.size();
+		for (uint32_t i = 0; i < dataSize; ++i) {
+			const auto &data = datas[i];
+			const auto &arrNames = data.arrDataNames;
+			for (const auto& name : arrNames) {
+				const auto &dataInfo = data.getDataInfo(name);
+				m_layoutBindingInfos.insert(dataInfo);
+			}
 		}
 	}
 

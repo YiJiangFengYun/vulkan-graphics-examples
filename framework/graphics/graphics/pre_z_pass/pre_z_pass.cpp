@@ -31,20 +31,20 @@ namespace vg
 
     void PreZPass::_setBuildInMatrixData(Pass::BuildInDataType type, Matrix4x4 matrix)
     {
-        m_pPass->_setBuildInMatrixData(type, matrix);
+        m_pPass->setBuildInMatrixData(type, matrix);
     }
 
-    void PreZPass::setPolygonMode(PolygonMode polygonMode)
+    void PreZPass::setPolygonMode(vk::PolygonMode polygonMode)
     {
         m_pPass->setPolygonMode(polygonMode);
     }
 
-	void PreZPass::setCullMode(CullModeFlags cullMode)
+	void PreZPass::setCullMode(vk::CullModeFlags cullMode)
     {
         m_pPass->setCullMode(cullMode);
     }
 
-	void PreZPass::setFrontFace(FrontFaceType frontFace)
+	void PreZPass::setFrontFace(vk::FrontFace frontFace)
     {
         m_pPass->setFrontFace(frontFace);
     }

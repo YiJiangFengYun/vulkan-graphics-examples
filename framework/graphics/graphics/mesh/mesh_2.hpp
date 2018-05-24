@@ -7,8 +7,7 @@ namespace vg
 	class DimSepMesh2 : public DimSepMesh<MeshDimType::SPACE_2>
 	{
 	public:
-		DimSepMesh2();
-		DimSepMesh2(MemoryPropertyFlags bufferMemoryPropertyFlags);
+		DimSepMesh2(vk::MemoryPropertyFlags bufferMemoryPropertyFlags = vk::MemoryPropertyFlagBits::eDeviceLocal);
 
 	private:
 
@@ -17,8 +16,7 @@ namespace vg
 	class DimSimpleMesh2 : public DimSimpleMesh<MeshDimType::SPACE_2>
 	{
 	public:
-		DimSimpleMesh2();
-		DimSimpleMesh2(MemoryPropertyFlags bufferMemoryPropertyFlags);
+		DimSimpleMesh2(vk::MemoryPropertyFlags bufferMemoryPropertyFlags = vk::MemoryPropertyFlagBits::eDeviceLocal);
 
 	private:
 

@@ -2,7 +2,112 @@
 
 namespace vg
 {
-	uint32_t MeshData::getDataBaseTypeSize(const DataType dataType)
+	MeshData::DataInfo::DataInfo()
+	{
+
+	}
+
+	MeshData::DataInfo::DataInfo(std::string name,
+		MeshData::DataType dataType,
+		uint32_t bindingPriority
+		)
+		: name(name)
+		, dataType(dataType)
+		, bindingPriority(bindingPriority)
+	{
+
+	}
+
+	MeshData::DataInfo::DataInfo(const DataInfo &target)
+		: name(target.name)
+		, dataType(target.dataType)
+		, bindingPriority(target.bindingPriority)
+	{
+
+	}
+
+	MeshData::DataInfo &MeshData::DataInfo::operator=(const DataInfo &target)
+	{
+		name = target.name;
+		dataType = target.dataType;
+		bindingPriority = target.bindingPriority;
+		return *this;
+	}
+
+
+	MeshData::DataInfo::DataInfo(const DataInfo &&target)
+		: name(target.name)
+		, dataType(target.dataType)
+		, bindingPriority(target.bindingPriority)
+	{
+
+	}
+
+	Bool32 MeshData::DataInfo::operator==(const DataInfo &target) const
+	{
+		return name == target.name && dataType == target.dataType && bindingPriority == target.bindingPriority;
+	}
+
+	Bool32 MeshData::DataInfo::operator<(const DataInfo &target) const
+	{
+		return bindingPriority < target.bindingPriority;
+	}
+
+	const std::vector<std::string> MeshData::getArrDataNames() const
+	{
+		return arrDataNames;
+	}
+
+	Bool32 MeshData::hasData(std::string name) const
+	{
+		return hasValue<std::vector<Byte>>(name, mapDatas);
+	}
+		
+	void MeshData::removeData(std::string name)
+	{
+		removeValue(name, mapDatas, arrDataNames);
+		removeValue(name, mapDataCounts);
+		removeValue(name, mapDataInfos);
+	}
+
+	const MeshData::DataInfo &MeshData::getDataInfo(std::string name) const
+	{
+		return getValue(name, mapDataInfos);
+	}
+
+	void MeshData::addData(const std::string name, const DataInfo &info, void *src, uint32_t size)
+	{
+		std::vector<Byte> temp(size);
+		if (size != 0u && src != nullptr) memcpy(temp.data(), src, size);
+		addValue(name, temp, mapDatas, arrDataNames);
+		addValue(name, 1u, mapDataCounts);
+		addValue(name, info, mapDataInfos);
+	}
+
+	void MeshData::getData(const std::string name, void *dst, uint32_t size, uint32_t offset) const
+	{
+		const auto &bytes = getValue(name, mapDatas);		
+		if (offset + size > static_cast<uint32_t>(bytes.size()))
+		    throw std::range_error("Out range of the saved material data!");
+		memcpy(dst, (char *)(bytes.data()) + offset, size);
+	}
+
+	void MeshData::setData(const std::string name, void *src, uint32_t size, uint32_t offset)
+	{
+		const auto& iterator = mapDatas.find(name);
+		if (iterator == mapDatas.cend())
+		{
+			throw std::runtime_error("Map don't has item whose key: " + name);
+		}
+		else
+		{
+			if (offset + size > static_cast<uint32_t>(mapDatas[name].size()))
+		        mapDatas[name].resize(offset + size);
+		    if(src) memcpy((char *)(mapDatas[name].data()) + offset, src, size);
+		}
+	}
+
+	uint32_t MeshData::getDataBaseSize(const DataType dataType)
 	{
 		switch (dataType)
 		{
@@ -39,206 +144,34 @@ namespace vg
 		}
 	}
 
-	uint32_t MeshData::getDataValueSize(std::string name, DataType dataType)
+	uint32_t MeshData::getDataBaseSize(const std::string name) const
 	{
-		switch (dataType)
-		{
-		case DataType::FLOAT_ARRAY:
-		{
-			auto arr = getValue(name, mapFloatArrays);
-			return static_cast<uint32_t>(sizeof(DataTypeInfo<DataType::FLOAT_ARRAY>::BaseType) * arr.size());
-		}
-		case DataType::INT_ARRAY:
-		{
-			auto arr = getValue(name, mapIntArrays);
-			return static_cast<uint32_t>(sizeof(DataTypeInfo<DataType::INT_ARRAY>::BaseType) * arr.size());
-		}
-		case DataType::VECTOR_2_ARRAY:
-		{
-			auto arr = getValue(name, mapVector2Arrays);
-			return static_cast<uint32_t>(sizeof(DataTypeInfo<DataType::VECTOR_2_ARRAY>::BaseType) * arr.size());
-		}
-		case DataType::VECTOR_3_ARRAY:
-		{
-			auto arr = getValue(name, mapVector3Arrays);
-			return static_cast<uint32_t>(sizeof(DataTypeInfo<DataType::VECTOR_3_ARRAY>::BaseType) * arr.size());
-		}
-		case DataType::VECTOR_4_ARRAY:
-		{
-			auto arr = getValue(name, mapVector4Arrays);
-			return static_cast<uint32_t>(sizeof(DataTypeInfo<DataType::VECTOR_4_ARRAY>::BaseType) * arr.size());
-		}
-		case DataType::COLOR_32_ARRAY:
-		{
-			auto arr = getValue(name, mapColor32Arrays);
-			return static_cast<uint32_t>(sizeof(DataTypeInfo<DataType::COLOR_32_ARRAY>::BaseType) * arr.size());
-		}
-		case DataType::COLOR_ARRAY:
-		{
-			auto arr = getValue(name, mapColor32Arrays);
-			return static_cast<uint32_t>(sizeof(DataTypeInfo<DataType::COLOR_ARRAY>::BaseType) * arr.size());
-		}
-		default:
-			throw std::runtime_error("Invalid data type for getting its used memory size.");
-		}
+		const auto& bytes = getValue(name, mapDatas);
+		const auto& count = getValue(name, mapDataCounts);
+		return static_cast<uint32_t>(bytes.size()) / count;
 	}
 
-	void MeshData::memCopyDataValue(std::string name, DataType dataType, void* dst, uint32_t offset, uint32_t elementStart, uint32_t maxElementCount)
+	uint32_t MeshData::getDataSize(const std::string name) const
 	{
+		const auto& bytes = getValue(name, mapDatas);
+		return static_cast<uint32_t>(bytes.size());
+	}
+
+	void MeshData::memoryCopyData(const std::string name
+		, void* dst
+		, uint32_t offset
+		, uint32_t elementStart
+		, uint32_t maxElementCount) const
+	{
+		const auto& bytes = getValue(name, mapDatas);
+		const auto& count = getValue(name, mapDataCounts);
+		uint32_t baseSize = static_cast<uint32_t>(bytes.size()) / count;
 		char *ptr = static_cast<char *>(dst);
 		ptr += offset;
-		switch (dataType)
-		{
-		case DataType::FLOAT_ARRAY:
-		{
-			auto arr = getValue(name, mapFloatArrays);
-			uint32_t finalElementCount = std::max(0u, std::min(static_cast<uint32_t>(arr.size()) - elementStart, maxElementCount));
-			if (finalElementCount == 0) break;
-			std::memcpy(ptr, arr.data() + elementStart, sizeof(DataTypeInfo<DataType::FLOAT_ARRAY>::BaseType) * finalElementCount);
-			break;
-		}
-		case DataType::INT_ARRAY:
-		{
-			auto arr = getValue(name, mapIntArrays);
-			uint32_t finalElementCount = std::max(0u, std::min(static_cast<uint32_t>(arr.size()) - elementStart, maxElementCount));
-			if (finalElementCount == 0) break;
-			std::memcpy(ptr, arr.data() + elementStart, sizeof(DataTypeInfo<DataType::INT_ARRAY>::BaseType) * finalElementCount);
-			break;
-		}
-		case DataType::VECTOR_2_ARRAY:
-		{
-			auto arr = getValue(name, mapVector2Arrays);
-			uint32_t finalElementCount = std::max(0u, std::min(static_cast<uint32_t>(arr.size()) - elementStart, maxElementCount));
-			if (finalElementCount == 0) break;
-			std::memcpy(ptr, arr.data() + elementStart, sizeof(DataTypeInfo<DataType::VECTOR_2_ARRAY>::BaseType) * finalElementCount);
-			break;
-		}
-		case DataType::VECTOR_3_ARRAY:
-		{
-			auto arr = getValue(name, mapVector3Arrays);
-			uint32_t finalElementCount = std::max(0u, std::min(static_cast<uint32_t>(arr.size()) - elementStart, maxElementCount));
-			if (finalElementCount == 0) break;
-			std::memcpy(ptr, arr.data() + elementStart, sizeof(DataTypeInfo<DataType::VECTOR_3_ARRAY>::BaseType) * finalElementCount);
-			break;
-		}
-		case DataType::VECTOR_4_ARRAY:
-		{
-			auto arr = getValue(name, mapVector4Arrays);
-			uint32_t finalElementCount = std::max(0u, std::min(static_cast<uint32_t>(arr.size()) - elementStart, maxElementCount));
-			if (finalElementCount == 0) break;
-			std::memcpy(ptr, arr.data() + elementStart, sizeof(DataTypeInfo<DataType::VECTOR_4_ARRAY>::BaseType) * finalElementCount);
-			break;
-		}
-		case DataType::COLOR_32_ARRAY:
-		{
-			auto arr = getValue(name, mapColor32Arrays);
-			uint32_t finalElementCount = std::max(0u, std::min(static_cast<uint32_t>(arr.size()) - elementStart, maxElementCount));
-			if (finalElementCount == 0) break;
-			std::memcpy(ptr, arr.data() + elementStart, sizeof(DataTypeInfo<DataType::COLOR_32_ARRAY>::BaseType) * finalElementCount);
-			break;
-		}
-		case DataType::COLOR_ARRAY:
-		{
-			auto arr = getValue(name, mapColorArrays);
-			uint32_t finalElementCount = std::max(0u, std::min(static_cast<uint32_t>(arr.size()) - elementStart, maxElementCount));
-			if (finalElementCount == 0) break;
-			std::memcpy(ptr, arr.data() + elementStart, sizeof(DataTypeInfo<DataType::COLOR_ARRAY>::BaseType) * finalElementCount);
-			break;
-		}
-		default:
-			throw std::runtime_error("Invalid data type for copying its data to memory.");
-		}
-	}
-
-	//------------------this used to eliminate ide warning------------------------------
-	template <MeshData::DataType type>
-	const typename MeshData::DataTypeInfo<type>::ValueType& MeshData::getDataValue(std::string name) const { return {}; }
-
-	template <MeshData::DataType type>
-	void MeshData::setDataValue(std::string name, const typename MeshData::DataTypeInfo<type>::ValueType& value) {}
-	//-----------------this used to eliminate ide warning----------------
-
-	template<>
-	const std::vector<float>& MeshData::getDataValue<MeshData::DataType::FLOAT_ARRAY>(std::string name) const
-	{
-		return getValue(name, mapFloatArrays);
-	}
-
-	template<>
-	void MeshData::setDataValue<MeshData::DataType::FLOAT_ARRAY>(std::string name, const std::vector<float>& value)
-	{
-		setValue(name, value, mapFloatArrays);
-	}
-
-	template<>
-	const std::vector<int32_t>& MeshData::getDataValue<MeshData::DataType::INT_ARRAY>(std::string name) const
-	{
-		return getValue(name, mapIntArrays);
-	}
-
-	template<>
-	void MeshData::setDataValue<MeshData::DataType::INT_ARRAY>(std::string name, const std::vector<int32_t>& value)
-	{
-		setValue(name, value, mapIntArrays);
-	}
-
-	template<>
-	const std::vector<Vector2>& MeshData::getDataValue<MeshData::DataType::VECTOR_2_ARRAY>(std::string name) const
-	{
-		return getValue(name, mapVector2Arrays);
-	}
-
-	template<>
-	void MeshData::setDataValue<MeshData::DataType::VECTOR_2_ARRAY>(std::string name, const std::vector<Vector2>& value)
-	{
-		setValue(name, value, mapVector2Arrays);
-	}
-
-	template<>
-	const std::vector<Vector3>& MeshData::getDataValue<MeshData::DataType::VECTOR_3_ARRAY>(std::string name) const
-	{
-		return getValue(name, mapVector3Arrays);
-	}
-
-	template<>
-	void MeshData::setDataValue<MeshData::DataType::VECTOR_3_ARRAY>(std::string name, const std::vector<Vector3>& value)
-	{
-		setValue(name, value, mapVector3Arrays);
-	}
-
-	template<>
-	const std::vector<Vector4>& MeshData::getDataValue<MeshData::DataType::VECTOR_4_ARRAY>(std::string name) const
-	{
-		return getValue(name, mapVector4Arrays);
-	}
-
-	template<>
-	void MeshData::setDataValue<MeshData::DataType::VECTOR_4_ARRAY>(std::string name, const std::vector<Vector4>& value)
-	{
-		setValue(name, value, mapVector4Arrays);
-	}
-
-	template<>
-	const std::vector<Color32>& MeshData::getDataValue<MeshData::DataType::COLOR_32_ARRAY>(std::string name) const
-	{
-		return getValue(name, mapColor32Arrays);
-	}
-
-	template<>
-	void MeshData::setDataValue<MeshData::DataType::COLOR_32_ARRAY>(std::string name, const std::vector<Color32>& value)
-	{
-		setValue(name, value, mapColor32Arrays);
-	}
-
-	template<>
-	const std::vector<Color>& MeshData::getDataValue<MeshData::DataType::COLOR_ARRAY>(std::string name) const
-	{
-		return getValue(name, mapColorArrays);
-	}
-
-	template<>
-	void MeshData::setDataValue<MeshData::DataType::COLOR_ARRAY>(std::string name, const std::vector<Color>& value)
-	{
-		setValue(name, value, mapColorArrays);
+		uint32_t finalElementCount = std::max(0u, std::min(count - elementStart, maxElementCount));
+		if (finalElementCount == 0) return;
+		uint32_t srcOffset = elementStart * baseSize;
+		uint32_t srcSize = finalElementCount * baseSize;
+		std::memcpy(ptr, bytes.data() + srcOffset, srcSize);
 	}
 }

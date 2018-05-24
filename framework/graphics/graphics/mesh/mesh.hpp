@@ -74,8 +74,7 @@ namespace vg
 	class InternalContentMesh : public ContentMesh
 	{
 	public:
-	    InternalContentMesh();
-        InternalContentMesh(MemoryPropertyFlags bufferMemoryPropertyFlags);
+        InternalContentMesh(vk::MemoryPropertyFlags bufferMemoryPropertyFlags = vk::MemoryPropertyFlagBits::eDeviceLocal);
 	protected:
 
 
@@ -116,37 +115,13 @@ namespace vg
 	class SepMesh : public InternalContentMesh
 	{
 	public:
-		struct LayoutBindingInfo
-		{
-			std::string name;
-			MeshData::DataType dataType;
-			uint32_t bindingPriority;
-
-			LayoutBindingInfo();
-
-			LayoutBindingInfo(std::string name,
-				MeshData::DataType dataType,
-				uint32_t bindingPriority);
-
-			LayoutBindingInfo(const LayoutBindingInfo &);
-
-			LayoutBindingInfo(const LayoutBindingInfo &&);
-
-			LayoutBindingInfo &operator=(const LayoutBindingInfo &);
-
-			Bool32 operator ==(const LayoutBindingInfo &target) const;
-
-			Bool32 operator<(const LayoutBindingInfo &target) const;
-		};
-
 		struct SubMeshInfo
 		{
 			PrimitiveTopology topology;
 			std::vector<uint32_t> indices;
 		};
 
-		SepMesh();
-		SepMesh(MemoryPropertyFlags bufferMemoryPropertyFlags);
+		SepMesh(vk::MemoryPropertyFlags bufferMemoryPropertyFlags = vk::MemoryPropertyFlagBits::eDeviceLocal);
 
 		virtual ~SepMesh();
 
@@ -199,17 +174,29 @@ namespace vg
 		template<TextureCoordinateType textureCoordinateType, TextureCoordinateIndex textureCoordinateIndex>
 		void setTextureCoordinates(const typename MeshData::DataTypeInfo<TextureCoordinateConstInfo<textureCoordinateType>::ARRAY_TYPE>::ValueType &textureCoordinates);
 
+        template<MeshData::DataType dataType>
+		Bool32 &hasData(std::string name) const;
+
+		template<MeshData::DataType dataType>
+		void &addData(std::string name
+		    , const typename MeshData::DataTypeInfo<dataType>::ValueType &value
+			, uint32_t bindingPriority = VG_VERTEX_BINDING_PRIORITY_OTHER_MIN
+			);
+
+		template<MeshData::DataType dataType>
+		void &removeData(std::string name) const;
+
 		template<MeshData::DataType dataType>
 		const typename MeshData::DataTypeInfo<dataType>::ValueType &getData(std::string name) const;
 
 		template <MeshData::DataType dataType>
-		void setData(const std::string name, const typename MeshData::DataTypeInfo<dataType>::ValueType &value, uint32_t bindingPriority = VG_VERTEX_BINDING_PRIORITY_OTHER_MIN);
+		void setData(const std::string name
+		    , const typename MeshData::DataTypeInfo<dataType>::ValueType &value
+			);
 
 	protected:
 		uint32_t m_vertexCount;
 		std::shared_ptr<MeshData> m_pData;
-		std::vector<std::string> m_arrLayoutBindingInfoNames;
-		std::unordered_map<std::string, LayoutBindingInfo> m_mapLayoutBindingInfos;
 		uint32_t m_subMeshCount;
 		std::vector<SubMeshInfo> m_subMeshInfos;
 
@@ -227,12 +214,6 @@ namespace vg
 		void _createVertexData();
 
 		void _createIndexData();
-
-		template<MeshData::DataType dataType>
-		inline const typename MeshData::DataTypeInfo<dataType>::ValueType &_getData(std::string name) const;
-
-		template <MeshData::DataType dataType>
-		inline void _setData(std::string name, const typename MeshData::DataTypeInfo<dataType>::ValueType &value, uint32_t bindingPriority = VG_VERTEX_BINDING_PRIORITY_OTHER_MIN);
 
 
 		inline void _sortLayoutBindingInfos();
@@ -253,8 +234,7 @@ namespace vg
 		using BaseValueType = typename MeshData::DataTypeInfo<ARRAY_DATA_TYPE>::BaseType;
 		using ArrayValueType = typename MeshData::DataTypeInfo<ARRAY_DATA_TYPE>::ValueType;
 
-		DimSepMesh();
-		DimSepMesh(MemoryPropertyFlags bufferMemoryPropertyFlags);
+		DimSepMesh(MemoryPropertyFlags bufferMemoryPropertyFlags = vk::MemoryPropertyFlagBits::eDeviceLocal);
 
 		virtual ~DimSepMesh();
 
@@ -286,8 +266,7 @@ namespace vg
 	class DimSimpleMesh : public InternalContentMesh, public Mesh<meshDimType>
 	{
 	public: 
-        DimSimpleMesh();
-        DimSimpleMesh(MemoryPropertyFlags bufferMemoryPropertyFlags);
+        DimSimpleMesh(MemoryPropertyFlags bufferMemoryPropertyFlags = vk::MemoryPropertyFlagBits::eDeviceLocal);
 		void setIsHasBounds(Bool32 isHasBounds);
 		void setBounds(fd::Bounds<PointType> bounds);
 	private:

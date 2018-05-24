@@ -100,14 +100,7 @@ namespace vg
 
 	
 //InternalContentMesh
-	InternalContentMesh::InternalContentMesh()
-	    : ContentMesh()
-	{
-		m_pVertexData = std::shared_ptr<VertexData>(new VertexData());
-		m_pIndexData = std::shared_ptr<IndexData>(new IndexData());
-	}
-
-	InternalContentMesh::InternalContentMesh(MemoryPropertyFlags bufferMemoryPropertyFlags)
+	InternalContentMesh::InternalContentMesh(vk::MemoryPropertyFlags bufferMemoryPropertyFlags)
 	    : ContentMesh()
 	{
 		m_pVertexData = std::shared_ptr<VertexData>(new VertexData(bufferMemoryPropertyFlags));
@@ -180,86 +173,11 @@ namespace vg
 		m_subIndexDataCount = count;
 	}
 
-
-//LayoutBindingInfo
-	SepMesh::LayoutBindingInfo::LayoutBindingInfo()
-	{
-
-	}
-
-	SepMesh::LayoutBindingInfo::LayoutBindingInfo(std::string name,
-		MeshData::DataType dataType,
-		uint32_t bindingPriority)
-		: name(name)
-		, dataType(dataType)
-		, bindingPriority(bindingPriority)
-	{
-
-	}
-
-	SepMesh::LayoutBindingInfo::LayoutBindingInfo(const LayoutBindingInfo &target)
-		: name(target.name)
-		, dataType(target.dataType)
-		, bindingPriority(target.bindingPriority)
-	{
-
-	}
-
-	SepMesh::LayoutBindingInfo &SepMesh::LayoutBindingInfo::operator=(const LayoutBindingInfo &target)
-	{
-		name = target.name;
-		dataType = target.dataType;
-		bindingPriority = target.bindingPriority;
-		return *this;
-	}
-
-
-	SepMesh::LayoutBindingInfo::LayoutBindingInfo(const LayoutBindingInfo &&target)
-		: name(target.name)
-		, dataType(target.dataType)
-		, bindingPriority(target.bindingPriority)
-	{
-
-	}
-
-	Bool32 SepMesh::LayoutBindingInfo::operator ==(const LayoutBindingInfo &target) const
-	{
-		return name == target.name && dataType == target.dataType && bindingPriority == target.bindingPriority;
-	}
-
-	Bool32 SepMesh::LayoutBindingInfo::operator<(const LayoutBindingInfo &target) const
-	{
-		return bindingPriority < target.bindingPriority;
-	}
-
-
 //SepMesh
-	SepMesh::SepMesh()
-		: InternalContentMesh()
-		, m_vertexCount(0u)
-		, m_pData()
-	    , m_arrLayoutBindingInfoNames()
-	    , m_mapLayoutBindingInfos()
-	    , m_subMeshCount()
-	    , m_subMeshInfos()
-		, m_multipliedColor(COLOR_WHITE) //default multiplied color should be (1, 1, 1, 1)
-	    , m_addedColor()
-		, m_applied(VG_FALSE)
-	    , m_appliedVertexCount(0u)
-	    , m_appliedSubMeshCount(0u)
-	    , m_layoutBindingInfos()
-	    , m_usingSubMeshInfos()
-	{
-		_createMeshData();
-		setSubMeshCount(1u);
-	}
-
-	SepMesh::SepMesh(MemoryPropertyFlags bufferMemoryPropertyFlags)
+	SepMesh::SepMesh(vk::MemoryPropertyFlags bufferMemoryPropertyFlags)
 		: InternalContentMesh(bufferMemoryPropertyFlags)
 		, m_vertexCount(0u)
 		, m_pData()
-		, m_arrLayoutBindingInfoNames()
-		, m_mapLayoutBindingInfos()
 		, m_subMeshCount()
 		, m_subMeshInfos()
 		, m_multipliedColor(COLOR_WHITE) //default multiplied color should be (1, 1, 1, 1)
@@ -292,22 +210,44 @@ namespace vg
 
 	const std::vector<Color32> &SepMesh::getColor32s() const
 	{
-		return _getData<MeshData::DataType::COLOR_32_ARRAY>(VG_VERTEX_COLOR_NAME);
+		if (hasData<MeshData::DataType::COLOR_32_ARRAY>(VG_VERTEX_COLOR_NAME) == VG_FALSE)
+		{
+			return {};
+		}
+		return getData<MeshData::DataType::COLOR_32_ARRAY>(VG_VERTEX_COLOR_NAME);
 	}
 
 	void SepMesh::setColor32s(const std::vector<Color32> &colors)
 	{
-		_setData<MeshData::DataType::COLOR_32_ARRAY>(VG_VERTEX_COLOR_NAME, colors, VG_VERTEX_BINDING_PRIORITY_COLOR);
+		if (hasData<MeshData::DataType::COLOR_32_ARRAY>(VG_VERTEX_COLOR_NAME) == VG_FALSE)
+		{
+		    addData<MeshData::DataType::COLOR_32_ARRAY>(VG_VERTEX_COLOR_NAME, colors, VG_VERTEX_BINDING_PRIORITY_COLOR);			
+		}
+		else
+		{
+		    setData<MeshData::DataType::COLOR_32_ARRAY>(VG_VERTEX_COLOR_NAME, colors);
+		}
 	}
 
 	const std::vector<Color> &SepMesh::getColors() const
 	{
-		return _getData<MeshData::DataType::COLOR_ARRAY>(VG_VERTEX_COLOR_NAME);
+		if (hasData<MeshData::DataType::COLOR_ARRAY>(VG_VERTEX_COLOR_NAME) == VG_FALSE)
+		{
+			return {};
+		}
+		return getData<MeshData::DataType::COLOR_ARRAY>(VG_VERTEX_COLOR_NAME);
 	}
 
 	void SepMesh::setColors(const std::vector<Color> &colors)
 	{
-		_setData<MeshData::DataType::COLOR_ARRAY>(VG_VERTEX_COLOR_NAME, colors, VG_VERTEX_BINDING_PRIORITY_COLOR);
+		if (hasData<MeshData::DataType::COLOR_ARRAY>(VG_VERTEX_COLOR_NAME) == VG_FALSE)
+		{
+		    addData<MeshData::DataType::COLOR_ARRAY>(VG_VERTEX_COLOR_NAME, colors, VG_VERTEX_BINDING_PRIORITY_COLOR);
+		}
+		else
+		{
+		   setData<MeshData::DataType::COLOR_ARRAY>(VG_VERTEX_COLOR_NAME, colors);
+		}
 	}
 
 	uint32_t SepMesh::getSubMeshCount() const
@@ -549,14 +489,6 @@ namespace vg
 
 
 //DimSepMesh
-    template <MeshDimType meshDimType>
-	DimSepMesh<meshDimType>::DimSepMesh() 
-		: SepMesh()
-		, Mesh<meshDimType>()
-	{
-		m_hasBounds = VG_TRUE;
-	}
-
 	template <MeshDimType meshDimType>
 	DimSepMesh<meshDimType>::DimSepMesh(MemoryPropertyFlags bufferMemoryPropertyFlags) 
 		: SepMesh(bufferMemoryPropertyFlags)
@@ -661,14 +593,6 @@ namespace vg
 	
 
 //DimSimpleMesh
-    template <MeshDimType meshDimType>
-	DimSimpleMesh<meshDimType>::DimSimpleMesh()
-	    : InternalContentMesh()
-		, Mesh<meshDimType>()
-	{
-
-	}
-
 	template <MeshDimType meshDimType>
 	DimSimpleMesh<meshDimType>::DimSimpleMesh(MemoryPropertyFlags bufferMemoryPropertyFlags)
 	    : InternalContentMesh(bufferMemoryPropertyFlags)

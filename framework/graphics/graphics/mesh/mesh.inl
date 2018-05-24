@@ -3,44 +3,56 @@ namespace vg
 	template<TextureCoordinateType textureCoordinateType, TextureCoordinateIndex textureCoordinateIndex>
 	const typename MeshData::DataTypeInfo<TextureCoordinateConstInfo<textureCoordinateType>::ARRAY_TYPE>::ValueType &SepMesh::getTextureCoordinates() const
 	{
-		return _getData<TextureCoordinateConstInfo<textureCoordinateType>::ARRAY_TYPE>(TextureCoordinateIndexInfo<textureCoordinateIndex>::VERTEX_NAME);
+		return getData<TextureCoordinateConstInfo<textureCoordinateType>::ARRAY_TYPE>(TextureCoordinateIndexInfo<textureCoordinateIndex>::VERTEX_NAME);
 	}
 
 	template<TextureCoordinateType textureCoordinateType, TextureCoordinateIndex textureCoordinateIndex>
 	void SepMesh::setTextureCoordinates(const typename MeshData::DataTypeInfo<TextureCoordinateConstInfo<textureCoordinateType>::ARRAY_TYPE>::ValueType &textureCoordinates)
 	{
-		_setData<TextureCoordinateConstInfo<textureCoordinateType>::ARRAY_TYPE>(TextureCoordinateIndexInfo<textureCoordinateIndex>::VERTEX_NAME, textureCoordinates, TextureCoordinateIndexInfo<textureCoordinateIndex>::VERTEX_BINDING_PRIORITY);
+		setData<TextureCoordinateConstInfo<textureCoordinateType>::ARRAY_TYPE>(TextureCoordinateIndexInfo<textureCoordinateIndex>::VERTEX_NAME, textureCoordinates, TextureCoordinateIndexInfo<textureCoordinateIndex>::VERTEX_BINDING_PRIORITY);
+	}
+
+	template<MeshData::DataType dataType>
+	Bool32 &SepMesh::hasData(std::string name) const
+	{
+		return m_pData->hasData<dataType>(name);
+	}
+
+	template<MeshData::DataType dataType>
+	void &SepMesh::addData(std::string name
+	    , const typename MeshData::DataTypeInfo<dataType>::ValueType &value
+		, uint32_t bindingPriority = VG_VERTEX_BINDING_PRIORITY_OTHER_MIN
+		)
+	{
+		//update layout binding info
+		MeshData::DataInfo info = {
+			name,
+			dataType,
+			bindingPriority
+		};
+		m_pData->addData<dataType>(name, info, value);
+		m_applied = VG_FALSE;
+	}
+
+	template<MeshData::DataType dataType>
+	void &SepMesh::removeData(std::string name) const
+	{
+		m_pData->removeData<dataType>(name);
+		removeValue(name, m_mapLayoutBindingInfos, m_arrLayoutBindingInfoNames);
+		m_applied = VG_FALSE;
 	}
 
 	template<MeshData::DataType dataType>
 	const typename MeshData::DataTypeInfo<dataType>::ValueType &SepMesh::getData(std::string name) const
 	{
-		return _getData<dataType>(name);
+		return m_pData->getData<dataType>(name);
 	}
 
 	template <MeshData::DataType dataType>
-	void SepMesh::setData(std::string name, const typename MeshData::DataTypeInfo<dataType>::ValueType &value, uint32_t bindingPriority)
+	void SepMesh::setData(std::string name, const typename MeshData::DataTypeInfo<dataType>::ValueType &value)
 	{
-		_setData<dataType>(name, value, bindingPriority);
-	}
-
-	template<MeshData::DataType dataType>
-	const typename MeshData::DataTypeInfo<dataType>::ValueType &SepMesh::_getData(std::string name) const
-	{
-		return m_pData->getDataValue<dataType>(name);
-	}
-
-	template <MeshData::DataType dataType>
-	void SepMesh::_setData(std::string name, const typename MeshData::DataTypeInfo<dataType>::ValueType &value, uint32_t bindingPriority)
-	{
-		m_pData->setDataValue<dataType>(name, value);
-		//update layout binding info
-		LayoutBindingInfo info(
-			name,
-			dataType,
-			bindingPriority
-		);
-		setValue(name, info, m_mapLayoutBindingInfos, m_arrLayoutBindingInfoNames);
+		m_pData->setData<dataType>(name, value);
 		m_applied = VG_FALSE;
 	}
+
 } //namespace vg

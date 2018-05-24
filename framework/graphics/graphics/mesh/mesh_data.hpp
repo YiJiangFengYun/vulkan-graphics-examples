@@ -145,57 +145,95 @@ namespace vg
 			}
 		}
 
-		//std::vector<float> arrFloats;
-		std::unordered_map<std::string, float> mapFloats;
+        struct DataInfo
+		{
+			std::string name;
+			MeshData::DataType dataType;
+			uint32_t bindingPriority;
 
-		//std::vector<std::vector<float>> arrFloatArrays;
-		std::unordered_map<std::string, std::vector<float>> mapFloatArrays;
+			DataInfo();
 
-		//std::vector<int32_t> arrInts;
-		std::unordered_map<std::string, int32_t> mapInts;
+			DataInfo(std::string name,
+				MeshData::DataType dataType,
+				uint32_t bindingPriority);
 
-		//std::vector<std::vector<int32_t>> arrIntArrays;
-		std::unordered_map<std::string, std::vector<int32_t>> mapIntArrays;
+			DataInfo(const DataInfo &);
 
-		//std::vector<Vector2> arrVector2s;
-		std::unordered_map <std::string, Vector2> mapVector2s;
+			DataInfo(const DataInfo &&);
 
-		//std::vector<std::vector<Vector2>> arrVector2Arrays;
-		std::unordered_map <std::string, std::vector<Vector2>> mapVector2Arrays;
+			DataInfo &operator=(const DataInfo &);
 
-		//std::vector<Vector3> arrVector3s;
-		std::unordered_map<std::string, Vector3> mapVector3s;
+			Bool32 operator ==(const DataInfo &target) const;
 
-		//std::vector<std::vector<Vector3>> arrVector3Arrays;
-		std::unordered_map<std::string, std::vector<Vector3>> mapVector3Arrays;
+			Bool32 operator<(const DataInfo &target) const;
+		};
 
-		//std::vector<Vector4> arrVector4s;
-		std::unordered_map<std::string, Vector4> mapVector4s;
 
-		//std::vector<std::vector<Vector4>> arrVector4Arrays;
-		std::unordered_map<std::string, std::vector<Vector4>> mapVector4Arrays;
+		std::vector<std::string> arrDataNames;
+		std::unordered_map<std::string, std::vector<Byte>> mapDatas;
+		std::unordered_map<std::string, uint32_t> mapDataCounts;
+		std::unordered_map<std::string, DataInfo> mapDataInfos;
 
-		//std::vector<Color32> arrColor32s;
-		std::unordered_map<std::string, Color32> mapColor32s;
+		const std::vector<std::string> getArrDataNames() const;
+		Bool32 hasData(std::string name) const;
+		void removeData(std::string name);
+	    const DataInfo &getDataInfo(std::string name) const;
 
-		//std::vector<std::vector<Color32>> arrColor32Arrays;
-		std::unordered_map<std::string, std::vector<Color32>> mapColor32Arrays;
+		void addData(const std::string name, const DataInfo &info, void *src, uint32_t size);
+		void getData(const std::string name, void *dst, uint32_t size, uint32_t offset) const;
+		void setData(const std::string name, void *src, uint32_t size, uint32_t offset);
 
-		std::unordered_map<std::string, std::vector<Color>> mapColorArrays;
+        template<typename T>
+		void addData(const std::string name, const PassDataInfo &info, const T &value);
+		template<typename T>
+		T getData(const std::string name) const;
+		template<typename T>
+		void setData(const std::string name, const T &value);
+        
+		template<typename T>
+		void addData(const std::string name, const PassDataInfo &info, const std::vector<T> &values);
+		template <typename T>
+		std::vector<T> getData(const std::string name, const uint32_t count) const;
+		template<typename T>
+		void setData(const std::string name, const std::vector<T> &values);
+
+		template<typename T>
+		void addData(const std::string name, const PassDataInfo &info, const T * const pSrc, const uint32_t count);
+		template<typename T>
+		void getData(const std::string name, const T * const pDst, const uint32_t count);
+		template<typename T>
+		void setData(const std::string name, const T * const pSrc, const uint32_t count);
 
 		template <DataType type>
-		const typename DataTypeInfo<type>::ValueType& getDataValue(std::string name) const;
+		Bool32 hasData(std::string name) const;
 
 		template <DataType type>
-		void setDataValue(std::string name, const typename DataTypeInfo<type>::ValueType& value);
+		void addData(std::string name, const typename DataTypeInfo<type>::ValueType& value);
 
-		uint32_t static getDataBaseTypeSize(DataType dataType);
+		template <DataType type>
+		void removeData(std::string name);
 
-		uint32_t getDataValueSize(std::string name, DataType dataType);
+		template <DataType type>
+		const typename DataTypeInfo<type>::ValueType& getData(std::string name) const;
 
-		void memCopyDataValue(std::string name, DataType dataType, void* dst, uint32_t offset, uint32_t elementStart, uint32_t maxElementCount);
+		template <DataType type>
+		void setData(std::string name, const typename DataTypeInfo<type>::ValueType& value);
+
+		uint32_t static getDataBaseSize(DataType dataType);				
+		uint32_t getDataBaseSize(const std::string name) const;
+
+		uint32_t getDataSize(const std::string name) const;
+
+
+		void memoryCopyData(const std::string name
+			, void* dst
+			, uint32_t offset
+			, uint32_t elementStart
+			, uint32_t maxElementCount) const;
 
 	};
 }
+
+#include "graphics/mesh/mesh_data.inl"
 
 #endif // !VG_MESH_DATA_H

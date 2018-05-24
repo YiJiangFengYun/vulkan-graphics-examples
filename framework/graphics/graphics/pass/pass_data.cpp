@@ -245,10 +245,6 @@ namespace vg
 		return static_cast<uint32_t>(bytes.size());
 	}
 
-	
-
-	
-
 	void PassData::memoryCopyData(const std::string name
 		, void* dst
 		, uint32_t offset

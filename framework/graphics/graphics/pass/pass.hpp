@@ -426,6 +426,7 @@ namespace vg
 				);
 		};
 		static Bool32 _compareBufferTextureInfo(const BufferTextureSortInfo &, const BufferTextureSortInfo &);
+		std::set<BufferTextureSortInfo, Bool32(*)(const BufferTextureSortInfo &, const BufferTextureSortInfo &)> m_sortBufferTexInfosSet;
 		Bool32 m_descriptorSetChanged;
 		uint32_t m_layoutBindingCount;		
         std::vector<vk::DescriptorSetLayoutBinding> m_descriptorSetLayoutBindings;

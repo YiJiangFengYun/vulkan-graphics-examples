@@ -70,6 +70,11 @@ namespace vg
 		removeValue(name, mapDataInfos);
 	}
 
+	uint32_t MeshData::Data::getDataCount(std::string name) const
+	{
+		return getValue(name, mapDataCounts);
+	}
+
 	const MeshData::DataInfo &MeshData::Data::getDataInfo(std::string name) const
 	{
 		return getValue(name, mapDataInfos);

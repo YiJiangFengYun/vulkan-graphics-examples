@@ -4,11 +4,9 @@ namespace vg
 {
 	PassDataInfo::PassDataInfo(uint32_t layoutPriority
 		, vk::ShaderStageFlags shaderStageFlags
-		, uint32_t size
 	    )
 		: layoutPriority(layoutPriority)
 		, shaderStageFlags(shaderStageFlags)
-		, size(size)
 	{
 		
 	}
@@ -16,7 +14,6 @@ namespace vg
 	PassDataInfo::PassDataInfo(const PassDataInfo &target)
 	    : layoutPriority(target.layoutPriority)
 		, shaderStageFlags(target.shaderStageFlags)
-		, size(target.size)
 	{
 
 	}
@@ -25,10 +22,29 @@ namespace vg
 	{
 		layoutPriority = target.layoutPriority;
 		shaderStageFlags = target.shaderStageFlags;
-		size = target.size;
+		return *this;
 	}
 
-	uint32_t PassDataInfo::getBufferSize() const
+	PassDataSizeInfo::PassDataSizeInfo(uint32_t size
+	    )
+		: size(size)
+	{
+		
+	}
+
+	PassDataSizeInfo::PassDataSizeInfo(const PassDataSizeInfo &target)
+	    : size(target.size)
+	{
+
+	}
+
+	PassDataSizeInfo& PassDataSizeInfo::operator=(const PassDataSizeInfo &target)
+	{
+		size = target.size;
+		return *this;
+	}
+
+	uint32_t PassDataSizeInfo::getBufferSize() const
 	{
 		const auto &pPhysicalDevice = pApp->getPhysicalDevice();
 		const auto &properties = pPhysicalDevice->getProperties();
@@ -116,6 +132,21 @@ namespace vg
 		bindingPriority = target.bindingPriority;
 		descriptorType = target.descriptorType;
 		stageFlags = target.stageFlags;
+		return *this;
+	}
+
+	PassData::PassData()
+	   : arrDataNames()
+	   , mapDatas()
+	   , mapDataCounts()
+	   , mapDataInfos()
+	   , mapDataSizeInfos()
+	   , arrBufferNames()
+	   , mapBuffers()
+	   , arrTexNames()
+	   , mapTextures()
+	{
+
 	}
 
 	const std::vector<std::string> PassData::getArrBufferNames() const
@@ -193,11 +224,26 @@ namespace vg
 		removeValue(name, mapDatas, arrDataNames);
 		removeValue(name, mapDataCounts);
 		removeValue(name, mapDataInfos);
+		removeValue(name, mapDataSizeInfos);
 	}
 
 	const PassDataInfo &PassData::getDataInfo(std::string name) const
 	{
 		return getValue(name, mapDataInfos);
+	}
+
+	const PassDataSizeInfo &PassData::getDataSizeInfo(std::string name) const
+	{
+		return getValue(name, mapDataSizeInfos);
+	}
+
+	void PassData::addData(const std::string name, const PassDataInfo &info, const PassDataSizeInfo &sizeInfo)
+	{
+		std::vector<Byte> temp(sizeInfo.size);
+		addValue(name, temp, mapDatas, arrDataNames);
+		addValue(name, 1u, mapDataCounts);
+		addValue(name, info, mapDataInfos);
+		addValue(name, sizeInfo, mapDataSizeInfos);
 	}
 
 	void PassData::addData(const std::string name, const PassDataInfo &info, void *src, uint32_t size)
@@ -207,6 +253,10 @@ namespace vg
 		addValue(name, temp, mapDatas, arrDataNames);
 		addValue(name, 1u, mapDataCounts);
 		addValue(name, info, mapDataInfos);
+		PassDataSizeInfo sizeInfo = {
+			size
+		};
+		addValue(name, sizeInfo, mapDataSizeInfos);
 	}
 
 	void PassData::getData(const std::string name, void *dst, uint32_t size, uint32_t offset) const
@@ -229,6 +279,11 @@ namespace vg
 			if (offset + size > static_cast<uint32_t>(mapDatas[name].size()))
 		        mapDatas[name].resize(offset + size);
 		    if(src) memcpy((char *)(mapDatas[name].data()) + offset, src, size);
+			setValue(name, 1u, mapDataCounts);
+			PassDataSizeInfo sizeInfo = {
+		    	size
+		    };
+		    setValue(name, sizeInfo, mapDataSizeInfos);
 		}
 	}
 

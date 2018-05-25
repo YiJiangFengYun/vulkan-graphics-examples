@@ -8,7 +8,8 @@ namespace vg {
     class BufferData 
     {
     public:
-        BufferData(vk::MemoryPropertyFlags bufferMemoryPropertyFlags = vk::MemoryPropertyFlags());
+        BufferData(vk::BufferUsageFlags bufferUsageFlags
+			, vk::MemoryPropertyFlags bufferMemoryPropertyFlags);
 
         ~BufferData();
 
@@ -26,7 +27,7 @@ namespace vg {
             , uint32_t size
             , Bool32 cacheMemory = VG_FALSE
             );
-        
+		vk::BufferUsageFlags getBufferUsageFlags() const;
         vk::MemoryPropertyFlags getMemoryPropertyFlags() const;
         uint32_t getSize() const;
         uint32_t getBufferSize() const;
@@ -36,8 +37,10 @@ namespace vg {
         uint32_t getMemorySize() const;
         const void *getMemory() const;
     private:
+		BufferData() = delete;
         uint32_t m_size;
         uint32_t m_bufferSize;
+		vk::BufferUsageFlags m_bufferUsageFlags;
         std::shared_ptr<vk::Buffer> m_pBuffer;
         uint32_t m_bufferMemorySize;
         std::shared_ptr<vk::DeviceMemory> m_pBufferMemory;

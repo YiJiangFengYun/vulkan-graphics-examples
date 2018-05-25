@@ -130,7 +130,23 @@ namespace vg
 					if ((*(buildInDataInfo.pComponent + j)).type == Pass::BuildInDataType::POST_RENDER_RESULT)
 					{
 						auto pColorTex = pPostRenderTarget->getColorAttachment();
-						pPass->setTexture(VG_M_POST_RENDER_TEXTURE_NAME, pColorTex, VG_M_POST_RENDER_TEXTURE_BINDING_PRIORITY);
+						PassTextureInfo info = {
+							pColorTex,
+							nullptr,
+							nullptr,
+							vk::ImageLayout::eUndefined,
+							VG_PASS_POST_RENDER_TEXTURE_BINDING_PRIORITY,
+							vg::ImageDescriptorType::COMBINED_IMAGE_SAMPLER,
+							vk::ShaderStageFlagBits::eFragment,
+						};
+						if (pPass->hasTexture(VG_PASS_POST_RENDER_TEXTURE_NAME) == VG_FALSE)
+						{
+							pPass->addTexture(VG_PASS_POST_RENDER_TEXTURE_NAME, info);
+						}
+						else
+						{
+							pPass->setTexture(VG_PASS_POST_RENDER_TEXTURE_NAME, info);
+						}
 						pPass->apply();
 						break;
 					}
@@ -788,30 +804,45 @@ namespace vg
 		        	Pass::BuildInDataType type = (*(info.pComponent + componentIndex)).type;
 		        	if (type == Pass::BuildInDataType::MATRIX_OBJECT_TO_NDC)
 		        	{
-		        		pPass->_setBuildInMatrixData(type, mvpMatrix);
+		        		pPass->setBuildInMatrixData(type, mvpMatrix);
 		        	}
 		        	else if (type == Pass::BuildInDataType::MATRIX_OBJECT_TO_WORLD)
 		        	{
-		        		pPass->_setBuildInMatrixData(type, modelMatrix);
+		        		pPass->setBuildInMatrixData(type, modelMatrix);
 		        	}
 		        	else if (type == Pass::BuildInDataType::MATRIX_OBJECT_TO_VIEW)
 		        	{
-		        		pPass->_setBuildInMatrixData(type, mvMatrix);
+		        		pPass->setBuildInMatrixData(type, mvMatrix);
 		        	}
 		        	else if (type == Pass::BuildInDataType::MATRIX_VIEW)
 		        	{
-		        		pPass->_setBuildInMatrixData(type, viewMatrix);
+		        		pPass->setBuildInMatrixData(type, viewMatrix);
 		        	}
 		        	else if (type == Pass::BuildInDataType::MATRIX_PROJECTION)
 		        	{
-		        		pPass->_setBuildInMatrixData(type, projMatrix);
+		        		pPass->setBuildInMatrixData(type, projMatrix);
 		        	}
 					else if (type == Pass::BuildInDataType::PRE_Z_DEPTH_RESULT)
 					{
 						if (pPreZTarget != nullptr)
 				        {
-							auto pPreTexture = pPreZTarget->getDepthAttachment();
-				        	pPass->setTexture(VG_M_PRE_Z_TEXTURE_NAME, pPreTexture, VG_M_PRE_Z_TEXTURE_BINDING_PRIORITY);
+							PassTextureInfo info = {
+								pPreZTarget->getDepthAttachment(),
+								nullptr,
+								nullptr,
+								vk::ImageLayout::eUndefined,
+								VG_PASS_PRE_Z_TEXTURE_BINDING_PRIORITY,
+								vg::ImageDescriptorType::COMBINED_IMAGE_SAMPLER,
+								vk::ShaderStageFlagBits::eFragment,
+							};
+							if (pPass->hasTexture(VG_PASS_PRE_Z_TEXTURE_NAME) == VG_FALSE)
+							{
+								pPass->addTexture(VG_PASS_PRE_Z_TEXTURE_NAME, info);
+							}
+							else
+							{
+								pPass->setTexture(VG_PASS_PRE_Z_TEXTURE_NAME, info);
+							}
 				        }
 					}
 		        }

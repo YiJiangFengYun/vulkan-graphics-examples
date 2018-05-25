@@ -177,6 +177,7 @@ namespace vg
 			const std::vector<std::string> getArrDataNames() const;
 		    Bool32 hasData(std::string name) const;
 		    void removeData(std::string name);
+			uint32_t getDataCount(std::string name) const;
 	        const DataInfo &getDataInfo(std::string name) const;
     
 		    void addData(const std::string name, const DataInfo &info, void *src, uint32_t size);
@@ -192,7 +193,7 @@ namespace vg
             
 		    template<typename T>
 		    void addData(const std::string name, const DataInfo &info, const std::vector<T> &values);
-		    template <typename T>
+			template <typename T>
 		    std::vector<T> getData(const std::string name, const uint32_t count) const;
 		    template<typename T>
 		    void setData(const std::string name, const std::vector<T> &values);
@@ -226,7 +227,7 @@ namespace vg
 		void removeData(std::string name);
 
 		template <DataType type>
-		const typename DataTypeInfo<type>::ValueType& getData(std::string name) const;
+		const typename DataTypeInfo<type>::ValueType getData(std::string name) const;
 
 		template <DataType type>
 		void setData(std::string name, const typename DataTypeInfo<type>::ValueType& value);

@@ -208,26 +208,30 @@ namespace vg
 		m_applied = VG_FALSE;
 	}
 
-	// const std::vector<Color32> &SepMesh::getColor32s() const
-	// {
-	// 	if (hasData<MeshData::DataType::COLOR_32_ARRAY>(VG_VERTEX_COLOR_NAME) == VG_FALSE)
-	// 	{
-	// 		return {};
-	// 	}
-	// 	return getData<MeshData::DataType::COLOR_32_ARRAY>(VG_VERTEX_COLOR_NAME);
-	// }
-
-	// void SepMesh::setColor32s(const std::vector<Color32> &colors)
-	// {
-	// 	if (hasData<MeshData::DataType::COLOR_32_ARRAY>(VG_VERTEX_COLOR_NAME) == VG_FALSE)
-	// 	{
-	// 	    addData<MeshData::DataType::COLOR_32_ARRAY>(VG_VERTEX_COLOR_NAME, colors, VG_VERTEX_BINDING_PRIORITY_COLOR);			
-	// 	}
-	// 	else
-	// 	{
-	// 	    setData<MeshData::DataType::COLOR_32_ARRAY>(VG_VERTEX_COLOR_NAME, colors);
-	// 	}
-	// }
+    Bool32 SepMesh::hasColor32s() const
+	{
+		return hasData<MeshData::DataType::COLOR_32_ARRAY>(VG_VERTEX_COLOR_NAME);
+	}
+		
+	void SepMesh::addColor32s(const std::vector<Color32> &color32s)
+	{
+		addData<MeshData::DataType::COLOR_32_ARRAY>(VG_VERTEX_COLOR_NAME, color32s, VG_VERTEX_BINDING_PRIORITY_COLOR);
+	}
+		
+	void SepMesh::removeColor32s()
+	{
+		removeData<MeshData::DataType::COLOR_32_ARRAY>(VG_VERTEX_COLOR_NAME);
+	}
+		
+	const std::vector<Color32> SepMesh::getColor32s() const
+	{
+		return getData<MeshData::DataType::COLOR_32_ARRAY>(VG_VERTEX_COLOR_NAME);
+	}
+		
+	void SepMesh::setColor32s(const std::vector<Color32> &color32s)
+	{
+		setData<MeshData::DataType::COLOR_32_ARRAY>(VG_VERTEX_COLOR_NAME, color32s);
+	}
 
 	Bool32 SepMesh::hasColors() const
 	{
@@ -244,7 +248,7 @@ namespace vg
 		removeData<MeshData::DataType::COLOR_ARRAY>(VG_VERTEX_COLOR_NAME);
 	}
 
-	const std::vector<Color> &SepMesh::getColors() const
+	const std::vector<Color> SepMesh::getColors() const
 	{
 		return getData<MeshData::DataType::COLOR_ARRAY>(VG_VERTEX_COLOR_NAME);
 	}
@@ -500,7 +504,7 @@ namespace vg
 
 //DimSepMesh
 	template <MeshDimType meshDimType>
-	DimSepMesh<meshDimType>::DimSepMesh(MemoryPropertyFlags bufferMemoryPropertyFlags) 
+	DimSepMesh<meshDimType>::DimSepMesh(vk::MemoryPropertyFlags bufferMemoryPropertyFlags) 
 		: SepMesh(bufferMemoryPropertyFlags)
 		, Mesh<meshDimType>()
 	{
@@ -514,39 +518,93 @@ namespace vg
 	}
 
 	template <MeshDimType meshDimType>
-	const typename DimSepMesh<meshDimType>::ArrayValueType &DimSepMesh<meshDimType>::getPositions() const
+	Bool32 DimSepMesh<meshDimType>::hasPositions() const
 	{
-		return _getData<DimSepMesh<meshDimType>::ARRAY_DATA_TYPE>(VG_VERTEX_POSITION_NAME);
+		return hasData<ARRAY_DATA_TYPE>(VG_VERTEX_POSITION_NAME);
+	}
+
+	template <MeshDimType meshDimType>
+	void DimSepMesh<meshDimType>::addPositions(const ArrayValueType &vertices)
+	{
+		addData<ARRAY_DATA_TYPE>(VG_VERTEX_POSITION_NAME, vertices, VG_VERTEX_BINDING_PRIORITY_POSITION);
+	}
+
+	template <MeshDimType meshDimType>
+	void DimSepMesh<meshDimType>::removePositions()
+	{
+		removeData<ARRAY_DATA_TYPE>(VG_VERTEX_POSITION_NAME);
+	}
+
+	template <MeshDimType meshDimType>
+	const typename DimSepMesh<meshDimType>::ArrayValueType DimSepMesh<meshDimType>::getPositions() const
+	{
+		return getData<ARRAY_DATA_TYPE>(VG_VERTEX_POSITION_NAME);
 	}
 
 	template <MeshDimType meshDimType>
 	void DimSepMesh<meshDimType>::setPositions(const ArrayValueType &vertices)
 	{
-		_setData<DimSepMesh<meshDimType>::ARRAY_DATA_TYPE>(VG_VERTEX_POSITION_NAME, vertices, VG_VERTEX_BINDING_PRIORITY_POSITION);
+		setData<ARRAY_DATA_TYPE>(VG_VERTEX_POSITION_NAME, vertices);
 	}
 
 	template <MeshDimType meshDimType>
-	const typename DimSepMesh<meshDimType>::ArrayValueType &DimSepMesh<meshDimType>::getNormals() const
+	Bool32 DimSepMesh<meshDimType>::hasNormals() const
 	{
-		return _getData<DimSepMesh<meshDimType>::ARRAY_DATA_TYPE>(VG_VERTEX_NORMAL_NAME);
+		return hasData<ARRAY_DATA_TYPE>(VG_VERTEX_NORMAL_NAME);
+	}
+	
+	template <MeshDimType meshDimType>
+	void DimSepMesh<meshDimType>::addNormals(const ArrayValueType &normals)
+	{
+		addData<ARRAY_DATA_TYPE>(VG_VERTEX_NORMAL_NAME, normals, VG_VERTEX_BINDING_PRIORITY_NORMAL);
+	}
+	
+	template <MeshDimType meshDimType>
+	void DimSepMesh<meshDimType>::removeNormals()
+	{
+		removeData<ARRAY_DATA_TYPE>(VG_VERTEX_NORMAL_NAME);
+	}
+
+	template <MeshDimType meshDimType>
+	const typename DimSepMesh<meshDimType>::ArrayValueType DimSepMesh<meshDimType>::getNormals() const
+	{
+		return getData<ARRAY_DATA_TYPE>(VG_VERTEX_NORMAL_NAME);
 	}
 
 	template <MeshDimType meshDimType>
 	void DimSepMesh<meshDimType>::setNormals(const ArrayValueType &normals)
 	{
-		_setData<DimSepMesh<meshDimType>::ARRAY_DATA_TYPE>(VG_VERTEX_NORMAL_NAME, normals, VG_VERTEX_BINDING_PRIORITY_NORMAL);
+		setData<ARRAY_DATA_TYPE>(VG_VERTEX_NORMAL_NAME, normals);
 	}
 
 	template <MeshDimType meshDimType>
-	const typename DimSepMesh<meshDimType>::ArrayValueType &DimSepMesh<meshDimType>::getTangents() const
+	Bool32 DimSepMesh<meshDimType>::hasTangents() const
 	{
-		return _getData<DimSepMesh<meshDimType>::ARRAY_DATA_TYPE>(VG_VERTEX_TANGENT_NAME);
+		return hasData<ARRAY_DATA_TYPE>(VG_VERTEX_TANGENT_NAME);
+	}
+
+	template <MeshDimType meshDimType>
+	void DimSepMesh<meshDimType>::addTangents(const ArrayValueType &tangents)
+	{
+         addData<ARRAY_DATA_TYPE>(VG_VERTEX_TANGENT_NAME, tangents, VG_VERTEX_BINDING_PRIORITY_TANGENT);
+	}
+	
+	template <MeshDimType meshDimType>
+	void DimSepMesh<meshDimType>::removeTangents()
+	{
+		removeData<ARRAY_DATA_TYPE>(VG_VERTEX_TANGENT_NAME);
+	}
+
+	template <MeshDimType meshDimType>
+	const typename DimSepMesh<meshDimType>::ArrayValueType DimSepMesh<meshDimType>::getTangents() const
+	{
+		return getData<ARRAY_DATA_TYPE>(VG_VERTEX_TANGENT_NAME);
 	}
 
 	template <MeshDimType meshDimType>
 	void DimSepMesh<meshDimType>::setTangents(const ArrayValueType &tangents)
 	{
-		_setData<DimSepMesh<meshDimType>::ARRAY_DATA_TYPE>(VG_VERTEX_TANGENT_NAME, tangents, VG_VERTEX_BINDING_PRIORITY_TANGENT);
+		setData<ARRAY_DATA_TYPE>(VG_VERTEX_TANGENT_NAME, tangents);
 	}
 
 	template <MeshDimType meshDimType>
@@ -579,7 +637,7 @@ namespace vg
 			return;
 		}
 
-		auto vertices = m_pData->getDataValue<ARRAY_DATA_TYPE>(VG_VERTEX_POSITION_NAME);
+		auto vertices = m_pData->getData<ARRAY_DATA_TYPE>(VG_VERTEX_POSITION_NAME);
 		BaseValueType minPos;
 		BaseValueType maxPos;
 		BaseValueType::length_type len = BaseValueType::length();
@@ -604,7 +662,7 @@ namespace vg
 
 //DimSimpleMesh
 	template <MeshDimType meshDimType>
-	DimSimpleMesh<meshDimType>::DimSimpleMesh(MemoryPropertyFlags bufferMemoryPropertyFlags)
+	DimSimpleMesh<meshDimType>::DimSimpleMesh(vk::MemoryPropertyFlags bufferMemoryPropertyFlags)
 	    : InternalContentMesh(bufferMemoryPropertyFlags)
 		, Mesh<meshDimType>()
 	{

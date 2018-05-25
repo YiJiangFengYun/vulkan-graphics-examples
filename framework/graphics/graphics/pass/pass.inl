@@ -141,7 +141,7 @@ namespace vg
 			size_t size = sizeof(T);
 			if (memcmp((char *)(&m_buildInDataCache) + offset1, &data, size) != 0) {
 				memcpy((char *)(&m_buildInDataCache) + offset1, &data, size);
-				setDataValue(VG_M_BUILDIN_NAME
+				setData(VG_PASS_BUILDIN_DATA_NAME
 				    , &data
 					, size
 					, offset2);

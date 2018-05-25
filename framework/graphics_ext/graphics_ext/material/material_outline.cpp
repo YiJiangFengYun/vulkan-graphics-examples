@@ -132,9 +132,35 @@ namespace vge
     void MaterialOutline::_applyInfos()
     {
         auto pPass = m_pPassOutline.get();
-        pPass->setDataValue("outline_info_vert", m_outlineInfoVert, 1u, 
-            vg::DescriptorType::UNIFORM_BUFFER, vg::ShaderStageFlagBits::VERTEX);
-        pPass->setDataValue("outline_info_frag", m_outlineInfoFrag, 2u,
-            vg::DescriptorType::UNIFORM_BUFFER, vg::ShaderStageFlagBits::FRAGMENT);
+		{
+			std::string name = "outline_info_vert";
+			if (pPass->hasData(name) == VG_FALSE)
+			{
+				vg::PassDataInfo info = {
+					VG_PASS_OTHER_DATA_MAX_LAYOUT_PRIORITY,
+					vk::ShaderStageFlagBits::eVertex,
+				};
+				pPass->addData(name, info, m_outlineInfoVert);
+			}
+			else
+			{
+				pPass->setData(name, m_outlineInfoVert);
+			}
+		}
+		{
+			std::string name = "outline_info_frag";
+			if (pPass->hasData(name) == VG_FALSE)
+			{
+				vg::PassDataInfo info = {
+					VG_PASS_OTHER_DATA_MAX_LAYOUT_PRIORITY + 1,
+					vk::ShaderStageFlagBits::eFragment,
+				};
+				pPass->addData(name, info, m_outlineInfoFrag);
+			}
+			else
+			{
+				pPass->setData(name, m_outlineInfoFrag);
+			}
+		}
     }
 } //vge

@@ -26,7 +26,8 @@ namespace vg
         : Base(BaseType::INDEX_DATA)
         , m_subDatas()
         , m_subDataCount()
-        , m_bufferData(bufferMemoryPropertyFlags ? vk::MemoryPropertyFlagBits::eDeviceLocal : bufferMemoryPropertyFlags)
+        , m_bufferData(vk::BufferUsageFlagBits::eIndexBuffer
+			, bufferMemoryPropertyFlags ? vk::MemoryPropertyFlagBits::eDeviceLocal : bufferMemoryPropertyFlags)
     {
     }
 
@@ -221,16 +222,19 @@ namespace vg
     template<vk::IndexType INDEX_TYPE>
     typename IndexData::IndexTypeInfo<INDEX_TYPE>::ValueType IndexData::getIndex(uint32_t index) const
     {
+        auto pMemery = m_bufferData.getMemory();
 #ifdef DEBUG
-        if (m_pMemory == nullptr) throw std::runtime_error("Failed to get index when not chache memory.");
+        if (pMemery == nullptr) throw std::runtime_error("Failed to get index when not chache memory.");
 #endif //!DEBUG
         using IndexType = typename IndexTypeInfo<INDEX_TYPE>::ValueType;
         IndexType resultIndex;
         memcpy(&resultIndex, 
-            static_cast<IndexType *>(m_pMemory) + index, 
+            static_cast<const IndexType *>(pMemery) + index, 
             sizeof(IndexType));
 
         return resultIndex;
+
+        
     }
 
     //template instantiation
@@ -239,13 +243,14 @@ namespace vg
     template<vk::IndexType INDEX_TYPE>
     std::vector<typename IndexData::IndexTypeInfo<INDEX_TYPE>::ValueType> IndexData::getIndices(uint32_t offset, uint32_t count) const
     {
+        auto pMemery = m_bufferData.getMemory();
 #ifdef DEBUG
-        if (m_pMemory == nullptr) throw std::runtime_error("Failed to get indices when not chache memory.");
+        if (pMemery == nullptr) throw std::runtime_error("Failed to get indices when not chache memory.");
 #endif //!DEBUG
         using IndexType = typename IndexTypeInfo<INDEX_TYPE>::ValueType;
         std::vector<IndexType> indices(count);
         memcpy(indices.data(), 
-            static_cast<IndexType *>(m_pMemory) + offset, 
+            static_cast<const IndexType *>(pMemery) + offset, 
             sizeof(IndexType) * static_cast<size_t>(count));
         return indices;
     }

@@ -298,7 +298,7 @@ namespace vgim
 		m_pMaterial->setRenderQueueType(vg::MaterialShowType::TRANSPARENT);
 
 		auto pPass = m_pMaterial->getMainPass();
-		pPass->setFrontFace(vg::FrontFaceType::CLOCKWISE);
+		pPass->setFrontFace(vk::FrontFace::eClockwise);
         //push constant
         // pPass->setPushConstantRange("default", vk::ShaderStageFlagBits::eVertex, static_cast<uint32_t>(sizeof(float) * 0), static_cast<uint32_t>(sizeof(float) * 4));
 
@@ -343,7 +343,7 @@ namespace vgim
 
     void _createMesh()
     {
-       m_pMesh = static_cast<std::shared_ptr<vg::DimSimpleMesh2>>(new vg::DimSimpleMesh2(vg::MemoryPropertyFlagBits::HOST_VISIBLE));
+       m_pMesh = static_cast<std::shared_ptr<vg::DimSimpleMesh2>>(new vg::DimSimpleMesh2(vk::MemoryPropertyFlagBits::eHostVisible));
        const auto& pVertexData = m_pMesh->getVertexData();
        const auto& pIndexData = m_pMesh->getIndexData();
        vk::VertexInputBindingDescription bindingDesc[1] = {};
@@ -459,15 +459,35 @@ namespace vgim
         io.Fonts->TexID = reinterpret_cast<void *>(VkImage(*(m_pFontTexture->getImage()->getImage())));
 
 		auto pPass = m_pMaterial->getMainPass();
-		pPass->setMainTexture(m_pFontTexture.get());
+
+		//main texture
+		std::string name = "main_texture";
+		vg::PassTextureInfo info = {
+			m_pFontTexture.get(),
+			nullptr,
+			nullptr,
+			vk::ImageLayout::eUndefined,
+			VG_PASS_OTHER_MAX_BINDING_PRIORITY,
+			vg::ImageDescriptorType::COMBINED_IMAGE_SAMPLER,
+			vk::ShaderStageFlagBits::eFragment,
+		};
+		if (pPass->hasTexture(name) == VG_FALSE)
+		{
+			pPass->addTexture(name, info);
+		}
+		else
+		{
+			pPass->setTexture(name, info);
+		}
     }
 
     void _destroyFontTexture()
     {
 		auto pPass = m_pMaterial->getMainPass();
         ImGuiIO& io = ImGui::GetIO();
-        io.Fonts->TexID = reinterpret_cast<void *>(0);        
-		pPass->setMainTexture(nullptr);
+        io.Fonts->TexID = reinterpret_cast<void *>(0);
+		std::string name = "main_texture";
+		pPass->removeTexture(name);
         m_pFontTexture = nullptr;
     }  
 } //vgim

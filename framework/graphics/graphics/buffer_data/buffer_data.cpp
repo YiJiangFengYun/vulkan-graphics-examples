@@ -4,8 +4,11 @@
 
 namespace vg
 {
-    BufferData::BufferData(vk::MemoryPropertyFlags memoryPropertyFlags)
-        : m_memoryPropertyFlags(memoryPropertyFlags)
+    BufferData::BufferData(vk::BufferUsageFlags bufferUsageFlags
+		, vk::MemoryPropertyFlags memoryPropertyFlags
+	    )
+        : m_bufferUsageFlags(bufferUsageFlags)
+		, m_memoryPropertyFlags(memoryPropertyFlags)
         , m_size()
         , m_bufferSize()
         , m_pBuffer()
@@ -81,6 +84,11 @@ namespace vg
 		}
     }
 
+	vk::BufferUsageFlags BufferData::getBufferUsageFlags() const
+	{
+		return m_bufferUsageFlags;
+	}
+
     vk::MemoryPropertyFlags BufferData::getMemoryPropertyFlags() const
     {
         return m_memoryPropertyFlags;
@@ -132,7 +140,7 @@ namespace vg
         createBufferForBufferData(memories, 
             memorySize, 
             _isDeviceMemoryLocal(), 
-            vk::BufferUsageFlagBits::eUniformBuffer,
+            m_bufferUsageFlags,
             m_memoryPropertyFlags,
             m_bufferSize,
             m_pBuffer,

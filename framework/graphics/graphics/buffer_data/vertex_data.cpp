@@ -26,7 +26,8 @@ namespace vg
 
     VertexData::VertexData(vk::MemoryPropertyFlags bufferMemoryPropertyFlags)
         : Base(BaseType::VERTEX_DATA)
-        , m_bufferData(bufferMemoryPropertyFlags ? bufferMemoryPropertyFlags : vk::MemoryPropertyFlagBits::eDeviceLocal)
+        , m_bufferData(vk::BufferUsageFlagBits::eVertexBuffer
+			, bufferMemoryPropertyFlags ? bufferMemoryPropertyFlags : vk::MemoryPropertyFlagBits::eDeviceLocal)
         , m_subDatas()
         , m_subDataCount()
     {

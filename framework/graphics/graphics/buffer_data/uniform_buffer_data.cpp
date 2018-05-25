@@ -253,7 +253,8 @@ namespace vg
         
     UniformBufferData::UniformBufferData(vk::MemoryPropertyFlags bufferMemoryPropertyFlags)
         : Base(BaseType::UNIFORM_BUFFER_DATA)
-        , m_bufferData(bufferMemoryPropertyFlags ? bufferMemoryPropertyFlags : vk::MemoryPropertyFlagBits::eHostVisible)
+        , m_bufferData(vk::BufferUsageFlagBits::eUniformBuffer
+			, bufferMemoryPropertyFlags ? bufferMemoryPropertyFlags : vk::MemoryPropertyFlagBits::eHostVisible)
         , m_subDataCount()
         , m_subDatas()
         , m_poolMaxSetCount()

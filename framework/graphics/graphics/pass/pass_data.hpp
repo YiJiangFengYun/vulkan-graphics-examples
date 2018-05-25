@@ -15,23 +15,30 @@
 #define VG_PASS_BUILDIN_DATA_LAYOUT_PRIORITY 0
 #define VG_PASS_OTHER_DATA_MAX_LAYOUT_PRIORITY 1
 
-#define VG_PASS_PRE_Z_TEXTURE_BINDING_PRIORITY 1
-#define VG_PASS_POST_RENDER_TEXTURE_BINDING_PRIORITY 2
-#define VG_PASS_OTHER_MAX_BINDING_PRIORITY 3
+#define VG_PASS_PRE_Z_TEXTURE_BINDING_PRIORITY 0
+#define VG_PASS_POST_RENDER_TEXTURE_BINDING_PRIORITY 1
+#define VG_PASS_OTHER_MAX_BINDING_PRIORITY 2
 
 namespace vg
 {
 	struct PassDataInfo {
 		uint32_t layoutPriority;
 		vk::ShaderStageFlags shaderStageFlags;
-		uint32_t size;
 		PassDataInfo(uint32_t layoutPriority = 0u
 			, vk::ShaderStageFlags shaderStageFlags = vk::ShaderStageFlags()
-			, uint32_t size = 0u
 		);
 		PassDataInfo(const PassDataInfo &);
 		PassDataInfo& operator=(const PassDataInfo &);
-		uint32_t getBufferSize() const;
+		
+	};
+
+	struct PassDataSizeInfo {
+		uint32_t size;
+
+		PassDataSizeInfo(uint32_t size = 0u);
+		PassDataSizeInfo(const PassDataSizeInfo &);
+		PassDataSizeInfo& operator=(const PassDataSizeInfo &);
+        uint32_t getBufferSize() const;
 	};
 
 	struct PassTextureInfo {
@@ -80,12 +87,15 @@ namespace vg
 		std::unordered_map<std::string, uint32_t> mapDataCounts;
 
 		std::unordered_map<std::string, PassDataInfo> mapDataInfos;
+		std::unordered_map<std::string, PassDataSizeInfo> mapDataSizeInfos;
 
 		std::vector<std::string> arrBufferNames;
 		std::unordered_map<std::string, PassBufferInfo> mapBuffers;
 
 		std::vector<std::string> arrTexNames;
 		std::unordered_map<std::string, PassTextureInfo> mapTextures;
+
+		PassData();
 
 		const std::vector<std::string> getArrBufferNames() const;
 		Bool32 hasBuffer(std::string name) const;
@@ -105,7 +115,9 @@ namespace vg
 		Bool32 hasData(std::string name) const;
 		void removeData(std::string name);
 	    const PassDataInfo &getDataInfo(std::string name) const;
+		const PassDataSizeInfo &getDataSizeInfo(std::string name) const;
 
+		void addData(const std::string name, const PassDataInfo &info, const PassDataSizeInfo &sizeInfo);
 		void addData(const std::string name, const PassDataInfo &info, void *src, uint32_t size);
 		void getData(const std::string name, void *dst, uint32_t size, uint32_t offset) const;
 		void setData(const std::string name, void *src, uint32_t size, uint32_t offset);

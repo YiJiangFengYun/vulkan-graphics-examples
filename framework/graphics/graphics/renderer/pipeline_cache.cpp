@@ -302,9 +302,9 @@ namespace vg
             createInfo.pVertexInputState = &emptyInputState;
         }
 
-        auto polygonMode = tranPolygonModeToVK(pPass->getPolygonMode());
-        auto cullMode = tranCullModeFlagsToVK(pPass->getCullMode());
-		auto frontFace = tranFrontFaceTypeToVK(pPass->getFrontFace());
+        auto polygonMode = pPass->getPolygonMode();
+        auto cullMode = pPass->getCullMode();
+		auto frontFace = pPass->getFrontFace();
         auto lineWidth = pPass->getLineWidth();
 		//Rasterization info.
 		vk::PipelineRasterizationStateCreateInfo rasterizationStateCreateInfo = {

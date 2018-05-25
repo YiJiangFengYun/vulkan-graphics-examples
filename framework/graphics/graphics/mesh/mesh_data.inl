@@ -85,7 +85,7 @@ namespace vg
 	template <MeshData::DataType type>
 	Bool32 MeshData::hasData(std::string name) const
 	{
-		return return datas[static_cast<size_t>(type)].hasData(name);
+		return datas[static_cast<size_t>(type)].hasData(name);
 	}
 
 	template <MeshData::DataType type>
@@ -101,15 +101,16 @@ namespace vg
 	}
 
 	template <MeshData::DataType type>
-	const typename MeshData::DataTypeInfo<type>::ValueType& MeshData::getData(std::string name) const
+	const typename MeshData::DataTypeInfo<type>::ValueType MeshData::getData(std::string name) const
 	{
-		return datas[static_cast<size_t>(type)].getData(name);
+		auto count = datas[static_cast<size_t>(type)].getDataCount(name);
+		return datas[static_cast<size_t>(type)].getData<typename DataTypeInfo<type>::BaseType>(name, count);
 	}
 
 	template <MeshData::DataType type>
 	void MeshData::setData(std::string name, const typename DataTypeInfo<type>::ValueType& value)
 	{
-		datas[static_cast<size_t>(type)].setData(name, value);
+		datas[static_cast<size_t>(type)].setData<typename DataTypeInfo<type>::BaseType>(name, value);
 	}
 
 	template <MeshData::DataType type>

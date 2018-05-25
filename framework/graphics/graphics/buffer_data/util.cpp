@@ -161,7 +161,7 @@ namespace vg
 
         uint32_t count = static_cast<uint32_t>(bindingDescCount);
         for (uint32_t i = 0; i < count; ++i) {
-            vertexBuffers[i] = *(pVertexData->getBuffer());
+            vertexBuffers[i] = *(pVertexData->getBufferData().getBuffer());
             offsets[i] = offset;
             offset += bindingDescs[i].stride * subVertexData.vertexCount;
         }
@@ -180,6 +180,6 @@ namespace vg
 		{
 			offset += subIndexDatas[i].bufferSize;
 		}
-		commandBuffer.bindIndexBuffer(*(pIndexData->getBuffer()), static_cast<vk::DeviceSize>(offset), subIndexDatas[subIndex].indexType);
+		commandBuffer.bindIndexBuffer(*(pIndexData->getBufferData().getBuffer()), static_cast<vk::DeviceSize>(offset), subIndexDatas[subIndex].indexType);
     }
 }

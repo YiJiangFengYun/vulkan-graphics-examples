@@ -231,7 +231,9 @@ namespace vg
 
 		//Applied
 		, m_sortDataSet(_compareDataInfo)
-		, m_dataBuffer()
+		, m_dataBuffer(vk::BufferUsageFlagBits::eUniformBuffer
+			, vk::MemoryPropertyFlagBits::eHostVisible)
+		, m_sortBufferTexInfosSet(_compareBufferTextureInfo)
 		, m_descriptorSetChanged(VG_FALSE)
 	    , m_layoutBindingCount()
 		, m_descriptorSetLayoutBindings()
@@ -261,8 +263,6 @@ namespace vg
 		: Pass()
 	{
 		m_pShader = pShader;
-		_initDefaultBuildInDataInfo();
-		_initBuildInData();
 	}
 
 
@@ -823,13 +823,15 @@ namespace vg
 			    uint32_t totalBufferSize = 0u;
 			    for (const auto &name : arrDataNames)
 			    {
-			    	const auto & dataInfo = data.getDataInfo(name);
-					DataSortInfo sortInfo;
-					sortInfo.name = name;
-					sortInfo.layoutPriority = dataInfo.layoutPriority;
-					sortInfo.size = dataInfo.size;
-					sortInfo.bufferSize = dataInfo.getBufferSize();
-					sortInfo.shaderStageFlags = dataInfo.shaderStageFlags;
+			    	const auto &dataInfo = data.getDataInfo(name);
+					const auto &dataSizeInfo = data.getDataSizeInfo(name);
+					DataSortInfo sortInfo = {
+						name,
+						dataInfo.shaderStageFlags,
+						dataInfo.layoutPriority,
+						dataSizeInfo.size,
+						dataSizeInfo.getBufferSize(),
+					};
 					m_sortDataSet.insert(sortInfo);
 			    	totalBufferSize += sortInfo.bufferSize;
 			    }
@@ -880,12 +882,39 @@ namespace vg
 			m_dataContentChanges.clear();
 		}
 
-		if (m_bufferChanged) {
+		if (m_bufferChanged || m_textureChanged) {
+			auto &sortInfos = m_sortBufferTexInfosSet;
+			sortInfos.clear();
+			const auto &arrBufferNames = data.arrBufferNames;
+			for (const auto &name : arrBufferNames)
+			{
+				const auto &bufferInfo = data.getBuffer(name);
+				BufferTextureSortInfo sortInfo = {
+					name,
+					bufferInfo.bindingPriority,
+					VG_FALSE,
+					reinterpret_cast<const void *>(&bufferInfo),
+				};
+				sortInfos.insert(sortInfo);
+			}
+			const auto &arrTextureNames = data.arrTexNames;
+			for (const auto &name : arrTextureNames)
+			{
+				const auto &textureInfo = data.getTexture(name);
+				BufferTextureSortInfo sortInfo = {
+					name,
+					textureInfo.bindingPriority,
+					VG_TRUE,
+					reinterpret_cast<const void *>(&textureInfo),
+				};
+				sortInfos.insert(sortInfo);
+			}
 
-		}
+			//This change will make build in descriptor set change.
+			m_descriptorSetChanged = VG_TRUE;
 
-		if (m_textureChanged) {
-
+			m_bufferChanged = VG_FALSE;
+			m_textureChanged = VG_FALSE;
 		}
 
 		if (m_descriptorSetChanged) {
@@ -931,7 +960,8 @@ namespace vg
 							dataUpdateDesSetInfo.bufferInfos[0].offset = offset;
 
 							uint32_t range = info.bufferSize;
-							auto nextIterator = ++iterator;
+							auto nextIterator = iterator;
+							++nextIterator;
 						    while (nextIterator != m_sortDataSet.end() && nextIterator->shaderStageFlags == currStageFlags)
 							{
 								range += nextIterator->bufferSize;
@@ -951,31 +981,7 @@ namespace vg
 			std::vector<vk::DescriptorSetLayoutBinding> bufferTextureBindingInfos;
 			std::vector<UpdateDescriptorSetInfo> bufferTextureUpdateDesSetInfos;
 			{
-				//sort by binding priority.
-				std::set<BufferTextureSortInfo, Bool32(*)(const BufferTextureSortInfo &, const BufferTextureSortInfo &)> sortInfos(_compareBufferTextureInfo);
-				const auto &arrBufferNames = data.arrBufferNames;
-			    for (const auto &name : arrBufferNames)
-			    {
-			    	const auto &bufferInfo = data.getBuffer(name);
-					BufferTextureSortInfo sortInfo;
-					sortInfo.name = name;
-					sortInfo.bindingPriority = bufferInfo.bindingPriority;
-					sortInfo.isTexture = VG_FALSE;
-					sortInfo.pInfo = reinterpret_cast<const void *>(&bufferInfo);
-					sortInfos.insert(sortInfo);
-			    }
-				const auto &arrTextureNames = data.arrTexNames;
-				for (const auto &name : arrTextureNames)
-				{
-					const auto &textureInfo = data.getTexture(name);
-					BufferTextureSortInfo sortInfo;
-					sortInfo.name = name;
-					sortInfo.bindingPriority = textureInfo.bindingPriority;
-					sortInfo.isTexture = VG_TRUE;
-					sortInfo.pInfo = reinterpret_cast<const void *>(&textureInfo);
-					sortInfos.insert(sortInfo);
-				}
-
+				auto sortInfos = m_sortBufferTexInfosSet;
 				//fill infos for creating descriptor set and its layout.
 				bufferTextureBindingCount = sortInfos.size();
 				bufferTextureBindingInfos.resize(bufferTextureBindingCount);
@@ -1049,18 +1055,18 @@ namespace vg
 			std::vector<UpdateDescriptorSetInfo> updateDescriptorSetInfos;	
 			{
 			    layoutBindingCount = dataBindingCount + bufferTextureBindingCount;
-			    descriptorSetLayoutBindings.resize(m_layoutBindingCount);
-			    updateDescriptorSetInfos.resize(m_layoutBindingCount);
+			    descriptorSetLayoutBindings.resize(layoutBindingCount);
+			    updateDescriptorSetInfos.resize(layoutBindingCount);
 			    uint32_t i = 0;
 			    uint32_t index = 0u;
 			    for (i = 0; i < dataBindingCount; ++i) {
-			    	m_descriptorSetLayoutBindings[index] = dataBindingInfos[i];
-			    	m_updateDescriptorSetInfos[index] = dataUpdateDesSetInfos[i];
+			    	descriptorSetLayoutBindings[index] = dataBindingInfos[i];
+			    	updateDescriptorSetInfos[index] = dataUpdateDesSetInfos[i];
 			    	++index;
 			    }
 			    for (i = 0; i < bufferTextureBindingCount; ++i) {
-			        m_descriptorSetLayoutBindings[index] = bufferTextureBindingInfos[i];
-			    	m_updateDescriptorSetInfos[index] = bufferTextureUpdateDesSetInfos[i];
+			        descriptorSetLayoutBindings[index] = bufferTextureBindingInfos[i];
+			    	updateDescriptorSetInfos[index] = bufferTextureUpdateDesSetInfos[i];
 			    	++index;
 			    }
 			}
@@ -1097,7 +1103,8 @@ namespace vg
 			}
 
 			//Create descriptor pool.
-			Bool32 createdPool;
+			std::shared_ptr<vk::DescriptorPool> pOldPool = nullptr;
+			Bool32 createdPool = VG_FALSE;
 			{
 				if (createdDescriptorSetLayout == VG_TRUE)
 				{
@@ -1118,7 +1125,7 @@ namespace vg
                         }
 		            }
         
-			        auto oldPool = m_pDescriptorPool;
+					pOldPool = m_pDescriptorPool;
                     if (isGreater == VG_FALSE)
                     {
 		                //create descriptor pool.                
@@ -1166,6 +1173,8 @@ namespace vg
 		            		1u,
 		            		layouts
 		            	};
+						//first we should free old descriptor set because pool may be old pool than is empty and allocated to create this descriptor set.
+						m_pDescriptorSet = nullptr;
 		            	m_pDescriptorSet = fd::allocateDescriptorSet(pDevice, m_pDescriptorPool.get(), allocateInfo);
 			        	// m_usingDescriptorSets[0] = *m_pDescriptorSet;
 		            }
@@ -1196,6 +1205,8 @@ namespace vg
 		        pDevice->updateDescriptorSets(writes, nullptr);
 			    m_updateDescriptorSetInfos = updateDescriptorSetInfos;				
 			}
+
+			m_descriptorSetChanged = VG_FALSE;
 			
 		}
 
@@ -1251,6 +1262,8 @@ namespace vg
 				m_descriptorSetLayouts = setLayouts;
 			}
 			m_descriptorSets = descriptorSets;
+
+			m_descriptorSetsChanged = VG_FALSE;
 		}
 
 		//Update push contant.
@@ -1263,6 +1276,8 @@ namespace vg
 				//Push constant change will make pipeline layout change.
 				m_pipelineLayoutChanged = VG_TRUE;
 		    }
+
+			m_pushConstantChanged = VG_FALSE;
 		}
 
 		//Create pipeline layout.
@@ -1278,6 +1293,8 @@ namespace vg
 			auto pDevice = pApp->getDevice();
 			m_pPipelineLayout = fd::createPipelineLayout(pDevice, pipelineLayoutCreateInfo);
 			_updatePipelineStateID();
+
+			m_pipelineLayoutChanged = VG_FALSE;
 		}
 	}
 
@@ -1329,9 +1346,11 @@ namespace vg
 		    PassDataInfo info = {
 		    	VG_PASS_BUILDIN_DATA_LAYOUT_PRIORITY,
 		    	vk::ShaderStageFlagBits::eVertex,
-		    	size
 		    };
-		    m_data.addData(VG_PASS_BUILDIN_DATA_NAME, info, nullptr, 0u);
+			PassDataSizeInfo sizeInfo = {
+				size,
+			};
+		    m_data.addData(VG_PASS_BUILDIN_DATA_NAME, info, sizeInfo);
 		}
 		else if (m_data.hasData(VG_PASS_BUILDIN_DATA_NAME))
 		{

@@ -52,8 +52,8 @@ void Window::_createMesh()
 {
 	m_pMesh = static_cast<std::shared_ptr<vg::DimSepMesh3>>(new vg::DimSepMesh3());
 	m_pMesh->setVertexCount(static_cast<uint32_t>(m_tempPositions.size()));
-	m_pMesh->setPositions(m_tempPositions);
-	m_pMesh->setColor32s(m_tempColors);
+	m_pMesh->addPositions(m_tempPositions);
+	m_pMesh->addColor32s(m_tempColors);
 	m_pMesh->setIndices(m_tempIndices, vg::PrimitiveTopology::TRIANGLE_LIST, 0u);
 	m_pMesh->apply(VG_TRUE);
 }
@@ -70,9 +70,9 @@ void Window::_createMaterial()
 	pShader->load("shaders/triangle/triangle.vert.spv", "shaders/triangle/triangle.frag.spv");
 	//pass
 	pPass->setMainColor(vg::Color(1.0f, 1.0f, 1.0f, 1.0f));
-	pPass->setPolygonMode(vg::PolygonMode::FILL);
-	pPass->setCullMode(vg::CullModeFlagBits::NONE);
-	pPass->setFrontFace(vg::FrontFaceType::COUNTER_CLOCKWISE);
+	pPass->setPolygonMode(vk::PolygonMode::eFill);
+	pPass->setCullMode(vk::CullModeFlagBits::eNone);
+	pPass->setFrontFace(vk::FrontFace::eCounterClockwise);
 	vk::PipelineColorBlendAttachmentState attachmentState[1] = {};
 	attachmentState[0].colorWriteMask = vk::ColorComponentFlagBits::eR
 		| vk::ColorComponentFlagBits::eG

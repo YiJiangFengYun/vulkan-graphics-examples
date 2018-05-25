@@ -5,9 +5,13 @@ namespace vg
 	{
 		std::vector<Byte> temp(sizeof(T));
 		memcpy(temp.data(), &value, sizeof(T));
-		addValue(name, mapDatas, arrDataNames);
+		addValue(name, temp, mapDatas, arrDataNames);
 		addValue(name, 1u, mapDataCounts);
 		addValue(name, info, mapDataInfos);
+		PassDataSizeInfo sizeInfo = {
+			static_cast<uint32_t>(sizeof(T)),
+		};
+		addValue(name, sizeInfo, mapDataSizeInfos);
 	}
 
 	template <typename T>
@@ -24,7 +28,12 @@ namespace vg
 	{
 		std::vector<Byte> temp(sizeof(T));
 		memcpy(temp.data(), &value, sizeof(T));
-		setValue(name, temp, mapDatas);
+		setValue(name, temp, mapDatas, arrDataNames);
+		setValue(name, 1u, mapDataCounts);
+		PassDataSizeInfo sizeInfo = {
+			static_cast<uint32_t>(sizeof(T)),
+		};
+		setValue(name, sizeInfo, mapDataSizeInfos);
 	}
 
 	template<typename T>
@@ -35,6 +44,10 @@ namespace vg
 		addValue(name, temp, mapDatas, arrDataNames);
 		addValue(name, values.size(), mapDataCounts);
 		addValue(name, info, mapDataInfos);
+		PassDataSizeInfo sizeInfo = {
+			static_cast<uint32_t>(sizeof(T) * values.size()),
+		};
+		addValue(name, sizeInfo, mapDataSizeInfos);
 	}
 
 	template <typename T>
@@ -51,8 +64,12 @@ namespace vg
 	{
 		std::vector<Byte> temp(sizeof(T) * values.size());
 		memcpy(temp.data(), values.data(), temp.size());
-		setValue(name, temp, mapDatas);
+		setValue(name, temp, mapDatas, arrDataNames);
 		setValue(name, values.size(), mapDataCounts);
+		PassDataSizeInfo sizeInfo = {
+			static_cast<uint32_t>(sizeof(T) * values.size()),
+		};
+		setValue(name, sizeInfo, mapDataSizeInfos);
 	}
 
 	template<typename T>
@@ -63,6 +80,10 @@ namespace vg
 		addValue(name, temp, mapDatas, arrDataNames);
 		addValue(name, count, mapDataCounts);
 		addValue(name, info, mapDataInfos);
+		PassDataSizeInfo sizeInfo =  {
+			static_cast<uint32_t>(sizeof(T)) * count,
+		};
+		addValue(name, sizeInfo, mapDataSizeInfos);
 	}
 
 	template<typename T>
@@ -78,7 +99,11 @@ namespace vg
 	{
 		std::vector<Byte> temp(sizeof(T) * count);
 		if (count != 0u && pSrc != nullptr) memcpy(temp.data(), pSrc, temp.size());
-		setValue(name, temp, mapDatas);
+		setValue(name, temp, mapDatas, arrDataNames);
 		setValue(name, count, mapDataCounts);
+		PassDataSizeInfo sizeInfo =  {
+			static_cast<uint32_t>(sizeof(T)) * count,
+		};
+		setValue(name, sizeInfo, mapDataSizeInfos);
 	}
 }

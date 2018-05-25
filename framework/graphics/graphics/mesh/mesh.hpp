@@ -129,16 +129,18 @@ namespace vg
 
 		void setVertexCount(uint32_t value);
 
-		//color
-		// const std::vector<Color32> &getColor32s() const;
+		//color32
+		Bool32 hasColor32s() const;
+		void addColor32s(const std::vector<Color32> &color32s);
+		void removeColor32s();
+		const std::vector<Color32> getColor32s() const;
+		void setColor32s(const std::vector<Color32> &color32s);
 
-		// void setColor32s(const std::vector<Color32> &colors);
-
-
+        //color
         Bool32 hasColors() const;
 		void addColors(const std::vector<Color> &colors);
 		void removeColors();
-		const std::vector<Color> &getColors() const;
+		const std::vector<Color> getColors() const;
 		void setColors(const std::vector<Color> &colors);
 
 		//index
@@ -181,7 +183,7 @@ namespace vg
 		void removeTextureCoordinates();
 
 		template<TextureCoordinateType textureCoordinateType, TextureCoordinateIndex textureCoordinateIndex>
-		const typename MeshData::DataTypeInfo<TextureCoordinateConstInfo<textureCoordinateType>::ARRAY_TYPE>::ValueType &getTextureCoordinates() const;
+		const typename MeshData::DataTypeInfo<TextureCoordinateConstInfo<textureCoordinateType>::ARRAY_TYPE>::ValueType getTextureCoordinates() const;
 
 		template<TextureCoordinateType textureCoordinateType, TextureCoordinateIndex textureCoordinateIndex>
 		void setTextureCoordinates(const typename MeshData::DataTypeInfo<TextureCoordinateConstInfo<textureCoordinateType>::ARRAY_TYPE>::ValueType &textureCoordinates);
@@ -196,10 +198,10 @@ namespace vg
 			);
 
 		template<MeshData::DataType dataType>
-		void removeData(std::string name) const;
+		void removeData(std::string name);
 
 		template<MeshData::DataType dataType>
-		const typename MeshData::DataTypeInfo<dataType>::ValueType &getData(std::string name) const;
+		const typename MeshData::DataTypeInfo<dataType>::ValueType getData(std::string name) const;
 
 		template <MeshData::DataType dataType>
 		void setData(const std::string name
@@ -250,20 +252,26 @@ namespace vg
 
 		virtual ~DimSepMesh();
 
-		//position
-		virtual const ArrayValueType &getPositions() const;
-
-		virtual void setPositions(const ArrayValueType &vertices);
+		//position		
+		Bool32 hasPositions() const;
+		void addPositions(const ArrayValueType &vertices);
+		void removePositions();
+		const ArrayValueType getPositions() const;
+		void setPositions(const ArrayValueType &vertices);
 
 		//normal
-		virtual const ArrayValueType &getNormals() const;
-
-		virtual void setNormals(const ArrayValueType &normals);
+		Bool32 hasNormals() const;
+		void addNormals(const ArrayValueType &normals);
+		void removeNormals();
+		const ArrayValueType getNormals() const;
+		void setNormals(const ArrayValueType &normals);
 
 		//tangent
-		virtual const ArrayValueType &getTangents() const;
-
-		virtual void setTangents(const ArrayValueType &tangents);
+		Bool32 hasTangents() const;
+		void addTangents(const ArrayValueType &tangents);
+		void removeTangents();
+		const ArrayValueType getTangents() const;
+		void setTangents(const ArrayValueType &tangents);
 
 		virtual void apply(Bool32 makeUnreadable) override;
 

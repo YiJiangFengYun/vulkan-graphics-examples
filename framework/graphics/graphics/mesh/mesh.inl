@@ -26,7 +26,7 @@ namespace vg
 	}
 
 	template<TextureCoordinateType textureCoordinateType, TextureCoordinateIndex textureCoordinateIndex>
-	const typename MeshData::DataTypeInfo<TextureCoordinateConstInfo<textureCoordinateType>::ARRAY_TYPE>::ValueType &SepMesh::getTextureCoordinates() const
+	const typename MeshData::DataTypeInfo<TextureCoordinateConstInfo<textureCoordinateType>::ARRAY_TYPE>::ValueType SepMesh::getTextureCoordinates() const
 	{
 		const auto TYPE = TextureCoordinateConstInfo<textureCoordinateType>::ARRAY_TYPE;
 		const auto NAME = TextureCoordinateIndexInfo<textureCoordinateIndex>::VERTEX_NAME;
@@ -64,14 +64,14 @@ namespace vg
 	}
 
 	template<MeshData::DataType dataType>
-	void SepMesh::removeData(std::string name) const
+	void SepMesh::removeData(std::string name)
 	{
 		m_pData->removeData<dataType>(name);
 		m_applied = VG_FALSE;
 	}
 
 	template<MeshData::DataType dataType>
-	const typename MeshData::DataTypeInfo<dataType>::ValueType &SepMesh::getData(std::string name) const
+	const typename MeshData::DataTypeInfo<dataType>::ValueType SepMesh::getData(std::string name) const
 	{
 		return m_pData->getData<dataType>(name);
 	}

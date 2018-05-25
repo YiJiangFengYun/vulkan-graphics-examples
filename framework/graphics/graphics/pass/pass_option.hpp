@@ -26,7 +26,7 @@ namespace vg
 	};
 
 	extern std::array<std::pair<ImageDescriptorType, vk::DescriptorType>, static_cast<size_t>(ImageDescriptorType::RANGE_SIZE)> arrImageDescriptorTypeToVK;
-	extern std::array<std::pair<BufferDescriptorType, vk::DescriptorType>, static_cast<size_t>(ImageDescriptorType::RANGE_SIZE)> arrBufferDescriptorTypeToVK;
+	extern std::array<std::pair<BufferDescriptorType, vk::DescriptorType>, static_cast<size_t>(BufferDescriptorType::RANGE_SIZE)> arrBufferDescriptorTypeToVK;
 
 	extern vk::DescriptorType tranImageDescriptorTypeToVK(ImageDescriptorType type);
 	extern vk::DescriptorType tranBufferDescriptorTypeToVK(BufferDescriptorType type);

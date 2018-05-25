@@ -277,13 +277,16 @@ namespace vg
 		else
 		{
 			if (offset + size > static_cast<uint32_t>(mapDatas[name].size()))
-		        mapDatas[name].resize(offset + size);
+			{
+				uint32_t newSize = offset + size;
+				mapDatas[name].resize(newSize);
+				PassDataSizeInfo sizeInfo = {
+					newSize
+				};
+				setValue(name, sizeInfo, mapDataSizeInfos);
+			}
 		    if(src) memcpy((char *)(mapDatas[name].data()) + offset, src, size);
 			setValue(name, 1u, mapDataCounts);
-			PassDataSizeInfo sizeInfo = {
-		    	size
-		    };
-		    setValue(name, sizeInfo, mapDataSizeInfos);
 		}
 	}
 

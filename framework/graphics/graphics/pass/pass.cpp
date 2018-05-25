@@ -378,7 +378,7 @@ namespace vg
 
 	void Pass::setMainColor(Color color)
 	{
-		m_buildInDataCache.mainColor = color;
+		// m_buildInDataCache.mainColor = color;
 		_updateBuildInData(BuildInDataType::MAIN_CLOLOR, color);
 	}
 
@@ -843,6 +843,13 @@ namespace vg
 					offset += info.bufferSize;
 				}
 			    m_dataBuffer.updateBuffer(memory.data(), totalBufferSize);
+
+				//The Data change will make data content change.
+				m_dataContentChanged = VG_TRUE;
+				for (const auto &name : arrDataNames)
+			    {
+					m_dataContentChanges[name] = VG_TRUE;
+				}
 			} else {
 				m_dataBuffer.updateBuffer(nullptr, 0u);
 			}
@@ -1351,35 +1358,37 @@ namespace vg
 				size,
 			};
 		    m_data.addData(VG_PASS_BUILDIN_DATA_NAME, info, sizeInfo);
+
+			uint32_t offset1 = 0u;
+		    for (uint32_t componentIndex = 0; componentIndex < componentCount; ++componentIndex)
+		    {
+		    	BuildInDataType type = (*(m_buildInDataInfo.pComponent + componentIndex)).type;
+		    	uint32_t count = static_cast<uint32_t>(BuildInDataType::COUNT);
+		        uint32_t offset2= 0u;
+		        for (uint32_t i = 0; i < count; ++i)
+		        {
+		        	if (i == static_cast<uint32_t>(type))
+		        	{
+		    			setData(VG_PASS_BUILDIN_DATA_NAME
+		    		        , ((char *)(&m_buildInDataCache) + offset2)
+		    			    , buildInDataTypeSizes[static_cast<uint32_t>(type)]
+		    			    , offset1);
+		    			break;
+		        	}
+		    		else
+		    		{
+		    			offset2 += buildInDataTypeSizes[i];
+		    		}
+		        }
+		    	offset1 += buildInDataTypeSizes[static_cast<uint32_t>(type)];
+		    }
 		}
 		else if (m_data.hasData(VG_PASS_BUILDIN_DATA_NAME))
 		{
 			m_data.removeData(VG_PASS_BUILDIN_DATA_NAME);
 		}
 		
-		uint32_t offset1 = 0u;
-		for (uint32_t componentIndex = 0; componentIndex < componentCount; ++componentIndex)
-		{
-			BuildInDataType type = (*(m_buildInDataInfo.pComponent + componentIndex)).type;
-			uint32_t count = static_cast<uint32_t>(BuildInDataType::COUNT);
-		    uint32_t offset2= 0u;
-		    for (uint32_t i = 0; i < count; ++i)
-		    {
-		    	if (i == static_cast<uint32_t>(type))
-		    	{
-					m_data.setData(VG_PASS_BUILDIN_DATA_NAME
-				        , ((char *)(&m_buildInDataCache) + offset2)
-					    , buildInDataTypeSizes[static_cast<uint32_t>(type)]
-					    , offset1);
-					break;
-		    	}
-				else
-				{
-					offset2 += buildInDataTypeSizes[i];
-				}
-		    }
-			offset1 += buildInDataTypeSizes[static_cast<uint32_t>(type)];
-		}
+		
 		m_dataChanged = VG_TRUE;
 	}
 

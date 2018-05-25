@@ -467,7 +467,7 @@ namespace vgim
 			nullptr,
 			nullptr,
 			vk::ImageLayout::eUndefined,
-			VG_PASS_OTHER_MAX_BINDING_PRIORITY,
+			VG_PASS_OTHER_MIN_BINDING_PRIORITY,
 			vg::ImageDescriptorType::COMBINED_IMAGE_SAMPLER,
 			vk::ShaderStageFlagBits::eFragment,
 		};

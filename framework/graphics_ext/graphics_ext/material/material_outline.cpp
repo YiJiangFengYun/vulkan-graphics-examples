@@ -137,7 +137,7 @@ namespace vge
 			if (pPass->hasData(name) == VG_FALSE)
 			{
 				vg::PassDataInfo info = {
-					VG_PASS_OTHER_DATA_MAX_LAYOUT_PRIORITY,
+					VG_PASS_OTHER_DATA_MIN_LAYOUT_PRIORITY,
 					vk::ShaderStageFlagBits::eVertex,
 				};
 				pPass->addData(name, info, m_outlineInfoVert);
@@ -152,7 +152,7 @@ namespace vge
 			if (pPass->hasData(name) == VG_FALSE)
 			{
 				vg::PassDataInfo info = {
-					VG_PASS_OTHER_DATA_MAX_LAYOUT_PRIORITY + 1,
+					VG_PASS_OTHER_DATA_MIN_LAYOUT_PRIORITY + 1,
 					vk::ShaderStageFlagBits::eFragment,
 				};
 				pPass->addData(name, info, m_outlineInfoFrag);

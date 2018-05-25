@@ -30,8 +30,7 @@ private:
 	struct OtherInfo 
 	{
 	    float lodBias;
-		OtherInfo();
-		OtherInfo(float lodBias);
+		OtherInfo(float lodBias = 0.0f);
 	} m_otherInfo;
 	
 	virtual void _init() override;

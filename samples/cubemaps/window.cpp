@@ -3,12 +3,6 @@
 #include <iostream>
 #include <gli/gli.hpp>
 
-Window::OtherInfo::OtherInfo()
-    : lodBias(0.0f)
-{
-
-}
-
 Window::OtherInfo::OtherInfo(float lodBias)
     : lodBias(lodBias)
 {
@@ -73,6 +67,8 @@ void Window::_initState()
 	m_rotationSpeed = 0.05f;
 	/// Build a quaternion from euler angles (pitch, yaw, roll), in radians.
 	m_cameraRotation = vg::Vector3(glm::radians(0.0f), glm::radians(0.0f), glm::radians(0.0f));
+
+	m_otherInfo.lodBias = 10.0f;
 }
 
 void Window::_createTexture()
@@ -186,14 +182,18 @@ void Window::_createMaterial()
 		buildInDataInfo.componentCount = 3u;
 		buildInDataInfo.pComponent = buildInDataCmps;
 		pPass->setBuildInDataInfo(buildInDataInfo);
-	    pPass->setCullMode(vg::CullModeFlagBits::FRONT);
-	    pPass->setFrontFace(vg::FrontFaceType::CLOCKWISE);
-	    pPass->setMainTexture(m_pCubeMapTex.get(),
-			vg::ShaderStageFlagBits::FRAGMENT,
-			vg::DescriptorType::COMBINED_IMAGE_SAMPLER,
+	    pPass->setCullMode(vk::CullModeFlagBits::eFront);
+	    pPass->setFrontFace(vk::FrontFace::eClockwise);
+		vg::PassTextureInfo mainTextureInfo = {
+			m_pCubeMapTex.get(),
 			nullptr,
-			m_pCubeMapTex->getSampler("other_sampler")
-			);
+			m_pCubeMapTex->getSampler("other_sampler"),
+			vk::ImageLayout::eUndefined,
+			VG_PASS_OTHER_MIN_BINDING_PRIORITY,
+			vg::ImageDescriptorType::COMBINED_IMAGE_SAMPLER,
+			vk::ShaderStageFlagBits::eFragment,
+		};
+		pPass->addTexture("main_texture", mainTextureInfo);
 	    pPass->apply();
 	    
 	    pMaterial->apply();
@@ -220,20 +220,28 @@ void Window::_createMaterial()
 		buildInDataInfo.componentCount = 2u;
 		buildInDataInfo.pComponent = buildInDataCmps;
 		pPass->setBuildInDataInfo(buildInDataInfo);
-	    pPass->setCullMode(vg::CullModeFlagBits::BACK);
-	    pPass->setFrontFace(vg::FrontFaceType::CLOCKWISE);
+	    pPass->setCullMode(vk::CullModeFlagBits::eBack);
+	    pPass->setFrontFace(vk::FrontFace::eClockwise);
 		vk::PipelineDepthStencilStateCreateInfo depthStencilState = {};
 	    depthStencilState.depthTestEnable = VG_TRUE;
 	    depthStencilState.depthWriteEnable = VG_TRUE;
 	    depthStencilState.depthCompareOp = vk::CompareOp::eLessOrEqual;
 	    pPass->setDepthStencilInfo(depthStencilState);
-	    pPass->setMainTexture(m_pCubeMapTex.get(),
-			vg::ShaderStageFlagBits::FRAGMENT,
-			vg::DescriptorType::COMBINED_IMAGE_SAMPLER,
+		vg::PassTextureInfo mainTextureInfo = {
+			m_pCubeMapTex.get(),
 			nullptr,
-			m_pCubeMapTex->getSampler("other_sampler")
-		    );
-	    pPass->setDataValue("other_info", m_otherInfo, VG_M_OTHER_MAX_BINDING_PRIORITY);	
+			m_pCubeMapTex->getSampler("other_sampler"),
+			vk::ImageLayout::eUndefined,
+			VG_PASS_OTHER_MIN_BINDING_PRIORITY,
+			vg::ImageDescriptorType::COMBINED_IMAGE_SAMPLER,
+			vk::ShaderStageFlagBits::eFragment,
+		};
+		pPass->addTexture("main_texture", mainTextureInfo);
+		vg::PassDataInfo dataInfo = {
+			VG_PASS_OTHER_DATA_MIN_LAYOUT_PRIORITY,
+			vk::ShaderStageFlagBits::eVertex,
+		};
+		pPass->addData("other_info", dataInfo, m_otherInfo);
 	    pPass->apply();
 	    
 	    pMaterial->apply();
@@ -354,7 +362,7 @@ void Window::_onUpdate()
 	ImGui::Begin("Settings", nullptr, ImGuiWindowFlags_AlwaysAutoResize | ImGuiWindowFlags_NoResize | ImGuiWindowFlags_NoMove);
 	if (ImGui::SliderFloat("LOD bias", &m_otherInfo.lodBias, 0.0f, (float)m_pCubeMapTex->getImage()->getInfo().mipLevels)) {
 		auto pPass = m_pMaterialReflect->getMainPass();
-		pPass->setDataValue("other_info", m_otherInfo, VG_M_OTHER_MAX_BINDING_PRIORITY);
+		pPass->setData("other_info", m_otherInfo);
 		pPass->apply();
 	}
 	uint32_t count = static_cast<uint32_t>(m_arrObjectNames.size());

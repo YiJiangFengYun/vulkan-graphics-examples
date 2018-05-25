@@ -13,11 +13,11 @@
 #define VG_PASS_POST_RENDER_TEXTURE_NAME "_post_render_tex"
 
 #define VG_PASS_BUILDIN_DATA_LAYOUT_PRIORITY 0
-#define VG_PASS_OTHER_DATA_MAX_LAYOUT_PRIORITY 1
+#define VG_PASS_OTHER_DATA_MIN_LAYOUT_PRIORITY 1
 
 #define VG_PASS_PRE_Z_TEXTURE_BINDING_PRIORITY 0
 #define VG_PASS_POST_RENDER_TEXTURE_BINDING_PRIORITY 1
-#define VG_PASS_OTHER_MAX_BINDING_PRIORITY 2
+#define VG_PASS_OTHER_MIN_BINDING_PRIORITY 2
 
 namespace vg
 {
@@ -55,7 +55,7 @@ namespace vg
 			, vk::ImageLayout imageLayout = vk::ImageLayout::eUndefined
 		    , uint32_t bindingPriority = 0u
 			, ImageDescriptorType descriptorType = ImageDescriptorType::COMBINED_IMAGE_SAMPLER
-			, vk::ShaderStageFlags stageFlags = vk::ShaderStageFlags()
+			, vk::ShaderStageFlags stageFlags = vk::ShaderStageFlagBits::eFragment
 			);
 		PassTextureInfo(const PassTextureInfo &);
 		PassTextureInfo& operator=(const PassTextureInfo &);

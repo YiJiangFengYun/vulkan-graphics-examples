@@ -845,11 +845,11 @@ namespace vg
 			    m_dataBuffer.updateBuffer(memory.data(), totalBufferSize);
 
 				//The Data change will make data content change.
-				m_dataContentChanged = VG_TRUE;
+				/*m_dataContentChanged = VG_TRUE;
 				for (const auto &name : arrDataNames)
 			    {
 					m_dataContentChanges[name] = VG_TRUE;
-				}
+				}*/
 			} else {
 				m_dataBuffer.updateBuffer(nullptr, 0u);
 			}
@@ -972,12 +972,14 @@ namespace vg
 						    while (nextIterator != m_sortDataSet.end() && nextIterator->shaderStageFlags == currStageFlags)
 							{
 								range += nextIterator->bufferSize;
+								++nextIterator;
 							}
 
 							dataUpdateDesSetInfo.bufferInfos[0].range = range;
 							dataUpdateDesSetInfos[dataBindingIndex] = dataUpdateDesSetInfo;
 						}
 						offset += info.bufferSize;
+						++dataBindingIndex;
 						++iterator;
 				    } while (iterator != m_sortDataSet.end());
 				}
@@ -1357,7 +1359,10 @@ namespace vg
 			PassDataSizeInfo sizeInfo = {
 				size,
 			};
-		    m_data.addData(VG_PASS_BUILDIN_DATA_NAME, info, sizeInfo);
+			if (hasData(VG_PASS_BUILDIN_DATA_NAME) == VG_FALSE)
+			{
+				addData(VG_PASS_BUILDIN_DATA_NAME, info, sizeInfo);
+			}
 
 			uint32_t offset1 = 0u;
 		    for (uint32_t componentIndex = 0; componentIndex < componentCount; ++componentIndex)

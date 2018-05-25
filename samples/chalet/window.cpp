@@ -94,8 +94,8 @@ namespace chalet
 	{
 		m_pMesh = static_cast<std::shared_ptr<vg::DimSepMesh3>>(new vg::DimSepMesh3());
 		m_pMesh->setVertexCount(static_cast<uint32_t>(m_tempPositions.size()));
-		m_pMesh->setPositions(m_tempPositions);
-		m_pMesh->setTextureCoordinates<vg::TextureCoordinateType::VECTOR_2, vg::TextureCoordinateIndex::TextureCoordinate_0>(m_tempTexCoords);
+		m_pMesh->addPositions(m_tempPositions);
+		m_pMesh->addTextureCoordinates<vg::TextureCoordinateType::VECTOR_2, vg::TextureCoordinateIndex::TextureCoordinate_0>(m_tempTexCoords);
 		m_pMesh->setIndices(m_tempIndices, vg::PrimitiveTopology::TRIANGLE_LIST, 0u);
 		m_pMesh->apply(VG_TRUE);
 	}
@@ -132,15 +132,23 @@ namespace chalet
 		auto pPass = m_pMaterial->getMainPass();
 		pShader->load("shaders/chalet.vert.spv",
 			"shaders/chalet.frag.spv");
-		pPass->setCullMode(vg::CullModeFlagBits::BACK);
-		pPass->setFrontFace(vg::FrontFaceType::CLOCKWISE);
+		pPass->setCullMode(vk::CullModeFlagBits::eBack);
+		pPass->setFrontFace(vk::FrontFace::eClockwise);
 		vk::PipelineDepthStencilStateCreateInfo depthStencilStateInfo;
 		depthStencilStateInfo.depthTestEnable = VG_TRUE;
 		depthStencilStateInfo.depthWriteEnable = VG_TRUE;
 		depthStencilStateInfo.depthCompareOp = vk::CompareOp::eLess;
 		pPass->setDepthStencilInfo(depthStencilStateInfo);
-		
-		pPass->setMainTexture(m_pTexture.get());
+		vg::PassTextureInfo mainTextureInfo = {
+			m_pTexture.get(),
+			nullptr,
+			nullptr,
+			vk::ImageLayout::eUndefined,
+			VG_PASS_OTHER_MIN_BINDING_PRIORITY,
+			vg::ImageDescriptorType::COMBINED_IMAGE_SAMPLER,
+			vk::ShaderStageFlagBits::eFragment,
+		};
+		pPass->addTexture("main_texture", mainTextureInfo);
 		
 		m_pMaterial->apply();
 	}
@@ -217,8 +225,8 @@ namespace chalet
 
         m_pMeshOfBounds = static_cast<std::shared_ptr<vg::DimSepMesh3>>(new vg::DimSepMesh3());
 		m_pMeshOfBounds->setVertexCount(pointCount);
-		m_pMeshOfBounds->setPositions(points);
-		m_pMeshOfBounds->setColor32s(colors);
+		m_pMeshOfBounds->addPositions(points);
+		m_pMeshOfBounds->addColor32s(colors);
 		m_pMeshOfBounds->setIndices(indices, vg::PrimitiveTopology::LINE_LIST, 0u);
 		m_pMeshOfBounds->apply(VG_TRUE);
 	}
@@ -232,7 +240,7 @@ namespace chalet
 		auto pPass = m_pMaterialOfBounds->getMainPass();
 		pShader->load("shaders/only_color.vert.spv", 
 			"shaders/only_color.frag.spv");
-		pPass->setCullMode(vg::CullModeFlagBits::NONE);
+		pPass->setCullMode(vk::CullModeFlagBits::eNone);
 		vg::Pass::BuildInDataInfo::Component buildInDataCmps[2] = {
 	    	{vg::Pass::BuildInDataType::MATRIX_OBJECT_TO_NDC},
 	    	{vg::Pass::BuildInDataType::MAIN_CLOLOR}

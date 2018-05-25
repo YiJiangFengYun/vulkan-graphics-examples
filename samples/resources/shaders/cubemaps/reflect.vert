@@ -9,7 +9,7 @@ layout (location = 1) in vec3 inNormal;
 layout(binding = 0) uniform BuildIn {
     mat4 matrixObjectToNDC;
 	mat4 matrixObjectToView;
-	vec4 lodBias;
+	float lodBias;
 } _buildIn;
 
 
@@ -31,7 +31,7 @@ void main()
 	
 	outPos = vec3(_buildIn.matrixObjectToView * vec4(inPos, 1.0));
 	outNormal = mat3(_buildIn.matrixObjectToView) * inNormal;	
-	outLodBias = _buildIn.lodBias.x;
+	outLodBias = _buildIn.lodBias;
 	
 	outInvModelView = inverse(_buildIn.matrixObjectToView);
 

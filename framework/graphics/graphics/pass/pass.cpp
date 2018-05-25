@@ -353,6 +353,12 @@ namespace vg
 		m_dataChanged = VG_TRUE;
 	}
 
+	void Pass::addData(const std::string name, const PassDataInfo &info, const PassDataSizeInfo &sizeInfo)
+	{
+		m_data.addData(name, info, sizeInfo);
+		m_dataChanged;
+	}
+
 	void Pass::addData(const std::string name, const PassDataInfo &info, void *src, uint32_t size)
 	{
 		m_data.addData(name, info, src, size);
@@ -362,6 +368,12 @@ namespace vg
 	void Pass::getData(const std::string name, void *dst, uint32_t size, uint32_t offset) const
 	{
 		return m_data.getData(name, dst, size, offset);
+	}
+
+	void Pass::setData(const std::string name, const PassDataInfo &info, const PassDataSizeInfo &sizeInfo)
+	{
+		m_data.setData(name, info, sizeInfo);
+		m_dataChanged = VG_TRUE;
 	}
 		
 	void Pass::setData(const std::string name, void *src, uint32_t size, uint32_t offset)
@@ -1362,6 +1374,10 @@ namespace vg
 			if (hasData(VG_PASS_BUILDIN_DATA_NAME) == VG_FALSE)
 			{
 				addData(VG_PASS_BUILDIN_DATA_NAME, info, sizeInfo);
+			}
+			else
+			{
+				setData(VG_PASS_BUILDIN_DATA_NAME, info, sizeInfo);
 			}
 
 			uint32_t offset1 = 0u;

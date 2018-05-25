@@ -267,6 +267,12 @@ namespace vg
 		memcpy(dst, (char *)(bytes.data()) + offset, size);
 	}
 
+	void PassData::setData(const std::string name, const PassDataInfo &info, const PassDataSizeInfo &sizeInfo)
+	{
+		setValue(name, info, mapDataInfos);
+		setValue(name, sizeInfo, mapDataSizeInfos);
+	}
+
 	void PassData::setData(const std::string name, void *src, uint32_t size, uint32_t offset)
 	{
 		const auto& iterator = mapDatas.find(name);

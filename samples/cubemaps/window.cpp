@@ -68,7 +68,7 @@ void Window::_initState()
 	/// Build a quaternion from euler angles (pitch, yaw, roll), in radians.
 	m_cameraRotation = vg::Vector3(glm::radians(0.0f), glm::radians(0.0f), glm::radians(0.0f));
 
-	m_otherInfo.lodBias = 10.0f;
+	m_otherInfo.lodBias = 0.0f;
 }
 
 void Window::_createTexture()

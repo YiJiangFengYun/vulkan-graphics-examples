@@ -22,7 +22,7 @@ namespace vg
 	{
 		const auto TYPE = TextureCoordinateConstInfo<textureCoordinateType>::ARRAY_TYPE;
 		const auto NAME = TextureCoordinateIndexInfo<textureCoordinateIndex>::VERTEX_NAME;
-		removeData(TYPE)(NAME);
+		removeData<TYPE>(NAME);
 	}
 
 	template<TextureCoordinateType textureCoordinateType, TextureCoordinateIndex textureCoordinateIndex>

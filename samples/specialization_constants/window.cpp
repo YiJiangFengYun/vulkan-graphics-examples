@@ -167,8 +167,8 @@ void Window::_createMaterial()
 		buildInDataInfo.componentCount = 2u;
 		buildInDataInfo.pComponent = buildInDataCmps;
 		pPass->setBuildInDataInfo(buildInDataInfo);
-		pPass->setCullMode(vg::CullModeFlagBits::BACK);
-		pPass->setFrontFace(vg::FrontFaceType::CLOCKWISE);
+		pPass->setCullMode(vk::CullModeFlagBits::eBack);
+		pPass->setFrontFace(vk::FrontFace::eClockwise);
 		pPass->setViewport(fd::Viewport(static_cast<float>(i) / static_cast<float>(SCENE_COUNT),
 		     0.0f,
 		 	1.0f / static_cast<float>(SCENE_COUNT),
@@ -215,13 +215,24 @@ void Window::_createMaterial()
 
 		specializationData.lightingModel = i;
 
-		pPass->setSpecializationData(vg::ShaderStageFlagBits::FRAGMENT, specializationInfo);
-		pPass->setMainTexture(m_pTexture.get(),
-			vg::ShaderStageFlagBits::FRAGMENT,
-			vg::DescriptorType::COMBINED_IMAGE_SAMPLER,
+		pPass->setSpecializationData(vk::ShaderStageFlagBits::eFragment, specializationInfo);
+
+		vg::PassTextureInfo mainTextureInfo = {
+			m_pTexture.get(),
 			nullptr,
-			m_pTexture->getSampler("other_sampler"));
-		pPass->setDataValue("light_info", m_lightInfo, VG_M_OTHER_MAX_BINDING_PRIORITY);
+			m_pTexture->getSampler("other_sampler"),
+			vk::ImageLayout::eUndefined,
+			VG_PASS_OTHER_MIN_BINDING_PRIORITY,
+			vg::ImageDescriptorType::COMBINED_IMAGE_SAMPLER,
+			vk::ShaderStageFlagBits::eFragment,
+		};
+		pPass->addTexture("main_texture", mainTextureInfo);
+
+		vg::PassDataInfo lightDataInfo = {
+			VG_PASS_OTHER_DATA_MIN_LAYOUT_PRIORITY,
+			vk::ShaderStageFlagBits::eVertex,
+		};
+		pPass->addData("light_info", lightDataInfo, m_lightInfo);
 		pPass->apply();
 
 	    pMaterials[i]->apply();

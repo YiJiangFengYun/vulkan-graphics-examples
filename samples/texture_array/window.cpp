@@ -80,8 +80,8 @@ void Window::_createMesh()
 {
 	m_pMesh = static_cast<std::shared_ptr<vg::DimSepMesh3>>(new vg::DimSepMesh3());
 	m_pMesh->setVertexCount(static_cast<uint32_t>(m_tempPositions.size()));
-	m_pMesh->setPositions(m_tempPositions);
-	m_pMesh->setTextureCoordinates<vg::TextureCoordinateType::VECTOR_2, vg::TextureCoordinateIndex::TextureCoordinate_0>(m_tempTexCoords);
+	m_pMesh->addPositions(m_tempPositions);
+	m_pMesh->addTextureCoordinates<vg::TextureCoordinateType::VECTOR_2, vg::TextureCoordinateIndex::TextureCoordinate_0>(m_tempTexCoords);
 	m_pMesh->setIndices(m_tempIndices, vg::PrimitiveTopology::TRIANGLE_LIST, 0u);
 	m_pMesh->apply(VG_TRUE);
 	m_pMesh->setIsHasBounds(VG_FALSE);
@@ -200,19 +200,29 @@ void Window::_createMaterial()
 		buildInDataInfo.componentCount = 2u;
 		buildInDataInfo.pComponent = buildInDataCmps;
 	pPass->setBuildInDataInfo(buildInDataInfo);
-	pPass->setCullMode(vg::CullModeFlagBits::NONE);
-	pPass->setFrontFace(vg::FrontFaceType::CLOCKWISE);
+	pPass->setCullMode(vk::CullModeFlagBits::eNone);
+	pPass->setFrontFace(vk::FrontFace::eClockwise);
 	vk::PipelineDepthStencilStateCreateInfo depthStencilState = {};
 	depthStencilState.depthTestEnable = VG_TRUE;
 	depthStencilState.depthWriteEnable = VG_TRUE;
 	depthStencilState.depthCompareOp = vk::CompareOp::eLessOrEqual;
 	pPass->setDepthStencilInfo(depthStencilState);
-	pPass->setMainTexture(m_pTexture.get(),
-		vg::ShaderStageFlagBits::FRAGMENT,
-		vg::DescriptorType::COMBINED_IMAGE_SAMPLER,
+
+	vg::PassTextureInfo mainTextureInfo = {
+		m_pTexture.get(),
 		nullptr,
-		m_pTexture->getSampler("other_sampler"));
-	pPass->setDataValue("other_info", m_otherInfo, VG_M_OTHER_MAX_BINDING_PRIORITY);
+		m_pTexture->getSampler("other_sampler"),
+		vk::ImageLayout::eUndefined,
+		VG_PASS_OTHER_MIN_BINDING_PRIORITY,
+		vg::ImageDescriptorType::COMBINED_IMAGE_SAMPLER,
+		vk::ShaderStageFlagBits::eFragment,
+	};
+	pPass->addTexture("main_texture", mainTextureInfo);
+	vg::PassDataInfo otherDataInfo = {
+		VG_PASS_OTHER_DATA_MIN_LAYOUT_PRIORITY,
+		vk::ShaderStageFlagBits::eVertex,
+	};
+	pPass->addData("other_info", otherDataInfo, m_otherInfo);
 	pPass->setInstanceCount(m_instanceCount);
 	pPass->apply();
 	
@@ -249,6 +259,6 @@ void Window::_onUpdate()
 		otherInfo.instance[i].arrayIndex.x = static_cast<float>(i);
 	}
 	auto pPass = m_pMaterial->getMainPass();
-	pPass->setDataValue("other_info", m_otherInfo, VG_M_OTHER_MAX_BINDING_PRIORITY);
+	pPass->setData("other_info", m_otherInfo);
 	pPass->apply();
 }

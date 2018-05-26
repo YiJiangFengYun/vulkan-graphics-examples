@@ -188,20 +188,28 @@ void Window::_createMaterial()
 	    buildInDataInfo.componentCount = 3u;
 	    buildInDataInfo.pComponent = buildInDataCmps;
 	    pPass->setBuildInDataInfo(buildInDataInfo);
-	    pPass->setCullMode(vg::CullModeFlagBits::BACK);
-	    pPass->setFrontFace(vg::FrontFaceType::CLOCKWISE);
+	    pPass->setCullMode(vk::CullModeFlagBits::eBack);
+	    pPass->setFrontFace(vk::FrontFace::eClockwise);
 	    vk::PipelineDepthStencilStateCreateInfo depthStencilState = {};
 	    depthStencilState.depthTestEnable = VG_TRUE;
 	    depthStencilState.depthWriteEnable = VG_TRUE;
 	    depthStencilState.depthCompareOp = vk::CompareOp::eLessOrEqual;
 	    pPass->setDepthStencilInfo(depthStencilState);
-	    pPass->setMainTexture(m_pTexture.get(),
-			vg::ShaderStageFlagBits::FRAGMENT,
-			vg::DescriptorType::COMBINED_IMAGE_SAMPLER,
+		vg::PassTextureInfo mainTextureInfo = {
+			m_pTexture.get(),
 			nullptr,
-			m_pTexture->getSampler("other_sampler")
-			);
-	    pPass->setDataValue("other_info", m_otherInfo, VG_M_OTHER_MAX_BINDING_PRIORITY);
+			m_pTexture->getSampler("other_sampler"),
+			vk::ImageLayout::eUndefined,
+			VG_PASS_OTHER_MIN_BINDING_PRIORITY,
+			vg::ImageDescriptorType::COMBINED_IMAGE_SAMPLER,
+			vk::ShaderStageFlagBits::eFragment,
+		};
+		pPass->addTexture("main_texture", mainTextureInfo);
+		vg::PassDataInfo otherDataInfo = {
+			VG_PASS_OTHER_DATA_MIN_LAYOUT_PRIORITY,
+			vk::ShaderStageFlagBits::eVertex,
+		};
+	    pPass->addData("other_info", otherDataInfo, m_otherInfo);
 	    pPass->apply();
 	    
 	    pMaterial->apply();
@@ -229,11 +237,11 @@ void Window::_createMaterial()
 	    buildInDataInfo.componentCount = 3u;
 	    buildInDataInfo.pComponent = buildInDataCmps;
 	    pPass->setBuildInDataInfo(buildInDataInfo);
-	    pPass->setCullMode(vg::CullModeFlagBits::BACK);
-	    pPass->setFrontFace(vg::FrontFaceType::CLOCKWISE);
+	    pPass->setCullMode(vk::CullModeFlagBits::eBack);
+	    pPass->setFrontFace(vk::FrontFace::eClockwise);
 
 		if (pApp->getPhysicalDeviceFeatures().fillModeNonSolid) {
-			pPass->setPolygonMode(vg::PolygonMode::LINE);
+			pPass->setPolygonMode(vk::PolygonMode::eLine);
 			pPass->setLineWidth(1.0f);
 		}
 
@@ -242,14 +250,21 @@ void Window::_createMaterial()
 	    depthStencilState.depthWriteEnable = VG_TRUE;
 	    depthStencilState.depthCompareOp = vk::CompareOp::eLessOrEqual;
 	    pPass->setDepthStencilInfo(depthStencilState);
-	    pPass->setMainTexture(m_pTexture.get(),
-			vg::ShaderStageFlagBits::FRAGMENT,
-			vg::DescriptorType::COMBINED_IMAGE_SAMPLER,
+		vg::PassTextureInfo mainTextureInfo = {
+			m_pTexture.get(),
 			nullptr,
-			m_pTexture->getSampler("other_sampler")
-		);
-	    pPass->setDataValue("other_info", m_otherInfo, VG_M_OTHER_MAX_BINDING_PRIORITY);
-	    pPass->apply();
+			m_pTexture->getSampler("other_sampler"),
+			vk::ImageLayout::eUndefined,
+			VG_PASS_OTHER_MIN_BINDING_PRIORITY,
+			vg::ImageDescriptorType::COMBINED_IMAGE_SAMPLER,
+			vk::ShaderStageFlagBits::eFragment,
+		};
+		pPass->addTexture("main_texture", mainTextureInfo);
+		vg::PassDataInfo otherDataInfo = {
+			VG_PASS_OTHER_DATA_MIN_LAYOUT_PRIORITY,
+			vk::ShaderStageFlagBits::eVertex,
+		};
+		pPass->addData("other_info", otherDataInfo, m_otherInfo);
 	    
 	    pMaterial->apply();
 	}
@@ -300,10 +315,12 @@ void Window::_initPostRender()
 	        buildInDataInfo.componentCount = 1u;
 	        buildInDataInfo.pComponent = buildInDataCmps;
 	        pPass->setBuildInDataInfo(buildInDataInfo);
-	        pPass->setCullMode(vg::CullModeFlagBits::NONE);
-	        pPass->setDataValue("mutiply_color_info", m_mutiplyColorInfo, 
-			    VG_M_OTHER_MAX_BINDING_PRIORITY, vg::DescriptorType::UNIFORM_BUFFER,
-				vg::ShaderStageFlagBits::FRAGMENT);
+	        pPass->setCullMode(vk::CullModeFlagBits::eNone);
+			vg::PassDataInfo multiplyColorDataInfo = {
+				VG_PASS_OTHER_DATA_MIN_LAYOUT_PRIORITY,
+				vk::ShaderStageFlagBits::eFragment,
+			};
+	        pPass->addData("mutiply_color_info", multiplyColorDataInfo, m_mutiplyColorInfo);
 	        pPass->apply();
 	        
 	        pMaterial->apply();
@@ -366,9 +383,7 @@ void Window::_onUpdate()
 	if (m_currPostRenderMaterialIndex == 0) {
 	    if (ImGui::ColorPicker4("Mutiply Color", reinterpret_cast<float *>(&m_mutiplyColorInfo.color))) {
 	    	auto pMaterial = m_postRenderMaterials[m_currPostRenderMaterialIndex].second.get();
-	    	pMaterial->getMainPass()->setDataValue("mutiply_color_info", m_mutiplyColorInfo, 
-			    VG_M_OTHER_MAX_BINDING_PRIORITY, vg::DescriptorType::UNIFORM_BUFFER,
-				vg::ShaderStageFlagBits::FRAGMENT);
+	    	pMaterial->getMainPass()->setData("mutiply_color_info", m_mutiplyColorInfo);
 	    	pMaterial->apply();
 	    }
 	}

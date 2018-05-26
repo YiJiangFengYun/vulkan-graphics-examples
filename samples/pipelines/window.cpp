@@ -98,8 +98,8 @@ void Window::_createMaterial()
 		//shader
 		pShader->load(vertShaderPaths[i], fragShaderPaths[i]);
 	    //pass
-		pPass->setCullMode(vg::CullModeFlagBits::BACK);
-		pPass->setFrontFace(vg::FrontFaceType::CLOCKWISE);
+		pPass->setCullMode(vk::CullModeFlagBits::eBack);
+		pPass->setFrontFace(vk::FrontFace::eClockwise);
 		pPass->setViewport(fd::Viewport(static_cast<float>(i) / static_cast<float>(SCENE_COUNT),
 		     0.0f,
 		 	1.0f / static_cast<float>(SCENE_COUNT),
@@ -116,10 +116,15 @@ void Window::_createMaterial()
 
 		if (i == 2u)
 		{
-			pPass->setPolygonMode(vg::PolygonMode::LINE);
+			pPass->setPolygonMode(vk::PolygonMode::eLine);
 		}
 
-		pPass->setDataValue("light_info", m_lightInfo, VG_M_OTHER_MAX_BINDING_PRIORITY);
+		vg::PassDataInfo lightDataInfo = {
+			VG_PASS_OTHER_DATA_MIN_LAYOUT_PRIORITY,
+			vk::ShaderStageFlagBits::eVertex,
+		};
+
+		pPass->addData("light_info", lightDataInfo, m_lightInfo);
 		pPass->apply();
 
 	    

@@ -103,8 +103,8 @@ void Window::_createMesh()
 {
 	m_pMesh = static_cast<std::shared_ptr<vg::DimSepMesh3>>(new vg::DimSepMesh3());
 	m_pMesh->setVertexCount(static_cast<uint32_t>(m_tempPositions.size()));
-	m_pMesh->setPositions(m_tempPositions);
-	m_pMesh->setColors(m_tempColors);
+	m_pMesh->addPositions(m_tempPositions);
+	m_pMesh->addColors(m_tempColors);
 	m_pMesh->setIndices(m_tempIndices, vg::PrimitiveTopology::TRIANGLE_LIST, 0u);
 	m_pMesh->apply(VG_TRUE);
 }
@@ -206,8 +206,8 @@ void Window::_createMaterial()
 	    	buildInDataInfo.componentCount = 2u;
 	    	buildInDataInfo.pComponent = buildInDataCmps;
 	    pPass->setBuildInDataInfo(buildInDataInfo);
-	    pPass->setCullMode(vg::CullModeFlagBits::BACK);
-	    pPass->setFrontFace(vg::FrontFaceType::CLOCKWISE);
+	    pPass->setCullMode(vk::CullModeFlagBits::eBack);
+	    pPass->setFrontFace(vk::FrontFace::eClockwise);
 	    vk::PipelineDepthStencilStateCreateInfo depthStencilState = {};
 	    depthStencilState.depthTestEnable = VG_TRUE;
 	    depthStencilState.depthWriteEnable = VG_TRUE;

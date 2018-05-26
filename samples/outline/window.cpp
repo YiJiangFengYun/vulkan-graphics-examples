@@ -101,8 +101,8 @@ void Window::_createMaterial()
 	        buildInDataInfo.componentCount = 2u;
 	        buildInDataInfo.pComponent = buildInDataCmps;
 	        pPass->setBuildInDataInfo(buildInDataInfo);
-	        pPass->setCullMode(vg::CullModeFlagBits::NONE);
-	        pPass->setFrontFace(vg::FrontFaceType::CLOCKWISE);
+	        pPass->setCullMode(vk::CullModeFlagBits::eNone);
+	        pPass->setFrontFace(vk::FrontFace::eClockwise);
 	        vk::PipelineDepthStencilStateCreateInfo depthStencilState = {};
 	        depthStencilState.depthTestEnable = VG_TRUE;
 	        depthStencilState.depthWriteEnable = VG_TRUE;
@@ -127,7 +127,11 @@ void Window::_createMaterial()
 			vertexInputFilter.locationCount = static_cast<uint32_t>(filterLocations.size());
 			vertexInputFilter.pLocations = filterLocations.data();
 			pPass->setVertexInputFilterInfo(vertexInputFilter);
-	        pPass->setDataValue("other_info", m_otherInfo, 1u);
+			vg::PassDataInfo otherDataInfo = {
+				VG_PASS_OTHER_DATA_MIN_LAYOUT_PRIORITY,
+				vk::ShaderStageFlagBits::eVertex,
+			};
+	        pPass->addData("other_info", otherDataInfo, m_otherInfo);
 	        pPass->apply();
 	        
 		}
@@ -148,8 +152,8 @@ void Window::_createMaterial()
 	        buildInDataInfo.componentCount = 1u;
 	        buildInDataInfo.pComponent = buildInDataCmps;
 	        pPass->setBuildInDataInfo(buildInDataInfo);
-	        pPass->setCullMode(vg::CullModeFlagBits::NONE);
-	        pPass->setFrontFace(vg::FrontFaceType::CLOCKWISE);
+	        pPass->setCullMode(vk::CullModeFlagBits::eNone);
+	        pPass->setFrontFace(vk::FrontFace::eClockwise);
 	        vk::PipelineDepthStencilStateCreateInfo depthStencilState = {};
 	        depthStencilState.depthTestEnable = VG_TRUE;
 	        depthStencilState.depthWriteEnable = VG_TRUE;

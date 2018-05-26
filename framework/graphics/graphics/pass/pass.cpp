@@ -245,6 +245,7 @@ namespace vg
 		, m_descriptorSetsChanged(VG_FALSE)
 		, m_descriptorSetLayouts()
 		, m_descriptorSets()
+		, m_dynamicOffsetsChanged(VG_FALSE)
 		, m_dynamicOffsets()
 		, m_pushConstantChanged(VG_FALSE)
 		, m_pushConstantRanges()
@@ -760,6 +761,7 @@ namespace vg
 	{
 		m_extUniformBufferCount = value;
 		m_extUniformBuffers.resize(value);
+		m_descriptorSetsChanged = VG_TRUE;
 	}
 
 	void Pass::setExtUniformBuffers(fd::ArrayProxy<ExternalUniformBufferInfo> extUniformBuffers
@@ -989,9 +991,10 @@ namespace vg
 
 							dataUpdateDesSetInfo.bufferInfos[0].range = range;
 							dataUpdateDesSetInfos[dataBindingIndex] = dataUpdateDesSetInfo;
+
+							++dataBindingIndex;
 						}
 						offset += info.bufferSize;
-						++dataBindingIndex;
 						++iterator;
 				    } while (iterator != m_sortDataSet.end());
 				}
@@ -1284,7 +1287,16 @@ namespace vg
 			}
 			m_descriptorSets = descriptorSets;
 
+			//This change will make dynamic offsets change.
+			m_dynamicOffsetsChanged = VG_TRUE;
+
 			m_descriptorSetsChanged = VG_FALSE;
+		}
+
+		if (m_dynamicOffsetsChanged == VG_TRUE)
+		{
+			_applyUniformBufferDynamicOffsets();
+			m_dynamicOffsetsChanged = VG_FALSE;
 		}
 
 		//Update push contant.
@@ -1323,7 +1335,7 @@ namespace vg
 	{
 #ifdef DEBUG
 		if (m_dataChanged || m_dataContentChanged || m_textureChanged || m_bufferChanged || 
-		    m_descriptorSetChanged || m_descriptorSetsChanged || m_pipelineLayoutChanged)
+		    m_descriptorSetChanged || m_descriptorSetsChanged || m_dynamicOffsetsChanged || m_pipelineLayoutChanged)
 		    throw std::runtime_error("Pass should apply change before used to render.");
 #endif //DEBUG
 	}

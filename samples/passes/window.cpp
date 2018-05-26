@@ -205,9 +205,9 @@ void Window::_createMaterial()
 	            "shaders/passes/gbuffer.frag.spv");
 
 			//pass
-			pPass->setPolygonMode(vg::PolygonMode::FILL);
-	        pPass->setCullMode(vg::CullModeFlagBits::BACK);
-	        pPass->setFrontFace(vg::FrontFaceType::CLOCKWISE);
+			pPass->setPolygonMode(vk::PolygonMode::eFill);
+	        pPass->setCullMode(vk::CullModeFlagBits::eBack);
+	        pPass->setFrontFace(vk::FrontFace::eClockwise);
 			vg::Pass::BuildInDataInfo::Component buildInDataCmps[2] = {
 	    		{vg::Pass::BuildInDataType::MATRIX_OBJECT_TO_NDC},
 	    		{vg::Pass::BuildInDataType::MATRIX_OBJECT_TO_WORLD}
@@ -239,11 +239,14 @@ void Window::_createMaterial()
 		    specializationInfo.dataSize = sizeof(specializationData);			
 		    specializationInfo.pData = &specializationData;
     
-		    pPass->setSpecializationData(vg::ShaderStageFlagBits::FRAGMENT, specializationInfo);
+		    pPass->setSpecializationData(vk::ShaderStageFlagBits::eFragment, specializationInfo);
+
+			vg::PassDataInfo otherDataInfo = {
+				VG_PASS_OTHER_DATA_MIN_LAYOUT_PRIORITY,
+				vk::ShaderStageFlagBits::eFragment,
+			};
     
-			//pass
-			pPass->setDataValue("other_info", m_otherInfo, 3u, vg::DescriptorType::UNIFORM_BUFFER,
-			    vg::ShaderStageFlagBits::FRAGMENT);
+			pPass->addData("other_info", otherDataInfo, m_otherInfo);
 		}
 		{
 			auto pShader = m_pMaterialOfScene->getMainShader();
@@ -267,9 +270,9 @@ void Window::_createMaterial()
 	    pShader->load("shaders/only_color.vert.spv", 
 	        "shaders/only_color.frag.spv");
 		//pass
-		pPass->setPolygonMode(vg::PolygonMode::FILL);
-	    pPass->setCullMode(vg::CullModeFlagBits::BACK);
-	    pPass->setFrontFace(vg::FrontFaceType::CLOCKWISE);
+		pPass->setPolygonMode(vk::PolygonMode::eFill);
+	    pPass->setCullMode(vk::CullModeFlagBits::eBack);
+	    pPass->setFrontFace(vk::FrontFace::eClockwise);
 		vg::Pass::BuildInDataInfo::Component buildInDataCmps[2] = {
 	    	{vg::Pass::BuildInDataType::MATRIX_OBJECT_TO_NDC},
 	    	{vg::Pass::BuildInDataType::MAIN_CLOLOR}
@@ -297,9 +300,9 @@ void Window::_createMaterial()
 	    pShader->load("shaders/passes/transparent.vert.spv", 
 	        "shaders/passes/transparent.frag.spv");
 		//pass
-		pPass->setPolygonMode(vg::PolygonMode::FILL);
-	    pPass->setCullMode(vg::CullModeFlagBits::NONE);
-	    pPass->setFrontFace(vg::FrontFaceType::COUNTER_CLOCKWISE);
+		pPass->setPolygonMode(vk::PolygonMode::eFill);
+	    pPass->setCullMode(vk::CullModeFlagBits::eNone);
+	    pPass->setFrontFace(vk::FrontFace::eCounterClockwise);
 		vg::Pass::BuildInDataInfo::Component buildInDataCmps[1] = {
 	    	{vg::Pass::BuildInDataType::MATRIX_OBJECT_TO_NDC},
 	    };
@@ -334,8 +337,17 @@ void Window::_createMaterial()
 	    colorBlendState.attachmentCount = attachmentCount;
 	    colorBlendState.pAttachments = attachmentStates;
 	    pPass->setColorBlendInfo(colorBlendState);
-		pPass->setMainTexture(m_pTextureOfSceneGlass.get(), vg::ShaderStageFlagBits::FRAGMENT,
-		    vg::DescriptorType::COMBINED_IMAGE_SAMPLER, nullptr, m_pSamplerOfSceneGlass);
+
+		vg::PassTextureInfo mainTextureInfo = {
+			m_pTextureOfSceneGlass.get(),
+			nullptr,
+			m_pSamplerOfSceneGlass,
+			vk::ImageLayout::eUndefined,
+			VG_PASS_OTHER_MIN_BINDING_PRIORITY,
+			vg::ImageDescriptorType::COMBINED_IMAGE_SAMPLER,
+			vk::ShaderStageFlagBits::eFragment,
+		};
+		pPass->addTexture("main_texture", mainTextureInfo);
 
 		m_pMaterialOfSceneGlass->apply();
 	}

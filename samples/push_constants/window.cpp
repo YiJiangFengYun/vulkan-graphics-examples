@@ -90,14 +90,14 @@ void Window::_createMaterial()
 		buildInDataInfo.componentCount = 2u;
 		buildInDataInfo.pComponent = buildInDataCmps;
 	pPass->setBuildInDataInfo(buildInDataInfo);
-	pPass->setCullMode(vg::CullModeFlagBits::BACK);
-	pPass->setFrontFace(vg::FrontFaceType::CLOCKWISE);
+	pPass->setCullMode(vk::CullModeFlagBits::eBack);
+	pPass->setFrontFace(vk::FrontFace::eClockwise);
 	vk::PipelineDepthStencilStateCreateInfo depthStencilState = {};
 	depthStencilState.depthTestEnable = VG_TRUE;
 	depthStencilState.depthWriteEnable = VG_TRUE;
 	depthStencilState.depthCompareOp = vk::CompareOp::eLessOrEqual;
 	pPass->setDepthStencilInfo(depthStencilState);
-	pPass->setPushConstantRange("push_constants", vk::ShaderStageFlagBits::eVertex, 0u, static_cast<uint32_t>(sizeof(m_pushConstants)));
+	pPass->addPushConstantRange("push_constants", vk::ShaderStageFlagBits::eVertex, 0u, static_cast<uint32_t>(sizeof(m_pushConstants)));
 	pPass->apply();
 	
 	pMaterial->apply();
@@ -140,6 +140,14 @@ void Window::_onUpdate()
 #undef cos_t
     
 	auto pPass = m_pMaterial->getMainPass();
-	pPass->setPushConstantUpdate("push_constants", m_pushConstants.data(),
-	    static_cast<uint32_t>(sizeof(m_pushConstants)), vk::ShaderStageFlagBits::eVertex, 0u);
+	if (pPass->hasPushConstantUpdate("push_constants") == VG_FALSE)
+	{
+		pPass->addPushConstantUpdate("push_constants", m_pushConstants.data(),
+			static_cast<uint32_t>(sizeof(m_pushConstants)), vk::ShaderStageFlagBits::eVertex, 0u);
+	}
+	else
+	{
+		pPass->setPushConstantUpdate("push_constants", m_pushConstants.data(),
+			static_cast<uint32_t>(sizeof(m_pushConstants)), vk::ShaderStageFlagBits::eVertex, 0u);
+	}
 }

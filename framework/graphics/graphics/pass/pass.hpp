@@ -456,6 +456,9 @@ namespace vg
 	    std::vector<vk::DescriptorSetLayout> m_descriptorSetLayouts;
 		//all descriptor sets.
 		std::vector<vk::DescriptorSet> m_descriptorSets;
+
+		//dynamic offsets.
+		Bool32 m_dynamicOffsetsChanged;
 		std::vector<uint32_t> m_dynamicOffsets;
 
 		//push constant Ranges.

@@ -26,6 +26,7 @@ add_subdirectory(passes)
 add_subdirectory(outline)
 add_subdirectory(pre_z_tex)
 add_subdirectory(post_render)
+add_subdirectory(triangle_2d)
 
 # sampler include directories and libraries is used by itself
 # set(INCLUDE_DIRS ${INCLUDE_DIRS} PARENT_SCOPE)

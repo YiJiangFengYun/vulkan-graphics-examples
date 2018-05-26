@@ -118,8 +118,16 @@ namespace vge
         };
     
 	    pRectMesh->setVertexCount(static_cast<uint32_t>(rectPoses.size()));
-        pRectMesh->setPositions(rectPoses);
-        pRectMesh->setTextureCoordinates<vg::TextureCoordinateType::VECTOR_2, vg::TextureCoordinateIndex::TextureCoordinate_0>(
+		if (m_pRectMesh->hasPositions() == VG_TRUE)
+		{
+			m_pRectMesh->removePositions();
+		}
+        pRectMesh->addPositions(rectPoses);
+		if (m_pRectMesh->hasTextureCoordinates<vg::TextureCoordinateType::VECTOR_2, vg::TextureCoordinateIndex::TextureCoordinate_0>() == VG_TRUE)
+		{
+			m_pRectMesh->removeTextureCoordinates<vg::TextureCoordinateType::VECTOR_2, vg::TextureCoordinateIndex::TextureCoordinate_0>();
+		}
+        pRectMesh->addTextureCoordinates<vg::TextureCoordinateType::VECTOR_2, vg::TextureCoordinateIndex::TextureCoordinate_0>(
             rectUVs
         );
         pRectMesh->setIndices(indices, vg::PrimitiveTopology::TRIANGLE_LIST, 0u);
@@ -522,8 +530,8 @@ namespace vge
 					nullptr,
 					nullptr,
 					vk::ImageLayout::eUndefined,
-					i,
-					vg::ImageDescriptorType::COMBINED_IMAGE_SAMPLER,
+					i + 1, //0 is own by build in buffer data of pass.
+					vg::ImageDescriptorType::INPUT_ATTACHMENT,
 					vk::ShaderStageFlagBits::eFragment,
 				};
 				pPass->addTexture("input_" + std::to_string(i), info);

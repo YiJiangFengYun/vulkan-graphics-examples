@@ -184,20 +184,28 @@ void Window::_createMaterial()
 	    buildInDataInfo.componentCount = 3u;
 	    buildInDataInfo.pComponent = buildInDataCmps;
 	    pPass->setBuildInDataInfo(buildInDataInfo);
-	    pPass->setCullMode(vg::CullModeFlagBits::BACK);
-	    pPass->setFrontFace(vg::FrontFaceType::CLOCKWISE);
+	    pPass->setCullMode(vk::CullModeFlagBits::eBack);
+	    pPass->setFrontFace(vk::FrontFace::eClockwise);
 	    vk::PipelineDepthStencilStateCreateInfo depthStencilState = {};
 	    depthStencilState.depthTestEnable = VG_TRUE;
 	    depthStencilState.depthWriteEnable = VG_TRUE;
 	    depthStencilState.depthCompareOp = vk::CompareOp::eLessOrEqual;
 	    pPass->setDepthStencilInfo(depthStencilState);
-	    pPass->setMainTexture(m_pTexture.get(),
-			vg::ShaderStageFlagBits::FRAGMENT,
-			vg::DescriptorType::COMBINED_IMAGE_SAMPLER,
+		vg::PassTextureInfo mainTextureInfo = {
+			m_pTexture.get(),
 			nullptr,
-			m_pTexture->getSampler("other_sampler")
-			);
-	    pPass->setDataValue("other_info", m_otherInfo, VG_M_OTHER_MAX_BINDING_PRIORITY);
+			m_pTexture->getSampler("other_sampler"),
+			vk::ImageLayout::eUndefined,
+			VG_PASS_OTHER_MIN_BINDING_PRIORITY,
+			vg::ImageDescriptorType::COMBINED_IMAGE_SAMPLER,
+			vk::ShaderStageFlagBits::eFragment,
+		};
+		pPass->addTexture("main_texture", mainTextureInfo);
+		vg::PassDataInfo otherDataInfo = {
+			VG_PASS_OTHER_DATA_MIN_LAYOUT_PRIORITY,
+			vk::ShaderStageFlagBits::eVertex,
+		};
+		pPass->addData("other_data", otherDataInfo, m_otherInfo);
 	    pPass->apply();
 	    
 	    pMaterial->apply();
@@ -225,11 +233,11 @@ void Window::_createMaterial()
 	    buildInDataInfo.componentCount = 3u;
 	    buildInDataInfo.pComponent = buildInDataCmps;
 	    pPass->setBuildInDataInfo(buildInDataInfo);
-	    pPass->setCullMode(vg::CullModeFlagBits::BACK);
-	    pPass->setFrontFace(vg::FrontFaceType::CLOCKWISE);
+	    pPass->setCullMode(vk::CullModeFlagBits::eBack);
+	    pPass->setFrontFace(vk::FrontFace::eClockwise);
 
 		if (pApp->getPhysicalDeviceFeatures().fillModeNonSolid) {
-			pPass->setPolygonMode(vg::PolygonMode::LINE);
+			pPass->setPolygonMode(vk::PolygonMode::eLine);
 			pPass->setLineWidth(1.0f);
 		}
 
@@ -238,13 +246,21 @@ void Window::_createMaterial()
 	    depthStencilState.depthWriteEnable = VG_TRUE;
 	    depthStencilState.depthCompareOp = vk::CompareOp::eLessOrEqual;
 	    pPass->setDepthStencilInfo(depthStencilState);
-	    pPass->setMainTexture(m_pTexture.get(),
-		    vg::ShaderStageFlagBits::FRAGMENT,
-			vg::DescriptorType::COMBINED_IMAGE_SAMPLER,
+		vg::PassTextureInfo mainTextureInfo = {
+			m_pTexture.get(),
 			nullptr,
-			m_pTexture->getSampler("other_sampler")
-		    );
-	    pPass->setDataValue("other_info", m_otherInfo, VG_M_OTHER_MAX_BINDING_PRIORITY);
+			m_pTexture->getSampler("other_sampler"),
+			vk::ImageLayout::eUndefined,
+			VG_PASS_OTHER_MIN_BINDING_PRIORITY,
+			vg::ImageDescriptorType::COMBINED_IMAGE_SAMPLER,
+			vk::ShaderStageFlagBits::eFragment,
+		};
+		pPass->addTexture("main_texture", mainTextureInfo);
+		vg::PassDataInfo otherDataInfo = {
+			VG_PASS_OTHER_DATA_MIN_LAYOUT_PRIORITY,
+			vk::ShaderStageFlagBits::eVertex,
+		};
+		pPass->addData("other_data", otherDataInfo, m_otherInfo);
 	    pPass->apply();
 	    
 	    pMaterial->apply();

@@ -1,8 +1,8 @@
 #include <exception>
 #include <iostream>
 #include "vulkan/vulkan.h"
-#include "test-triangle/window.hpp"
-#include "test-triangle/app.hpp"
+#include "triangle_2d/window.hpp"
+#include "triangle_2d/app.hpp"
 #include "graphics/global.hpp"
 
 const uint32_t WINDOW_WIDTH = 800;
@@ -12,15 +12,13 @@ int main() {
 	static plog::DebugOutputAppender<plog::TxtFormatter> debugOutputAppender;
 	plog::init(plog::debug, &debugOutputAppender);
 
-	testTriangle::App testTriangle;
-	testTriangle.init<testTriangle::Window>(WINDOW_WIDTH, WINDOW_HEIGHT, "test-triangle");
-	// testTriangle.createSubWindow<testTriangle::Window>(200, 200, "sub window");
-	//testTriangle.createSubWindow<testTriangle::Window>(200, 400, "sub window2");
+	App triangle2D;
+	triangle2D.init<Window>(WINDOW_WIDTH, WINDOW_HEIGHT, "triangle_2d");
 
 	LOG(plog::debug) << "Initialization completed." << std::endl;
 
 	LOG(plog::debug) << "Start to app run loop." << std::endl;
-	testTriangle.run();
+	triangle2D.run();
 
 	return 0;
 }

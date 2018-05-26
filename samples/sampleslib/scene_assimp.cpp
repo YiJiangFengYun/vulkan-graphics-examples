@@ -170,8 +170,8 @@ namespace sampleslib
                 {
                     const aiMesh *paiMesh = pScene->mMeshes[i];
     
-                    aiColor3D tempColor(0.0f, 0.0f, 0.0f);
-                    pScene->mMaterials[paiMesh->mMaterialIndex]->Get(AI_MATKEY_COLOR_DIFFUSE, tempColor);
+                    aiColor3D diffuseColor(0.0f, 0.0f, 0.0f);
+                    pScene->mMaterials[paiMesh->mMaterialIndex]->Get(AI_MATKEY_COLOR_DIFFUSE, diffuseColor);
                     const aiVector3D zero3D(0.0f, 0.0f, 0.0f);
                     const aiColor4D whiteColor3D(1.0f, 1.0f, 1.0f, 1.0f);
 
@@ -269,9 +269,9 @@ namespace sampleslib
 							}
 							case VertexLayoutComponent::VERTEX_COMPONENT_COLOR:
 							{
-								vertexBuffer.push_back(pColor->r);
-								vertexBuffer.push_back(pColor->g);
-								vertexBuffer.push_back(pColor->b);
+								vertexBuffer.push_back(pColor->r * diffuseColor.r);
+								vertexBuffer.push_back(pColor->g * diffuseColor.g);
+								vertexBuffer.push_back(pColor->b * diffuseColor.b);
 								break;
 							}
 							case VertexLayoutComponent::VERTEX_COMPONENT_TANGENT:

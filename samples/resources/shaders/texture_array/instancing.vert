@@ -6,27 +6,23 @@
 layout (location = 0) in vec4 inPos;
 layout (location = 1) in vec2 inUV;
 
-layout(binding = 0) uniform BuildIn {
-    mat4 matrixProjection;
-	mat4 matrixView;
-} _buildIn;
-
 struct Instance
 {
 	mat4 model;
 	vec4 arrayIndex;
 };
 
-layout (binding = 2) uniform OtherInfo 
-{
+layout(binding = 0) uniform BuildIn {
+    mat4 matrixProjection;
+	mat4 matrixView;
 	Instance instance[8];
-} otherInfo;
+} _buildIn;
 
 layout (location = 0) out vec3 outUV;
 
 void main() 
 {
-	outUV = vec3(inUV, otherInfo.instance[gl_InstanceIndex].arrayIndex.x);
-	mat4 modelView = _buildIn.matrixView * otherInfo.instance[gl_InstanceIndex].model;
+	outUV = vec3(inUV, _buildIn.instance[gl_InstanceIndex].arrayIndex.x);
+	mat4 modelView = _buildIn.matrixView * _buildIn.instance[gl_InstanceIndex].model;
 	gl_Position = _buildIn.matrixProjection * modelView * inPos;
 }

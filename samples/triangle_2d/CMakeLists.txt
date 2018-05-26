@@ -1,6 +1,6 @@
 # add the binary tree directory to the search path for include files
 # include_directories( ${CMAKE_CURRENT_BINARY_DIR} )
-set(EXE_NAME "test-triangle-2d")
+set(EXE_NAME "triangle_2d")
 file(GLOB_RECURSE HEADERS *.hpp *.inl)
 file(GLOB_RECURSE SOURCES *.cpp)
 
@@ -11,7 +11,7 @@ if(SOURCES)
     set_property(TARGET ${EXE_NAME} PROPERTY FOLDER ${FOLDER_NAME})
 
     # Compile shaders
-    set(COMMON_SHADER_NAMES ${COMMON_SHADER_NAMES} "triangle-2d")
+    set(COMMON_SHADER_NAMES ${COMMON_SHADER_NAMES} "triangle_2d")
     set(SHADERS_DIR "${SHADERS_DIR}/${EXE_NAME}")
     set(RESOURCES_OUTPUT_DIR "${CMAKE_CURRENT_BINARY_DIR}")
     res_process("${EXE_NAME}" "${RESOURCES_OUTPUT_DIR}" "${RESOURCES_DIR}" "${SHADERS_DIR}" "${COMMON_SHADER_NAMES}")

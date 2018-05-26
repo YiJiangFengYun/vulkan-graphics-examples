@@ -100,9 +100,9 @@ void Window::_createMesh()
 {
 	m_pMesh = static_cast<std::shared_ptr<vg::DimSepMesh3>>(new vg::DimSepMesh3());
 	m_pMesh->setVertexCount(static_cast<uint32_t>(m_tempPositions.size()));
-	m_pMesh->setPositions(m_tempPositions);
-	m_pMesh->setNormals(m_tempNormals);
-	m_pMesh->setTextureCoordinates<vg::TextureCoordinateType::VECTOR_2, vg::TextureCoordinateIndex::TextureCoordinate_0>(m_tempTexCoords);
+	m_pMesh->addPositions(m_tempPositions);
+	m_pMesh->addNormals(m_tempNormals);
+	m_pMesh->addTextureCoordinates<vg::TextureCoordinateType::VECTOR_2, vg::TextureCoordinateIndex::TextureCoordinate_0>(m_tempTexCoords);
 	m_pMesh->setIndices(m_tempIndices, vg::PrimitiveTopology::TRIANGLE_LIST, 0u);
 	m_pMesh->apply(VG_TRUE);
 }
@@ -184,20 +184,29 @@ void Window::_createMaterial()
 	//shader
 	pShader->load("shaders/texture/texture.vert.spv", "shaders/texture/texture.frag.spv");
 	//pass
-	pPass->setCullMode(vg::CullModeFlagBits::FRONT);
-	pPass->setFrontFace(vg::FrontFaceType::CLOCKWISE);
+	pPass->setCullMode(vk::CullModeFlagBits::eFront);
+	pPass->setFrontFace(vk::FrontFace::eClockwise);
 	vk::PipelineDepthStencilStateCreateInfo depthStencilState = {};
 	depthStencilState.depthTestEnable = VG_TRUE;
 	depthStencilState.depthWriteEnable = VG_TRUE;
 	depthStencilState.depthCompareOp = vk::CompareOp::eLessOrEqual;
 	pPass->setDepthStencilInfo(depthStencilState);
-	pPass->setMainTexture(m_pTexture.get(), 
-	    vg::ShaderStageFlagBits::FRAGMENT, 
-		vg::DescriptorType::COMBINED_IMAGE_SAMPLER,
+
+	vg::PassTextureInfo mainTextureInfo = {
+		m_pTexture.get(),
 		nullptr,
-		m_pTexture->getSampler("other_sampler")
-		);
-	pPass->setDataValue("other_info", m_otherInfo, VG_M_OTHER_MAX_BINDING_PRIORITY);
+		m_pTexture->getSampler("other_sampler"),
+		vk::ImageLayout::eUndefined,
+		VG_PASS_OTHER_MIN_BINDING_PRIORITY,
+		vg::ImageDescriptorType::COMBINED_IMAGE_SAMPLER,
+		vk::ShaderStageFlagBits::eFragment,
+	};
+	pPass->addTexture("main_texture", mainTextureInfo);
+	vg::PassDataInfo otherDataInfo = {
+		VG_PASS_OTHER_DATA_MIN_LAYOUT_PRIORITY,
+		vk::ShaderStageFlagBits::eVertex,
+	};
+	pPass->addData("other_info", otherDataInfo, m_otherInfo);
 	pPass->apply();
 	
 	pMaterial->apply();
@@ -227,7 +236,7 @@ void Window::_onUpdate()
 	ImGui::SetNextWindowSize(ImVec2(0, 0));
 	ImGui::Begin("Settings", nullptr, ImGuiWindowFlags_AlwaysAutoResize | ImGuiWindowFlags_NoResize | ImGuiWindowFlags_NoMove);
 	if (ImGui::SliderFloat("LOD bias", &m_otherInfo.lodBias, 0.0f, (float)m_pTexture->getImage()->getInfo().mipLevels)) {
-		pPass->setDataValue("other_info", m_otherInfo, VG_M_OTHER_MAX_BINDING_PRIORITY);
+		pPass->setData("other_info", m_otherInfo);
 	    pPass->apply();
 	}
 	ImGui::End();

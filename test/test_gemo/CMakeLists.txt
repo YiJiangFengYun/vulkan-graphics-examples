@@ -1,7 +1,7 @@
 
 # add the binary tree directory to the search path for include files
 # include_directories( ${CMAKE_CURRENT_BINARY_DIR} )
-set(EXE_NAME "test-gemo")
+set(EXE_NAME "test_gemo")
 file(GLOB_RECURSE HEADERS *.hpp *.inl)
 file(GLOB_RECURSE SOURCES *.cpp)
 

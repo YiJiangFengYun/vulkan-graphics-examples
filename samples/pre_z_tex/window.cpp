@@ -89,11 +89,11 @@ void Window::_createMaterial()
 		pShader->load("shaders/pre_z_tex/pre_z_tex_show.vert.spv",
 			"shaders/pre_z_tex/pre_z_tex_show.frag.spv");
 
-	    pPass->setCullMode(vg::CullModeFlagBits::BACK);
-	    pPass->setFrontFace(vg::FrontFaceType::COUNTER_CLOCKWISE);
+	    pPass->setCullMode(vk::CullModeFlagBits::eBack);
+	    pPass->setFrontFace(vk::FrontFace::eCounterClockwise);
 
-		pPreZPass->setCullMode(vg::CullModeFlagBits::BACK);
-		pPreZPass->setFrontFace(vg::FrontFaceType::CLOCKWISE);
+		pPreZPass->setCullMode(vk::CullModeFlagBits::eBack);
+		pPreZPass->setFrontFace(vk::FrontFace::eClockwise);
 
 	    vk::PipelineDepthStencilStateCreateInfo depthStencilState = {};
 	    depthStencilState.depthTestEnable = VG_TRUE;
@@ -109,8 +109,12 @@ void Window::_createMaterial()
 		buildInData.pComponent = buildInDataCmps;
 		pPass->setBuildInDataInfo(buildInData);
 
-	    pPass->setDataValue("other_info", m_otherInfo, VG_M_OTHER_MAX_BINDING_PRIORITY, 
-		    vg::DescriptorType::UNIFORM_BUFFER, vg::ShaderStageFlagBits::FRAGMENT);
+		vg::PassDataInfo otherDataInfo = {
+			VG_PASS_OTHER_DATA_MIN_LAYOUT_PRIORITY,
+			vk::ShaderStageFlagBits::eFragment,
+		};
+
+	    pPass->addData("other_info", otherDataInfo, m_otherInfo);
 	    
 	    pMaterial->apply();
 	}
@@ -141,8 +145,7 @@ void Window::_onUpdate()
 	{
 		m_otherInfo.zNear = m_pCamera->getZNear();
 	    m_otherInfo.zFar = m_pCamera->getZFar();
-		m_pMaterial->getMainPass()->setDataValue("other_info", m_otherInfo, VG_M_OTHER_MAX_BINDING_PRIORITY, 
-		    vg::DescriptorType::UNIFORM_BUFFER, vg::ShaderStageFlagBits::FRAGMENT);
+		m_pMaterial->getMainPass()->setData("other_info", m_otherInfo);
 	    m_pMaterial->apply();
 	}
 }

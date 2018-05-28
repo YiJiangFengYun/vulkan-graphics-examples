@@ -106,64 +106,17 @@ namespace vg
 		return m_size;
 	}
 
-	Pass::PushConstantUpdate::PushConstantUpdate()
-	    : m_stageFlags()
-		, m_offset()
-		, m_size()
-		, m_pData(nullptr)
+	Pass::PushConstantUpdateInfo::PushConstantUpdateInfo(vk::ShaderStageFlags stageFlags
+	    , uint32_t offset
+	    , uint32_t size
+	    , const void *pData
+	    )
+		: stageFlags(stageFlags)
+		, offset(offset)
+		, size(size)
+		, pData(pData)
 	{
 
-	}
-	
-	Pass::PushConstantUpdate::~PushConstantUpdate()
-	{
-		if (m_pData != nullptr)
-		{
-			free(m_pData);
-		}
-	}
-
-	void Pass::PushConstantUpdate::init(const void *pData
-		, uint32_t size
-		, vk::ShaderStageFlags stageFlags
-		, uint32_t offset)
-	{
-		if (m_pData != nullptr && (m_size != size))
-		{
-			free(m_pData);
-			m_pData = nullptr;
-			m_size = 0;
-		}
-	
-		if (m_pData == nullptr)
-		{
-			m_pData = malloc(size);
-			m_size = size;
-		}
-		memcpy(m_pData, pData, size);
-
-		m_stageFlags = stageFlags;
-		m_offset = offset;
-	}
-
-	vk::ShaderStageFlags Pass::PushConstantUpdate::getStageFlags() const
-	{
-		return m_stageFlags;
-	}
-
-	uint32_t Pass::PushConstantUpdate::getOffset() const
-	{
-		return m_offset;
-	}
-
-	const void *Pass::PushConstantUpdate::getData() const
-	{
-		return m_pData;
-	}
-
-	uint32_t Pass::PushConstantUpdate::getSize() const
-	{
-		return m_size;
 	}
 
 	Pass::VertexInputFilterInfo::VertexInputFilterInfo(Bool32 filterEnable
@@ -196,6 +149,11 @@ namespace vg
 		return item1.bindingPriority < item2.bindingPriority;
 	}
 
+	Bool32 Pass::_comparePushConstantInfo(const PushConstantSortInfo &item1, const PushConstantSortInfo &item2)
+	{
+		return item1.priority < item2.priority;
+	}
+
 	Pass::Pass() 
 		: Base(BaseType::PASS)
 		, m_data()
@@ -217,10 +175,7 @@ namespace vg
 		, m_subpass(0u)		
 		, m_defaultInputAssemblyState()
 		, m_mapSpecilizationDatas()
-		, m_mapPushConstantRanges()
-		, m_arrPushConstantRangeNames()
-		, m_mapPPushConstantUpdates()		
-		, m_arrPushConstantUpdateNames()
+		, m_pushConstant()
 		, m_buildInDataInfo()
 		, m_buildInDataInfoComponents()
 		, m_buildInDataCache()
@@ -249,6 +204,7 @@ namespace vg
 		, m_dynamicOffsets()
 		, m_pushConstantChanged(VG_FALSE)
 		, m_pushConstantRanges()
+		, m_sortedPushConstantItems()
 		, m_pPipelineLayout(nullptr)
 		, m_pipelineLayoutChanged(VG_FALSE)
 		, m_pipelineStateID()
@@ -592,32 +548,6 @@ namespace vg
 		return m_mapSpecilizationDatas;
 	}
 
-	std::vector<vk::PushConstantRange> Pass::getPushConstantRanges() const
-	{
-		size_t size = m_arrPushConstantRangeNames.size();
-		std::vector<vk::PushConstantRange> pushConstantRanges(size);
-		for (size_t i = 0; i < size; ++i)
-		{
-			const auto &name = m_arrPushConstantRangeNames[i];
-			const auto &iterator = m_mapPushConstantRanges.find(name);
-			pushConstantRanges[i] = iterator->second;
-		}
-		return pushConstantRanges;
-	}
-
-    std::vector<std::shared_ptr<Pass::PushConstantUpdate>> Pass::getPushconstantUpdates() const
-	{
-		size_t size = m_arrPushConstantUpdateNames.size();
-		std::vector<std::shared_ptr<Pass::PushConstantUpdate>> pPushConstantUpdates(size);
-		for (size_t i = 0; i < size; ++i)
-		{
-			const auto &name = m_arrPushConstantUpdateNames[i];
-			const auto &iterator = m_mapPPushConstantUpdates.find(name);
-			pPushConstantUpdates[i] = iterator->second;
-		}
-		return pPushConstantUpdates;
-	}
-
 	void Pass::setSpecializationData(vk::ShaderStageFlagBits shaderStage
 		, const vk::SpecializationInfo &info)
 	{
@@ -631,67 +561,68 @@ namespace vg
 		_updatePipelineStateID();
 	}
 
-	Bool32 Pass::hasPushConstantRange(std::string name) const
+	Bool32 Pass::hasPushConstant(std::string name) const
 	{
-		return hasValue(name, m_mapPushConstantRanges);
+		return m_pushConstant.hasPushConstant(name);
 	}
 		
-	void Pass::addPushConstantRange(std::string name, vk::ShaderStageFlags stageFlags
-		, uint32_t offset
+	void Pass::addPushConstant(std::string name
+	    , uint32_t priority
+		, vk::ShaderStageFlags stageFlags		
 		, uint32_t size
 		)
 	{
-		vk::PushConstantRange pushConstantRange(stageFlags, offset, size);
-		addValue(name, pushConstantRange, m_mapPushConstantRanges, m_arrPushConstantRangeNames);
+		m_pushConstant.addPushConstant(name, priority, stageFlags, size);
 		m_pushConstantChanged = VG_TRUE;
 	}
 
-	void Pass::removePushConstantRange(std::string name)
+	void Pass::removePushConstant(std::string name)
 	{
-		removeValue(name, m_mapPushConstantRanges, m_arrPushConstantRangeNames);
-	}
-
-	void Pass::setPushConstantRange(std::string name
-		, vk::ShaderStageFlags stageFlags
-		, uint32_t offset
-		, uint32_t size)
-	{
-		vk::PushConstantRange pushConstantRange(stageFlags, offset, size);
-		setValue(name, pushConstantRange, m_mapPushConstantRanges, m_arrPushConstantRangeNames);
+		m_pushConstant.removePushConstant(name);
 		m_pushConstantChanged = VG_TRUE;
 	}
 
-	Bool32 Pass::hasPushConstantUpdate(std::string name) const
+	const PassPushConstantData::ConstantItem &Pass::getPushConstant(std::string name) const
 	{
-		return hasValue(name, m_mapPPushConstantUpdates);
+		return m_pushConstant.getPushConstant(name);
 	}
 
-	void Pass::addPushConstantUpdate(std::string name
-	    , const void *pData
+	void Pass::setPushConstant(std::string name
+	    , uint32_t priority
+		, vk::ShaderStageFlags stageFlags		
 		, uint32_t size
-		, vk::ShaderStageFlags stageFlags
-		, uint32_t offset
 		)
 	{
-		std::shared_ptr<PushConstantUpdate> pPushConstantUpdate(new PushConstantUpdate());
-		pPushConstantUpdate->init(pData, size, stageFlags, offset);
-		addValue(name, pPushConstantUpdate, m_mapPPushConstantUpdates, m_arrPushConstantUpdateNames);
-	}
-
-	void Pass::removePushConstantUpdate(std::string name)
-	{
-		removeValue(name, m_mapPPushConstantUpdates, m_arrPushConstantUpdateNames);
+		m_pushConstant.setPushConstant(name, priority, stageFlags, size);
+		m_pushConstantChanged = VG_TRUE;
 	}
 
 	void Pass::setPushConstantUpdate(std::string name
+		, uint32_t offset
 		, const void *pData
 		, uint32_t size
-		, vk::ShaderStageFlags stageFlags
-		, uint32_t offset)
+		)
 	{
-		std::shared_ptr<PushConstantUpdate> pPushConstantUpdate(new PushConstantUpdate());
-		pPushConstantUpdate->init(pData, size, stageFlags, offset);
-		setValue(name, pPushConstantUpdate, m_mapPPushConstantUpdates, m_arrPushConstantUpdateNames);
+		m_pushConstant.setPushConstantUpdate(name, offset, pData, size);
+	}
+
+	std::vector<Pass::PushConstantUpdateInfo> Pass::getPushconstantUpdates() const
+	{
+		std::vector<PushConstantUpdateInfo> updateInfos(m_sortedPushConstantItems.size());
+		uint32_t index = 0u;
+		for (const auto &item : m_sortedPushConstantItems)
+		{
+			const auto &pushConstantItem = m_pushConstant.getPushConstant(item.name);
+			PushConstantUpdateInfo updateInfo = {
+				pushConstantItem.getStageFlags(),
+				pushConstantItem.getUpdate().getOffset(),
+				pushConstantItem.getUpdate().getSize(),
+				pushConstantItem.getUpdate().getData(),
+			};
+			updateInfos[index] = updateInfo;
+			++index;
+		}
+		return updateInfos;
 	}
 
 	uint32_t Pass::getInstanceCount() const
@@ -1303,7 +1234,33 @@ namespace vg
 		if (m_pushConstantChanged)
 		{
 			//push constants
-		    auto pushConstantRanges = getPushConstantRanges();
+			const auto &arrNames = m_pushConstant.getArrItemNames();
+			m_sortedPushConstantItems.clear();
+			for (const auto &name : arrNames)
+			{
+				const auto &item = m_pushConstant.getPushConstant(name);
+				PushConstantSortInfo sortInfo = {name,
+				    item.getPriority(),
+				    };
+				m_sortedPushConstantItems.insert(sortInfo);
+			}
+
+			std::vector<vk::PushConstantRange> pushConstantRanges(m_sortedPushConstantItems.size());
+			uint32_t offset = 0u;
+			uint32_t index = 0u;
+			for (const auto &sortInfo : m_sortedPushConstantItems)
+			{
+				const auto &item = m_pushConstant.getPushConstant(sortInfo.name);
+				vk::PushConstantRange range = {
+		             item.getStageFlags(),
+					 offset,
+					 item.getRange().size,
+				};
+				pushConstantRanges[index] = range;
+				offset += item.getRange().size;
+				++index;
+			}
+
 		    if (m_pushConstantRanges != pushConstantRanges) {
 		    	m_pushConstantRanges = pushConstantRanges;
 				//Push constant change will make pipeline layout change.
@@ -1578,6 +1535,15 @@ namespace vg
 	    )
 		:  bufferInfos(bufferInfos)
 		, imageInfos(imageInfos)
+	{
+
+	}
+
+	Pass::PushConstantSortInfo::PushConstantSortInfo(std::string name
+		, uint32_t priority
+		)
+		: name(name)
+		, priority(priority)
 	{
 
 	}

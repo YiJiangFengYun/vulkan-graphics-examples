@@ -12,6 +12,12 @@ layout(binding = 0) uniform BuildIn {
 	mat4 matrixObjectToWorld;	
 } _buildIn;
 
+// layout (constant_id = 0) const uint LIGHT_COUNT = 0;
+
+// layout(binding = 1) uniform OtherInfo {
+// 	vec4 lightPos[LIGHT_COUNT];
+// } otherInfo;
+
 layout (location = 0) out vec4 outColor;
 
 out gl_PerVertex 

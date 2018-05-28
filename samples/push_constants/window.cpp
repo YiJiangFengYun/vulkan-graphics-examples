@@ -97,7 +97,8 @@ void Window::_createMaterial()
 	depthStencilState.depthWriteEnable = VG_TRUE;
 	depthStencilState.depthCompareOp = vk::CompareOp::eLessOrEqual;
 	pPass->setDepthStencilInfo(depthStencilState);
-	pPass->addPushConstantRange("push_constants", vk::ShaderStageFlagBits::eVertex, 0u, static_cast<uint32_t>(sizeof(m_pushConstants)));
+	pPass->addPushConstant("push_constants", 0u, vk::ShaderStageFlagBits::eVertex, static_cast<uint32_t>(sizeof(m_pushConstants)));
+	// pPass->addPushConstantRange("push_constants", vk::ShaderStageFlagBits::eVertex, 0u, static_cast<uint32_t>(sizeof(m_pushConstants)));
 	pPass->apply();
 	
 	pMaterial->apply();
@@ -140,14 +141,5 @@ void Window::_onUpdate()
 #undef cos_t
     
 	auto pPass = m_pMaterial->getMainPass();
-	if (pPass->hasPushConstantUpdate("push_constants") == VG_FALSE)
-	{
-		pPass->addPushConstantUpdate("push_constants", m_pushConstants.data(),
-			static_cast<uint32_t>(sizeof(m_pushConstants)), vk::ShaderStageFlagBits::eVertex, 0u);
-	}
-	else
-	{
-		pPass->setPushConstantUpdate("push_constants", m_pushConstants.data(),
-			static_cast<uint32_t>(sizeof(m_pushConstants)), vk::ShaderStageFlagBits::eVertex, 0u);
-	}
+	pPass->setPushConstantUpdate("push_constants", 0u, m_pushConstants.data(), static_cast<uint32_t>(sizeof(m_pushConstants)));
 }

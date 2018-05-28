@@ -330,13 +330,14 @@ namespace vg
 
 		//push constants
 		auto pushConstantUpdates = pPass->getPushconstantUpdates();
-		for(const auto& pPushConstantUpdate : pushConstantUpdates)
+		for(const auto& pushConstantUpdate : pushConstantUpdates)
 		{
 			pCommandBuffer->pushConstants(*pPipelineLayout, 
-			    pPushConstantUpdate->getStageFlags(), 
-				pPushConstantUpdate->getOffset(),
-				pPushConstantUpdate->getSize(),
-				pPushConstantUpdate->getData());
+			    pushConstantUpdate.stageFlags, 
+				pushConstantUpdate.offset,
+				pushConstantUpdate.size,
+				pushConstantUpdate.pData
+			);
 		}
 
 

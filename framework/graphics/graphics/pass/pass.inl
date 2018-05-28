@@ -1,23 +1,6 @@
 namespace vg
 {
 	template<typename T>
-	void Pass::PushConstantUpdate::init(const T &data
-		, vk::ShaderStageFlags stageFlags 
-		, uint32_t offset)
-	{
-		init(&data, static_cast<uint32_t>(sizeof(T)), stageFlags, offset);
-	}
-
-    template<typename T>
-	T Pass::PushConstantUpdate::getData() const
-	{
-		size_t size = sizeof(T);
-		T data;
-		memcpy(&data, m_pData, size);
-		return data;
-	}
-
-	template<typename T>
 	void Pass::addData(const std::string name, const PassDataInfo &info, const T &value)
 	{
 		m_data.addData<T>(name, info, value);
@@ -81,26 +64,12 @@ namespace vg
 	}
 
 	template<typename T>
-	void Pass::addPushConstantUpdate(std::string name
-	    , const T &data
-		, vk::ShaderStageFlags stageFlags
+	void Pass::setPushConstantUpdate(std::string name
 		, uint32_t offset
+	    , const T &data
 		)
 	{
-		std::shared_ptr<PushConstantUpdate> pPushConstantUpdate(new PushConstantUpdate());
-		pPushConstantUpdate->init(data, stageFlags, offset);
-		addValue(name, pPushConstantUpdate, m_mapPPushConstantUpdates, m_arrPushConstantUpdateNames);
-	}
-
-    template<typename T>
-	void Pass::setPushConstantUpdate(std::string name
-		, const T &data
-		, vk::ShaderStageFlags stageFlags 
-		, uint32_t offset)
-	{
-		std::shared_ptr<PushConstantUpdate> pPushConstantUpdate(new PushConstantUpdate());
-		pPushConstantUpdate->init(data, stageFlags, offset);
-		setValue(name, pPushConstantUpdate, m_mapPPushConstantUpdates, m_arrPushConstantUpdateNames);
+		m_pushConstant.setPushConstantUpdate(name, offset, data);
 	}
 
 	template <typename T>

@@ -11,6 +11,7 @@
 #include "graphics/util/util.hpp"
 #include "graphics/buffer_data/uniform_buffer_data.hpp"
 #include "graphics/texture/texture_default.hpp"
+#include "graphics/pass/pass_push_constant.hpp"
 
 //to do 
 //specilazation constant and push constant
@@ -142,34 +143,17 @@ namespace vg
 			void *m_pData;
 		};
 
-		class PushConstantUpdate 
+		struct PushConstantUpdateInfo
 		{
-		public:
-	        PushConstantUpdate();
-			~PushConstantUpdate();
-
-			void init(const void *pData
-			     , uint32_t size
-				 , vk::ShaderStageFlags stageFlags
-				 , uint32_t offset);
-
-			template<typename T>
-			void init(const T &data
-			    , vk::ShaderStageFlags stageFlags 
-				, uint32_t offset);
-
-			vk::ShaderStageFlags getStageFlags() const;
-			uint32_t getOffset() const;
-			const void *getData() const;
-			uint32_t getSize() const;			
-
-            template<typename T>
-			T getData() const;
-		private:
-		   vk::ShaderStageFlags m_stageFlags;
-		   uint32_t m_offset;
-		   uint32_t m_size;
-		   void* m_pData;
+			vk::ShaderStageFlags stageFlags;
+			uint32_t offset;
+			uint32_t size;
+			const void *pData;
+			PushConstantUpdateInfo(vk::ShaderStageFlags stageFlags = vk::ShaderStageFlags()
+			    , uint32_t offset = 0u
+				, uint32_t size = 0u
+				, const void *pData = nullptr
+				);
 		};
 
 		struct VertexInputFilterInfo
@@ -274,52 +258,37 @@ namespace vg
 		const SpecializationData *getSpecializationData(vk::ShaderStageFlagBits shaderStage) const;
 
 		const std::unordered_map<vk::ShaderStageFlagBits, std::shared_ptr<Pass::SpecializationData>> &getSpecilizationDatas() const;
-		std::vector<vk::PushConstantRange> getPushConstantRanges() const;
-		std::vector<std::shared_ptr<PushConstantUpdate>> getPushconstantUpdates() const;
 		
 		void setSpecializationData(vk::ShaderStageFlagBits shaderStage
 			, const vk::SpecializationInfo &info);
 
-		Bool32 hasPushConstantRange(std::string name) const;
-		void addPushConstantRange(std::string name, vk::ShaderStageFlags stageFlags
-			, uint32_t offset
+		Bool32 hasPushConstant(std::string name) const;
+		void addPushConstant(std::string name
+		    , uint32_t priority
+			, vk::ShaderStageFlags stageFlags		
 			, uint32_t size
 			);
-		void removePushConstantRange(std::string name);
-	    void setPushConstantRange(std::string name
-		    , vk::ShaderStageFlags stageFlags
-			, uint32_t offset
+		void removePushConstant(std::string name);
+		const PassPushConstantData::ConstantItem &getPushConstant(std::string name) const;
+		void setPushConstant(std::string name
+		    , uint32_t priority
+		    , vk::ShaderStageFlags stageFlags		
 			, uint32_t size
 			);
 
-		Bool32 hasPushConstantUpdate(std::string name) const;
-		void addPushConstantUpdate(std::string name
-		    , const void *pData
-			, uint32_t size
-			, vk::ShaderStageFlags stageFlags
-			, uint32_t offset
-			);
-		void removePushConstantUpdate(std::string name);
 		void setPushConstantUpdate(std::string name
-		    , const void *pData
-			, uint32_t size
-			, vk::ShaderStageFlags stageFlags
 			, uint32_t offset
+			, const void *pData
+			, uint32_t size
 			);
-        
+			
 		template<typename T>
-		void addPushConstantUpdate(std::string name
-		    , const T &data
-			, vk::ShaderStageFlags stageFlags
+		void setPushConstantUpdate(std::string name
 			, uint32_t offset
+		    , const T &data
 			);
 
-        template<typename T>
-		void setPushConstantUpdate(std::string name
-		    , const T &data
-			, vk::ShaderStageFlags stageFlags 
-			, uint32_t offset
-			);
+		std::vector<PushConstantUpdateInfo> getPushconstantUpdates() const;
 
 		uint32_t getInstanceCount() const;
 		void setInstanceCount(uint32_t count);
@@ -377,10 +346,8 @@ namespace vg
 		
 		//each stage may own a specilization constant data.
 		std::unordered_map<vk::ShaderStageFlagBits, std::shared_ptr<SpecializationData>> m_mapSpecilizationDatas;
-		std::unordered_map<std::string, vk::PushConstantRange> m_mapPushConstantRanges;
-		std::vector<std::string> m_arrPushConstantRangeNames;		
-		std::unordered_map<std::string, std::shared_ptr<PushConstantUpdate>> m_mapPPushConstantUpdates;
-		std::vector<std::string> m_arrPushConstantUpdateNames;		
+		
+		PassPushConstantData m_pushConstant;
 
 		BuildInDataInfo m_buildInDataInfo;		
 		std::vector<BuildInDataInfo::Component> m_buildInDataInfoComponents;
@@ -463,7 +430,17 @@ namespace vg
 
 		//push constant Ranges.
 		Bool32 m_pushConstantChanged;
+		struct PushConstantSortInfo {
+			std::string name;
+			uint32_t priority;
+
+			PushConstantSortInfo(std::string name = nullptr
+				, uint32_t priority = 0u
+				);
+		};
+		static Bool32 _comparePushConstantInfo(const PushConstantSortInfo &, const PushConstantSortInfo &);
 		std::vector<vk::PushConstantRange> m_pushConstantRanges;
+		std::set<PushConstantSortInfo, Bool32(*)(const PushConstantSortInfo &, const PushConstantSortInfo &)> m_sortedPushConstantItems;
 
 		//pipeline layout
 		std::shared_ptr<vk::PipelineLayout> m_pPipelineLayout;

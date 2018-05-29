@@ -63,6 +63,30 @@ namespace vg
 		m_dataContentChanges[name] = VG_TRUE;
 	}
 
+	template <typename T>
+    void Pass::addSpecializationItem(vk::ShaderStageFlagBits shaderStage
+        , std::string name
+        , uint32_t priority
+        , const T &data
+        )
+	{
+		m_mapSpecilizationDatas[shaderStage].addSpecialization(name, priority, data);
+		m_specializationChanged = VG_TRUE;
+        m_mapSpecializationDataChanges[shaderStage] = VG_TRUE;
+	}
+
+	template <typename T>
+    void Pass::setSpecializationItem(vk::ShaderStageFlagBits shaderStage
+        , std::string name
+        , uint32_t priority
+        , const T &data
+        )
+	{
+		m_mapSpecilizationDatas[shaderStage].setSpecialization(name, priority, data);
+		m_specializationChanged = VG_TRUE;
+        m_mapSpecializationDataChanges[shaderStage] = VG_TRUE;
+	}
+
 	template<typename T>
 	void Pass::setPushConstantUpdate(std::string name
 		, uint32_t offset

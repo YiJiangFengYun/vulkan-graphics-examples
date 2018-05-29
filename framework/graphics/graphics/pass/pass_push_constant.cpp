@@ -5,8 +5,8 @@
 namespace vg
 {
     PassPushConstantData::ConstantRange::ConstantRange(uint32_t size
-		// , uint32_t offset
-		)
+        // , uint32_t offset
+        )
         : size(size)
     {}
 
@@ -15,20 +15,20 @@ namespace vg
     {
 
     }
-	
+    
     PassPushConstantData::ConstantRange& PassPushConstantData::ConstantRange::operator=(const ConstantRange &target)
     {
         size = target.size;
-		return *this;
+        return *this;
     }
 
     PassPushConstantData::ConstantUpdate::ConstantUpdate(uint32_t offset
-		, uint32_t size
-		, std::vector<Byte> data
-		)
+        , std::vector<Byte> data    
+        , uint32_t size
+        )
         : m_offset(offset)
+        , m_data()        
         , m_size(0u)
-        , m_data()
     {
         setData(data.data(), size);
     }
@@ -40,33 +40,33 @@ namespace vg
     {
 
     }
-		    
+            
     PassPushConstantData::ConstantUpdate& PassPushConstantData::ConstantUpdate::operator=(const ConstantUpdate &target)
     {
         m_offset = target.m_offset;
         m_size = target.m_size;
         m_data = target.m_data;
-		return *this;
+        return *this;
     }
 
     void PassPushConstantData::ConstantUpdate::set(uint32_t offset
-		, const void *pData
-		, uint32_t size
-		)
+        , const void *pData
+        , uint32_t size
+        )
     {
         m_offset = offset;
         setData(pData, size);
     }
 
     void PassPushConstantData::ConstantUpdate::setData(const void *pData
-		, uint32_t size
-		)
+        , uint32_t size
+        )
     {
         if (m_data.size() < size) {
             m_data.resize(size);
         }
         memcpy(m_data.data(), pData, size);
-		m_size = size;
+        m_size = size;
     }
 
     uint32_t PassPushConstantData::ConstantUpdate::getOffset() const
@@ -74,20 +74,20 @@ namespace vg
         return m_offset;
     }
 
-	const void *PassPushConstantData::ConstantUpdate::getData() const
+    const void *PassPushConstantData::ConstantUpdate::getData() const
     {
         return m_data.data();
     }
-			
+            
     uint32_t PassPushConstantData::ConstantUpdate::getSize() const
     {
         return m_size;
     }
 
     PassPushConstantData::ConstantItem::ConstantItem(uint32_t priority
-		, vk::ShaderStageFlags stageFlags
-		, uint32_t size
-		)
+        , vk::ShaderStageFlags stageFlags
+        , uint32_t size
+        )
         : m_priority(priority)
         , m_stageFlags(stageFlags)
         , m_range(size)
@@ -104,14 +104,14 @@ namespace vg
     {
 
     }
-		
+        
     PassPushConstantData::ConstantItem &PassPushConstantData::ConstantItem::operator=(const ConstantItem &target)
     {
         m_priority = target.m_priority;
         m_stageFlags = target.m_stageFlags;
         m_range = target.m_range;
         m_update = target.m_update;
-		return *this;
+        return *this;
     }
 
     uint32_t PassPushConstantData::ConstantItem::getPriority() const
@@ -124,21 +124,21 @@ namespace vg
         return m_stageFlags;
     }
 
-	const PassPushConstantData::ConstantRange &PassPushConstantData::ConstantItem::getRange() const
+    const PassPushConstantData::ConstantRange &PassPushConstantData::ConstantItem::getRange() const
     {
         return m_range;
     }
-	
+    
     PassPushConstantData::ConstantRange &PassPushConstantData::ConstantItem::getRange()
     {
         return m_range;
     }
-	
+    
     const PassPushConstantData::ConstantUpdate &PassPushConstantData::ConstantItem::getUpdate() const
     {
         return m_update;
     }
-			
+            
     PassPushConstantData::ConstantUpdate &PassPushConstantData::ConstantItem::getUpdate()
     {
         return m_update;
@@ -158,9 +158,9 @@ namespace vg
 
     void PassPushConstantData::addPushConstant(std::string name
         , uint32_t priority
-		, vk::ShaderStageFlags stageFlags		
-		, uint32_t size
-		)
+        , vk::ShaderStageFlags stageFlags		
+        , uint32_t size
+        )
     {
         ConstantItem temp(priority, stageFlags, size);
         addValue(name, temp, m_mapItems, m_arrItemNames);
@@ -178,25 +178,25 @@ namespace vg
 
     void PassPushConstantData::setPushConstant(std::string name
         , uint32_t priority
-		, vk::ShaderStageFlags stageFlags		
-		, uint32_t size
-		)
+        , vk::ShaderStageFlags stageFlags		
+        , uint32_t size
+        )
     {
         ConstantItem temp(priority, stageFlags, size);
         setValue(name, temp, m_mapItems, m_arrItemNames);
     }
 
     void PassPushConstantData::setPushConstantUpdate(std::string name
-		, uint32_t offset
-		, const void *pData
-		, uint32_t size
-		)
+        , uint32_t offset
+        , const void *pData
+        , uint32_t size
+        )
     {
         auto &temp = getValue(name, m_mapItems, m_arrItemNames);
         temp.getUpdate().set(offset, pData, size);
     }
 
-    const std::vector<std::string> &PassPushConstantData::getArrItemNames() const
+    const std::vector<std::string> &PassPushConstantData::getPushConstantNames() const
     {
         return m_arrItemNames;
     }

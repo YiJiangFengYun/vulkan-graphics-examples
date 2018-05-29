@@ -239,9 +239,9 @@ namespace vg
         //Fill specialization data from pass.
         for (auto &shaderStage : shaderStages)
         {
-            if (pPass->IsHasSpecializationData(shaderStage.stage)) 
+            if (pPass->hasSpecializationInfo(shaderStage.stage)) 
             {
-                shaderStage.pSpecializationInfo = &(pPass->getSpecializationData(shaderStage.stage)->getInfo());
+                shaderStage.pSpecializationInfo = &(pPass->getSpecializationInfo(shaderStage.stage));
             }
         }
 

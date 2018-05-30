@@ -9,7 +9,7 @@ namespace vg
     }
     
     template <typename T>
-    Bool32 SlotMap<T>::hasValue(const lotType &slot) const
+    Bool32 SlotMap<T>::hasValue(const SlotType &slot) const
     {
         return m_map.count(slot) != 0;
     }
@@ -21,7 +21,7 @@ namespace vg
             const auto &iterator = m_map.find(slot);
             if (iterator != m_map.cend())
             {
-                throw std::runtime_error("Map has exist the item whose key: " + name);
+                throw std::runtime_error("Map has exist the item whose key: " + std::to_string(slot));
             }
             m_map.insert({slot, value});
         }
@@ -31,19 +31,19 @@ namespace vg
     }
 
     template <typename T>
-    void  SlotMap<T>::removeValue(const SlotType &slot)
+    void SlotMap<T>::removeValue(const SlotType &slot)
     {
         m_map.erase(slot);
         m_slots.erase(slot);
     }
 
     template <typename T>
-    SlotMap<T>::ValueType & SlotMap<T>::getValue(const SlotType &slot) const
+    const typename SlotMap<T>::ValueType &SlotMap<T>::getValue(const SlotType &slot) const
     {
         const auto &iterator = m_map.find(slot);
         if (iterator == m_map.cend())
         {
-            throw std::runtime_error("Map don't has item whose key: " + name);
+            throw std::runtime_error("Map don't has item whose key: " + std::to_string(slot));
         }
         else
         {
@@ -52,13 +52,27 @@ namespace vg
     }
 
     template <typename T>
-    void  SlotMap<T>::setValue(const SlotType &slot, const ValueType &value)
+    typename SlotMap<T>::ValueType &SlotMap<T>::getValue(const SlotType &slot)
+    {
+        const auto &iterator = m_map.find(slot);
+        if (iterator == m_map.cend())
+        {
+            throw std::runtime_error("Map don't has item whose key: " + std::to_string(slot));
+        }
+        else
+        {
+            return iterator->second;
+        }
+    }
+
+    template <typename T>
+    void SlotMap<T>::setValue(const SlotType &slot, const ValueType &value)
     {
         {
             const auto &iterator = m_map.find(slot);
             if (iterator == m_map.cend())
             {
-                throw std::runtime_error("Map don't has item whose key: " + name);
+                throw std::runtime_error("Map don't has item whose key: " + std::to_string(slot));
             }
             else
             {

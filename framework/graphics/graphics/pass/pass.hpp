@@ -463,11 +463,7 @@ namespace vg
             vk::SpecializationInfo info;
             std::vector<vk::SpecializationMapEntry> mapEntries;
             std::vector<Byte> data;
-            SpecializationAppliedData(SpecializationSortInfoSet sortSet = {}
-                , vk::SpecializationInfo info = {}
-                , std::vector<vk::SpecializationMapEntry> mapEntries = {}
-                , std::vector<Byte> data = {}
-                );
+            SpecializationAppliedData();
         };
         std::unordered_map<vk::ShaderStageFlagBits, SpecializationAppliedData> m_mapSpecializationAppliedData;
 

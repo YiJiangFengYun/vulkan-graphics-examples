@@ -1609,15 +1609,11 @@ namespace vg
 
     }
 
-    Pass::SpecializationAppliedData::SpecializationAppliedData(SpecializationSortInfoSet sortSet
-        , vk::SpecializationInfo info
-        , std::vector<vk::SpecializationMapEntry> mapEntries
-        , std::vector<Byte> data
-        )
-        : sortSet(sortSet)
-        , info(info)
-        , mapEntries(mapEntries)
-        , data(data)
+    Pass::SpecializationAppliedData::SpecializationAppliedData()
+        : sortSet(_compareSpecializationSortInfo)
+        , info()
+        , mapEntries()
+        , data()
     {
 
     }

@@ -4,4 +4,4 @@ format (COLLADA).
 3.Bug of render of sample "mesh" and "post_render".
 4.Optimze push constant, specialization const and exterual uniform data of pass, use map storage.
 5.Chagne all tap indentation to 4 space indentation.
-5.Delete "apply" mechanism mode.
+6.Delete "apply" mechanism mode.

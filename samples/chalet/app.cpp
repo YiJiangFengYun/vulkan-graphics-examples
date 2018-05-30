@@ -2,8 +2,8 @@
 
 namespace chalet
 {
-	App::App():
-		sampleslib::App()
-	{
-	}
+    App::App():
+        sampleslib::App()
+    {
+    }
 }

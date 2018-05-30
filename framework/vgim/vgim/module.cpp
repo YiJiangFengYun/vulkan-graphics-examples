@@ -6,7 +6,7 @@ namespace vgim
     uint32_t m_canvasHeight;
 
     double m_time;
-	
+    
     std::shared_ptr<vg::Texture2D> m_pFontTexture;
     std::shared_ptr<vg::Material> m_pMaterial;
     
@@ -36,9 +36,9 @@ namespace vgim
     }
 
     vg::Material *getMaterial()
-	{
-		return m_pMaterial.get();
-	}
+    {
+        return m_pMaterial.get();
+    }
 
     vg::DimSimpleMesh2 *getMesh()
     {
@@ -60,10 +60,10 @@ namespace vgim
         return m_pScene.get();
     }
 
-	void setShaderPath(const std::string &vertShaderPath, const std::string &fragShaderPath)
-	{
-		m_pMaterial->getMainShader()->load(vertShaderPath, fragShaderPath);
-	}
+    void setShaderPath(const std::string &vertShaderPath, const std::string &fragShaderPath)
+    {
+        m_pMaterial->getMainShader()->load(vertShaderPath, fragShaderPath);
+    }
 
     void _createMaterial();
     void _destroyMaterial();
@@ -79,24 +79,24 @@ namespace vgim
     void _createFontTexture();
     void _destroyFontTexture();
 
-	void moduleCreate(plog::Severity severity, plog::IAppender *appender)
-	{
-		if (inited == VG_IM_TRUE) return;
+    void moduleCreate(plog::Severity severity, plog::IAppender *appender)
+    {
+        if (inited == VG_IM_TRUE) return;
         plog::IAppender *callerAppender = appender;
-		if (appender == nullptr) {
-		    //init default log to write to the windows debug output
-			static plog::DebugOutputAppender<plog::TxtFormatter> debugOutputAppender;
-			appender = &debugOutputAppender;
-		}
-		plog::init<VGIM_PLOG_ID>(severity, appender);
+        if (appender == nullptr) {
+            //init default log to write to the windows debug output
+            static plog::DebugOutputAppender<plog::TxtFormatter> debugOutputAppender;
+            appender = &debugOutputAppender;
+        }
+        plog::init<VGIM_PLOG_ID>(severity, appender);
         vg::moduleCreate(severity, callerAppender);
-		//Indicate module was initialized.
-		inited = VG_IM_TRUE;
-	}
+        //Indicate module was initialized.
+        inited = VG_IM_TRUE;
+    }
 
-	void moduleDestory()
-	{
-		inited = VG_IM_FALSE;
+    void moduleDestory()
+    {
+        inited = VG_IM_FALSE;
         isCreatedCanvas = VG_IM_FALSE;
         _destroyFontTexture();
         _destroyScene();
@@ -104,7 +104,7 @@ namespace vgim
         _destroyUIObject();
         _destroyMesh();
         _destroyMaterial();
-	}
+    }
 
     void moduleCreateCanvas(uint32_t canvasWidth, uint32_t canvasHeight)
     {
@@ -112,7 +112,7 @@ namespace vgim
         m_canvasWidth = canvasWidth;
         m_canvasHeight = canvasHeight;
         m_time = 0.0;
-		_createMaterial();
+        _createMaterial();
         _createMesh();
         _createUIObject();
         _createCamera();
@@ -123,9 +123,9 @@ namespace vgim
     }
 
     void setLogSeverity(plog::Severity severity)
-	{
-		plog::get<VGIM_PLOG_ID>()->setMaxSeverity(severity);
-	}
+    {
+        plog::get<VGIM_PLOG_ID>()->setMaxSeverity(severity);
+    }
 
     void updateIMGUI(uint32_t canvasWidth
         , uint32_t canvasHeight
@@ -140,13 +140,13 @@ namespace vgim
 
         // Dimensions
         ImGuiIO& io = ImGui::GetIO();
-		io.DisplaySize = ImVec2(static_cast<float>(canvasWidth), static_cast<float>(canvasHeight));
-		io.FontGlobalScale = 1.0f;
+        io.DisplaySize = ImVec2(static_cast<float>(canvasWidth), static_cast<float>(canvasHeight));
+        io.FontGlobalScale = 1.0f;
 
         //camera
         auto &pCamera = m_pCamera;
-		pCamera->updateProj(fd::Bounds<glm::vec2>(glm::vec2(0.0f, 0.0f), 
-		    glm::vec2(static_cast<float>(canvasWidth), static_cast<float>(canvasHeight))));
+        pCamera->updateProj(fd::Bounds<glm::vec2>(glm::vec2(0.0f, 0.0f), 
+            glm::vec2(static_cast<float>(canvasWidth), static_cast<float>(canvasHeight))));
 
         //time
         io.DeltaTime = static_cast<float>(currTime - m_time);
@@ -168,8 +168,8 @@ namespace vgim
         ImGui::Render();        
         //update mesh
         auto drawData = ImGui::GetDrawData();
-		if (drawData == nullptr) return;
-		uint32_t vertexCount = drawData != nullptr ? drawData->TotalVtxCount : 0u;
+        if (drawData == nullptr) return;
+        uint32_t vertexCount = drawData != nullptr ? drawData->TotalVtxCount : 0u;
         uint32_t indexCount = drawData != nullptr ? drawData->TotalIdxCount : 0u;
         uint32_t vertexSize = static_cast<uint32_t>(vertexCount * sizeof(ImDrawVert));
         uint32_t indexSize = static_cast<uint32_t>(indexCount * sizeof(ImDrawIdx));
@@ -178,7 +178,7 @@ namespace vgim
         const auto& pVertexData = m_pMesh->getVertexData();
         const auto& pIndexData = m_pMesh->getIndexData();
 
-		uint32_t cmdListCount = drawData != nullptr ? drawData->CmdListsCount : 0u;
+        uint32_t cmdListCount = drawData != nullptr ? drawData->CmdListsCount : 0u;
 
         std::vector<vg::MemorySlice> vertexSlices(cmdListCount);
         std::vector<vg::MemorySlice> indexSlices(cmdListCount);
@@ -243,26 +243,26 @@ namespace vgim
         pIndexData->updateBuffer(indexSlices, indexSize, VG_FALSE);
 
         pVertexData->updateSubDataCount(vertexSubDataCount);
-		if (vertexSubDataCount)
-		{
-			const auto &firstSubVertexData = pVertexData->getSubVertexDatas()[0];
-			pVertexData->updateDesData(firstSubVertexData.vertexInputStateInfo);
-			pVertexData->updateVertexCount(vertexCounts);
-			pVertexData->updateBufferSize(vertexBufferSizes);
-		}
+        if (vertexSubDataCount)
+        {
+            const auto &firstSubVertexData = pVertexData->getSubVertexDatas()[0];
+            pVertexData->updateDesData(firstSubVertexData.vertexInputStateInfo);
+            pVertexData->updateVertexCount(vertexCounts);
+            pVertexData->updateBufferSize(vertexBufferSizes);
+        }
 
         pIndexData->updateSubDataCount(indexSubDataCount);
-		if (indexSubDataCount)
-		{
-			const auto &firstSubIndexData = pIndexData->getSubIndexDatas()[0];
-			pIndexData->updateDesData(firstSubIndexData.indexType, firstSubIndexData.inputAssemblyStateInfo);
-			pIndexData->updateIndexCount(indexCounts);
-			pIndexData->updateBufferSize(indexBufferSizes);
-			pIndexData->updateVertexDataIndex(indexVertexDataIndices);
+        if (indexSubDataCount)
+        {
+            const auto &firstSubIndexData = pIndexData->getSubIndexDatas()[0];
+            pIndexData->updateDesData(firstSubIndexData.indexType, firstSubIndexData.inputAssemblyStateInfo);
+            pIndexData->updateIndexCount(indexCounts);
+            pIndexData->updateBufferSize(indexBufferSizes);
+            pIndexData->updateVertexDataIndex(indexVertexDataIndices);
 
             pUIObject->setHasClipRect(VG_TRUE);
             pUIObject->updateClipRects(indexRects);
-		}
+        }
 
 
         //update material
@@ -275,30 +275,30 @@ namespace vgim
         // m_pPass->setPushConstantUpdate("default", &data, static_cast<uint32_t>(sizeof(data)), 
         //     vk::ShaderStageFlagBits::eVertex, 0u);
 
-		auto pPass = m_pMaterial->getMainPass();
+        auto pPass = m_pMaterial->getMainPass();
 
         fd::Viewport viewPort(0.0f, 0.0f, ImGui::GetIO().DisplaySize.x / static_cast<float>(m_canvasWidth), 
             ImGui::GetIO().DisplaySize.y / static_cast<float>(m_canvasHeight), 0.0f, 1.0f);
-		pPass->setViewport(viewPort);
+        pPass->setViewport(viewPort);
 
         fd::Rect2D scissor(0.0f, 0.0f, ImGui::GetIO().DisplaySize.x / static_cast<float>(m_canvasWidth), 
             ImGui::GetIO().DisplaySize.y / static_cast<float>(m_canvasHeight));
-		pPass->setScissor(scissor);
+        pPass->setScissor(scissor);
 
-		m_pUIObject->setMaterialCount(m_pMesh->getSubMeshCount());
+        m_pUIObject->setMaterialCount(m_pMesh->getSubMeshCount());
 
-		m_pUIObject->setMaterial(m_pMaterial.get());
-		
+        m_pUIObject->setMaterial(m_pMaterial.get());
+        
     }
 
-	void _createMaterial()
-	{
-		m_pMaterial = std::shared_ptr<vg::Material>(new vg::Material());
-		m_pMaterial->setRenderPriority(0u);
-		m_pMaterial->setRenderQueueType(vg::MaterialShowType::TRANSPARENT);
+    void _createMaterial()
+    {
+        m_pMaterial = std::shared_ptr<vg::Material>(new vg::Material());
+        m_pMaterial->setRenderPriority(0u);
+        m_pMaterial->setRenderQueueType(vg::MaterialShowType::TRANSPARENT);
 
-		auto pPass = m_pMaterial->getMainPass();
-		pPass->setFrontFace(vk::FrontFace::eClockwise);
+        auto pPass = m_pMaterial->getMainPass();
+        pPass->setFrontFace(vk::FrontFace::eClockwise);
         //push constant
         // pPass->setPushConstantRange("default", vk::ShaderStageFlagBits::eVertex, static_cast<uint32_t>(sizeof(float) * 0), static_cast<uint32_t>(sizeof(float) * 4));
 
@@ -324,17 +324,17 @@ namespace vgim
         vk::PipelineColorBlendStateCreateInfo colorBlendInfo;
         colorBlendInfo.attachmentCount = blendAttachmentStates.size();
         colorBlendInfo.pAttachments = blendAttachmentStates.data();
-		pPass->setColorBlendInfo(colorBlendInfo);
+        pPass->setColorBlendInfo(colorBlendInfo);
 
         //depth stencil
         vk::PipelineDepthStencilStateCreateInfo depthStencilInfo;
         depthStencilInfo.depthTestEnable = VK_FALSE;
         depthStencilInfo.depthWriteEnable = VK_FALSE;
-		pPass->setDepthStencilInfo(depthStencilInfo);
+        pPass->setDepthStencilInfo(depthStencilInfo);
 
-		
-		m_pMaterial->apply();
-	}
+        
+        m_pMaterial->apply();
+    }
 
     void _destroyMaterial()
     {
@@ -385,7 +385,7 @@ namespace vgim
     {
         m_pUIObject = std::shared_ptr<vg::VisualObject2>(new vg::VisualObject2());
         m_pUIObject->setMesh(m_pMesh.get());
-		m_pUIObject->setMaterialCount(1u);
+        m_pUIObject->setMaterialCount(1u);
         m_pUIObject->setMaterial(m_pMaterial.get());
     }
 
@@ -424,15 +424,15 @@ namespace vgim
         //style
         ImGui::StyleColorsDark();
         // // Color scheme
-		// ImGuiStyle& style = ImGui::GetStyle();
-		// style.Colors[ImGuiCol_TitleBg] = ImVec4(1.0f, 0.0f, 0.0f, 1.0f);
-		// style.Colors[ImGuiCol_TitleBgActive] = ImVec4(1.0f, 0.0f, 0.0f, 1.0f);
-		// style.Colors[ImGuiCol_TitleBgCollapsed] = ImVec4(1.0f, 0.0f, 0.0f, 0.1f);
-		// style.Colors[ImGuiCol_MenuBarBg] = ImVec4(1.0f, 0.0f, 0.0f, 0.4f);
-		// style.Colors[ImGuiCol_Header] = ImVec4(0.8f, 0.0f, 0.0f, 0.4f);
-		// style.Colors[ImGuiCol_HeaderActive] = ImVec4(1.0f, 0.0f, 0.0f, 0.4f);
-		// style.Colors[ImGuiCol_HeaderHovered] = ImVec4(1.0f, 0.0f, 0.0f, 0.4f);
-		// style.Colors[ImGuiCol_CheckMark] = ImVec4(1.0f, 0.0f, 0.0f, 0.8f);
+        // ImGuiStyle& style = ImGui::GetStyle();
+        // style.Colors[ImGuiCol_TitleBg] = ImVec4(1.0f, 0.0f, 0.0f, 1.0f);
+        // style.Colors[ImGuiCol_TitleBgActive] = ImVec4(1.0f, 0.0f, 0.0f, 1.0f);
+        // style.Colors[ImGuiCol_TitleBgCollapsed] = ImVec4(1.0f, 0.0f, 0.0f, 0.1f);
+        // style.Colors[ImGuiCol_MenuBarBg] = ImVec4(1.0f, 0.0f, 0.0f, 0.4f);
+        // style.Colors[ImGuiCol_Header] = ImVec4(0.8f, 0.0f, 0.0f, 0.4f);
+        // style.Colors[ImGuiCol_HeaderActive] = ImVec4(1.0f, 0.0f, 0.0f, 0.4f);
+        // style.Colors[ImGuiCol_HeaderHovered] = ImVec4(1.0f, 0.0f, 0.0f, 0.4f);
+        // style.Colors[ImGuiCol_CheckMark] = ImVec4(1.0f, 0.0f, 0.0f, 0.8f);
     }
 
     void _createFontTexture()
@@ -446,48 +446,48 @@ namespace vgim
 
         m_pFontTexture = std::shared_ptr<vg::Texture2D>(new vg::Texture2D(vk::Format::eR8G8B8A8Unorm, 
             VG_FALSE, width, height));
-		vg::TextureDataInfo layoutInfo;
-		vg::TextureDataInfo::Component component;
-		component.mipLevel = 0u;
-		component.layerCount = 1u;
-		component.baseArrayLayer = 0u;
-		component.size = size;
-		layoutInfo.componentCount = 1u;
-		layoutInfo.pComponent = &component;
-		m_pFontTexture->applyData(layoutInfo, reinterpret_cast<void *>(pixels), size);
+        vg::TextureDataInfo layoutInfo;
+        vg::TextureDataInfo::Component component;
+        component.mipLevel = 0u;
+        component.layerCount = 1u;
+        component.baseArrayLayer = 0u;
+        component.size = size;
+        layoutInfo.componentCount = 1u;
+        layoutInfo.pComponent = &component;
+        m_pFontTexture->applyData(layoutInfo, reinterpret_cast<void *>(pixels), size);
         
         io.Fonts->TexID = reinterpret_cast<void *>(VkImage(*(m_pFontTexture->getImage()->getImage())));
 
-		auto pPass = m_pMaterial->getMainPass();
+        auto pPass = m_pMaterial->getMainPass();
 
-		//main texture
-		std::string name = "main_texture";
-		vg::PassTextureInfo info = {
-			m_pFontTexture.get(),
-			nullptr,
-			nullptr,
-			vk::ImageLayout::eUndefined,
-			VG_PASS_OTHER_MIN_BINDING_PRIORITY,
-			vg::ImageDescriptorType::COMBINED_IMAGE_SAMPLER,
-			vk::ShaderStageFlagBits::eFragment,
-		};
-		if (pPass->hasTexture(name) == VG_FALSE)
-		{
-			pPass->addTexture(name, info);
-		}
-		else
-		{
-			pPass->setTexture(name, info);
-		}
+        //main texture
+        std::string name = "main_texture";
+        vg::PassTextureInfo info = {
+            m_pFontTexture.get(),
+            nullptr,
+            nullptr,
+            vk::ImageLayout::eUndefined,
+            VG_PASS_OTHER_MIN_BINDING_PRIORITY,
+            vg::ImageDescriptorType::COMBINED_IMAGE_SAMPLER,
+            vk::ShaderStageFlagBits::eFragment,
+        };
+        if (pPass->hasTexture(name) == VG_FALSE)
+        {
+            pPass->addTexture(name, info);
+        }
+        else
+        {
+            pPass->setTexture(name, info);
+        }
     }
 
     void _destroyFontTexture()
     {
-		auto pPass = m_pMaterial->getMainPass();
+        auto pPass = m_pMaterial->getMainPass();
         ImGuiIO& io = ImGui::GetIO();
         io.Fonts->TexID = reinterpret_cast<void *>(0);
-		std::string name = "main_texture";
-		pPass->removeTexture(name);
+        std::string name = "main_texture";
+        pPass->removeTexture(name);
         m_pFontTexture = nullptr;
     }  
 } //vgim

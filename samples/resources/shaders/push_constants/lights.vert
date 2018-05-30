@@ -12,11 +12,11 @@ layout (location = 3) in vec3 inColor;
 
 layout(binding = 0) uniform BuildIn {
     mat4 matrixObjectToNDC;
-	mat4 matrixObjectToWorld;
+    mat4 matrixObjectToWorld;
 } _buildIn;
 
 layout(push_constant) uniform PushConsts {
-	vec4 lightPos[lightCount];
+    vec4 lightPos[lightCount];
 } pushConsts;
 
 layout (location = 0) out vec3 outNormal;
@@ -26,21 +26,21 @@ layout (location = 3) out vec4 outLightVec[lightCount];
 
 out gl_PerVertex
 {
-	vec4 gl_Position;
+    vec4 gl_Position;
 };
 
 void main() 
 {
-	outNormal = inNormal;
-	outColor = inColor;
-	
-	gl_Position = _buildIn.matrixObjectToNDC * vec4(inPos.xyz, 1.0);
-	
-	for (int i = 0; i < lightCount; ++i)
-	{	
-		vec4 worldPos =  _buildIn.matrixObjectToWorld * vec4(inPos.xyz, 1.0);
-		outLightVec[i].xyz = pushConsts.lightPos[i].xyz - inPos.xyz;		
-		// Store light radius in w
-		outLightVec[i].w = pushConsts.lightPos[i].w;
-	}
+    outNormal = inNormal;
+    outColor = inColor;
+    
+    gl_Position = _buildIn.matrixObjectToNDC * vec4(inPos.xyz, 1.0);
+    
+    for (int i = 0; i < lightCount; ++i)
+    {    
+        vec4 worldPos =  _buildIn.matrixObjectToWorld * vec4(inPos.xyz, 1.0);
+        outLightVec[i].xyz = pushConsts.lightPos[i].xyz - inPos.xyz;        
+        // Store light radius in w
+        outLightVec[i].w = pushConsts.lightPos[i].w;
+    }
 }

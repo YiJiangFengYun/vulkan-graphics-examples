@@ -1,0 +1,9 @@
+#ifndef VG_PASS_EXT_UNIFORM_BUFFER_HPP
+#define VG_PASS_EXT_UNIFORM_BUFFER_HPP
+
+namespace vg
+{
+
+} //vg
+
+#endif //VG_PASS_EXT_UNIFORM_BUFFER_HPP

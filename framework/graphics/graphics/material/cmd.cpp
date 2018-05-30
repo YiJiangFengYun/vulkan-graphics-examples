@@ -9,7 +9,7 @@ namespace vg
          , std::vector<T> &arr
          , std::vector<uint32_t> *pToParentIndices
          , std::vector<ParentT> *pParentArr
-		 , uint32_t parentArrCount
+         , uint32_t parentArrCount
          , const T &newData
          )
     {
@@ -19,19 +19,19 @@ namespace vg
             arr.resize(capacity);
             if (pParentArr != nullptr) {
                 pToParentIndices->resize(capacity);
-			    for (uint32_t i = 0; i < count; ++i)
-			    {
-			    	auto &parent = (*pParentArr)[(*pToParentIndices)[i]];
+                for (uint32_t i = 0; i < count; ++i)
+                {
+                    auto &parent = (*pParentArr)[(*pToParentIndices)[i]];
                     auto point = &(arr[i]);
                     memcpy((char *)(&parent) + parentPointOffset, &point, sizeof(point));
-			    }
+                }
             }
         }
         auto &dstData = arr[count];
         dstData = newData;
         if (pParentArr != nullptr) {
             auto pDst = &dstData;
-			uint32_t parentIndex = parentArrCount - 1;
+            uint32_t parentIndex = parentArrCount - 1;
             ParentT * pParent = &((*pParentArr)[parentIndex]);
             memcpy((char *)pParent + parentPointOffset, &pDst, sizeof(pDst));
             (*pToParentIndices)[count] = parentIndex;
@@ -44,7 +44,7 @@ namespace vg
          , uint32_t &capacity
          , std::vector<std::vector<T>> &arr
          , std::vector<ParentT> *pParentArr
-		 , uint32_t parentArrCount
+         , uint32_t parentArrCount
          , uint32_t dataCount
          , const T *pDatas
          )
@@ -59,7 +59,7 @@ namespace vg
         memcpy(dstData.data(), pDatas, dataCount * sizeof(T));
         if (pParentArr != nullptr) {
             auto pDst = dstData.data();
-			uint32_t parentIndex = parentArrCount - 1;
+            uint32_t parentIndex = parentArrCount - 1;
             ParentT * pParent = &((*pParentArr)[parentIndex]);
             memcpy((char *)pParent + parentPointOffset, &pDst, sizeof(pDst));
         }
@@ -151,8 +151,8 @@ namespace vg
         : pRenderPass(pRenderPass)
         , subPassIndex(subPassIndex)
         , pFrameBuffer(pFrameBuffer)
-	    , framebufferWidth(framebufferWidth)
-	    , framebufferHeight(framebufferHeight)
+        , framebufferWidth(framebufferWidth)
+        , framebufferHeight(framebufferHeight)
         , renderArea(renderArea)
         , clearValueCount(clearValueCount)
         , pClearValues(pClearValues)
@@ -183,7 +183,7 @@ namespace vg
         , m_renderPassInfoCount(0u)
         , m_renderPassInfoCapacity(0u)
         , m_renderPassInfos()
-		, m_renderPassInfoToCmdInfoIndices()
+        , m_renderPassInfoToCmdInfoIndices()
 
         , m_clearValuesCount(0u)
         , m_clearValuesCapacity(0u)
@@ -192,17 +192,17 @@ namespace vg
         , m_cmdDrawCount(0u)
         , m_cmdDrawCapacity(0u)
         , m_cmdDraws()
-		, m_cmdDrawToRenderPassInfoIndices()
+        , m_cmdDrawToRenderPassInfoIndices()
 
         , m_cmdDrawIndexedCount(0u)
         , m_cmdDrawIndexedCapacity(0u)
         , m_cmdDrawIndexeds()
-		, m_cmdDrawIndexedToRenderPassInfoIndices()
+        , m_cmdDrawIndexedToRenderPassInfoIndices()
 
         , m_barrierInfoCount(0u)
         , m_barrierInfosCapacity(0u)
         , m_barrierInfos()
-		, m_barrierInfoToCmdInfoIndices()
+        , m_barrierInfoToCmdInfoIndices()
 
         , m_memoryBarrierCount(0u)
         , m_memoryBarrierCapacity(0u)
@@ -245,7 +245,7 @@ namespace vg
             m_cmdInfos,
             nullptr,
             nullptr,
-			0,
+            0,
             cmdInfo
             );
 
@@ -258,7 +258,7 @@ namespace vg
                 m_renderPassInfos,
                 &m_renderPassInfoToCmdInfoIndices,
                 &m_cmdInfos,
-				m_cmdInfoCount,
+                m_cmdInfoCount,
                 *(cmdInfo.pRenderPassInfo)
             );
 
@@ -271,7 +271,7 @@ namespace vg
                 m_clearValuesCapacity,
                 m_clearValues,
                 &m_renderPassInfos,
-				m_renderPassInfoCount,
+                m_renderPassInfoCount,
                 clearValueCount,
                 pClearValues
             );
@@ -309,7 +309,7 @@ namespace vg
                 m_barrierInfos,
                 &m_barrierInfoToCmdInfoIndices,
                 &m_cmdInfos,
-				m_cmdInfoCount,
+                m_cmdInfoCount,
                 *(cmdInfo.pBarrierInfo)
             );
 
@@ -320,7 +320,7 @@ namespace vg
                 m_memoryBarrierCapacity,
                 m_memoryBarriers,
                 &m_barrierInfos,
-				m_barrierInfoCount,
+                m_barrierInfoCount,
                 memoryBarrierCount,
                 pMemoryBarriers
             );
@@ -332,7 +332,7 @@ namespace vg
                 m_bufferMemoryBarrierCapacity,
                 m_bufferMemoryBarriers,
                 &m_barrierInfos,
-				m_barrierInfoCount,
+                m_barrierInfoCount,
                 bufferMemoryBarrierCount,
                 pBufferMemoryBarriers
             );
@@ -344,7 +344,7 @@ namespace vg
                 m_imageMemoryBarrierCapacity,
                 m_imageMemoryBarriers,
                 &m_barrierInfos,
-				m_barrierInfoCount,
+                m_barrierInfoCount,
                 imageMemoryBarrierCount,
                 pImageMemoryBarriers
             );
@@ -366,7 +366,7 @@ namespace vg
         m_renderPassInfoCapacity = 0u;
         m_renderPassInfos.clear();
         m_renderPassInfos.shrink_to_fit();
-		m_renderPassInfoToCmdInfoIndices.clear();
+        m_renderPassInfoToCmdInfoIndices.clear();
         m_renderPassInfoToCmdInfoIndices.shrink_to_fit();
 
         m_clearValuesCount = 0u;
@@ -378,21 +378,21 @@ namespace vg
         m_cmdDrawCapacity = 0u;
         m_cmdDraws.clear();
         m_cmdDraws.shrink_to_fit();
-	    m_cmdDrawToRenderPassInfoIndices.clear();
+        m_cmdDrawToRenderPassInfoIndices.clear();
         m_cmdDrawToRenderPassInfoIndices.shrink_to_fit();
 
         m_cmdDrawIndexedCount = 0u;
         m_cmdDrawIndexedCapacity = 0u;
         m_cmdDrawIndexeds.clear();
         m_cmdDrawIndexeds.shrink_to_fit();
-		m_cmdDrawIndexedToRenderPassInfoIndices.clear();
+        m_cmdDrawIndexedToRenderPassInfoIndices.clear();
         m_cmdDrawIndexedToRenderPassInfoIndices.shrink_to_fit();
 
         m_barrierInfoCount = 0u;
         m_barrierInfosCapacity = 0u;
         m_barrierInfos.clear();
         m_barrierInfos.shrink_to_fit();
-		m_barrierInfoToCmdInfoIndices.clear();
+        m_barrierInfoToCmdInfoIndices.clear();
         m_barrierInfoToCmdInfoIndices.shrink_to_fit();
 
         m_memoryBarrierCount = 0u;

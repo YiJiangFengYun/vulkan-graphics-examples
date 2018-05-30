@@ -27,7 +27,7 @@ namespace vg
         , m_subDatas()
         , m_subDataCount()
         , m_bufferData(vk::BufferUsageFlagBits::eIndexBuffer
-			, bufferMemoryPropertyFlags ? bufferMemoryPropertyFlags : vk::MemoryPropertyFlagBits::eDeviceLocal)
+            , bufferMemoryPropertyFlags ? bufferMemoryPropertyFlags : vk::MemoryPropertyFlagBits::eDeviceLocal)
     {
     }
 

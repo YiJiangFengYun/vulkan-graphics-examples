@@ -32,7 +32,7 @@ namespace fd
         currTimer = 0.0f;
         costTimer = 0.0f;
         m_addUpTimer = 0.0f;
-		m_addUpCount = 0u;
+        m_addUpCount = 0u;
         m_isDoing = FD_FALSE;
     }
 
@@ -45,25 +45,25 @@ namespace fd
     void CostTimer::end()
     {
         auto now = ClockType::now();
-		endTime = now;
-		auto diff = std::chrono::duration_cast<std::chrono::microseconds>(now - startTime).count();
-		currTimer = static_cast<float>(diff / 1000.0f);
-		m_addUpTimer += static_cast<float>(diff / 1000.0f);
+        endTime = now;
+        auto diff = std::chrono::duration_cast<std::chrono::microseconds>(now - startTime).count();
+        currTimer = static_cast<float>(diff / 1000.0f);
+        m_addUpTimer += static_cast<float>(diff / 1000.0f);
         if (m_timerType == TimerType::AVERAGE) {
-		    ++m_addUpCount;
+            ++m_addUpCount;
             if ( m_addUpTimer > 1000.0f)
-		    {
+            {
                 costTimer = m_addUpTimer / static_cast<float>(m_addUpCount);
-		    	m_addUpTimer = 0.0f;
-		    	m_addUpCount = 0u;
-		    }
+                m_addUpTimer = 0.0f;
+                m_addUpCount = 0u;
+            }
         } else if (m_timerType == TimerType::ONCE) {
             costTimer = m_addUpTimer;
             m_addUpTimer = 0.0f;
         } else {
             costTimer = m_addUpTimer;
         }
-		
+        
         m_isDoing = FD_FALSE;
     }
 

@@ -5,21 +5,21 @@
 
 namespace vg
 {
-	template <SpaceType SPACE_TYPE>
-	class CameraOP : public Camera<SPACE_TYPE>
-	{
-	public:
-		CameraOP();
-		void updateProj(BoundsType viewBounds);
-		typename TransformType::MatrixType getProjMatrix() const override;
-		BoundsType getViewBounds() const;
-	protected:
-		BoundsType m_viewBounds;
-		typename TransformType::MatrixType m_projMatrix;
-		virtual void _applyProj() = 0;
-	private:
-		
-	};
+    template <SpaceType SPACE_TYPE>
+    class CameraOP : public Camera<SPACE_TYPE>
+    {
+    public:
+        CameraOP();
+        void updateProj(BoundsType viewBounds);
+        typename TransformType::MatrixType getProjMatrix() const override;
+        BoundsType getViewBounds() const;
+    protected:
+        BoundsType m_viewBounds;
+        typename TransformType::MatrixType m_projMatrix;
+        virtual void _applyProj() = 0;
+    private:
+        
+    };
 } //namespace kgs
 
 #endif // !VG_CAMERA_OP_H

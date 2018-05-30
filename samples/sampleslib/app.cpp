@@ -2,8 +2,8 @@
 
 namespace sampleslib
 {
-	App::App()
-	    : vgf::App()
-	{
-	}
+    App::App()
+        : vgf::App()
+    {
+    }
 }

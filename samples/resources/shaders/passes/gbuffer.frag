@@ -17,24 +17,24 @@ layout (location = 2) out vec4 outAlbedo;
 
 // float linearDepth(float depth)
 // {
-// 	float z = depth * 2.0f - 1.0f; 
-// 	return (2.0f * NEAR_PLANE * FAR_PLANE) / (FAR_PLANE + NEAR_PLANE - z * (FAR_PLANE - NEAR_PLANE));	
+//     float z = depth * 2.0f - 1.0f; 
+//     return (2.0f * NEAR_PLANE * FAR_PLANE) / (FAR_PLANE + NEAR_PLANE - z * (FAR_PLANE - NEAR_PLANE));    
 // }
 
 void main() 
 {
-	outPosition = vec4(inWorldPos, 1.0);
+    outPosition = vec4(inWorldPos, 1.0);
 
-	vec3 N = normalize(inNormal);
-	// N.y = -N.y;
-	outNormal = vec4(N, 1.0);
+    vec3 N = normalize(inNormal);
+    // N.y = -N.y;
+    outNormal = vec4(N, 1.0);
 
-	// outAlbedo.rgb = inColor;
-	outAlbedo = vec4(inColor, 1.0);
+    // outAlbedo.rgb = inColor;
+    outAlbedo = vec4(inColor, 1.0);
 
-	// Store linearized depth in alpha component
-	// outPosition.a = linearDepth(gl_FragCoord.z);
+    // Store linearized depth in alpha component
+    // outPosition.a = linearDepth(gl_FragCoord.z);
 
-	// Write color attachments to avoid undefined behaviour (validation error)
-	// outColor = vec4(0.0);
+    // Write color attachments to avoid undefined behaviour (validation error)
+    // outColor = vec4(0.0);
 }

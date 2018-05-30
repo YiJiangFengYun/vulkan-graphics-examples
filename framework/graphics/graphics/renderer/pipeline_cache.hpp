@@ -10,11 +10,11 @@
 
 namespace boost {
     template<> 
-	struct hash<vk::RenderPass> {
-		size_t operator()(const vk::RenderPass& renderPass) const {
+    struct hash<vk::RenderPass> {
+        size_t operator()(const vk::RenderPass& renderPass) const {
             return hash<VkRenderPass>()((VkRenderPass)renderPass);
-		}
-	};
+        }
+    };
 }
 
 namespace vg {
@@ -52,7 +52,7 @@ namespace vg {
 
             InfoFullKey(Info info);
             InfoFullKey(const InfoFullKey &);
-			InfoFullKey& operator=(const InfoFullKey &);
+            InfoFullKey& operator=(const InfoFullKey &);
             InfoFullKey() = delete;
         };
 

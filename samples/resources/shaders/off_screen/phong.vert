@@ -10,8 +10,8 @@ layout (location = 3) in vec3 inNormal;
 
 layout(binding = 0) uniform BuildIn {
     mat4 matrixObjectToNDC;
-	mat4 matrixObjectToView;
-	vec4 lightPos;
+    mat4 matrixObjectToView;
+    vec4 lightPos;
 } _buildIn;
 
 layout (location = 0) out vec3 outNormal;
@@ -21,20 +21,20 @@ layout (location = 3) out vec3 outLightVec;
 
 out gl_PerVertex
 {
-	vec4 gl_Position;
-	float gl_ClipDistance[];
+    vec4 gl_Position;
+    float gl_ClipDistance[];
 };
 
 void main() 
 {
-	outNormal = mat3(_buildIn.matrixObjectToView) * inNormal;
-	outColor = inColor;
-	gl_Position = _buildIn.matrixObjectToNDC * inPos;
-	outPos = vec3(_buildIn.matrixObjectToView * inPos);
-	outLightVec = normalize(_buildIn.lightPos.xyz - outPos);
+    outNormal = mat3(_buildIn.matrixObjectToView) * inNormal;
+    outColor = inColor;
+    gl_Position = _buildIn.matrixObjectToNDC * inPos;
+    outPos = vec3(_buildIn.matrixObjectToView * inPos);
+    outLightVec = normalize(_buildIn.lightPos.xyz - outPos);
 
-	// Clip against reflection plane
-	// vec4 clipPlane = vec4(0.0, -1.0, 0.0, 1.5);
-	vec4 clipPlane = vec4(0.0, 1.0, 0.0, 0.0);
-	gl_ClipDistance[0] = dot(inPos, clipPlane);	
+    // Clip against reflection plane
+    // vec4 clipPlane = vec4(0.0, -1.0, 0.0, 1.5);
+    vec4 clipPlane = vec4(0.0, 1.0, 0.0, 0.0);
+    gl_ClipDistance[0] = dot(inPos, clipPlane);    
 }

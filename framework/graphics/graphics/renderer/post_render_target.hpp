@@ -11,7 +11,7 @@ namespace vg
     {
     public:
         static const vk::Format DEFAULT_COLOR_FORMAT;
-		static const vk::Format DEFAULT_DEPTH_STENCIL_FORMAT;
+        static const vk::Format DEFAULT_DEPTH_STENCIL_FORMAT;
         PostRenderTarget(uint32_t framebufferWidth = 0u
             , uint32_t framebufferHeight = 0u
             , vk::Format colorImageFormat = DEFAULT_COLOR_FORMAT
@@ -28,14 +28,14 @@ namespace vg
         const vk::Framebuffer *getFramebuffer() const;
     private:
         uint32_t m_framebufferWidth;
-		uint32_t m_framebufferHeight;
+        uint32_t m_framebufferHeight;
         vk::Format m_colorImageFormat;
-		vk::Format m_depthStencilImageFormat;
+        vk::Format m_depthStencilImageFormat;
         fd::Rect2D m_renderArea;
-		std::shared_ptr<Texture2DColorAttachment> m_pColorAttachment;
-		std::shared_ptr<TextureDepthStencilAttachment> m_pDepthStencilAttachment;
-		std::shared_ptr<vk::RenderPass> m_pRenderPass;
-		std::shared_ptr<vk::Framebuffer> m_pFramebuffer;
+        std::shared_ptr<Texture2DColorAttachment> m_pColorAttachment;
+        std::shared_ptr<TextureDepthStencilAttachment> m_pDepthStencilAttachment;
+        std::shared_ptr<vk::RenderPass> m_pRenderPass;
+        std::shared_ptr<vk::Framebuffer> m_pFramebuffer;
 
         void _createObjs();
     };

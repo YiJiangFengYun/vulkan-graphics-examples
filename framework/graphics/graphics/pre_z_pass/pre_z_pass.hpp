@@ -27,21 +27,21 @@ namespace vg
         void setBuildInDataInfo(Pass::BuildInDataInfo info);
         void _setBuildInMatrixData(Pass::BuildInDataType type, Matrix4x4 matrix);
 
-		void setPolygonMode(vk::PolygonMode polygonMode);
+        void setPolygonMode(vk::PolygonMode polygonMode);
 
-		void setCullMode(vk::CullModeFlags cullMode);
+        void setCullMode(vk::CullModeFlags cullMode);
 
-		void setFrontFace(vk::FrontFace frontFace);
+        void setFrontFace(vk::FrontFace frontFace);
 
-		void setLineWidth(float lineWidth);
+        void setLineWidth(float lineWidth);
 
-		void setViewport(const fd::Viewport &viewport);
+        void setViewport(const fd::Viewport &viewport);
 
-		void setScissor(const fd::Rect2D &scissor);
+        void setScissor(const fd::Rect2D &scissor);
 
-		void setDepthStencilInfo(const vk::PipelineDepthStencilStateCreateInfo &value);
+        void setDepthStencilInfo(const vk::PipelineDepthStencilStateCreateInfo &value);
 
-		void setDefaultInputAssemblyState(vk::PipelineInputAssemblyStateCreateInfo & value);
+        void setDefaultInputAssemblyState(vk::PipelineInputAssemblyStateCreateInfo & value);
 
         void setVertexInputFilterInfo(const Pass::VertexInputFilterInfo &value);
 

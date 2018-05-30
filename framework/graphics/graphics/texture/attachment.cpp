@@ -2,25 +2,25 @@
 
 namespace vg
 {
-	BaseColorAttachment::BaseColorAttachment(Bool32 isInputUsage)
-	    : m_isInputUsage(isInputUsage)
-	{
+    BaseColorAttachment::BaseColorAttachment(Bool32 isInputUsage)
+        : m_isInputUsage(isInputUsage)
+    {
 
-	}
+    }
 
     BaseColorAttachment::~BaseColorAttachment()
-	{
+    {
 
-	}
+    }
 
-	BaseDepthStencilAttachment::BaseDepthStencilAttachment(Bool32 isInputUsage)
-	    : m_isInputUsage(isInputUsage)
-	{
+    BaseDepthStencilAttachment::BaseDepthStencilAttachment(Bool32 isInputUsage)
+        : m_isInputUsage(isInputUsage)
+    {
 
-	}
+    }
 
-	BaseDepthStencilAttachment::~BaseDepthStencilAttachment()
-	{
-		
-	}
+    BaseDepthStencilAttachment::~BaseDepthStencilAttachment()
+    {
+        
+    }
 } //vg

@@ -1,7 +1,7 @@
     O1P1     O2P2     O3P2     O4P3               O5P4                O6P2
 +---------+-------+---------+======--------+==============---------+-------+    (main cmd execute sequence)
         
-	O2P1	
+    O2P1    
 +---------+                                                                     (Object 2 pass 1 execute sequence)
 
     O3P1

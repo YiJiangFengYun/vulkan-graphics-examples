@@ -457,7 +457,7 @@ namespace vg
      Bool32 Pass::hasSpecializationInfo(vk::ShaderStageFlagBits shaderStage) const
      {
         const auto &iterator = m_mapSpecializationAppliedData.find(shaderStage);
-	    if (iterator == m_mapSpecializationAppliedData.cend())
+        if (iterator == m_mapSpecializationAppliedData.cend())
         {
             return VG_FALSE;
         }
@@ -470,29 +470,29 @@ namespace vg
     const vk::SpecializationInfo &Pass::getSpecializationInfo(vk::ShaderStageFlagBits shaderStage) const
     {
         const auto &iterator = m_mapSpecializationAppliedData.find(shaderStage);
-	    if (iterator == m_mapSpecializationAppliedData.cend())
-	    {
-	    	throw std::runtime_error("Don't has the specialization info, its shader stage is : " + 
+        if (iterator == m_mapSpecializationAppliedData.cend())
+        {
+            throw std::runtime_error("Don't has the specialization info, its shader stage is : " + 
                 std::to_string(static_cast<uint32_t>(shaderStage)));
-	    }
-	    else
-	    {
-	    	return iterator->second.info;
-	    }
+        }
+        else
+        {
+            return iterator->second.info;
+        }
     }
 
     const PassSpecializationData &Pass::getSpecializationData(vk::ShaderStageFlagBits shaderStage) const
     {
         const auto &iterator = m_mapSpecilizationDatas.find(shaderStage);
-	    if (iterator == m_mapSpecilizationDatas.cend())
-	    {
-	    	throw std::runtime_error("Don't has the specialization data, its shader stage is : " + 
+        if (iterator == m_mapSpecilizationDatas.cend())
+        {
+            throw std::runtime_error("Don't has the specialization data, its shader stage is : " + 
                 std::to_string(static_cast<uint32_t>(shaderStage)));
-	    }
-	    else
-	    {
-	    	return iterator->second;
-	    }
+        }
+        else
+        {
+            return iterator->second;
+        }
     }
 
     const PassSpecializationData &Pass::getSpecializationData(vk::ShaderStageFlagBits shaderStage)
@@ -503,14 +503,14 @@ namespace vg
     Bool32 Pass::hasSpecializationItem(vk::ShaderStageFlagBits shaderStage, std::string name) const
     {
         const auto &iterator = m_mapSpecilizationDatas.find(shaderStage);
-	    if (iterator == m_mapSpecilizationDatas.cend())
-	    {
-	    	return VG_FALSE;
-	    }
-	    else
-	    {
-	    	return iterator->second.hasSpecialization(name);
-	    }
+        if (iterator == m_mapSpecilizationDatas.cend())
+        {
+            return VG_FALSE;
+        }
+        else
+        {
+            return iterator->second.hasSpecialization(name);
+        }
     }
     
     void Pass::addSpecializationItem(vk::ShaderStageFlagBits shaderStage

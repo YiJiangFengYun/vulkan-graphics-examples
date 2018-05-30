@@ -3,14 +3,14 @@
 
 namespace vgf
 {
-	class Entity
-	{
-	public:
-		Entity();
-		~Entity();
-	private:
+    class Entity
+    {
+    public:
+        Entity();
+        ~Entity();
+    private:
 
-	};
+    };
 }
 
 #endif // !VGF_ENTITY_H

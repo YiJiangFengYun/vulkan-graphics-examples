@@ -5,14 +5,14 @@
 
 namespace chalet
 {
-	class App : public sampleslib::App
-	{
-	public:
-		App();
+    class App : public sampleslib::App
+    {
+    public:
+        App();
 
-	private:
+    private:
 
-	};
+    };
 }
 
 #endif // !APP_H

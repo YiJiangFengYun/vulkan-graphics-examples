@@ -10,9 +10,9 @@ layout (binding = 0) uniform BuildIn
 
 out gl_PerVertex
 {
-	vec4 gl_Position;
+    vec4 gl_Position;
 };
 void main()
 {
-	gl_Position = _buildIn.matrixToNDC * inPos;
+    gl_Position = _buildIn.matrixToNDC * inPos;
 }

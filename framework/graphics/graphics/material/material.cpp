@@ -2,11 +2,11 @@
 
 namespace vg
 {
-	Material::BindInfo::BindInfo(const Matrix4x4 *pProjMatrix
+    Material::BindInfo::BindInfo(const Matrix4x4 *pProjMatrix
         , const Matrix4x4 *pViewMatrix
-		, uint32_t trunkFramebufferWidth
-		, uint32_t trunkFramebufferHeight
-		, InstanceID objectID
+        , uint32_t trunkFramebufferWidth
+        , uint32_t trunkFramebufferHeight
+        , InstanceID objectID
         , const Matrix4x4 *pModelMatrix
         , const BaseMesh *pMesh
         , uint32_t subMeshIndex
@@ -19,10 +19,10 @@ namespace vg
         )
         : pProjMatrix(pProjMatrix)
         , pViewMatrix(pViewMatrix)
-		, trunkFramebufferWidth(trunkFramebufferWidth)
-		, trunkFramebufferHeight(trunkFramebufferHeight)
-		, objectID(objectID)
-		, pModelMatrix(pModelMatrix)
+        , trunkFramebufferWidth(trunkFramebufferWidth)
+        , trunkFramebufferHeight(trunkFramebufferHeight)
+        , objectID(objectID)
+        , pModelMatrix(pModelMatrix)
         , pMesh(pMesh)
         , subMeshIndex(subMeshIndex)
         , hasClipRect(hasClipRect)
@@ -35,174 +35,174 @@ namespace vg
     }
 
     Material::BindResult::BindResult(CmdBuffer *pPreZCmdBuffer
-	    , CmdBuffer *pBranchCmdBuffer
+        , CmdBuffer *pBranchCmdBuffer
         , CmdBuffer *pTrunkRenderPassCmdBuffer
         , CmdBuffer *pTrunkWaitBarrierCmdBuffer
         )
-	    : pPreZCmdBuffer(pPreZCmdBuffer)
-		, pBranchCmdBuffer(pBranchCmdBuffer)
+        : pPreZCmdBuffer(pPreZCmdBuffer)
+        , pBranchCmdBuffer(pBranchCmdBuffer)
         , pTrunkRenderPassCmdBuffer(pTrunkRenderPassCmdBuffer)
         , pTrunkWaitBarrierCmdBuffer(pTrunkWaitBarrierCmdBuffer)
     {
 
     }
 
-	Material::EndBindInfo::EndBindInfo(InstanceID objectID
-	    , uint32_t subMeshIndex
-		)
-	    : objectID(objectID)
-		, subMeshIndex(subMeshIndex)
-	{
-
-	}
-
-	Material::MaterialCreateInfo::MaterialCreateInfo(Bool32 onlyOnce
-	    , Bool32 createPreZPass
-	    )
-		: onlyOnce(onlyOnce)
-		, createPreZPass(createPreZPass) 
-
-	{
-
-	}
-
-	Material::Material(Bool32 onlyOnce)
-		: Base(BaseType::MATERIAL)
-		, name()
-		, m_onlyOnce(onlyOnce)
-		, m_pBindTargetID(std::shared_ptr<InstanceID>{new InstanceID(0)})
-		, m_renderQueueType()
-		, m_renderPriority()
-		, m_arrPasses()
-		, m_mapPasses()
-		, m_pMainShader()
-		, m_pMainPass()
-		, m_pPreZPass()
-	{
-		m_pMainShader = std::shared_ptr<vg::Shader>{new vg::Shader()};
-		m_pMainPass = std::shared_ptr<vg::Pass>{ new vg::Pass(m_pMainShader.get())};
-		_addPass(m_pMainPass.get());
-	}
-
-	Material::Material(MaterialCreateInfo createInfo)
-	    : Material(createInfo.onlyOnce)
-	{
-		if (createInfo.createPreZPass) {
-			m_pPreZPass = std::shared_ptr<PreZPass>{new PreZPass()};
-		}
-	}
-
-	Material::~Material()
-	{
-	}
-
-	uint32_t Material::getPassCount() const
-	{
-		return static_cast<uint32_t>(m_arrPasses.size());
-	}
-
-	const Pass *Material::getPassWithIndex(uint32_t index) const
-	{
-		return m_arrPasses[index];
-	}
-
-	Pass *Material::getPassWithIndex(uint32_t index)
-	{
-		return m_arrPasses[index];
-	}
-
-	const Pass * const *Material::getPasses() const
-	{
-		return m_arrPasses.data();
-	}
-
-	Pass * const *Material::getPasses()
-	{
-		return m_arrPasses.data();
-	}
-
-	Bool32 Material::isHas(const Pass *pass) const
-	{
-		return m_mapPasses.find(pass->getID()) != m_mapPasses.cend();
-	}
-
-
-	const Shader *Material::getMainShader() const 
-	{
-		return m_pMainShader.get();
-	}
-
-	Shader *Material::getMainShader()
-	{
-		return m_pMainShader.get();
-	}
-
-	const Pass *Material::getMainPass() const
-	{
-		return m_pMainPass.get();
-	}
-
-	Pass *Material::getMainPass()
-	{
-		return m_pMainPass.get();
-	}
-
-	const PreZPass * Material::getPreZPass() const
-	{
-		return m_pPreZPass.get();
-	}
-
-	PreZPass * Material::getPreZPass()
-	{
-		return m_pPreZPass.get();
-	}
-
-	void Material::apply()
-	{
-		for (const auto& item : m_mapPasses)
-		{
-			item.second->apply();
-		}
-		if (m_pPreZPass != nullptr)
-		{
-			m_pPreZPass->apply();
-		}
-	}
-
-	MaterialShowType Material::getShowType()
-	{
-		return m_renderQueueType;
-	}
-
-	void Material::setRenderQueueType(MaterialShowType type)
-	{
-		m_renderQueueType = type;
-	}
-
-	uint32_t Material::getRenderPriority()
-	{
-		return m_renderPriority;
-	}
-
-	void Material::setRenderPriority(uint32_t priority)
-	{
-		m_renderPriority = priority;
-	}
-
-	void Material::beginBind(const BindInfo info, BindResult *pResult) const
+    Material::EndBindInfo::EndBindInfo(InstanceID objectID
+        , uint32_t subMeshIndex
+        )
+        : objectID(objectID)
+        , subMeshIndex(subMeshIndex)
     {
-		if (m_onlyOnce == VG_TRUE) {
-			if (*m_pBindTargetID != 0) 
-			    throw std::runtime_error("The material binding is only once, but it was used to repeatedly bind.");
-			*m_pBindTargetID = info.objectID;
-		}
 
-		auto &result = *pResult;
-		if (m_pPreZPass != nullptr && result.pPreZCmdBuffer != nullptr)
-		{
+    }
+
+    Material::MaterialCreateInfo::MaterialCreateInfo(Bool32 onlyOnce
+        , Bool32 createPreZPass
+        )
+        : onlyOnce(onlyOnce)
+        , createPreZPass(createPreZPass) 
+
+    {
+
+    }
+
+    Material::Material(Bool32 onlyOnce)
+        : Base(BaseType::MATERIAL)
+        , name()
+        , m_onlyOnce(onlyOnce)
+        , m_pBindTargetID(std::shared_ptr<InstanceID>{new InstanceID(0)})
+        , m_renderQueueType()
+        , m_renderPriority()
+        , m_arrPasses()
+        , m_mapPasses()
+        , m_pMainShader()
+        , m_pMainPass()
+        , m_pPreZPass()
+    {
+        m_pMainShader = std::shared_ptr<vg::Shader>{new vg::Shader()};
+        m_pMainPass = std::shared_ptr<vg::Pass>{ new vg::Pass(m_pMainShader.get())};
+        _addPass(m_pMainPass.get());
+    }
+
+    Material::Material(MaterialCreateInfo createInfo)
+        : Material(createInfo.onlyOnce)
+    {
+        if (createInfo.createPreZPass) {
+            m_pPreZPass = std::shared_ptr<PreZPass>{new PreZPass()};
+        }
+    }
+
+    Material::~Material()
+    {
+    }
+
+    uint32_t Material::getPassCount() const
+    {
+        return static_cast<uint32_t>(m_arrPasses.size());
+    }
+
+    const Pass *Material::getPassWithIndex(uint32_t index) const
+    {
+        return m_arrPasses[index];
+    }
+
+    Pass *Material::getPassWithIndex(uint32_t index)
+    {
+        return m_arrPasses[index];
+    }
+
+    const Pass * const *Material::getPasses() const
+    {
+        return m_arrPasses.data();
+    }
+
+    Pass * const *Material::getPasses()
+    {
+        return m_arrPasses.data();
+    }
+
+    Bool32 Material::isHas(const Pass *pass) const
+    {
+        return m_mapPasses.find(pass->getID()) != m_mapPasses.cend();
+    }
+
+
+    const Shader *Material::getMainShader() const 
+    {
+        return m_pMainShader.get();
+    }
+
+    Shader *Material::getMainShader()
+    {
+        return m_pMainShader.get();
+    }
+
+    const Pass *Material::getMainPass() const
+    {
+        return m_pMainPass.get();
+    }
+
+    Pass *Material::getMainPass()
+    {
+        return m_pMainPass.get();
+    }
+
+    const PreZPass * Material::getPreZPass() const
+    {
+        return m_pPreZPass.get();
+    }
+
+    PreZPass * Material::getPreZPass()
+    {
+        return m_pPreZPass.get();
+    }
+
+    void Material::apply()
+    {
+        for (const auto& item : m_mapPasses)
+        {
+            item.second->apply();
+        }
+        if (m_pPreZPass != nullptr)
+        {
+            m_pPreZPass->apply();
+        }
+    }
+
+    MaterialShowType Material::getShowType()
+    {
+        return m_renderQueueType;
+    }
+
+    void Material::setRenderQueueType(MaterialShowType type)
+    {
+        m_renderQueueType = type;
+    }
+
+    uint32_t Material::getRenderPriority()
+    {
+        return m_renderPriority;
+    }
+
+    void Material::setRenderPriority(uint32_t priority)
+    {
+        m_renderPriority = priority;
+    }
+
+    void Material::beginBind(const BindInfo info, BindResult *pResult) const
+    {
+        if (m_onlyOnce == VG_TRUE) {
+            if (*m_pBindTargetID != 0) 
+                throw std::runtime_error("The material binding is only once, but it was used to repeatedly bind.");
+            *m_pBindTargetID = info.objectID;
+        }
+
+        auto &result = *pResult;
+        if (m_pPreZPass != nullptr && result.pPreZCmdBuffer != nullptr)
+        {
             RenderPassInfo trunkRenderPassInfo;
             trunkRenderPassInfo.pRenderPass = nullptr;
-            trunkRenderPassInfo.pFrameBuffer = nullptr;			
+            trunkRenderPassInfo.pFrameBuffer = nullptr;            
             trunkRenderPassInfo.framebufferWidth = info.trunkFramebufferWidth;
             trunkRenderPassInfo.framebufferHeight = info.trunkFramebufferHeight;
             trunkRenderPassInfo.projMatrix = *(info.pProjMatrix);
@@ -216,42 +216,42 @@ namespace vg
             CmdInfo cmdInfo;
             cmdInfo.pRenderPassInfo = &trunkRenderPassInfo;
             result.pPreZCmdBuffer->addCmd(cmdInfo);
-		}
+        }
 
-		_beginBind(info, pResult);
+        _beginBind(info, pResult);
 
     }
 
-	void Material::endBind(const EndBindInfo info) const
-	{
-		if (m_onlyOnce == VG_TRUE) {
-			*m_pBindTargetID = 0;
-		}
+    void Material::endBind(const EndBindInfo info) const
+    {
+        if (m_onlyOnce == VG_TRUE) {
+            *m_pBindTargetID = 0;
+        }
 
-		_endBind(info);
-		
-	}
+        _endBind(info);
+        
+    }
 
-	void Material::_addPass(Pass *pPass)
-	{
-		if (isHas(pPass)) return;
-		m_arrPasses.push_back(pPass);
-		m_mapPasses[pPass->getID()] = pPass;
-	}
+    void Material::_addPass(Pass *pPass)
+    {
+        if (isHas(pPass)) return;
+        m_arrPasses.push_back(pPass);
+        m_mapPasses[pPass->getID()] = pPass;
+    }
 
-	void Material::_removePass(Pass *pPass)
-	{
-		if (isHas(pPass) == VG_FALSE) return;
-		m_arrPasses.erase(std::remove(m_arrPasses.begin(), m_arrPasses.end(), pPass));
-		m_mapPasses.erase(pPass->getID());
-	}
+    void Material::_removePass(Pass *pPass)
+    {
+        if (isHas(pPass) == VG_FALSE) return;
+        m_arrPasses.erase(std::remove(m_arrPasses.begin(), m_arrPasses.end(), pPass));
+        m_mapPasses.erase(pPass->getID());
+    }
 
     void Material::_beginBind(const BindInfo info, BindResult *pResult) const
     {
-		auto &result = *pResult;
+        auto &result = *pResult;
         RenderPassInfo trunkRenderPassInfo;
         trunkRenderPassInfo.pRenderPass = nullptr;
-        trunkRenderPassInfo.pFrameBuffer = nullptr;			
+        trunkRenderPassInfo.pFrameBuffer = nullptr;            
         trunkRenderPassInfo.framebufferWidth = info.trunkFramebufferWidth;
         trunkRenderPassInfo.framebufferHeight = info.trunkFramebufferHeight;
         trunkRenderPassInfo.projMatrix = *(info.pProjMatrix);
@@ -266,10 +266,10 @@ namespace vg
         cmdInfo.pRenderPassInfo = &trunkRenderPassInfo;
         result.pTrunkRenderPassCmdBuffer->addCmd(cmdInfo);
         
-	}
-	
-	void Material::_endBind(const EndBindInfo info) const
-	{
+    }
+    
+    void Material::_endBind(const EndBindInfo info) const
+    {
 
-	}
+    }
 }

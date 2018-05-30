@@ -10,13 +10,13 @@ namespace sampleslib
     public:
         enum class VertexLayoutComponent {
             VERTEX_COMPONENT_POSITION = 0x0,
-		    VERTEX_COMPONENT_NORMAL = 0x1,
-		    VERTEX_COMPONENT_COLOR = 0x2,
-		    VERTEX_COMPONENT_UV = 0x3,
-		    VERTEX_COMPONENT_TANGENT = 0x4,
-		    VERTEX_COMPONENT_BITANGENT = 0x5,
-		    VERTEX_COMPONENT_DUMMY_FLOAT = 0x6,
-		    VERTEX_COMPONENT_DUMMY_VEC4 = 0x7
+            VERTEX_COMPONENT_NORMAL = 0x1,
+            VERTEX_COMPONENT_COLOR = 0x2,
+            VERTEX_COMPONENT_UV = 0x3,
+            VERTEX_COMPONENT_TANGENT = 0x4,
+            VERTEX_COMPONENT_BITANGENT = 0x5,
+            VERTEX_COMPONENT_DUMMY_FLOAT = 0x6,
+            VERTEX_COMPONENT_DUMMY_VEC4 = 0x7
         };
 
         struct CreateInfo {
@@ -52,7 +52,7 @@ namespace sampleslib
     protected:
         void _init(const CreateInfo &createInfo);
         std::shared_ptr<vg::VertexData> m_pSharedVertexData;
-		std::shared_ptr<vg::IndexData> m_pSharedIndexData;
+        std::shared_ptr<vg::IndexData> m_pSharedIndexData;
         std::vector<std::shared_ptr<vg::DimSharedContentMesh3>> m_pMeshes;
         std::vector<std::shared_ptr<vg::VisualObject3>> m_pObjects;
     private:

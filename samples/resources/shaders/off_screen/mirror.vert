@@ -17,12 +17,12 @@ layout (location = 1) out vec4 outPos;
 
 out gl_PerVertex
 {
-	vec4 gl_Position;
+    vec4 gl_Position;
 };
 
 void main() 
 {
-	outUV = inUV;
-	outPos = _buildIn.matrixObjectToNDC * vec4(inPos.xyz, 1.0);
-	gl_Position = outPos;		
+    outUV = inUV;
+    outPos = _buildIn.matrixObjectToNDC * vec4(inPos.xyz, 1.0);
+    gl_Position = outPos;        
 }

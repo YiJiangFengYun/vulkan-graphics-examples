@@ -35,16 +35,16 @@ namespace sampleslib
         : m_pMeshes()
         , m_pObjects()
         , m_pSharedVertexData(new vg::VertexData())
-		, m_pSharedIndexData(new vg::IndexData())
-	{
-		
-	}
+        , m_pSharedIndexData(new vg::IndexData())
+    {
+        
+    }
 
     AssimpScene::AssimpScene(const CreateInfo &createInfo)
         : m_pMeshes()
         , m_pObjects()
         , m_pSharedVertexData(new vg::VertexData())
-		, m_pSharedIndexData(new vg::IndexData())
+        , m_pSharedIndexData(new vg::IndexData())
     {
     }
 
@@ -113,7 +113,7 @@ namespace sampleslib
                         break;
                     default:
                         // All components except the ones listed above are made up of 3 floats
-			    		stride += 3u * static_cast<uint32_t>(sizeof(float));
+                        stride += 3u * static_cast<uint32_t>(sizeof(float));
                         format = vk::Format::eR32G32B32Sfloat;
                     }
     
@@ -182,7 +182,7 @@ namespace sampleslib
                     vertexCounts[i] = vertexCount;
 
                     uint32_t vertexBufferSize = vertexSize * vertexCount;
-					uint32_t indexCount = 0u;
+                    uint32_t indexCount = 0u;
                     uint32_t indexBufferSize = 0u;          
                     for (uint32_t j = 0; j < vertexCount; ++j)
                     {
@@ -199,10 +199,10 @@ namespace sampleslib
                         int32_t yDelta = createInfo.isRightHand ? 1 : -1; //If it is right hand, y will be inversed.
                         for (componentIndex = 0u; componentIndex < componentCount; ++componentIndex)
                         {
-							switch (*(pComponent + componentIndex))
-							{
-							case VertexLayoutComponent::VERTEX_COMPONENT_POSITION:
-							{
+                            switch (*(pComponent + componentIndex))
+                            {
+                            case VertexLayoutComponent::VERTEX_COMPONENT_POSITION:
+                            {
                                 float x = pPos->x;
                                 float y;
                                 float z = pPos->z;
@@ -217,91 +217,91 @@ namespace sampleslib
                                 }
                                 else 
                                 {
-								    y = pPos->y;
+                                    y = pPos->y;
                                 }
 
-								x = x * scale.x + offset.x;
-								y = y * scale.y + offset.y;
-								z = z * scale.z + offset.z;
-								vertexBuffer.push_back(x);
-								vertexBuffer.push_back(y);
-								vertexBuffer.push_back(z);
+                                x = x * scale.x + offset.x;
+                                y = y * scale.y + offset.y;
+                                z = z * scale.z + offset.z;
+                                vertexBuffer.push_back(x);
+                                vertexBuffer.push_back(y);
+                                vertexBuffer.push_back(z);
 
-								//bounds...
-								if (minOfBounds.x > x)minOfBounds.x = x;
-								if (minOfBounds.y > y)minOfBounds.y = y;
-								if (minOfBounds.z > z)minOfBounds.z = z;
+                                //bounds...
+                                if (minOfBounds.x > x)minOfBounds.x = x;
+                                if (minOfBounds.y > y)minOfBounds.y = y;
+                                if (minOfBounds.z > z)minOfBounds.z = z;
 
-								if (maxOfBounds.x < x)maxOfBounds.x = x;
-								if (maxOfBounds.y < y)maxOfBounds.y = y;
-								if (maxOfBounds.z < z)maxOfBounds.z = z;
+                                if (maxOfBounds.x < x)maxOfBounds.x = x;
+                                if (maxOfBounds.y < y)maxOfBounds.y = y;
+                                if (maxOfBounds.z < z)maxOfBounds.z = z;
 
-								break;
-							}
-							case VertexLayoutComponent::VERTEX_COMPONENT_NORMAL:
-							{
-								float x = pNormal->x;
-								float y;
-								float z = pNormal->z;
-								if (! createInfo.isRightHand) {
-									y = - pNormal->y;
-									vg::Vector4 temp(x, y, z, 0.0f);
-									vg::Quaternion tempQ(vg::Vector3(glm::radians(180.0f), glm::radians(0.0f), glm::radians(0.0f)));
-									temp = tempQ * temp;
+                                break;
+                            }
+                            case VertexLayoutComponent::VERTEX_COMPONENT_NORMAL:
+                            {
+                                float x = pNormal->x;
+                                float y;
+                                float z = pNormal->z;
+                                if (! createInfo.isRightHand) {
+                                    y = - pNormal->y;
+                                    vg::Vector4 temp(x, y, z, 0.0f);
+                                    vg::Quaternion tempQ(vg::Vector3(glm::radians(180.0f), glm::radians(0.0f), glm::radians(0.0f)));
+                                    temp = tempQ * temp;
                                     temp = glm::normalize(temp);
-									x = temp.x;
-									y = temp.y;
-									z = temp.z;
-								}
-								else {
-									y = pNormal->y;
-								}
-								vertexBuffer.push_back(x);
-								vertexBuffer.push_back(y);
-								vertexBuffer.push_back(z);
-								break;
-							}
-							case VertexLayoutComponent::VERTEX_COMPONENT_UV:
-							{
-								vertexBuffer.push_back(pTexCoord->x * uvScale.s);
-								vertexBuffer.push_back(pTexCoord->y * uvScale.t);
-								break;
-							}
-							case VertexLayoutComponent::VERTEX_COMPONENT_COLOR:
-							{
-								vertexBuffer.push_back(pColor->r * diffuseColor.r);
-								vertexBuffer.push_back(pColor->g * diffuseColor.g);
-								vertexBuffer.push_back(pColor->b * diffuseColor.b);
-								break;
-							}
-							case VertexLayoutComponent::VERTEX_COMPONENT_TANGENT:
-							{
-								vertexBuffer.push_back(pTangent->x);
-								vertexBuffer.push_back(yDelta * pTangent->y);
-								vertexBuffer.push_back(pTangent->z);
-								break;
-							}
-							case VertexLayoutComponent::VERTEX_COMPONENT_BITANGENT:
-							{
-								vertexBuffer.push_back(pBitangent->x);
-								vertexBuffer.push_back(yDelta * pBitangent->y);
-								vertexBuffer.push_back(pBitangent->z);
-								break;
-							}
-							// Dummy components for padding
-							case VertexLayoutComponent::VERTEX_COMPONENT_DUMMY_FLOAT:
-							{
-								vertexBuffer.push_back(0.0f);
-								break;
-							}
-							case VertexLayoutComponent::VERTEX_COMPONENT_DUMMY_VEC4:
-							{
-								vertexBuffer.push_back(0.0f);
-								vertexBuffer.push_back(0.0f);
-								vertexBuffer.push_back(0.0f);
-								vertexBuffer.push_back(0.0f);
-								break;
-							}
+                                    x = temp.x;
+                                    y = temp.y;
+                                    z = temp.z;
+                                }
+                                else {
+                                    y = pNormal->y;
+                                }
+                                vertexBuffer.push_back(x);
+                                vertexBuffer.push_back(y);
+                                vertexBuffer.push_back(z);
+                                break;
+                            }
+                            case VertexLayoutComponent::VERTEX_COMPONENT_UV:
+                            {
+                                vertexBuffer.push_back(pTexCoord->x * uvScale.s);
+                                vertexBuffer.push_back(pTexCoord->y * uvScale.t);
+                                break;
+                            }
+                            case VertexLayoutComponent::VERTEX_COMPONENT_COLOR:
+                            {
+                                vertexBuffer.push_back(pColor->r * diffuseColor.r);
+                                vertexBuffer.push_back(pColor->g * diffuseColor.g);
+                                vertexBuffer.push_back(pColor->b * diffuseColor.b);
+                                break;
+                            }
+                            case VertexLayoutComponent::VERTEX_COMPONENT_TANGENT:
+                            {
+                                vertexBuffer.push_back(pTangent->x);
+                                vertexBuffer.push_back(yDelta * pTangent->y);
+                                vertexBuffer.push_back(pTangent->z);
+                                break;
+                            }
+                            case VertexLayoutComponent::VERTEX_COMPONENT_BITANGENT:
+                            {
+                                vertexBuffer.push_back(pBitangent->x);
+                                vertexBuffer.push_back(yDelta * pBitangent->y);
+                                vertexBuffer.push_back(pBitangent->z);
+                                break;
+                            }
+                            // Dummy components for padding
+                            case VertexLayoutComponent::VERTEX_COMPONENT_DUMMY_FLOAT:
+                            {
+                                vertexBuffer.push_back(0.0f);
+                                break;
+                            }
+                            case VertexLayoutComponent::VERTEX_COMPONENT_DUMMY_VEC4:
+                            {
+                                vertexBuffer.push_back(0.0f);
+                                vertexBuffer.push_back(0.0f);
+                                vertexBuffer.push_back(0.0f);
+                                vertexBuffer.push_back(0.0f);
+                                break;
+                            }
                             }
                         }
                     }
@@ -354,23 +354,23 @@ namespace sampleslib
                 if (createInfo.multipleMesh)
                 {
                     pSharedVertexData->updateSubDataCount(vertexSubDataCount);
-		            if (vertexSubDataCount)
-		            {
-		            	const auto &firstSubVertexData = pSharedVertexData->getSubVertexDatas()[0];
-		            	pSharedVertexData->updateDesData(firstSubVertexData.vertexInputStateInfo);
-		            	pSharedVertexData->updateVertexCount(vertexCounts);
-		            	pSharedVertexData->updateBufferSize(vertexBufferSizes);
-		            }
+                    if (vertexSubDataCount)
+                    {
+                        const auto &firstSubVertexData = pSharedVertexData->getSubVertexDatas()[0];
+                        pSharedVertexData->updateDesData(firstSubVertexData.vertexInputStateInfo);
+                        pSharedVertexData->updateVertexCount(vertexCounts);
+                        pSharedVertexData->updateBufferSize(vertexBufferSizes);
+                    }
             
                     pSharedIndexData->updateSubDataCount(indexSubDataCount);
-		            if (indexSubDataCount)
-		            {
-		            	const auto &firstSubIndexData = pSharedIndexData->getSubIndexDatas()[0];
-		            	pSharedIndexData->updateDesData(firstSubIndexData.indexType, firstSubIndexData.inputAssemblyStateInfo);
-		            	pSharedIndexData->updateIndexCount(indexCounts);
-		            	pSharedIndexData->updateBufferSize(indexBufferSizes);
-		            	pSharedIndexData->updateVertexDataIndex(indexVertexDataIndices);
-		            }
+                    if (indexSubDataCount)
+                    {
+                        const auto &firstSubIndexData = pSharedIndexData->getSubIndexDatas()[0];
+                        pSharedIndexData->updateDesData(firstSubIndexData.indexType, firstSubIndexData.inputAssemblyStateInfo);
+                        pSharedIndexData->updateIndexCount(indexCounts);
+                        pSharedIndexData->updateBufferSize(indexBufferSizes);
+                        pSharedIndexData->updateVertexDataIndex(indexVertexDataIndices);
+                    }
                 } 
                 else
                 {
@@ -400,7 +400,7 @@ namespace sampleslib
                     }
                     pSharedIndexData->updateBufferSize(indexBufferSize);
 
-					std::array<uint32_t, 1> vertexDataIndex = { 0u };
+                    std::array<uint32_t, 1> vertexDataIndex = { 0u };
                     pSharedIndexData->updateVertexDataIndex(vertexDataIndex);
                 }
             }
@@ -416,15 +416,15 @@ namespace sampleslib
                     float x = boundses[i].getMin().x;
                     float y = boundses[i].getMin().y;
                     float z = boundses[i].getMin().z;
-					if (minOfBounds.x > x)minOfBounds.x = x;
-					if (minOfBounds.y > y)minOfBounds.y = y;
-					if (minOfBounds.z > z)minOfBounds.z = z;
+                    if (minOfBounds.x > x)minOfBounds.x = x;
+                    if (minOfBounds.y > y)minOfBounds.y = y;
+                    if (minOfBounds.z > z)minOfBounds.z = z;
                     x = boundses[i].getMax().x;
                     y = boundses[i].getMax().y;
                     z = boundses[i].getMax().z;
-					if (maxOfBounds.x < x)maxOfBounds.x = x;
-					if (maxOfBounds.y < y)maxOfBounds.y = y;
-					if (maxOfBounds.z < z)maxOfBounds.z = z;
+                    if (maxOfBounds.x < x)maxOfBounds.x = x;
+                    if (maxOfBounds.y < y)maxOfBounds.y = y;
+                    if (maxOfBounds.z < z)maxOfBounds.z = z;
                 }
                 integrateBounds.setMinMax(minOfBounds, maxOfBounds);
             }
@@ -446,7 +446,7 @@ namespace sampleslib
                     for (uint32_t i = 0; i < meshCount; ++i)
                     {
                         auto &pMesh = pMeshes[i];
-				    	pMesh = std::shared_ptr<vg::DimSharedContentMesh3>(new vg::DimSharedContentMesh3());
+                        pMesh = std::shared_ptr<vg::DimSharedContentMesh3>(new vg::DimSharedContentMesh3());
                         pMesh->init(pSharedVertexData, pSharedIndexData, i, 1u);
                         pMesh->setIsHasBounds(VG_TRUE);
                         pMesh->setBounds(boundses[i]);
@@ -477,8 +477,8 @@ namespace sampleslib
 
                     for (uint32_t i = 0; i < count; ++i)
                     {
-						pObjects[i] = std::shared_ptr<vg::VisualObject3>(new vg::VisualObject3());
-						pObjects[i]->setMesh(pMeshes[i].get());
+                        pObjects[i] = std::shared_ptr<vg::VisualObject3>(new vg::VisualObject3());
+                        pObjects[i]->setMesh(pMeshes[i].get());
                     }
                 }
                 else

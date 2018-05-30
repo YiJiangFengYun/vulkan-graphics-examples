@@ -19,16 +19,16 @@ namespace vg
 #define TEMP_TRANSPARENT TRANSPARENT
 #undef TRANSPARENT
 #endif //TRANSPARENT
-	enum class MaterialShowType
-	{
-		BACKGROUND,
-		OPAQUE,
-		TRANSPARENT,
-		OVERLAY,
-		BEGIN_RANGE = BACKGROUND,
-		END_RANGE = OVERLAY,
-		RANGE_SIZE = (END_RANGE - BEGIN_RANGE + 1)
-	};
+    enum class MaterialShowType
+    {
+        BACKGROUND,
+        OPAQUE,
+        TRANSPARENT,
+        OVERLAY,
+        BEGIN_RANGE = BACKGROUND,
+        END_RANGE = OVERLAY,
+        RANGE_SIZE = (END_RANGE - BEGIN_RANGE + 1)
+    };
 #ifdef TEMP_OPAQUE
 #define OPAQUE TEMP_OPAQUE
 #endif //TEMP_OPAQUE
@@ -37,7 +37,7 @@ namespace vg
 #define TRANSPARENT TEMP_TRANSPARENT
 #endif //TEMP_TRANSPARENT
 
-	
+    
 } //namespace kgs
 
 #endif // !VG_MATERIAL_DATA_H

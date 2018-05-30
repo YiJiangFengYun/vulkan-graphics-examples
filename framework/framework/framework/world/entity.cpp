@@ -2,11 +2,11 @@
 
 namespace vgf
 {
-	Entity::Entity()
-	{
-	}
+    Entity::Entity()
+    {
+    }
 
-	Entity::~Entity()
-	{
-	}
+    Entity::~Entity()
+    {
+    }
 }

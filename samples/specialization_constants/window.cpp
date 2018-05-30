@@ -33,7 +33,7 @@ Window::Window(std::shared_ptr<GLFWwindow> pWindow
 void Window::_init()
 {
     ParentWindowType::_init();
-    _loadAssimpScene();	
+    _loadAssimpScene();    
     _createTexture();
     _createMaterial();
     _createVisualObjects();
@@ -61,7 +61,7 @@ void Window::_loadAssimpScene()
         sampleslib::AssimpScene::VertexLayoutComponent::VERTEX_COMPONENT_POSITION,
         sampleslib::AssimpScene::VertexLayoutComponent::VERTEX_COMPONENT_NORMAL,
         sampleslib::AssimpScene::VertexLayoutComponent::VERTEX_COMPONENT_UV,
-        sampleslib::AssimpScene::VertexLayoutComponent::VERTEX_COMPONENT_COLOR	    				
+        sampleslib::AssimpScene::VertexLayoutComponent::VERTEX_COMPONENT_COLOR                        
     };
     sampleslib::AssimpScene::CreateInfo createInfo;
     createInfo.fileName = "models/color_teapot_spheres.dae";

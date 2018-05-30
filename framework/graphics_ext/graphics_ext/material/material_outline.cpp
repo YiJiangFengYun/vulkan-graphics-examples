@@ -106,7 +106,7 @@ namespace vge
     void MaterialOutline::_createOtherPasses()
     {
         m_pShaderOutline = std::shared_ptr<vg::Shader>{new vg::Shader()};
-	    m_pPassOutline = std::shared_ptr<vg::Pass>{ new vg::Pass(m_pShaderOutline.get())};
+        m_pPassOutline = std::shared_ptr<vg::Pass>{ new vg::Pass(m_pShaderOutline.get())};
         _addPass(m_pPassOutline.get());
     }
 
@@ -115,13 +115,13 @@ namespace vge
         //outline pass
         {
             auto pPass = m_pPassOutline.get();
-	        vg::Pass::BuildInDataInfo::Component buildInDataCmps[1] = {
-	    		{vg::Pass::BuildInDataType::MATRIX_OBJECT_TO_NDC},
-	    	};
-	        vg::Pass::BuildInDataInfo buildInDataInfo;
-	        buildInDataInfo.componentCount = 1u;
-	        buildInDataInfo.pComponent = buildInDataCmps;
-	        pPass->setBuildInDataInfo(buildInDataInfo);
+            vg::Pass::BuildInDataInfo::Component buildInDataCmps[1] = {
+                {vg::Pass::BuildInDataType::MATRIX_OBJECT_TO_NDC},
+            };
+            vg::Pass::BuildInDataInfo buildInDataInfo;
+            buildInDataInfo.componentCount = 1u;
+            buildInDataInfo.pComponent = buildInDataCmps;
+            pPass->setBuildInDataInfo(buildInDataInfo);
 
             _applyInfos();
                 
@@ -132,35 +132,35 @@ namespace vge
     void MaterialOutline::_applyInfos()
     {
         auto pPass = m_pPassOutline.get();
-		{
-			std::string name = "outline_info_vert";
-			if (pPass->hasData(name) == VG_FALSE)
-			{
-				vg::PassDataInfo info = {
-					VG_PASS_OTHER_DATA_MIN_LAYOUT_PRIORITY,
-					vk::ShaderStageFlagBits::eVertex,
-				};
-				pPass->addData(name, info, m_outlineInfoVert);
-			}
-			else
-			{
-				pPass->setData(name, m_outlineInfoVert);
-			}
-		}
-		{
-			std::string name = "outline_info_frag";
-			if (pPass->hasData(name) == VG_FALSE)
-			{
-				vg::PassDataInfo info = {
-					VG_PASS_OTHER_DATA_MIN_LAYOUT_PRIORITY + 1,
-					vk::ShaderStageFlagBits::eFragment,
-				};
-				pPass->addData(name, info, m_outlineInfoFrag);
-			}
-			else
-			{
-				pPass->setData(name, m_outlineInfoFrag);
-			}
-		}
+        {
+            std::string name = "outline_info_vert";
+            if (pPass->hasData(name) == VG_FALSE)
+            {
+                vg::PassDataInfo info = {
+                    VG_PASS_OTHER_DATA_MIN_LAYOUT_PRIORITY,
+                    vk::ShaderStageFlagBits::eVertex,
+                };
+                pPass->addData(name, info, m_outlineInfoVert);
+            }
+            else
+            {
+                pPass->setData(name, m_outlineInfoVert);
+            }
+        }
+        {
+            std::string name = "outline_info_frag";
+            if (pPass->hasData(name) == VG_FALSE)
+            {
+                vg::PassDataInfo info = {
+                    VG_PASS_OTHER_DATA_MIN_LAYOUT_PRIORITY + 1,
+                    vk::ShaderStageFlagBits::eFragment,
+                };
+                pPass->addData(name, info, m_outlineInfoFrag);
+            }
+            else
+            {
+                pPass->setData(name, m_outlineInfoFrag);
+            }
+        }
     }
 } //vge

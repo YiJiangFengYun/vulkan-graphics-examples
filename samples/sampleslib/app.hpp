@@ -5,14 +5,14 @@
 
 namespace sampleslib
 {
-	class App : public vgf::App
-	{
-	public:
-		App();
+    class App : public vgf::App
+    {
+    public:
+        App();
 
-	private:
+    private:
 
-	};
+    };
 }
 
 #endif // !SAMPLES_LIB_APP_H

@@ -5,11 +5,11 @@
 
 namespace vg
 {
-	VkResult createDebugReportCallbackEXT(VkInstance instance, const VkDebugReportCallbackCreateInfoEXT* pCreateInfo,
-		const VkAllocationCallbacks* pAllocator, VkDebugReportCallbackEXT* pCallback);
+    VkResult createDebugReportCallbackEXT(VkInstance instance, const VkDebugReportCallbackCreateInfoEXT* pCreateInfo,
+        const VkAllocationCallbacks* pAllocator, VkDebugReportCallbackEXT* pCallback);
 
-	void destroyDebugReportCallbackEXT(VkInstance instance, VkDebugReportCallbackEXT callback,
-		const VkAllocationCallbacks* pAllocator);
+    void destroyDebugReportCallbackEXT(VkInstance instance, VkDebugReportCallbackEXT callback,
+        const VkAllocationCallbacks* pAllocator);
 }
 
 #endif // !VG_VULKAN_EXT_H

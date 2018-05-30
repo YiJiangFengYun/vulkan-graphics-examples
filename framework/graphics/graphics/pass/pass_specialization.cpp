@@ -37,7 +37,7 @@ namespace vg
         m_priority = target.m_priority;
         m_data = target.m_data;
         m_size = target.m_size;
-		return *this;
+        return *this;
     }
 
     void PassSpecializationData::SpecializationItem::setData(const void *pData

@@ -17,8 +17,8 @@ layout (location = 1) out vec2 outUV;
 
 void main () 
 {
-	outColor = inColor;
-	outUV = inUV;
-	
-	gl_Position = _buildIn.matrixObjectToNDC * vec4(inPos.xyz, 1.0);		
+    outColor = inColor;
+    outUV = inUV;
+    
+    gl_Position = _buildIn.matrixObjectToNDC * vec4(inPos.xyz, 1.0);        
 }

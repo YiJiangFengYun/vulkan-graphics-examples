@@ -6,8 +6,8 @@ FILE* open_or_exit(const char* fname, const char* mode)
     FILE* f;
     errno_t err = fopen_s(&f, fname, mode);
     if (err != 0) {
-    	perror(fname);
-    	exit(1);
+        perror(fname);
+        exit(1);
     }
     return f;
 }
@@ -15,8 +15,8 @@ FILE* open_or_exit(const char* fname, const char* mode)
 int main(int argc, char** argv)
 {
     if (argc < 3) {
-    	fprintf(stderr, "Please specify variable name to save embed value in code, input file to embed and out file to create code.");
-    	return 4;
+        fprintf(stderr, "Please specify variable name to save embed value in code, input file to embed and out file to create code.");
+        return 4;
     }    
     const char * variableName = argv[1];
     const char * inputFilePath = argv[2];
@@ -47,11 +47,11 @@ int main(int argc, char** argv)
     /* the whole file is now loaded in the memory buffer. */
     size_t linecount = 0;
     size_t i;
-		fprintf(out, "#include <stdint.h>\n");
+        fprintf(out, "#include <stdint.h>\n");
     fprintf(out, "const unsigned char %s[] = {\n", variableName);
     for (i = 0; i < lSize; ++i) {
-    	fprintf(out, "0x%02x, ", *(buffer + i));
-    	if (++linecount == 10) { fprintf(out, "\n"); linecount = 0; }
+        fprintf(out, "0x%02x, ", *(buffer + i));
+        if (++linecount == 10) { fprintf(out, "\n"); linecount = 0; }
     }
     if (linecount > 0) fprintf(out, "\n");
     fprintf(out, "};\n");

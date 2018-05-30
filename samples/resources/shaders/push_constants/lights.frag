@@ -16,25 +16,25 @@ layout (location = 0) out vec4 outFragColor;
 
 void main() 
 {
-	vec3 lightColor[lightCount];
-	lightColor[0] = vec3(1.0, 0.0, 0.0);
-	lightColor[1] = vec3(0.0, 1.0, 0.0);
-	lightColor[2] = vec3(0.0, 0.0, 1.0);
-	lightColor[3] = vec3(1.0, 0.0, 1.0);
-	lightColor[4] = vec3(0.0, 1.0, 1.0);
-	lightColor[5] = vec3(1.0, 1.0, 0.0);
-	
-	vec3 diffuse = vec3(0.0);
-	// Just some very basic attenuation
-	for (int i = 0; i < lightCount; ++i)
-	{				
-		float lRadius =  MAX_LIGHT_DIST * inLightVec[i].w;
-	
-		float dist = min(dot(inLightVec[i], inLightVec[i]), lRadius) / lRadius;
-		float distFactor = 1.0 - dist;		
-	
-		diffuse += lightColor[i] * distFactor;		
-	}
-			
-	outFragColor.rgb = diffuse;			
+    vec3 lightColor[lightCount];
+    lightColor[0] = vec3(1.0, 0.0, 0.0);
+    lightColor[1] = vec3(0.0, 1.0, 0.0);
+    lightColor[2] = vec3(0.0, 0.0, 1.0);
+    lightColor[3] = vec3(1.0, 0.0, 1.0);
+    lightColor[4] = vec3(0.0, 1.0, 1.0);
+    lightColor[5] = vec3(1.0, 1.0, 0.0);
+    
+    vec3 diffuse = vec3(0.0);
+    // Just some very basic attenuation
+    for (int i = 0; i < lightCount; ++i)
+    {                
+        float lRadius =  MAX_LIGHT_DIST * inLightVec[i].w;
+    
+        float dist = min(dot(inLightVec[i], inLightVec[i]), lRadius) / lRadius;
+        float distFactor = 1.0 - dist;        
+    
+        diffuse += lightColor[i] * distFactor;        
+    }
+            
+    outFragColor.rgb = diffuse;            
 }

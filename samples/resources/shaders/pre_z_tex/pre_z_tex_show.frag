@@ -6,7 +6,7 @@
 
 layout(binding = 0) uniform OtherInfo {
   float zFar;
-  float zNear;	
+  float zNear;    
 } otherInfo;
 
 layout (binding = 1) uniform sampler2D depthSampler;
@@ -20,11 +20,11 @@ float LinearizeDepth(float depth)
   float n = otherInfo.zNear; // camera z near
   float f = otherInfo.zFar; // camera z far
   float z = depth;
-  return n / (f - z * (f - n));	
+  return n / (f - z * (f - n));    
 }
 
 void main() 
 {
-	float depth = texture(depthSampler, inUV).r;
-	outColor = vec4(vec3(LinearizeDepth(depth)), 1.0);
+    float depth = texture(depthSampler, inUV).r;
+    outColor = vec4(vec3(LinearizeDepth(depth)), 1.0);
 }

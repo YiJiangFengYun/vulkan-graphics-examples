@@ -21,7 +21,7 @@ namespace vg
         return VG_FALSE;
     }
 
-	Bool32  UniformBufferData::DescriptorBufferInfo::operator !=(const DescriptorBufferInfo& target) const
+    Bool32  UniformBufferData::DescriptorBufferInfo::operator !=(const DescriptorBufferInfo& target) const
     {
         if ((*this) == target) return VG_FALSE;
         return VG_TRUE;
@@ -68,9 +68,9 @@ namespace vg
         init(info, pBuffer, pDescriptorPool);
     }
 
-	UniformBufferData::SubData::~SubData()
-	{
-	}
+    UniformBufferData::SubData::~SubData()
+    {
+    }
 
     void UniformBufferData::SubData::init(SubDataInfo info
         , const vk::Buffer *pBuffer
@@ -100,16 +100,16 @@ namespace vg
 
             //Create descriptor set layout.
             auto pDevice = pApp->getDevice();
-		    if (m_layoutBindingCount)
-		    {
-		    	vk::DescriptorSetLayoutCreateInfo createInfo =
-		    	{
-		    		vk::DescriptorSetLayoutCreateFlags(),
-		    		static_cast<uint32_t>(m_layoutBindingCount),
-		    		m_layoutBindings.data()
-		    	};
-		    	m_pDescriptorSetLayout = fd::createDescriptorSetLayout(pDevice, createInfo);
-		    }
+            if (m_layoutBindingCount)
+            {
+                vk::DescriptorSetLayoutCreateInfo createInfo =
+                {
+                    vk::DescriptorSetLayoutCreateFlags(),
+                    static_cast<uint32_t>(m_layoutBindingCount),
+                    m_layoutBindings.data()
+                };
+                m_pDescriptorSetLayout = fd::createDescriptorSetLayout(pDevice, createInfo);
+            }
             else
             {
                 m_pDescriptorSetLayout = nullptr;
@@ -118,28 +118,28 @@ namespace vg
         }
 
         vk::DescriptorPool descriptorPool = pDescriptorPool != nullptr ? *(pDescriptorPool) : vk::DescriptorPool(nullptr);
-		vk::DescriptorPool lastDescriptorPool = m_pDescriptorPool != nullptr ? *(m_pDescriptorPool) : vk::DescriptorPool(nullptr);
+        vk::DescriptorPool lastDescriptorPool = m_pDescriptorPool != nullptr ? *(m_pDescriptorPool) : vk::DescriptorPool(nullptr);
         Bool32 poolChanged = lastDescriptorPool != descriptorPool ? VG_TRUE : VG_FALSE;
-		//Copy descriptor pool.
-		if (poolChanged) m_pDescriptorPool = pDescriptorPool;
+        //Copy descriptor pool.
+        if (poolChanged) m_pDescriptorPool = pDescriptorPool;
         if (layoutBindingChanged || poolChanged)
         {
             //Create descriptor set.
             auto pDevice = pApp->getDevice();
-		    if (m_pDescriptorSetLayout != nullptr && descriptorPool != vk::DescriptorPool(nullptr))
-		    {
-		    	vk::DescriptorSetLayout layouts[] = { *m_pDescriptorSetLayout };
-		    	vk::DescriptorSetAllocateInfo allocateInfo = {
-		    		descriptorPool,
-		    		1u,
-		    		layouts
-		    	};
-		    	m_pDescriptorSet = fd::allocateDescriptorSet(pDevice, m_pDescriptorPool, allocateInfo);
-		    }
-		    else
-		    {
-		    	m_pDescriptorSet = nullptr;
-		    }
+            if (m_pDescriptorSetLayout != nullptr && descriptorPool != vk::DescriptorPool(nullptr))
+            {
+                vk::DescriptorSetLayout layouts[] = { *m_pDescriptorSetLayout };
+                vk::DescriptorSetAllocateInfo allocateInfo = {
+                    descriptorPool,
+                    1u,
+                    layouts
+                };
+                m_pDescriptorSet = fd::allocateDescriptorSet(pDevice, m_pDescriptorPool, allocateInfo);
+            }
+            else
+            {
+                m_pDescriptorSet = nullptr;
+            }
         }
 
         //Check if descriptor infos  is changed.
@@ -172,9 +172,9 @@ namespace vg
         }
 
         vk::Buffer buffer = pBuffer != nullptr ? *pBuffer : vk::Buffer(nullptr);
-		vk::Buffer lastBuffer = m_pBuffer != nullptr ? *m_pBuffer : vk::Buffer(nullptr);
+        vk::Buffer lastBuffer = m_pBuffer != nullptr ? *m_pBuffer : vk::Buffer(nullptr);
         Bool32 bufferChanged = lastBuffer != buffer ? VG_TRUE : VG_FALSE;
-		if (bufferChanged) m_pBuffer = pBuffer;
+        if (bufferChanged) m_pBuffer = pBuffer;
         if (descriptorInfosChanged)
         {
             //Copy descriptor infos data
@@ -188,9 +188,9 @@ namespace vg
             (needWrite || bufferChanged || layoutBindingChanged || poolChanged))
         {
             std::vector<vk::WriteDescriptorSet> writes(m_layoutBindingCount);
-		    std::vector<std::vector<vk::DescriptorBufferInfo>> bufferInfoss(m_layoutBindingCount);
-		    uint32_t offset = info.bufferOffset;
-		    uint32_t descriptorInfoIndex = 0u;
+            std::vector<std::vector<vk::DescriptorBufferInfo>> bufferInfoss(m_layoutBindingCount);
+            uint32_t offset = info.bufferOffset;
+            uint32_t descriptorInfoIndex = 0u;
             for (uint32_t bindingIndex = 0u; bindingIndex < m_layoutBindingCount; ++bindingIndex)
             {
                 const auto &layoutBinding = m_layoutBindings[bindingIndex];
@@ -205,14 +205,14 @@ namespace vg
                     ++descriptorInfoIndex;
                 }
                 writes[bindingIndex].dstSet = *m_pDescriptorSet;
-		    	writes[bindingIndex].dstBinding = layoutBinding.binding;
-		    	writes[bindingIndex].descriptorType = layoutBinding.descriptorType;
-		    	writes[bindingIndex].dstArrayElement = 0;
-		    	writes[bindingIndex].descriptorCount = layoutBinding.descriptorCount;
-		    	writes[bindingIndex].pBufferInfo = bufferInfoss[bindingIndex].data();
+                writes[bindingIndex].dstBinding = layoutBinding.binding;
+                writes[bindingIndex].descriptorType = layoutBinding.descriptorType;
+                writes[bindingIndex].dstArrayElement = 0;
+                writes[bindingIndex].descriptorCount = layoutBinding.descriptorCount;
+                writes[bindingIndex].pBufferInfo = bufferInfoss[bindingIndex].data();
             }
-		    auto pDevice = pApp->getDevice();
-		    pDevice->updateDescriptorSets(writes, nullptr);
+            auto pDevice = pApp->getDevice();
+            pDevice->updateDescriptorSets(writes, nullptr);
         }
     }
 
@@ -254,7 +254,7 @@ namespace vg
     UniformBufferData::UniformBufferData(vk::MemoryPropertyFlags bufferMemoryPropertyFlags)
         : Base(BaseType::UNIFORM_BUFFER_DATA)
         , m_bufferData(vk::BufferUsageFlagBits::eUniformBuffer
-			, bufferMemoryPropertyFlags ? bufferMemoryPropertyFlags : vk::MemoryPropertyFlagBits::eHostVisible)
+            , bufferMemoryPropertyFlags ? bufferMemoryPropertyFlags : vk::MemoryPropertyFlagBits::eHostVisible)
         , m_subDataCount()
         , m_subDatas()
         , m_poolMaxSetCount()
@@ -362,39 +362,39 @@ namespace vg
                         isGreater = VG_FALSE;
                         break;
                     }
-		        }
+                }
             }
-		    
+            
 
-			auto oldPool = m_pDescriptorPool;
+            auto oldPool = m_pDescriptorPool;
             if (isGreater == VG_FALSE)
             {
-		        //create descriptor pool.                
+                //create descriptor pool.                
                 std::vector<vk::DescriptorPoolSize> arrPoolSizeInfos(poolSizeInfos.size());
-		        size_t index = 0;
-		        for (const auto& item : poolSizeInfos)
-		        {
-		        	arrPoolSizeInfos[index].type = item.first;
-		        	arrPoolSizeInfos[index].descriptorCount = item.second;
-		        	++index;
-		        }
+                size_t index = 0;
+                for (const auto& item : poolSizeInfos)
+                {
+                    arrPoolSizeInfos[index].type = item.first;
+                    arrPoolSizeInfos[index].descriptorCount = item.second;
+                    ++index;
+                }
 
                 auto pDevice = pApp->getDevice();
-		        {
-		        	if (arrPoolSizeInfos.size())
-		        	{
-		        		vk::DescriptorPoolCreateInfo createInfo = { vk::DescriptorPoolCreateFlagBits::eFreeDescriptorSet
-		        			, poolMaxSetCount
-		        			, static_cast<uint32_t>(arrPoolSizeInfos.size())
-		        			, arrPoolSizeInfos.data()
-		        		};
-		        		m_pDescriptorPool = fd::createDescriptorPool(pDevice, createInfo);
-		        	}
-		        	else
-		        	{
-		        		m_pDescriptorPool = nullptr;
-		        	}
-		        }
+                {
+                    if (arrPoolSizeInfos.size())
+                    {
+                        vk::DescriptorPoolCreateInfo createInfo = { vk::DescriptorPoolCreateFlagBits::eFreeDescriptorSet
+                            , poolMaxSetCount
+                            , static_cast<uint32_t>(arrPoolSizeInfos.size())
+                            , arrPoolSizeInfos.data()
+                        };
+                        m_pDescriptorPool = fd::createDescriptorPool(pDevice, createInfo);
+                    }
+                    else
+                    {
+                        m_pDescriptorPool = nullptr;
+                    }
+                }
 
                 m_poolSizeInfos = poolSizeInfos;
 

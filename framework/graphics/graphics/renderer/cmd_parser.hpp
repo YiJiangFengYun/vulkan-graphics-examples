@@ -15,8 +15,8 @@ namespace vg
     public:
         struct ResultInfo
         {
-			uint32_t drawCount;
-			ResultInfo(uint32_t drawCount = 0u);
+            uint32_t drawCount;
+            ResultInfo(uint32_t drawCount = 0u);
         };
 
         static void recordTrunk(CmdBuffer *pCmdBuffer
@@ -48,22 +48,22 @@ namespace vg
             , PipelineCache *pPipelineCache
             , ResultInfo *pResult = nullptr);
 
-		static void _createPipeline(const vk::RenderPass *pRenderPass,
-		    const BaseMesh *pMesh,
-		    uint32_t subMeshIndex,
-		    const Pass *pPass,
-		    PipelineCache *pPipelineCache,
-		    std::shared_ptr<vk::Pipeline> &pPipeline);
+        static void _createPipeline(const vk::RenderPass *pRenderPass,
+            const BaseMesh *pMesh,
+            uint32_t subMeshIndex,
+            const Pass *pPass,
+            PipelineCache *pPipelineCache,
+            std::shared_ptr<vk::Pipeline> &pPipeline);
 
-		static void _recordCommandBuffer(vk::Pipeline *pPipeline,
-	        vk::CommandBuffer *pCommandBuffer,
-		    uint32_t framebufferWidth,
-		    uint32_t framebufferHeight,
-		    const BaseMesh *pMesh,
-		    uint32_t subMeshIndex,
-		    const Pass *pPass,
+        static void _recordCommandBuffer(vk::Pipeline *pPipeline,
+            vk::CommandBuffer *pCommandBuffer,
+            uint32_t framebufferWidth,
+            uint32_t framebufferHeight,
+            const BaseMesh *pMesh,
+            uint32_t subMeshIndex,
+            const Pass *pPass,
             const fd::Viewport viewport,
-		    const fd::Rect2D scissor,
+            const fd::Rect2D scissor,
             const CmdDraw * pCmdDraw,
             const CmdDrawIndexed * pCmdDrawIndexed
         );

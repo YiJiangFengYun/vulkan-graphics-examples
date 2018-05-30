@@ -1,7 +1,7 @@
 set(LIBRARY_NAME "foundation")
 configure_file(
-	"${CMAKE_CURRENT_SOURCE_DIR}/config/config.hpp.in"
-	"${CMAKE_CURRENT_SOURCE_DIR}/${LIBRARY_NAME}/config.hpp"
+    "${CMAKE_CURRENT_SOURCE_DIR}/config/config.hpp.in"
+    "${CMAKE_CURRENT_SOURCE_DIR}/${LIBRARY_NAME}/config.hpp"
 )
 set(INCLUDE_DIRS ${INCLUDE_DIRS} "${CMAKE_CURRENT_SOURCE_DIR}")
 file(GLOB_RECURSE HEADERS "${LIBRARY_NAME}/*.hpp" "${LIBRARY_NAME}/*.inl")

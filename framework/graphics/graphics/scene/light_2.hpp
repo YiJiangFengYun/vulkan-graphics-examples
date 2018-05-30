@@ -6,11 +6,11 @@
 
 namespace vg
 {
-	class Light2 : public Light<SpaceType::SPACE_2>
-	{
-	public:
-		Light2();
-	};
+    class Light2 : public Light<SpaceType::SPACE_2>
+    {
+    public:
+        Light2();
+    };
 
 } //namespace kgs
 

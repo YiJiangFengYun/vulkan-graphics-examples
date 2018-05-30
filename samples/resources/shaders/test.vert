@@ -5,7 +5,7 @@
 
 out gl_PerVertex 
 {
-	vec4 gl_Position;   
+    vec4 gl_Position;   
 };
 
 vec3 positions[3] = vec3[](

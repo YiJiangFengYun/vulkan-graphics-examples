@@ -33,7 +33,7 @@
 
 namespace fd
 {
-	using Bool32 = uint32_t;
+    using Bool32 = uint32_t;
 }
 
 #endif // !FD_GLOBAL_H

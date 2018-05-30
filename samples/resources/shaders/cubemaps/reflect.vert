@@ -8,8 +8,8 @@ layout (location = 1) in vec3 inNormal;
 
 layout(binding = 0) uniform BuildIn {
     mat4 matrixObjectToNDC;
-	mat4 matrixObjectToView;
-	float lodBias;
+    mat4 matrixObjectToView;
+    float lodBias;
 } _buildIn;
 
 
@@ -22,20 +22,20 @@ layout (location = 5) out mat4 outInvModelView;
 
 out gl_PerVertex 
 {
-	vec4 gl_Position;
+    vec4 gl_Position;
 };
 
 void main() 
 {
-	gl_Position = _buildIn.matrixObjectToNDC * vec4(inPos.xyz, 1.0);
-	
-	outPos = vec3(_buildIn.matrixObjectToView * vec4(inPos, 1.0));
-	outNormal = mat3(_buildIn.matrixObjectToView) * inNormal;	
-	outLodBias = _buildIn.lodBias;
-	
-	outInvModelView = inverse(_buildIn.matrixObjectToView);
+    gl_Position = _buildIn.matrixObjectToNDC * vec4(inPos.xyz, 1.0);
+    
+    outPos = vec3(_buildIn.matrixObjectToView * vec4(inPos, 1.0));
+    outNormal = mat3(_buildIn.matrixObjectToView) * inNormal;    
+    outLodBias = _buildIn.lodBias;
+    
+    outInvModelView = inverse(_buildIn.matrixObjectToView);
 
-	vec3 lightPos = vec3(0.0f, -5.0f, 5.0f);
-	outLightVec = lightPos.xyz - outPos.xyz;
-	outViewVec = -outPos.xyz;		
+    vec3 lightPos = vec3(0.0f, -5.0f, 5.0f);
+    outLightVec = lightPos.xyz - outPos.xyz;
+    outViewVec = -outPos.xyz;        
 }

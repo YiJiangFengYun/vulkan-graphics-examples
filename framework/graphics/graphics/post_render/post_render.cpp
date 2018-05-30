@@ -3,7 +3,7 @@
 namespace vg
 {
     PostRender::BindInfo::BindInfo( uint32_t framebufferWidth
-		, uint32_t framebufferHeight
+        , uint32_t framebufferHeight
         )
         : framebufferWidth(framebufferWidth)
         , framebufferHeight(framebufferHeight)
@@ -28,10 +28,10 @@ namespace vg
         return m_pMaterial;
     }
 
-	Material * PostRender::getMaterial()
-	{
-		return m_pMaterial;
-	}
+    Material * PostRender::getMaterial()
+    {
+        return m_pMaterial;
+    }
         
     void PostRender::setMaterial(Material * pMaterial)
     {
@@ -71,7 +71,7 @@ namespace vg
             };
             vg::RenderPassInfo renderPassInfo;
             renderPassInfo.pRenderPass = nullptr;
-	        renderPassInfo.pFrameBuffer = nullptr;
+            renderPassInfo.pFrameBuffer = nullptr;
             renderPassInfo.framebufferWidth = info.framebufferWidth;
             renderPassInfo.framebufferHeight = info.framebufferHeight;
             renderPassInfo.projMatrix = vg::Matrix4x4(1.0f);
@@ -89,7 +89,7 @@ namespace vg
             pResult->pPostRenderCmdBuffer->addCmd(cmdInfo);
         }
     }
-		
+        
     void PostRender::endBind() const
     {
         

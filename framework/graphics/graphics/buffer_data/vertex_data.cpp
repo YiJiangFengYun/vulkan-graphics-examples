@@ -17,7 +17,7 @@ namespace vg
 
     }
 
-	VertexData::_SubVertexData::_SubVertexData()
+    VertexData::_SubVertexData::_SubVertexData()
         : bindingDescs()
         , attrDescs()
     {
@@ -27,7 +27,7 @@ namespace vg
     VertexData::VertexData(vk::MemoryPropertyFlags bufferMemoryPropertyFlags)
         : Base(BaseType::VERTEX_DATA)
         , m_bufferData(vk::BufferUsageFlagBits::eVertexBuffer
-			, bufferMemoryPropertyFlags ? bufferMemoryPropertyFlags : vk::MemoryPropertyFlagBits::eDeviceLocal)
+            , bufferMemoryPropertyFlags ? bufferMemoryPropertyFlags : vk::MemoryPropertyFlagBits::eDeviceLocal)
         , m_subDatas()
         , m_subDataCount()
     {
@@ -87,7 +87,7 @@ namespace vg
             {
                 auto &bindingDescs = m__subDatas[i].bindingDescs;
                 auto vertexInputStateInfo = (*(pSubDatas + i)).vertexInputStateInfo;
-				bindingDescs.resize(vertexInputStateInfo.vertexBindingDescriptionCount);
+                bindingDescs.resize(vertexInputStateInfo.vertexBindingDescriptionCount);
                 memcpy(bindingDescs.data(), vertexInputStateInfo.pVertexBindingDescriptions,
                     sizeof(vk::VertexInputBindingDescription) * vertexInputStateInfo.vertexBindingDescriptionCount);
                 auto &attrDescs = m__subDatas[i].attrDescs;
@@ -99,7 +99,7 @@ namespace vg
                 m_subDatas[i].vertexInputStateInfo.pVertexAttributeDescriptions = attrDescs.data();
 
             }
-		    
+            
         }
     }
 
@@ -107,9 +107,9 @@ namespace vg
     {
         size_t size = m_subDatas.size();
         if (size == 0u) {
-			m_subDatas.resize(1u);
-			m__subDatas.resize(1u);
-			size = 1u;
+            m_subDatas.resize(1u);
+            m__subDatas.resize(1u);
+            size = 1u;
         };
         Bool32 isChange = VG_FALSE;
         for (size_t i = 0u; i < size; ++i) 
@@ -118,7 +118,7 @@ namespace vg
             _SubVertexData &_subData = m__subDatas[i];
             if (_isEqual(subData.vertexInputStateInfo, vertexInputStateInfo) == VG_FALSE) {
                 auto &bindingDescs = _subData.bindingDescs;
-				bindingDescs.resize(vertexInputStateInfo.vertexBindingDescriptionCount);
+                bindingDescs.resize(vertexInputStateInfo.vertexBindingDescriptionCount);
                 memcpy(bindingDescs.data(), vertexInputStateInfo.pVertexBindingDescriptions,
                     sizeof(vk::VertexInputBindingDescription) * vertexInputStateInfo.vertexBindingDescriptionCount);
                 auto &attrDescs = _subData.attrDescs;
@@ -141,9 +141,9 @@ namespace vg
     {
         size_t size = m_subDatas.size();
         if (size == 0u) {
-			m_subDatas.resize(1u);
-			m__subDatas.resize(1u);
-			size = 1u;
+            m_subDatas.resize(1u);
+            m__subDatas.resize(1u);
+            size = 1u;
         };
         Bool32 isChange = VG_FALSE;
         for (size_t i = 0u; i < size; ++i) 
@@ -164,7 +164,7 @@ namespace vg
             _SubVertexData &_subData = m__subDatas[i];
             if (_isEqual(subData.vertexInputStateInfo, vertexInputStateInfo) == VG_FALSE) {
                 auto &bindingDescs = _subData.bindingDescs;
-				bindingDescs.resize(vertexInputStateInfo.vertexBindingDescriptionCount);
+                bindingDescs.resize(vertexInputStateInfo.vertexBindingDescriptionCount);
                 memcpy(bindingDescs.data(), vertexInputStateInfo.pVertexBindingDescriptions,
                     sizeof(vk::VertexInputBindingDescription) * vertexInputStateInfo.vertexBindingDescriptionCount);
                 auto &attrDescs = _subData.attrDescs;
@@ -188,12 +188,12 @@ namespace vg
         m_subDatas.resize(count);
         m__subDatas.resize(count);
         m_subDataCount = count;
-		for (uint32_t i = 0; i < count; ++i)
-		{
-			auto &inputInfo = m_subDatas[i].vertexInputStateInfo;
-			inputInfo.pVertexBindingDescriptions = m__subDatas[i].bindingDescs.data();
-			inputInfo.pVertexAttributeDescriptions = m__subDatas[i].attrDescs.data();
-		}
+        for (uint32_t i = 0; i < count; ++i)
+        {
+            auto &inputInfo = m_subDatas[i].vertexInputStateInfo;
+            inputInfo.pVertexBindingDescriptions = m__subDatas[i].bindingDescs.data();
+            inputInfo.pVertexAttributeDescriptions = m__subDatas[i].attrDescs.data();
+        }
     }
 
     void VertexData::updateVertexCount(fd::ArrayProxy<uint32_t> vertexCounts, uint32_t offset)
@@ -225,7 +225,7 @@ namespace vg
             auto &stateInfo = *(stateInfos.data() + i);
             auto &_subData = m__subDatas[offset];
             auto &bindingDescs = _subData.bindingDescs;
-			bindingDescs.resize(stateInfo.vertexBindingDescriptionCount);
+            bindingDescs.resize(stateInfo.vertexBindingDescriptionCount);
             memcpy(bindingDescs.data(), stateInfo.pVertexBindingDescriptions,
                 sizeof(vk::VertexInputBindingDescription) * stateInfo.vertexBindingDescriptionCount);
             auto &attrDescs = _subData.attrDescs;

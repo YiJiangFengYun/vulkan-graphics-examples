@@ -35,12 +35,12 @@ namespace vge
 
         struct OutlineInfoVert
         {
-        	float outlineWidth = 1u;
+            float outlineWidth = 1u;
         } m_outlineInfoVert;
 
         struct OutlineInfoFrag
         {
-        	vg::Color outlineColor = vg::Color(1.0f);
+            vg::Color outlineColor = vg::Color(1.0f);
         } m_outlineInfoFrag;
 
         virtual void _beginBind(const BindInfo info, BindResult *pResult) const override;

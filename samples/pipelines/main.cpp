@@ -6,25 +6,25 @@
 const uint32_t WINDOW_WIDTH = 1280;
 const uint32_t WINDOW_HEIGHT = 720;
 int main() {
-	vgf::moduleCreate(plog::warning);
-	// vg::setVulkanLogSeverity(plog::debug);
-	vg::setCostTimeLogSeverity(plog::debug);
-	static plog::DebugOutputAppender<plog::TxtFormatter> debugOutputAppender;
-	plog::init(plog::debug, &debugOutputAppender);
+    vgf::moduleCreate(plog::warning);
+    // vg::setVulkanLogSeverity(plog::debug);
+    vg::setCostTimeLogSeverity(plog::debug);
+    static plog::DebugOutputAppender<plog::TxtFormatter> debugOutputAppender;
+    plog::init(plog::debug, &debugOutputAppender);
 
-	vg::PhysicalDeviceFeatures requiredFeatures;
+    vg::PhysicalDeviceFeatures requiredFeatures;
 
     vg::PhysicalDeviceFeaturePriorities optionalFeatures;
-	optionalFeatures.fillModeNonSolid = 1u;
-	optionalFeatures.wideLines = 1u;
+    optionalFeatures.fillModeNonSolid = 1u;
+    optionalFeatures.wideLines = 1u;
 
-	App app;
-	app.init<Window>(WINDOW_WIDTH, WINDOW_HEIGHT, "pipelines", requiredFeatures, optionalFeatures);
+    App app;
+    app.init<Window>(WINDOW_WIDTH, WINDOW_HEIGHT, "pipelines", requiredFeatures, optionalFeatures);
 
-	LOG(plog::debug) << "Initialization completed." << std::endl;
+    LOG(plog::debug) << "Initialization completed." << std::endl;
 
-	LOG(plog::debug) << "Start to app run loop." << std::endl;
-	app.run();
+    LOG(plog::debug) << "Start to app run loop." << std::endl;
+    app.run();
 
-	return 0;
+    return 0;
 }

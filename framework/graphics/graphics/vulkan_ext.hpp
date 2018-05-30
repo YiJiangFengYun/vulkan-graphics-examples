@@ -523,7 +523,7 @@ namespace vg
       uint32_t inheritedQueries;
     };
     static_assert( sizeof( PhysicalDeviceFeaturePriorities ) == sizeof( VkPhysicalDeviceFeatures ), 
-	    "struct PhysicalDeviceFeaturePriorities and struct VkPhysicalDeviceFeatures have different size!" );
+        "struct PhysicalDeviceFeaturePriorities and struct VkPhysicalDeviceFeatures have different size!" );
 } //vg
 
 #endif

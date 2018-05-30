@@ -47,17 +47,17 @@ namespace vge
 
     void MaterialDeferred::_beginBind(const BindInfo info, BindResult *pResult) const
     {
-		uint32_t trunkFramebufferWidth = info.trunkFramebufferWidth;
-		uint32_t trunkFramebufferHeight = info.trunkFramebufferHeight;
+        uint32_t trunkFramebufferWidth = info.trunkFramebufferWidth;
+        uint32_t trunkFramebufferHeight = info.trunkFramebufferHeight;
         uint32_t framebufferWidth = m_info.framebufferWidth;
         uint32_t framebufferHeight = m_info.framebufferHeight;
 
         uint32_t targetSize = static_cast<uint32_t>(
-			std::max(
-				info.clipRect.width * trunkFramebufferWidth, 
-				info.clipRect.height * trunkFramebufferHeight
-			)
-		);
+            std::max(
+                info.clipRect.width * trunkFramebufferWidth, 
+                info.clipRect.height * trunkFramebufferHeight
+            )
+        );
 
         auto pRectMesh = _getRectMesh();
         //rect pos
@@ -117,16 +117,16 @@ namespace vge
             0, 1, 3, 3, 1, 2
         };
     
-	    pRectMesh->setVertexCount(static_cast<uint32_t>(rectPoses.size()));
-		if (m_pRectMesh->hasPositions() == VG_TRUE)
-		{
-			m_pRectMesh->removePositions();
-		}
+        pRectMesh->setVertexCount(static_cast<uint32_t>(rectPoses.size()));
+        if (m_pRectMesh->hasPositions() == VG_TRUE)
+        {
+            m_pRectMesh->removePositions();
+        }
         pRectMesh->addPositions(rectPoses);
-		if (m_pRectMesh->hasTextureCoordinates<vg::TextureCoordinateType::VECTOR_2, vg::TextureCoordinateIndex::TextureCoordinate_0>() == VG_TRUE)
-		{
-			m_pRectMesh->removeTextureCoordinates<vg::TextureCoordinateType::VECTOR_2, vg::TextureCoordinateIndex::TextureCoordinate_0>();
-		}
+        if (m_pRectMesh->hasTextureCoordinates<vg::TextureCoordinateType::VECTOR_2, vg::TextureCoordinateIndex::TextureCoordinate_0>() == VG_TRUE)
+        {
+            m_pRectMesh->removeTextureCoordinates<vg::TextureCoordinateType::VECTOR_2, vg::TextureCoordinateIndex::TextureCoordinate_0>();
+        }
         pRectMesh->addTextureCoordinates<vg::TextureCoordinateType::VECTOR_2, vg::TextureCoordinateIndex::TextureCoordinate_0>(
             rectUVs
         );
@@ -140,7 +140,7 @@ namespace vge
             vg::RenderPassInfo renderPassInfo;
             renderPassInfo.pRenderPass = m_pRenderPass.get();
             renderPassInfo.subPassIndex = 0u;
-	    	renderPassInfo.pFrameBuffer = m_pFrameBuffer.get();
+            renderPassInfo.pFrameBuffer = m_pFrameBuffer.get();
             renderPassInfo.framebufferWidth = framebufferWidth;
             renderPassInfo.framebufferHeight = framebufferHeight;
             renderPassInfo.projMatrix = *(info.pProjMatrix);
@@ -153,18 +153,18 @@ namespace vge
             renderPassInfo.scissor = scissor;
     
             vk::ClearValue clearValueColor = {
-	    		std::array<float, 4>{0.0f, 0.0f, 0.0f, 0.0f}
-	    	};
-	    	vk::ClearValue clearValueDepthStencil = {
-	    		vk::ClearDepthStencilValue(1.0f, 0)
-	    	};
+                std::array<float, 4>{0.0f, 0.0f, 0.0f, 0.0f}
+            };
+            vk::ClearValue clearValueDepthStencil = {
+                vk::ClearDepthStencilValue(1.0f, 0)
+            };
     
             vk::ClearValue clearValues[5];
-	    	clearValues[0] = clearValueColor;
-	    	clearValues[1] = clearValueColor;
-	    	clearValues[2] = clearValueColor;
-	    	clearValues[3] = clearValueColor;
-	    	clearValues[4] = clearValueDepthStencil;
+            clearValues[0] = clearValueColor;
+            clearValues[1] = clearValueColor;
+            clearValues[2] = clearValueColor;
+            clearValues[3] = clearValueColor;
+            clearValues[4] = clearValueDepthStencil;
     
             renderPassInfo.clearValueCount = 5;
             renderPassInfo.pClearValues = clearValues;
@@ -179,7 +179,7 @@ namespace vge
             vg::RenderPassInfo renderPassInfo;
             renderPassInfo.pRenderPass = m_pRenderPass.get();
             renderPassInfo.subPassIndex = 1u;
-	    	renderPassInfo.pFrameBuffer = m_pFrameBuffer.get();
+            renderPassInfo.pFrameBuffer = m_pFrameBuffer.get();
             renderPassInfo.framebufferWidth = framebufferWidth;
             renderPassInfo.framebufferHeight = framebufferHeight;
             renderPassInfo.projMatrix = vg::Matrix4x4(1.0f);
@@ -204,7 +204,7 @@ namespace vge
         {
             vg::RenderPassInfo trunkRenderPassInfo;
             trunkRenderPassInfo.pRenderPass = nullptr;
-	    	trunkRenderPassInfo.pFrameBuffer = nullptr;
+            trunkRenderPassInfo.pFrameBuffer = nullptr;
             trunkRenderPassInfo.framebufferWidth = info.trunkFramebufferWidth;
             trunkRenderPassInfo.framebufferHeight = info.trunkFramebufferHeight;
             trunkRenderPassInfo.projMatrix = vg::Matrix4x4(1.0f);
@@ -315,7 +315,7 @@ namespace vge
         std::vector<vk::AttachmentReference> colorAttachmentRefs1(createInfo.deferredAttachmentCount);
         for (uint32_t i = 0; i < createInfo.deferredAttachmentCount; ++i)
         {
-			colorAttachmentRefs1[i] = {i + 1, vk::ImageLayout::eColorAttachmentOptimal};
+            colorAttachmentRefs1[i] = {i + 1, vk::ImageLayout::eColorAttachmentOptimal};
         }
 
         vk::AttachmentReference depthAttachmentRef1 = {attachmentCount - 1, vk::ImageLayout::eDepthStencilAttachmentOptimal};
@@ -372,17 +372,17 @@ namespace vge
         dependencies[2].dependencyFlags = vk::DependencyFlagBits::eByRegion;
         
     
-	    vk::RenderPassCreateInfo renderPassCreateInfo = {
-	    	vk::RenderPassCreateFlags(),
-	    	static_cast<uint32_t>(attachmentDescs.size()),
-	    	attachmentDescs.data(),
-	    	static_cast<uint32_t>(subpassDescs.size()),
-	    	subpassDescs.data(),
-	    	static_cast<uint32_t>(dependencies.size()),
-	    	dependencies.data()
-	    };
-	    auto pDevice = vg::pApp->getDevice();
-	    m_pRenderPass = fd::createRenderPass(pDevice, renderPassCreateInfo);
+        vk::RenderPassCreateInfo renderPassCreateInfo = {
+            vk::RenderPassCreateFlags(),
+            static_cast<uint32_t>(attachmentDescs.size()),
+            attachmentDescs.data(),
+            static_cast<uint32_t>(subpassDescs.size()),
+            subpassDescs.data(),
+            static_cast<uint32_t>(dependencies.size()),
+            dependencies.data()
+        };
+        auto pDevice = vg::pApp->getDevice();
+        m_pRenderPass = fd::createRenderPass(pDevice, renderPassCreateInfo);
     }
 
     void MaterialDeferred::_createFramebuffer()
@@ -401,27 +401,27 @@ namespace vge
         }
         attachments[offset] = *(m_pDepthStencilAttachment->getImageView()->getImageView());
     
-	    vk::FramebufferCreateInfo createInfo = {
-	    	vk::FramebufferCreateFlags(),                   //flags
-	    	*m_pRenderPass,                                 //renderPass
-	    	attachmentCount,                                //attachmentCount
-	    	attachments.data(),                             //pAttachments
-			info.framebufferWidth,                               //width
-			info.framebufferHeight,                               //height
-	    	1u                                              //layers
-	    };
-	    auto pDevice = vg::pApp->getDevice();
-	    m_pFrameBuffer = fd::createFrameBuffer(pDevice, createInfo);
+        vk::FramebufferCreateInfo createInfo = {
+            vk::FramebufferCreateFlags(),                   //flags
+            *m_pRenderPass,                                 //renderPass
+            attachmentCount,                                //attachmentCount
+            attachments.data(),                             //pAttachments
+            info.framebufferWidth,                               //width
+            info.framebufferHeight,                               //height
+            1u                                              //layers
+        };
+        auto pDevice = vg::pApp->getDevice();
+        m_pFrameBuffer = fd::createFrameBuffer(pDevice, createInfo);
     }
 
     void MaterialDeferred::_createOtherPasses(CreateInfo createInfo)
     {
         m_pShaderDeferred = std::shared_ptr<vg::Shader>{new vg::Shader()};
         m_pShaderComposition = std::shared_ptr<vg::Shader>{new vg::Shader()};
-	    m_pPassDeferred = std::shared_ptr<vg::Pass>{ new vg::Pass(m_pShaderDeferred.get())};
-	    m_pPassComposition = std::shared_ptr<vg::Pass>{ new vg::Pass(m_pShaderComposition.get())};
-	    _addPass(m_pPassDeferred.get());
-	    _addPass(m_pPassComposition.get());
+        m_pPassDeferred = std::shared_ptr<vg::Pass>{ new vg::Pass(m_pShaderDeferred.get())};
+        m_pPassComposition = std::shared_ptr<vg::Pass>{ new vg::Pass(m_pShaderComposition.get())};
+        _addPass(m_pPassDeferred.get());
+        _addPass(m_pPassComposition.get());
 
 
     }
@@ -433,25 +433,25 @@ namespace vge
             auto pPass = m_pPassDeferred.get();
             pPass->setSubpass(0u);
             const uint32_t attachmentCount = 3u;
-	        vk::PipelineColorBlendAttachmentState attachmentStates[attachmentCount] = {};
+            vk::PipelineColorBlendAttachmentState attachmentStates[attachmentCount] = {};
             for (uint32_t i = 0; i < attachmentCount; ++i)
             {
                 attachmentStates[i].colorWriteMask = vk::ColorComponentFlagBits::eR | 
                     vk::ColorComponentFlagBits::eG | 
                     vk::ColorComponentFlagBits::eB | 
                     vk::ColorComponentFlagBits::eA;
-	            attachmentStates[i].blendEnable = VG_FALSE;
+                attachmentStates[i].blendEnable = VG_FALSE;
             }
-	        
-	        vk::PipelineColorBlendStateCreateInfo colorBlendState = {};
-	        colorBlendState.attachmentCount = attachmentCount;
-	        colorBlendState.pAttachments = attachmentStates;
-	        pPass->setColorBlendInfo(colorBlendState);
+            
+            vk::PipelineColorBlendStateCreateInfo colorBlendState = {};
+            colorBlendState.attachmentCount = attachmentCount;
+            colorBlendState.pAttachments = attachmentStates;
+            pPass->setColorBlendInfo(colorBlendState);
             vk::PipelineDepthStencilStateCreateInfo depthStencilState = {};
-	        depthStencilState.depthTestEnable = VG_TRUE;
-	        depthStencilState.depthWriteEnable = VG_TRUE;
-	        depthStencilState.depthCompareOp = vk::CompareOp::eLessOrEqual;
-	        pPass->setDepthStencilInfo(depthStencilState);
+            depthStencilState.depthTestEnable = VG_TRUE;
+            depthStencilState.depthWriteEnable = VG_TRUE;
+            depthStencilState.depthCompareOp = vk::CompareOp::eLessOrEqual;
+            pPass->setDepthStencilInfo(depthStencilState);
             pPass->apply();
         }
     
@@ -460,12 +460,12 @@ namespace vge
             auto pPass = m_pPassComposition.get();
             pPass->setSubpass(1u);
             pPass->setPolygonMode(vk::PolygonMode::eFill);
-	        pPass->setCullMode(vk::CullModeFlagBits::eNone);
-	        pPass->setFrontFace(vk::FrontFace::eCounterClockwise);
-	        vg::Pass::BuildInDataInfo buildInDataInfo;
-	        buildInDataInfo.componentCount = 0u;
-	        buildInDataInfo.pComponent = nullptr;
-	        pPass->setBuildInDataInfo(buildInDataInfo);
+            pPass->setCullMode(vk::CullModeFlagBits::eNone);
+            pPass->setFrontFace(vk::FrontFace::eCounterClockwise);
+            vg::Pass::BuildInDataInfo buildInDataInfo;
+            buildInDataInfo.componentCount = 0u;
+            buildInDataInfo.pComponent = nullptr;
+            pPass->setBuildInDataInfo(buildInDataInfo);
     
             vk::PipelineInputAssemblyStateCreateInfo inputAssemblyState = {
                 vk::PipelineInputAssemblyStateCreateFlags(),
@@ -475,26 +475,26 @@ namespace vge
             pPass->setDefaultInputAssemblyState(inputAssemblyState);
             
              const uint32_t attachmentCount = 1u;
-	        vk::PipelineColorBlendAttachmentState attachmentStates[attachmentCount] = {};
+            vk::PipelineColorBlendAttachmentState attachmentStates[attachmentCount] = {};
             for (uint32_t i = 0; i < attachmentCount; ++i)
             {
                 attachmentStates[i].colorWriteMask = vk::ColorComponentFlagBits::eR | 
                     vk::ColorComponentFlagBits::eG | 
                     vk::ColorComponentFlagBits::eB | 
                     vk::ColorComponentFlagBits::eA;
-	            attachmentStates[i].blendEnable = VG_FALSE;
+                attachmentStates[i].blendEnable = VG_FALSE;
             }
-	        
-	        vk::PipelineColorBlendStateCreateInfo colorBlendState = {};
-	        colorBlendState.attachmentCount = attachmentCount;
-	        colorBlendState.pAttachments = attachmentStates;
-	        pPass->setColorBlendInfo(colorBlendState);
+            
+            vk::PipelineColorBlendStateCreateInfo colorBlendState = {};
+            colorBlendState.attachmentCount = attachmentCount;
+            colorBlendState.pAttachments = attachmentStates;
+            pPass->setColorBlendInfo(colorBlendState);
     
-	        vk::PipelineDepthStencilStateCreateInfo depthStencilState = {};
-	        depthStencilState.depthTestEnable = VG_FALSE;
-	        depthStencilState.depthWriteEnable = VG_FALSE;
-	        depthStencilState.depthCompareOp = vk::CompareOp::eAlways;
-	        pPass->setDepthStencilInfo(depthStencilState);
+            vk::PipelineDepthStencilStateCreateInfo depthStencilState = {};
+            depthStencilState.depthTestEnable = VG_FALSE;
+            depthStencilState.depthWriteEnable = VG_FALSE;
+            depthStencilState.depthCompareOp = vk::CompareOp::eAlways;
+            pPass->setDepthStencilInfo(depthStencilState);
 
             
                 
@@ -505,16 +505,16 @@ namespace vge
         {
             auto pPass = m_pMainPass.get();
             pPass->setPolygonMode(vk::PolygonMode::eFill);
-	        pPass->setCullMode(vk::CullModeFlagBits::eNone);
-	        pPass->setFrontFace(vk::FrontFace::eCounterClockwise);
+            pPass->setCullMode(vk::CullModeFlagBits::eNone);
+            pPass->setFrontFace(vk::FrontFace::eCounterClockwise);
             vg::Pass::BuildInDataInfo buildInDataInfo;
-	        buildInDataInfo.componentCount = 0u;
-	        buildInDataInfo.pComponent = nullptr;
-	        pPass->setBuildInDataInfo(buildInDataInfo);
+            buildInDataInfo.componentCount = 0u;
+            buildInDataInfo.pComponent = nullptr;
+            pPass->setBuildInDataInfo(buildInDataInfo);
             vk::PipelineDepthStencilStateCreateInfo depthStencilState = {};
-	        depthStencilState.depthTestEnable = VG_TRUE;
-	        depthStencilState.depthWriteEnable = VG_TRUE;
-	        depthStencilState.depthCompareOp = vk::CompareOp::eLessOrEqual;
+            depthStencilState.depthTestEnable = VG_TRUE;
+            depthStencilState.depthWriteEnable = VG_TRUE;
+            depthStencilState.depthCompareOp = vk::CompareOp::eLessOrEqual;
             pPass->setDepthStencilInfo(depthStencilState);
             
             pPass->apply();
@@ -525,47 +525,47 @@ namespace vge
             auto info = m_info;
             for (uint32_t i = 0; i < info.deferredAttachmentCount; ++i) 
             {
-				vg::PassTextureInfo info = {
-					m_arrPDeferredAttachments[i].get(),
-					nullptr,
-					nullptr,
-					vk::ImageLayout::eUndefined,
-					i + 1, //0 is own by build in buffer data of pass.
-					vg::ImageDescriptorType::INPUT_ATTACHMENT,
-					vk::ShaderStageFlagBits::eFragment,
-				};
-				pPass->addTexture("input_" + std::to_string(i), info);
+                vg::PassTextureInfo info = {
+                    m_arrPDeferredAttachments[i].get(),
+                    nullptr,
+                    nullptr,
+                    vk::ImageLayout::eUndefined,
+                    i + 1, //0 is own by build in buffer data of pass.
+                    vg::ImageDescriptorType::INPUT_ATTACHMENT,
+                    vk::ShaderStageFlagBits::eFragment,
+                };
+                pPass->addTexture("input_" + std::to_string(i), info);
             }
             pPass->apply();
         }
 
-		{
-			auto pPass = m_pMainPass.get();
-			{
-				vg::PassTextureInfo info = {
-					m_pColorAttachment.get(),
-					nullptr,
-					nullptr,
-					vk::ImageLayout::eUndefined,
-					0u,
-					vg::ImageDescriptorType::COMBINED_IMAGE_SAMPLER,
-					vk::ShaderStageFlagBits::eFragment,
-				};
-				pPass->addTexture("color", info);
-			}
+        {
+            auto pPass = m_pMainPass.get();
+            {
+                vg::PassTextureInfo info = {
+                    m_pColorAttachment.get(),
+                    nullptr,
+                    nullptr,
+                    vk::ImageLayout::eUndefined,
+                    0u,
+                    vg::ImageDescriptorType::COMBINED_IMAGE_SAMPLER,
+                    vk::ShaderStageFlagBits::eFragment,
+                };
+                pPass->addTexture("color", info);
+            }
 
-			{
-				vg::PassTextureInfo info = {
-					m_pDepthStencilAttachment.get(),
-					m_pDepthStencilAttachment->getImageView("only_depth"),
-					nullptr,
-					vk::ImageLayout::eUndefined,
-					1u,
-					vg::ImageDescriptorType::COMBINED_IMAGE_SAMPLER,
-					vk::ShaderStageFlagBits::eFragment,
-				};
-				pPass->addTexture("depth", info);
-			}
+            {
+                vg::PassTextureInfo info = {
+                    m_pDepthStencilAttachment.get(),
+                    m_pDepthStencilAttachment->getImageView("only_depth"),
+                    nullptr,
+                    vk::ImageLayout::eUndefined,
+                    1u,
+                    vg::ImageDescriptorType::COMBINED_IMAGE_SAMPLER,
+                    vk::ShaderStageFlagBits::eFragment,
+                };
+                pPass->addTexture("depth", info);
+            }
             pPass->apply();
         }
     }

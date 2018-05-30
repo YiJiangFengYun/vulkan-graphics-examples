@@ -15,17 +15,17 @@ const uint32_t WINDOW_WIDTH = 800;
 const uint32_t WINDOW_HEIGHT = 600;
 int main() {
 
-	vgf::moduleCreate(plog::debug);
-	static plog::DebugOutputAppender<plog::TxtFormatter> debugOutputAppender;
-	plog::init(plog::debug, &debugOutputAppender);
+    vgf::moduleCreate(plog::debug);
+    static plog::DebugOutputAppender<plog::TxtFormatter> debugOutputAppender;
+    plog::init(plog::debug, &debugOutputAppender);
 
-	chalet::App app;
-	app.init<chalet::Window>(WINDOW_WIDTH, WINDOW_HEIGHT, "chalet");
+    chalet::App app;
+    app.init<chalet::Window>(WINDOW_WIDTH, WINDOW_HEIGHT, "chalet");
 
-	LOG(plog::debug) << "Initialization completed." << std::endl;
+    LOG(plog::debug) << "Initialization completed." << std::endl;
 
-	LOG(plog::debug) << "Start to app run loop." << std::endl;
-	app.run();
+    LOG(plog::debug) << "Start to app run loop." << std::endl;
+    app.run();
 
-	return 0;
+    return 0;
 }

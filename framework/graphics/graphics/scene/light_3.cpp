@@ -2,9 +2,9 @@
 
 namespace vg
 {
-	Light3::Light3()
-		: Light<SpaceType::SPACE_3>()
-	{
+    Light3::Light3()
+        : Light<SpaceType::SPACE_3>()
+    {
 
-	}
+    }
 } //namespace kgs

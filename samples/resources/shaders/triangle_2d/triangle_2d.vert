@@ -4,9 +4,9 @@
 
 layout(binding = 0) uniform BuildIn {
     mat4 matrixObjectToNDC;
-	vec4 mainColor;
-	mat4 matrixObjectToView;
-	mat4 matrixObjectToWorld;
+    vec4 mainColor;
+    mat4 matrixObjectToView;
+    mat4 matrixObjectToWorld;
 } _buildIn;
 
 layout(location = 0) in vec2 inPosition;

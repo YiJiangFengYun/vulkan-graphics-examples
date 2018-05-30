@@ -5,7 +5,7 @@
 class App : public sampleslib::App
 {
 public:
-	App();
+    App();
 private:
 };
 

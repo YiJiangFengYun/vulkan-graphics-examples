@@ -5,20 +5,20 @@
 
 namespace vg
 {
-	struct UsedQueueFamily
-	{
-		int32_t graphicsFamily;
-		int32_t presentFamily;
-		uint32_t graphicsMaxQueueCount;
-		uint32_t presentMaxQueueCount;
+    struct UsedQueueFamily
+    {
+        int32_t graphicsFamily;
+        int32_t presentFamily;
+        uint32_t graphicsMaxQueueCount;
+        uint32_t presentMaxQueueCount;
 
-		UsedQueueFamily();
+        UsedQueueFamily();
 
-		Bool32 isComplete() const;
+        Bool32 isComplete() const;
 
-		UsedQueueFamily static findQueueFamilies(const vk::PhysicalDevice& physicalDevice
-			, const vk::SurfaceKHR& surface);
-	};
+        UsedQueueFamily static findQueueFamilies(const vk::PhysicalDevice& physicalDevice
+            , const vk::SurfaceKHR& surface);
+    };
 }
 
 #endif // !VG_QUEUE_FAMILY_H

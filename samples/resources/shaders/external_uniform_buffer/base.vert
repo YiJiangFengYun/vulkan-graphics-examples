@@ -8,25 +8,25 @@ layout (location = 1) in vec3 inColor;
 
 layout(binding = 0) uniform BuildIn {
     mat4 matrixProjection;
-	mat4 matrixView;
+    mat4 matrixView;
 } _buildIn;
 
 layout (set = 1, binding = 2) uniform OtherInfo 
 {
-	mat4 model;
+    mat4 model;
 } otherInfo;
 
 layout (location = 0) out vec3 outColor;
 
 out gl_PerVertex 
 {
-	vec4 gl_Position;   
+    vec4 gl_Position;   
 };
 
 void main() 
 {
-	outColor = inColor;
-	mat4 modelView = _buildIn.matrixView * otherInfo.model;
-	vec3 worldPos = vec3(modelView * vec4(inPos, 1.0));
-	gl_Position = _buildIn.matrixProjection * modelView * vec4(inPos.xyz, 1.0);
+    outColor = inColor;
+    mat4 modelView = _buildIn.matrixView * otherInfo.model;
+    vec3 worldPos = vec3(modelView * vec4(inPos, 1.0));
+    gl_Position = _buildIn.matrixProjection * modelView * vec4(inPos.xyz, 1.0);
 }

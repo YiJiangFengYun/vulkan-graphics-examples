@@ -5,7 +5,7 @@
 
 layout (binding = 0) uniform MutiplyColorInfo 
 {
-	vec4 color;
+    vec4 color;
 } mutiplyColorInfo;
 
 layout (binding = 1) uniform sampler2D samplerColorMap;
@@ -16,5 +16,5 @@ layout (location = 0) out vec4 outColor;
 
 void main()
 {
-	outColor = texture(samplerColorMap, inUV) * mutiplyColorInfo.color;
+    outColor = texture(samplerColorMap, inUV) * mutiplyColorInfo.color;
 }

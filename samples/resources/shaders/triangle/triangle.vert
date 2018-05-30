@@ -8,14 +8,14 @@ layout (location = 1) in vec3 inColor;
 
 layout(binding = 0) uniform BuildIn {
     mat4 matrixObjectToNDC;
-	vec4 mainColor;
-	mat4 matrixObjectToWorld;	
+    vec4 mainColor;
+    mat4 matrixObjectToWorld;    
 } _buildIn;
 
 // layout (constant_id = 0) const uint LIGHT_COUNT = 0;
 
 // layout(binding = 1) uniform OtherInfo {
-// 	vec4 lightPos[LIGHT_COUNT];
+//     vec4 lightPos[LIGHT_COUNT];
 // } otherInfo;
 
 layout (location = 0) out vec4 outColor;
@@ -28,6 +28,6 @@ out gl_PerVertex
 
 void main() 
 {
-	outColor = _buildIn.mainColor * vec4(inColor, 1.0);
-	gl_Position = _buildIn.matrixObjectToNDC * vec4(inPos.xyz, 1.0);
+    outColor = _buildIn.mainColor * vec4(inColor, 1.0);
+    gl_Position = _buildIn.matrixObjectToNDC * vec4(inPos.xyz, 1.0);
 }

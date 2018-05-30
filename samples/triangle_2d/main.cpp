@@ -8,17 +8,17 @@
 const uint32_t WINDOW_WIDTH = 800;
 const uint32_t WINDOW_HEIGHT = 600;
 int main() {
-	vgf::moduleCreate(plog::debug);
-	static plog::DebugOutputAppender<plog::TxtFormatter> debugOutputAppender;
-	plog::init(plog::debug, &debugOutputAppender);
+    vgf::moduleCreate(plog::debug);
+    static plog::DebugOutputAppender<plog::TxtFormatter> debugOutputAppender;
+    plog::init(plog::debug, &debugOutputAppender);
 
-	App triangle2D;
-	triangle2D.init<Window>(WINDOW_WIDTH, WINDOW_HEIGHT, "triangle_2d");
+    App triangle2D;
+    triangle2D.init<Window>(WINDOW_WIDTH, WINDOW_HEIGHT, "triangle_2d");
 
-	LOG(plog::debug) << "Initialization completed." << std::endl;
+    LOG(plog::debug) << "Initialization completed." << std::endl;
 
-	LOG(plog::debug) << "Start to app run loop." << std::endl;
-	triangle2D.run();
+    LOG(plog::debug) << "Start to app run loop." << std::endl;
+    triangle2D.run();
 
-	return 0;
+    return 0;
 }

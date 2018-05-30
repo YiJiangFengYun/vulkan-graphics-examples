@@ -7,54 +7,54 @@
 
 namespace vg
 {
-	enum class ObjectType
-	{
-		UNDEFINED,
-		VISUAL_OBJECT,
-		CAMERA,
-		LIGHT,
-		BEGIN_RANGE = VISUAL_OBJECT,
-		END_RANGE = LIGHT,
-		RANGE_SIZE = (END_RANGE - BEGIN_RANGE + 1)
-	};
+    enum class ObjectType
+    {
+        UNDEFINED,
+        VISUAL_OBJECT,
+        CAMERA,
+        LIGHT,
+        BEGIN_RANGE = VISUAL_OBJECT,
+        END_RANGE = LIGHT,
+        RANGE_SIZE = (END_RANGE - BEGIN_RANGE + 1)
+    };
 
     //This class is used for object base features.
-	class BaseObject
-	{
-	public:
-		BaseObject();
-		ObjectType getObjectType();
+    class BaseObject
+    {
+    public:
+        BaseObject();
+        ObjectType getObjectType();
 
-		void beginRender() const;
-		void endRender() const;
-	protected:
-		ObjectType m_objectType;
+        void beginRender() const;
+        void endRender() const;
+    protected:
+        ObjectType m_objectType;
 
-		virtual void _beginRender() const;
-		virtual void _endRender() const;
-	};
+        virtual void _beginRender() const;
+        virtual void _endRender() const;
+    };
 
     //This class is used for object dimension space features.
     template <SpaceType SPACE_TYPE>
     class DimObject
-	{
-	public:
-	    using TransformType = typename SpaceTransformTypeInfo<SPACE_TYPE>::TransformType;
+    {
+    public:
+        using TransformType = typename SpaceTransformTypeInfo<SPACE_TYPE>::TransformType;
         DimObject();
 
-		TransformType *getTransform() const;
-	protected:
-	    std::shared_ptr<TransformType> m_pTransform;
-	};
+        TransformType *getTransform() const;
+    protected:
+        std::shared_ptr<TransformType> m_pTransform;
+    };
 
-	template <SpaceType SPACE_TYPE>
-	class Object : public BaseObject, public DimObject<SPACE_TYPE>
-	{
-	public:
-		Object();
-	protected:
-		
-	};
+    template <SpaceType SPACE_TYPE>
+    class Object : public BaseObject, public DimObject<SPACE_TYPE>
+    {
+    public:
+        Object();
+    protected:
+        
+    };
 
 } //namespace kgs
 

@@ -28,7 +28,7 @@
 
 namespace vgf
 { 
-	using Bool32 = uint32_t;
+    using Bool32 = uint32_t;
 }
 
 #endif // !VGF_GLOBAL_H

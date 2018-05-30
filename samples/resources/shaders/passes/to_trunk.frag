@@ -15,13 +15,13 @@ layout (location = 0) out vec4 outColor;
 //   float n = 0.001; // camera z near
 //   float f = 256.0; // camera z far
 //   float z = depth;
-//   return n / (f - z * (f - n));	
+//   return n / (f - z * (f - n));    
 // }
 
 void main() 
 {
-	vec4 color = texture(colorSampler, inUV);
-	float depth = texture(depthSampler, inUV).r;
-	gl_FragDepth = depth;
-	outColor = color;
+    vec4 color = texture(colorSampler, inUV);
+    float depth = texture(depthSampler, inUV).r;
+    gl_FragDepth = depth;
+    outColor = color;
 }

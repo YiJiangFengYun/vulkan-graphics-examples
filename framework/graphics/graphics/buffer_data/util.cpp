@@ -23,28 +23,28 @@ namespace vg
         if (isDeviceMemoryLocal == VG_TRUE)
         {
             //create staging buffer.
-		    vk::BufferCreateInfo createInfo = {
-		    	vk::BufferCreateFlags(),
-		    	bufferSize,
-		    	vk::BufferUsageFlagBits::eTransferSrc,
-		    	vk::SharingMode::eExclusive
-		    };
+            vk::BufferCreateInfo createInfo = {
+                vk::BufferCreateFlags(),
+                bufferSize,
+                vk::BufferUsageFlagBits::eTransferSrc,
+                vk::SharingMode::eExclusive
+            };
     
-		    auto pPhysicalDevice = pApp->getPhysicalDevice();
-		    auto pDevice = pApp->getDevice();
-		    auto pStagingBuffer = fd::createBuffer(pDevice, createInfo);
+            auto pPhysicalDevice = pApp->getPhysicalDevice();
+            auto pDevice = pApp->getDevice();
+            auto pStagingBuffer = fd::createBuffer(pDevice, createInfo);
             vk::MemoryRequirements memReqs = pDevice->getBufferMemoryRequirements(*pStagingBuffer);
-		    vk::MemoryAllocateInfo allocateInfo = {
-		    	memReqs.size,
-		    	vg::findMemoryType(pPhysicalDevice, memReqs.memoryTypeBits, vk::MemoryPropertyFlagBits::eHostVisible)
-		    };
+            vk::MemoryAllocateInfo allocateInfo = {
+                memReqs.size,
+                vg::findMemoryType(pPhysicalDevice, memReqs.memoryTypeBits, vk::MemoryPropertyFlagBits::eHostVisible)
+            };
     
-		    auto pStagingBufferMemory = fd::allocateMemory(pDevice, allocateInfo);
+            auto pStagingBufferMemory = fd::allocateMemory(pDevice, allocateInfo);
     
-		    pDevice->bindBufferMemory(*pStagingBuffer, *pStagingBufferMemory, 0u);
+            pDevice->bindBufferMemory(*pStagingBuffer, *pStagingBufferMemory, 0u);
     
-		    void* data;
-		    pDevice->mapMemory(*pStagingBufferMemory, 0u, static_cast<vk::DeviceSize>(bufferSize), vk::MemoryMapFlags(), &data);
+            void* data;
+            pDevice->mapMemory(*pStagingBufferMemory, 0u, static_cast<vk::DeviceSize>(bufferSize), vk::MemoryMapFlags(), &data);
             uint32_t count = memories.size();
             uint32_t offset = 0;
             uint32_t size = 0;
@@ -61,26 +61,26 @@ namespace vg
             {
                 pDevice->flushMappedMemoryRanges(ranges);                
             }
-		    pDevice->unmapMemory(*pStagingBufferMemory);
+            pDevice->unmapMemory(*pStagingBufferMemory);
     
-		    //create vertex buffer
+            //create vertex buffer
             // if old buffer size is same as required buffer size, we don't to create a new buffer for it.
             if (resultBufferSize < bufferSize) {
                 resultBufferSize = bufferSize;
-		        createInfo.usage = vk::BufferUsageFlagBits::eTransferDst | targetUsage;
-		        resultBuffer = fd::createBuffer(pDevice, createInfo);
-		        memReqs = pDevice->getBufferMemoryRequirements(*resultBuffer);
+                createInfo.usage = vk::BufferUsageFlagBits::eTransferDst | targetUsage;
+                resultBuffer = fd::createBuffer(pDevice, createInfo);
+                memReqs = pDevice->getBufferMemoryRequirements(*resultBuffer);
                 resultBufferMemorySize = static_cast<uint32_t>(memReqs.size);        
-		        allocateInfo.allocationSize = memReqs.size;
-		        allocateInfo.memoryTypeIndex = vg::findMemoryType(pPhysicalDevice, memReqs.memoryTypeBits, memoryPropertyFlags);
-		        resultBufferMemory = fd::allocateMemory(pDevice, allocateInfo);
-		        pDevice->bindBufferMemory(*resultBuffer, *resultBufferMemory, 0u);
+                allocateInfo.allocationSize = memReqs.size;
+                allocateInfo.memoryTypeIndex = vg::findMemoryType(pPhysicalDevice, memReqs.memoryTypeBits, memoryPropertyFlags);
+                resultBufferMemory = fd::allocateMemory(pDevice, allocateInfo);
+                pDevice->bindBufferMemory(*resultBuffer, *resultBufferMemory, 0u);
             }
             
             {
-		        uint32_t offset = 0u;            
-		        //copy buffer from staging buffer to vertex buffer.
-		        auto pCommandBuffer = beginSingleTimeCommands();
+                uint32_t offset = 0u;            
+                //copy buffer from staging buffer to vertex buffer.
+                auto pCommandBuffer = beginSingleTimeCommands();
 
                 std::vector<vk::BufferCopy> regions(count);
                 for (uint32_t i = 0; i < count; ++i)
@@ -90,9 +90,9 @@ namespace vg
                     regions[i].size = ranges[i].size;
                 }
 
-		        pCommandBuffer->copyBuffer(*pStagingBuffer, *resultBuffer, regions);
+                pCommandBuffer->copyBuffer(*pStagingBuffer, *resultBuffer, regions);
     
-		        endSingleTimeCommands(pCommandBuffer);
+                endSingleTimeCommands(pCommandBuffer);
             }
         }
         else
@@ -103,28 +103,28 @@ namespace vg
             {
                 resultBufferSize = bufferSize;
                 //create staging buffer.
-		        vk::BufferCreateInfo createInfo = {
-		        	vk::BufferCreateFlags(),
-		        	bufferSize,
-		        	targetUsage,
-		        	vk::SharingMode::eExclusive
-		        };
+                vk::BufferCreateInfo createInfo = {
+                    vk::BufferCreateFlags(),
+                    bufferSize,
+                    targetUsage,
+                    vk::SharingMode::eExclusive
+                };
         
-		        auto pPhysicalDevice = pApp->getPhysicalDevice();
-		        auto pDevice = pApp->getDevice();
-		        resultBuffer = fd::createBuffer(pDevice, createInfo);
+                auto pPhysicalDevice = pApp->getPhysicalDevice();
+                auto pDevice = pApp->getDevice();
+                resultBuffer = fd::createBuffer(pDevice, createInfo);
                 vk::MemoryRequirements memReqs = pDevice->getBufferMemoryRequirements(*resultBuffer);
                 resultBufferMemorySize = static_cast<uint32_t>(memReqs.size);  
-		        vk::MemoryAllocateInfo allocateInfo = {
-		        	memReqs.size,
-		        	vg::findMemoryType(pPhysicalDevice, memReqs.memoryTypeBits, memoryPropertyFlags)
-		        };
+                vk::MemoryAllocateInfo allocateInfo = {
+                    memReqs.size,
+                    vg::findMemoryType(pPhysicalDevice, memReqs.memoryTypeBits, memoryPropertyFlags)
+                };
         
-		        resultBufferMemory = fd::allocateMemory(pDevice, allocateInfo);
+                resultBufferMemory = fd::allocateMemory(pDevice, allocateInfo);
         
-		        pDevice->bindBufferMemory(*resultBuffer, *resultBufferMemory, 0u);
+                pDevice->bindBufferMemory(*resultBuffer, *resultBufferMemory, 0u);
         
-		        pDevice->mapMemory(*resultBufferMemory, 0u, static_cast<vk::DeviceSize>(bufferSize), vk::MemoryMapFlags(), resultMemoryForHostVisible);
+                pDevice->mapMemory(*resultBufferMemory, 0u, static_cast<vk::DeviceSize>(bufferSize), vk::MemoryMapFlags(), resultMemoryForHostVisible);
             }
             uint32_t count = memories.size();
             uint32_t offset = 0;
@@ -138,7 +138,7 @@ namespace vg
                 ranges[i].offset = offset;
                 ranges[i].size = size;
             }
-		    auto pDevice = pApp->getDevice();
+            auto pDevice = pApp->getDevice();
             if (count)
             {
                 pDevice->flushMappedMemoryRanges(ranges);                
@@ -147,13 +147,13 @@ namespace vg
     }
 
     void vertexDataToCommandBuffer(vk::CommandBuffer &commandBuffer, const VertexData *pVertexData, uint32_t subIndex)
-	{
-		const auto &subVertexDatas = pVertexData->getSubVertexDatas();
+    {
+        const auto &subVertexDatas = pVertexData->getSubVertexDatas();
         const auto &subVertexData = subVertexDatas[subIndex];
-		uint32_t bindingDescCount = subVertexData.vertexInputStateInfo.vertexBindingDescriptionCount;
+        uint32_t bindingDescCount = subVertexData.vertexInputStateInfo.vertexBindingDescriptionCount;
         const auto &bindingDescs = subVertexData.vertexInputStateInfo.pVertexBindingDescriptions;
         std::vector<vk::Buffer> vertexBuffers(bindingDescCount);
-		std::vector<vk::DeviceSize> offsets(bindingDescCount);
+        std::vector<vk::DeviceSize> offsets(bindingDescCount);
         uint32_t offset = 0u;        
         for (uint32_t i = 0; i < subIndex; ++i) {
             offset += subVertexDatas[i].bufferSize;
@@ -166,8 +166,8 @@ namespace vg
             offset += bindingDescs[i].stride * subVertexData.vertexCount;
         }
         
-		commandBuffer.bindVertexBuffers(0u, vertexBuffers, offsets);
-	}
+        commandBuffer.bindVertexBuffers(0u, vertexBuffers, offsets);
+    }
 
     void indexDataToCommandBuffer(vk::CommandBuffer &commandBuffer, 
         const IndexData *pIndexData, 
@@ -176,10 +176,10 @@ namespace vg
     {
         uint32_t offset = 0u;
         const auto &subIndexDatas = pIndexData->getSubIndexDatas();
-		for (uint32_t i = 0; i < subIndex; ++i)
-		{
-			offset += subIndexDatas[i].bufferSize;
-		}
-		commandBuffer.bindIndexBuffer(*(pIndexData->getBufferData().getBuffer()), static_cast<vk::DeviceSize>(offset), subIndexDatas[subIndex].indexType);
+        for (uint32_t i = 0; i < subIndex; ++i)
+        {
+            offset += subIndexDatas[i].bufferSize;
+        }
+        commandBuffer.bindIndexBuffer(*(pIndexData->getBufferData().getBuffer()), static_cast<vk::DeviceSize>(offset), subIndexDatas[subIndex].indexType);
     }
 }

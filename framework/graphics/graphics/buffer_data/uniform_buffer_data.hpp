@@ -20,7 +20,7 @@ namespace vg
             DescriptorBufferInfo(uint32_t range = 0u, uint32_t bufferRange = 0u, uint32_t dynamicOffset = 0u);
 
             Bool32 operator ==(const DescriptorBufferInfo& target) const;
-			Bool32 operator !=(const DescriptorBufferInfo& target) const;
+            Bool32 operator !=(const DescriptorBufferInfo& target) const;
         };
 
         struct SubDataInfo 
@@ -43,7 +43,7 @@ namespace vg
         public:
             SubData();
             SubData(SubDataInfo info, const vk::Buffer *pBuffer, const vk::DescriptorPool *pDescriptorPool);
-			~SubData();
+            ~SubData();
             void init(SubDataInfo info, const vk::Buffer *pBuffer, const vk::DescriptorPool *pDescriptorPool);
 
             uint32_t getLayoutBindingCount() const;
@@ -99,10 +99,10 @@ namespace vg
 
         std::uint32_t m_poolMaxSetCount;
         std::unordered_map<vk::DescriptorType, uint32_t> m_poolSizeInfos;
-		std::shared_ptr<vk::DescriptorPool> m_pDescriptorPool;
+        std::shared_ptr<vk::DescriptorPool> m_pDescriptorPool;
 
-		uint32_t m_subDataCount;
-		std::vector<SubData> m_subDatas;
+        uint32_t m_subDataCount;
+        std::vector<SubData> m_subDatas;
 
         Bool32 _isEqual(uint32_t subDataCount1, const SubData *pSubDatas1, uint32_t subDataOffset1,
             uint32_t subDataCount2, const SubDataInfo *pSubDatas2);

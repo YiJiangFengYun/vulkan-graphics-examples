@@ -5,12 +5,12 @@
 
 layout (binding = 1) uniform Data
 {
-	vec4 outlineColor;
+    vec4 outlineColor;
 } dataFrag;
 
 layout (location = 0) out vec4 outFragColor;
 
 void main() 
 {
-	outFragColor = dataFrag.outlineColor;
+    outFragColor = dataFrag.outlineColor;
 }

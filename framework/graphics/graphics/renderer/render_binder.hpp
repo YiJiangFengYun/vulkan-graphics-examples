@@ -29,7 +29,7 @@ namespace vg
             , BaseCamera *pCamera
             , const PreZTarget *pPreZTarget = nullptr
             , CmdBuffer *pPreZCmdBuffer = nullptr
-			, CmdBuffer *pBranchCmdBuffer = nullptr
+            , CmdBuffer *pBranchCmdBuffer = nullptr
             , CmdBuffer *pTrunkWaitBarrierCmdBuffer = nullptr            
             , CmdBuffer *pTrunkRenderPassCmdBuffer = nullptr
             , PostRender *pPostRender = nullptr
@@ -41,7 +41,7 @@ namespace vg
         uint32_t m_framebufferWidth;
         uint32_t m_framebufferHeight;
         std::vector<BaseVisualObject *> m_bindedObjects;
-		uint32_t m_bindedObjectCount;
+        uint32_t m_bindedObjectCount;
 
         void _beginBind();
 
@@ -49,7 +49,7 @@ namespace vg
             , BaseCamera *pCamera
             , const PreZTarget *pPreZTarget = nullptr
             , CmdBuffer *pPreZCmdBuffer = nullptr
-			, CmdBuffer *pBranchCmdBuffer = nullptr
+            , CmdBuffer *pBranchCmdBuffer = nullptr
             , CmdBuffer *pTrunkWaitBarrierCmdBuffer = nullptr            
             , CmdBuffer *pTrunkRenderPassCmdBuffer = nullptr
             , PostRender *pPostRender = nullptr
@@ -58,22 +58,22 @@ namespace vg
             );
 
         void _bindScene2(Scene<SpaceType::SPACE_2> *pScene
-		    , Camera<SpaceType::SPACE_2> *pCamera
+            , Camera<SpaceType::SPACE_2> *pCamera
             , const PreZTarget *pPreZTarget = nullptr
-			, CmdBuffer *pPreZCmdBuffer = nullptr
-			, CmdBuffer *pBranchCmdBuffer = nullptr
+            , CmdBuffer *pPreZCmdBuffer = nullptr
+            , CmdBuffer *pBranchCmdBuffer = nullptr
             , CmdBuffer *pTrunkWaitBarrierCmdBuffer = nullptr            
             , CmdBuffer *pTrunkRenderPassCmdBuffer = nullptr
-			);
+            );
 
-		void _bindScene3(Scene<SpaceType::SPACE_3> *pScene
-		    , Camera<SpaceType::SPACE_3> *pCamera
+        void _bindScene3(Scene<SpaceType::SPACE_3> *pScene
+            , Camera<SpaceType::SPACE_3> *pCamera
             , const PreZTarget *pPreZTarget = nullptr
-			, CmdBuffer *pPreZCmdBuffer = nullptr
-			, CmdBuffer *pBranchCmdBuffer = nullptr
+            , CmdBuffer *pPreZCmdBuffer = nullptr
+            , CmdBuffer *pBranchCmdBuffer = nullptr
             , CmdBuffer *pTrunkWaitBarrierCmdBuffer = nullptr            
             , CmdBuffer *pTrunkRenderPassCmdBuffer = nullptr
-			);
+            );
 
         void _setPreZBuildInData(BaseVisualObject * pVisualObject
             , Matrix4x4 modelMatrix
@@ -81,7 +81,7 @@ namespace vg
             , Matrix4x4 projMatrix
             , const PreZTarget *pPreZTarget
 #if defined(DEBUG) && defined(VG_ENABLE_COST_TIMER)
-	        , fd::CostTimer * pPreparingBuildInDataCostTimer
+            , fd::CostTimer * pPreparingBuildInDataCostTimer
 #endif //DEBUG and VG_ENABLE_COST_TIMER
             );
 
@@ -91,16 +91,16 @@ namespace vg
             , Matrix4x4 projMatrix
             , const PreZTarget *pPreZTarget
 #if defined(DEBUG) && defined(VG_ENABLE_COST_TIMER)
-	    , fd::CostTimer * pPreparingBuildInDataCostTimer
+        , fd::CostTimer * pPreparingBuildInDataCostTimer
 #endif //DEBUG and VG_ENABLE_COST_TIMER
-		);
+        );
 
-		void _bindVisualObject(BaseVisualObject *pVisublObject
+        void _bindVisualObject(BaseVisualObject *pVisublObject
             , BaseVisualObject::BindInfo & bindInfo
             , BaseVisualObject::BindResult *pResult
             );
 
-		void _endBind();
+        void _endBind();
     };
 } //vg
 

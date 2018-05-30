@@ -9,7 +9,7 @@ layout (location = 2) in vec3 inNormal;
 
 layout(binding = 0) uniform BuildIn {
     mat4 matrixObjectToNDC;
-	mat4 matrixObjectToWorld;	
+    mat4 matrixObjectToWorld;    
 } _buildIn;
 
 layout (location = 0) out vec3 outNormal;
@@ -19,22 +19,22 @@ layout (location = 2) out vec3 outWorldPos;
 
 out gl_PerVertex
 {
-	vec4 gl_Position;
+    vec4 gl_Position;
 };
 
 void main() 
 {
-	gl_Position = _buildIn.matrixObjectToNDC * inPos;
-	
-	// Vertex position in world space
-	outWorldPos = vec3(_buildIn.matrixObjectToWorld * inPos);
-	// // GL to Vulkan coord space
-	// outWorldPos.y = -outWorldPos.y;
-	
-	// Normal in world space
-	// mat3 mNormal = transpose(inverse(mat3(_buildIn.matrixObjectToWorld)));
-	outNormal = mat3(_buildIn.matrixObjectToWorld) * normalize(inNormal);	
-	
-	// Currently just vertex color
-	outColor = inColor;
+    gl_Position = _buildIn.matrixObjectToNDC * inPos;
+    
+    // Vertex position in world space
+    outWorldPos = vec3(_buildIn.matrixObjectToWorld * inPos);
+    // // GL to Vulkan coord space
+    // outWorldPos.y = -outWorldPos.y;
+    
+    // Normal in world space
+    // mat3 mNormal = transpose(inverse(mat3(_buildIn.matrixObjectToWorld)));
+    outNormal = mat3(_buildIn.matrixObjectToWorld) * normalize(inNormal);    
+    
+    // Currently just vertex color
+    outColor = inColor;
 }

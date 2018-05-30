@@ -6,20 +6,20 @@
 
 namespace vg
 {
-	class VisualObject2 : public VisualObject<SpaceType::SPACE_2>
-	{
-	public:
-		VisualObject2();
+    class VisualObject2 : public VisualObject<SpaceType::SPACE_2>
+    {
+    public:
+        VisualObject2();
 
-		template <class VisualizerType>
-		VisualObject2()
-		    : VisualObject<SpaceType::SPACE_2><VisualizerType>()
-		{
+        template <class VisualizerType>
+        VisualObject2()
+            : VisualObject<SpaceType::SPACE_2><VisualizerType>()
+        {
 
-		}
+        }
 
-		virtual Matrix4x4 _getModelMatrix() const override;
-	};
+        virtual Matrix4x4 _getModelMatrix() const override;
+    };
 
 } //namespace kgs
 

@@ -12,11 +12,11 @@ namespace vg
     public:
         struct BindInfo 
         {
-			uint32_t framebufferWidth;
-			uint32_t framebufferHeight;
+            uint32_t framebufferWidth;
+            uint32_t framebufferHeight;
 
             BindInfo( uint32_t framebufferWidth = 0u
-			    , uint32_t framebufferHeight = 0u
+                , uint32_t framebufferHeight = 0u
                 );
         };
     
@@ -29,12 +29,12 @@ namespace vg
 
         PostRender();
         const Material * getMaterial() const;
-		Material * getMaterial();
+        Material * getMaterial();
         void setMaterial(Material * pMaterial);
 
         Bool32 isValidBindToRender() const;
         void beginBind(const BindInfo info, BindResult *pResult) const;
-		void endBind() const;
+        void endBind() const;
 
     private:
        Material * m_pMaterial;

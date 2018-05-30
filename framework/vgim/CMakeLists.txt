@@ -1,7 +1,7 @@
 set(LIBRARY_NAME "vgim")
 configure_file(
-	"${CMAKE_CURRENT_SOURCE_DIR}/config/config.hpp.in"
-	"${CMAKE_CURRENT_SOURCE_DIR}/${LIBRARY_NAME}/config.hpp"
+    "${CMAKE_CURRENT_SOURCE_DIR}/config/config.hpp.in"
+    "${CMAKE_CURRENT_SOURCE_DIR}/${LIBRARY_NAME}/config.hpp"
 )
 
 set(INCLUDE_DIRS ${INCLUDE_DIRS} ${IMGUI_DIR})

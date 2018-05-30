@@ -18,7 +18,7 @@ namespace fd
         using TimePointType = typename std::chrono::time_point<ClockType>;
 
         TimePointType startTime;
-		TimePointType endTime;
+        TimePointType endTime;
         float currTimer;
         float costTimer;
         CostTimer();

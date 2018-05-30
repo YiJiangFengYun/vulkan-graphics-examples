@@ -12,8 +12,8 @@ namespace vg
         , m_pShader()
         , m_pPass()
     {
-		m_pShader = std::shared_ptr<Shader>{ new Shader() };
-		m_pPass = std::shared_ptr<Pass>{ new Pass(m_pShader.get()) };
+        m_pShader = std::shared_ptr<Shader>{ new Shader() };
+        m_pPass = std::shared_ptr<Pass>{ new Pass(m_pShader.get()) };
         m_pShader->load(DEFAULT_VERT_SHADER_CODE, DEFAULT_VERT_SHADER_CODE_SIZE,
             DEFAULT_FRAG_SHADER_CODE, DEFAULT_FRAG_SHADER_CODE_SIZE);
         _init();
@@ -39,37 +39,37 @@ namespace vg
         m_pPass->setPolygonMode(polygonMode);
     }
 
-	void PreZPass::setCullMode(vk::CullModeFlags cullMode)
+    void PreZPass::setCullMode(vk::CullModeFlags cullMode)
     {
         m_pPass->setCullMode(cullMode);
     }
 
-	void PreZPass::setFrontFace(vk::FrontFace frontFace)
+    void PreZPass::setFrontFace(vk::FrontFace frontFace)
     {
         m_pPass->setFrontFace(frontFace);
     }
 
-	void PreZPass::setLineWidth(float lineWidth)
+    void PreZPass::setLineWidth(float lineWidth)
     {
         m_pPass->setLineWidth(lineWidth);
     }
 
-	void PreZPass::setViewport(const fd::Viewport &viewport)
+    void PreZPass::setViewport(const fd::Viewport &viewport)
     {
         m_pPass->setViewport(viewport);
     }
 
-	void PreZPass::setScissor(const fd::Rect2D &scissor)
+    void PreZPass::setScissor(const fd::Rect2D &scissor)
     {
         m_pPass->setScissor(scissor);
     }
 
-	void PreZPass::setDepthStencilInfo(const vk::PipelineDepthStencilStateCreateInfo &value)
+    void PreZPass::setDepthStencilInfo(const vk::PipelineDepthStencilStateCreateInfo &value)
     {
         m_pPass->setDepthStencilInfo(value);
     }
 
-	void PreZPass::setDefaultInputAssemblyState(vk::PipelineInputAssemblyStateCreateInfo & value)
+    void PreZPass::setDefaultInputAssemblyState(vk::PipelineInputAssemblyStateCreateInfo & value)
     {
         m_pPass->setDefaultInputAssemblyState(value);
     }
@@ -97,11 +97,11 @@ namespace vg
     void PreZPass::_init()
     {
         vg::Pass::BuildInDataInfo::Component buildInDataCmp = {
-	    		{vg::Pass::BuildInDataType::MATRIX_OBJECT_TO_NDC},
-	    	};
-	    vg::Pass::BuildInDataInfo buildInDataInfo;
-	    buildInDataInfo.componentCount = 1u;
-	    buildInDataInfo.pComponent = &buildInDataCmp;
+                {vg::Pass::BuildInDataType::MATRIX_OBJECT_TO_NDC},
+            };
+        vg::Pass::BuildInDataInfo buildInDataInfo;
+        buildInDataInfo.componentCount = 1u;
+        buildInDataInfo.pComponent = &buildInDataCmp;
         m_pPass->setBuildInDataInfo(buildInDataInfo);
     }
 } //vg

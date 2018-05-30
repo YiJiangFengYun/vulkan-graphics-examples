@@ -158,7 +158,7 @@ namespace vg
 
     void PassPushConstantData::addPushConstant(std::string name
         , uint32_t priority
-        , vk::ShaderStageFlags stageFlags		
+        , vk::ShaderStageFlags stageFlags        
         , uint32_t size
         )
     {
@@ -178,7 +178,7 @@ namespace vg
 
     void PassPushConstantData::setPushConstant(std::string name
         , uint32_t priority
-        , vk::ShaderStageFlags stageFlags		
+        , vk::ShaderStageFlags stageFlags        
         , uint32_t size
         )
     {

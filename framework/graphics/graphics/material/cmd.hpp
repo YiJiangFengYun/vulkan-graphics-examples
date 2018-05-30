@@ -65,7 +65,7 @@ namespace vg
         uint32_t subPassIndex;
         const vk::Framebuffer *pFrameBuffer;
         uint32_t framebufferWidth;
-		uint32_t framebufferHeight;
+        uint32_t framebufferHeight;
         fd::Rect2D renderArea;
         uint32_t clearValueCount;
         const vk::ClearValue *pClearValues;
@@ -75,7 +75,7 @@ namespace vg
         const Pass *pPass;
         Matrix4x4 modelMatrix;
         const BaseMesh *pMesh;
-		uint32_t subMeshIndex;
+        uint32_t subMeshIndex;
         fd::Viewport viewport;
         fd::Rect2D scissor;
         const CmdDraw *pCmdDraw;
@@ -89,8 +89,8 @@ namespace vg
         RenderPassInfo(const vk::RenderPass *pRenderPass = nullptr
             , uint32_t subPassIndex = 0u
             , const vk::Framebuffer *pFrameBuffer = nullptr
-			, uint32_t framebufferWidth = 0u
-			, uint32_t framebufferHeight = 0u
+            , uint32_t framebufferWidth = 0u
+            , uint32_t framebufferHeight = 0u
             , fd::Rect2D renderArea = fd::Rect2D()
             , uint32_t clearValueCount = 0u
             , const vk::ClearValue *pClearValues = nullptr
@@ -112,12 +112,12 @@ namespace vg
             );
     };
 
-	struct CmdInfo
-	{
-		const RenderPassInfo *pRenderPassInfo;
-		const BarrierInfo *pBarrierInfo;
-		CmdInfo();
-	};
+    struct CmdInfo
+    {
+        const RenderPassInfo *pRenderPassInfo;
+        const BarrierInfo *pBarrierInfo;
+        CmdInfo();
+    };
 
     class CmdBuffer 
     {
@@ -138,7 +138,7 @@ namespace vg
         uint32_t m_renderPassInfoCount;
         uint32_t m_renderPassInfoCapacity;
         std::vector<RenderPassInfo> m_renderPassInfos;
-		std::vector<uint32_t> m_renderPassInfoToCmdInfoIndices;
+        std::vector<uint32_t> m_renderPassInfoToCmdInfoIndices;
 
         uint32_t m_clearValuesCount;
         uint32_t m_clearValuesCapacity;
@@ -147,17 +147,17 @@ namespace vg
         uint32_t m_cmdDrawCount;
         uint32_t m_cmdDrawCapacity;
         std::vector<CmdDraw> m_cmdDraws;
-		std::vector<uint32_t> m_cmdDrawToRenderPassInfoIndices;
+        std::vector<uint32_t> m_cmdDrawToRenderPassInfoIndices;
 
         uint32_t m_cmdDrawIndexedCount;
         uint32_t m_cmdDrawIndexedCapacity;
         std::vector<CmdDrawIndexed> m_cmdDrawIndexeds;
-		std::vector<uint32_t> m_cmdDrawIndexedToRenderPassInfoIndices;
+        std::vector<uint32_t> m_cmdDrawIndexedToRenderPassInfoIndices;
 
         uint32_t m_barrierInfoCount;
         uint32_t m_barrierInfosCapacity;
         std::vector<BarrierInfo> m_barrierInfos;
-		std::vector<uint32_t> m_barrierInfoToCmdInfoIndices;
+        std::vector<uint32_t> m_barrierInfoToCmdInfoIndices;
 
         uint32_t m_memoryBarrierCount;
         uint32_t m_memoryBarrierCapacity;
@@ -170,7 +170,7 @@ namespace vg
         uint32_t m_imageMemoryBarrierCount;
         uint32_t m_imageMemoryBarrierCapacity;
         std::vector<std::vector<vk::ImageMemoryBarrier>> m_imageMemoryBarriers;
-	};
+    };
 } //vg
 
 #endif //VG_RENDER_PASS_INFO_HPP

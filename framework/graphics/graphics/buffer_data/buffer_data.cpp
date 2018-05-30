@@ -5,10 +5,10 @@
 namespace vg
 {
     BufferData::BufferData(vk::BufferUsageFlags bufferUsageFlags
-		, vk::MemoryPropertyFlags memoryPropertyFlags
-	    )
+        , vk::MemoryPropertyFlags memoryPropertyFlags
+        )
         : m_bufferUsageFlags(bufferUsageFlags)
-		, m_memoryPropertyFlags(memoryPropertyFlags)
+        , m_memoryPropertyFlags(memoryPropertyFlags)
         , m_size()
         , m_bufferSize()
         , m_pBuffer()
@@ -65,29 +65,29 @@ namespace vg
         m_size = size;
 
         if (size)
-		{
-			if (cacheMemory) {
-				if (m_pMemory == nullptr) {
-					m_pMemory = malloc(size);
-					m_memorySize = size;
-				}
-				uint32_t count = memories.size();
-				uint32_t offset = 0;
-				uint32_t size = 0;
-				for (uint32_t i = 0; i < count; ++i) {
-					offset = (*(memories.data() + i)).offset;
-					size = (*(memories.data() + i)).size;
-					memcpy(((char*)m_pMemory + offset), (*(memories.data() + i)).pMemory, size);
-				}
-			}
-			_createBuffer(memories, size);
-		}
+        {
+            if (cacheMemory) {
+                if (m_pMemory == nullptr) {
+                    m_pMemory = malloc(size);
+                    m_memorySize = size;
+                }
+                uint32_t count = memories.size();
+                uint32_t offset = 0;
+                uint32_t size = 0;
+                for (uint32_t i = 0; i < count; ++i) {
+                    offset = (*(memories.data() + i)).offset;
+                    size = (*(memories.data() + i)).size;
+                    memcpy(((char*)m_pMemory + offset), (*(memories.data() + i)).pMemory, size);
+                }
+            }
+            _createBuffer(memories, size);
+        }
     }
 
-	vk::BufferUsageFlags BufferData::getBufferUsageFlags() const
-	{
-		return m_bufferUsageFlags;
-	}
+    vk::BufferUsageFlags BufferData::getBufferUsageFlags() const
+    {
+        return m_bufferUsageFlags;
+    }
 
     vk::MemoryPropertyFlags BufferData::getMemoryPropertyFlags() const
     {

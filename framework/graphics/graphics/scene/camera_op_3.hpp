@@ -5,13 +5,13 @@
 
 namespace vg
 {
-	class CameraOP3 : public CameraOP<SpaceType::SPACE_3>
-	{
-	public:
-		CameraOP3();
-	private:
-	    virtual void _applyProj() override;
-	};
+    class CameraOP3 : public CameraOP<SpaceType::SPACE_3>
+    {
+    public:
+        CameraOP3();
+    private:
+        virtual void _applyProj() override;
+    };
 } //namespace kgs
 
 #endif // !VG_CAMERA_OP_3_H

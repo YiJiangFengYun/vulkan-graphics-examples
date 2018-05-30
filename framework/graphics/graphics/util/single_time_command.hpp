@@ -6,8 +6,8 @@
 
 namespace vg
 {
-	extern std::shared_ptr<vk::CommandBuffer> beginSingleTimeCommands();
+    extern std::shared_ptr<vk::CommandBuffer> beginSingleTimeCommands();
 
-	extern void endSingleTimeCommands(const std::shared_ptr<vk::CommandBuffer> &pCommandBuffer);
+    extern void endSingleTimeCommands(const std::shared_ptr<vk::CommandBuffer> &pCommandBuffer);
 } //namespace kgs
 #endif // !VG_SINGLE_TIME_COMMAND_H

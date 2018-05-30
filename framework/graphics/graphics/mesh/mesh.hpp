@@ -189,22 +189,21 @@ namespace vg
         void setTextureCoordinates(const typename MeshData::DataTypeInfo<TextureCoordinateConstInfo<textureCoordinateType>::ARRAY_TYPE>::ValueType &textureCoordinates);
 
         template<MeshData::DataType dataType>
-        Bool32 hasData(std::string name) const;
+        Bool32 hasData(const SlotType &slot) const;
 
         template<MeshData::DataType dataType>
-        void addData(std::string name
+        void addData(const SlotType &slot
             , const typename MeshData::DataTypeInfo<dataType>::ValueType &value
-            , uint32_t bindingPriority = VG_VERTEX_BINDING_PRIORITY_OTHER_MIN
             );
 
         template<MeshData::DataType dataType>
-        void removeData(std::string name);
+        void removeData(const SlotType &slot);
 
         template<MeshData::DataType dataType>
-        const typename MeshData::DataTypeInfo<dataType>::ValueType getData(std::string name) const;
+        const typename MeshData::DataTypeInfo<dataType>::ValueType getData(const SlotType &slot) const;
 
         template <MeshData::DataType dataType>
-        void setData(const std::string name
+        void setData(const SlotType &slot
             , const typename MeshData::DataTypeInfo<dataType>::ValueType &value
             );
 

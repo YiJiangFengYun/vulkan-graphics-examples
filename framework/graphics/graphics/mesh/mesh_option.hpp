@@ -5,6 +5,7 @@
 #include <vulkan/vulkan.hpp>
 #include "graphics/global.hpp"
 #include "graphics/mesh/mesh_data.hpp"
+#include "graphics/util/slot_map.hpp"
 
 namespace vg
 {
@@ -57,8 +58,7 @@ namespace vg
     template<TextureCoordinateIndex index>
     struct TextureCoordinateIndexInfo
     {
-        static const std::string VERTEX_NAME;
-        static const std::uint32_t VERTEX_BINDING_PRIORITY;
+        static const uint32_t SLOT;
     };
 
     enum class PrimitiveTopology
@@ -150,28 +150,16 @@ namespace vg
     };
 
     template<>
-    const std::string TextureCoordinateIndexInfo<TextureCoordinateIndex::TextureCoordinate_0>::VERTEX_NAME = VG_VERTEX_TextureCoordinate0_NAME;
+    const std::uint32_t TextureCoordinateIndexInfo<TextureCoordinateIndex::TextureCoordinate_0>::SLOT = VG_VERTEX_SlOT_TextureCoordinate0;
 
     template<>
-    const std::uint32_t TextureCoordinateIndexInfo<TextureCoordinateIndex::TextureCoordinate_0>::VERTEX_BINDING_PRIORITY = VG_VERTEX_BINDING_PRIORITY_TextureCoordinate0;
+    const std::uint32_t TextureCoordinateIndexInfo<TextureCoordinateIndex::TextureCoordinate_1>::SLOT = VG_VERTEX_SLOT_TextureCoordinate1;
 
     template<>
-    const std::string TextureCoordinateIndexInfo<TextureCoordinateIndex::TextureCoordinate_1>::VERTEX_NAME = VG_VERTEX_TextureCoordinate1_NAME;
+    const std::uint32_t TextureCoordinateIndexInfo<TextureCoordinateIndex::TextureCoordinate_2>::SLOT = VG_VERTEX_SLOT_TextureCoordinate2;
 
     template<>
-    const std::uint32_t TextureCoordinateIndexInfo<TextureCoordinateIndex::TextureCoordinate_1>::VERTEX_BINDING_PRIORITY = VG_VERTEX_BINDING_PRIORITY_TextureCoordinate1;
-
-    template<>
-    const std::string TextureCoordinateIndexInfo<TextureCoordinateIndex::TextureCoordinate_2>::VERTEX_NAME = VG_VERTEX_TextureCoordinate2_NAME;
-
-    template<>
-    const std::uint32_t TextureCoordinateIndexInfo<TextureCoordinateIndex::TextureCoordinate_2>::VERTEX_BINDING_PRIORITY = VG_VERTEX_BINDING_PRIORITY_TextureCoordinate2;
-
-    template<>
-    const std::string TextureCoordinateIndexInfo<TextureCoordinateIndex::TextureCoordinate_3>::VERTEX_NAME = VG_VERTEX_TextureCoordinate3_NAME;
-
-    template<>
-    const std::uint32_t TextureCoordinateIndexInfo<TextureCoordinateIndex::TextureCoordinate_3>::VERTEX_BINDING_PRIORITY = VG_VERTEX_BINDING_PRIORITY_TextureCoordinate3;
+    const std::uint32_t TextureCoordinateIndexInfo<TextureCoordinateIndex::TextureCoordinate_3>::SLOT = VG_VERTEX_SLOT_TextureCoordinate3;
 } //namespace kgs
 
 #endif // !VG_MESH_OPTION_H

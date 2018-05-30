@@ -210,52 +210,52 @@ namespace vg
 
     Bool32 SepMesh::hasColor32s() const
     {
-        return hasData<MeshData::DataType::COLOR_32_ARRAY>(VG_VERTEX_COLOR_NAME);
+        return hasData<MeshData::DataType::COLOR_32_ARRAY>(VG_VERTEX_SLOT_COLOR);
     }
         
     void SepMesh::addColor32s(const std::vector<Color32> &color32s)
     {
-        addData<MeshData::DataType::COLOR_32_ARRAY>(VG_VERTEX_COLOR_NAME, color32s, VG_VERTEX_BINDING_PRIORITY_COLOR);
+        addData<MeshData::DataType::COLOR_32_ARRAY>(VG_VERTEX_SLOT_COLOR, color32s);
     }
         
     void SepMesh::removeColor32s()
     {
-        removeData<MeshData::DataType::COLOR_32_ARRAY>(VG_VERTEX_COLOR_NAME);
+        removeData<MeshData::DataType::COLOR_32_ARRAY>(VG_VERTEX_SLOT_COLOR);
     }
         
     const std::vector<Color32> SepMesh::getColor32s() const
     {
-        return getData<MeshData::DataType::COLOR_32_ARRAY>(VG_VERTEX_COLOR_NAME);
+        return getData<MeshData::DataType::COLOR_32_ARRAY>(VG_VERTEX_SLOT_COLOR);
     }
         
     void SepMesh::setColor32s(const std::vector<Color32> &color32s)
     {
-        setData<MeshData::DataType::COLOR_32_ARRAY>(VG_VERTEX_COLOR_NAME, color32s);
+        setData<MeshData::DataType::COLOR_32_ARRAY>(VG_VERTEX_SLOT_COLOR, color32s);
     }
 
     Bool32 SepMesh::hasColors() const
     {
-        return hasData<MeshData::DataType::COLOR_ARRAY>(VG_VERTEX_COLOR_NAME);
+        return hasData<MeshData::DataType::COLOR_ARRAY>(VG_VERTEX_SLOT_COLOR);
     }
         
     void SepMesh::addColors(const std::vector<Color> &colors)
     {
-        addData<MeshData::DataType::COLOR_ARRAY>(VG_VERTEX_COLOR_NAME, colors, VG_VERTEX_BINDING_PRIORITY_COLOR);
+        addData<MeshData::DataType::COLOR_ARRAY>(VG_VERTEX_SLOT_COLOR, colors);
     }
         
     void SepMesh::removeColors()
     {
-        removeData<MeshData::DataType::COLOR_ARRAY>(VG_VERTEX_COLOR_NAME);
+        removeData<MeshData::DataType::COLOR_ARRAY>(VG_VERTEX_SLOT_COLOR);
     }
 
     const std::vector<Color> SepMesh::getColors() const
     {
-        return getData<MeshData::DataType::COLOR_ARRAY>(VG_VERTEX_COLOR_NAME);
+        return getData<MeshData::DataType::COLOR_ARRAY>(VG_VERTEX_SLOT_COLOR);
     }
 
     void SepMesh::setColors(const std::vector<Color> &colors)
     {
-        setData<MeshData::DataType::COLOR_ARRAY>(VG_VERTEX_COLOR_NAME, colors);
+        setData<MeshData::DataType::COLOR_ARRAY>(VG_VERTEX_SLOT_COLOR, colors);
     }
 
     uint32_t SepMesh::getSubMeshCount() const
@@ -430,7 +430,7 @@ namespace vg
         uint32_t offset = 0u;
         for (const auto& layoutInfo : m_layoutBindingInfos)
         {
-            m_pData->memoryCopyData(layoutInfo.dataType, layoutInfo.name, stagingMemory, offset, 0u, vertexCount);
+            m_pData->memoryCopyData(layoutInfo.dataType, layoutInfo.slot, stagingMemory, offset, 0u, vertexCount);
             offset += MeshData::getDataBaseSize(layoutInfo.dataType) * vertexCount;
         }
 
@@ -479,9 +479,9 @@ namespace vg
         uint32_t dataSize = datas.size();
         for (uint32_t i = 0; i < dataSize; ++i) {
             const auto &data = datas[i];
-            const auto &arrNames = data.arrDataNames;
-            for (const auto& name : arrNames) {
-                const auto &dataInfo = data.getDataInfo(name);
+            const auto &slots = data.getSlots();
+            for (const auto& slot : slots) {
+                const auto &dataInfo = data.getDataInfo(slot);
                 m_layoutBindingInfos.insert(dataInfo);
             }
         }
@@ -520,91 +520,91 @@ namespace vg
     template <MeshDimType meshDimType>
     Bool32 DimSepMesh<meshDimType>::hasPositions() const
     {
-        return hasData<ARRAY_DATA_TYPE>(VG_VERTEX_POSITION_NAME);
+        return hasData<ARRAY_DATA_TYPE>(VG_VERTEX_SLOT_POSITION);
     }
 
     template <MeshDimType meshDimType>
     void DimSepMesh<meshDimType>::addPositions(const ArrayValueType &vertices)
     {
-        addData<ARRAY_DATA_TYPE>(VG_VERTEX_POSITION_NAME, vertices, VG_VERTEX_BINDING_PRIORITY_POSITION);
+        addData<ARRAY_DATA_TYPE>(VG_VERTEX_SLOT_POSITION, vertices);
     }
 
     template <MeshDimType meshDimType>
     void DimSepMesh<meshDimType>::removePositions()
     {
-        removeData<ARRAY_DATA_TYPE>(VG_VERTEX_POSITION_NAME);
+        removeData<ARRAY_DATA_TYPE>(VG_VERTEX_SLOT_POSITION);
     }
 
     template <MeshDimType meshDimType>
     const typename DimSepMesh<meshDimType>::ArrayValueType DimSepMesh<meshDimType>::getPositions() const
     {
-        return getData<ARRAY_DATA_TYPE>(VG_VERTEX_POSITION_NAME);
+        return getData<ARRAY_DATA_TYPE>(VG_VERTEX_SLOT_POSITION);
     }
 
     template <MeshDimType meshDimType>
     void DimSepMesh<meshDimType>::setPositions(const ArrayValueType &vertices)
     {
-        setData<ARRAY_DATA_TYPE>(VG_VERTEX_POSITION_NAME, vertices);
+        setData<ARRAY_DATA_TYPE>(VG_VERTEX_SLOT_POSITION, vertices);
     }
 
     template <MeshDimType meshDimType>
     Bool32 DimSepMesh<meshDimType>::hasNormals() const
     {
-        return hasData<ARRAY_DATA_TYPE>(VG_VERTEX_NORMAL_NAME);
+        return hasData<ARRAY_DATA_TYPE>(VG_VERTEX_SLOT_NORMAL);
     }
     
     template <MeshDimType meshDimType>
     void DimSepMesh<meshDimType>::addNormals(const ArrayValueType &normals)
     {
-        addData<ARRAY_DATA_TYPE>(VG_VERTEX_NORMAL_NAME, normals, VG_VERTEX_BINDING_PRIORITY_NORMAL);
+        addData<ARRAY_DATA_TYPE>(VG_VERTEX_SLOT_NORMAL, normals);
     }
     
     template <MeshDimType meshDimType>
     void DimSepMesh<meshDimType>::removeNormals()
     {
-        removeData<ARRAY_DATA_TYPE>(VG_VERTEX_NORMAL_NAME);
+        removeData<ARRAY_DATA_TYPE>(VG_VERTEX_SLOT_NORMAL);
     }
 
     template <MeshDimType meshDimType>
     const typename DimSepMesh<meshDimType>::ArrayValueType DimSepMesh<meshDimType>::getNormals() const
     {
-        return getData<ARRAY_DATA_TYPE>(VG_VERTEX_NORMAL_NAME);
+        return getData<ARRAY_DATA_TYPE>(VG_VERTEX_SLOT_NORMAL);
     }
 
     template <MeshDimType meshDimType>
     void DimSepMesh<meshDimType>::setNormals(const ArrayValueType &normals)
     {
-        setData<ARRAY_DATA_TYPE>(VG_VERTEX_NORMAL_NAME, normals);
+        setData<ARRAY_DATA_TYPE>(VG_VERTEX_SLOT_NORMAL, normals);
     }
 
     template <MeshDimType meshDimType>
     Bool32 DimSepMesh<meshDimType>::hasTangents() const
     {
-        return hasData<ARRAY_DATA_TYPE>(VG_VERTEX_TANGENT_NAME);
+        return hasData<ARRAY_DATA_TYPE>(VG_VERTEX_SLOT_TANGENT);
     }
 
     template <MeshDimType meshDimType>
     void DimSepMesh<meshDimType>::addTangents(const ArrayValueType &tangents)
     {
-         addData<ARRAY_DATA_TYPE>(VG_VERTEX_TANGENT_NAME, tangents, VG_VERTEX_BINDING_PRIORITY_TANGENT);
+         addData<ARRAY_DATA_TYPE>(VG_VERTEX_SLOT_TANGENT, tangents);
     }
     
     template <MeshDimType meshDimType>
     void DimSepMesh<meshDimType>::removeTangents()
     {
-        removeData<ARRAY_DATA_TYPE>(VG_VERTEX_TANGENT_NAME);
+        removeData<ARRAY_DATA_TYPE>(VG_VERTEX_SLOT_TANGENT);
     }
 
     template <MeshDimType meshDimType>
     const typename DimSepMesh<meshDimType>::ArrayValueType DimSepMesh<meshDimType>::getTangents() const
     {
-        return getData<ARRAY_DATA_TYPE>(VG_VERTEX_TANGENT_NAME);
+        return getData<ARRAY_DATA_TYPE>(VG_VERTEX_SLOT_TANGENT);
     }
 
     template <MeshDimType meshDimType>
     void DimSepMesh<meshDimType>::setTangents(const ArrayValueType &tangents)
     {
-        setData<ARRAY_DATA_TYPE>(VG_VERTEX_TANGENT_NAME, tangents);
+        setData<ARRAY_DATA_TYPE>(VG_VERTEX_SLOT_TANGENT, tangents);
     }
 
     template <MeshDimType meshDimType>
@@ -637,7 +637,7 @@ namespace vg
             return;
         }
 
-        auto vertices = m_pData->getData<ARRAY_DATA_TYPE>(VG_VERTEX_POSITION_NAME);
+        auto vertices = m_pData->getData<ARRAY_DATA_TYPE>(VG_VERTEX_SLOT_POSITION);
         BaseValueType minPos;
         BaseValueType maxPos;
         BaseValueType::length_type len = BaseValueType::length();

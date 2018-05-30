@@ -6,25 +6,17 @@
 #include <unordered_map>
 #include "graphics/global.hpp"
 #include "graphics/util/util.hpp"
+#include "graphics/util/slot_map.hpp"
 
-#define VG_VERTEX_POSITION_NAME "_Position"
-#define VG_VERTEX_COLOR_NAME "_Color"
-#define VG_VERTEX_NORMAL_NAME "_Normal"
-#define VG_VERTEX_TANGENT_NAME "_Tangent"
-#define VG_VERTEX_TextureCoordinate0_NAME "_TexCoord_0"
-#define VG_VERTEX_TextureCoordinate1_NAME "_TexCoord_1"
-#define VG_VERTEX_TextureCoordinate2_NAME "_TexCoord_2"
-#define VG_VERTEX_TextureCoordinate3_NAME "_TexCoord_3"
-
-#define VG_VERTEX_BINDING_PRIORITY_POSITION 0u
-#define VG_VERTEX_BINDING_PRIORITY_COLOR 1u
-#define VG_VERTEX_BINDING_PRIORITY_NORMAL 2u
-#define VG_VERTEX_BINDING_PRIORITY_TANGENT 3u
-#define VG_VERTEX_BINDING_PRIORITY_TextureCoordinate0 4u
-#define VG_VERTEX_BINDING_PRIORITY_TextureCoordinate1 5u
-#define VG_VERTEX_BINDING_PRIORITY_TextureCoordinate2 6u
-#define VG_VERTEX_BINDING_PRIORITY_TextureCoordinate3 7u
-#define VG_VERTEX_BINDING_PRIORITY_OTHER_MIN 8u
+#define VG_VERTEX_SLOT_POSITION 0u
+#define VG_VERTEX_SLOT_COLOR 1u
+#define VG_VERTEX_SLOT_NORMAL 2u
+#define VG_VERTEX_SLOT_TANGENT 3u
+#define VG_VERTEX_SlOT_TextureCoordinate0 4u
+#define VG_VERTEX_SLOT_TextureCoordinate1 5u
+#define VG_VERTEX_SLOT_TextureCoordinate2 6u
+#define VG_VERTEX_SLOT_TextureCoordinate3 7u
+#define VG_VERTEX_SLOT_OTHER_MIN 8u
 
 namespace vg
 {
@@ -147,90 +139,97 @@ namespace vg
 
         struct DataInfo
         {
-            std::string name;
-            MeshData::DataType dataType;
-            uint32_t bindingPriority;
+            uint32_t slot;
+            DataType dataType;
+
 
             DataInfo();
 
-            DataInfo(std::string name,
-                MeshData::DataType dataType,
-                uint32_t bindingPriority);
+            DataInfo(DataType dataType
+                , uint32_t slot
+                );
 
             DataInfo(const DataInfo &);
 
-            DataInfo(const DataInfo &&);
-
             DataInfo &operator=(const DataInfo &);
-
-            Bool32 operator ==(const DataInfo &target) const;
-
+            Bool32 operator==(const DataInfo &target) const;
             Bool32 operator<(const DataInfo &target) const;
         };
 
         struct Data {
-            std::vector<std::string> arrDataNames;
-            std::unordered_map<std::string, std::vector<Byte>> mapDatas;
-            std::unordered_map<std::string, uint32_t> mapDataCounts;
-            std::unordered_map<std::string, DataInfo> mapDataInfos;
+            DataInfo info;
+            std::vector<Byte> data;
+            uint32_t count;
 
-            const std::vector<std::string> getArrDataNames() const;
-            Bool32 hasData(std::string name) const;
-            void removeData(std::string name);
-            uint32_t getDataCount(std::string name) const;
-            const DataInfo &getDataInfo(std::string name) const;
+            Data(DataInfo info = DataInfo()
+                , std::vector<Byte> data = std::vector<Byte>()
+                , uint32_t count = 0u
+            );
+        };
+        using SlotMapType = SlotMap<Data>;        
+        
+        struct Datas {
+            SlotMapType datas;
+
+            const std::set<SlotType> &getSlots() const;
+            Bool32 hasData(const SlotType &slot) const;
+            void removeData(const SlotType &slot);
+            uint32_t getDataCount(const SlotType &slot) const;
+            const DataInfo &getDataInfo(const SlotType &slot) const;
     
-            void addData(const std::string name, const DataInfo &info, void *src, uint32_t size);
-            void getData(const std::string name, void *dst, uint32_t size, uint32_t offset) const;
-            void setData(const std::string name, void *src, uint32_t size, uint32_t offset);
+            void addData(const SlotType &slot, const DataInfo &info, void *src, uint32_t size);
+            void getData(const SlotType &slot, void *dst, uint32_t size, uint32_t offset) const;
+            void setData(const SlotType &slot, void *src, uint32_t size, uint32_t offset);
     
             template<typename T>
-            void addData(const std::string name, const DataInfo &info, const T &value);
+            void addData(const SlotType &slot, const DataInfo &info, const T &value);
             template<typename T>
-            T getData(const std::string name) const;
+            T getData(const SlotType &slot) const;
             template<typename T>
-            void setData(const std::string name, const T &value);
+            void setData(const SlotType &slot, const T &value);
             
             template<typename T>
-            void addData(const std::string name, const DataInfo &info, const std::vector<T> &values);
+            void addData(const SlotType &slot, const DataInfo &info, const std::vector<T> &values);
             template <typename T>
-            std::vector<T> getData(const std::string name, const uint32_t count) const;
+            std::vector<T> getData(const SlotType &slot, const uint32_t count) const;
             template<typename T>
-            void setData(const std::string name, const std::vector<T> &values);
+            void setData(const SlotType &slot, const std::vector<T> &values);
     
             template<typename T>
-            void addData(const std::string name, const DataInfo &info, const T * const pSrc, const uint32_t count);
+            void addData(const SlotType &slot, const DataInfo &info, const T * const pSrc, const uint32_t count);
             template<typename T>
-            void getData(const std::string name, const T * const pDst, const uint32_t count);
+            void getData(const SlotType &slot, const T * const pDst, const uint32_t count);
             template<typename T>
-            void setData(const std::string name, const T * const pSrc, const uint32_t count);
+            void setData(const SlotType &slot, const T * const pSrc, const uint32_t count);
 
-            uint32_t getDataBaseSize(const std::string name) const;
-            uint32_t getDataSize(const std::string name) const;
+            uint32_t getDataBaseSize(const SlotType &slot) const;
+            uint32_t getDataSize(const SlotType &slot) const;
 
-            void memoryCopyData(const std::string name
+            void memoryCopyData(const SlotType &slot
                 , void* dst
                 , uint32_t offset
                 , uint32_t elementStart
                 , uint32_t maxElementCount) const;
         };
 
-        std::array<Data, static_cast<size_t>(DataType::RANGE_SIZE)> datas;
+        MeshData();
+
+        std::array<Datas, static_cast<size_t>(DataType::RANGE_SIZE)> datas;
 
         template <DataType type>
-        Bool32 hasData(std::string name) const;
+        Bool32 hasData(const SlotType &slot) const;
 
         template <DataType type>
-        void addData(std::string name, const DataInfo &info, const typename DataTypeInfo<type>::ValueType& value);
+        void addData(const SlotType &slot, const DataInfo &info, const typename DataTypeInfo<type>::ValueType& value);
 
         template <DataType type>
-        void removeData(std::string name);
+        void removeData(const SlotType &slot);
 
         template <DataType type>
-        const typename DataTypeInfo<type>::ValueType getData(std::string name) const;
+        const typename DataTypeInfo<type>::ValueType getData(const SlotType &slot) const;
 
         template <DataType type>
-        void setData(std::string name, const typename DataTypeInfo<type>::ValueType& value);
+        void setData(const SlotType &slot, const typename DataTypeInfo<type>::ValueType& value);
 
         uint32_t static getDataBaseSize(DataType dataType);
 
@@ -238,17 +237,17 @@ namespace vg
         uint32_t static getDataBaseSize();
 
         template <DataType type>
-        uint32_t getDataSize(const std::string name) const;
+        uint32_t getDataSize(const SlotType &slot) const;
 
         void memoryCopyData(DataType type
-            , const std::string name
+            , const SlotType &slot
             , void* dst
             , uint32_t offset
             , uint32_t elementStart
             , uint32_t maxElementCount) const;
 
         template <DataType type>
-        void memoryCopyData(const std::string name
+        void memoryCopyData(const SlotType &slot
             , void* dst
             , uint32_t offset
             , uint32_t elementStart

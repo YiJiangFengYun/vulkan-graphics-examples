@@ -3,23 +3,20 @@
 
 #include <set>
 #include <unordered_map>
-#include <string>
-#include "graphics/global.hpp"
 
 namespace vg
 {
-    using SlotType = uint32_t;
     template <typename T>
     class SlotMap {
     public:
+        using SlotType = uint32_t;
         using ValueType = T;
 
         SlotMap();
-        Bool32 hasValue(const SlotType &slot) const;
+        Bool32 hasValue(const lotType &slot) const;
         void addValue(const SlotType &slot, const ValueType &value);
         void removeValue(const SlotType &slot);
-        const ValueType &getValue(const SlotType &slot) const;
-        ValueType &getValue(const SlotType &slot);
+        ValueType &getValue(const SlotType &slot) const;
         void setValue(const SlotType &slot, const ValueType &value);
         const std::set<SlotType> &getSlots() const;
 

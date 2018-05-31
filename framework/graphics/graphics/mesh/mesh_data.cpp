@@ -3,126 +3,136 @@
 namespace vg
 {
     MeshData::DataInfo::DataInfo()
-        : dataType()
-        , slot()
     {
 
     }
 
-    MeshData::DataInfo::DataInfo(MeshData::DataType dataType
-        , uint32_t slot
+    MeshData::DataInfo::DataInfo(std::string name,
+        MeshData::DataType dataType,
+        uint32_t bindingPriority
         )
-        : dataType(dataType)
-        , slot(slot)
+        : name(name)
+        , dataType(dataType)
+        , bindingPriority(bindingPriority)
     {
 
     }
 
     MeshData::DataInfo::DataInfo(const DataInfo &target)
-        : dataType(target.dataType)
-        , slot(target.slot)
+        : name(target.name)
+        , dataType(target.dataType)
+        , bindingPriority(target.bindingPriority)
     {
 
     }
 
     MeshData::DataInfo &MeshData::DataInfo::operator=(const DataInfo &target)
     {
+        name = target.name;
         dataType = target.dataType;
-        slot = target.slot;
+        bindingPriority = target.bindingPriority;
         return *this;
+    }
+
+
+    MeshData::DataInfo::DataInfo(const DataInfo &&target)
+        : name(target.name)
+        , dataType(target.dataType)
+        , bindingPriority(target.bindingPriority)
+    {
+
     }
 
     Bool32 MeshData::DataInfo::operator==(const DataInfo &target) const
     {
-        return slot == target.slot && dataType == target.dataType;
+        return name == target.name && dataType == target.dataType && bindingPriority == target.bindingPriority;
     }
 
     Bool32 MeshData::DataInfo::operator<(const DataInfo &target) const
     {
-        return slot < target.slot;
+        return bindingPriority < target.bindingPriority;
     }
 
-    MeshData::Data::Data(DataInfo info
-        , std::vector<Byte> data
-        , uint32_t count
-        )
-        : info(info)
-        , data(data)
-        , count(count)
+    const std::vector<std::string> MeshData::Data::getArrDataNames() const
     {
-
+        return arrDataNames;
     }
 
-    const std::set<SlotType> &MeshData::Datas::getSlots() const
+    Bool32 MeshData::Data::hasData(std::string name) const
     {
-        return datas.getSlots();
-    }
-
-    Bool32 MeshData::Datas::hasData(const SlotType &slot) const
-    {
-        return datas.hasValue(slot);
+        return hasValue<std::vector<Byte>>(name, mapDatas);
     }
         
-    void MeshData::Datas::removeData(const SlotType &slot)
+    void MeshData::Data::removeData(std::string name)
     {
-        datas.removeValue(slot);
+        removeValue(name, mapDatas, arrDataNames);
+        removeValue(name, mapDataCounts);
+        removeValue(name, mapDataInfos);
     }
 
-    uint32_t MeshData::Datas::getDataCount(const SlotType &slot) const
+    uint32_t MeshData::Data::getDataCount(std::string name) const
     {
-        return datas.getValue(slot).count;
+        return getValue(name, mapDataCounts);
     }
 
-    const MeshData::DataInfo &MeshData::Datas::getDataInfo(const SlotType &slot) const
+    const MeshData::DataInfo &MeshData::Data::getDataInfo(std::string name) const
     {
-        return datas.getValue(slot).info;
+        return getValue(name, mapDataInfos);
     }
 
-    void MeshData::Datas::addData(const SlotType &slot, const DataInfo &info, void *src, uint32_t size)
+    void MeshData::Data::addData(const std::string name, const DataInfo &info, void *src, uint32_t size)
     {
         std::vector<Byte> temp(size);
         if (size != 0u && src != nullptr) memcpy(temp.data(), src, size);
-        Data tempData(info, temp, 1u);
-        datas.addValue(slot, std::move(tempData));
+        addValue(name, temp, mapDatas, arrDataNames);
+        addValue(name, 1u, mapDataCounts);
+        addValue(name, info, mapDataInfos);
     }
 
-    void MeshData::Datas::getData(const SlotType &slot, void *dst, uint32_t size, uint32_t offset) const
+    void MeshData::Data::getData(const std::string name, void *dst, uint32_t size, uint32_t offset) const
     {
-        const auto &bytes = datas.getValue(slot).data;
+        const auto &bytes = getValue(name, mapDatas);        
         if (offset + size > static_cast<uint32_t>(bytes.size()))
             throw std::range_error("Out range of the saved material data!");
         memcpy(dst, (char *)(bytes.data()) + offset, size);
     }
 
-    void MeshData::Datas::setData(const SlotType &slot, void *src, uint32_t size, uint32_t offset)
+    void MeshData::Data::setData(const std::string name, void *src, uint32_t size, uint32_t offset)
     {
-        auto &bytes = datas.getValue(slot).data;
-        if (offset + size > static_cast<uint32_t>(bytes.size()))
-            bytes.resize(offset + size);
-        if(src) memcpy(bytes.data() + offset, src, size);
+        const auto& iterator = mapDatas.find(name);
+        if (iterator == mapDatas.cend())
+        {
+            throw std::runtime_error("Map don't has item whose key: " + name);
+        }
+        else
+        {
+            if (offset + size > static_cast<uint32_t>(mapDatas[name].size()))
+                mapDatas[name].resize(offset + size);
+            if(src) memcpy((char *)(mapDatas[name].data()) + offset, src, size);
+        }
     }
 
-    uint32_t MeshData::Datas::getDataBaseSize(const SlotType &slot) const
+    uint32_t MeshData::Data::getDataBaseSize(const std::string name) const
     {
-        const auto& bytes = datas.getValue(slot).data;
-        const auto& count = datas.getValue(slot).count;
+        const auto& bytes = getValue(name, mapDatas);
+        const auto& count = getValue(name, mapDataCounts);
         return static_cast<uint32_t>(bytes.size()) / count;
     }
     
-    uint32_t MeshData::Datas::getDataSize(const SlotType &slot) const
+    uint32_t MeshData::Data::getDataSize(const std::string name) const
     {
-        const auto& bytes = datas.getValue(slot).data;
+        const auto& bytes = getValue(name, mapDatas);
         return static_cast<uint32_t>(bytes.size());
     }
 
-    void MeshData::Datas::memoryCopyData(const SlotType &slot
+    void MeshData::Data::memoryCopyData(const std::string name
         , void* dst
         , uint32_t offset
         , uint32_t elementStart
         , uint32_t maxElementCount) const
     {
-        const auto& bytes = datas.getValue(slot).data;
-        const auto& count = datas.getValue(slot).count;
+        const auto& bytes = getValue(name, mapDatas);
+        const auto& count = getValue(name, mapDataCounts);
         uint32_t baseSize = static_cast<uint32_t>(bytes.size()) / count;
         char *ptr = static_cast<char *>(dst);
         ptr += offset;
@@ -131,12 +141,6 @@ namespace vg
         uint32_t srcOffset = elementStart * baseSize;
         uint32_t srcSize = finalElementCount * baseSize;
         std::memcpy(ptr, bytes.data() + srcOffset, srcSize);
-    }
-
-    MeshData::MeshData()
-        : datas()
-    {
-
     }
 
     uint32_t MeshData::getDataBaseSize(const DataType dataType)
@@ -177,13 +181,13 @@ namespace vg
     }
 
     void MeshData::memoryCopyData(DataType type
-            , const SlotType &slot
+            , const std::string name
             , void* dst
             , uint32_t offset
             , uint32_t elementStart
             , uint32_t maxElementCount) const
     {
-        datas[static_cast<size_t>(type)].memoryCopyData(slot, dst, offset, elementStart, maxElementCount);
+        datas[static_cast<size_t>(type)].memoryCopyData(name, dst, offset, elementStart, maxElementCount);
     }
     
 }

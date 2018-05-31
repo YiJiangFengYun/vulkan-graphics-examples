@@ -154,47 +154,47 @@ namespace vg
         Shader *getShader();
         void setShader(Shader *pShader);
 
-        Bool32 hasBuffer(std::string name) const;
-        void addBuffer(std::string name, const PassBufferInfo &bufferInfo);
-        void removeBuffer(std::string name);
-        PassBufferInfo getBuffer(std::string name);
-        void setBuffer(std::string name, const PassBufferInfo &bufferInfo);
+        Bool32 hasBuffer(const SlotType &slot) const;
+        void addBuffer(const SlotType &slot, const PassBufferInfo &bufferInfo);
+        void removeBuffer(const SlotType &slot);
+        PassBufferInfo getBuffer(const SlotType &slot);
+        void setBuffer(const SlotType &slot, const PassBufferInfo &bufferInfo);
 
-        Bool32 hasTexture(std::string name) const;
-        void addTexture(std::string name, const PassTextureInfo &texInfo);
-        void removeTexture(std::string name);
-        PassTextureInfo getTexture(std::string name) const;
-        void setTexture(std::string name, const PassTextureInfo &texInfo);
+        Bool32 hasTexture(const SlotType &slot) const;
+        void addTexture(const SlotType &slot, const PassTextureInfo &texInfo);
+        void removeTexture(const SlotType &slot);
+        PassTextureInfo getTexture(const SlotType &slot) const;
+        void setTexture(const SlotType &slot, const PassTextureInfo &texInfo);
 
-        Bool32 hasData(std::string name) const;
-        void removeData(std::string name);
+        Bool32 hasData(const SlotType &slot) const;
+        void removeData(const SlotType &slot);
 
-        void addData(const std::string name, const PassDataInfo &info, const PassDataSizeInfo &sizeInfo);
-        void addData(const std::string name, const PassDataInfo &info, void *src, uint32_t size);
-        void getData(const std::string name, void *dst, uint32_t size, uint32_t offset) const;
-        void setData(const std::string name, const PassDataInfo &info, const PassDataSizeInfo &sizeInfo);
-        void setData(const std::string name, void *src, uint32_t size, uint32_t offset);
+        void addData(const SlotType &slot, const PassDataInfo &info, const PassDataSizeInfo &sizeInfo);
+        void addData(const SlotType &slot, const PassDataInfo &info, void *src, uint32_t size);
+        void getData(const SlotType &slot, void *dst, uint32_t size, uint32_t offset) const;
+        void setData(const SlotType &slot, const PassDataInfo &info, const PassDataSizeInfo &sizeInfo);
+        void setData(const SlotType &slot, void *src, uint32_t size, uint32_t offset);
 
         template<typename T>
-        void addData(const std::string name, const PassDataInfo &info, const T &value);
+        void addData(const SlotType &slot, const PassDataInfo &info, const T &value);
         template<typename T>
-        T getData(const std::string name) const;
+        T getData(const SlotType &slot) const;
         template<typename T>
-        void setData(const std::string name, const T &value);
+        void setData(const SlotType &slot, const T &value);
         
         template<typename T>
-        void addData(const std::string name, const PassDataInfo &info, const std::vector<T> &values);
+        void addData(const SlotType &slot, const PassDataInfo &info, const std::vector<T> &values);
         template <typename T>
-        std::vector<T> getData(const std::string name, const uint32_t count) const;
+        std::vector<T> getData(const SlotType &slot, const uint32_t count) const;
         template<typename T>
-        void setData(const std::string name, const std::vector<T> &values);
+        void setData(const SlotType &slot, const std::vector<T> &values);
 
         template<typename T>
-        void addData(const std::string name, const PassDataInfo &info, const T * const pSrc, const uint32_t count);
+        void addData(const SlotType &slot, const PassDataInfo &info, const T * const pSrc, const uint32_t count);
         template<typename T>
-        void getData(const std::string name, const T * const pDst, const uint32_t count);
+        void getData(const SlotType &slot, const T * const pDst, const uint32_t count);
         template<typename T>
-        void setData(const std::string name, const T * const pSrc, const uint32_t count);
+        void setData(const SlotType &slot, const T * const pSrc, const uint32_t count);
 
 
         Color getMainColor() const;
@@ -327,10 +327,10 @@ namespace vg
         void beginRecord() const;
         void endRecord() const;
     private:
-        PassData m_data;
+        PassDatas m_data;
         Bool32 m_dataChanged;
         Bool32 m_dataContentChanged;
-        std::unordered_map<std::string, Bool32> m_dataContentChanges;
+        std::unordered_map<SlotType, Bool32> m_dataContentChanges;
         Bool32 m_textureChanged;
         Bool32 m_bufferChanged;
 
@@ -368,33 +368,15 @@ namespace vg
         ////////applied data
 
         //Build in buffer.
-        struct DataSortInfo {
-            std::string name;
-            vk::ShaderStageFlags shaderStageFlags;
-            uint32_t layoutPriority;
-            uint32_t size;
-            uint32_t bufferSize;
-
-            DataSortInfo(std::string name = nullptr
-                , vk::ShaderStageFlags shaderStageFlags = vk::ShaderStageFlags()
-                , uint32_t layoutPriority = 0u
-                , uint32_t size = 0u
-                , uint32_t bufferSize = 0u
-                );
-        };
-        static Bool32 _compareDataInfo(const DataSortInfo &, const DataSortInfo &);
-        std::set<DataSortInfo, Bool32(*)(const DataSortInfo &, const DataSortInfo &)> m_sortDataSet;
         BufferData m_dataBuffer;
 
         //build in descriptor set layout.
         struct BufferTextureSortInfo {
-            std::string name;
-            uint32_t bindingPriority;
+            SlotType slot;
             Bool32 isTexture;
             const void *pInfo;
 
-            BufferTextureSortInfo(std::string name = nullptr
-                , uint32_t bindingPriority = 0u
+            BufferTextureSortInfo(SlotType slot = 0u
                 , Bool32 isTexture = VG_FALSE
                 , const void *pInfo = nullptr
                 );

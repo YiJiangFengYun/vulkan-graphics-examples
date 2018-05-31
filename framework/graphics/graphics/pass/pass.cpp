@@ -53,20 +53,6 @@ namespace vg
 
     }
 
-    Bool32 Pass::_compareDataInfo(const DataSortInfo &item1, const DataSortInfo &item2)
-    {
-        uint32_t shaderStageValue1 = static_cast<uint32_t>(item1.shaderStageFlags);
-        uint32_t shaderStageValue2 = static_cast<uint32_t>(item2.shaderStageFlags);
-        int32_t result = static_cast<int32_t>(shaderStageValue1) - static_cast<int32_t>(shaderStageValue2);
-        if (result > 0) {
-            return VG_FALSE;
-        } else if (result < 0) {
-            return VG_TRUE;
-        } else {
-            return item1.layoutPriority < item2.layoutPriority;
-        }
-    }
-
     Bool32 Pass::_compareBufferTextureInfo(const BufferTextureSortInfo &item1, const BufferTextureSortInfo &item2)
     {
         return item1.bindingPriority < item2.bindingPriority;
@@ -115,7 +101,6 @@ namespace vg
         , m_vertexInputFilterLocations()
 
         //Applied
-        , m_sortDataSet(_compareDataInfo)
         , m_dataBuffer(vk::BufferUsageFlagBits::eUniformBuffer
             , vk::MemoryPropertyFlagBits::eHostVisible)
         , m_sortBufferTexInfosSet(_compareBufferTextureInfo)
@@ -174,101 +159,101 @@ namespace vg
         _updatePipelineStateID();
     }
 
-    Bool32 Pass::hasBuffer(std::string name) const
+    Bool32 Pass::hasBuffer(const SlotType &slot) const
     {
-        return m_data.hasBuffer(name);
+        return m_data.hasBuffer(slot);
     }
 
-    void Pass::addBuffer(std::string name, const PassBufferInfo &bufferInfo)
+    void Pass::addBuffer(const SlotType &slot, const PassBufferInfo &bufferInfo)
     {
-        m_data.addBuffer(name, bufferInfo);
+        m_data.addBuffer(slot, bufferInfo);
         m_bufferChanged = VG_TRUE;
     }
 
-    void Pass::removeBuffer(std::string name)
+    void Pass::removeBuffer(const SlotType &slot)
     {
-        m_data.removeBuffer(name);
+        m_data.removeBuffer(slot);
         m_bufferChanged = VG_TRUE;
     }
 
-    PassBufferInfo Pass::getBuffer(std::string name)
+    PassBufferInfo Pass::getBuffer(const SlotType &slot)
     {
-        return m_data.getBuffer(name);
+        return m_data.getBuffer(slot);
     }
         
-    void Pass::setBuffer(std::string name, const PassBufferInfo &bufferInfo)
+    void Pass::setBuffer(const SlotType &slot, const PassBufferInfo &bufferInfo)
     {
-        m_data.setBuffer(name, bufferInfo);
+        m_data.setBuffer(slot, bufferInfo);
         m_bufferChanged = VG_TRUE;
     }
 
-    Bool32 Pass::hasTexture(std::string name) const
+    Bool32 Pass::hasTexture(const SlotType &slot) const
     {
-        return m_data.hasTexture(name);
+        return m_data.hasTexture(slot);
     }
 
-    void Pass::addTexture(std::string name, const PassTextureInfo &texInfo)
+    void Pass::addTexture(const SlotType &slot, const PassTextureInfo &texInfo)
     {
-        m_data.addTexture(name, texInfo);
+        m_data.addTexture(slot, texInfo);
         m_textureChanged = VG_TRUE;
     }
 
-    void Pass::removeTexture(std::string name)
+    void Pass::removeTexture(const SlotType &slot)
     {
-        m_data.removeTexture(name);
+        m_data.removeTexture(slot);
         m_textureChanged = VG_TRUE;
     }
 
-    PassTextureInfo Pass::getTexture(std::string name) const
+    PassTextureInfo Pass::getTexture(const SlotType &slot) const
     {
-        return m_data.getTexture(name);
+        return m_data.getTexture(slot);
     }
     
-    void Pass::setTexture(std::string name, const PassTextureInfo &texInfo)
+    void Pass::setTexture(const SlotType &slot, const PassTextureInfo &texInfo)
     {
-        m_data.setTexture(name, texInfo);
+        m_data.setTexture(slot, texInfo);
         m_textureChanged = VG_TRUE;
     }
 
-    Bool32 Pass::hasData(std::string name) const
+    Bool32 Pass::hasData(const SlotType &slot) const
     {
-        return m_data.hasData(name);
+        return m_data.hasData(slot);
     }
 
-    void Pass::removeData(std::string name)
+    void Pass::removeData(const SlotType &slot)
     {
-        m_data.removeData(name);
+        m_data.removeData(slot);
         m_dataChanged = VG_TRUE;
     }
 
-    void Pass::addData(const std::string name, const PassDataInfo &info, const PassDataSizeInfo &sizeInfo)
+    void Pass::addData(const SlotType &slot, const PassDataInfo &info, const PassDataSizeInfo &sizeInfo)
     {
-        m_data.addData(name, info, sizeInfo);
+        m_data.addData(slot, info, sizeInfo);
         m_dataChanged;
     }
 
-    void Pass::addData(const std::string name, const PassDataInfo &info, void *src, uint32_t size)
+    void Pass::addData(const SlotType &slot, const PassDataInfo &info, void *src, uint32_t size)
     {
-        m_data.addData(name, info, src, size);
+        m_data.addData(slot, info, src, size);
         m_dataChanged = VG_TRUE;
     }
     
-    void Pass::getData(const std::string name, void *dst, uint32_t size, uint32_t offset) const
+    void Pass::getData(const SlotType &slot, void *dst, uint32_t size, uint32_t offset) const
     {
-        return m_data.getData(name, dst, size, offset);
+        return m_data.getData(slot, dst, size, offset);
     }
 
-    void Pass::setData(const std::string name, const PassDataInfo &info, const PassDataSizeInfo &sizeInfo)
+    void Pass::setData(const SlotType &slot, const PassDataInfo &info, const PassDataSizeInfo &sizeInfo)
     {
-        m_data.setData(name, info, sizeInfo);
+        m_data.setData(slot, info, sizeInfo);
         m_dataChanged = VG_TRUE;
     }
         
-    void Pass::setData(const std::string name, void *src, uint32_t size, uint32_t offset)
+    void Pass::setData(const SlotType &slot, void *src, uint32_t size, uint32_t offset)
     {
-        m_data.setData(name, src, size, offset);
+        m_data.setData(slot, src, size, offset);
         m_dataContentChanged = VG_TRUE;
-        m_dataContentChanges[name] = VG_TRUE;
+        m_dataContentChanges[slot] = VG_TRUE;
     }
 
     Color Pass::getMainColor() const
@@ -745,30 +730,24 @@ namespace vg
         const auto &data = m_data;
         if (m_dataChanged) {
             //Construct data buffer.
-            m_sortDataSet.clear();
-            const auto &arrDataNames = data.arrDataNames;
-            if (arrDataNames.size() > 0) {
+            const auto &slots = data.getDataSlots();
+            if (slots.size() > 0) {
                 uint32_t totalBufferSize = 0u;
-                for (const auto &name : arrDataNames)
+                for (const auto &slot : slots)
                 {
-                    const auto &dataInfo = data.getDataInfo(name);
-                    const auto &dataSizeInfo = data.getDataSizeInfo(name);
-                    DataSortInfo sortInfo = {
-                        name,
-                        dataInfo.shaderStageFlags,
-                        dataInfo.layoutPriority,
-                        dataSizeInfo.size,
-                        dataSizeInfo.getBufferSize(),
-                    };
-                    m_sortDataSet.insert(sortInfo);
-                    totalBufferSize += sortInfo.bufferSize;
+                    const auto &dataInfo = data.getDataInfo(slot);
+                    const auto &dataSizeInfo = data.getDataSizeInfo(slot);
+                    totalBufferSize += dataSizeInfo.getBufferSize();
                 }
 
                 std::vector<Byte> memory(totalBufferSize);
                 uint32_t offset = 0u;
-                for (const auto &info : m_sortDataSet) {
-                    data.getData(info.name, memory.data() + offset, info.size, 0u);
-                    offset += info.bufferSize;
+                for (const auto &slot : slots)
+                {
+                    const auto &dataInfo = data.getDataInfo(slot);
+                    const auto &dataSizeInfo = data.getDataSizeInfo(slot);
+                    data.getData(slot, memory.data() + offset, dataSizeInfo.size, 0u);
+                    offset += dataSizeInfo.getBufferSize();
                 }
                 m_dataBuffer.updateBuffer(memory.data(), totalBufferSize);
 
@@ -791,8 +770,9 @@ namespace vg
         if (m_dataContentChanged) {
             //Update data buffer.
             uint32_t count = 0;
-            for (const auto &info : m_sortDataSet) {
-                if (m_dataContentChanges.count(info.name) != 0) {
+            const auto &slots = data.getDataSlots();
+            for (const auto &slot : slots) {
+                if (m_dataContentChanges.count(slot) != 0) {
                     ++count;
                 }
             }
@@ -800,16 +780,19 @@ namespace vg
             std::vector<MemorySlice> memorySlices(count);
             uint32_t index = 0u;
             uint32_t offset = 0u;
-            for (const auto &info : m_sortDataSet) {
-                if (m_dataContentChanges.count(info.name) != 0) {
-                    memories[index].resize(info.bufferSize);
-                    data.getData(info.name, memories[index].data(), info.size, 0u);
+            for (const auto &slot : slots) {
+                const auto &dataInfo = data.getDataInfo(slot);
+                const auto &dataSizeInfo = data.getDataSizeInfo(slot);
+                uint32_t bufferSize = dataSizeInfo.getBufferSize();
+                if (m_dataContentChanges.count(slot) != 0) {
+                    memories[index].resize(bufferSize);
+                    data.getData(slot, memories[index].data(), dataSizeInfo.size, 0u);
                     memorySlices[index].pMemory = memories[index].data();
                     memorySlices[index].offset = offset;
-                    memorySlices[index].size = info.bufferSize;
+                    memorySlices[index].size = bufferSize;
                     ++index;
                 }
-                offset += info.bufferSize;
+                offset += bufferSize;
             }
             m_dataBuffer.updateBuffer(memorySlices, m_dataBuffer.getSize());
 
@@ -820,25 +803,23 @@ namespace vg
         if (m_bufferChanged || m_textureChanged) {
             auto &sortInfos = m_sortBufferTexInfosSet;
             sortInfos.clear();
-            const auto &arrBufferNames = data.arrBufferNames;
-            for (const auto &name : arrBufferNames)
+            const auto &bufferSlots = data.getBufferSlots();
+            for (const auto &slot : bufferSlots)
             {
-                const auto &bufferInfo = data.getBuffer(name);
+                const auto &bufferInfo = data.getBuffer(slot);
                 BufferTextureSortInfo sortInfo = {
-                    name,
-                    bufferInfo.bindingPriority,
+                    slot,
                     VG_FALSE,
                     reinterpret_cast<const void *>(&bufferInfo),
                 };
                 sortInfos.insert(sortInfo);
             }
-            const auto &arrTextureNames = data.arrTexNames;
-            for (const auto &name : arrTextureNames)
+            const auto &textureSlots = data.getBufferSlots();
+            for (const auto &slot : textureSlots)
             {
-                const auto &textureInfo = data.getTexture(name);
+                const auto &textureInfo = data.getTexture(slot);
                 BufferTextureSortInfo sortInfo = {
-                    name,
-                    textureInfo.bindingPriority,
+                    slot,
                     VG_TRUE,
                     reinterpret_cast<const void *>(&textureInfo),
                 };
@@ -1554,28 +1535,11 @@ namespace vg
     {
     }
 
-    Pass::DataSortInfo::DataSortInfo(std::string name
-        , vk::ShaderStageFlags shaderStageFlags
-        , uint32_t layoutPriority
-        , uint32_t size
-        , uint32_t bufferSize
-        )
-        : name(name)
-        , shaderStageFlags(shaderStageFlags)
-        , layoutPriority(layoutPriority)
-        , size(size)
-        , bufferSize(bufferSize)
-    {
-
-    }
-
-    Pass::BufferTextureSortInfo::BufferTextureSortInfo(std::string name
-        , uint32_t bindingPriority
+    Pass::BufferTextureSortInfo::BufferTextureSortInfo(SlotType slot
         , Bool32 isTexture
         , const void *pInfo
         )
-        : name(name)
-        , bindingPriority(bindingPriority)
+        : slot(slot)
         , isTexture(isTexture)
         , pInfo(pInfo)
     {

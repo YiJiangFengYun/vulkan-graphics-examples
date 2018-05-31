@@ -5,27 +5,20 @@
 #include "graphics/buffer_data/buffer_data.hpp"
 #include "graphics/texture/texture.hpp"
 #include "graphics/pass/pass_option.hpp"
+#include "graphics/util/slot_map.hpp"
 
+#define VG_PASS_BUILDIN_DATA_LAYOUT_SLOT 0
+#define VG_PASS_OTHER_DATA_MIN_LAYOUT_SLOT 1
 
-#define VG_PASS_BUILDIN_DATA_NAME "_BuildIn"
-
-#define VG_PASS_PRE_Z_TEXTURE_NAME "_pre_z_depth_tex"
-#define VG_PASS_POST_RENDER_TEXTURE_NAME "_post_render_tex"
-
-#define VG_PASS_BUILDIN_DATA_LAYOUT_PRIORITY 0
-#define VG_PASS_OTHER_DATA_MIN_LAYOUT_PRIORITY 1
-
-#define VG_PASS_PRE_Z_TEXTURE_BINDING_PRIORITY 0
-#define VG_PASS_POST_RENDER_TEXTURE_BINDING_PRIORITY 1
-#define VG_PASS_OTHER_MIN_BINDING_PRIORITY 2
+#define VG_PASS_PRE_Z_TEXTURE_BINDING_SLOT 0
+#define VG_PASS_POST_RENDER_TEXTURE_BINDING_SLOT 1
+#define VG_PASS_OTHER_MIN_BINDING_SLOT 2
 
 namespace vg
 {
     struct PassDataInfo {
-        uint32_t layoutPriority;
         vk::ShaderStageFlags shaderStageFlags;
-        PassDataInfo(uint32_t layoutPriority = 0u
-            , vk::ShaderStageFlags shaderStageFlags = vk::ShaderStageFlags()
+        PassDataInfo(vk::ShaderStageFlags shaderStageFlags = vk::ShaderStageFlags()
         );
         PassDataInfo(const PassDataInfo &);
         PassDataInfo& operator=(const PassDataInfo &);
@@ -46,14 +39,12 @@ namespace vg
         const Texture::ImageView *pImageView;
         const Texture::Sampler *pSampler;
         vk::ImageLayout imageLayout;            
-        uint32_t bindingPriority;
         ImageDescriptorType descriptorType;
         vk::ShaderStageFlags stageFlags;
         PassTextureInfo(const Texture *pTexture = nullptr
             , const Texture::ImageView *pImageView = nullptr
             , const Texture::Sampler *pSampler = nullptr
             , vk::ImageLayout imageLayout = vk::ImageLayout::eUndefined
-            , uint32_t bindingPriority = 0u
             , ImageDescriptorType descriptorType = ImageDescriptorType::COMBINED_IMAGE_SAMPLER
             , vk::ShaderStageFlags stageFlags = vk::ShaderStageFlagBits::eFragment
             );
@@ -65,13 +56,11 @@ namespace vg
         const BufferData *pBuffer;
         uint32_t offset;
         uint32_t range;
-        uint32_t bindingPriority;
         BufferDescriptorType descriptorType;
         vk::ShaderStageFlags stageFlags;
         PassBufferInfo(const BufferData *pBuffer = nullptr
             , uint32_t offset = 0u
             , uint32_t range = 0u
-            , uint32_t bindingPriority = 0u
             , BufferDescriptorType descriptorType = BufferDescriptorType::UNIFORM_BUFFER
             , vk::ShaderStageFlags stageFlags = vk::ShaderStageFlags()
             );
@@ -79,76 +68,85 @@ namespace vg
         PassBufferInfo& operator=(const PassBufferInfo &);
     };
 
-
     struct PassData
-    {    
-        std::vector<std::string> arrDataNames;
-        std::unordered_map<std::string, std::vector<Byte>> mapDatas;
-        std::unordered_map<std::string, uint32_t> mapDataCounts;
+    {
+        PassDataInfo info;
+        PassDataSizeInfo sizeInfo;
+        std::vector<Byte> data;
+        uint32_t count;
 
-        std::unordered_map<std::string, PassDataInfo> mapDataInfos;
-        std::unordered_map<std::string, PassDataSizeInfo> mapDataSizeInfos;
+        PassData(PassDataInfo info = PassDataInfo()
+            , PassDataSizeInfo sizeInfo = PassDataSizeInfo()
+            , std::vector<Byte> data = std::vector<Byte>()
+            , uint32_t count = 0u
+            );
+    };
 
-        std::vector<std::string> arrBufferNames;
-        std::unordered_map<std::string, PassBufferInfo> mapBuffers;
 
-        std::vector<std::string> arrTexNames;
-        std::unordered_map<std::string, PassTextureInfo> mapTextures;
+    struct PassDatas
+    {
+        using DataSlotMapType = SlotMap<PassData>;
+        using BufferSlotMapType = SlotMap<PassBufferInfo>;
+        using TextureSlotMapType = SlotMap<PassTextureInfo>;
 
-        PassData();
+        DataSlotMapType datas;
+        BufferSlotMapType buffers;
+        TextureSlotMapType textures;
+    
+        PassDatas();
 
-        const std::vector<std::string> getArrBufferNames() const;
-        Bool32 hasBuffer(std::string name) const;
-        void addBuffer(std::string name, const PassBufferInfo &bufferInfo);
-        void removeBuffer(std::string name);
-        const PassBufferInfo &getBuffer(std::string name) const;
-        void setBuffer(std::string name, const PassBufferInfo &bufferInfo);
+        const std::set<SlotType> &getBufferSlots() const;
+        Bool32 hasBuffer(const SlotType &slot) const;
+        void addBuffer(const SlotType &slot, const PassBufferInfo &bufferInfo);
+        void removeBuffer(const SlotType &slot);
+        const PassBufferInfo &getBuffer(const SlotType &slot) const;
+        void setBuffer(const SlotType &slot, const PassBufferInfo &bufferInfo);
 
-        const std::vector<std::string> getArrTextureNames() const;
-        Bool32 hasTexture(std::string name) const;
-        void addTexture(std::string name, const PassTextureInfo &texInfo);
-        void removeTexture(std::string name);
-        const PassTextureInfo &getTexture(std::string name) const;
-        void setTexture(std::string name, const PassTextureInfo &texInfo);
+        const std::set<SlotType> &getTextureSlots() const;
+        Bool32 hasTexture(const SlotType &slot) const;
+        void addTexture(const SlotType &slot, const PassTextureInfo &texInfo);
+        void removeTexture(const SlotType &slot);
+        const PassTextureInfo &getTexture(const SlotType &slot) const;
+        void setTexture(const SlotType &slot, const PassTextureInfo &texInfo);
 
-        const std::vector<std::string> getArrDataNames() const;
-        Bool32 hasData(std::string name) const;
-        void removeData(std::string name);
-        const PassDataInfo &getDataInfo(std::string name) const;
-        const PassDataSizeInfo &getDataSizeInfo(std::string name) const;
+        const std::set<SlotType> &getDataSlots() const;
+        Bool32 hasData(const SlotType &slot) const;
+        void removeData(const SlotType &slot);
+        const PassDataInfo &getDataInfo(const SlotType &slot) const;
+        const PassDataSizeInfo &getDataSizeInfo(const SlotType &slot) const;
 
-        void addData(const std::string name, const PassDataInfo &info, const PassDataSizeInfo &sizeInfo);
-        void addData(const std::string name, const PassDataInfo &info, void *src, uint32_t size);
-        void getData(const std::string name, void *dst, uint32_t size, uint32_t offset) const;
-        void setData(const std::string name, const PassDataInfo &info, const PassDataSizeInfo &sizeInfo);
-        void setData(const std::string name, void *src, uint32_t size, uint32_t offset);
+        void addData(const SlotType &slot, const PassDataInfo &info, const PassDataSizeInfo &sizeInfo);
+        void addData(const SlotType &slot, const PassDataInfo &info, void *src, uint32_t size);
+        void getData(const SlotType &slot, void *dst, uint32_t size, uint32_t offset) const;
+        void setData(const SlotType &slot, const PassDataInfo &info, const PassDataSizeInfo &sizeInfo);
+        void setData(const SlotType &slot, void *src, uint32_t size, uint32_t offset);
 
         template<typename T>
-        void addData(const std::string name, const PassDataInfo &info, const T &value);
+        void addData(const SlotType &slot, const PassDataInfo &info, const T &value);
         template<typename T>
-        T getData(const std::string name) const;
+        T getData(const SlotType &slot) const;
         template<typename T>
-        void setData(const std::string name, const T &value);
+        void setData(const SlotType &slot, const T &value);
         
         template<typename T>
-        void addData(const std::string name, const PassDataInfo &info, const std::vector<T> &values);
+        void addData(const SlotType &slot, const PassDataInfo &info, const std::vector<T> &values);
         template <typename T>
-        std::vector<T> getData(const std::string name, const uint32_t count) const;
+        std::vector<T> getData(const SlotType &slot, const uint32_t count) const;
         template<typename T>
-        void setData(const std::string name, const std::vector<T> &values);
+        void setData(const SlotType &slot, const std::vector<T> &values);
 
         template<typename T>
-        void addData(const std::string name, const PassDataInfo &info, const T * const pSrc, const uint32_t count);
+        void addData(const SlotType &slot, const PassDataInfo &info, const T * const pSrc, const uint32_t count);
         template<typename T>
-        void getData(const std::string name, const T * const pDst, const uint32_t count);
+        void getData(const SlotType &slot, const T * const pDst, const uint32_t count);
         template<typename T>
-        void setData(const std::string name, const T * const pSrc, const uint32_t count);
+        void setData(const SlotType &slot, const T * const pSrc, const uint32_t count);
 
-        uint32_t getDataBaseSize(const std::string name) const;
+        uint32_t getDataBaseSize(const SlotType &slot) const;
 
-        uint32_t getDataSize(const std::string name) const;
+        uint32_t getDataSize(const SlotType &slot) const;
 
-        void memoryCopyData(const std::string name
+        void memoryCopyData(const SlotType &slot
             , void* dst
             , uint32_t offset
             , uint32_t elementStart

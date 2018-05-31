@@ -2,25 +2,21 @@
 
 namespace vg
 {
-    PassDataInfo::PassDataInfo(uint32_t layoutPriority
-        , vk::ShaderStageFlags shaderStageFlags
+    PassDataInfo::PassDataInfo(vk::ShaderStageFlags shaderStageFlags
         )
-        : layoutPriority(layoutPriority)
-        , shaderStageFlags(shaderStageFlags)
+        : shaderStageFlags(shaderStageFlags)
     {
         
     }
 
     PassDataInfo::PassDataInfo(const PassDataInfo &target)
-        : layoutPriority(target.layoutPriority)
-        , shaderStageFlags(target.shaderStageFlags)
+        : shaderStageFlags(target.shaderStageFlags)
     {
 
     }
 
     PassDataInfo& PassDataInfo::operator=(const PassDataInfo &target)
     {
-        layoutPriority = target.layoutPriority;
         shaderStageFlags = target.shaderStageFlags;
         return *this;
     }
@@ -56,7 +52,6 @@ namespace vg
         , const Texture::ImageView *pImageView
         , const Texture::Sampler *pSampler
         , vk::ImageLayout imageLayout
-        , uint32_t bindingPriority
         , ImageDescriptorType descriptorType
         , vk::ShaderStageFlags stageFlags
     )
@@ -64,7 +59,6 @@ namespace vg
         , pImageView(pImageView)
         , pSampler(pSampler)
         , imageLayout(imageLayout)
-        , bindingPriority(bindingPriority)
         , descriptorType(descriptorType)
         , stageFlags(stageFlags)
     {
@@ -76,7 +70,6 @@ namespace vg
         , pImageView(target.pImageView)
         , pSampler(target.pSampler)
         , imageLayout(target.imageLayout)
-        , bindingPriority(target.bindingPriority)
         , descriptorType(target.descriptorType)
         , stageFlags(target.stageFlags)
     {
@@ -89,7 +82,6 @@ namespace vg
         pImageView = target.pImageView;
         pSampler = target.pSampler;
         imageLayout = target.imageLayout;
-        bindingPriority = target.bindingPriority;
         descriptorType = target.descriptorType;
         stageFlags = target.stageFlags;
         return *this;
@@ -99,14 +91,12 @@ namespace vg
     PassBufferInfo::PassBufferInfo(const BufferData *pBuffer
         , uint32_t offset
         , uint32_t range
-        , uint32_t bindingPriority
         , BufferDescriptorType descriptorType
         , vk::ShaderStageFlags stageFlags
         )
         : pBuffer(pBuffer)
         , offset(offset)
         , range(range)
-        , bindingPriority(bindingPriority)
         , descriptorType(descriptorType)
         , stageFlags(stageFlags)
     {
@@ -117,7 +107,6 @@ namespace vg
         : pBuffer(target.pBuffer)
         , offset(target.offset)
         , range(target.range)
-        , bindingPriority(target.bindingPriority)
         , descriptorType(target.descriptorType)
         , stageFlags(target.stageFlags)
     {
@@ -129,194 +118,187 @@ namespace vg
         pBuffer = target.pBuffer;
         offset = target.offset;
         range = target.range;
-        bindingPriority = target.bindingPriority;
         descriptorType = target.descriptorType;
         stageFlags = target.stageFlags;
         return *this;
     }
 
-    PassData::PassData()
-       : arrDataNames()
-       , mapDatas()
-       , mapDataCounts()
-       , mapDataInfos()
-       , mapDataSizeInfos()
-       , arrBufferNames()
-       , mapBuffers()
-       , arrTexNames()
-       , mapTextures()
+    PassData::PassData(PassDataInfo info
+        , PassDataSizeInfo sizeInfo
+        , std::vector<Byte> data
+        , uint32_t count
+        )
+        : info(info)
+        , sizeInfo(sizeInfo)
+        , data(data)
+        , count(count)
     {
 
     }
 
-    const std::vector<std::string> PassData::getArrBufferNames() const
+    PassDatas::PassDatas()
+       : datas()
+       , buffers()
+       , textures()
     {
-        return arrBufferNames;
+
     }
 
-    Bool32 PassData::hasBuffer(std::string name) const
+    const std::set<SlotType> &PassDatas::getBufferSlots() const
     {
-        return hasValue<PassBufferInfo>(name, mapBuffers);
+        return buffers.getSlots();
     }
 
-    void PassData::addBuffer(std::string name, const PassBufferInfo &bufferInfo)
+    Bool32 PassDatas::hasBuffer(const SlotType &slot) const
     {
-        addValue(name, bufferInfo, mapBuffers, arrBufferNames);
+        return buffers.hasValue(slot);
     }
 
-    void PassData::removeBuffer(std::string name)
+    void PassDatas::addBuffer(const SlotType &slot, const PassBufferInfo &bufferInfo)
     {
-        removeValue(name, mapBuffers, arrBufferNames);
+        buffers.addValue(slot, bufferInfo);
     }
 
-    const PassBufferInfo &PassData::getBuffer(std::string name) const
+    void PassDatas::removeBuffer(const SlotType &slot)
     {
-        return getValue(name, mapBuffers, arrBufferNames);
+        buffers.removeValue(slot);
     }
 
-    void PassData::setBuffer(std::string name, const PassBufferInfo &bufferInfo)
+    const PassBufferInfo &PassDatas::getBuffer(const SlotType &slot) const
     {
-        setValue(name, bufferInfo, mapBuffers, arrBufferNames);
+        return buffers.getValue(slot);
     }
 
-    const std::vector<std::string> PassData::getArrTextureNames() const
+    void PassDatas::setBuffer(const SlotType &slot, const PassBufferInfo &bufferInfo)
     {
-        return arrTexNames;
+        buffers.setValue(slot, bufferInfo);
     }
 
-    Bool32 PassData::hasTexture(std::string name) const
+    const std::set<SlotType> &PassDatas::getTextureSlots() const
     {
-        return hasValue<PassTextureInfo>(name, mapTextures);
+        return textures.getSlots();
+    }
+
+    Bool32 PassDatas::hasTexture(const SlotType &slot) const
+    {
+        return textures.hasValue(slot);
     }
         
-    void PassData::addTexture(std::string name, const PassTextureInfo &texInfo)
+    void PassDatas::addTexture(const SlotType &slot, const PassTextureInfo &texInfo)
     {
-        addValue(name, texInfo, mapTextures, arrTexNames);
+        textures.addValue(slot, texInfo);
     }
         
-    void PassData::removeTexture(std::string name)
+    void PassDatas::removeTexture(const SlotType &slot)
     {
-        removeValue(name, mapTextures, arrTexNames);
+        textures.removeValue(slot);
     }
 
-    const PassTextureInfo &PassData::getTexture(std::string name) const
+    const PassTextureInfo &PassDatas::getTexture(const SlotType &slot) const
     {
-        return getValue(name, mapTextures, arrTexNames);
+        return textures.getValue(slot);
     }
 
-    void PassData::setTexture(std::string name, const PassTextureInfo &texInfo)
+    void PassDatas::setTexture(const SlotType &slot, const PassTextureInfo &texInfo)
     {
-        setValue(name, texInfo, mapTextures, arrTexNames);
+        textures.setValue(slot, texInfo);
     }
 
-    const std::vector<std::string> PassData::getArrDataNames() const
+    const std::set<SlotType> &PassDatas::getDataSlots() const
     {
-        return arrDataNames;
+        return datas.getSlots();
     }
 
-    Bool32 PassData::hasData(std::string name) const
+    Bool32 PassDatas::hasData(const SlotType &slot) const
     {
-        return hasValue<std::vector<Byte>>(name, mapDatas);
+        return datas.hasValue(slot);
     }
         
-    void PassData::removeData(std::string name)
+    void PassDatas::removeData(const SlotType &slot)
     {
-        removeValue(name, mapDatas, arrDataNames);
-        removeValue(name, mapDataCounts);
-        removeValue(name, mapDataInfos);
-        removeValue(name, mapDataSizeInfos);
+        datas.removeValue(slot);
     }
 
-    const PassDataInfo &PassData::getDataInfo(std::string name) const
+    const PassDataInfo &PassDatas::getDataInfo(const SlotType &slot) const
     {
-        return getValue(name, mapDataInfos);
+        return datas.getValue(slot).info;
     }
 
-    const PassDataSizeInfo &PassData::getDataSizeInfo(std::string name) const
+    const PassDataSizeInfo &PassDatas::getDataSizeInfo(const SlotType &slot) const
     {
-        return getValue(name, mapDataSizeInfos);
+        return datas.getValue(slot).sizeInfo;
     }
 
-    void PassData::addData(const std::string name, const PassDataInfo &info, const PassDataSizeInfo &sizeInfo)
+    void PassDatas::addData(const SlotType &slot, const PassDataInfo &info, const PassDataSizeInfo &sizeInfo)
     {
         std::vector<Byte> temp(sizeInfo.size);
-        addValue(name, temp, mapDatas, arrDataNames);
-        addValue(name, 1u, mapDataCounts);
-        addValue(name, info, mapDataInfos);
-        addValue(name, sizeInfo, mapDataSizeInfos);
+        PassData tempData(info, sizeInfo, temp, 1u);
+        datas.addValue(slot, std::move(tempData));
     }
 
-    void PassData::addData(const std::string name, const PassDataInfo &info, void *src, uint32_t size)
+    void PassDatas::addData(const SlotType &slot, const PassDataInfo &info, void *src, uint32_t size)
     {
+
         std::vector<Byte> temp(size);
         if (size != 0u && src != nullptr) memcpy(temp.data(), src, size);
-        addValue(name, temp, mapDatas, arrDataNames);
-        addValue(name, 1u, mapDataCounts);
-        addValue(name, info, mapDataInfos);
         PassDataSizeInfo sizeInfo = {
             size
         };
-        addValue(name, sizeInfo, mapDataSizeInfos);
+        PassData tempData(info, sizeInfo, temp, 1u);
+        datas.addValue(slot, std::move(tempData));
     }
 
-    void PassData::getData(const std::string name, void *dst, uint32_t size, uint32_t offset) const
+    void PassDatas::getData(const SlotType &slot, void *dst, uint32_t size, uint32_t offset) const
     {
-        const auto &bytes = getValue(name, mapDatas);        
+        const auto &bytes = datas.getValue(slot).data;
         if (offset + size > static_cast<uint32_t>(bytes.size()))
             throw std::range_error("Out range of the saved material data!");
         memcpy(dst, (char *)(bytes.data()) + offset, size);
     }
 
-    void PassData::setData(const std::string name, const PassDataInfo &info, const PassDataSizeInfo &sizeInfo)
+    void PassDatas::setData(const SlotType &slot, const PassDataInfo &info, const PassDataSizeInfo &sizeInfo)
     {
-        setValue(name, info, mapDataInfos);
-        setValue(name, sizeInfo, mapDataSizeInfos);
+        auto &value = datas.getValue(slot);
+        value.info = info;
+        value.sizeInfo = sizeInfo;
     }
 
-    void PassData::setData(const std::string name, void *src, uint32_t size, uint32_t offset)
+    void PassDatas::setData(const SlotType &slot, void *src, uint32_t size, uint32_t offset)
     {
-        const auto& iterator = mapDatas.find(name);
-        if (iterator == mapDatas.cend())
+        auto &value = datas.getValue(slot);
+        auto &bytes = value.data;
+        uint32_t newSize = offset + size;
+        if (newSize > static_cast<uint32_t>(bytes.size()))
         {
-            throw std::runtime_error("Map don't has item whose key: " + name);
+            bytes.resize(newSize);
+            value.sizeInfo.size = newSize;
         }
-        else
-        {
-            if (offset + size > static_cast<uint32_t>(mapDatas[name].size()))
-            {
-                uint32_t newSize = offset + size;
-                mapDatas[name].resize(newSize);
-                PassDataSizeInfo sizeInfo = {
-                    newSize
-                };
-                setValue(name, sizeInfo, mapDataSizeInfos);
-            }
-            if(src) memcpy((char *)(mapDatas[name].data()) + offset, src, size);
-            setValue(name, 1u, mapDataCounts);
-        }
+        if(src) memcpy(bytes.data() + offset, src, size);
+        value.count = 1u;
     }
 
-    uint32_t PassData::getDataBaseSize(const std::string name) const
+    uint32_t PassDatas::getDataBaseSize(const SlotType &slot) const
     {
-        const auto& bytes = getValue(name, mapDatas);
-        const auto& count = getValue(name, mapDataCounts);
+        const auto& bytes = datas.getValue(slot).data;
+        const auto& count = datas.getValue(slot).count;
         return static_cast<uint32_t>(bytes.size()) / count;
     }
 
-    uint32_t PassData::getDataSize(const std::string name) const
+    uint32_t PassDatas::getDataSize(const SlotType &slot) const
     {
-        const auto& bytes = getValue(name, mapDatas);
+        const auto& bytes = datas.getValue(slot).data;
         return static_cast<uint32_t>(bytes.size());
     }
 
-    void PassData::memoryCopyData(const std::string name
+    void PassDatas::memoryCopyData(const SlotType &slot
         , void* dst
         , uint32_t offset
         , uint32_t elementStart
         , uint32_t maxElementCount) const
     {
-        const auto& bytes = getValue(name, mapDatas);
-        const auto& count = getValue(name, mapDataCounts);
+        auto &value = datas.getValue(slot);
+        const auto& bytes = value.data;
+        const auto& count = value.count;
         uint32_t baseSize = static_cast<uint32_t>(bytes.size()) / count;
         char *ptr = static_cast<char *>(dst);
         ptr += offset;

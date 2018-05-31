@@ -166,7 +166,7 @@ namespace vg
                 , uint32_t count = 0u
             );
         };
-        using SlotMapType = SlotMap<Data>;
+        using SlotMapType = SlotMap<Data>;        
         
         struct Datas {
             SlotMapType datas;

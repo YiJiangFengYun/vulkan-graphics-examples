@@ -1,107 +1,109 @@
 namespace vg
 {
     template<typename T>
-    void PassDatas::addData(const SlotType &slot, const PassDataInfo &info, const T &value)
+    void PassData::addData(const std::string name, const PassDataInfo &info, const T &value)
     {
         std::vector<Byte> temp(sizeof(T));
         memcpy(temp.data(), &value, sizeof(T));
+        addValue(name, temp, mapDatas, arrDataNames);
+        addValue(name, 1u, mapDataCounts);
+        addValue(name, info, mapDataInfos);
         PassDataSizeInfo sizeInfo = {
             static_cast<uint32_t>(sizeof(T)),
         };
-        Data tempData(info, sizeInfo, temp, 1u);
-        datas.addValue(slot, std::move(tempData));
+        addValue(name, sizeInfo, mapDataSizeInfos);
     }
 
     template <typename T>
-    T PassDatas::getData(const SlotType &slot) const
+    T PassData::getData(const std::string name) const
     {
-        const auto& bytes = datas.getValue().data;
+        const auto& bytes = getValue(name, mapDatas);
         T t;
         memcpy(&t, bytes.data(), sizeof(T));
         return t;
     }
 
     template<typename T>
-    void PassDatas::setData(const SlotType &slot, const T &value)
+    void PassData::setData(const std::string name, const T &value)
     {
-        auto &value = datas.getValue(slot);
-        auto &bytes = value.data;
-        auto size = static_cast<uint32_t>(sizeof(T));
-        if (bytes.size() < size) bytes.resize(size);
-        memcpy(bytes.data(), &value, size);
-        value.count = 1u;
-        value.sizeInfo.size = size;
+        std::vector<Byte> temp(sizeof(T));
+        memcpy(temp.data(), &value, sizeof(T));
+        setValue(name, temp, mapDatas, arrDataNames);
+        setValue(name, 1u, mapDataCounts);
+        PassDataSizeInfo sizeInfo = {
+            static_cast<uint32_t>(sizeof(T)),
+        };
+        setValue(name, sizeInfo, mapDataSizeInfos);
     }
 
     template<typename T>
-    void PassDatas::addData(const SlotType &slot, const PassDataInfo &info, const std::vector<T> &values)
+    void PassData::addData(const std::string name, const PassDataInfo &info, const std::vector<T> &values)
     {
-        uint32_t size = static_cast<uint32_t>(sizeof(T) * values.size());
-        std::vector<Byte> temp(size);
+        std::vector<Byte> temp(sizeof(T) * values.size());
         memcpy(temp.data(), values.data(), temp.size());
+        addValue(name, temp, mapDatas, arrDataNames);
+        addValue(name, values.size(), mapDataCounts);
+        addValue(name, info, mapDataInfos);
         PassDataSizeInfo sizeInfo = {
-            size,
+            static_cast<uint32_t>(sizeof(T) * values.size()),
         };
-        Data tempData(info, sizeInfo, temp, static_cast<uint32_t>(values.size()));
-        datas.addValue(slot, std::move(tempData));
+        addValue(name, sizeInfo, mapDataSizeInfos);
     }
 
     template <typename T>
-    std::vector<T> PassDatas::getData(const SlotType &slot, const uint32_t count) const
+    std::vector<T> PassData::getData(const std::string name, const uint32_t count) const
     {
-        const auto& bytes = datas.getValue(slot).data;
+        const auto& bytes = getValue(name, mapDatas);
         std::vector<T> ts(count);
         memcpy(ts.data(), bytes.data(), sizeof(T) * count);
         return ts;
     }
 
     template<typename T>
-    void PassDatas::setData(const SlotType &slot, const std::vector<T> &values)
+    void PassData::setData(const std::string name, const std::vector<T> &values)
     {
-        auto &value = datas.getValue(slot);
-        auto &bytes = value.data;
-        uint32_t srcSize = static_cast<uint32_t>(sizeof(T) * values.size());
-        if (srcSize > static_cast<uint32_t>(bytes.size()))
-        {
-            bytes.resize(srcSize);
-            value.sizeInfo.size = srcSize;
-        }
-        memcpy(bytes.data(), values.data(), srcSize);
-        value.count = static_cast<uint32_t>(values.size());
-    }
-
-    template<typename T>
-    void PassDatas::addData(const SlotType &slot, const PassDataInfo &info, const T * const pSrc, const uint32_t count)
-    {
-        uint32_t size = static_cast<uint32_t>(sizeof(T) * count;
-        std::vector<Byte> temp(size);
-        if (count != 0u && pSrc != nullptr)memcpy(temp.data(), pSrc, size);
+        std::vector<Byte> temp(sizeof(T) * values.size());
+        memcpy(temp.data(), values.data(), temp.size());
+        setValue(name, temp, mapDatas, arrDataNames);
+        setValue(name, values.size(), mapDataCounts);
         PassDataSizeInfo sizeInfo = {
-            size,
+            static_cast<uint32_t>(sizeof(T) * values.size()),
         };
-        Data tempData(info, sizeInfo, temp, count);
-        datas.addValue(slot, std::move(tempData));
+        setValue(name, sizeInfo, mapDataSizeInfos);
     }
 
     template<typename T>
-    void PassDatas::getData(const std::string name, const T * const pDst, const uint32_t count)
+    void PassData::addData(const std::string name, const PassDataInfo &info, const T * const pSrc, const uint32_t count)
     {
-        const auto& bytes = datas.getValue(slot).data;
+        std::vector<Byte> temp(sizeof(T) * count);
+        if (count != 0u && pSrc != nullptr) memcpy(temp.data(), pSrc, temp.size());
+        addValue(name, temp, mapDatas, arrDataNames);
+        addValue(name, count, mapDataCounts);
+        addValue(name, info, mapDataInfos);
+        PassDataSizeInfo sizeInfo =  {
+            static_cast<uint32_t>(sizeof(T)) * count,
+        };
+        addValue(name, sizeInfo, mapDataSizeInfos);
+    }
+
+    template<typename T>
+    void PassData::getData(const std::string name, const T * const pDst, const uint32_t count)
+    {
+        const auto& bytes = getValue(name, mapDatas);
         size_t size = sizeof(T) * count;
         memcpy(pDst, bytes.data(), size);
     }
 
     template<typename T>
-    void PassDatas::setData(const std::string name, const T * const pSrc, const uint32_t count)
+    void PassData::setData(const std::string name, const T * const pSrc, const uint32_t count)
     {
-        auto &value = datas.getValue(slot);
-        auto &bytes = value.data;
-        uint32_t srcSize = static_cast<uint32_t>(sizeof(T)) * count;
-        if (srcSize > static_cast<uint32_t>(bytes.size())) {
-            bytes.resize(srcSize);
-            value.sizeInfo.size = srcSize;
-        }
-        if (srcSize > 0) memcpy(bytes.data(), pSrc, srcSize);
-        value.count = count;
+        std::vector<Byte> temp(sizeof(T) * count);
+        if (count != 0u && pSrc != nullptr) memcpy(temp.data(), pSrc, temp.size());
+        setValue(name, temp, mapDatas, arrDataNames);
+        setValue(name, count, mapDataCounts);
+        PassDataSizeInfo sizeInfo =  {
+            static_cast<uint32_t>(sizeof(T)) * count,
+        };
+        setValue(name, sizeInfo, mapDataSizeInfos);
     }
 }

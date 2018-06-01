@@ -2,6 +2,4 @@
 format (COLLADA).
 2.Perfect light system and Add some necessary light types.
 3.Bug of render of sample "mesh" and "post_render".
-4.Optimze exterual uniform data of pass, use map storage.
-5.Delete "apply" mechanism mode.
-6.Replace name mechanism with slot mechanism that can integrate the features of name and priority.
+4.Delete "apply" mechanism mode.

@@ -135,6 +135,37 @@ namespace vg
         return *this;
     }
 
+    PassExtUniformBufferInfo::PassExtUniformBufferInfo(UniformBufferData *pData
+        , uint32_t subDataOffset
+        , uint32_t subDataCount
+        , uint32_t bindingPriority
+        )
+        : pData(pData)
+        , subDataOffset(subDataOffset)
+        , subDataCount(subDataCount)
+        , bindingPriority(bindingPriority)
+    {
+
+    }
+        
+    PassExtUniformBufferInfo::PassExtUniformBufferInfo(const PassExtUniformBufferInfo &target)
+        : pData(target.pData)
+        , subDataOffset(target.subDataOffset)
+        , subDataCount(target.subDataCount)
+        , bindingPriority(target.bindingPriority)
+    {
+
+    }
+        
+    PassExtUniformBufferInfo& PassExtUniformBufferInfo::operator=(const PassExtUniformBufferInfo &target)
+    {
+        pData = target.pData;
+        subDataOffset = target.subDataOffset;
+        subDataCount = target.subDataCount;
+        bindingPriority = target.bindingPriority;
+        return *this;
+    }
+
     PassData::PassData()
        : arrDataNames()
        , mapDatas()
@@ -207,6 +238,36 @@ namespace vg
     void PassData::setTexture(std::string name, const PassTextureInfo &texInfo)
     {
         setValue(name, texInfo, mapTextures, arrTexNames);
+    }
+
+    const std::vector<std::string> PassData::getExtUniformBufferNames() const
+    {
+        return arrExtUniformBufferNames;
+    }
+
+    Bool32 PassData::hasExtUniformBuffer(std::string name) const
+    {
+        return hasValue(name, mapExtUniformBuffers, arrExtUniformBufferNames);
+    }
+        
+    void PassData::addExtUniformBuffer(std::string name, const PassExtUniformBufferInfo &extUniformBufferInfo)
+    {
+        addValue(name, extUniformBufferInfo, mapExtUniformBuffers, arrExtUniformBufferNames);
+    }
+        
+    void PassData::removeExtUniformBuffer(std::string name)
+    {
+        removeValue(name, mapExtUniformBuffers, arrExtUniformBufferNames);
+    }
+        
+    const PassExtUniformBufferInfo &PassData::getExtUniformBuffer(std::string name) const
+    {
+        return getValue(name, mapExtUniformBuffers, arrExtUniformBufferNames);
+    }
+
+    void PassData::setExtUniformBuffer(std::string name, const PassExtUniformBufferInfo &extUniformBufferInfo)
+    {
+        setValue(name, extUniformBufferInfo, mapExtUniformBuffers, arrExtUniformBufferNames);
     }
 
     const std::vector<std::string> PassData::getArrDataNames() const

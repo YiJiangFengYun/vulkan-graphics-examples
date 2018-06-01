@@ -213,12 +213,12 @@ void Window::_createMaterial()
         depthStencilState.depthWriteEnable = VG_TRUE;
         depthStencilState.depthCompareOp = vk::CompareOp::eLessOrEqual;
         pPass->setDepthStencilInfo(depthStencilState);
-        vg::Pass::ExternalUniformBufferInfo externalUniformBufferInfo;
+        vg::PassExtUniformBufferInfo externalUniformBufferInfo;
         externalUniformBufferInfo.pData = m_pExtUniformData.get();
         externalUniformBufferInfo.subDataOffset = i;
         externalUniformBufferInfo.subDataCount = 1u;
-        pPass->setExtUniformBufferCount(1u);
-        pPass->setExtUniformBuffers(externalUniformBufferInfo);
+		externalUniformBufferInfo.bindingPriority = 0u;
+		pPass->addExtUniformBuffer("ext_uniform_buffer", externalUniformBufferInfo);
         pPass->apply();
         
         pMaterial->apply();

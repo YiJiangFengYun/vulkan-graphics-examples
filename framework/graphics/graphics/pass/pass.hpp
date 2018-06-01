@@ -21,16 +21,6 @@ namespace vg
     class Pass : public Base
     {
     public:
-        struct ExternalUniformBufferInfo 
-        {
-            UniformBufferData *pData;
-            uint32_t subDataOffset;
-            uint32_t subDataCount;
-            ExternalUniformBufferInfo(UniformBufferData *pData = nullptr
-                , uint32_t subDataOffset = 0u
-                , uint32_t subDataCount = 0u);
-        };
-
         enum class BuildInDataType
         {
             MATRIX_OBJECT_TO_NDC = 0,
@@ -165,6 +155,13 @@ namespace vg
         void removeTexture(std::string name);
         PassTextureInfo getTexture(std::string name) const;
         void setTexture(std::string name, const PassTextureInfo &texInfo);
+
+        //external uniform buffer
+        Bool32 hasExtUniformBuffer(std::string name) const;
+        void addExtUniformBuffer(std::string name, const PassExtUniformBufferInfo &info);
+        void removeExtUniformBuffer(std::string name);
+        PassExtUniformBufferInfo getExtUniformBuffer(std::string name) const;
+        void setExtUniformBuffer(std::string name, const PassExtUniformBufferInfo &info);
 
         Bool32 hasData(std::string name) const;
         void removeData(std::string name);
@@ -302,14 +299,6 @@ namespace vg
         const VertexInputFilterInfo &getVertexInputFilter() const;
         void setVertexInputFilterInfo(const VertexInputFilterInfo &value);
 
-        //external uniform buffer
-        uint32_t getExtUniformBufferCount() const;
-        const ExternalUniformBufferInfo * getExtUniformBuffers() const;
-        void setExtUniformBufferCount(uint32_t value);
-        void setExtUniformBuffers(fd::ArrayProxy<ExternalUniformBufferInfo> extUniformBuffers
-            , uint32_t offset = 0u
-            );
-
         const BufferData &getBufferData() const;
         const vk::DescriptorSetLayout *getDescriptorSetLayout() const;
         const vk::DescriptorPool *getDescriptorPool() const;
@@ -333,6 +322,7 @@ namespace vg
         std::unordered_map<std::string, Bool32> m_dataContentChanges;
         Bool32 m_textureChanged;
         Bool32 m_bufferChanged;
+        Bool32 m_extUniformBufferChanged;
 
         vk::PolygonMode m_polygonMode;
         vk::CullModeFlags m_cullMode;
@@ -360,10 +350,6 @@ namespace vg
 
         VertexInputFilterInfo m_vertexInputFilterInfo;
         std::vector<uint32_t> m_vertexInputFilterLocations;
-
-        //external uniform buffer data.
-        uint32_t m_extUniformBufferCount;
-        std::vector<ExternalUniformBufferInfo> m_extUniformBuffers;
 
         ////////applied data
 
@@ -421,6 +407,10 @@ namespace vg
 
         //build in descriptor set
         std::shared_ptr<vk::DescriptorSet> m_pDescriptorSet;
+
+        //external uniform buffer.
+        static Bool32 _compareExtUniformBufferInfo(const PassExtUniformBufferInfo &, const PassExtUniformBufferInfo &);
+        std::set<PassExtUniformBufferInfo, Bool32(*)(const PassExtUniformBufferInfo &, const PassExtUniformBufferInfo &)> m_sortExtUniformBufferInfoSet;
 
         //all descriptor sets and layouts
         Bool32 m_descriptorSetsChanged;

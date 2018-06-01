@@ -2,17 +2,6 @@
 
 namespace vg
 {
-
-    Pass::ExternalUniformBufferInfo::ExternalUniformBufferInfo(UniformBufferData *pData
-        , uint32_t subDataOffset
-        , uint32_t subDataCount)
-        : pData(pData)
-        , subDataOffset(subDataOffset)
-        , subDataCount(subDataCount)
-    {
-
-    }
-
     Pass::BuildInDataInfo::BuildInDataInfo()
         : componentCount(0u)
         , pComponent(nullptr)
@@ -72,6 +61,11 @@ namespace vg
         return item1.bindingPriority < item2.bindingPriority;
     }
 
+    Bool32 Pass::_compareExtUniformBufferInfo(const PassExtUniformBufferInfo &item1, const PassExtUniformBufferInfo &item2)
+    {
+        return item1.bindingPriority < item2.bindingPriority;
+    }
+
     Bool32 Pass::_comparePushConstantInfo(const PushConstantSortInfo &item1, const PushConstantSortInfo &item2)
     {
         return item1.priority < item2.priority;
@@ -90,6 +84,7 @@ namespace vg
         , m_dataContentChanges()
         , m_textureChanged(VG_FALSE)
         , m_bufferChanged(VG_FALSE)
+        , m_extUniformBufferChanged(VG_FALSE)
         , m_polygonMode()
         , m_cullMode()
         , m_frontFace()
@@ -109,8 +104,6 @@ namespace vg
         , m_buildInDataInfo()
         , m_buildInDataInfoComponents()
         , m_buildInDataCache()
-        , m_extUniformBufferCount()
-        , m_extUniformBuffers()
         , m_vertexInputFilterInfo()
         , m_vertexInputFilterLocations()
 
@@ -122,6 +115,7 @@ namespace vg
         , m_descriptorSetChanged(VG_FALSE)
         , m_layoutBindingCount()
         , m_descriptorSetLayoutBindings()
+        , m_sortExtUniformBufferInfoSet(_compareExtUniformBufferInfo)
         , m_updateDescriptorSetInfos()
         , m_pDescriptorSetLayout(nullptr)
         , m_poolSizeInfos()
@@ -228,6 +222,34 @@ namespace vg
     {
         m_data.setTexture(name, texInfo);
         m_textureChanged = VG_TRUE;
+    }
+
+    Bool32 Pass::hasExtUniformBuffer(std::string name) const
+    {
+        return m_data.hasExtUniformBuffer(name);
+    }
+        
+    void Pass::addExtUniformBuffer(std::string name, const PassExtUniformBufferInfo &info)
+    {
+        m_data.addExtUniformBuffer(name, info);
+        m_extUniformBufferChanged = VG_TRUE;
+    }
+        
+    void Pass::removeExtUniformBuffer(std::string name)
+    {
+        m_data.removeExtUniformBuffer(name);
+        m_extUniformBufferChanged = VG_TRUE;
+    }
+
+    PassExtUniformBufferInfo Pass::getExtUniformBuffer(std::string name) const
+    {
+        return m_data.getExtUniformBuffer(name);
+    }
+
+    void Pass::setExtUniformBuffer(std::string name, const PassExtUniformBufferInfo &info)
+    {
+        m_data.setExtUniformBuffer(name, info);
+        m_extUniformBufferChanged = VG_TRUE;
     }
 
     Bool32 Pass::hasData(std::string name) const
@@ -659,35 +681,6 @@ namespace vg
         m_vertexInputFilterInfo = value;
         m_vertexInputFilterInfo.pLocations = m_vertexInputFilterLocations.data();
         _updatePipelineStateID();
-    }
-
-    uint32_t Pass::getExtUniformBufferCount() const
-    {
-        return m_extUniformBufferCount;
-    }
-
-    const Pass::ExternalUniformBufferInfo * Pass::getExtUniformBuffers() const
-    {
-        return m_extUniformBuffers.data();
-    }
-
-    void Pass::setExtUniformBufferCount(uint32_t value)
-    {
-        m_extUniformBufferCount = value;
-        m_extUniformBuffers.resize(value);
-        m_descriptorSetsChanged = VG_TRUE;
-    }
-
-    void Pass::setExtUniformBuffers(fd::ArrayProxy<ExternalUniformBufferInfo> extUniformBuffers
-        , uint32_t offset
-        )
-    {
-        uint32_t count = static_cast<uint32_t>(extUniformBuffers.size());
-        uint32_t total = m_extUniformBufferCount;
-        for (uint32_t i = 0; i < count && offset < total; ++i, ++offset) {
-            m_extUniformBuffers[offset] = *(extUniformBuffers.data() + i);
-        }
-        m_descriptorSetsChanged = VG_TRUE;
     }
 
     const BufferData &Pass::getBufferData() const
@@ -1148,11 +1141,25 @@ namespace vg
             
         }
 
+        if (m_extUniformBufferChanged) {
+            const auto &names = m_data.getExtUniformBufferNames();
+            m_sortExtUniformBufferInfoSet.clear();
+            for (const auto &name : names) {
+                const auto &extUniformBufferInfo = m_data.getExtUniformBuffer(name);
+                m_sortExtUniformBufferInfoSet.insert(extUniformBufferInfo);
+            }
+            
+            //This change will make descriptor sets change.
+            m_descriptorSetsChanged = VG_TRUE;
+
+            m_extUniformBufferChanged = VG_FALSE;
+        }
+
         //Update descriptor sets and their layouts.
         if (m_descriptorSetsChanged) {
             auto pLayout = m_pDescriptorSetLayout;
             uint32_t layoutCount = pLayout != nullptr ? 1 : 0;
-            for (const auto &extUniformbuffer : m_extUniformBuffers)
+            for (const auto &extUniformbuffer : m_sortExtUniformBufferInfoSet)
             {
                 uint32_t subDataOffset = extUniformbuffer.subDataOffset;
                 uint32_t subDataCount = extUniformbuffer.subDataCount;
@@ -1176,7 +1183,7 @@ namespace vg
                 ++layoutIndex;
             }
     
-            for (const auto &extUniformbuffer : m_extUniformBuffers)
+            for (const auto &extUniformbuffer : m_sortExtUniformBufferInfoSet)
             {
                 uint32_t subDataOffset = extUniformbuffer.subDataOffset;
                 uint32_t subDataCount = extUniformbuffer.subDataCount;
@@ -1342,7 +1349,7 @@ namespace vg
     void Pass::beginRecord() const
     {
 #ifdef DEBUG
-        if (m_dataChanged || m_dataContentChanged || m_textureChanged || m_bufferChanged || 
+        if (m_dataChanged || m_dataContentChanged || m_textureChanged || m_bufferChanged || m_extUniformBufferChanged ||
             m_descriptorSetChanged || m_descriptorSetsChanged || m_dynamicOffsetsChanged || 
             m_specializationChanged || m_pipelineLayoutChanged)
             throw std::runtime_error("Pass should apply change before used to render.");
@@ -1446,7 +1453,7 @@ namespace vg
     void Pass::_applyUniformBufferDynamicOffsets()
     {
         uint32_t dynamicCount = 0u;
-        for (const auto &extUniformbuffer : m_extUniformBuffers)
+        for (const auto &extUniformbuffer : m_sortExtUniformBufferInfoSet)
         {
             uint32_t subDataOffset = extUniformbuffer.subDataOffset;
             uint32_t subDataCount = extUniformbuffer.subDataCount;
@@ -1473,7 +1480,7 @@ namespace vg
               m_dynamicOffsets.resize(dynamicCount);
         uint32_t dynamicIndex = 0u;
 
-        for (const auto &extUniformbuffer : m_extUniformBuffers)
+        for (const auto &extUniformbuffer : m_sortExtUniformBufferInfoSet)
         {
             uint32_t subDataOffset = extUniformbuffer.subDataOffset;
             uint32_t subDataCount = extUniformbuffer.subDataCount;

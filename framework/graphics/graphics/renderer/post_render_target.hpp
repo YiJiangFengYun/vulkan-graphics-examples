@@ -4,10 +4,11 @@
 #include "graphics/global.hpp"
 #include "graphics/texture/texture_2d.hpp"
 #include "graphics/texture/texture_depth_stencil_attachment.hpp"
+#include "graphics/renderer/render_target.hpp"
 
 namespace vg
 {
-    class PostRenderTarget
+    class PostRenderTarget : public BaseRenderTarget
     {
     public:
         static const vk::Format DEFAULT_COLOR_FORMAT;
@@ -17,21 +18,15 @@ namespace vg
             , vk::Format colorImageFormat = DEFAULT_COLOR_FORMAT
             , vk::Format depthStencilImageFormat = DEFAULT_DEPTH_STENCIL_FORMAT
             );
-        uint32_t getFramebufferWidth() const;
-        uint32_t getFramebufferHeight() const;
         vk::Format getColorImageFormat() const;
         vk::Format getDepthStencilImageFormat() const;
-        fd::Rect2D getRenderArea() const;
         const Texture2DColorAttachment *getColorAttachment() const;
         const TextureDepthStencilAttachment *getDepthStencilAttachment() const;
         const vk::RenderPass *getRenderPass() const;
         const vk::Framebuffer *getFramebuffer() const;
     private:
-        uint32_t m_framebufferWidth;
-        uint32_t m_framebufferHeight;
         vk::Format m_colorImageFormat;
         vk::Format m_depthStencilImageFormat;
-        fd::Rect2D m_renderArea;
         std::shared_ptr<Texture2DColorAttachment> m_pColorAttachment;
         std::shared_ptr<TextureDepthStencilAttachment> m_pDepthStencilAttachment;
         std::shared_ptr<vk::RenderPass> m_pRenderPass;

@@ -3,10 +3,11 @@
 
 #include "graphics/global.hpp"
 #include "graphics/texture/texture_2d.hpp"
+#include "graphics/renderer/render_target.hpp"
 
 namespace vg
 {
-    class PreZTarget
+    class PreZTarget : public BaseRenderTarget
     {
     public:
         static const vk::Format DEFAULT_DEPTH_FORMAT;
@@ -15,22 +16,15 @@ namespace vg
             , vk::Format depthImageFormat = DEFAULT_DEPTH_FORMAT
             );
         
-        uint32_t getFramebufferWidth() const;
-        uint32_t getFramebufferHeight() const;
         vk::Format getDepthImageFormat() const;
-        fd::Rect2D getRenderArea() const;
         const Texture2DDepthAttachment *getDepthAttachment() const;
         const vk::RenderPass *getRenderPass() const;
         const vk::Framebuffer *getFramebuffer() const;
     private:
-        uint32_t m_framebufferWidth;
-        uint32_t m_framebufferHeight;
         vk::Format m_depthImageFormat;
-        fd::Rect2D m_renderArea;                
         std::shared_ptr<Texture2DDepthAttachment> m_pDepthAttachment;
         std::shared_ptr<vk::RenderPass> m_pRenderPass;
         std::shared_ptr<vk::Framebuffer> m_pFramebuffer;
-
         void _createObjs();
     };
 } //vg

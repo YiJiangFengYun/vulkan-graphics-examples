@@ -4,50 +4,33 @@ namespace vg
 {
     const vk::Format RenderTarget::DEFAULT_DEPTH_STENCIL_FORMAT(vk::Format::eD32SfloatS8Uint);
 
-    RenderTarget::RenderTarget(uint32_t framebufferWidth
+    BaseRenderTarget::BaseRenderTarget(uint32_t framebufferWidth
         , uint32_t framebufferHeight
-        , vk::Format colorImageFormat
-        , vk::Format depthStencilImageFormat
         )
-        : m_colorImageFormat(colorImageFormat)
-        , m_depthStencilImageFormat(depthStencilImageFormat)
-        , m_framebufferWidth(framebufferWidth)
+        : m_framebufferWidth(framebufferWidth)
         , m_framebufferHeight(framebufferHeight)
-        , m_renderArea(0.0f, 0.0f, 1.0f, 1.0f)
-        , m_pFirstRenderPass()
-        , m_pSecondRenderPass()
-        , m_pFirstFramebuffer()
-        , m_pSecondFramebuffer()
+        ,  m_renderArea(0.0f, 0.0f, 1.0f, 1.0f)
+        , m_clearValues()
     {
 
     }
 
-    uint32_t RenderTarget::getFramebufferWidth() const
+    uint32_t BaseRenderTarget::getFramebufferWidth() const
     {
         return m_framebufferWidth;
     }
 
-    uint32_t RenderTarget::getFramebufferHeight() const
+    uint32_t BaseRenderTarget::getFramebufferHeight() const
     {
         return m_framebufferHeight;
     }
 
-    vk::Format RenderTarget::getColorImageFormat() const
-    {
-        return m_colorImageFormat;
-    }
-
-    vk::Format RenderTarget::getDepthStencilImageFormat() const
-    {
-        return m_depthStencilImageFormat;
-    }
-
-    const fd::Rect2D & RenderTarget::getRenderArea() const
+    const fd::Rect2D & BaseRenderTarget::getRenderArea() const
     {
         return m_renderArea;
     }
 
-    void RenderTarget::setRenderArea(const fd::Rect2D & area)
+    void BaseRenderTarget::setRenderArea(const fd::Rect2D & area)
     {
 #ifdef DEBUG
         if (area.width < 0)
@@ -69,6 +52,49 @@ namespace vg
 #endif // DEBUG
 
         m_renderArea = area;
+    }
+
+    uint32_t BaseRenderTarget::getClearValueCount() const
+    {
+        return static_cast<uint32_t>(m_clearValues.size());
+    }
+
+    const vk::ClearValue *BaseRenderTarget::getClearValues() const
+    {
+        return m_clearValues.data();
+    }
+
+    void BaseRenderTarget::setClearValues(vk::ClearValue *pClearValues, uint32_t clearValueCount)
+    {
+        m_clearValues.resize(clearValueCount);
+        memcpy(m_clearValues.data(), pClearValues, sizeof(vk::ClearValue) * clearValueCount);
+    }
+
+    RenderTarget::RenderTarget(uint32_t framebufferWidth
+        , uint32_t framebufferHeight
+        , vk::Format colorImageFormat
+        , vk::Format depthStencilImageFormat
+        )
+        : BaseRenderTarget(framebufferWidth, framebufferHeight)
+        , m_colorImageFormat(colorImageFormat)
+        , m_depthStencilImageFormat(depthStencilImageFormat)
+        , m_pFirstRenderPass()
+        , m_pSecondRenderPass()
+        , m_pFirstFramebuffer()
+        , m_pSecondFramebuffer()
+        
+    {
+        
+    }
+
+    vk::Format RenderTarget::getColorImageFormat() const
+    {
+        return m_colorImageFormat;
+    }
+
+    vk::Format RenderTarget::getDepthStencilImageFormat() const
+    {
+        return m_depthStencilImageFormat;
     }
 
     const vk::RenderPass *RenderTarget::getFirstRenderPass() const

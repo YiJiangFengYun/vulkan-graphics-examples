@@ -16,6 +16,16 @@ namespace vg
         _createRenderPass();
         _createDepthStencilTex();
         _createFramebuffer();
+        vk::ClearValue clearValueColor = {
+            std::array<float, 4>{0.0f, 0.0f, 0.0f, 0.0f}
+        };
+        vk::ClearValue clearValueDepthStencil = {
+            vk::ClearDepthStencilValue(1.0f, 0)
+        };
+        std::array<vk::ClearValue, 2> clearValues = { clearValueColor
+            , clearValueDepthStencil
+        };
+        setClearValues(clearValues.data(), static_cast<uint32_t>(clearValues.size()));
     }
 
     void ColorTexRenderTarget::_createRenderPass()

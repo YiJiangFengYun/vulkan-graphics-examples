@@ -10,27 +10,26 @@ namespace vg
         , vk::Format colorImageFormat
         , vk::Format depthStencilImageFormat
         )
-        : m_framebufferWidth(framebufferWidth)
-        , m_framebufferHeight(framebufferHeight)
+        : BaseRenderTarget(framebufferWidth, framebufferHeight)
         , m_colorImageFormat(colorImageFormat)
         , m_depthStencilImageFormat(depthStencilImageFormat)
-        , m_renderArea()
         , m_pColorAttachment()
         , m_pDepthStencilAttachment()
         , m_pRenderPass()
         , m_pFramebuffer()
     {
         _createObjs();
-    }
 
-    uint32_t PostRenderTarget::getFramebufferWidth() const
-    {
-        return m_framebufferWidth;
-    }
-
-    uint32_t PostRenderTarget::getFramebufferHeight() const
-    {
-        return m_framebufferHeight;
+        vk::ClearValue clearValueColor = {
+            std::array<float, 4>{0.0f, 0.0f, 0.0f, 0.0f}
+        };
+        vk::ClearValue clearValueDepthStencil = {
+            vk::ClearDepthStencilValue(1.0f, 0)
+        };
+        std::array<vk::ClearValue, 2> clearValues = { clearValueColor
+            , clearValueDepthStencil
+        };
+        setClearValues(clearValues.data(), static_cast<uint32_t>(clearValues.size()));
     }
         
     vk::Format PostRenderTarget::getColorImageFormat() const
@@ -41,11 +40,6 @@ namespace vg
     vk::Format PostRenderTarget::getDepthStencilImageFormat() const
     {
         return m_depthStencilImageFormat;
-    }
-        
-    fd::Rect2D PostRenderTarget::getRenderArea() const
-    {
-        return m_renderArea;
     }
         
     const Texture2DColorAttachment *PostRenderTarget::getColorAttachment() const

@@ -8,35 +8,22 @@ namespace vg
         , uint32_t framebufferHeight
         , vk::Format depthImageFormat
         )
-        : m_framebufferWidth(framebufferWidth)
-        , m_framebufferHeight(framebufferHeight)
+        : BaseRenderTarget(framebufferWidth, framebufferHeight)
         , m_depthImageFormat(depthImageFormat)
-        , m_renderArea()
         , m_pDepthAttachment()
         , m_pRenderPass()
         , m_pFramebuffer()
     {
         _createObjs();
-    }
-
-    uint32_t PreZTarget::getFramebufferWidth() const
-    {
-        return m_framebufferWidth;
-    }
-
-    uint32_t PreZTarget::getFramebufferHeight() const
-    {
-        return m_framebufferHeight;
+        vk::ClearValue clearValueDepthStencil = {
+            vk::ClearDepthStencilValue(1.0f, 0)
+        };
+        setClearValues(&clearValueDepthStencil, 1u);
     }
 
     vk::Format PreZTarget::getDepthImageFormat() const
     {
         return m_depthImageFormat;
-    }
-
-    fd::Rect2D PreZTarget::getRenderArea() const
-    {
-        return m_renderArea;
     }
 
     const Texture2DDepthAttachment *PreZTarget::getDepthAttachment() const

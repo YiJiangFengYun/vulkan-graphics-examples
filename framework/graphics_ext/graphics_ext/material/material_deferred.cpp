@@ -140,6 +140,8 @@ namespace vge
             vg::RenderPassBeginInfo renderPassBeginInfo;
             renderPassBeginInfo.pRenderPass = m_pRenderPass.get();
             renderPassBeginInfo.pFrameBuffer = m_pFrameBuffer.get();
+            renderPassBeginInfo.framebufferWidth = framebufferWidth;
+            renderPassBeginInfo.framebufferHeight = framebufferHeight;
             renderPassBeginInfo.renderArea = fd::Rect2D();
 
             vk::ClearValue clearValueColor = {

@@ -128,12 +128,16 @@ namespace vg
 
     RenderPassBeginInfo::RenderPassBeginInfo(const vk::RenderPass *pRenderPass
         , const vk::Framebuffer *pFrameBuffer
+        , uint32_t framebufferWidth
+        , uint32_t framebufferHeight
         , fd::Rect2D renderArea
         , uint32_t clearValueCount
         , const vk::ClearValue *pClearValues
         )
         : pRenderPass(pRenderPass)
         , pFrameBuffer(pFrameBuffer)
+        , framebufferWidth(framebufferWidth)
+        , framebufferHeight(framebufferHeight)
         , renderArea(renderArea)
         , clearValueCount(clearValueCount)
         , pClearValues(pClearValues)

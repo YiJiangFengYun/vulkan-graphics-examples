@@ -64,12 +64,16 @@ namespace vg
     {
         const vk::RenderPass *pRenderPass;
         const vk::Framebuffer *pFrameBuffer;
+        uint32_t framebufferWidth;
+        uint32_t framebufferHeight;
         fd::Rect2D renderArea;
         uint32_t clearValueCount;
         const vk::ClearValue *pClearValues;
 
         RenderPassBeginInfo(const vk::RenderPass *pRenderPass = nullptr
             , const vk::Framebuffer *pFrameBuffer = nullptr
+            , uint32_t framebufferWidth = 0u
+            , uint32_t framebufferHeight = 0u
             , fd::Rect2D renderArea = fd::Rect2D()
             , uint32_t clearValueCount = 0u
             , const vk::ClearValue *pClearValues = nullptr

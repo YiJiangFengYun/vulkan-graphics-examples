@@ -127,7 +127,7 @@ namespace vg
     }
 
     RenderPassBeginInfo::RenderPassBeginInfo(const vk::RenderPass *pRenderPass
-        , const vk::Framebuffer *pFrameBuffer
+        , const vk::Framebuffer *pFramebuffer
         , uint32_t framebufferWidth
         , uint32_t framebufferHeight
         , fd::Rect2D renderArea
@@ -135,7 +135,7 @@ namespace vg
         , const vk::ClearValue *pClearValues
         )
         : pRenderPass(pRenderPass)
-        , pFrameBuffer(pFrameBuffer)
+        , pFramebuffer(pFramebuffer)
         , framebufferWidth(framebufferWidth)
         , framebufferHeight(framebufferHeight)
         , renderArea(renderArea)
@@ -147,7 +147,7 @@ namespace vg
 
     RenderPassInfo::RenderPassInfo(const vk::RenderPass *pRenderPass
         , uint32_t subPassIndex
-        , const vk::Framebuffer *pFrameBuffer
+        , const vk::Framebuffer *pFramebuffer
         , uint32_t framebufferWidth
         , uint32_t framebufferHeight
         , Matrix4x4 projMatrix
@@ -168,7 +168,7 @@ namespace vg
         )
         : pRenderPass(pRenderPass)
         , subPassIndex(subPassIndex)
-        , pFrameBuffer(pFrameBuffer)
+        , pFramebuffer(pFramebuffer)
         , framebufferWidth(framebufferWidth)
         , framebufferHeight(framebufferHeight)
         , projMatrix(projMatrix)

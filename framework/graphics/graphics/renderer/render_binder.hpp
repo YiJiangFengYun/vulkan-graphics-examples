@@ -8,6 +8,7 @@
 #include "graphics/scene/scene.hpp"
 #include "graphics/post_render/post_render.hpp"
 #include "graphics/renderer/renderer_option.hpp"
+#include "graphics/renderer/render_target.hpp"
 #include "graphics/renderer/pre_z_target.hpp"
 #include "graphics/renderer/post_render_target.hpp"
 
@@ -24,6 +25,12 @@ namespace vg
         uint32_t getFramebufferHeight() const;
         void setFramebufferHeight(uint32_t value);
 
+        void bindForRenderPassBegin(const BaseRenderTarget *pRenderTarget
+            , const vk::RenderPass *pRenderPass
+            , const vk::Framebuffer *pFramebuffer
+            , CmdBuffer *pCmdBuffer
+            );
+        void bindForRenderPassEnd(CmdBuffer *pCmdBuffer);
 
         void bind(BaseScene *pScene
             , BaseCamera *pCamera
@@ -36,6 +43,7 @@ namespace vg
             , const PostRenderTarget *pPostRenderTarget = nullptr
             , CmdBuffer *pPostRenderCmdBuffer = nullptr
             );
+        
 
     private:
         uint32_t m_framebufferWidth;

@@ -19,25 +19,20 @@ namespace vg
             ResultInfo(uint32_t drawCount = 0u);
         };
 
-        static void recordTrunk(CmdBuffer *pCmdBuffer
+        static void record(CmdBuffer *pCmdBuffer
             , vk::CommandBuffer *pCommandBuffer
             , PipelineCache *pPipelineCache
-            , const vk::RenderPass *pRenderPass
             , ResultInfo *pResult = nullptr
             );
+            
         static void recordTrunkWaitBarrier(CmdBuffer *pTrunkWaitBarrierCmdBuffer
             , vk::CommandBuffer *pCommandBuffer
             );
-        
-        static void recordBranch(CmdBuffer *pCmdBuffer
-            , vk::CommandBuffer *pCommandBuffer
-            , PipelineCache *pPipelineCache
-            , ResultInfo *pResult = nullptr
-            );
 
-        static void recordItemRenderPassBegin(const RenderPassInfo *pRenderPassInfo
-            ,  vk::CommandBuffer *pCommandBuffer);
-        static void recordItemRenderPassEnd(const RenderPassInfo *pRenderPassInfo
+        static void recordItemRenderPassBegin(const RenderPassBeginInfo *pRenderPassBeginInfo
+            ,  vk::CommandBuffer *pCommandBuffer
+            );
+        static void recordItemRenderPassEnd(const RenderPassEndInfo *pRenderPassEndInfo
             ,  vk::CommandBuffer *pCommandBuffer);
         static void recordItemRenderPassEnd(vk::CommandBuffer *pCommandBuffer);
 

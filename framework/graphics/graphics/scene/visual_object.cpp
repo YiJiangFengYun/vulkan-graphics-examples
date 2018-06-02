@@ -195,10 +195,10 @@ namespace vg
             if (pMaterial == nullptr) continue;
             uint32_t subMeshIndex = subMeshOffset + i;
             Material::BindInfo infoForVisualizer = {
+				info.trunkFramebufferWidth,
+				info.trunkFramebufferHeight,
                 info.pProjMatrix,
                 info.pViewMatrix,
-                info.trunkFramebufferWidth,
-                info.trunkFramebufferHeight,
                 m_id,
                 &modelMatrix,
                 m_pMesh,

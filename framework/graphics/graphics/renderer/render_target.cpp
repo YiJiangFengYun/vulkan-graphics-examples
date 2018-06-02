@@ -9,7 +9,7 @@ namespace vg
         )
         : m_framebufferWidth(framebufferWidth)
         , m_framebufferHeight(framebufferHeight)
-        ,  m_renderArea(0.0f, 0.0f, 1.0f, 1.0f)
+        , m_renderArea(0.0f, 0.0f, 1.0f, 1.0f)
         , m_clearValues()
     {
 

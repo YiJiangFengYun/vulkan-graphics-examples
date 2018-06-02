@@ -6,23 +6,77 @@ namespace vg
         : drawCount(drawCount)
     {
     }
-    
-    void CMDParser::recordTrunk(CmdBuffer *pCmdBuffer
+
+    void CMDParser::record(CmdBuffer *pCmdBuffer
         , vk::CommandBuffer *pCommandBuffer
         , PipelineCache *pPipelineCache
-        , const vk::RenderPass *pRenderPass
         , ResultInfo *pResult
         )
     {
+        uint32_t drawCount = 0u;
         auto cmdInfoCount = pCmdBuffer->getCmdCount();
+        uint32_t lastSubPassIndex = 0u;
+        const vk::RenderPass *pRenderPass;
+        const vk::Framebuffer *pFramebuffer;
         for (uint32_t cmdInfoIndex = 0u; cmdInfoIndex < cmdInfoCount; ++cmdInfoIndex)
         {
-            auto pRenderPassInfo = (pCmdBuffer->getCmdInfos() + cmdInfoIndex)->pRenderPassInfo;
-            if (pRenderPassInfo == nullptr) throw std::runtime_error("There isn't render pass info in trunk render pass cmd buffer.");
-            auto tempRenderPassInfo = *pRenderPassInfo;
-            tempRenderPassInfo.pRenderPass = pRenderPass;
-            recordItem(&tempRenderPassInfo, pCommandBuffer, pPipelineCache, pResult);
+            const auto &cmdInfo = *(pCmdBuffer->getCmdInfos() + cmdInfoIndex);
+            const auto &pRenderPassBeginInfo = cmdInfo.pRenderPassBeginInfo;
+            if (pRenderPassBeginInfo != nullptr)
+            {
+                recordItemRenderPassBegin(pRenderPassBeginInfo, pCommandBuffer);
+                lastSubPassIndex = 0u;
+                pRenderPass = pRenderPassBeginInfo->pRenderPass;
+                pFramebuffer = pRenderPassBeginInfo->pFramebuffer;
+            }
+
+            const auto &pRenderPassInfo = cmdInfo.pRenderPassInfo;
+            if (pRenderPassInfo != nullptr)
+            {
+                if (pRenderPassInfo->subPassIndex - lastSubPassIndex == 1u) {
+                    recordItemNextSubpass(pCommandBuffer);
+                } else if (pRenderPassInfo->subPassIndex - lastSubPassIndex != 0u) {
+                    throw std::runtime_error("Error of increasing of subpass index of render pass for cmd info.");
+                } //else it is inner sub pass.
+
+                if (pRenderPassInfo->pRenderPass == nullptr || pRenderPassInfo->pFramebuffer == nullptr) {
+                    RenderPassInfo tempRenderPassInfo = *pRenderPassInfo;
+                    if (tempRenderPassInfo.pRenderPass == nullptr)tempRenderPassInfo.pRenderPass = pRenderPass;
+                    if (tempRenderPassInfo.pFramebuffer == nullptr)tempRenderPassInfo.pFramebuffer = pFramebuffer;
+                    recordItem(&tempRenderPassInfo, pCommandBuffer, pPipelineCache, pResult);
+                } else {
+                    recordItem(pRenderPassInfo, pCommandBuffer, pPipelineCache, pResult);
+                }
+            
+                lastSubPassIndex = pRenderPassInfo->subPassIndex;
+                ++drawCount;
+            }
+
+            const auto &pRenderPassEndInfo = cmdInfo.pRenderPassEndInfo;
+            if (pRenderPassEndInfo != nullptr)
+            {
+                pRenderPass = nullptr;
+                pFramebuffer = nullptr;
+                recordItemRenderPassEnd(pRenderPassEndInfo, pCommandBuffer);
+            }
+
+            auto pBarrierInfo = cmdInfo.pBarrierInfo;
+            if (pBarrierInfo != nullptr)
+            {
+                pCommandBuffer->pipelineBarrier(pBarrierInfo->srcStageMask
+                    , pBarrierInfo->dstStageMask
+                    , pBarrierInfo->dependencyFlags
+                    , pBarrierInfo->memoryBarrierCount
+                    , pBarrierInfo->pMemoryBarriers
+                    , pBarrierInfo->bufferMemoryBarrierCount
+                    , pBarrierInfo->pBufferMemoryBarriers
+                    , pBarrierInfo->imageMemoryBarrierCount
+                    , pBarrierInfo->pImageMemoryBarriers
+                    );
+            }
         }
+
+        if (pResult != nullptr)pResult->drawCount = drawCount;
     }
 
     void CMDParser::recordTrunkWaitBarrier(CmdBuffer *pTrunkWaitBarrierCmdBuffer
@@ -53,81 +107,15 @@ namespace vg
         }
     }
 
-    void CMDParser::recordBranch(CmdBuffer *pCmdBuffer
-        ,  vk::CommandBuffer *pCommandBuffer
-        , PipelineCache *pPipelineCache
-        , ResultInfo *pResult
-        )
-    {
-        uint32_t drawCount = 0u;
-        auto cmdInfoCount = pCmdBuffer->getCmdCount();
-        vk::RenderPass lastRenderPass = vk::RenderPass();
-        uint32_t lastSubPassIndex = 0u;
-        for (uint32_t cmdInfoIndex = 0u; cmdInfoIndex < cmdInfoCount; ++cmdInfoIndex)
-        {
-            auto pRenderPassInfo = (pCmdBuffer->getCmdInfos() + cmdInfoIndex)->pRenderPassInfo;
-            if (pRenderPassInfo)
-            {
-                if (lastRenderPass == vk::RenderPass() || lastRenderPass != *(pRenderPassInfo->pRenderPass)) {
-                    if (pRenderPassInfo->subPassIndex != 0) {
-                        throw std::runtime_error("Error of start of subpass index of render pass for cmd info.");
-                    }
-                    recordItemRenderPassBegin(pRenderPassInfo, pCommandBuffer);
-                } else if (pRenderPassInfo->subPassIndex - lastSubPassIndex == 1u) {
-                    recordItemNextSubpass(pCommandBuffer);
-                } else if (pRenderPassInfo->subPassIndex - lastSubPassIndex != 0u) {
-                    throw std::runtime_error("Error of increasing of subpass index of render pass for cmd info.");
-                } //else it is inner sub pass.
-                
-                recordItem(pRenderPassInfo, pCommandBuffer, pPipelineCache, pResult);
-
-                //do end render pass.
-                const RenderPassInfo * pNextRenderPassInfo = nullptr;
-                uint32_t nextIndex = cmdInfoIndex + 1;
-                while (nextIndex < cmdInfoCount && pNextRenderPassInfo == nullptr) {
-                    pNextRenderPassInfo = (pCmdBuffer->getCmdInfos() + nextIndex)->pRenderPassInfo;
-                    ++nextIndex;
-                }
-                if (pNextRenderPassInfo == nullptr || *(pNextRenderPassInfo->pRenderPass) != *(pRenderPassInfo->pRenderPass)) {
-                    recordItemRenderPassEnd(pRenderPassInfo, pCommandBuffer);
-                }
-
-                lastRenderPass = *(pRenderPassInfo->pRenderPass);
-                lastSubPassIndex = pRenderPassInfo->subPassIndex;
-                ++drawCount;
-            }
-            else 
-            {
-                auto pBarrierInfo = (pCmdBuffer->getCmdInfos() + cmdInfoIndex)->pBarrierInfo;
-                if (pBarrierInfo != nullptr)
-                {
-                    pCommandBuffer->pipelineBarrier(pBarrierInfo->srcStageMask
-                        , pBarrierInfo->dstStageMask
-                        , pBarrierInfo->dependencyFlags
-                        , pBarrierInfo->memoryBarrierCount
-                        , pBarrierInfo->pMemoryBarriers
-                        , pBarrierInfo->bufferMemoryBarrierCount
-                        , pBarrierInfo->pBufferMemoryBarriers
-                        , pBarrierInfo->imageMemoryBarrierCount
-                        , pBarrierInfo->pImageMemoryBarriers
-                        );
-                }
-            }
-            
-        }
-
-        if (pResult != nullptr)pResult->drawCount = drawCount;
-    }
-
-    void CMDParser::recordItemRenderPassBegin(const RenderPassInfo *pRenderPassInfo
+    void CMDParser::recordItemRenderPassBegin(const RenderPassBeginInfo *pRenderPassBeginInfo
             ,  vk::CommandBuffer *pCommandBuffer)
     {
-        uint32_t framebufferWidth = pRenderPassInfo->framebufferWidth;
-        uint32_t framebufferHeight = pRenderPassInfo->framebufferHeight;
-        auto renderArea = pRenderPassInfo->renderArea;
+        uint32_t framebufferWidth = pRenderPassBeginInfo->framebufferWidth;
+        uint32_t framebufferHeight = pRenderPassBeginInfo->framebufferHeight;
+        auto renderArea = pRenderPassBeginInfo->renderArea;
         vk::RenderPassBeginInfo renderPassBeginInfo = {
-            * (pRenderPassInfo->pRenderPass), 
-            * (pRenderPassInfo->pFrameBuffer),
+            * (pRenderPassBeginInfo->pRenderPass), 
+            * (pRenderPassBeginInfo->pFramebuffer),
             vk::Rect2D(           
                 vk::Offset2D(static_cast<int32_t>(std::round(framebufferWidth * renderArea.x))
                     , static_cast<int32_t>(std::round(framebufferHeight * renderArea.y))
@@ -136,14 +124,14 @@ namespace vg
                     static_cast<uint32_t>(std::round(framebufferHeight * renderArea.height))
                 )
             ),
-            pRenderPassInfo->clearValueCount,
-            pRenderPassInfo->pClearValues
+            pRenderPassBeginInfo->clearValueCount,
+            pRenderPassBeginInfo->pClearValues
         };
 
         pCommandBuffer->beginRenderPass(renderPassBeginInfo, vk::SubpassContents::eInline);
     }
 
-    void CMDParser::recordItemRenderPassEnd(const RenderPassInfo *pRenderPassInfo
+    void CMDParser::recordItemRenderPassEnd(const RenderPassEndInfo *pRenderPassEndInfo
             ,  vk::CommandBuffer *pCommandBuffer)
     {
         pCommandBuffer->endRenderPass();

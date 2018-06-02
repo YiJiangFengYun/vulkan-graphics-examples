@@ -139,7 +139,7 @@ namespace vge
         {
             vg::RenderPassBeginInfo renderPassBeginInfo;
             renderPassBeginInfo.pRenderPass = m_pRenderPass.get();
-            renderPassBeginInfo.pFrameBuffer = m_pFrameBuffer.get();
+            renderPassBeginInfo.pFramebuffer = m_pFrameBuffer.get();
             renderPassBeginInfo.framebufferWidth = framebufferWidth;
             renderPassBeginInfo.framebufferHeight = framebufferHeight;
             renderPassBeginInfo.renderArea = fd::Rect2D();
@@ -171,7 +171,7 @@ namespace vge
             vg::RenderPassInfo renderPassInfo;
             renderPassInfo.pRenderPass = m_pRenderPass.get();
             renderPassInfo.subPassIndex = 0u;
-            renderPassInfo.pFrameBuffer = m_pFrameBuffer.get();
+            renderPassInfo.pFramebuffer = m_pFrameBuffer.get();
             renderPassInfo.framebufferWidth = framebufferWidth;
             renderPassInfo.framebufferHeight = framebufferHeight;
             renderPassInfo.projMatrix = *(info.pProjMatrix);
@@ -193,7 +193,7 @@ namespace vge
             vg::RenderPassInfo renderPassInfo;
             renderPassInfo.pRenderPass = m_pRenderPass.get();
             renderPassInfo.subPassIndex = 1u;
-            renderPassInfo.pFrameBuffer = m_pFrameBuffer.get();
+            renderPassInfo.pFramebuffer = m_pFrameBuffer.get();
             renderPassInfo.framebufferWidth = framebufferWidth;
             renderPassInfo.framebufferHeight = framebufferHeight;
             renderPassInfo.projMatrix = vg::Matrix4x4(1.0f);
@@ -225,7 +225,7 @@ namespace vge
         {
             vg::RenderPassInfo trunkRenderPassInfo;
             trunkRenderPassInfo.pRenderPass = nullptr;
-            trunkRenderPassInfo.pFrameBuffer = nullptr;
+            trunkRenderPassInfo.pFramebuffer = nullptr;
             trunkRenderPassInfo.framebufferWidth = info.trunkFramebufferWidth;
             trunkRenderPassInfo.framebufferHeight = info.trunkFramebufferHeight;
             trunkRenderPassInfo.projMatrix = vg::Matrix4x4(1.0f);

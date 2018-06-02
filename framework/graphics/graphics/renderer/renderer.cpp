@@ -52,16 +52,13 @@ namespace vg
     Renderer::Renderer(const RenderTarget * pRenderTarget)
         : Base(BaseType::RENDERER)
         , m_pRenderTarget()
-        , m_clearValueColor(0.0f)
-        , m_clearValueDepth(1.0f)
-        , m_clearValueStencil(0u)
         , m_pipelineCache()
         , m_trunkRenderPassCmdBuffer()
         , m_trunkWaitBarrierCmdBuffer()
         , m_branchCmdBuffer()
         , m_framebufferWidth(0u)
         , m_framebufferHeight(0u)
-        , m_renderBinder(m_framebufferWidth,m_framebufferHeight)
+        , m_renderBinder()
         //pre z
         , m_preZEnable(VG_FALSE)
         , m_pPreZTarget()
@@ -106,6 +103,9 @@ namespace vg
                 _resetFramebufferSize(framebufferWidth, framebufferHeight);
             }
         }
+        if (m_pPostRenderTarget != nullptr)
+            m_pPostRenderTarget->setClearValues(pRenderTarget->getClearValues()
+                , pRenderTarget->getClearValueCount());
     }
 
     void Renderer::enablePreZ()
@@ -165,36 +165,6 @@ namespace vg
         _postRender();
     }
 
-    const Color &Renderer::getClearValueColor() const
-    {
-        return m_clearValueColor;
-    }
-
-    void Renderer::setClearValueColor(Color color)
-    {
-        m_clearValueColor = color;
-    }
-
-    float Renderer::getClearValueDepth() const
-    {
-        return m_clearValueDepth;
-    }
-
-    void Renderer::setClearValueDepth(float value)
-    {
-        m_clearValueDepth = value;
-    }
-
-    uint32_t Renderer::getClearValueStencil() const
-    {
-        return m_clearValueStencil;
-    }
-
-    void Renderer::setClearValueStencil(uint32_t value)
-    {
-        m_clearValueStencil = value;
-    }
-
     // Renderer::PreObjectRecordingFun Renderer::setPreObjectRecordingCallBack(PreObjectRecordingFun cbFun)
     // {
     //     auto oldFun = m_preObjectRecordingFun;
@@ -229,7 +199,7 @@ namespace vg
         m_renderBinder.setFramebufferHeight(height);
         if (m_preZEnable) 
         {
-            if (width != 0 && height != 0u)
+            if (width != 0u && height != 0u)
             {
                 _createPreZObjs();
             }
@@ -238,6 +208,17 @@ namespace vg
                 _destroyPreZObjs();
             }
         }
+		if (m_postRenderEnable)
+		{
+			if (width != 0u && height != 0u)
+			{
+				_createPostRenderObjs();
+			}
+			else
+			{
+				_destroyPostRenderObjs();
+			}
+		}
     }
 
     void Renderer::_preRender()
@@ -306,6 +287,66 @@ namespace vg
                 m_pPostRenderCmdbuffer->begin();
             }
 
+            //bind render pass begin.
+			if (preZEnable)
+            {
+                //pre z cmd buffer
+                const BaseRenderTarget *pRenderTarget;
+                const vk::RenderPass *pRenderPass;
+                const vk::Framebuffer *pFramebuffer;
+                pRenderTarget = m_pPreZTarget.get();
+                pRenderPass = m_pPreZTarget->getRenderPass();
+                pFramebuffer = m_pPreZTarget->getFramebuffer();
+                m_renderBinder.bindForRenderPassBegin(pRenderTarget
+                    , pRenderPass
+                    , pFramebuffer
+                    , m_pPreZCmdBuffer.get()
+                    );
+            }
+
+            if (postRenderEnable)
+            {
+                const BaseRenderTarget *pRenderTarget;
+                const vk::RenderPass *pRenderPass;
+                const vk::Framebuffer *pFramebuffer;
+
+                //trunk cmd buffer
+                pRenderTarget = m_pPostRenderTarget.get();
+                pRenderPass = m_pPostRenderTarget->getRenderPass();
+                pFramebuffer = m_pPostRenderTarget->getFramebuffer();
+                m_renderBinder.bindForRenderPassBegin(pRenderTarget
+                    , pRenderPass
+                    , pFramebuffer
+                    , &m_trunkRenderPassCmdBuffer
+                    );
+                
+                //post render cmd buffer
+                pRenderTarget = m_pRenderTarget;
+                pRenderPass = i == 0 ? m_pRenderTarget->getFirstRenderPass() : m_pRenderTarget->getSecondRenderPass();
+                pFramebuffer = i == 0 ? m_pRenderTarget->getFirstFramebuffer() : m_pRenderTarget->getSecondFramebuffer();
+                m_renderBinder.bindForRenderPassBegin(pRenderTarget
+                    , pRenderPass
+                    , pFramebuffer
+                    , m_pPostRenderCmdbuffer.get()
+                    );
+            }
+            else
+            {
+                const BaseRenderTarget *pRenderTarget;
+                const vk::RenderPass *pRenderPass;
+                const vk::Framebuffer *pFramebuffer;
+
+                //trunk cmd buffer
+                pRenderTarget = m_pRenderTarget;
+                pRenderPass = i == 0 ? m_pRenderTarget->getFirstRenderPass() : m_pRenderTarget->getSecondRenderPass();
+                pFramebuffer = i == 0 ? m_pRenderTarget->getFirstFramebuffer() : m_pRenderTarget->getSecondFramebuffer();
+                m_renderBinder.bindForRenderPassBegin(pRenderTarget
+                    , pRenderPass
+                    , pFramebuffer
+                    , &m_trunkRenderPassCmdBuffer
+                    );
+            }
+
             m_renderBinder.bind(pScene
                 , pCamera
                 , preZEnable ? m_pPreZTarget.get() : nullptr
@@ -318,22 +359,38 @@ namespace vg
                 , postRenderEnable ? m_pPostRenderCmdbuffer.get() : nullptr
                 );
 
+            
+            //bind render pass end.
+            if (preZEnable) m_renderBinder.bindForRenderPassEnd(m_pPreZCmdBuffer.get());
+            if (postRenderEnable)
+            {
+                //trunk cmd buffer
+                m_renderBinder.bindForRenderPassEnd(&m_trunkRenderPassCmdBuffer);
+                
+                //post render cmd buffer
+                m_renderBinder.bindForRenderPassEnd(m_pPostRenderCmdbuffer.get());
+            }
+            else
+            {
+                //trunk cmd buffer
+                m_renderBinder.bindForRenderPassEnd(&m_trunkRenderPassCmdBuffer);
+            }
+             
+
+            //record ...
             // pre z
             if (preZEnable)
             {
                 resultInfo.drawCount += m_pPreZCmdBuffer->getCmdCount();
-                _recordPreZRenderPassForBegin();
-                CMDParser::recordTrunk(m_pPreZCmdBuffer.get(),
-                    m_pCommandBuffer.get(),
-                    &m_pipelineCache,
-                    m_pPreZTarget->getRenderPass()
+                CMDParser::record(m_pPreZCmdBuffer.get()
+                    , m_pCommandBuffer.get()
+                    , &m_pipelineCache
                     );
-                _recordPreZRenderPassForEnd();
             }
 
             //branch render pass.
             CMDParser::ResultInfo cmdParseResult;
-            CMDParser::recordBranch(&m_branchCmdBuffer,
+            CMDParser::record(&m_branchCmdBuffer,
                 m_pCommandBuffer.get(),
                 &m_pipelineCache,
                 &cmdParseResult
@@ -343,45 +400,21 @@ namespace vg
             //trunk wait barrier
             CMDParser::recordTrunkWaitBarrier(&m_trunkWaitBarrierCmdBuffer,
                 m_pCommandBuffer.get());
-    
-            
 
+            //trunk render pass.
+            resultInfo.drawCount += m_trunkRenderPassCmdBuffer.getCmdCount();
+            CMDParser::record(&m_trunkRenderPassCmdBuffer
+                , m_pCommandBuffer.get()
+                , &m_pipelineCache
+                );
             //post render record
             if (postRenderEnable)
             {
-                const vk::RenderPass * pRenderPass;
-                //trunk render pass.
-                resultInfo.drawCount += m_trunkRenderPassCmdBuffer.getCmdCount();
-                pRenderPass = _recordTrunkRenderPassForBegin(VG_TRUE, VG_TRUE);
-                CMDParser::recordTrunk(&m_trunkRenderPassCmdBuffer,
-                    m_pCommandBuffer.get(),
-                    &m_pipelineCache,
-                    pRenderPass
+                CMDParser::record(m_pPostRenderCmdbuffer.get()
+                    , m_pCommandBuffer.get()
+                    , &m_pipelineCache
                     );
-                _recordTrunkRenderPassForEnd();
-
-                //post render pass.
-                resultInfo.drawCount += m_pPostRenderCmdbuffer->getCmdCount();
-                pRenderPass = _recordTrunkRenderPassForBegin(VG_FALSE, i == 0);
-                CMDParser::recordTrunk(m_pPostRenderCmdbuffer.get(),
-                    m_pCommandBuffer.get(),
-                    &m_pipelineCache,
-                    pRenderPass
-                    );
-                _recordTrunkRenderPassForEnd();
-            }
-            else
-            {
-                //trunk render pass.
-                resultInfo.drawCount += m_trunkRenderPassCmdBuffer.getCmdCount();
-                auto pRenderPass = _recordTrunkRenderPassForBegin(VG_FALSE, i == 0);
-                CMDParser::recordTrunk(&m_trunkRenderPassCmdBuffer,
-                    m_pCommandBuffer.get(),
-                    &m_pipelineCache,
-                    pRenderPass
-                    );
-                _recordTrunkRenderPassForEnd();
-            }        
+            }      
 
             if (preZEnable)
             {
@@ -481,111 +514,6 @@ namespace vg
         
     }
 
-    void Renderer::_recordPreZRenderPassForBegin()
-    {
-        vk::ClearValue clearValueDepthStencil = {
-            vk::ClearDepthStencilValue(m_clearValueDepth
-                , m_clearValueStencil
-            )
-        };
-        std::array<vk::ClearValue, 1> clearValues = {
-           clearValueDepthStencil,
-        };
-
-        const auto framebufferWidth = m_framebufferWidth;
-        const auto framebufferHeight = m_framebufferHeight;
-        const auto renderArea = m_pRenderTarget->getRenderArea();
-
-        vk::RenderPassBeginInfo renderPassBeginInfo = {
-            *(m_pPreZTarget->getRenderPass()),                   //renderPass
-            *(m_pPreZTarget->getFramebuffer()),                  //framebuffer
-            vk::Rect2D(                                       //renderArea
-                vk::Offset2D(static_cast<int32_t>(std::round(framebufferWidth * renderArea.x))
-                    , static_cast<int32_t>(std::round(framebufferHeight * renderArea.y))
-                ),
-                vk::Extent2D(static_cast<uint32_t>(std::round(framebufferWidth * renderArea.width)),
-                    static_cast<uint32_t>(std::round(framebufferHeight * renderArea.height))
-                )
-            ),
-            static_cast<uint32_t>(clearValues.size()),      //clearValueCount
-            clearValues.data()                              //pClearValues
-        };
-
-        m_pCommandBuffer->beginRenderPass(renderPassBeginInfo, vk::SubpassContents::eInline);
-    }
-        
-    void Renderer::_recordPreZRenderPassForEnd()
-    {
-        m_pCommandBuffer->endRenderPass();
-    }
-
-    const vk::RenderPass *  Renderer::_recordTrunkRenderPassForBegin(Bool32 isPostRender, Bool32 isFirst)
-    {
-        vk::ClearValue clearValueColor = {
-            std::array<float, 4>{
-                m_clearValueColor[0], 
-                m_clearValueColor[1], 
-                m_clearValueColor[2], 
-                m_clearValueColor[3]
-            }
-        };
-        vk::ClearValue clearValueDepthStencil = {
-            vk::ClearDepthStencilValue(m_clearValueDepth
-                , m_clearValueStencil
-            )
-        };
-        std::array<vk::ClearValue, 2> clearValues = { clearValueColor
-            , clearValueDepthStencil
-        };
-
-
-        const auto framebufferWidth = m_framebufferWidth;
-        const auto framebufferHeight = m_framebufferHeight;
-        const auto renderArea = m_pRenderTarget->getRenderArea();
-        const vk::RenderPass * pRenderPass;
-        const vk::Framebuffer * pFramebuffer;
-
-        if (isPostRender == VG_TRUE)
-        {
-            pRenderPass = m_pPostRenderTarget->getRenderPass();
-            pFramebuffer = m_pPostRenderTarget->getFramebuffer();
-        }
-        else if (isFirst == VG_TRUE)
-        {
-            pRenderPass = m_pRenderTarget->getFirstRenderPass();
-            pFramebuffer = m_pRenderTarget->getFirstFramebuffer();
-        }
-        else
-        {
-            pRenderPass = m_pRenderTarget->getSecondRenderPass();
-            pFramebuffer = m_pRenderTarget->getSecondFramebuffer();
-        }
-
-        vk::RenderPassBeginInfo renderPassBeginInfo = {
-            *pRenderPass,                                   //renderPass
-            *pFramebuffer,                                  //framebuffer
-            vk::Rect2D(                                       //renderArea
-                vk::Offset2D(static_cast<int32_t>(std::round(framebufferWidth * renderArea.x))
-                    , static_cast<int32_t>(std::round(framebufferHeight * renderArea.y))
-                ),
-                vk::Extent2D(static_cast<uint32_t>(std::round(framebufferWidth * renderArea.width)),
-                    static_cast<uint32_t>(std::round(framebufferHeight * renderArea.height))
-                )
-            ),
-            static_cast<uint32_t>(clearValues.size()),      //clearValueCount
-            clearValues.data()                              //pClearValues
-        };
-
-        m_pCommandBuffer->beginRenderPass(renderPassBeginInfo, vk::SubpassContents::eInline);
-
-        return pRenderPass;
-    }
-
-    void Renderer::_recordTrunkRenderPassForEnd()
-    {
-        m_pCommandBuffer->endRenderPass();
-    }
-
     void Renderer::_recordCommandBufferForEnd()
     {
         
@@ -593,8 +521,6 @@ namespace vg
         m_pCommandBuffer->end();
         VG_LOG(plog::debug) << "Post end command buffer." << std::endl;
     }
-
-    
 
     /*void Renderer::_createFence()
     {

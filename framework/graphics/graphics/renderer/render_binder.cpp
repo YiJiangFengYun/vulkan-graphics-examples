@@ -43,6 +43,37 @@ namespace vg
         m_framebufferHeight = value;
     }
 
+    void RenderBinder::bindForRenderPassBegin(const BaseRenderTarget *pRenderTarget
+        , const vk::RenderPass *pRenderPass
+        , const vk::Framebuffer *pFramebuffer
+        , CmdBuffer *pCmdBuffer
+        )
+    {
+        const auto framebufferWidth = pRenderTarget->getFramebufferWidth();
+        const auto framebufferHeight = pRenderTarget->getFramebufferHeight();
+        const auto renderArea = pRenderTarget->getRenderArea();
+        RenderPassBeginInfo beginInfo;
+        beginInfo.pRenderPass = pRenderPass;
+        beginInfo.pFramebuffer = pFramebuffer;
+        beginInfo.framebufferWidth = framebufferWidth;
+        beginInfo.framebufferHeight = framebufferHeight;
+        beginInfo.renderArea = pRenderTarget->getRenderArea();
+        beginInfo.clearValueCount = pRenderTarget->getClearValueCount();
+        beginInfo.pClearValues = pRenderTarget->getClearValues();
+
+        CmdInfo cmdInfo;
+        cmdInfo.pRenderPassBeginInfo = &beginInfo;
+        pCmdBuffer->addCmd(cmdInfo);
+    }
+
+    void RenderBinder::bindForRenderPassEnd(CmdBuffer *pCmdBuffer)
+    {
+        RenderPassEndInfo endInfo;
+        CmdInfo cmdInfo;
+        cmdInfo.pRenderPassEndInfo = &endInfo;
+        pCmdBuffer->addCmd(cmdInfo);
+    }
+
     void RenderBinder::bind(BaseScene *pScene
         , BaseCamera *pCamera
         , const PreZTarget *pPreZTarget

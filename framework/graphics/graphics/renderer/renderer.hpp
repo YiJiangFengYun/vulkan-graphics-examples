@@ -81,22 +81,11 @@ namespace vg
         void render(const RenderInfo &info, RenderResultInfo &resultInfo);
         // void renderEnd(const RenderInfo &info);
 
-        const Color &getClearValueColor() const;
-        void setClearValueColor(Color color);
-        float getClearValueDepth() const;
-        void setClearValueDepth(float value);
-        uint32_t getClearValueStencil() const;
-        void setClearValueStencil(uint32_t value);
-
 #if defined(DEBUG) && defined(VG_ENABLE_COST_TIMER)
         const fd::CostTimer &getPreparingRenderCostTimer() const;
 #endif //DEBUG and VG_ENABLE_COST_TIMER
     protected:
         const RenderTarget *m_pRenderTarget;
-
-        Color m_clearValueColor;
-        float m_clearValueDepth;
-        uint32_t m_clearValueStencil;
         std::shared_ptr<vk::CommandPool> m_pCommandPool;
         std::shared_ptr<vk::CommandBuffer> m_pCommandBuffer;
         PipelineCache m_pipelineCache;
@@ -140,16 +129,13 @@ namespace vg
         //void _createFence();
 
         void _recordCommandBufferForBegin();
-        void _recordPreZRenderPassForBegin();
-        void _recordPreZRenderPassForEnd();
-        const vk::RenderPass * _recordTrunkRenderPassForBegin(Bool32 isPostRender, Bool32 isFirst);
-        void _recordTrunkRenderPassForEnd();
         void _recordCommandBufferForEnd();
         
         void _createPreZObjs();
         void _destroyPreZObjs();
         void _createPostRenderObjs();
         void _destroyPostRenderObjs();
+
     private:
     };
 

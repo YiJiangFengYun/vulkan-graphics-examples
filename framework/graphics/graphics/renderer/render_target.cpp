@@ -64,7 +64,7 @@ namespace vg
         return m_clearValues.data();
     }
 
-    void BaseRenderTarget::setClearValues(vk::ClearValue *pClearValues, uint32_t clearValueCount)
+    void BaseRenderTarget::setClearValues(const vk::ClearValue *pClearValues, uint32_t clearValueCount)
     {
         m_clearValues.resize(clearValueCount);
         memcpy(m_clearValues.data(), pClearValues, sizeof(vk::ClearValue) * clearValueCount);

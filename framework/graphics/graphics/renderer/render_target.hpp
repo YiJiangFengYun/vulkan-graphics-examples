@@ -16,7 +16,7 @@ namespace vg
         void setRenderArea(const fd::Rect2D & area);
         uint32_t getClearValueCount() const;
         const vk::ClearValue *getClearValues() const;
-        void setClearValues(vk::ClearValue *pClearValue, uint32_t clearValueCount);
+        void setClearValues(const vk::ClearValue *pClearValue, uint32_t clearValueCount);
     protected:
         uint32_t m_framebufferWidth;
         uint32_t m_framebufferHeight;

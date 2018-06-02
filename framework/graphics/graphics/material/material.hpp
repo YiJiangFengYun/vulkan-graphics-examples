@@ -16,10 +16,10 @@ namespace vg
     public:
         struct BindInfo 
         {
-            const Matrix4x4 *pProjMatrix;
-            const Matrix4x4 *pViewMatrix;
             uint32_t trunkFramebufferWidth;
             uint32_t trunkFramebufferHeight;
+            const Matrix4x4 *pProjMatrix;
+            const Matrix4x4 *pViewMatrix;
             InstanceID objectID;
             const Matrix4x4 *pModelMatrix;
             const BaseMesh *pMesh;
@@ -31,20 +31,20 @@ namespace vg
             fd::CostTimer *pPreparingCommandBufferCostTimer;
 #endif //DEBUG and VG_ENABLE_COST_TIMER
 
-            BindInfo(const Matrix4x4 *pProjMatrix = nullptr
-                , const Matrix4x4 *pViewMatrix = nullptr
-                , uint32_t trunkFramebufferWidth = 0u
+            BindInfo(uint32_t trunkFramebufferWidth = 0u
                 , uint32_t trunkFramebufferHeight = 0u
-#if defined(DEBUG) && defined(VG_ENABLE_COST_TIMER)
-                , fd::CostTimer *pPreparingPipelineCostTimer = nullptr
-                , fd::CostTimer *pPreparingCommandBufferCostTimer = nullptr
-#endif //DEBUG and VG_ENABLE_COST_TIMER
+                , const Matrix4x4 *pProjMatrix = nullptr
+                , const Matrix4x4 *pViewMatrix = nullptr
                 , InstanceID objectID = 0
                 , const Matrix4x4 *pModelMatrix = nullptr
                 , const BaseMesh *pMesh = nullptr
                 , uint32_t subMeshIndex = 0u
                 , Bool32 hasClipRect = VG_FALSE
                 , const fd::Rect2D clipRect = fd::Rect2D()
+#if defined(DEBUG) && defined(VG_ENABLE_COST_TIMER)
+                , fd::CostTimer *pPreparingPipelineCostTimer = nullptr
+                , fd::CostTimer *pPreparingCommandBufferCostTimer = nullptr
+#endif //DEBUG and VG_ENABLE_COST_TIMER
                 );
         };
     

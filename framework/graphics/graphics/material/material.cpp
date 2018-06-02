@@ -2,10 +2,10 @@
 
 namespace vg
 {
-    Material::BindInfo::BindInfo(const Matrix4x4 *pProjMatrix
-        , const Matrix4x4 *pViewMatrix
-        , uint32_t trunkFramebufferWidth
+    Material::BindInfo::BindInfo(uint32_t trunkFramebufferWidth
         , uint32_t trunkFramebufferHeight
+        , const Matrix4x4 *pProjMatrix
+        , const Matrix4x4 *pViewMatrix
         , InstanceID objectID
         , const Matrix4x4 *pModelMatrix
         , const BaseMesh *pMesh

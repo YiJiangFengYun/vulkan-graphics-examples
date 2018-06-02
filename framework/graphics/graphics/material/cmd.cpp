@@ -67,7 +67,9 @@ namespace vg
     }
 
     CmdInfo::CmdInfo()
-        : pRenderPassInfo(nullptr)
+        : pRenderPassBeginInfo(nullptr)
+        , pRenderPassInfo(nullptr)
+        , pRenderPassEndInfo(nullptr) 
         , pBarrierInfo(nullptr)
     {
 
@@ -124,14 +126,26 @@ namespace vg
 
     }
 
+    RenderPassBeginInfo::RenderPassBeginInfo(const vk::RenderPass *pRenderPass
+        , const vk::Framebuffer *pFrameBuffer
+        , fd::Rect2D renderArea
+        , uint32_t clearValueCount
+        , const vk::ClearValue *pClearValues
+        )
+        : pRenderPass(pRenderPass)
+        , pFrameBuffer(pFrameBuffer)
+        , renderArea(renderArea)
+        , clearValueCount(clearValueCount)
+        , pClearValues(pClearValues)
+    {
+
+    }
+
     RenderPassInfo::RenderPassInfo(const vk::RenderPass *pRenderPass
         , uint32_t subPassIndex
         , const vk::Framebuffer *pFrameBuffer
         , uint32_t framebufferWidth
         , uint32_t framebufferHeight
-        , fd::Rect2D renderArea
-        , uint32_t clearValueCount
-        , const vk::ClearValue *pClearValues
         , Matrix4x4 projMatrix
         , Matrix4x4 viewMatrix
         , const Pass *pPass
@@ -153,9 +167,6 @@ namespace vg
         , pFrameBuffer(pFrameBuffer)
         , framebufferWidth(framebufferWidth)
         , framebufferHeight(framebufferHeight)
-        , renderArea(renderArea)
-        , clearValueCount(clearValueCount)
-        , pClearValues(pClearValues)
         , projMatrix(projMatrix)
         , viewMatrix(viewMatrix)
         , pPass(pPass)
@@ -174,16 +185,31 @@ namespace vg
     {    
     }
 
+    RenderPassEndInfo::RenderPassEndInfo()
+    {
+
+    }
+
 
     CmdBuffer::CmdBuffer()
         : m_cmdInfoCount(0u)
         , m_cmdInfoCapacity(0u)
         , m_cmdInfos()
 
+        , m_renderPassBeginInfoCount(0u)
+        , m_renderPassBeginInfoCapacity(0u)
+        , m_renderPassBeginInfos()
+        , m_renderPassBeginInfoToCmdInfoIndices()
+
         , m_renderPassInfoCount(0u)
         , m_renderPassInfoCapacity(0u)
         , m_renderPassInfos()
         , m_renderPassInfoToCmdInfoIndices()
+
+        , m_renderPassEndInfoCount(0u)
+        , m_renderPassEndInfoCapacity(0u)
+        , m_renderPassEndInfos()
+        , m_renderPassEndInfoToCmdInfoIndices()
 
         , m_clearValuesCount(0u)
         , m_clearValuesCapacity(0u)
@@ -229,7 +255,9 @@ namespace vg
     {
         m_cmdInfoCount =  0u;
 
+        m_renderPassBeginInfoCount = 0u;
         m_renderPassInfoCount = 0u;
+        m_renderPassEndInfoCount = 0u;
         m_cmdDrawCount = 0u;
         m_cmdDrawIndexedCount = 0u;
 
@@ -248,6 +276,33 @@ namespace vg
             0,
             cmdInfo
             );
+        //copy render pass begin info.
+        if (cmdInfo.pRenderPassBeginInfo != nullptr)
+        {
+            addData<RenderPassBeginInfo, CmdInfo, offsetof(CmdInfo, pRenderPassBeginInfo)>(
+                m_renderPassBeginInfoCount,
+                m_renderPassBeginInfoCapacity,
+                m_renderPassBeginInfos,
+                &m_renderPassBeginInfoToCmdInfoIndices,
+                &m_cmdInfos,
+                m_cmdInfoCount,
+                *(cmdInfo.pRenderPassBeginInfo)
+            );
+
+            auto &renderPassBeginInfo = *(cmdInfo.pRenderPassBeginInfo);
+
+            auto clearValueCount = renderPassBeginInfo.clearValueCount;
+            auto pClearValues = renderPassBeginInfo.pClearValues;
+            addData<vk::ClearValue, RenderPassBeginInfo, offsetof(RenderPassBeginInfo, pClearValues)>(
+                m_clearValuesCount,
+                m_clearValuesCapacity,
+                m_clearValues,
+                &m_renderPassBeginInfos,
+                m_renderPassBeginInfoCount,
+                clearValueCount,
+                pClearValues
+            );
+        }
 
         //copy render pass info
         if (cmdInfo.pRenderPassInfo != nullptr)
@@ -263,18 +318,6 @@ namespace vg
             );
 
             auto &renderPassInfo = *(cmdInfo.pRenderPassInfo);
-            
-            auto clearValueCount = renderPassInfo.clearValueCount;
-            auto pClearValues = renderPassInfo.pClearValues;
-            addData<vk::ClearValue, RenderPassInfo, offsetof(RenderPassInfo, pClearValues)>(
-                m_clearValuesCount,
-                m_clearValuesCapacity,
-                m_clearValues,
-                &m_renderPassInfos,
-                m_renderPassInfoCount,
-                clearValueCount,
-                pClearValues
-            );
 
             if (renderPassInfo.pCmdDraw != nullptr) {
                 addData<CmdDraw, RenderPassInfo, offsetof(RenderPassInfo, pCmdDraw)>(
@@ -298,6 +341,20 @@ namespace vg
                     *(renderPassInfo.pCmdDrawIndexed)
                 );
             }
+        }
+
+        //copy render pass end info.
+        if (cmdInfo.pRenderPassEndInfo != nullptr)
+        {
+            addData<RenderPassEndInfo, CmdInfo, offsetof(CmdInfo, pRenderPassEndInfo)>(
+                m_renderPassEndInfoCount,
+                m_renderPassEndInfoCapacity,
+                m_renderPassEndInfos,
+                &m_renderPassEndInfoToCmdInfoIndices,
+                &m_cmdInfos,
+                m_cmdInfoCount,
+                *(cmdInfo.pRenderPassEndInfo)
+            );
         }
 
         //copy barrier info
@@ -362,12 +419,26 @@ namespace vg
         m_cmdInfos.clear();
         m_cmdInfos.shrink_to_fit();
 
+        m_renderPassBeginInfoCount = 0u;
+        m_renderPassBeginInfoCapacity = 0u;
+        m_renderPassBeginInfos.clear();
+        m_renderPassBeginInfos.shrink_to_fit();
+        m_renderPassBeginInfoToCmdInfoIndices.clear();
+        m_renderPassBeginInfoToCmdInfoIndices.shrink_to_fit();
+
         m_renderPassInfoCount = 0u;
         m_renderPassInfoCapacity = 0u;
         m_renderPassInfos.clear();
         m_renderPassInfos.shrink_to_fit();
         m_renderPassInfoToCmdInfoIndices.clear();
         m_renderPassInfoToCmdInfoIndices.shrink_to_fit();
+
+        m_renderPassEndInfoCount = 0u;
+        m_renderPassEndInfoCapacity = 0u;
+        m_renderPassEndInfos.clear();
+        m_renderPassEndInfos.shrink_to_fit();
+        m_renderPassEndInfoToCmdInfoIndices.clear();
+        m_renderPassEndInfoToCmdInfoIndices.shrink_to_fit();
 
         m_clearValuesCount = 0u;
         m_clearValuesCapacity = 0u;

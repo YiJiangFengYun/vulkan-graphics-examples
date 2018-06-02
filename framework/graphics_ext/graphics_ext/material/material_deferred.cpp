@@ -134,6 +134,35 @@ namespace vge
         pRectMesh->apply(VG_TRUE);
     
         auto &result = *pResult;
+
+        //begin render pass.
+        {
+            vg::RenderPassBeginInfo renderPassBeginInfo;
+            renderPassBeginInfo.pRenderPass = m_pRenderPass.get();
+            renderPassBeginInfo.pFrameBuffer = m_pFrameBuffer.get();
+            renderPassBeginInfo.renderArea = fd::Rect2D();
+
+            vk::ClearValue clearValueColor = {
+                std::array<float, 4>{0.0f, 0.0f, 0.0f, 0.0f}
+            };
+            vk::ClearValue clearValueDepthStencil = {
+                vk::ClearDepthStencilValue(1.0f, 0)
+            };
+
+            vk::ClearValue clearValues[5];
+            clearValues[0] = clearValueColor;
+            clearValues[1] = clearValueColor;
+            clearValues[2] = clearValueColor;
+            clearValues[3] = clearValueColor;
+            clearValues[4] = clearValueDepthStencil;
+    
+            renderPassBeginInfo.clearValueCount = 5;
+            renderPassBeginInfo.pClearValues = clearValues;
+
+            vg::CmdInfo cmdInfo;
+            cmdInfo.pRenderPassBeginInfo = &renderPassBeginInfo;
+            result.pBranchCmdBuffer->addCmd(cmdInfo);
+        }
     
         //frist pass
         {
@@ -151,23 +180,6 @@ namespace vge
             renderPassInfo.subMeshIndex = info.subMeshIndex;
             renderPassInfo.viewport = viewport;
             renderPassInfo.scissor = scissor;
-    
-            vk::ClearValue clearValueColor = {
-                std::array<float, 4>{0.0f, 0.0f, 0.0f, 0.0f}
-            };
-            vk::ClearValue clearValueDepthStencil = {
-                vk::ClearDepthStencilValue(1.0f, 0)
-            };
-    
-            vk::ClearValue clearValues[5];
-            clearValues[0] = clearValueColor;
-            clearValues[1] = clearValueColor;
-            clearValues[2] = clearValueColor;
-            clearValues[3] = clearValueColor;
-            clearValues[4] = clearValueDepthStencil;
-    
-            renderPassInfo.clearValueCount = 5;
-            renderPassInfo.pClearValues = clearValues;
     
             vg::CmdInfo cmdInfo;
             cmdInfo.pRenderPassInfo = &renderPassInfo;
@@ -198,6 +210,13 @@ namespace vge
             cmdInfo.pRenderPassInfo = &renderPassInfo;
             result.pBranchCmdBuffer->addCmd(cmdInfo);
     
+        }
+
+        {
+            vg::RenderPassEndInfo renderPassEndInfo;
+            vg::CmdInfo cmdInfo;
+            cmdInfo.pRenderPassEndInfo = &renderPassEndInfo;
+            result.pBranchCmdBuffer->addCmd(cmdInfo);
         }
     
         //final pass is trunk pass.

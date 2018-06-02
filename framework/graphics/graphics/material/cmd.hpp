@@ -44,7 +44,8 @@ namespace vg
         );
     };
 
-    struct CmdDrawIndexed {
+    struct CmdDrawIndexed 
+    {
         uint32_t indexCount;
         uint32_t instanceCount;
         uint32_t firstIndex;
@@ -59,6 +60,22 @@ namespace vg
         );
     };
 
+    struct RenderPassBeginInfo
+    {
+        const vk::RenderPass *pRenderPass;
+        const vk::Framebuffer *pFrameBuffer;
+        fd::Rect2D renderArea;
+        uint32_t clearValueCount;
+        const vk::ClearValue *pClearValues;
+
+        RenderPassBeginInfo(const vk::RenderPass *pRenderPass = nullptr
+            , const vk::Framebuffer *pFrameBuffer = nullptr
+            , fd::Rect2D renderArea = fd::Rect2D()
+            , uint32_t clearValueCount = 0u
+            , const vk::ClearValue *pClearValues = nullptr
+            );
+    };
+
     struct RenderPassInfo
     {
         const vk::RenderPass *pRenderPass;
@@ -66,9 +83,6 @@ namespace vg
         const vk::Framebuffer *pFrameBuffer;
         uint32_t framebufferWidth;
         uint32_t framebufferHeight;
-        fd::Rect2D renderArea;
-        uint32_t clearValueCount;
-        const vk::ClearValue *pClearValues;
 
         Matrix4x4 projMatrix;
         Matrix4x4 viewMatrix;
@@ -91,9 +105,6 @@ namespace vg
             , const vk::Framebuffer *pFrameBuffer = nullptr
             , uint32_t framebufferWidth = 0u
             , uint32_t framebufferHeight = 0u
-            , fd::Rect2D renderArea = fd::Rect2D()
-            , uint32_t clearValueCount = 0u
-            , const vk::ClearValue *pClearValues = nullptr
             , Matrix4x4 projMatrix = Matrix4x4(1.0f)
             , Matrix4x4 viewMatrix = Matrix4x4(1.0f)
             , const Pass *pPass = nullptr
@@ -112,9 +123,16 @@ namespace vg
             );
     };
 
+    struct RenderPassEndInfo
+    {
+        RenderPassEndInfo();
+    };
+
     struct CmdInfo
     {
+        const RenderPassBeginInfo *pRenderPassBeginInfo;
         const RenderPassInfo *pRenderPassInfo;
+        const RenderPassEndInfo *pRenderPassEndInfo;        
         const BarrierInfo *pBarrierInfo;
         CmdInfo();
     };
@@ -135,10 +153,20 @@ namespace vg
         uint32_t m_cmdInfoCapacity;
         std::vector<CmdInfo> m_cmdInfos;
 
+        uint32_t m_renderPassBeginInfoCount;
+        uint32_t m_renderPassBeginInfoCapacity;
+        std::vector<RenderPassBeginInfo> m_renderPassBeginInfos;
+        std::vector<uint32_t> m_renderPassBeginInfoToCmdInfoIndices;
+
         uint32_t m_renderPassInfoCount;
         uint32_t m_renderPassInfoCapacity;
         std::vector<RenderPassInfo> m_renderPassInfos;
         std::vector<uint32_t> m_renderPassInfoToCmdInfoIndices;
+
+        uint32_t m_renderPassEndInfoCount;
+        uint32_t m_renderPassEndInfoCapacity;
+        std::vector<RenderPassEndInfo> m_renderPassEndInfos;
+        std::vector<uint32_t> m_renderPassEndInfoToCmdInfoIndices;
 
         uint32_t m_clearValuesCount;
         uint32_t m_clearValuesCapacity;

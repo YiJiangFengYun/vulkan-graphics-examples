@@ -208,17 +208,17 @@ namespace vg
                 _destroyPreZObjs();
             }
         }
-		if (m_postRenderEnable)
-		{
-			if (width != 0u && height != 0u)
-			{
-				_createPostRenderObjs();
-			}
-			else
-			{
-				_destroyPostRenderObjs();
-			}
-		}
+        if (m_postRenderEnable)
+        {
+            if (width != 0u && height != 0u)
+            {
+                _createPostRenderObjs();
+            }
+            else
+            {
+                _destroyPostRenderObjs();
+            }
+        }
     }
 
     void Renderer::_preRender()
@@ -264,178 +264,7 @@ namespace vg
         {
             if (i == 0) resultInfo.isRendered = VG_TRUE;
             const auto & sceneInfo = *(info.pSceneInfos + i);
-            const auto pScene = sceneInfo.pScene;
-            const auto pCamera = sceneInfo.pCamera;
-            const auto pPostRender = sceneInfo.pPostRender;
-            Bool32 preZEnable = m_preZEnable == VG_TRUE && sceneInfo.preZ == VG_TRUE;
-            Bool32 postRenderEnable = m_postRenderEnable == VG_TRUE && 
-                sceneInfo.pPostRender != nullptr &&
-                sceneInfo.pPostRender->isValidBindToRender() == VG_TRUE;
-#if defined(DEBUG) && defined(VG_ENABLE_COST_TIMER)
-            fd::CostTimer preparingSceneCostTimer(fd::CostTimer::TimerType::ONCE);
-            preparingSceneCostTimer.begin();
-#endif //DEBUG and VG_ENABLE_COST_TIMER
-            if (preZEnable)
-            {
-                m_pPreZCmdBuffer->begin();
-            }
-            m_branchCmdBuffer.begin();
-            m_trunkWaitBarrierCmdBuffer.begin();                        
-            m_trunkRenderPassCmdBuffer.begin();
-            if (postRenderEnable)
-            {
-                m_pPostRenderCmdbuffer->begin();
-            }
-
-            //bind render pass begin.
-			if (preZEnable)
-            {
-                //pre z cmd buffer
-                const BaseRenderTarget *pRenderTarget;
-                const vk::RenderPass *pRenderPass;
-                const vk::Framebuffer *pFramebuffer;
-                pRenderTarget = m_pPreZTarget.get();
-                pRenderPass = m_pPreZTarget->getRenderPass();
-                pFramebuffer = m_pPreZTarget->getFramebuffer();
-                m_renderBinder.bindForRenderPassBegin(pRenderTarget
-                    , pRenderPass
-                    , pFramebuffer
-                    , m_pPreZCmdBuffer.get()
-                    );
-            }
-
-            if (postRenderEnable)
-            {
-                const BaseRenderTarget *pRenderTarget;
-                const vk::RenderPass *pRenderPass;
-                const vk::Framebuffer *pFramebuffer;
-
-                //trunk cmd buffer
-                pRenderTarget = m_pPostRenderTarget.get();
-                pRenderPass = m_pPostRenderTarget->getRenderPass();
-                pFramebuffer = m_pPostRenderTarget->getFramebuffer();
-                m_renderBinder.bindForRenderPassBegin(pRenderTarget
-                    , pRenderPass
-                    , pFramebuffer
-                    , &m_trunkRenderPassCmdBuffer
-                    );
-                
-                //post render cmd buffer
-                pRenderTarget = m_pRenderTarget;
-                pRenderPass = i == 0 ? m_pRenderTarget->getFirstRenderPass() : m_pRenderTarget->getSecondRenderPass();
-                pFramebuffer = i == 0 ? m_pRenderTarget->getFirstFramebuffer() : m_pRenderTarget->getSecondFramebuffer();
-                m_renderBinder.bindForRenderPassBegin(pRenderTarget
-                    , pRenderPass
-                    , pFramebuffer
-                    , m_pPostRenderCmdbuffer.get()
-                    );
-            }
-            else
-            {
-                const BaseRenderTarget *pRenderTarget;
-                const vk::RenderPass *pRenderPass;
-                const vk::Framebuffer *pFramebuffer;
-
-                //trunk cmd buffer
-                pRenderTarget = m_pRenderTarget;
-                pRenderPass = i == 0 ? m_pRenderTarget->getFirstRenderPass() : m_pRenderTarget->getSecondRenderPass();
-                pFramebuffer = i == 0 ? m_pRenderTarget->getFirstFramebuffer() : m_pRenderTarget->getSecondFramebuffer();
-                m_renderBinder.bindForRenderPassBegin(pRenderTarget
-                    , pRenderPass
-                    , pFramebuffer
-                    , &m_trunkRenderPassCmdBuffer
-                    );
-            }
-
-            m_renderBinder.bind(pScene
-                , pCamera
-                , preZEnable ? m_pPreZTarget.get() : nullptr
-                , preZEnable ? m_pPreZCmdBuffer.get() : nullptr
-                , & m_branchCmdBuffer
-                , & m_trunkWaitBarrierCmdBuffer
-                , & m_trunkRenderPassCmdBuffer
-                , postRenderEnable ? pPostRender : nullptr
-                , postRenderEnable ? m_pPostRenderTarget.get() : nullptr
-                , postRenderEnable ? m_pPostRenderCmdbuffer.get() : nullptr
-                );
-
-            
-            //bind render pass end.
-            if (preZEnable) m_renderBinder.bindForRenderPassEnd(m_pPreZCmdBuffer.get());
-            if (postRenderEnable)
-            {
-                //trunk cmd buffer
-                m_renderBinder.bindForRenderPassEnd(&m_trunkRenderPassCmdBuffer);
-                
-                //post render cmd buffer
-                m_renderBinder.bindForRenderPassEnd(m_pPostRenderCmdbuffer.get());
-            }
-            else
-            {
-                //trunk cmd buffer
-                m_renderBinder.bindForRenderPassEnd(&m_trunkRenderPassCmdBuffer);
-            }
-             
-
-            //record ...
-            // pre z
-            if (preZEnable)
-            {
-                resultInfo.drawCount += m_pPreZCmdBuffer->getCmdCount();
-                CMDParser::record(m_pPreZCmdBuffer.get()
-                    , m_pCommandBuffer.get()
-                    , &m_pipelineCache
-                    );
-            }
-
-            //branch render pass.
-            CMDParser::ResultInfo cmdParseResult;
-            CMDParser::record(&m_branchCmdBuffer,
-                m_pCommandBuffer.get(),
-                &m_pipelineCache,
-                &cmdParseResult
-                );
-            resultInfo.drawCount += cmdParseResult.drawCount;
-
-            //trunk wait barrier
-            CMDParser::recordTrunkWaitBarrier(&m_trunkWaitBarrierCmdBuffer,
-                m_pCommandBuffer.get());
-
-            //trunk render pass.
-            resultInfo.drawCount += m_trunkRenderPassCmdBuffer.getCmdCount();
-            CMDParser::record(&m_trunkRenderPassCmdBuffer
-                , m_pCommandBuffer.get()
-                , &m_pipelineCache
-                );
-            //post render record
-            if (postRenderEnable)
-            {
-                CMDParser::record(m_pPostRenderCmdbuffer.get()
-                    , m_pCommandBuffer.get()
-                    , &m_pipelineCache
-                    );
-            }      
-
-            if (preZEnable)
-            {
-                m_pPreZCmdBuffer->end();
-            }
-            m_trunkRenderPassCmdBuffer.end();
-            m_trunkWaitBarrierCmdBuffer.end();
-            m_branchCmdBuffer.end();
-            if (postRenderEnable)
-            {
-                m_pPostRenderCmdbuffer->end();
-            }
-    
-#if defined(DEBUG) && defined(VG_ENABLE_COST_TIMER)
-            preparingSceneCostTimer.end();
-            VG_COST_TIME_LOG(plog::debug) << "Preparing scene cost time: " 
-                << preparingSceneCostTimer.costTimer 
-                << "ms, scene id: " << pScene->getID() 
-                << ", scene type: " << (pScene->getSpaceType() == SpaceType::SPACE_3 ? "space3" : "space2") 
-                <<  std::endl;
-#endif //DEBUG and VG_ENABLE_COST_TIMER
+            _renderScene(sceneInfo, i == 0, resultInfo);
         }
 
         //command buffer end
@@ -499,6 +328,183 @@ namespace vg
     void Renderer::_postRender()
     {
         m_pipelineCache.end();
+    }
+
+    void Renderer::_renderScene(const SceneInfo &sceneInfo, Bool32 isFirstScene, RenderResultInfo &resultInfo)
+    {
+        _renderSceneLights(sceneInfo, resultInfo);
+        _renderSceneVisualization(sceneInfo, isFirstScene, resultInfo);
+    }
+
+    void Renderer::_renderSceneLights(const SceneInfo &sceneInfo, RenderResultInfo &resultInfo)
+    {
+        const auto pScene = sceneInfo.pScene;
+        
+    }
+
+    void Renderer::_renderSceneVisualization(const SceneInfo &sceneInfo, Bool32 isFirstScene, RenderResultInfo &resultInfo)
+    {
+        const auto pScene = sceneInfo.pScene;
+        const auto pCamera = sceneInfo.pCamera;
+        const auto pPostRender = sceneInfo.pPostRender;
+        Bool32 preZEnable = m_preZEnable == VG_TRUE && sceneInfo.preZ == VG_TRUE;
+        Bool32 postRenderEnable = m_postRenderEnable == VG_TRUE && 
+            sceneInfo.pPostRender != nullptr &&
+            sceneInfo.pPostRender->isValidBindToRender() == VG_TRUE;
+#if defined(DEBUG) && defined(VG_ENABLE_COST_TIMER)
+        fd::CostTimer preparingSceneCostTimer(fd::CostTimer::TimerType::ONCE);
+        preparingSceneCostTimer.begin();
+#endif //DEBUG and VG_ENABLE_COST_TIMER
+        if (preZEnable)
+        {
+            m_pPreZCmdBuffer->begin();
+        }
+        m_branchCmdBuffer.begin();
+        m_trunkWaitBarrierCmdBuffer.begin();                        
+        m_trunkRenderPassCmdBuffer.begin();
+        if (postRenderEnable)
+        {
+            m_pPostRenderCmdbuffer->begin();
+        }
+        //bind render pass begin.
+        if (preZEnable)
+        {
+            //pre z cmd buffer
+            const BaseRenderTarget *pRenderTarget;
+            const vk::RenderPass *pRenderPass;
+            const vk::Framebuffer *pFramebuffer;
+            pRenderTarget = m_pPreZTarget.get();
+            pRenderPass = m_pPreZTarget->getRenderPass();
+            pFramebuffer = m_pPreZTarget->getFramebuffer();
+            m_renderBinder.bindForRenderPassBegin(pRenderTarget
+                , pRenderPass
+                , pFramebuffer
+                , m_pPreZCmdBuffer.get()
+                );
+        }
+        if (postRenderEnable)
+        {
+            const BaseRenderTarget *pRenderTarget;
+            const vk::RenderPass *pRenderPass;
+            const vk::Framebuffer *pFramebuffer;
+            //trunk cmd buffer
+            pRenderTarget = m_pPostRenderTarget.get();
+            pRenderPass = m_pPostRenderTarget->getRenderPass();
+            pFramebuffer = m_pPostRenderTarget->getFramebuffer();
+            m_renderBinder.bindForRenderPassBegin(pRenderTarget
+                , pRenderPass
+                , pFramebuffer
+                , &m_trunkRenderPassCmdBuffer
+                );
+            
+            //post render cmd buffer
+            pRenderTarget = m_pRenderTarget;
+            pRenderPass = isFirstScene ? m_pRenderTarget->getFirstRenderPass() : m_pRenderTarget->getSecondRenderPass();
+            pFramebuffer = isFirstScene ? m_pRenderTarget->getFirstFramebuffer() : m_pRenderTarget->getSecondFramebuffer();
+            m_renderBinder.bindForRenderPassBegin(pRenderTarget
+                , pRenderPass
+                , pFramebuffer
+                , m_pPostRenderCmdbuffer.get()
+                );
+        }
+        else
+        {
+            const BaseRenderTarget *pRenderTarget;
+            const vk::RenderPass *pRenderPass;
+            const vk::Framebuffer *pFramebuffer;
+            //trunk cmd buffer
+            pRenderTarget = m_pRenderTarget;
+            pRenderPass = isFirstScene ? m_pRenderTarget->getFirstRenderPass() : m_pRenderTarget->getSecondRenderPass();
+            pFramebuffer = isFirstScene ? m_pRenderTarget->getFirstFramebuffer() : m_pRenderTarget->getSecondFramebuffer();
+            m_renderBinder.bindForRenderPassBegin(pRenderTarget
+                , pRenderPass
+                , pFramebuffer
+                , &m_trunkRenderPassCmdBuffer
+                );
+        }
+        m_renderBinder.bind(pScene
+            , pCamera
+            , preZEnable ? m_pPreZTarget.get() : nullptr
+            , preZEnable ? m_pPreZCmdBuffer.get() : nullptr
+            , & m_branchCmdBuffer
+            , & m_trunkWaitBarrierCmdBuffer
+            , & m_trunkRenderPassCmdBuffer
+            , postRenderEnable ? pPostRender : nullptr
+            , postRenderEnable ? m_pPostRenderTarget.get() : nullptr
+            , postRenderEnable ? m_pPostRenderCmdbuffer.get() : nullptr
+            );
+        
+        //bind render pass end.
+        if (preZEnable) m_renderBinder.bindForRenderPassEnd(m_pPreZCmdBuffer.get());
+        if (postRenderEnable)
+        {
+            //trunk cmd buffer
+            m_renderBinder.bindForRenderPassEnd(&m_trunkRenderPassCmdBuffer);
+            
+            //post render cmd buffer
+            m_renderBinder.bindForRenderPassEnd(m_pPostRenderCmdbuffer.get());
+        }
+        else
+        {
+            //trunk cmd buffer
+            m_renderBinder.bindForRenderPassEnd(&m_trunkRenderPassCmdBuffer);
+        }
+         
+        //record ...
+        // pre z
+        if (preZEnable)
+        {
+            resultInfo.drawCount += m_pPreZCmdBuffer->getCmdCount();
+            CMDParser::record(m_pPreZCmdBuffer.get()
+                , m_pCommandBuffer.get()
+                , &m_pipelineCache
+                );
+        }
+        //branch render pass.
+        CMDParser::ResultInfo cmdParseResult;
+        CMDParser::record(&m_branchCmdBuffer,
+            m_pCommandBuffer.get(),
+            &m_pipelineCache,
+            &cmdParseResult
+            );
+        resultInfo.drawCount += cmdParseResult.drawCount;
+        //trunk wait barrier
+        CMDParser::recordTrunkWaitBarrier(&m_trunkWaitBarrierCmdBuffer,
+            m_pCommandBuffer.get());
+        //trunk render pass.
+        resultInfo.drawCount += m_trunkRenderPassCmdBuffer.getCmdCount();
+        CMDParser::record(&m_trunkRenderPassCmdBuffer
+            , m_pCommandBuffer.get()
+            , &m_pipelineCache
+            );
+        //post render record
+        if (postRenderEnable)
+        {
+            CMDParser::record(m_pPostRenderCmdbuffer.get()
+                , m_pCommandBuffer.get()
+                , &m_pipelineCache
+                );
+        }      
+        if (preZEnable)
+        {
+            m_pPreZCmdBuffer->end();
+        }
+        m_trunkRenderPassCmdBuffer.end();
+        m_trunkWaitBarrierCmdBuffer.end();
+        m_branchCmdBuffer.end();
+        if (postRenderEnable)
+        {
+            m_pPostRenderCmdbuffer->end();
+        }
+
+#if defined(DEBUG) && defined(VG_ENABLE_COST_TIMER)
+        preparingSceneCostTimer.end();
+        VG_COST_TIME_LOG(plog::debug) << "Preparing scene cost time: " 
+            << preparingSceneCostTimer.costTimer 
+            << "ms, scene id: " << pScene->getID() 
+            << ", scene type: " << (pScene->getSpaceType() == SpaceType::SPACE_3 ? "space3" : "space2") 
+            <<  std::endl;
+#endif //DEBUG and VG_ENABLE_COST_TIMER
     }
 
     void Renderer::_recordCommandBufferForBegin()

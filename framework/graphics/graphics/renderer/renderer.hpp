@@ -122,6 +122,10 @@ namespace vg
         virtual void _postRender();
         virtual Bool32 _isValidForRender() const;
 
+        virtual void _renderScene(const SceneInfo &sceneInfo, Bool32 isFirstScene, RenderResultInfo &resultInfo);
+        void _renderSceneLights(const SceneInfo &sceneInfo, RenderResultInfo &resultInfo);
+        void _renderSceneVisualization(const SceneInfo &sceneInfo, Bool32 isFirstScene, RenderResultInfo &resultInfo);
+
         
         void _createCommandPool();
         void _createCommandBuffer();

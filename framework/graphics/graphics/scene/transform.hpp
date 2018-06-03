@@ -12,41 +12,9 @@ namespace vg
     class BaseTransform : public Base
     {
     public:
-        using ConstIterator = typename std::vector<BaseTransform *>::const_iterator;
         BaseTransform();
-
-        uint32_t getChildCount() const;
-        void detachChildren();
-        const BaseTransform * const * getChildren() const;
-        BaseTransform * const * getChildren();
     protected:
-        BaseTransform *m_pParent;
-        std::unordered_map<InstanceID, BaseTransform *> m_mapPChildren;
-        std::vector<BaseTransform *> m_arrPChildren;
 
-        const BaseTransform *_getChildWithIndex(uint32_t index) const;
-        BaseTransform *_getChildWithIndex(uint32_t index);
-        const BaseTransform * const * _getChildren() const;
-        BaseTransform * const * _getChildren();
-
-        ConstIterator _getChildPos(const BaseTransform *child) const;
-
-        void _addChild(BaseTransform *pNewChild);
-        void _addChild(BaseTransform *pNewChild, ConstIterator pos);
-        void _removeChild(BaseTransform *pChild);
-
-        const BaseTransform *_getParent() const;
-        BaseTransform *_getParent();
-        void _setParent(BaseTransform *pParent);
-
-        const BaseTransform *_getRoot() const;
-        BaseTransform *_getRoot();
-
-        void _setParentOnly(BaseTransform *pNewParent);
-        void _addChildOnly(BaseTransform *pNewChild);
-        void _addChildOnly(BaseTransform *pNewChild, ConstIterator pos);
-        void _removeChildOnly(BaseTransform *pChild);
-        Bool32 _isChild(const BaseTransform *pTransform) const;
     };
 
     template <SpaceType SPACE_TYPE>
@@ -63,12 +31,22 @@ namespace vg
         Transform();
 
         //------------hierarchy-----------------------
+        uint32_t getChildCount() const;
+
         const Type *getChildWithIndex(uint32_t index) const;
         Type *getChildWithIndex(uint32_t index);
-        ConstIterator getChildPos(const Type *child) const;
-		Bool32 isChild(const Type *pTransform) const;
+
+        typename std::vector<Type *>::const_iterator getChildPos(const Type *child) const;
+
+        const Type * const * getChildren() const;
+        Type * const * getChildren();
+
+        void detachChildren();
+
+        Bool32 isChild(const Type *pTransform) const;
+
         void addChild(Type *pNewChild);
-        void addChild(Type *pNewChild, ConstIterator pos);
+        void addChild(Type *pNewChild, typename std::vector<Type *>::const_iterator pos);
         void removeChild(Type *pChild);
 
         const Type *getParent() const;
@@ -125,6 +103,9 @@ namespace vg
         MatrixType getMatrixWorldToLocal() const;
 
     protected:
+        Type *m_pParent;
+        std::unordered_map<InstanceID, Type *> m_mapPChildren;
+        std::vector<Type *> m_arrPChildren;
         Bool32 m_isChanged;
         PointType m_localPosition;
         MatrixType m_localPosMatrix;
@@ -134,6 +115,12 @@ namespace vg
         MatrixType m_localRotationMatrix;
         MatrixType m_localMatrix;
         MatrixType m_localMatrixInverse;
+
+        void _setParentOnly(Type *pNewParent);
+        void _addChildOnly(Type *pNewChild);
+        void _addChildOnly(Type *pNewChild, typename std::vector<Type *>::const_iterator pos);
+        void _removeChildOnly(Type *pChild);
+        Bool32 _isChild(const Type *pTransform) const;
 
         void _setLocalPositionOnly(PointType position);
         void _setLocalScaleOnly(VectorType scale);

@@ -71,7 +71,7 @@ namespace vg
             };
             vg::RenderPassInfo renderPassInfo;
             renderPassInfo.pRenderPass = nullptr;
-            renderPassInfo.pFrameBuffer = nullptr;
+            renderPassInfo.pFramebuffer = nullptr;
             renderPassInfo.framebufferWidth = info.framebufferWidth;
             renderPassInfo.framebufferHeight = info.framebufferHeight;
             renderPassInfo.projMatrix = vg::Matrix4x4(1.0f);

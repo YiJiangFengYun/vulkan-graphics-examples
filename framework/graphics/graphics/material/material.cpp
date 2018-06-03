@@ -197,27 +197,6 @@ namespace vg
             *m_pBindTargetID = info.objectID;
         }
 
-        auto &result = *pResult;
-        if (m_pPreZPass != nullptr && result.pPreZCmdBuffer != nullptr)
-        {
-            RenderPassInfo trunkRenderPassInfo;
-            trunkRenderPassInfo.pRenderPass = nullptr;
-            trunkRenderPassInfo.pFrameBuffer = nullptr;            
-            trunkRenderPassInfo.framebufferWidth = info.trunkFramebufferWidth;
-            trunkRenderPassInfo.framebufferHeight = info.trunkFramebufferHeight;
-            trunkRenderPassInfo.projMatrix = *(info.pProjMatrix);
-            trunkRenderPassInfo.viewMatrix = *(info.pViewMatrix);
-            trunkRenderPassInfo.pPass = m_pPreZPass->getPass();
-            trunkRenderPassInfo.modelMatrix = *(info.pModelMatrix);
-            trunkRenderPassInfo.pMesh = info.pMesh;
-            trunkRenderPassInfo.subMeshIndex = info.subMeshIndex;
-            trunkRenderPassInfo.viewport = fd::Viewport();
-            trunkRenderPassInfo.scissor = info.hasClipRect ? info.clipRect : fd::Rect2D();
-            CmdInfo cmdInfo;
-            cmdInfo.pRenderPassInfo = &trunkRenderPassInfo;
-            result.pPreZCmdBuffer->addCmd(cmdInfo);
-        }
-
         _beginBind(info, pResult);
 
     }
@@ -251,7 +230,7 @@ namespace vg
         auto &result = *pResult;
         RenderPassInfo trunkRenderPassInfo;
         trunkRenderPassInfo.pRenderPass = nullptr;
-        trunkRenderPassInfo.pFrameBuffer = nullptr;            
+        trunkRenderPassInfo.pFramebuffer = nullptr;            
         trunkRenderPassInfo.framebufferWidth = info.trunkFramebufferWidth;
         trunkRenderPassInfo.framebufferHeight = info.trunkFramebufferHeight;
         trunkRenderPassInfo.projMatrix = *(info.pProjMatrix);

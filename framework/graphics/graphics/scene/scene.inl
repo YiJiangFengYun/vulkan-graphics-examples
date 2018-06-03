@@ -1,27 +1,30 @@
 namespace vg
 {
+    template <SpaceType SPACE_TYPE>
     template <typename T>
-    Bool32 BaseScene::_isHasObject(const T *pTarget, const std::unordered_map<InstanceID, T *> &map) const
+    Bool32 Scene<SPACE_TYPE>::_isHasObject(const T *pTarget, const std::unordered_map<InstanceID, T *> &map) const
     {
         return map.find(pTarget->getID()) != map.cend();
     }
 
+    template <SpaceType SPACE_TYPE>
     template <typename T>
-    void BaseScene::_addObject(T *pTarget
+    void Scene<SPACE_TYPE>::_addObject(T *pTarget
         , std::vector<T *> &arr
         , std::unordered_map<InstanceID, T *> &map
         , std::unordered_map<InstanceID, T *> &mapTransformToObjs
-        , BaseTransform *root
+        , TransformType *root
         , T *pParent
     )
     {
         if (_isHasObject(pTarget, map)) return;        
-        _addObjectSetObjectOnly(pTarget, root, pParent);
+        _addObjectSetObjectOnly(dynamic_cast<ObjectType *>(pTarget), root, pParent);
         _addObjectAddSceneDataOnly(pTarget, arr, map, mapTransformToObjs);
     }
 
+    template <SpaceType SPACE_TYPE>
     template <typename T>
-    void BaseScene::_removeObject(T *pTarget
+    void Scene<SPACE_TYPE>::_removeObject(T *pTarget
         , std::vector<T *> &arr
         , std::unordered_map<InstanceID, T *> &map
         , std::unordered_map<InstanceID, T *> &mapTransformToObjs
@@ -29,11 +32,12 @@ namespace vg
     {
         if (_isHasObject(pTarget, map) == VG_FALSE) return;
         _removeObjectDeleteSceneDataOnly(pTarget, arr, map, mapTransformToObjs);
-        _removeObjectSetObjectOnly(pTarget);
+        _removeObjectSetObjectOnly(dynamic_cast<ObjectType *>(pTarget));
     }
 
+    template <SpaceType SPACE_TYPE>
     template <typename T>
-    void BaseScene::_addObjectAddSceneDataOnly(T *pTarget
+    void Scene<SPACE_TYPE>::_addObjectAddSceneDataOnly(T *pTarget
         , std::vector<T *> &arr
         , std::unordered_map<InstanceID, T *> &map
         , std::unordered_map<InstanceID, T *> &mapTransformToObjs
@@ -44,8 +48,9 @@ namespace vg
         mapTransformToObjs[pTarget->getTransform()->getID()] = pTarget;
     }
 
+    template <SpaceType SPACE_TYPE>
     template <typename T>
-    void BaseScene::_removeObjectDeleteSceneDataOnly(T *pTarget
+    void Scene<SPACE_TYPE>::_removeObjectDeleteSceneDataOnly(T *pTarget
         , std::vector<T *> &arr
         , std::unordered_map<InstanceID, T *> &map
         , std::unordered_map<InstanceID, T *> &mapTransformToObjs

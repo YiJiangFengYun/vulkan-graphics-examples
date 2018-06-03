@@ -22,97 +22,12 @@ namespace vg
         void setIsLeftHand(Bool32 isLeftHand);
         void beginRender() const;
         void endRender() const;
-
-        uint32_t getVisualObjectCount() const;
-        uint32_t getCameraCount() const;
-        uint32_t getLightCount() const;
-        
-        
     protected:
         SpaceType m_spaceType;
         Bool32 m_isRightHand;
 
-        std::shared_ptr<BaseTransform> m_pRootTransform;
-
-        std::vector<BaseVisualObject *> m_arrPVisualObjects;
-        std::unordered_map<InstanceID, BaseVisualObject *> m_mapPVisualObjects;
-        std::unordered_map<InstanceID, BaseVisualObject *> m_mapTransformIdToVisualObjects;
-        std::vector<BaseCamera *> m_arrPCameras;
-        std::unordered_map<InstanceID, BaseCamera *> m_mapPCameras;
-        std::unordered_map<InstanceID, BaseCamera *> m_mapTransformIdToCameras;
-        std::vector<BaseLight *> m_arrPLights;
-        std::unordered_map<InstanceID, BaseLight *> m_mapPLights;
-        std::unordered_map<InstanceID, BaseLight *> m_mapTransformIdToLights;
-
-        const BaseVisualObject *_getVisualObjectWithIndex(uint32_t index) const;
-        BaseVisualObject *_getVisualObjectWithIndex(uint32_t index);
-        const BaseVisualObject *_getVisualObjectWithTransform(const BaseTransform *pTransform) const;
-        BaseVisualObject *_getVisualObjectWithTransform(const BaseTransform *pTransform);
-        Bool32 _isHasVisualObject(const BaseVisualObject *pTarget) const;
-        void _addVisualObject(BaseVisualObject *pTarget, BaseVisualObject *pParent = nullptr);
-        void _removeVisualObject(BaseVisualObject *pTarget);
-
-        const BaseCamera *_getCameraWithIndex(uint32_t index) const;
-        BaseCamera *_getCameraWithIndex(uint32_t index);
-        const BaseCamera *_getCameraWithTransform(const BaseTransform *pTransform) const;
-        BaseCamera *_getCameraWithTransform(const BaseTransform *pTransform);
-        Bool32 _isHasCamera(const BaseCamera *pTarget) const;
-        void _addCamera(BaseCamera *pTarget, BaseCamera *pParent = nullptr);
-        void _removeCamera(BaseCamera *pTarget);
-
-        const BaseLight *_getLightWithIndex(uint32_t index) const;
-        BaseLight *_getLightWithIndex(uint32_t index);
-        const BaseLight *_getLightWithTransform(const BaseTransform *pTransform) const;
-        BaseLight *_getLightWithTransform(const BaseTransform *pTransform);
-        Bool32 _isHasLight(const BaseLight *pTarget) const;
-        void _addLight(BaseLight *pTarget, BaseLight *pParent = nullptr);
-        void _removeLight(BaseLight *pTarget);
-
         virtual void _beginRender() const;
         virtual void _endRender() const;
-    
-    private:
-        template <typename T>
-        Bool32 _isHasObject(const T *pTarget
-            , const std::unordered_map<InstanceID, T *> &map
-        ) const;
-
-        template <typename T>
-        void _addObject(T *pTarget
-            , std::vector<T *> &arr
-            , std::unordered_map<InstanceID, T *> &map
-            , std::unordered_map<InstanceID, T *> &mapTransformToObjs
-            , BaseTransform *root
-            , T *pParent = nullptr
-        );
-
-        template <typename T>
-        void _removeObject(T *pTarget
-            , std::vector<T *> &arr
-            , std::unordered_map<InstanceID, T *> &map
-            , std::unordered_map<InstanceID, T *> &mapTransformToObjs
-        );
-
-        template <typename T>
-        void _addObjectAddSceneDataOnly(T *pTarget
-            , std::vector<T *> &arr
-            , std::unordered_map<InstanceID, T *> &map
-            , std::unordered_map<InstanceID, T *> &mapTransformToObjs
-        );
-
-        template <typename T>
-        void _removeObjectDeleteSceneDataOnly(T *pTarget
-            , std::vector<T *> &arr
-            , std::unordered_map<InstanceID, T *> &map
-            , std::unordered_map<InstanceID, T *> &mapTransformToObjs
-        );
-        
-        void _addObjectSetObjectOnly(DimObject *pTarget
-            , BaseTransform *root
-            , DimObject *pParent = nullptr
-            );
-        
-        void _removeObjectSetObjectOnly(DimObject *pTarget);
     };
 
     template <SpaceType SPACE_TYPE>
@@ -130,9 +45,15 @@ namespace vg
         using PointType = typename SpaceTypeInfo<SPACE_TYPE>::PointType;
         using MatrixVectorType = typename SpaceTypeInfo<SPACE_TYPE>::MatrixVectorType;
 
+        const std::shared_ptr<TransformType> pRootTransformForVisualObject;
+        const std::shared_ptr<TransformType> pRootTransformForCamera;
+        const std::shared_ptr<TransformType> pRootTransformForLight;
+        // const std::shared_ptr<TransformType> pRootTransform;
+
 
         Scene();
 
+        uint32_t getVisualObjectCount() const;
         const VisualObjectType *getVisualObjectWithIndex(uint32_t index) const;
         VisualObjectType *getVisualObjectWithIndex(uint32_t index);
         const VisualObjectType *getVisualObjectWithTransform(const TransformType *pTransform) const;
@@ -141,6 +62,7 @@ namespace vg
         void addVisualObject(VisualObjectType *pTarget, VisualObjectType *pParent = nullptr);
         void removeVisualObject(VisualObjectType *pTarget);
 
+        uint32_t getCameraCount() const;
         const CameraType *getCameraWithIndex(uint32_t index) const;
         CameraType *getCameraWithIndex(uint32_t index);
         const CameraType *getCameraWithTransform(const TransformType *pTransform) const;
@@ -149,6 +71,7 @@ namespace vg
         void addCamera(CameraType *pTarget, CameraType *pParent = nullptr);
         void removeCamera(CameraType *pTarget);
 
+        uint32_t getLightCount() const;
         const LightType *getLightWithIndex(uint32_t index) const;
         LightType *getLightWithIndex(uint32_t index);
         const LightType *getLightWithTransform(const TransformType *pTransform) const;
@@ -177,8 +100,66 @@ namespace vg
             , fd::Rect2D *viewRect = nullptr) const = 0;
 
     protected:
+
+        //aggregations
+        std::vector<VisualObjectType *> m_arrPVisualObjects;
+        std::unordered_map<InstanceID, VisualObjectType *> m_mapPVisualObjects;
+        std::unordered_map<InstanceID, VisualObjectType *> m_mapTransformIdToVisualObjects;
+        std::vector<CameraType *> m_arrPCameras;
+        std::unordered_map<InstanceID, CameraType *> m_mapPCameras;
+        std::unordered_map<InstanceID, CameraType *> m_mapTransformIdToCameras;
+        std::vector<LightType *> m_arrPLights;
+        std::unordered_map<InstanceID, LightType *> m_mapPLights;
+        std::unordered_map<InstanceID, LightType *> m_mapTransformIdToLights;
+
+        virtual void _addVisualObject(VisualObjectType *pTarget
+            , VisualObjectType *pParent);
+        virtual void _removeVisualObject(VisualObjectType *pTarget);
+
+        virtual void _beginRender() const override;
+        virtual void _endRender() const override;
     private:
+        template <typename T>
+        Bool32 _isHasObject(const T *pTarget
+            , const std::unordered_map<InstanceID, T *> &map
+        ) const;
+
+        template <typename T>
+        void _addObject(T *pTarget
+            , std::vector<T *> &arr
+            , std::unordered_map<InstanceID, T *> &map
+            , std::unordered_map<InstanceID, T *> &mapTransformToObjs
+            , TransformType *root
+            , T *pParent = nullptr
+        );
+
+        template <typename T>
+        void _removeObject(T *pTarget
+            , std::vector<T *> &arr
+            , std::unordered_map<InstanceID, T *> &map
+            , std::unordered_map<InstanceID, T *> &mapTransformToObjs
+        );
+
+        template <typename T>
+        void _addObjectAddSceneDataOnly(T *pTarget
+            , std::vector<T *> &arr
+            , std::unordered_map<InstanceID, T *> &map
+            , std::unordered_map<InstanceID, T *> &mapTransformToObjs
+        );
+
+        template <typename T>
+        void _removeObjectDeleteSceneDataOnly(T *pTarget
+            , std::vector<T *> &arr
+            , std::unordered_map<InstanceID, T *> &map
+            , std::unordered_map<InstanceID, T *> &mapTransformToObjs
+        );
         
+        void _addObjectSetObjectOnly(ObjectType *pTarget
+            , TransformType *root
+            , ObjectType *pParent = nullptr
+            );
+        
+        void _removeObjectSetObjectOnly(ObjectType *pTarget);
     };
 } //namespace kgs
 

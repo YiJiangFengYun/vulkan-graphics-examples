@@ -29,7 +29,6 @@ namespace vg
         void endRender() const;
     protected:
         ObjectType m_objectType;
-        std::shared_ptr<BaseTransform> m_pTransform;
 
         virtual void _beginRender() const;
         virtual void _endRender() const;
@@ -37,19 +36,19 @@ namespace vg
 
     //This class is used for object dimension space features.
     template <SpaceType SPACE_TYPE>
-    class DimObject : public BaseObject
+    class DimObject
     {
     public:
         using TransformType = typename SpaceTransformTypeInfo<SPACE_TYPE>::TransformType;
         DimObject();
-        const TransformType *getTransform() const;
-        TransformType *getTransform();
+
+        TransformType *getTransform() const;
     protected:
-        
+        std::shared_ptr<TransformType> m_pTransform;
     };
 
     template <SpaceType SPACE_TYPE>
-    class Object : public DimObject<SPACE_TYPE>
+    class Object : public BaseObject, public DimObject<SPACE_TYPE>
     {
     public:
         Object();

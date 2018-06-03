@@ -349,10 +349,10 @@ namespace vg
         auto pos = pParent->getChildPos(pTransform);
         //copy chilren refs;
         auto childCount = pTransform->getChildCount();
-        auto children = pTransform->getChildren();
+        //auto children = pTransform->getChildren();
         //insert to pos of parent before target
         for (uint32_t i = 0; i < childCount; ++i) {
-            auto child = *(children + i);
+            auto child = pTransform->getChildWithIndex(i);
             pParent->addChild(child, pos);
         }
 

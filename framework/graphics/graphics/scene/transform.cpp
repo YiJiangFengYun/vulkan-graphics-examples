@@ -5,17 +5,192 @@ namespace vg
 //BaesTransform
     BaseTransform::BaseTransform()
         : Base(BaseType::TRANSFORM)
+        , m_pParent(nullptr)
+        , m_arrPChildren()
+        , m_mapPChildren()
     {
 
+    }
+
+    uint32_t BaseTransform::getChildCount() const
+    {
+        return static_cast<uint32_t>(m_arrPChildren.size());
+    }
+    
+    void BaseTransform::detachChildren()
+    {
+        for (auto item : m_arrPChildren)
+        {
+            item->_setParentOnly(nullptr);
+        }
+        m_arrPChildren.resize(0u);
+        m_mapPChildren.clear();
+    }
+
+    const BaseTransform * const * BaseTransform::getChildren() const
+    {
+        return _getChildren();
+    }
+
+    BaseTransform * const * BaseTransform::getChildren()
+    {
+        return _getChildren();
+    }
+
+    const BaseTransform *BaseTransform::_getChildWithIndex(uint32_t index) const
+    {
+        return m_arrPChildren[index];
+    }
+        
+    BaseTransform *BaseTransform::_getChildWithIndex(uint32_t index)
+    {
+        return m_arrPChildren[index];
+    }
+    
+    const BaseTransform * const * BaseTransform::_getChildren() const
+    {
+        return m_arrPChildren.data();
+    }
+        
+    BaseTransform * const * BaseTransform::_getChildren()
+    {
+        return m_arrPChildren.data();
+    }
+    typename BaseTransform::ConstIterator BaseTransform::_getChildPos(const BaseTransform *child) const
+    {
+#ifdef DEBUG
+        if (_isChild(child) == VG_FALSE) throw std::invalid_argument("The target is not a child of the tranform.");
+#endif // DEBUG
+        return std::find(m_arrPChildren.cbegin(), m_arrPChildren.cend(), child);
+    }
+
+    void BaseTransform::_addChild(BaseTransform *pNewChild)
+    {
+        if (_isChild(pNewChild)) return;
+
+        _addChildOnly(pNewChild);
+        pNewChild->_setParent(this);
+    }
+
+    void BaseTransform::_addChild(BaseTransform *pNewChild, ConstIterator pos)
+    {
+        _addChildOnly(pNewChild, pos);
+        pNewChild->_setParent(this);
+    }
+
+    void BaseTransform::_removeChild(BaseTransform *pChild)
+    {
+        if (_isChild(pChild) == VG_FALSE) return;
+
+        _removeChildOnly(pChild);
+        pChild->_setParentOnly(nullptr);
+    }
+
+    const BaseTransform *BaseTransform::_getParent() const
+    {
+        return m_pParent;
+    }
+
+    BaseTransform *BaseTransform::_getParent()
+    {
+        return m_pParent;
+    }
+
+    void BaseTransform::_setParent(BaseTransform *pParent)
+    {
+        if (m_pParent == pParent) return;
+        if (pParent == nullptr)
+        {
+            m_pParent->_removeChildOnly(this);
+            _setParentOnly(nullptr);
+        }
+        else
+        {
+            if (m_pParent != nullptr)
+            {
+                _setParent(nullptr);
+            }
+            _setParentOnly(pParent);
+            pParent->_addChildOnly(this);
+        }
+    }
+
+    const BaseTransform *BaseTransform::_getRoot() const
+    {
+        if (m_pParent == nullptr)
+        {
+            return nullptr;
+        }
+        else
+        {
+            auto root = m_pParent;
+            while (root->m_pParent != nullptr)
+            {
+                root = root->m_pParent;
+            }
+            return root;
+        }
+    }
+        
+    BaseTransform *BaseTransform::_getRoot()
+    {
+        if (m_pParent == nullptr)
+        {
+            return nullptr;
+        }
+        else
+        {
+            auto root = m_pParent;
+            while (root->m_pParent != nullptr)
+            {
+                root = root->m_pParent;
+            }
+            return root;
+        }
+    }
+
+    void BaseTransform::_setParentOnly(BaseTransform *pNewParent)
+    {
+        m_pParent = pNewParent;
+    }
+
+    void BaseTransform::_addChildOnly(BaseTransform *pNewChild)
+    {
+        m_arrPChildren.push_back(pNewChild);
+        m_mapPChildren[pNewChild->getID()] = pNewChild;
+    }
+
+    void BaseTransform::_addChildOnly(BaseTransform *pNewChild, ConstIterator pos)
+    {
+        if (_isChild(pNewChild))
+        {
+            auto removed = std::remove(m_arrPChildren.begin(), m_arrPChildren.end(), pNewChild);
+            m_arrPChildren.erase(removed, m_arrPChildren.end());
+            m_arrPChildren.insert(pos, pNewChild);
+        }
+        else
+        {
+            m_arrPChildren.insert(pos, pNewChild);
+            m_mapPChildren[pNewChild->getID()] = pNewChild;
+        }
+    }
+        
+    void BaseTransform::_removeChildOnly(BaseTransform *pChild)
+    {
+        auto removed = std::remove(m_arrPChildren.begin(), m_arrPChildren.end(), pChild);
+        m_arrPChildren.erase(removed, m_arrPChildren.end());
+        m_mapPChildren.erase(pChild->getID());
+    }
+        
+    Bool32 BaseTransform::_isChild(const BaseTransform *pTransform) const
+    {
+        return m_mapPChildren.find(pTransform->getID()) != m_mapPChildren.cend();
     }
 
 //Transform
     template <SpaceType SPACE_TYPE>
     Transform<SPACE_TYPE>::Transform()
         : BaseTransform()
-        , m_pParent(nullptr)
-        , m_arrPChildren()
-        , m_mapPChildren()
         , m_isChanged(VG_FALSE)
         , m_localPosition(0.0f)
         , m_localPosMatrix(1.0f)
@@ -30,53 +205,21 @@ namespace vg
     }
 
     template <SpaceType SPACE_TYPE>
-    uint32_t Transform<SPACE_TYPE>::getChildCount() const
-    {
-        return static_cast<uint32_t>(m_arrPChildren.size());
-    }
-
-    template <SpaceType SPACE_TYPE>
-    void Transform<SPACE_TYPE>::detachChildren()
-    {
-        for (auto item : m_arrPChildren)
-        {
-            item->_setParentOnly(nullptr);
-        }
-        m_arrPChildren.resize(0u);
-        m_mapPChildren.clear();
-    }
-
-    template <SpaceType SPACE_TYPE>
     const typename Transform<SPACE_TYPE>::Type *Transform<SPACE_TYPE>::getChildWithIndex(uint32_t index) const
     {
-        return m_arrPChildren[index];
+		return dynamic_cast<const Type *>(_getChildWithIndex(index));
     }
 
     template <SpaceType SPACE_TYPE>
     typename Transform<SPACE_TYPE>::Type *Transform<SPACE_TYPE>::getChildWithIndex(uint32_t index)
     {
-        return m_arrPChildren[index];
+        return dynamic_cast<Type *>(_getChildWithIndex(index));
     }
 
     template <SpaceType SPACE_TYPE>
-    typename std::vector<typename Transform<SPACE_TYPE>::Type *>::const_iterator Transform<SPACE_TYPE>::getChildPos(const Type *child) const
+    typename Transform<SPACE_TYPE>::ConstIterator Transform<SPACE_TYPE>::getChildPos(const Type *child) const
     {
-#ifdef DEBUG
-        if (isChild(child) == VG_FALSE) throw std::invalid_argument("The target is not a child of the tranform.");
-#endif // DEBUG
-        return std::find(m_arrPChildren.cbegin(), m_arrPChildren.cend(), child);
-    }
-
-    template <SpaceType SPACE_TYPE>
-    const typename Transform<SPACE_TYPE>::Type * const * Transform<SPACE_TYPE>::getChildren() const
-    {
-        return m_arrPChildren.data();
-    }
-
-    template <SpaceType SPACE_TYPE>
-    typename Transform<SPACE_TYPE>::Type * const * Transform<SPACE_TYPE>::getChildren()
-    {
-        return m_arrPChildren.data();
+        return _getChildPos(child);
     }
 
     template <SpaceType SPACE_TYPE>
@@ -88,95 +231,49 @@ namespace vg
     template <SpaceType SPACE_TYPE>
     void Transform<SPACE_TYPE>::addChild(Type *pNewChild)
     {
-        if (_isChild(pNewChild)) return;
-
-        _addChildOnly(pNewChild);
-        pNewChild->setParent(this);
+        _addChild(pNewChild);
     }
 
     template <SpaceType SPACE_TYPE>
-    void Transform<SPACE_TYPE>::addChild(Type *pNewChild, typename std::vector<Type *>::const_iterator pos)
+    void Transform<SPACE_TYPE>::addChild(Type *pNewChild, ConstIterator pos)
     {
-        _addChildOnly(pNewChild, pos);
-        pNewChild->setParent(this);
+        _addChild(pNewChild, pos);
     }
 
     template <SpaceType SPACE_TYPE>
     void Transform<SPACE_TYPE>::removeChild(Type *pChild)
     {
-        if (_isChild(pChild) == VG_FALSE) return;
-
-        _removeChildOnly(pChild);
-        pChild->_setParentOnly(nullptr);
+        _removeChild(pChild);
     }
 
     template <SpaceType SPACE_TYPE>
     const typename Transform<SPACE_TYPE>::Type *Transform<SPACE_TYPE>::getParent() const
     {
-        return m_pParent;
+        return dynamic_cast<const Type *>(_getParent());
     }
 
     template <SpaceType SPACE_TYPE>
     typename Transform<SPACE_TYPE>::Type *Transform<SPACE_TYPE>::getParent()
     {
-        return m_pParent;
+       return dynamic_cast<Type *>(_getParent());
     }
 
     template <SpaceType SPACE_TYPE>
     void Transform<SPACE_TYPE>::setParent(Type *pParent)
     {
-        if (m_pParent == pParent) return;
-        if (pParent == nullptr)
-        {
-            m_pParent->_removeChildOnly(this);
-            _setParentOnly(nullptr);
-        }
-        else
-        {
-            if (m_pParent != nullptr)
-            {
-                setParent(nullptr);
-            }
-            _setParentOnly(pParent);
-            pParent->_addChildOnly(this);
-        }
-
+        _setParent(pParent);
     }
 
     template <SpaceType SPACE_TYPE>
     const typename Transform<SPACE_TYPE>::Type *Transform<SPACE_TYPE>::getRoot() const
     {
-        if (m_pParent == nullptr)
-        {
-            return nullptr;
-        }
-        else
-        {
-            auto root = m_pParent;
-            while (root->m_pParent != nullptr)
-            {
-                root = root->m_pParent;
-            }
-            return root;
-        }
+        return dynamic_cast<const Type *>(_getRoot());
     }
 
     template <SpaceType SPACE_TYPE>
     typename Transform<SPACE_TYPE>::Type *Transform<SPACE_TYPE>::getRoot()
     {
-        if (m_pParent == nullptr)
-        {
-            return nullptr;
-        }
-        else
-        {
-            auto root = m_pParent;
-            while (root->m_pParent != nullptr)
-            {
-                root = root->m_pParent;
-            }
-            return root;
-        }
+        return dynamic_cast<Type *>(_getRoot());
     }
 
     template <SpaceType SPACE_TYPE>
@@ -221,11 +318,11 @@ namespace vg
     typename Transform<SPACE_TYPE>::RotationType Transform<SPACE_TYPE>::getRotation() const
     {
         RotationType rotation = m_localRotation;
-        Type *curr = m_pParent;
+        Type *curr = dynamic_cast<Type *>(m_pParent);
         while (curr != nullptr)
         {
             rotation = curr->m_localRotation * rotation;
-            curr = curr->m_pParent;
+            curr = dynamic_cast<Type *>(curr->m_pParent);
         }
         return rotation;
     }
@@ -247,11 +344,11 @@ namespace vg
     typename Transform<SPACE_TYPE>::VectorType Transform<SPACE_TYPE>::getScale() const
     {
         VectorType scale = m_localScale;
-        auto curr = m_pParent;
+        auto curr = dynamic_cast<Type *>(m_pParent);
         while (curr != nullptr)
         {
             scale = curr->m_localScale * scale;
-            curr = curr->m_pParent;
+            curr = dynamic_cast<Type *>(curr->m_pParent);
         }
         return scale;
     }
@@ -305,49 +402,6 @@ namespace vg
     }
 
     template <SpaceType SPACE_TYPE>
-    void Transform<SPACE_TYPE>::_setParentOnly(Type *pNewParent)
-    {
-        m_pParent = pNewParent;
-    }
-
-    template <SpaceType SPACE_TYPE>
-    void Transform<SPACE_TYPE>::_addChildOnly(Type *pNewChild)
-    {
-        m_arrPChildren.push_back(pNewChild);
-        m_mapPChildren[pNewChild->getID()] = pNewChild;
-    }
-
-    template <SpaceType SPACE_TYPE>
-    void Transform<SPACE_TYPE>::_addChildOnly(Type *pNewChild, typename std::vector<Type *>::const_iterator pos)
-    {
-        if (_isChild(pNewChild))
-        {
-            auto removed = std::remove(m_arrPChildren.begin(), m_arrPChildren.end(), pNewChild);
-            m_arrPChildren.erase(removed, m_arrPChildren.end());
-            m_arrPChildren.insert(pos, pNewChild);
-        }
-        else
-        {
-            m_arrPChildren.insert(pos, pNewChild);
-            m_mapPChildren[pNewChild->getID()] = pNewChild;
-        }
-    }
-
-    template <SpaceType SPACE_TYPE>
-    void Transform<SPACE_TYPE>::_removeChildOnly(Type *pChild)
-    {
-        auto removed = std::remove(m_arrPChildren.begin(), m_arrPChildren.end(), pChild);
-        m_arrPChildren.erase(removed, m_arrPChildren.end());
-        m_mapPChildren.erase(pChild->getID());
-    }
-
-    template <SpaceType SPACE_TYPE>
-    inline Bool32 Transform<SPACE_TYPE>::_isChild(const Type *pTransform) const
-    {
-        return m_mapPChildren.find(pTransform->getID()) != m_mapPChildren.cend();
-    }
-
-    template <SpaceType SPACE_TYPE>
     typename void Transform<SPACE_TYPE>::_setLocalPositionOnly(PointType position)
     {
         m_localPosition = position;
@@ -388,11 +442,11 @@ namespace vg
         {
             matrix = m_localMatrix;
         }
-        auto curr = m_pParent;
+        auto curr = dynamic_cast<Type *>(m_pParent);
         while (curr != nullptr)
         {
             matrix = curr->m_localMatrix * matrix;
-            curr = curr->m_pParent;
+            curr = dynamic_cast<Type *>(curr->m_pParent);
         }
         return matrix;
     }

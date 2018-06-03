@@ -4,6 +4,7 @@ namespace vg
 {
 //BaseObject
     BaseObject::BaseObject()
+        : m_pTransform()
     {
 
     }
@@ -37,14 +38,21 @@ namespace vg
 //DimObject
     template <SpaceType SPACE_TYPE>
     DimObject<SPACE_TYPE>::DimObject()
-        : m_pTransform(new TransformType())
+        : BaseObject()
     {
+        m_pTransform = std::shared_ptr<BaseTransform>(new TransformType());
     }
-  
+
     template <SpaceType SPACE_TYPE>
-    typename DimObject<SPACE_TYPE>::TransformType * DimObject<SPACE_TYPE>::getTransform() const
+    const typename DimObject<SPACE_TYPE>::TransformType *DimObject<SPACE_TYPE>::getTransform() const
     {
-        return m_pTransform.get();
+        return dynamic_cast<const TransformType *>(m_pTransform.get());
+    }
+
+    template <SpaceType SPACE_TYPE>
+    typename DimObject<SPACE_TYPE>::TransformType *DimObject<SPACE_TYPE>::getTransform()
+    {
+        return dynamic_cast<TransformType *>(m_pTransform.get());
     }
 
     //template instantiation
@@ -55,8 +63,7 @@ namespace vg
 //Object
     template <SpaceType SPACE_TYPE>
     Object<SPACE_TYPE>::Object()
-        : BaseObject()
-        , DimObject<SPACE_TYPE>()
+        : DimObject<SPACE_TYPE>()
     {
 
     }

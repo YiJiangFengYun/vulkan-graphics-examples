@@ -19,6 +19,8 @@ namespace vg
         void detachChildren();
         const BaseTransform * const * getChildren() const;
         BaseTransform * const * getChildren();
+
+        void setParent(BaseTransform *pParent);
     protected:
         BaseTransform *m_pParent;
         std::unordered_map<InstanceID, BaseTransform *> m_mapPChildren;
@@ -37,7 +39,6 @@ namespace vg
 
         const BaseTransform *_getParent() const;
         BaseTransform *_getParent();
-        void _setParent(BaseTransform *pParent);
 
         const BaseTransform *_getRoot() const;
         BaseTransform *_getRoot();

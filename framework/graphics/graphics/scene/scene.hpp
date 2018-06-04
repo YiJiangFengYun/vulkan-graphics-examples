@@ -20,14 +20,14 @@ namespace vg
         Bool32 getIsLeftHand() const;
         void setIsRightHand(Bool32 isRightHand);
         void setIsLeftHand(Bool32 isLeftHand);
-        void beginRender() const;
-        void endRender() const;
+        void beginRender();
+        void endRender();
     protected:
         SpaceType m_spaceType;
         Bool32 m_isRightHand;
 
-        virtual void _beginRender() const;
-        virtual void _endRender() const;
+        virtual void _beginRender();
+        virtual void _endRender();
     };
 
     template <SpaceType SPACE_TYPE>
@@ -116,8 +116,8 @@ namespace vg
             , VisualObjectType *pParent);
         virtual void _removeVisualObject(VisualObjectType *pTarget);
 
-        virtual void _beginRender() const override;
-        virtual void _endRender() const override;
+        virtual void _beginRender() override;
+        virtual void _endRender() override;
     private:
         template <typename T>
         Bool32 _isHasObject(const T *pTarget

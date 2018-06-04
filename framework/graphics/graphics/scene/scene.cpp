@@ -48,21 +48,21 @@ namespace vg
         }
     }
 
-    void BaseScene::beginRender() const
+    void BaseScene::beginRender()
     {
         _beginRender();
     }
-    void BaseScene::endRender() const
+    void BaseScene::endRender()
     {
         _endRender();
     }
 
-    void BaseScene::_beginRender() const
+    void BaseScene::_beginRender()
     {
         
     }
     
-    void BaseScene::_endRender() const
+    void BaseScene::_endRender()
     { 
         
     }
@@ -278,7 +278,7 @@ namespace vg
     }
 
     template <SpaceType SPACE_TYPE>
-    void Scene<SPACE_TYPE>::_beginRender() const
+    void Scene<SPACE_TYPE>::_beginRender()
     {
         uint32_t len;
         len = static_cast<uint32_t>(m_arrPVisualObjects.size());
@@ -296,7 +296,7 @@ namespace vg
     }
     
     template <SpaceType SPACE_TYPE>
-    void Scene<SPACE_TYPE>::_endRender() const
+    void Scene<SPACE_TYPE>::_endRender()
     {
         uint32_t len;
         len = static_cast<uint32_t>(m_arrPVisualObjects.size());

@@ -336,6 +336,7 @@ namespace vg
         _renderSceneVisualization(sceneInfo, isFirstScene, resultInfo);
     }
 
+    //Render scene light depth
     void Renderer::_renderSceneLights(const SceneInfo &sceneInfo, RenderResultInfo &resultInfo)
     {
         const auto pScene = sceneInfo.pScene;
@@ -344,9 +345,9 @@ namespace vg
 
     void Renderer::_renderSceneVisualization(const SceneInfo &sceneInfo, Bool32 isFirstScene, RenderResultInfo &resultInfo)
     {
-        const auto pScene = sceneInfo.pScene;
-        const auto pCamera = sceneInfo.pCamera;
-        const auto pPostRender = sceneInfo.pPostRender;
+        auto pScene = sceneInfo.pScene;
+        auto pCamera = sceneInfo.pCamera;
+        auto pPostRender = sceneInfo.pPostRender;
         Bool32 preZEnable = m_preZEnable == VG_TRUE && sceneInfo.preZ == VG_TRUE;
         Bool32 postRenderEnable = m_postRenderEnable == VG_TRUE && 
             sceneInfo.pPostRender != nullptr &&

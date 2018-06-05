@@ -45,10 +45,7 @@ namespace vg
         using PointType = typename SpaceTypeInfo<SPACE_TYPE>::PointType;
         using MatrixVectorType = typename SpaceTypeInfo<SPACE_TYPE>::MatrixVectorType;
 
-        const std::shared_ptr<TransformType> pRootTransformForVisualObject;
-        const std::shared_ptr<TransformType> pRootTransformForCamera;
-        const std::shared_ptr<TransformType> pRootTransformForLight;
-        // const std::shared_ptr<TransformType> pRootTransform;
+        const std::shared_ptr<TransformType> pRootTransform;
 
 
         Scene();

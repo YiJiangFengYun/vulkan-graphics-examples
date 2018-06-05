@@ -71,9 +71,7 @@ namespace vg
     template <SpaceType SPACE_TYPE>
     Scene<SPACE_TYPE>::Scene()
         : BaseScene()
-        , pRootTransformForVisualObject(new TransformType())
-        , pRootTransformForCamera(new TransformType())
-        , pRootTransformForLight(new TransformType())
+        , pRootTransform(new TransformType())
     {
         m_spaceType = SPACE_TYPE;
     }
@@ -177,7 +175,7 @@ namespace vg
             , m_arrPCameras
             , m_mapPCameras
             , m_mapTransformIdToCameras
-            , pRootTransformForCamera.get()
+            , pRootTransform.get()
             , pParent
         );
     }
@@ -239,7 +237,7 @@ namespace vg
             , m_arrPLights
             , m_mapPLights
             , m_mapTransformIdToLights
-            , pRootTransformForLight.get()
+            , pRootTransform.get()
             , pParent
         );
     }
@@ -262,7 +260,7 @@ namespace vg
             , m_arrPVisualObjects
             , m_mapPVisualObjects
             , m_mapTransformIdToVisualObjects
-            , pRootTransformForVisualObject.get()
+            , pRootTransform.get()
             , pParent
         );
     }

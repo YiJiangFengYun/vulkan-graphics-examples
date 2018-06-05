@@ -249,7 +249,7 @@ namespace vg
         //allocate enough space for array to storage points.
         std::vector<SceneType::VisualObjectType *> validVisualObjects(visualObjectCount);
         uint32_t validVisualObjectCount(0u);
-        auto pRoot = pScene->pRootTransformForVisualObject;
+        auto pRoot = pScene->pRootTransform;
         fillValidVisualObjects(validVisualObjects
             , validVisualObjectCount
             , pRoot.get()

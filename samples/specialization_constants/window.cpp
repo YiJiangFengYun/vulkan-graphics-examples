@@ -194,12 +194,15 @@ void Window::_createMaterial()
 
         pPass->addSpecializationItem(vk::ShaderStageFlagBits::eFragment, "light_model", 0u, specializationData.lightingModel);
         pPass->addSpecializationItem(vk::ShaderStageFlagBits::eFragment, "toon_desaturation_factor", 1u, specializationData.toonDesaturationFactor);
-
-        vg::PassTextureInfo mainTextureInfo = {
+        vg::PassTextureInfo::TextureInfo itemInfo = {
             m_pTexture.get(),
             nullptr,
             m_pTexture->getSampler("other_sampler"),
             vk::ImageLayout::eUndefined,
+        };
+        vg::PassTextureInfo mainTextureInfo = {
+            1u,
+            &itemInfo,
             VG_PASS_OTHER_MIN_BINDING_PRIORITY,
             vg::ImageDescriptorType::COMBINED_IMAGE_SAMPLER,
             vk::ShaderStageFlagBits::eFragment,

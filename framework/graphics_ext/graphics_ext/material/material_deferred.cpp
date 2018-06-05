@@ -546,11 +546,15 @@ namespace vge
             auto info = m_info;
             for (uint32_t i = 0; i < info.deferredAttachmentCount; ++i) 
             {
-                vg::PassTextureInfo info = {
+                vg::PassTextureInfo::TextureInfo itemInfo = {
                     m_arrPDeferredAttachments[i].get(),
                     nullptr,
                     nullptr,
                     vk::ImageLayout::eUndefined,
+                };
+                vg::PassTextureInfo info = {
+                    1u,
+                    &itemInfo,
                     i + 1, //0 is own by build in buffer data of pass.
                     vg::ImageDescriptorType::INPUT_ATTACHMENT,
                     vk::ShaderStageFlagBits::eFragment,
@@ -563,11 +567,15 @@ namespace vge
         {
             auto pPass = m_pMainPass.get();
             {
-                vg::PassTextureInfo info = {
+                vg::PassTextureInfo::TextureInfo itemInfo = {
                     m_pColorAttachment.get(),
                     nullptr,
                     nullptr,
                     vk::ImageLayout::eUndefined,
+                };
+                vg::PassTextureInfo info = {
+                    1u,
+                    &itemInfo,
                     0u,
                     vg::ImageDescriptorType::COMBINED_IMAGE_SAMPLER,
                     vk::ShaderStageFlagBits::eFragment,
@@ -576,11 +584,15 @@ namespace vge
             }
 
             {
-                vg::PassTextureInfo info = {
+                vg::PassTextureInfo::TextureInfo itemInfo = {
                     m_pDepthStencilAttachment.get(),
                     m_pDepthStencilAttachment->getImageView("only_depth"),
                     nullptr,
                     vk::ImageLayout::eUndefined,
+                };
+                vg::PassTextureInfo info = {
+                    1u,
+                    &itemInfo,
                     1u,
                     vg::ImageDescriptorType::COMBINED_IMAGE_SAMPLER,
                     vk::ShaderStageFlagBits::eFragment,

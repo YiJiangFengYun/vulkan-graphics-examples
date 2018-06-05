@@ -184,11 +184,15 @@ void Window::_createMaterial()
         pPass->setBuildInDataInfo(buildInDataInfo);
         pPass->setCullMode(vk::CullModeFlagBits::eFront);
         pPass->setFrontFace(vk::FrontFace::eClockwise);
-        vg::PassTextureInfo mainTextureInfo = {
+        vg::PassTextureInfo::TextureInfo itemInfo = {
             m_pCubeMapTex.get(),
             nullptr,
             m_pCubeMapTex->getSampler("other_sampler"),
             vk::ImageLayout::eUndefined,
+        };
+        vg::PassTextureInfo mainTextureInfo = {
+            1u,
+            &itemInfo,
             VG_PASS_OTHER_MIN_BINDING_PRIORITY,
             vg::ImageDescriptorType::COMBINED_IMAGE_SAMPLER,
             vk::ShaderStageFlagBits::eFragment,
@@ -227,11 +231,15 @@ void Window::_createMaterial()
         depthStencilState.depthWriteEnable = VG_TRUE;
         depthStencilState.depthCompareOp = vk::CompareOp::eLessOrEqual;
         pPass->setDepthStencilInfo(depthStencilState);
-        vg::PassTextureInfo mainTextureInfo = {
+        vg::PassTextureInfo::TextureInfo itemInfo = {
             m_pCubeMapTex.get(),
             nullptr,
             m_pCubeMapTex->getSampler("other_sampler"),
             vk::ImageLayout::eUndefined,
+        };
+        vg::PassTextureInfo mainTextureInfo = {
+            1u,
+            &itemInfo,
             VG_PASS_OTHER_MIN_BINDING_PRIORITY,
             vg::ImageDescriptorType::COMBINED_IMAGE_SAMPLER,
             vk::ShaderStageFlagBits::eFragment,

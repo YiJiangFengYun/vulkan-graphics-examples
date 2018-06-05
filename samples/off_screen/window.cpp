@@ -298,21 +298,29 @@ void Window::_createMaterial()
         depthStencilState.depthWriteEnable = VG_TRUE;
         depthStencilState.depthCompareOp = vk::CompareOp::eLessOrEqual;
         pPass->setDepthStencilInfo(depthStencilState);
-        vg::PassTextureInfo mainTextureInfo = {
+        vg::PassTextureInfo::TextureInfo mainTextureItemInfo = {
             m_pTexturePlane.get(),
             nullptr,
             m_pTexturePlane->getSampler("other_sampler"),
             vk::ImageLayout::eUndefined,
+        };
+        vg::PassTextureInfo mainTextureInfo = {
+            1u,
+            &mainTextureItemInfo,
             VG_PASS_OTHER_MIN_BINDING_PRIORITY,
             vg::ImageDescriptorType::COMBINED_IMAGE_SAMPLER,
             vk::ShaderStageFlagBits::eFragment,
         };
         pPass->addTexture("main_texture", mainTextureInfo);
-        vg::PassTextureInfo offscreenTextureInfo = {
+        vg::PassTextureInfo::TextureInfo offscreenTextureItemInfo = {
             m_pOffScreenTex.get(),
             nullptr,
             nullptr,
             vk::ImageLayout::eUndefined,
+        };
+        vg::PassTextureInfo offscreenTextureInfo = {
+            1u,
+            &offscreenTextureItemInfo,
             VG_PASS_OTHER_MIN_BINDING_PRIORITY + 1,
             vg::ImageDescriptorType::COMBINED_IMAGE_SAMPLER,
             vk::ShaderStageFlagBits::eFragment,

@@ -43,17 +43,26 @@ namespace vg
     };
 
     struct PassTextureInfo {
-        const Texture *pTexture;
-        const Texture::ImageView *pImageView;
-        const Texture::Sampler *pSampler;
-        vk::ImageLayout imageLayout;            
+        struct TextureInfo {
+            const Texture *pTexture;
+            const Texture::ImageView *pImageView;
+            const Texture::Sampler *pSampler;
+            vk::ImageLayout imageLayout;
+            TextureInfo(const Texture *pTexture = nullptr
+                , const Texture::ImageView *pImageView = nullptr
+                , const Texture::Sampler *pSampler = nullptr
+                , vk::ImageLayout imageLayout = vk::ImageLayout::eUndefined
+            );
+            TextureInfo(const TextureInfo &);
+            TextureInfo& operator=(const TextureInfo &);
+        };
+        uint32_t textureCount;
+        const TextureInfo *pTextures;
         uint32_t bindingPriority;
         ImageDescriptorType descriptorType;
         vk::ShaderStageFlags stageFlags;
-        PassTextureInfo(const Texture *pTexture = nullptr
-            , const Texture::ImageView *pImageView = nullptr
-            , const Texture::Sampler *pSampler = nullptr
-            , vk::ImageLayout imageLayout = vk::ImageLayout::eUndefined
+        PassTextureInfo(uint32_t textureCount = 0u
+            , const TextureInfo *pTextures = nullptr
             , uint32_t bindingPriority = 0u
             , ImageDescriptorType descriptorType = ImageDescriptorType::COMBINED_IMAGE_SAMPLER
             , vk::ShaderStageFlags stageFlags = vk::ShaderStageFlagBits::eFragment
@@ -62,22 +71,65 @@ namespace vg
         PassTextureInfo& operator=(const PassTextureInfo &);
     };
 
+    struct PassTextureData {
+        std::vector<PassTextureInfo::TextureInfo> textures;
+        uint32_t bindingPriority;
+        ImageDescriptorType descriptorType;
+        vk::ShaderStageFlags stageFlags;
+        PassTextureData(std::vector<PassTextureInfo::TextureInfo> textures = {}
+            , uint32_t bindingPriority = 0u
+            , ImageDescriptorType descriptorType = ImageDescriptorType::COMBINED_IMAGE_SAMPLER
+            , vk::ShaderStageFlags stageFlags = vk::ShaderStageFlagBits::eFragment
+            );
+        PassTextureData(const PassTextureData &);
+        PassTextureData(const PassTextureInfo &);
+        PassTextureData& operator=(const PassTextureData &);
+        PassTextureData& operator=(const PassTextureInfo &);
+        PassTextureInfo getTextureInfo() const;
+    };
+
     struct PassBufferInfo {
-        const BufferData *pBuffer;
-        uint32_t offset;
-        uint32_t range;
+        struct BufferInfo {
+            const BufferData *pBuffer;
+            uint32_t offset;
+            uint32_t range;
+            BufferInfo(const BufferData *pBuffer = nullptr
+                , uint32_t offset = 0u
+                , uint32_t range = 0u
+            );
+            BufferInfo(const BufferInfo &);
+            BufferInfo& operator=(const BufferInfo &);
+        };
+        uint32_t bufferCount;
+        const BufferInfo *pBuffers;
         uint32_t bindingPriority;
         BufferDescriptorType descriptorType;
         vk::ShaderStageFlags stageFlags;
-        PassBufferInfo(const BufferData *pBuffer = nullptr
-            , uint32_t offset = 0u
-            , uint32_t range = 0u
+        PassBufferInfo(uint32_t bufferCount = 0u
+            , const BufferInfo *pBuffers = nullptr
             , uint32_t bindingPriority = 0u
             , BufferDescriptorType descriptorType = BufferDescriptorType::UNIFORM_BUFFER
             , vk::ShaderStageFlags stageFlags = vk::ShaderStageFlags()
             );
         PassBufferInfo(const PassBufferInfo &);
         PassBufferInfo& operator=(const PassBufferInfo &);
+    };
+
+    struct PassBufferData {
+        std::vector<PassBufferInfo::BufferInfo> buffers;
+        uint32_t bindingPriority;
+        BufferDescriptorType descriptorType;
+        vk::ShaderStageFlags stageFlags;
+        PassBufferData(std::vector<PassBufferInfo::BufferInfo> buffers = {}
+            , uint32_t bindingPriority = 0u
+            , BufferDescriptorType descriptorType = BufferDescriptorType::UNIFORM_BUFFER
+            , vk::ShaderStageFlags stageFlags = vk::ShaderStageFlags()
+            );
+        PassBufferData(const PassBufferData &);
+        PassBufferData(const PassBufferInfo &);
+        PassBufferData& operator=(const PassBufferData &);
+        PassBufferData& operator=(const PassBufferInfo &);
+        PassBufferInfo getBufferInfo() const;
     };
 
 
@@ -107,10 +159,10 @@ namespace vg
         std::unordered_map<std::string, PassDataSizeInfo> mapDataSizeInfos;
 
         std::vector<std::string> arrBufferNames;
-        std::unordered_map<std::string, PassBufferInfo> mapBuffers;
+        std::unordered_map<std::string, PassBufferData> mapBuffers;
 
         std::vector<std::string> arrTexNames;
-        std::unordered_map<std::string, PassTextureInfo> mapTextures;
+        std::unordered_map<std::string, PassTextureData> mapTextures;
 
         std::vector<std::string> arrExtUniformBufferNames;
         std::unordered_map<std::string, PassExtUniformBufferInfo> mapExtUniformBuffers;
@@ -121,14 +173,16 @@ namespace vg
         Bool32 hasBuffer(std::string name) const;
         void addBuffer(std::string name, const PassBufferInfo &bufferInfo);
         void removeBuffer(std::string name);
-        const PassBufferInfo &getBuffer(std::string name) const;
+        PassBufferInfo getBufferInfo(std::string name) const;
+        const PassBufferData &getBufferData(std::string name) const;
         void setBuffer(std::string name, const PassBufferInfo &bufferInfo);
 
         const std::vector<std::string> getArrTextureNames() const;
         Bool32 hasTexture(std::string name) const;
         void addTexture(std::string name, const PassTextureInfo &texInfo);
         void removeTexture(std::string name);
-        const PassTextureInfo &getTexture(std::string name) const;
+        PassTextureInfo getTextureInfo(std::string name) const;
+        const PassTextureData &getTextureData(std::string name) const;
         void setTexture(std::string name, const PassTextureInfo &texInfo);
 
         const std::vector<std::string> getExtUniformBufferNames() const;

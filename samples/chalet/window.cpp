@@ -139,11 +139,15 @@ namespace chalet
         depthStencilStateInfo.depthWriteEnable = VG_TRUE;
         depthStencilStateInfo.depthCompareOp = vk::CompareOp::eLess;
         pPass->setDepthStencilInfo(depthStencilStateInfo);
-        vg::PassTextureInfo mainTextureInfo = {
+        vg::PassTextureInfo::TextureInfo itemInfo = {
             m_pTexture.get(),
             nullptr,
             nullptr,
             vk::ImageLayout::eUndefined,
+        };
+        vg::PassTextureInfo mainTextureInfo = {
+            1u,
+            &itemInfo,
             VG_PASS_OTHER_MIN_BINDING_PRIORITY,
             vg::ImageDescriptorType::COMBINED_IMAGE_SAMPLER,
             vk::ShaderStageFlagBits::eFragment,

@@ -377,12 +377,12 @@ namespace vg
             std::string name;
             uint32_t bindingPriority;
             Bool32 isTexture;
-            const void *pInfo;
+            const void *pData;
 
             BufferTextureSortInfo(std::string name = nullptr
                 , uint32_t bindingPriority = 0u
                 , Bool32 isTexture = VG_FALSE
-                , const void *pInfo = nullptr
+                , const void *pData = nullptr
                 );
         };
         static Bool32 _compareBufferTextureInfo(const BufferTextureSortInfo &, const BufferTextureSortInfo &);

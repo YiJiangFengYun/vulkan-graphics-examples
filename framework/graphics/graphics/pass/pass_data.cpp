@@ -52,18 +52,111 @@ namespace vg
         return static_cast<uint32_t>(std::ceil(size / minOffsetAlignment) * minOffsetAlignment);
     }
 
-    PassTextureInfo::PassTextureInfo(const Texture *pTexture
+    PassTextureInfo::TextureInfo::TextureInfo(const Texture *pTexture
         , const Texture::ImageView *pImageView
         , const Texture::Sampler *pSampler
         , vk::ImageLayout imageLayout
-        , uint32_t bindingPriority
-        , ImageDescriptorType descriptorType
-        , vk::ShaderStageFlags stageFlags
-    )
+        )
         : pTexture(pTexture)
         , pImageView(pImageView)
         , pSampler(pSampler)
         , imageLayout(imageLayout)
+    {
+
+    }
+
+    PassTextureInfo::TextureInfo::TextureInfo(const TextureInfo &target)
+        : pTexture(target.pTexture)
+        , pImageView(target.pImageView)
+        , pSampler(target.pSampler)
+        , imageLayout(target.imageLayout)
+    {
+
+    }
+            
+    PassTextureInfo::TextureInfo& PassTextureInfo::TextureInfo::operator=(const TextureInfo &target)
+    {
+        pTexture = target.pTexture;
+        pImageView = target.pImageView;
+        pSampler = target.pSampler;
+        imageLayout = target.imageLayout;
+        return *this;
+    }
+
+    PassTextureData::PassTextureData(std::vector<PassTextureInfo::TextureInfo> textures
+        , uint32_t bindingPriority
+        , ImageDescriptorType descriptorType
+        , vk::ShaderStageFlags stageFlags
+        )
+        : textures(textures)
+        , bindingPriority(bindingPriority)
+        , descriptorType(descriptorType)
+        , stageFlags(stageFlags)
+    {
+
+    }
+        
+    PassTextureData::PassTextureData(const PassTextureData &target)
+        : textures(target.textures)
+        , bindingPriority(target.bindingPriority)
+        , descriptorType(target.descriptorType)
+        , stageFlags(target.stageFlags)
+    {
+
+    }
+        
+    PassTextureData::PassTextureData(const PassTextureInfo &target)
+        : textures()
+        , bindingPriority(target.bindingPriority)
+        , descriptorType(target.descriptorType)
+        , stageFlags(target.stageFlags)
+    {
+        textures.resize(target.textureCount);
+        memcpy(textures.data(), target.pTextures, 
+            sizeof(PassTextureInfo::TextureInfo) * static_cast<size_t>(target.textureCount));
+    }
+        
+    PassTextureData &PassTextureData::operator=(const PassTextureData &target)
+    {
+        textures = target.textures;
+        bindingPriority = target.bindingPriority;
+        descriptorType = target.descriptorType;
+        stageFlags = target.stageFlags;
+        return *this;
+    }
+        
+    PassTextureData &PassTextureData::operator=(const PassTextureInfo &target)
+    {
+        textures.resize(target.textureCount);
+        memcpy(textures.data(), target.pTextures, 
+            sizeof(PassTextureInfo::TextureInfo) * static_cast<size_t>(target.textureCount));
+        
+        bindingPriority = target.bindingPriority;
+        descriptorType = target.descriptorType;
+        stageFlags = target.stageFlags;
+        return *this;
+    }
+        
+    PassTextureInfo PassTextureData::getTextureInfo() const
+    {
+        PassTextureInfo result = {
+            static_cast<uint32_t>(textures.size()),
+            textures.data(),
+            bindingPriority,
+            descriptorType,
+            stageFlags,
+        };
+        return result;
+    }
+
+    PassTextureInfo::PassTextureInfo(uint32_t textureCount
+        , const TextureInfo *pTextures
+        , uint32_t bindingPriority
+        , ImageDescriptorType descriptorType
+        , vk::ShaderStageFlags stageFlags
+        )
+        : textureCount(textureCount)
+        , pTextures(pTextures)
         , bindingPriority(bindingPriority)
         , descriptorType(descriptorType)
         , stageFlags(stageFlags)
@@ -72,10 +165,8 @@ namespace vg
     }
 
     PassTextureInfo::PassTextureInfo(const PassTextureInfo &target)
-        : pTexture(target.pTexture)
-        , pImageView(target.pImageView)
-        , pSampler(target.pSampler)
-        , imageLayout(target.imageLayout)
+        : textureCount(target.textureCount)
+        , pTextures(target.pTextures)
         , bindingPriority(target.bindingPriority)
         , descriptorType(target.descriptorType)
         , stageFlags(target.stageFlags)
@@ -85,27 +176,50 @@ namespace vg
 
     PassTextureInfo& PassTextureInfo::operator=(const PassTextureInfo &target)
     {
-        pTexture = target.pTexture;
-        pImageView = target.pImageView;
-        pSampler = target.pSampler;
-        imageLayout = target.imageLayout;
+        textureCount = target.textureCount;
+        pTextures = target.pTextures;
         bindingPriority = target.bindingPriority;
         descriptorType = target.descriptorType;
         stageFlags = target.stageFlags;
         return *this;
     }
 
-
-    PassBufferInfo::PassBufferInfo(const BufferData *pBuffer
+    PassBufferInfo::BufferInfo::BufferInfo(const BufferData *pBuffer
         , uint32_t offset
         , uint32_t range
-        , uint32_t bindingPriority
-        , BufferDescriptorType descriptorType
-        , vk::ShaderStageFlags stageFlags
         )
         : pBuffer(pBuffer)
         , offset(offset)
         , range(range)
+    {
+
+    }
+        
+    PassBufferInfo::BufferInfo::BufferInfo(const BufferInfo &target)
+        : pBuffer(target.pBuffer)
+        , offset(target.offset)
+        , range(target.range)
+    {
+
+    }
+            
+    PassBufferInfo::BufferInfo &PassBufferInfo::BufferInfo::operator=(const BufferInfo &target)
+    {
+        pBuffer = target.pBuffer;
+        offset = target.offset;
+        range = target.range;
+        return *this;
+    }
+
+
+    PassBufferInfo::PassBufferInfo(uint32_t bufferCount
+        , const BufferInfo *pBuffers
+        , uint32_t bindingPriority
+        , BufferDescriptorType descriptorType
+        , vk::ShaderStageFlags stageFlags
+        )
+        : bufferCount(bufferCount)
+        , pBuffers(pBuffers)
         , bindingPriority(bindingPriority)
         , descriptorType(descriptorType)
         , stageFlags(stageFlags)
@@ -114,9 +228,8 @@ namespace vg
     }
 
     PassBufferInfo::PassBufferInfo(const PassBufferInfo &target)
-        : pBuffer(target.pBuffer)
-        , offset(target.offset)
-        , range(target.range)
+        : bufferCount(target.bufferCount)
+        , pBuffers(target.pBuffers)
         , bindingPriority(target.bindingPriority)
         , descriptorType(target.descriptorType)
         , stageFlags(target.stageFlags)
@@ -126,13 +239,77 @@ namespace vg
 
     PassBufferInfo& PassBufferInfo::operator=(const PassBufferInfo &target)
     {
-        pBuffer = target.pBuffer;
-        offset = target.offset;
-        range = target.range;
+        bufferCount = target.bufferCount;
+        pBuffers = target.pBuffers;
         bindingPriority = target.bindingPriority;
         descriptorType = target.descriptorType;
         stageFlags = target.stageFlags;
         return *this;
+    }
+
+    PassBufferData::PassBufferData(std::vector<PassBufferInfo::BufferInfo> buffers
+        , uint32_t bindingPriority
+        , BufferDescriptorType descriptorType
+        , vk::ShaderStageFlags stageFlags
+        )
+        : buffers(buffers)
+        , bindingPriority(bindingPriority)
+        , descriptorType(descriptorType)
+        , stageFlags(stageFlags)
+    {
+
+    }
+        
+    PassBufferData::PassBufferData(const PassBufferData &target)
+        : buffers(target.buffers)
+        , bindingPriority(target.bindingPriority)
+        , descriptorType(target.descriptorType)
+        , stageFlags(target.stageFlags)
+    {
+
+    }
+        
+    PassBufferData::PassBufferData(const PassBufferInfo &target)
+        : buffers()
+        , bindingPriority(target.bindingPriority)
+        , descriptorType(target.descriptorType)
+        , stageFlags(target.stageFlags)
+    {
+        buffers.resize(target.bufferCount);
+        memcpy(buffers.data(), target.pBuffers, 
+            sizeof(PassBufferInfo::BufferInfo) * static_cast<size_t>(target.bufferCount));
+    }
+        
+    PassBufferData &PassBufferData::operator=(const PassBufferData &target)
+    {
+        buffers = target.buffers;
+        bindingPriority = target.bindingPriority;
+        descriptorType = target.descriptorType;
+        stageFlags = target.stageFlags;
+        return *this;
+    }
+        
+    PassBufferData &PassBufferData::operator=(const PassBufferInfo &target)
+    {
+        buffers.resize(target.bufferCount);
+        memcpy(buffers.data(), target.pBuffers, 
+            sizeof(PassBufferInfo::BufferInfo) * static_cast<size_t>(target.bufferCount));
+        bindingPriority = target.bindingPriority;
+        descriptorType = target.descriptorType;
+        stageFlags = target.stageFlags;
+        return *this;
+    }
+        
+    PassBufferInfo PassBufferData::getBufferInfo() const
+    {
+        PassBufferInfo result = {
+            static_cast<uint32_t>(buffers.size()),
+            buffers.data(),
+            bindingPriority,
+            descriptorType,
+            stageFlags,
+        };
+        return result;
     }
 
     PassExtUniformBufferInfo::PassExtUniformBufferInfo(UniformBufferData *pData
@@ -187,12 +364,13 @@ namespace vg
 
     Bool32 PassData::hasBuffer(std::string name) const
     {
-        return hasValue<PassBufferInfo>(name, mapBuffers);
+        return hasValue<PassBufferData>(name, mapBuffers);
     }
 
     void PassData::addBuffer(std::string name, const PassBufferInfo &bufferInfo)
     {
-        addValue(name, bufferInfo, mapBuffers, arrBufferNames);
+        PassBufferData bufferData(bufferInfo);
+        addValue(name, bufferData, mapBuffers, arrBufferNames);
     }
 
     void PassData::removeBuffer(std::string name)
@@ -200,14 +378,19 @@ namespace vg
         removeValue(name, mapBuffers, arrBufferNames);
     }
 
-    const PassBufferInfo &PassData::getBuffer(std::string name) const
+    PassBufferInfo PassData::getBufferInfo(std::string name) const
+    {
+        return getValue(name, mapBuffers, arrBufferNames).getBufferInfo();
+    }
+
+    const PassBufferData &PassData::getBufferData(std::string name) const
     {
         return getValue(name, mapBuffers, arrBufferNames);
     }
 
     void PassData::setBuffer(std::string name, const PassBufferInfo &bufferInfo)
     {
-        setValue(name, bufferInfo, mapBuffers, arrBufferNames);
+        getValue(name, mapBuffers, arrBufferNames) = bufferInfo;
     }
 
     const std::vector<std::string> PassData::getArrTextureNames() const
@@ -217,12 +400,13 @@ namespace vg
 
     Bool32 PassData::hasTexture(std::string name) const
     {
-        return hasValue<PassTextureInfo>(name, mapTextures);
+        return hasValue<PassTextureData>(name, mapTextures);
     }
         
     void PassData::addTexture(std::string name, const PassTextureInfo &texInfo)
     {
-        addValue(name, texInfo, mapTextures, arrTexNames);
+        PassTextureData textureData(texInfo);
+        addValue(name, textureData, mapTextures, arrTexNames);
     }
         
     void PassData::removeTexture(std::string name)
@@ -230,14 +414,19 @@ namespace vg
         removeValue(name, mapTextures, arrTexNames);
     }
 
-    const PassTextureInfo &PassData::getTexture(std::string name) const
+    PassTextureInfo PassData::getTextureInfo(std::string name) const
+    {
+        return getValue(name, mapTextures, arrTexNames).getTextureInfo();
+    }
+
+    const PassTextureData &PassData::getTextureData(std::string name) const
     {
         return getValue(name, mapTextures, arrTexNames);
     }
 
     void PassData::setTexture(std::string name, const PassTextureInfo &texInfo)
     {
-        setValue(name, texInfo, mapTextures, arrTexNames);
+        getValue(name, mapTextures, arrTexNames) = texInfo;
     }
 
     const std::vector<std::string> PassData::getExtUniformBufferNames() const

@@ -187,7 +187,7 @@ namespace vg
 
     PassBufferInfo Pass::getBuffer(std::string name)
     {
-        return m_data.getBuffer(name);
+        return m_data.getBufferInfo(name);
     }
         
     void Pass::setBuffer(std::string name, const PassBufferInfo &bufferInfo)
@@ -215,7 +215,7 @@ namespace vg
 
     PassTextureInfo Pass::getTexture(std::string name) const
     {
-        return m_data.getTexture(name);
+        return m_data.getTextureInfo(name);
     }
     
     void Pass::setTexture(std::string name, const PassTextureInfo &texInfo)
@@ -816,24 +816,24 @@ namespace vg
             const auto &arrBufferNames = data.arrBufferNames;
             for (const auto &name : arrBufferNames)
             {
-                const auto &bufferInfo = data.getBuffer(name);
+                const auto &bufferData = data.getBufferData(name);
                 BufferTextureSortInfo sortInfo = {
                     name,
-                    bufferInfo.bindingPriority,
+                    bufferData.bindingPriority,
                     VG_FALSE,
-                    reinterpret_cast<const void *>(&bufferInfo),
+                    reinterpret_cast<const void *>(&bufferData),
                 };
                 sortInfos.insert(sortInfo);
             }
             const auto &arrTextureNames = data.arrTexNames;
             for (const auto &name : arrTextureNames)
             {
-                const auto &textureInfo = data.getTexture(name);
+                const auto &textureData = data.getTextureData(name);
                 BufferTextureSortInfo sortInfo = {
                     name,
-                    textureInfo.bindingPriority,
+                    textureData.bindingPriority,
                     VG_TRUE,
-                    reinterpret_cast<const void *>(&textureInfo),
+                    reinterpret_cast<const void *>(&textureData),
                 };
                 sortInfos.insert(sortInfo);
             }
@@ -927,51 +927,58 @@ namespace vg
                     ++currBinding;
                     if (sortInfo.isTexture == VG_TRUE)
                     {
-                        const auto &textureInfo = *(reinterpret_cast<const PassTextureInfo *>(sortInfo.pInfo));
-                        bindingInfo.descriptorType = tranImageDescriptorTypeToVK(textureInfo.descriptorType);
-                        bindingInfo.descriptorCount = 1u;
-                        bindingInfo.stageFlags = textureInfo.stageFlags;
-
-                        const auto pTexture = textureInfo.pTexture != nullptr ? textureInfo.pTexture : pDefaultTexture2D.get();
-                        vk::ImageView imageView;
-                        if (textureInfo.pTexture != nullptr) {
-                            if (textureInfo.pImageView != nullptr) {
-                                imageView = *(textureInfo.pImageView->getImageView());
+                        const auto &textureData = *(reinterpret_cast<const PassTextureData *>(sortInfo.pData));
+                        bindingInfo.descriptorType = tranImageDescriptorTypeToVK(textureData.descriptorType);
+                        bindingInfo.stageFlags = textureData.stageFlags;
+                        auto textureCount = static_cast<uint32_t>(textureData.textures.size());
+                        bindingInfo.descriptorCount = textureCount;
+                        updateDesSetInfo.imageInfos.resize(textureCount);
+                        for (uint32_t i = 0; i < textureCount; ++i)
+                        {
+                            auto oneTexInfo = textureData.textures[i];
+                            const auto pTexture = oneTexInfo.pTexture != nullptr ? oneTexInfo.pTexture : pDefaultTexture2D.get();
+                            vk::ImageView imageView;
+                            if (oneTexInfo.pTexture != nullptr) {
+                                if (oneTexInfo.pImageView != nullptr) {
+                                    imageView = *(oneTexInfo.pImageView->getImageView());
+                                } else {
+                                    imageView = *(pTexture->getImageView()->getImageView());
+                                }
                             } else {
                                 imageView = *(pTexture->getImageView()->getImageView());
                             }
-                        } else {
-                            imageView = *(pTexture->getImageView()->getImageView());
+                            vk::Sampler sampler;
+                            if (oneTexInfo.pSampler != nullptr) {
+                                sampler = *(oneTexInfo.pSampler->getSampler());
+                            } else {
+                                sampler = *(pTexture->getSampler()->getSampler());
+                            }
+                            vk::ImageLayout imageLayout;
+                            if (oneTexInfo.imageLayout != vk::ImageLayout::eUndefined) {
+                                imageLayout = oneTexInfo.imageLayout;
+                            } else {
+                                imageLayout = pTexture->getImage()->getInfo().layout;
+                            }
+                            updateDesSetInfo.imageInfos[i].imageView = imageView;
+                            updateDesSetInfo.imageInfos[i].sampler = sampler;
+                            updateDesSetInfo.imageInfos[i].imageLayout = imageLayout;
                         }
-                        vk::Sampler sampler;
-                        if (textureInfo.pSampler != nullptr) {
-                            sampler = *(textureInfo.pSampler->getSampler());
-                        } else {
-                            sampler = *(pTexture->getSampler()->getSampler());
-                        }
-                        vk::ImageLayout imageLayout;
-                        if (textureInfo.imageLayout != vk::ImageLayout::eUndefined) {
-                            imageLayout = textureInfo.imageLayout;
-                        } else {
-                            imageLayout = pTexture->getImage()->getInfo().layout;
-                        }
-
-                        updateDesSetInfo.imageInfos.resize(1u);
-                        updateDesSetInfo.imageInfos[0].imageView = imageView;
-                        updateDesSetInfo.imageInfos[0].sampler = sampler;
-                        updateDesSetInfo.imageInfos[0].imageLayout = imageLayout;
                     }
                     else
                     {
-                        const auto &bufferInfo = *(reinterpret_cast<const PassBufferInfo *>(sortInfo.pInfo));
-                        bindingInfo.descriptorType = tranBufferDescriptorTypeToVK(bufferInfo.descriptorType);
-                        bindingInfo.descriptorCount = 1u;
-                        bindingInfo.stageFlags = bufferInfo.stageFlags;
-
-                        updateDesSetInfo.bufferInfos.resize(1u);
-                        updateDesSetInfo.bufferInfos[0].buffer = *(bufferInfo.pBuffer->getBuffer());
-                        updateDesSetInfo.bufferInfos[0].offset = bufferInfo.offset;
-                        updateDesSetInfo.bufferInfos[0].range = bufferInfo.range;
+                        const auto &bufferData = *(reinterpret_cast<const PassBufferData *>(sortInfo.pData));
+                        bindingInfo.descriptorType = tranBufferDescriptorTypeToVK(bufferData.descriptorType);
+                        bindingInfo.stageFlags = bufferData.stageFlags;
+                        auto bufferCount = static_cast<uint32_t>(bufferData.buffers.size());
+                        bindingInfo.descriptorCount = bufferCount;
+                        updateDesSetInfo.bufferInfos.resize(bufferCount);                        
+                        for (uint32_t i = 0; i < bufferCount; ++i)
+                        {
+                            auto oneBufferInfo = bufferData.buffers[i];
+                            updateDesSetInfo.bufferInfos[i].buffer = *(oneBufferInfo.pBuffer->getBuffer());
+                            updateDesSetInfo.bufferInfos[i].offset = oneBufferInfo.offset;
+                            updateDesSetInfo.bufferInfos[i].range = oneBufferInfo.range;
+                        }
                     }
                     bufferTextureBindingInfos[bufferTextureBindingIndex] = bindingInfo;
                     bufferTextureUpdateDesSetInfos[bufferTextureBindingIndex] = updateDesSetInfo;
@@ -1579,12 +1586,12 @@ namespace vg
     Pass::BufferTextureSortInfo::BufferTextureSortInfo(std::string name
         , uint32_t bindingPriority
         , Bool32 isTexture
-        , const void *pInfo
+        , const void *pData
         )
         : name(name)
         , bindingPriority(bindingPriority)
         , isTexture(isTexture)
-        , pInfo(pInfo)
+        , pData(pData)
     {
 
     }

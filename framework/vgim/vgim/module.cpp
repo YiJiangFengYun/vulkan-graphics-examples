@@ -462,11 +462,15 @@ namespace vgim
 
         //main texture
         std::string name = "main_texture";
-        vg::PassTextureInfo info = {
+        vg::PassTextureInfo::TextureInfo itemInfo = {
             m_pFontTexture.get(),
             nullptr,
             nullptr,
             vk::ImageLayout::eUndefined,
+        };
+        vg::PassTextureInfo info = {
+            1u,
+            &itemInfo,
             VG_PASS_OTHER_MIN_BINDING_PRIORITY,
             vg::ImageDescriptorType::COMBINED_IMAGE_SAMPLER,
             vk::ShaderStageFlagBits::eFragment,

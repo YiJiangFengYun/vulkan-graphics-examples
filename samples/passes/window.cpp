@@ -324,12 +324,15 @@ void Window::_createMaterial()
         colorBlendState.attachmentCount = attachmentCount;
         colorBlendState.pAttachments = attachmentStates;
         pPass->setColorBlendInfo(colorBlendState);
-
-        vg::PassTextureInfo mainTextureInfo = {
+        vg::PassTextureInfo::TextureInfo itemInfo = {
             m_pTextureOfSceneGlass.get(),
             nullptr,
             m_pSamplerOfSceneGlass,
             vk::ImageLayout::eUndefined,
+        };
+        vg::PassTextureInfo mainTextureInfo = {
+            1u,
+            &itemInfo,
             VG_PASS_OTHER_MIN_BINDING_PRIORITY,
             vg::ImageDescriptorType::COMBINED_IMAGE_SAMPLER,
             vk::ShaderStageFlagBits::eFragment,

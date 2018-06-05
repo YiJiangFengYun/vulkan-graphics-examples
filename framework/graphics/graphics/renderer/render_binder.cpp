@@ -161,11 +161,15 @@ namespace vg
                     if ((*(buildInDataInfo.pComponent + j)).type == Pass::BuildInDataType::POST_RENDER_RESULT)
                     {
                         auto pColorTex = pPostRenderTarget->getColorAttachment();
-                        PassTextureInfo info = {
+                        vg::PassTextureInfo::TextureInfo itemInfo = {
                             pColorTex,
                             nullptr,
                             nullptr,
                             vk::ImageLayout::eUndefined,
+                        };
+                        PassTextureInfo info = {
+                            1u,
+                            &itemInfo,
                             VG_PASS_POST_RENDER_TEXTURE_BINDING_PRIORITY,
                             vg::ImageDescriptorType::COMBINED_IMAGE_SAMPLER,
                             vk::ShaderStageFlagBits::eFragment,
@@ -857,11 +861,15 @@ namespace vg
                     {
                         if (pPreZTarget != nullptr)
                         {
-                            PassTextureInfo info = {
+                            vg::PassTextureInfo::TextureInfo itemInfo = {
                                 pPreZTarget->getDepthAttachment(),
                                 nullptr,
                                 nullptr,
                                 vk::ImageLayout::eUndefined,
+                            };
+                            PassTextureInfo info = {
+                                1u,
+                                &itemInfo,
                                 VG_PASS_PRE_Z_TEXTURE_BINDING_PRIORITY,
                                 vg::ImageDescriptorType::COMBINED_IMAGE_SAMPLER,
                                 vk::ShaderStageFlagBits::eFragment,

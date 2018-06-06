@@ -302,6 +302,7 @@ namespace vg
                     , modelMatrix
                     , viewMatrix
                     , projMatrix
+                    , pScene
                     , pPreZTarget
 #if defined(DEBUG) && defined(VG_ENABLE_COST_TIMER)
                     , preparingBuildInDataCostTimer
@@ -610,6 +611,7 @@ namespace vg
                         , modelMatrix
                         , viewMatrix
                         , projMatrix
+                        , pScene
                         , pPreZTarget
 #if defined(DEBUG) && defined(VG_ENABLE_COST_TIMER)
                         , preparingBuildInDataCostTimer
@@ -771,6 +773,7 @@ namespace vg
         , Matrix4x4 modelMatrix
         , Matrix4x4 viewMatrix
         , Matrix4x4 projMatrix
+        , BaseScene *pScene
         , const PreZTarget *pPreZTarget
 #if defined(DEBUG) && defined(VG_ENABLE_COST_TIMER)
         , fd::CostTimer * pPreparingBuildInDataCostTimer
@@ -856,6 +859,34 @@ namespace vg
                     else if (type == Pass::BuildInDataType::MATRIX_PROJECTION)
                     {
                         pPass->setBuildInMatrixData(type, projMatrix);
+                    }
+                    else if (type == Pass::BuildInDataType::LIGHTS_DATA)
+                    {
+                        if (pScene->getRegisterLightCount() > 0)
+                        {
+                            vg::PassBufferInfo::BufferInfo itemInfo = {
+                                &pScene->getLightDataBuffer(),
+                                0u,
+                                pScene->getLightDataBuffer().getBufferSize(),
+                            };
+                            PassBufferInfo info = {
+                                1u,
+                                &itemInfo,
+                                VG_PASS_LIGHT_DATA_BUFFER_BINDING_PRIORITY,
+                                vg::BufferDescriptorType::UNIFORM_BUFFER,
+                                vk::ShaderStageFlagBits::eVertex | vk::ShaderStageFlagBits::eFragment
+                            };
+                            if (pPass->hasBuffer(VG_PASS_LIGHT_DATA_BUFFER_NAME) == VG_FALSE)
+                            {
+                                pPass->addBuffer(VG_PASS_LIGHT_DATA_BUFFER_NAME, info);
+                            }
+                            else
+                            {
+                                pPass->setBuffer(VG_PASS_LIGHT_DATA_BUFFER_NAME, info);
+                            }
+                        }
+                        // pPass->
+
                     }
                     else if (type == Pass::BuildInDataType::PRE_Z_DEPTH_RESULT)
                     {

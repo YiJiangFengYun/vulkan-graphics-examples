@@ -97,6 +97,7 @@ namespace vg
             , Matrix4x4 modelMatrix
             , Matrix4x4 viewMatrix
             , Matrix4x4 projMatrix
+            , BaseScene *pScene            
             , const PreZTarget *pPreZTarget
 #if defined(DEBUG) && defined(VG_ENABLE_COST_TIMER)
         , fd::CostTimer * pPreparingBuildInDataCostTimer

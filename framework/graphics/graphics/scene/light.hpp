@@ -9,7 +9,7 @@ namespace vg
     {
     public:
         BaseLight();
-
+        virtual void memcpyLightData(void *pDst) const = 0;
     protected:
 
     };

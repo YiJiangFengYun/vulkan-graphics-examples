@@ -3,14 +3,27 @@
 
 #include <vector>
 #include <unordered_map>
+#include <typeinfo>
+#include <typeindex>
 #include "graphics/util/util.hpp"
 #include "graphics/scene/object.hpp"
 #include "graphics/scene/visual_object.hpp"
 #include "graphics/scene/camera.hpp"
 #include "graphics/scene/light.hpp"
+#include "graphics/buffer_data/buffer_data.hpp"
 
+#define VG_DEFAULT_SCENE_MAX_LIGHT_COUNT 10u
 namespace vg
 {
+    struct LightInfo {
+        uint32_t bindingPriority;        
+        uint32_t maxLightCount;
+        uint32_t lightDataSize;
+        LightInfo(uint32_t bindingPriority = 0u
+            , uint32_t maxLightCount = VG_DEFAULT_SCENE_MAX_LIGHT_COUNT
+            , uint32_t lightDataSize = 0u
+            );
+    };
     class BaseScene : public Base
     {
     public:
@@ -20,14 +33,25 @@ namespace vg
         Bool32 getIsLeftHand() const;
         void setIsRightHand(Bool32 isRightHand);
         void setIsLeftHand(Bool32 isLeftHand);
+        uint32_t getRegisterLightCount() const;
+        Bool32 isHasRegisterLight(const std::type_info &lightTypeInfo) const;
+        void registerLight(const std::type_info &lightTypeInfo, const LightInfo &lightInfo);
+        void unregisterLight(const std::type_info &lightTypeInfo);
+        const BufferData &getLightDataBuffer() const;
         void beginRender();
         void endRender();
     protected:
         SpaceType m_spaceType;
         Bool32 m_isRightHand;
+        BufferData m_lightDataBuffer;
+        std::vector<const std::type_info *> m_arrRegisteredLights;
+        std::unordered_map<std::type_index, LightInfo> m_mapRegisteredLights;
 
+        virtual void _registerLight(const std::type_info &lightTypeInfo, const LightInfo &lightInfo);
+        virtual void _unregisterLight(const std::type_info &lightTypeInfo);
         virtual void _beginRender();
         virtual void _endRender();
+        virtual void _syncLightData() = 0;
     };
 
     template <SpaceType SPACE_TYPE>
@@ -108,15 +132,14 @@ namespace vg
         std::vector<LightType *> m_arrPLights;
         std::unordered_map<InstanceID, LightType *> m_mapPLights;
         std::unordered_map<InstanceID, LightType *> m_mapTransformIdToLights;
-        // virtual void _addVisualObject(VisualObjectType *pTarget
-        //     , VisualObjectType *pParent);
-        // virtual void _removeVisualObject(VisualObjectType *pTarget);
+        std::unordered_map<std::type_index, std::vector<LightType *>> m_mapLightGroups;
 
-        // virtual void _registerLight(const std::type_info &lightTypeInfo, const LightInfo &lightInfo) override;
-        // virtual void _unregisterLight(const std::type_info &lightTypeInfo) override;
+        virtual void _registerLight(const std::type_info &lightTypeInfo, const LightInfo &lightInfo) override;
+        virtual void _unregisterLight(const std::type_info &lightTypeInfo) override;
 
         virtual void _beginRender() override;
         virtual void _endRender() override;
+        virtual void _syncLightData() override;
     private:
         template <typename T>
         Bool32 _isHasObject(const T *pTarget

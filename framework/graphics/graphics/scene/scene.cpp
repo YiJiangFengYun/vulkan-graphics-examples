@@ -2,9 +2,24 @@
 
 namespace vg
 {
+    LightInfo::LightInfo(uint32_t bindingPriority
+        , uint32_t maxLightCount
+        , uint32_t lightDataSize
+        )
+        : bindingPriority(bindingPriority)
+        , maxLightCount(maxLightCount)
+        , lightDataSize(lightDataSize)
+    {
+
+    }
+
     BaseScene::BaseScene()
         : Base(BaseType::SCENE)
         , m_isRightHand(VG_FALSE)
+        , m_lightDataBuffer(vk::BufferUsageFlagBits::eUniformBuffer
+            , vk::MemoryPropertyFlagBits::eHostVisible)
+        , m_arrRegisteredLights()
+        , m_mapRegisteredLights()
     {
 
     }
@@ -48,18 +63,71 @@ namespace vg
         }
     }
 
+    uint32_t BaseScene::getRegisterLightCount() const
+    {
+        return static_cast<uint32_t>(m_arrRegisteredLights.size());
+    }
+
+    Bool32 BaseScene::isHasRegisterLight(const std::type_info &lightTypeInfo) const
+    {
+        return m_mapRegisteredLights.count(lightTypeInfo) != 0;
+    }
+
+    void BaseScene::registerLight(const std::type_info &lightTypeInfo, const LightInfo &lightInfo)
+    {
+        _registerLight(lightTypeInfo, lightInfo);
+    }
+    
+    void BaseScene::unregisterLight(const std::type_info &lightTypeInfo)
+    {
+        _unregisterLight(lightTypeInfo);
+    }
+
+    const BufferData &BaseScene::getLightDataBuffer() const
+    {
+        return m_lightDataBuffer;
+    }
+
     void BaseScene::beginRender()
     {
         _beginRender();
     }
+
     void BaseScene::endRender()
     {
         _endRender();
     }
 
+    void BaseScene::_registerLight(const std::type_info &lightTypeInfo, const LightInfo &lightInfo)
+    {
+        {
+            const auto &iterator = m_mapRegisteredLights.find(std::type_index(lightTypeInfo));
+            if (iterator != m_mapRegisteredLights.cend())
+            {
+                throw std::runtime_error("Repeatedly register the same light.");
+            }
+            m_mapRegisteredLights.insert({lightTypeInfo, lightInfo});
+        }
+        {
+            auto iterator = std::find(m_arrRegisteredLights.begin(), m_arrRegisteredLights.end(), &lightTypeInfo);
+            if (iterator != m_arrRegisteredLights.end())
+            {
+                throw std::runtime_error("Repeatedly register the same light.");
+            }
+            m_arrRegisteredLights.push_back(&lightTypeInfo);
+        }
+    }
+    
+    void BaseScene::_unregisterLight(const std::type_info &lightTypeInfo)
+    {
+        m_mapRegisteredLights.erase(std::type_index(lightTypeInfo));
+        auto iterator = std::find(m_arrRegisteredLights.begin(), m_arrRegisteredLights.end(), &lightTypeInfo);
+        m_arrRegisteredLights.erase(iterator);
+    }
+
     void BaseScene::_beginRender()
     {
-        
+        _syncLightData();
     }
     
     void BaseScene::_endRender()
@@ -237,12 +305,26 @@ namespace vg
     template <SpaceType SPACE_TYPE>
     Bool32 Scene<SPACE_TYPE>::isHasLight(const LightType *pTarget) const
     {
+#ifdef DEBUG
+        if (isHasRegisterLight(typeid(*pTarget)))
+            throw std::invalid_argument("The light type is not registered.");
+#endif //DEBUG
         return _isHasObject<LightType>(pTarget, m_mapPLights);
     }
 
     template <SpaceType SPACE_TYPE>
     void Scene<SPACE_TYPE>::addLight(LightType *pTarget, LightType *pParent)
     {
+        const auto &typeInfo = typeid(*pTarget);
+#ifdef DEBUG
+        if (isHasRegisterLight(typeInfo))
+            throw std::invalid_argument("The light type is not registered.");
+#endif //DEBUG
+        const auto &lightInfo = m_mapRegisteredLights[std::type_index(typeInfo)];
+#ifdef DEBUG
+        if (getLightCount() == lightInfo.maxLightCount)
+            throw std::runtime_error("Light count of the scene must not more than max light count of the scene.");
+#endif //DEBUG
         _addObject<LightType>(pTarget
             , m_arrPLights
             , m_mapPLights
@@ -250,39 +332,40 @@ namespace vg
             , pRootTransform.get()
             , pParent
         );
+
+        m_mapLightGroups[std::type_index(typeInfo)].push_back(pTarget);
     }
 
     template <SpaceType SPACE_TYPE>
     void Scene<SPACE_TYPE>::removeLight(LightType *pTarget)
     {
+        const auto &typeInfo = typeid(*pTarget);        
+#ifdef DEBUG
+        if (isHasRegisterLight(typeInfo))
+            throw std::invalid_argument("The light type is not registered.");
+#endif //DEBUG
         _removeObject<LightType>(pTarget
             , m_arrPLights
             , m_mapPLights
             , m_mapTransformIdToLights
         );
+
+        auto &lightGroup = m_mapLightGroups[std::type_index(typeInfo)];
+        auto iterator = std::find(lightGroup.begin(), lightGroup.end(), pTarget);
+        lightGroup.erase(iterator);
     }
 
     template <SpaceType SPACE_TYPE>
-    void Scene<SPACE_TYPE>::_addVisualObject(VisualObjectType *pTarget
-        , VisualObjectType *pParent)
+    void Scene<SPACE_TYPE>::_registerLight(const std::type_info &lightTypeInfo, const LightInfo &lightInfo)
     {
-        _addObject<VisualObjectType>(pTarget
-            , m_arrPVisualObjects
-            , m_mapPVisualObjects
-            , m_mapTransformIdToVisualObjects
-            , pRootTransform.get()
-            , pParent
-        );
+        BaseScene::_registerLight(lightTypeInfo, lightInfo);
     }
-
+    
     template <SpaceType SPACE_TYPE>
-    void Scene<SPACE_TYPE>::_removeVisualObject(VisualObjectType *pTarget)
+    void Scene<SPACE_TYPE>::_unregisterLight(const std::type_info &lightTypeInfo)
     {
-        _removeObject<VisualObjectType>(pTarget
-            , m_arrPVisualObjects
-            , m_mapPVisualObjects
-            , m_mapTransformIdToVisualObjects
-        );
+        BaseScene::_unregisterLight(lightTypeInfo);
+        m_mapLightGroups.erase(lightTypeInfo);
     }
 
     template <SpaceType SPACE_TYPE>
@@ -321,6 +404,47 @@ namespace vg
             m_arrPLights[i]->endRender();
         }
         BaseScene::_endRender();
+    }
+
+    template <SpaceType SPACE_TYPE>
+    void Scene<SPACE_TYPE>::_syncLightData()
+    {
+        //coyy and sort array.
+        auto arrRegisteredLights = m_arrRegisteredLights;
+        auto &mapReigsteredLighst = m_mapRegisteredLights;
+        std::sort(arrRegisteredLights.begin(), arrRegisteredLights.end(), [&](const std::type_info *item1, const std::type_info *item2) {
+            const auto &lightInfo1 = mapReigsteredLighst[std::type_index(*item1)];
+            const auto &lightInfo2 = mapReigsteredLighst[std::type_index(*item2)];
+            return lightInfo1.bindingPriority - lightInfo2.bindingPriority;
+        });
+
+        //Caculate totol size of light data.        
+        uint32_t totalSize = 0u;
+        for (const auto pLightTypeInfo : arrRegisteredLights)
+        {
+            const auto &lightInfo = m_mapRegisteredLights[std::type_index(*pLightTypeInfo)];
+            const auto &lightGroup = m_mapLightGroups[std::type_index(*pLightTypeInfo)];
+            uint32_t lightCount = static_cast<uint32_t>(lightGroup.size());
+            totalSize += static_cast<uint32_t>(sizeof(uint32_t));
+            totalSize += lightInfo.lightDataSize * lightCount;
+        }
+        
+        //Allocate memory and copty ligth data to it.
+        std::vector<Byte> memory(totalSize);
+        uint32_t offset = 0u;
+        for (const auto pLightTypeInfo : arrRegisteredLights)
+        {
+            const auto &lightInfo = m_mapRegisteredLights[std::type_index(*pLightTypeInfo)];
+            const auto &lightGroup = m_mapLightGroups[std::type_index(*pLightTypeInfo)];
+            uint32_t lightCount = static_cast<uint32_t>(lightGroup.size());
+            memcpy(memory.data() + offset, &lightCount, sizeof(uint32_t));
+            offset += static_cast<uint32_t>(sizeof(uint32_t));
+            for (const auto &pLight : lightGroup) {
+                pLight->memcpyLightData(memory.data() + offset);
+                offset += lightInfo.lightDataSize;
+            }
+        }
+        m_lightDataBuffer.updateBuffer(memory.data(), totalSize);
     }
 
     template <SpaceType SPACE_TYPE>

@@ -56,14 +56,16 @@ namespace vg
         , std::unordered_map<InstanceID, T *> &mapTransformToObjs
         )
     {
-        for (auto iter = arr.begin(); iter != arr.end(); ++iter)
-        {
-            if (*iter == pTarget)
-            {
-                arr.erase(iter);
-                break;
-            }
-        }
+        auto iterator = std::find(arr.begin(), arr.end(), pTarget);
+        arr.erase(iterator);
+        // for (auto iter = arr.begin(); iter != arr.end(); ++iter)
+        // {
+        //     if (*iter == pTarget)
+        //     {
+        //         arr.erase(iter);
+        //         break;
+        //     }
+        // }
         map.erase(pTarget->getID());
         mapTransformToObjs.erase(pTarget->getTransform()->getID());
     }

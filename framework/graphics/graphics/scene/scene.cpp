@@ -119,13 +119,23 @@ namespace vg
     template <SpaceType SPACE_TYPE>
     void Scene<SPACE_TYPE>::addVisualObject(VisualObjectType *pTarget, VisualObjectType *pParent)
     {
-        _addVisualObject(pTarget, pParent);
+        _addObject<VisualObjectType>(pTarget
+            , m_arrPVisualObjects
+            , m_mapPVisualObjects
+            , m_mapTransformIdToVisualObjects
+            , pRootTransform.get()
+            , pParent
+        );
     }
 
     template <SpaceType SPACE_TYPE>
     void Scene<SPACE_TYPE>::removeVisualObject(VisualObjectType *pTarget)
     {
-        _removeVisualObject(pTarget);
+        _removeObject<VisualObjectType>(pTarget
+            , m_arrPVisualObjects
+            , m_mapPVisualObjects
+            , m_mapTransformIdToVisualObjects
+        );
     }
 
     template <SpaceType SPACE_TYPE>
@@ -278,6 +288,7 @@ namespace vg
     template <SpaceType SPACE_TYPE>
     void Scene<SPACE_TYPE>::_beginRender()
     {
+        BaseScene::_beginRender();
         uint32_t len;
         len = static_cast<uint32_t>(m_arrPVisualObjects.size());
         for (uint32_t i = 0; i < len; ++i) {
@@ -309,6 +320,7 @@ namespace vg
         for (uint32_t i = 0; i < len; ++i) {
             m_arrPLights[i]->endRender();
         }
+        BaseScene::_endRender();
     }
 
     template <SpaceType SPACE_TYPE>

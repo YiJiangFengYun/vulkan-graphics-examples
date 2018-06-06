@@ -108,10 +108,12 @@ namespace vg
         std::vector<LightType *> m_arrPLights;
         std::unordered_map<InstanceID, LightType *> m_mapPLights;
         std::unordered_map<InstanceID, LightType *> m_mapTransformIdToLights;
+        // virtual void _addVisualObject(VisualObjectType *pTarget
+        //     , VisualObjectType *pParent);
+        // virtual void _removeVisualObject(VisualObjectType *pTarget);
 
-        virtual void _addVisualObject(VisualObjectType *pTarget
-            , VisualObjectType *pParent);
-        virtual void _removeVisualObject(VisualObjectType *pTarget);
+        // virtual void _registerLight(const std::type_info &lightTypeInfo, const LightInfo &lightInfo) override;
+        // virtual void _unregisterLight(const std::type_info &lightTypeInfo) override;
 
         virtual void _beginRender() override;
         virtual void _endRender() override;

@@ -425,11 +425,13 @@ namespace vg
             const auto &lightInfo = m_mapRegisteredLights[std::type_index(*pLightTypeInfo)];
             const auto &lightGroup = m_mapLightGroups[std::type_index(*pLightTypeInfo)];
             uint32_t lightCount = static_cast<uint32_t>(lightGroup.size());
+            //space for count variable.
             totalSize += static_cast<uint32_t>(sizeof(uint32_t));
+            //space for data of this type lights.
             totalSize += lightInfo.lightDataSize * lightCount;
         }
         
-        //Allocate memory and copty ligth data to it.
+        //Allocate memory and copy ligth data to it.
         std::vector<Byte> memory(totalSize);
         uint32_t offset = 0u;
         for (const auto pLightTypeInfo : arrRegisteredLights)

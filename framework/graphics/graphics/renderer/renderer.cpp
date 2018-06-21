@@ -223,7 +223,7 @@ namespace vg
 
     void Renderer::_preRender()
     {
-        m_pipelineCache.start();
+        m_pipelineCache.begin();
     }
 
     void Renderer::_renderBegin(const RenderInfo & info, RenderResultInfo & resultInfo)

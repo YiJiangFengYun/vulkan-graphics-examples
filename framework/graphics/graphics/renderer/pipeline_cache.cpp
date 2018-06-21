@@ -170,7 +170,7 @@ namespace vg
 
     }
 
-    void PipelineCache::start()
+    void PipelineCache::begin()
     {
         m_mapPipelineFullBack = m_mapPipelineFull;
         m_mapPipelineFull.clear();

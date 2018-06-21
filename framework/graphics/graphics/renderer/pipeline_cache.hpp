@@ -74,7 +74,7 @@ namespace vg {
          * When start of new frame calling this mehod to move cache to back and make cache
          * to empty. After rendering process, we will pick useful pipeline from back.
          **/
-        void start();
+        void begin();
         std::shared_ptr<vk::Pipeline> caching(const Info &info);
         /**
          * At end of render of frame, we call this method to delete all unuseful pipeline in back.

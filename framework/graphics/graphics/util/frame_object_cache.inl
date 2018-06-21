@@ -5,8 +5,31 @@ namespace vg
         : m_isDoing()
         , m_mapObjects()
         , m_mapOldObjects()
+        , m_hasCreator()
+        , m_creator()
     {
 
+    }
+
+    template <typename KeyType, typename ObjectType>
+    FrameObjectCache<KeyType, ObjectType>::FrameObjectCache(const Creator &creator)
+        : FrameObjectCache()
+    {
+        m_hasCreator = VG_TRUE;
+        m_creator = creator;
+    }
+
+    template <typename KeyType, typename ObjectType>
+    const typename FrameObjectCache<KeyType, ObjectType>::Creator &FrameObjectCache<KeyType, ObjectType>::getCreator() const
+    {
+        return m_creator;
+    }
+
+    template <typename KeyType, typename ObjectType>
+    void FrameObjectCache<KeyType, ObjectType>::setCreator(const Creator &creator)
+    {
+        m_hasCreator = VG_TRUE;
+        m_creator = creator;
     }
 
     template <typename KeyType, typename ObjectType>
@@ -16,31 +39,33 @@ namespace vg
         m_mapOldObjects = m_mapObjects;
         m_mapObjects.clear();
     }
+
+    template <typename KeyType, typename ObjectType>
+    ObjectType FrameObjectCache<KeyType, ObjectType>::caching(KeyType key)
+    {
+        Bool32 isHas = m_mapOldObjects.count(key) != 0;
+        if (isHas)
+        {
+            auto iterator = m_mapOldObjects.find(key);
+            auto oldObj = iterator->second;
+            m_mapObjects.insert({key, oldObj});
+            return oldObj;
+        }
+        else
+        {
+            ObjectType newObj;
+            if (m_hasCreator) {
+                newObj = m_creator(key);
+            }
+            m_mapObjects.insert({key, newObj});
+            return newObj;
+        }
+    }
     
     template <typename KeyType, typename ObjectType>
     void FrameObjectCache<KeyType, ObjectType>::end()
     {
         m_isDoing = VG_FALSE;
         m_mapOldObjects.clear();
-    }
-
-    template <typename KeyType, typename ObjectType>
-    Bool32 FrameObjectCache<KeyType, ObjectType>::hasOldObject(KeyType key)
-    {
-        return m_mapOldObjects.count(key) != 0;
-    }
-
-    template <typename KeyType, typename ObjectType>
-    ObjectType FrameObjectCache<KeyType, ObjectType>::getOldObject(KeyType key)
-    {
-        auto iterator = m_mapOldObjects.find(key);
-        if (iterator == m_mapOldObjects.cend())
-        {
-            throw std::runtime_error("Don't has special old object.");
-        }
-        else
-        {
-            return iterator->second;
-        }
     }
 } //vg

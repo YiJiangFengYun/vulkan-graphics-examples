@@ -326,7 +326,7 @@ namespace vg
 #endif //DEBUG
         const auto &lightInfo = m_mapRegisteredLights[std::type_index(typeInfo)];
 #ifdef DEBUG
-        if (getLightCount() == lightInfo.maxLightCount)
+        if (getLightCount() == lightInfo.maxCount)
             throw std::runtime_error("Light count of the scene must not more than max light count of the scene.");
 #endif //DEBUG
         _addObject<LightType>(pTarget

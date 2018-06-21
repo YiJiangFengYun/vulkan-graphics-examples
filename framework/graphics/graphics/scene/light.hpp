@@ -1,6 +1,7 @@
 #ifndef VG_LIGHT_H
 #define VG_LIGHT_H
 
+#include "graphics/texture/texture.hpp"
 #include "graphics/scene/object.hpp"
 
 namespace vg

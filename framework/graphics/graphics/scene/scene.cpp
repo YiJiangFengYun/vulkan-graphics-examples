@@ -3,12 +3,14 @@
 namespace vg
 {
     LightInfo::LightInfo(uint32_t bindingPriority
-        , uint32_t maxLightCount
-        , uint32_t lightDataSize
+        , uint32_t maxCount
+        , uint32_t dataSize
+        , uint32_t textureCount
         )
         : bindingPriority(bindingPriority)
-        , maxLightCount(maxLightCount)
-        , lightDataSize(lightDataSize)
+        , maxCount(maxCount)
+        , dataSize(dataSize)
+        , textureCount(textureCount)
     {
 
     }

@@ -16,12 +16,14 @@
 namespace vg
 {
     struct LightInfo {
-        uint32_t bindingPriority;        
-        uint32_t maxLightCount;
-        uint32_t lightDataSize;
+        uint32_t bindingPriority;
+        uint32_t maxCount;
+        uint32_t dataSize;
+        uint32_t textureCount;
         LightInfo(uint32_t bindingPriority = 0u
-            , uint32_t maxLightCount = VG_DEFAULT_SCENE_MAX_LIGHT_COUNT
-            , uint32_t lightDataSize = 0u
+            , uint32_t maxCount = VG_DEFAULT_SCENE_MAX_LIGHT_COUNT
+            , uint32_t dataSize = 0u
+            , uint32_t textureCount = 0u
             );
     };
     class BaseScene : public Base

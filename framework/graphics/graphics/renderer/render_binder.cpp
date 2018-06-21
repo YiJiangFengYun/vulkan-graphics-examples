@@ -27,6 +27,10 @@ namespace vg
                 , vk::MemoryPropertyFlagBits::eHostVisible)
             };
         })
+        , m_lightTypeCount()
+        , m_pCurrLightDataBuffer()
+        , m_lightPassTextureInfos()
+        , m_lightTextureInfos()
     {}
 
      uint32_t RenderBinder::getFramebufferWidth() const
@@ -130,6 +134,9 @@ namespace vg
 
         auto arrRegisteredLights = pScene->getArrRegisteredLights();
         auto mapReigsteredLights = pScene->getMapRegisteredLights();
+
+        m_lightTypeCount = static_cast<uint32_t>(arrRegisteredLights.size());
+
         //copy and sort array.
         std::sort(arrRegisteredLights.begin(), arrRegisteredLights.end(), [&](const std::type_info *item1, const std::type_info *item2) {
             const auto &lightInfo1 = mapReigsteredLights[std::type_index(*item1)];
@@ -137,22 +144,33 @@ namespace vg
             return lightInfo1.bindingPriority - lightInfo2.bindingPriority;
         });
 
-        //Caculate totol size of light data.        
+        //count total size of light data.        
+        //count total texture binding count.
         uint32_t totalSize = 0u;
+        uint32_t totalTextureBindingCount = 0u;
         for (const auto pLightTypeInfo : arrRegisteredLights)
         {
             const auto &lightInfo = mapReigsteredLights[std::type_index(*pLightTypeInfo)];
-            uint32_t maxLightCount = lightInfo.maxLightCount;
+            uint32_t maxLightCount = lightInfo.maxCount;
+            uint32_t textureCount = lightInfo.textureCount;
             //space for count variable.
             totalSize += static_cast<uint32_t>(sizeof(uint32_t));
             //space for data of this type lights.
-            totalSize += lightInfo.lightDataSize * maxLightCount;
+            totalSize += lightInfo.dataSize * maxLightCount;
+            totalTextureBindingCount += textureCount;
+        }
+
+        if (static_cast<uint32_t>(m_lightTextureInfos.size()) < totalTextureBindingCount) 
+        {
+            m_lightTextureInfos.resize(static_cast<uint32_t>(totalTextureBindingCount));
         }
         
         //Allocate memory and copy ligth data to it.
+        //Create light pass texture infos.
         std::vector<Byte> memory(totalSize);
         uint32_t offset = 0u;
         uint32_t lightTypeOffset = 0u;
+        uint32_t lightBindingOffset = 0u;
         for (const auto pLightTypeInfo : arrRegisteredLights)
         {
             const auto &lightInfo = mapReigsteredLights[std::type_index(*pLightTypeInfo)];
@@ -160,25 +178,68 @@ namespace vg
             {
                 const auto &lightGroup = dynamic_cast<Scene<SpaceType::SPACE_2> *>(pScene)->getLightGroup(*pLightTypeInfo);
                 uint32_t lightCount = static_cast<uint32_t>(lightGroup.size());
+
+                //copy data to buffer
                 memcpy(memory.data() + offset, &lightCount, sizeof(uint32_t));
                 offset += static_cast<uint32_t>(sizeof(uint32_t));
                 for (const auto &pLight : lightGroup) {
                     pLight->memcpyLightData(memory.data() + offset);
-                    offset += lightInfo.lightDataSize;
+                    offset += lightInfo.dataSize;
                 }
+                
+                //create pass texture infos.
+                for (uint32_t textureIndex = 0; textureIndex < lightInfo.textureCount; ++textureIndex)
+                {
+                    auto lightTextureInfos = m_lightTextureInfos[lightBindingOffset];
+                    auto lightPassTextureInfo = m_lightPassTextureInfos[lightBindingOffset];
+                    lightPassTextureInfo.textureCount = lightCount;
+                    lightPassTextureInfo.descriptorType = vg::ImageDescriptorType::COMBINED_IMAGE_SAMPLER;
+                    lightPassTextureInfo.stageFlags = vk::ShaderStageFlagBits::eFragment;
+                    lightPassTextureInfo.bindingPriority = VG_PASS_LIGHT_TEXTURE_MIN_BINDING_PRIORITY + lightBindingOffset;
+                    if (static_cast<uint32_t>(lightTextureInfos.size()) < lightCount)
+                        lightTextureInfos.resize(static_cast<uint32_t>(lightCount));
+                    for (uint32_t lightIndex = 0; lightIndex < lightCount; ++lightIndex) {
+                        auto pLight = lightGroup[lightIndex];
+                        lightTextureInfos[lightIndex].pTexture = pLight->getTexture(textureIndex);
+                    }
+                    lightPassTextureInfo.pTextures = lightTextureInfos.data();
+                    ++lightBindingOffset;
+                }
+                
             }
             else
             {
                 const auto &lightGroup = dynamic_cast<Scene<SpaceType::SPACE_3> *>(pScene)->getLightGroup(*pLightTypeInfo);
                 uint32_t lightCount = static_cast<uint32_t>(lightGroup.size());
+                //copy data to buffer
                 memcpy(memory.data() + offset, &lightCount, sizeof(uint32_t));
                 offset += static_cast<uint32_t>(sizeof(uint32_t));
                 for (const auto &pLight : lightGroup) {
                     pLight->memcpyLightData(memory.data() + offset);
-                    offset += lightInfo.lightDataSize;
+                    offset += lightInfo.dataSize;
+                }
+
+                //create pass texture infos.
+                for (uint32_t textureIndex = 0; textureIndex < lightInfo.textureCount; ++textureIndex)
+                {
+                    auto lightTextureInfos = m_lightTextureInfos[lightBindingOffset];
+                    auto lightPassTextureInfo = m_lightPassTextureInfos[lightBindingOffset];
+                    lightPassTextureInfo.textureCount = lightCount;
+                    lightPassTextureInfo.descriptorType = vg::ImageDescriptorType::COMBINED_IMAGE_SAMPLER;
+                    lightPassTextureInfo.stageFlags = vk::ShaderStageFlagBits::eFragment;
+                    lightPassTextureInfo.bindingPriority = VG_PASS_LIGHT_TEXTURE_MIN_BINDING_PRIORITY + lightBindingOffset;
+                    if (static_cast<uint32_t>(lightTextureInfos.size()) < lightCount)
+                        lightTextureInfos.resize(static_cast<uint32_t>(lightCount));
+                    for (uint32_t lightIndex = 0; lightIndex < lightCount; ++lightIndex) {
+                        auto pLight = lightGroup[lightIndex];
+                        lightTextureInfos[lightIndex].pTexture = pLight->getTexture(textureIndex);
+                    }
+                    lightPassTextureInfo.pTextures = lightTextureInfos.data();
+                    ++lightBindingOffset;
                 }
             }
-            lightTypeOffset += lightInfo.lightDataSize * lightInfo.maxLightCount;
+            lightTypeOffset += static_cast<uint32_t>(sizeof(uint32_t));
+            lightTypeOffset += lightInfo.dataSize * lightInfo.maxCount;
             //offet should be entire block memory for last light types because light count may be is less than max light count.
             offset = lightTypeOffset;
         }
@@ -944,7 +1005,8 @@ namespace vg
                     }
                     else if (type == Pass::BuildInDataType::LIGHTS_DATA)
                     {
-                        if (pScene->getRegisterLightCount() > 0)
+                        //light data buffer.
+                        if (m_lightTypeCount > 0)
                         {
                             vg::PassBufferInfo::BufferInfo itemInfo = {
                                 m_pCurrLightDataBuffer,
@@ -967,7 +1029,21 @@ namespace vg
                                 pPass->setBuffer(VG_PASS_LIGHT_DATA_BUFFER_NAME, info);
                             }
                         }
-                        // pPass->
+                        //light textures.
+                        auto lightPassTextureInfos = m_lightPassTextureInfos;
+                        uint32_t textureInfoCount = static_cast<uint32_t>(lightPassTextureInfos.size());
+                        for (uint32_t textureInfoIndex = 0u; textureInfoIndex < textureInfoCount; ++textureInfoIndex)
+                        {
+                            std::string name = VG_PASS_LIGHT_TEXTURE_NAME + std::to_string(textureInfoIndex);
+                            if (pPass->hasTexture(name) == VG_FALSE) 
+                            {
+                                pPass->addTexture(name, lightPassTextureInfos[textureInfoIndex]);
+                            }
+                            else
+                            {
+                                pPass->setTexture(name, lightPassTextureInfos[textureInfoIndex]);
+                            }
+                        }
 
                     }
                     else if (type == Pass::BuildInDataType::PRE_Z_DEPTH_RESULT)

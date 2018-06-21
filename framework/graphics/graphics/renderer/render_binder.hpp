@@ -58,6 +58,9 @@ namespace vg
         //light data buffer.
         FrameObjectCache<InstanceID, std::shared_ptr<BufferData>> m_lightDataBufferCache;
         BufferData *m_pCurrLightDataBuffer;
+        uint32_t m_lightTypeCount;
+        std::vector<PassTextureInfo> m_lightPassTextureInfos;
+        std::vector<std::vector<PassTextureInfo::TextureInfo>> m_lightTextureInfos;
 
         void _beginBind();
 

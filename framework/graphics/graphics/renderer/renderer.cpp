@@ -223,7 +223,6 @@ namespace vg
 
     void Renderer::_preRender()
     {
-        m_pipelineCache.begin();
     }
 
     void Renderer::_renderBegin(const RenderInfo & info, RenderResultInfo & resultInfo)
@@ -234,7 +233,8 @@ namespace vg
         fd::CostTimer renderBeginCostTimer(fd::CostTimer::TimerType::ONCE);
         renderBeginCostTimer.begin();
 #endif //DEBUG and VG_ENABLE_COST_TIMER
-
+        m_pipelineCache.begin();
+        m_renderBinder.begin();
         uint32_t count = info.sceneInfoCount;
         for (uint32_t i = 0; i < count; ++i)
         {
@@ -313,7 +313,9 @@ namespace vg
             const auto pScene = sceneInfo.pScene;
             pScene->endRender();
         }
-        
+
+        m_pipelineCache.end();
+        m_renderBinder.end();
 #if defined(DEBUG) && defined(VG_ENABLE_COST_TIMER)
         renderEndCostTimer.end();
         VG_COST_TIME_LOG(plog::debug) << "Render end cost time: " 
@@ -327,7 +329,6 @@ namespace vg
 
     void Renderer::_postRender()
     {
-        m_pipelineCache.end();
     }
 
     void Renderer::_renderScene(const SceneInfo &sceneInfo, Bool32 isFirstScene, RenderResultInfo &resultInfo)

@@ -21,6 +21,12 @@ namespace vg
         , m_framebufferHeight(framebufferHeight)
         , m_bindedObjects()
         , m_bindedObjectCount(0u)
+        //light data buffer
+        , m_lightDataBufferCache([](const vg::InstanceID &sceneID) {
+            return std::shared_ptr<BufferData>{new BufferData(vk::BufferUsageFlagBits::eUniformBuffer
+                , vk::MemoryPropertyFlagBits::eHostVisible)
+            };
+        })
     {}
 
      uint32_t RenderBinder::getFramebufferWidth() const
@@ -41,6 +47,11 @@ namespace vg
     void RenderBinder::setFramebufferHeight(uint32_t value)
     {
         m_framebufferHeight = value;
+    }
+
+    void RenderBinder::begin()
+    {
+        m_lightDataBufferCache.begin();
     }
 
     void RenderBinder::bindForRenderPassBegin(const BaseRenderTarget *pRenderTarget
@@ -87,6 +98,7 @@ namespace vg
         )
     {
         _beginBind();
+        _syncLightData(pScene);
         _bind(pScene, 
             pCamera,
             pPreZTarget,
@@ -101,9 +113,79 @@ namespace vg
         _endBind();
     }
 
+    void RenderBinder::end()
+    {
+        m_lightDataBufferCache.end();
+    }
+
     void RenderBinder::_beginBind()
     {
         m_bindedObjectCount = 0u;
+    }
+
+    void RenderBinder::_syncLightData(BaseScene *pScene)
+    {
+        BufferData *pLightDataBuffer = m_lightDataBufferCache.caching(pScene->getID()).get();
+        m_pCurrLightDataBuffer = pLightDataBuffer; 
+
+        auto arrRegisteredLights = pScene->getArrRegisteredLights();
+        auto mapReigsteredLights = pScene->getMapRegisteredLights();
+        //copy and sort array.
+        std::sort(arrRegisteredLights.begin(), arrRegisteredLights.end(), [&](const std::type_info *item1, const std::type_info *item2) {
+            const auto &lightInfo1 = mapReigsteredLights[std::type_index(*item1)];
+            const auto &lightInfo2 = mapReigsteredLights[std::type_index(*item2)];
+            return lightInfo1.bindingPriority - lightInfo2.bindingPriority;
+        });
+
+        //Caculate totol size of light data.        
+        uint32_t totalSize = 0u;
+        for (const auto pLightTypeInfo : arrRegisteredLights)
+        {
+            const auto &lightInfo = mapReigsteredLights[std::type_index(*pLightTypeInfo)];
+            uint32_t maxLightCount = lightInfo.maxLightCount;
+            //space for count variable.
+            totalSize += static_cast<uint32_t>(sizeof(uint32_t));
+            //space for data of this type lights.
+            totalSize += lightInfo.lightDataSize * maxLightCount;
+        }
+        
+        //Allocate memory and copy ligth data to it.
+        std::vector<Byte> memory(totalSize);
+        uint32_t offset = 0u;
+        uint32_t lightTypeOffset = 0u;
+        for (const auto pLightTypeInfo : arrRegisteredLights)
+        {
+            const auto &lightInfo = mapReigsteredLights[std::type_index(*pLightTypeInfo)];
+            if (pScene->getSpaceType() == SpaceType::SPACE_2) 
+            {
+                const auto &lightGroup = dynamic_cast<Scene<SpaceType::SPACE_2> *>(pScene)->getLightGroup(*pLightTypeInfo);
+                uint32_t lightCount = static_cast<uint32_t>(lightGroup.size());
+                memcpy(memory.data() + offset, &lightCount, sizeof(uint32_t));
+                offset += static_cast<uint32_t>(sizeof(uint32_t));
+                for (const auto &pLight : lightGroup) {
+                    pLight->memcpyLightData(memory.data() + offset);
+                    offset += lightInfo.lightDataSize;
+                }
+            }
+            else
+            {
+                const auto &lightGroup = dynamic_cast<Scene<SpaceType::SPACE_3> *>(pScene)->getLightGroup(*pLightTypeInfo);
+                uint32_t lightCount = static_cast<uint32_t>(lightGroup.size());
+                memcpy(memory.data() + offset, &lightCount, sizeof(uint32_t));
+                offset += static_cast<uint32_t>(sizeof(uint32_t));
+                for (const auto &pLight : lightGroup) {
+                    pLight->memcpyLightData(memory.data() + offset);
+                    offset += lightInfo.lightDataSize;
+                }
+            }
+            lightTypeOffset += lightInfo.lightDataSize * lightInfo.maxLightCount;
+            //offet should be entire block memory for last light types because light count may be is less than max light count.
+            offset = lightTypeOffset;
+        }
+
+        pLightDataBuffer->updateBuffer(memory.data(), totalSize);
+
+
     }
 
     void RenderBinder::_bind(BaseScene *pScene
@@ -865,9 +947,9 @@ namespace vg
                         if (pScene->getRegisterLightCount() > 0)
                         {
                             vg::PassBufferInfo::BufferInfo itemInfo = {
-                                &pScene->getLightDataBuffer(),
+                                m_pCurrLightDataBuffer,
                                 0u,
-                                pScene->getLightDataBuffer().getBufferSize(),
+                                m_pCurrLightDataBuffer->getBufferSize(),
                             };
                             PassBufferInfo info = {
                                 1u,
@@ -949,4 +1031,33 @@ namespace vg
         }
         m_bindedObjectCount = 0u;
     }
+
+
+
+
+
+    // RenderBinder::BindForSceneVisualizationInfo::BindForSceneVisualizationInfo(BaseScene *pScene
+    //     , BaseCamera *pCamera
+    //     , const PreZTarget *pPreZTarget
+    //     , CmdBuffer *pPreZCmdBuffer
+    //     , CmdBuffer *pBranchCmdBuffer
+    //     , CmdBuffer *pTrunkWaitBarrierCmdBuffer            
+    //     , CmdBuffer *pTrunkRenderPassCmdBuffer
+    //     , PostRender *pPostRender
+    //     , const PostRenderTarget *pPostRenderTarget
+    //     , CmdBuffer *pPostRenderCmdBuffer
+    //     )
+    //     : pScene(pScene)
+    //     , pCamera(pCamera)
+    //     , pPreZTarget(pPreZTarget)
+    //     , pPreZCmdBuffer(pPreZCmdBuffer)
+    //     , pBranchCmdBuffer(pBranchCmdBuffer)
+    //     , pTrunkWaitBarrierCmdBuffer(pTrunkWaitBarrierCmdBuffer)
+    //     , pTrunkRenderPassCmdBuffer(pTrunkRenderPassCmdBuffer)
+    //     , pPostRender(pPostRender)
+    //     , pPostRenderTarget(pPostRenderTarget)
+    //     , pPostRenderCmdBuffer(pPostRenderCmdBuffer)
+    // {
+
+    // }
 } //vg

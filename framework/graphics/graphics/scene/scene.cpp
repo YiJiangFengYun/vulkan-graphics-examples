@@ -16,8 +16,6 @@ namespace vg
     BaseScene::BaseScene()
         : Base(BaseType::SCENE)
         , m_isRightHand(VG_FALSE)
-        , m_lightDataBuffer(vk::BufferUsageFlagBits::eUniformBuffer
-            , vk::MemoryPropertyFlagBits::eHostVisible)
         , m_arrRegisteredLights()
         , m_mapRegisteredLights()
     {
@@ -73,6 +71,16 @@ namespace vg
         return m_mapRegisteredLights.count(lightTypeInfo) != 0;
     }
 
+    const std::vector<const std::type_info *> BaseScene::getArrRegisteredLights() const
+    {
+        return m_arrRegisteredLights;
+    }
+
+    const std::unordered_map<std::type_index, LightInfo> BaseScene::getMapRegisteredLights() const
+    {
+        return m_mapRegisteredLights;
+    }
+
     void BaseScene::registerLight(const std::type_info &lightTypeInfo, const LightInfo &lightInfo)
     {
         _registerLight(lightTypeInfo, lightInfo);
@@ -81,11 +89,6 @@ namespace vg
     void BaseScene::unregisterLight(const std::type_info &lightTypeInfo)
     {
         _unregisterLight(lightTypeInfo);
-    }
-
-    const BufferData &BaseScene::getLightDataBuffer() const
-    {
-        return m_lightDataBuffer;
     }
 
     void BaseScene::beginRender()
@@ -127,7 +130,6 @@ namespace vg
 
     void BaseScene::_beginRender()
     {
-        _syncLightData();
     }
     
     void BaseScene::_endRender()
@@ -356,6 +358,21 @@ namespace vg
     }
 
     template <SpaceType SPACE_TYPE>
+    const std::vector<typename Scene<SPACE_TYPE>::LightType *> Scene<SPACE_TYPE>::getLightGroup(const std::type_info &lightTypeInfo)
+    {
+        auto typeIndex = std::type_index(lightTypeInfo);
+        auto iterator = m_mapLightGroups.find(typeIndex);
+        if (iterator == m_mapLightGroups.end()) 
+        {
+            throw std::invalid_argument("The light type group don't exist!");
+        }
+        else
+        {
+            return iterator->second;
+        }
+    }
+
+    template <SpaceType SPACE_TYPE>
     void Scene<SPACE_TYPE>::_registerLight(const std::type_info &lightTypeInfo, const LightInfo &lightInfo)
     {
         BaseScene::_registerLight(lightTypeInfo, lightInfo);
@@ -404,49 +421,6 @@ namespace vg
             m_arrPLights[i]->endRender();
         }
         BaseScene::_endRender();
-    }
-
-    template <SpaceType SPACE_TYPE>
-    void Scene<SPACE_TYPE>::_syncLightData()
-    {
-        //coyy and sort array.
-        auto arrRegisteredLights = m_arrRegisteredLights;
-        auto &mapReigsteredLighst = m_mapRegisteredLights;
-        std::sort(arrRegisteredLights.begin(), arrRegisteredLights.end(), [&](const std::type_info *item1, const std::type_info *item2) {
-            const auto &lightInfo1 = mapReigsteredLighst[std::type_index(*item1)];
-            const auto &lightInfo2 = mapReigsteredLighst[std::type_index(*item2)];
-            return lightInfo1.bindingPriority - lightInfo2.bindingPriority;
-        });
-
-        //Caculate totol size of light data.        
-        uint32_t totalSize = 0u;
-        for (const auto pLightTypeInfo : arrRegisteredLights)
-        {
-            const auto &lightInfo = m_mapRegisteredLights[std::type_index(*pLightTypeInfo)];
-            const auto &lightGroup = m_mapLightGroups[std::type_index(*pLightTypeInfo)];
-            uint32_t lightCount = static_cast<uint32_t>(lightGroup.size());
-            //space for count variable.
-            totalSize += static_cast<uint32_t>(sizeof(uint32_t));
-            //space for data of this type lights.
-            totalSize += lightInfo.lightDataSize * lightCount;
-        }
-        
-        //Allocate memory and copy ligth data to it.
-        std::vector<Byte> memory(totalSize);
-        uint32_t offset = 0u;
-        for (const auto pLightTypeInfo : arrRegisteredLights)
-        {
-            const auto &lightInfo = m_mapRegisteredLights[std::type_index(*pLightTypeInfo)];
-            const auto &lightGroup = m_mapLightGroups[std::type_index(*pLightTypeInfo)];
-            uint32_t lightCount = static_cast<uint32_t>(lightGroup.size());
-            memcpy(memory.data() + offset, &lightCount, sizeof(uint32_t));
-            offset += static_cast<uint32_t>(sizeof(uint32_t));
-            for (const auto &pLight : lightGroup) {
-                pLight->memcpyLightData(memory.data() + offset);
-                offset += lightInfo.lightDataSize;
-            }
-        }
-        m_lightDataBuffer.updateBuffer(memory.data(), totalSize);
     }
 
     template <SpaceType SPACE_TYPE>

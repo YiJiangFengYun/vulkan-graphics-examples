@@ -35,15 +35,15 @@ namespace vg
         void setIsLeftHand(Bool32 isLeftHand);
         uint32_t getRegisterLightCount() const;
         Bool32 isHasRegisterLight(const std::type_info &lightTypeInfo) const;
+        const std::vector<const std::type_info *> getArrRegisteredLights() const;
+        const std::unordered_map<std::type_index, LightInfo> getMapRegisteredLights() const;
         void registerLight(const std::type_info &lightTypeInfo, const LightInfo &lightInfo);
         void unregisterLight(const std::type_info &lightTypeInfo);
-        const BufferData &getLightDataBuffer() const;
         void beginRender();
         void endRender();
     protected:
         SpaceType m_spaceType;
         Bool32 m_isRightHand;
-        BufferData m_lightDataBuffer;
         std::vector<const std::type_info *> m_arrRegisteredLights;
         std::unordered_map<std::type_index, LightInfo> m_mapRegisteredLights;
 
@@ -51,7 +51,6 @@ namespace vg
         virtual void _unregisterLight(const std::type_info &lightTypeInfo);
         virtual void _beginRender();
         virtual void _endRender();
-        virtual void _syncLightData() = 0;
     };
 
     template <SpaceType SPACE_TYPE>
@@ -100,6 +99,7 @@ namespace vg
         Bool32 isHasLight(const LightType *pTarget) const;
         void addLight(LightType *pTarget, LightType *pParent = nullptr);
         void removeLight(LightType *pTarget);
+        const std::vector<LightType *> getLightGroup(const std::type_info &lightTypeInfo);
 
         /*Get projective matrix with camera, it will change origin projective matrix of the camera
           with handed type info.*/
@@ -139,7 +139,6 @@ namespace vg
 
         virtual void _beginRender() override;
         virtual void _endRender() override;
-        virtual void _syncLightData() override;
     private:
         template <typename T>
         Bool32 _isHasObject(const T *pTarget

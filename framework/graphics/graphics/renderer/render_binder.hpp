@@ -11,6 +11,7 @@
 #include "graphics/renderer/render_target.hpp"
 #include "graphics/renderer/pre_z_target.hpp"
 #include "graphics/renderer/post_render_target.hpp"
+#include "graphics/util/frame_object_cache.hpp"
 
 namespace vg
 {
@@ -25,6 +26,8 @@ namespace vg
         uint32_t getFramebufferHeight() const;
         void setFramebufferHeight(uint32_t value);
 
+        void begin();
+
         void bindForRenderPassBegin(const BaseRenderTarget *pRenderTarget
             , const vk::RenderPass *pRenderPass
             , const vk::Framebuffer *pFramebuffer
@@ -32,18 +35,19 @@ namespace vg
             );
         void bindForRenderPassEnd(CmdBuffer *pCmdBuffer);
 
-        void bind(BaseScene *pScene
-            , BaseCamera *pCamera
+        void bind(BaseScene *pScene = nullptr
+            , BaseCamera *pCamera = nullptr
             , const PreZTarget *pPreZTarget = nullptr
             , CmdBuffer *pPreZCmdBuffer = nullptr
             , CmdBuffer *pBranchCmdBuffer = nullptr
-            , CmdBuffer *pTrunkWaitBarrierCmdBuffer = nullptr            
+            , CmdBuffer *pTrunkWaitBarrierCmdBuffer = nullptr
             , CmdBuffer *pTrunkRenderPassCmdBuffer = nullptr
             , PostRender *pPostRender = nullptr
             , const PostRenderTarget *pPostRenderTarget = nullptr
             , CmdBuffer *pPostRenderCmdBuffer = nullptr
             );
         
+        void end();
 
     private:
         uint32_t m_framebufferWidth;
@@ -51,7 +55,13 @@ namespace vg
         std::vector<BaseVisualObject *> m_bindedObjects;
         uint32_t m_bindedObjectCount;
 
+        //light data buffer.
+        FrameObjectCache<InstanceID, std::shared_ptr<BufferData>> m_lightDataBufferCache;
+        BufferData *m_pCurrLightDataBuffer;
+
         void _beginBind();
+
+        void _syncLightData(BaseScene *pScene);
 
         void _bind(BaseScene *pScene
             , BaseCamera *pCamera

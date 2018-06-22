@@ -2,32 +2,27 @@
 #define VG_CAMERA_H
 
 #include "graphics/scene/object.hpp"
+#include "graphics/scene/projector.hpp"
 
 namespace vg
 {
-    // enum class Camera
     class BaseCamera : public Base
     {
     public:
         BaseCamera();
         virtual ~BaseCamera();
-        Bool32 getIsOrthographic() const;        
+        Bool32 getIsOrthographic() const;
     protected:
-        Bool32 m_isOrthographic;
+        std::shared_ptr<BaseProjector> m_pProjector;
     };
+
     template <SpaceType SPACE_TYPE>
     class Camera : public BaseCamera, public Object<SPACE_TYPE>
     {
     public:
-        using BoundsType = fd::Bounds<typename SpaceTypeInfo<SPACE_TYPE>::PointType>;
-        Camera()
-            : BaseCamera()
-            , Object<SPACE_TYPE>()
-        {
-            m_objectType = ObjectType::CAMERA;
-        }
-
-        virtual typename TransformType::MatrixType getProjMatrix() const = 0;
+        Camera();
+        typename Projector<SPACE_TYPE>::MatrixType getProjMatrix() const;
+        const Projector<SPACE_TYPE> *getDirector() const;
     };
 } //namespace kgs
 

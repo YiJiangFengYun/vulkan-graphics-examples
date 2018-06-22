@@ -23,11 +23,7 @@ namespace vg
         void setZNear(float zNear);
         float getZFar() const;
         void setZFar(float zFar);
-
-        typename TransformType::MatrixType getProjMatrix() const override;
     private:
-        float m_fovy, m_aspect, m_zNear, m_zFar;
-        TransformType::MatrixType m_projMatrix;
     };
 
 } //namespace kgs

@@ -9,14 +9,11 @@ namespace vg
     class CameraOP : public Camera<SPACE_TYPE>
     {
     public:
+        using BoundsType = typename ProjectorOP<SPACE_TYPE>::BoundsType;
         CameraOP();
         void updateProj(BoundsType viewBounds);
-        typename TransformType::MatrixType getProjMatrix() const override;
         BoundsType getViewBounds() const;
     protected:
-        BoundsType m_viewBounds;
-        typename TransformType::MatrixType m_projMatrix;
-        virtual void _applyProj() = 0;
     private:
         
     };

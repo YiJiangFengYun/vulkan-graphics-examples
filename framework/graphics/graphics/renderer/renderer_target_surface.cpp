@@ -1,16 +1,16 @@
-#include "graphics/renderer/render_target_surface.hpp"
+#include "graphics/renderer/renderer_target_surface.hpp"
 
 #include "graphics/app/app.hpp"
 #include "graphics/texture/texture_depth_stencil_attachment.hpp"
 
 namespace vg
 {
-    SurfaceRenderTarget::SurfaceRenderTarget(uint32_t swapchainImageViewCount
+    SurfaceRendererTarget::SurfaceRendererTarget(uint32_t swapchainImageViewCount
         , vk::ImageView *pSwapchainImageViews
         , vk::Format swapchainImageFormat
         , uint32_t swapchainImageWidth
         , uint32_t swapchainImageHeight)
-        : RenderTarget(swapchainImageWidth
+        : RendererTarget(swapchainImageWidth
             , swapchainImageHeight
             , swapchainImageFormat
             , DEFAULT_DEPTH_STENCIL_FORMAT
@@ -34,14 +34,14 @@ namespace vg
         setClearValues(clearValues.data(), static_cast<uint32_t>(clearValues.size()));
     }
 
-    void SurfaceRenderTarget::setImageIndex(uint32_t imageIndex)
+    void SurfaceRendererTarget::setImageIndex(uint32_t imageIndex)
     {
         m_imageIndex = imageIndex;
-        m_pFirstFramebuffer = m_pFirstFramebuffers[m_imageIndex].get();
-        m_pSecondFramebuffer = m_pSecondFramebuffers[m_imageIndex].get();
+        m_pFirstFramebuffer = m_pFirstFramebuffers[m_imageIndex];
+        m_pSecondFramebuffer = m_pSecondFramebuffers[m_imageIndex];
     }
 
-    void SurfaceRenderTarget::_createRenderPass()
+    void SurfaceRendererTarget::_createRenderPass()
     {
         vk::AttachmentDescription colorAttachment = {
             vk::AttachmentDescriptionFlags(),     //flags
@@ -137,17 +137,17 @@ namespace vg
         auto pDevice = pApp->getDevice();
 
         m_pFirstSurfaceRenderPass = fd::createRenderPass(pDevice, createInfo);
-        m_pFirstRenderPass = m_pFirstSurfaceRenderPass.get();
+        m_pFirstRenderPass = m_pFirstSurfaceRenderPass;
 
         colorAttachment.loadOp = vk::AttachmentLoadOp::eLoad;
         colorAttachment.initialLayout = vk::ImageLayout::ePresentSrcKHR;
         attachments = { colorAttachment, depthAttachment };
 
         m_pSecondSurfaceRenderPass = fd::createRenderPass(pDevice, createInfo);
-        m_pSecondRenderPass = m_pSecondSurfaceRenderPass.get(); 
+        m_pSecondRenderPass = m_pSecondSurfaceRenderPass; 
     }
 
-    void SurfaceRenderTarget::_createDepthStencilTex()
+    void SurfaceRendererTarget::_createDepthStencilTex()
     {
         auto pTex = new TextureDepthStencilAttachment(
                 m_depthStencilImageFormat,
@@ -157,7 +157,7 @@ namespace vg
         m_pDepthStencilAttachment = std::shared_ptr<BaseDepthStencilAttachment>(pTex);
     }
 
-    void SurfaceRenderTarget::_createFramebuffers()
+    void SurfaceRendererTarget::_createFramebuffers()
     {
         auto pDevice = pApp->getDevice();
         {
@@ -180,7 +180,7 @@ namespace vg
                 m_pFirstFramebuffers[imageIndex] = fd::createFrameBuffer(pDevice, createInfo);
             }
     
-            m_pFirstFramebuffer = m_pFirstFramebuffers[m_imageIndex].get();
+            m_pFirstFramebuffer = m_pFirstFramebuffers[m_imageIndex];
         }
 
         {
@@ -203,10 +203,7 @@ namespace vg
                 m_pSecondFramebuffers[imageIndex] = fd::createFrameBuffer(pDevice, createInfo);
             }
     
-            m_pSecondFramebuffer = m_pSecondFramebuffers[m_imageIndex].get();
+            m_pSecondFramebuffer = m_pSecondFramebuffers[m_imageIndex];
         }
-        
-        
-       
     }
 } //vg

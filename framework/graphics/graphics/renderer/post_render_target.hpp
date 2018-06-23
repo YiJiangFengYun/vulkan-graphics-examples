@@ -4,11 +4,11 @@
 #include "graphics/global.hpp"
 #include "graphics/texture/texture_2d.hpp"
 #include "graphics/texture/texture_depth_stencil_attachment.hpp"
-#include "graphics/renderer/render_target.hpp"
+#include "graphics/render_target/render_target.hpp"
 
 namespace vg
 {
-    class PostRenderTarget : public BaseRenderTarget
+    class PostRenderTarget : public OnceRenderTarget
     {
     public:
         static const vk::Format DEFAULT_COLOR_FORMAT;
@@ -22,16 +22,11 @@ namespace vg
         vk::Format getDepthStencilImageFormat() const;
         const Texture2DColorAttachment *getColorAttachment() const;
         const TextureDepthStencilAttachment *getDepthStencilAttachment() const;
-        const vk::RenderPass *getRenderPass() const;
-        const vk::Framebuffer *getFramebuffer() const;
     private:
         vk::Format m_colorImageFormat;
         vk::Format m_depthStencilImageFormat;
         std::shared_ptr<Texture2DColorAttachment> m_pColorAttachment;
         std::shared_ptr<TextureDepthStencilAttachment> m_pDepthStencilAttachment;
-        std::shared_ptr<vk::RenderPass> m_pRenderPass;
-        std::shared_ptr<vk::Framebuffer> m_pFramebuffer;
-
         void _createObjs();
     };
 } //vg

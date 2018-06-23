@@ -1,15 +1,15 @@
-#ifndef VG_RENDER_TARGET_SURFACE_HPP
-#define VG_RENDER_TARGET_SURFACE_HPP
+#ifndef VG_RENDERER_TARGET_SURFACE_HPP
+#define VG_RENDERER_TARGET_SURFACE_HPP
 
 #include "graphics/texture/attachment.hpp"
-#include "graphics/renderer/render_target.hpp"
+#include "graphics/renderer/renderer_target.hpp"
 
 namespace vg
 {
-    class SurfaceRenderTarget : public RenderTarget 
+    class SurfaceRendererTarget : public RendererTarget 
     {
     public:
-        SurfaceRenderTarget(uint32_t swapchainImageViewCount
+        SurfaceRendererTarget(uint32_t swapchainImageViewCount
             , vk::ImageView *pSwapchainImageViews
             , vk::Format swapchainImageFormat
             , uint32_t swapchainImageWidth
@@ -32,4 +32,4 @@ namespace vg
     };
 } //vg
 
-#endif //VG_RENDER_TARGET_SURFACE_HPP
+#endif //VG_RENDERER_TARGET_SURFACE_HPP

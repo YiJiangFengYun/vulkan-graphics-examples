@@ -36,8 +36,8 @@
 #include <graphics/material/material.hpp>
 
 #include <graphics/renderer/renderer.hpp>
-#include <graphics/renderer/render_target_surface.hpp>
-#include <graphics/renderer/render_target_color_texture.hpp>
+#include <graphics/renderer/renderer_target_surface.hpp>
+#include <graphics/renderer/renderer_target_color_texture.hpp>
 
 #include <graphics/scene/scene_2.hpp>
 #include <graphics/scene/scene_3.hpp>

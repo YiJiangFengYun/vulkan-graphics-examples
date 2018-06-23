@@ -8,7 +8,7 @@
 #include "graphics/scene/scene.hpp"
 #include "graphics/post_render/post_render.hpp"
 #include "graphics/renderer/renderer_option.hpp"
-#include "graphics/renderer/render_target.hpp"
+#include "graphics/render_target/render_target.hpp"
 #include "graphics/renderer/pre_z_target.hpp"
 #include "graphics/renderer/post_render_target.hpp"
 #include "graphics/util/frame_object_cache.hpp"

@@ -208,7 +208,7 @@ namespace vgf {
     void Window::_createRenderer()
     {
         size_t num = m_swapchainImages.size();
-        m_pRenderTarget = std::shared_ptr<vg::SurfaceRenderTarget> {new vg::SurfaceRenderTarget{
+        m_pRendererTarget = std::shared_ptr<vg::SurfaceRendererTarget> {new vg::SurfaceRendererTarget{
             static_cast<uint32_t>(m_swapchainImageViews.size()),
                 m_swapchainImageViews.data(),
                 m_swapchainImageFormat,
@@ -218,7 +218,7 @@ namespace vgf {
         };
 
         m_pRenderer = std::shared_ptr<vg::Renderer>{ new vg::Renderer{
-                m_pRenderTarget.get()  
+                m_pRendererTarget.get()  
             }
         };
     }
@@ -414,7 +414,7 @@ namespace vgf {
             imageIndex = m_currImageIndex;
         }
 
-        m_pRenderTarget->setImageIndex(imageIndex);
+        m_pRendererTarget->setImageIndex(imageIndex);
 
         if (m_pRenderer->isValidForRender())
         {

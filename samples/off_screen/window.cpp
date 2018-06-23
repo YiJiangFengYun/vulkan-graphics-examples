@@ -98,12 +98,12 @@ void Window::_createOffscreenTex()
 
 void Window::_createOffscreenRenderer()
 {
-    m_pOffScreenRenderTarget = std::shared_ptr<vg::ColorTexRenderTarget>{
-        new vg::ColorTexRenderTarget(m_pOffScreenTex.get()),
+    m_pOffScreenRendererTarget = std::shared_ptr<vg::ColorTexRendererTarget>{
+        new vg::ColorTexRendererTarget(m_pOffScreenTex.get()),
     };
     m_pOffScreenRenderer = std::shared_ptr<vg::Renderer>{
         new vg::Renderer{
-            m_pOffScreenRenderTarget.get(),
+            m_pOffScreenRendererTarget.get(),
         } 
     };
 }

@@ -8,11 +8,9 @@ namespace vg
         , uint32_t framebufferHeight
         , vk::Format depthImageFormat
         )
-        : BaseRenderTarget(framebufferWidth, framebufferHeight)
+        : OnceRenderTarget(framebufferWidth, framebufferHeight)
         , m_depthImageFormat(depthImageFormat)
         , m_pDepthAttachment()
-        , m_pRenderPass()
-        , m_pFramebuffer()
     {
         _createObjs();
         vk::ClearValue clearValueDepthStencil = {
@@ -29,16 +27,6 @@ namespace vg
     const Texture2DDepthAttachment *PreZTarget::getDepthAttachment() const
     {
         return m_pDepthAttachment.get();
-    }
-
-    const vk::RenderPass *PreZTarget::getRenderPass() const
-    {
-        return m_pRenderPass.get();
-    }
-        
-    const vk::Framebuffer *PreZTarget::getFramebuffer() const
-    {
-        return m_pFramebuffer.get();
     }
 
     void PreZTarget::_createObjs()

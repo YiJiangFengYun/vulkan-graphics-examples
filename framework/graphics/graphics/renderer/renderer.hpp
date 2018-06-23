@@ -10,7 +10,7 @@
 #include "graphics/texture/texture_depth_stencil_attachment.hpp"
 #include "graphics/texture/texture_2d.hpp"
 #include "graphics/renderer/pipeline_cache.hpp"
-#include "graphics/renderer/render_target.hpp"
+#include "graphics/renderer/renderer_target.hpp"
 #include "graphics/post_render/post_render.hpp"
 #include "graphics/renderer/pre_z_target.hpp"
 #include "graphics/renderer/post_render_target.hpp"
@@ -63,11 +63,11 @@ namespace vg
                 , uint32_t drawCount = 0u);
         };
 
-        Renderer(const RenderTarget * pRenderTarget = nullptr);
+        Renderer(const RendererTarget * pRendererTarget = nullptr);
         ~Renderer();
 
-        const RenderTarget * getRenderTarget() const;
-        void setRenderTarget(const RenderTarget * pRenderTarget);
+        const RendererTarget * getRendererTarget() const;
+        void setRendererTarget(const RendererTarget * pRendererTarget);
 
         void enablePreZ();
         void disablePreZ();
@@ -85,7 +85,7 @@ namespace vg
         const fd::CostTimer &getPreparingRenderCostTimer() const;
 #endif //DEBUG and VG_ENABLE_COST_TIMER
     protected:
-        const RenderTarget *m_pRenderTarget;
+        const RendererTarget *m_pRendererTarget;
         std::shared_ptr<vk::CommandPool> m_pCommandPool;
         std::shared_ptr<vk::CommandBuffer> m_pCommandBuffer;
         PipelineCache m_pipelineCache;

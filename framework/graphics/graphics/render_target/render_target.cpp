@@ -1,9 +1,7 @@
-#include "graphics/renderer/render_target.hpp"
+#include "graphics/render_target/render_target.hpp"
 
 namespace vg
 {
-    const vk::Format RenderTarget::DEFAULT_DEPTH_STENCIL_FORMAT(vk::Format::eD32SfloatS8Uint);
-
     BaseRenderTarget::BaseRenderTarget(uint32_t framebufferWidth
         , uint32_t framebufferHeight
         )
@@ -70,51 +68,60 @@ namespace vg
         memcpy(m_clearValues.data(), pClearValues, sizeof(vk::ClearValue) * clearValueCount);
     }
 
-    RenderTarget::RenderTarget(uint32_t framebufferWidth
+    OnceRenderTarget::OnceRenderTarget(uint32_t framebufferWidth
         , uint32_t framebufferHeight
-        , vk::Format colorImageFormat
-        , vk::Format depthStencilImageFormat
         )
-        : BaseRenderTarget(framebufferWidth, framebufferHeight)
-        , m_colorImageFormat(colorImageFormat)
-        , m_depthStencilImageFormat(depthStencilImageFormat)
+        : BaseRenderTarget(framebufferWidth
+            , framebufferHeight
+            )
+        , m_pRenderPass()
+        , m_pFramebuffer()
+    {
+
+    }
+        
+    const vk::RenderPass * OnceRenderTarget::getRenderPass() const
+    {
+        return m_pRenderPass.get();
+    }
+
+    const vk::Framebuffer * OnceRenderTarget::getFramebuffer() const
+    {
+        return m_pFramebuffer.get();
+    }
+
+    MultiRenderTarget::MultiRenderTarget(uint32_t framebufferWidth
+        , uint32_t framebufferHeight
+        )
+        : BaseRenderTarget(framebufferWidth
+            , framebufferHeight
+            )
         , m_pFirstRenderPass()
         , m_pSecondRenderPass()
         , m_pFirstFramebuffer()
         , m_pSecondFramebuffer()
+    {
+
+    }
         
+    const vk::RenderPass * MultiRenderTarget::getFirstRenderPass() const
     {
+        return m_pFirstRenderPass.get();
+    }
         
-    }
-
-    vk::Format RenderTarget::getColorImageFormat() const
+    const vk::RenderPass * MultiRenderTarget::getSecondRenderPass() const
     {
-        return m_colorImageFormat;
+        return m_pSecondRenderPass.get();
     }
-
-    vk::Format RenderTarget::getDepthStencilImageFormat() const
+        
+    const vk::Framebuffer * MultiRenderTarget::getFirstFramebuffer() const
     {
-        return m_depthStencilImageFormat;
+        return m_pFirstFramebuffer.get();
     }
-
-    const vk::RenderPass *RenderTarget::getFirstRenderPass() const
+        
+    const vk::Framebuffer * MultiRenderTarget::getSecondFramebuffer() const
     {
-        return m_pFirstRenderPass;
-    }
-
-    const vk::RenderPass *RenderTarget::getSecondRenderPass() const
-    {
-        return m_pSecondRenderPass;
-    }
-
-    const vk::Framebuffer *RenderTarget::getFirstFramebuffer() const
-    {
-        return m_pFirstFramebuffer;
-    }
-
-    const vk::Framebuffer *RenderTarget::getSecondFramebuffer() const
-    {
-        return m_pSecondFramebuffer;
+        return m_pSecondFramebuffer.get();
     }
 
 } //vg

@@ -49,9 +49,9 @@ namespace vg
 
     }
 
-    Renderer::Renderer(const RenderTarget * pRenderTarget)
+    Renderer::Renderer(const RendererTarget * pRendererTarget)
         : Base(BaseType::RENDERER)
-        , m_pRenderTarget()
+        , m_pRendererTarget()
         , m_pipelineCache()
         , m_trunkRenderPassCmdBuffer()
         , m_trunkWaitBarrierCmdBuffer()
@@ -72,7 +72,7 @@ namespace vg
         , m_preparingRenderCostTimer(fd::CostTimer::TimerType::AVERAGE)
 #endif //DEBUG and VG_ENABLE_COST_TIMER
     {
-        setRenderTarget(pRenderTarget);
+        setRendererTarget(pRendererTarget);
         _createCommandPool();
         _createCommandBuffer();
         //_createFence();
@@ -82,20 +82,20 @@ namespace vg
     {
     }
 
-    const RenderTarget * Renderer::getRenderTarget() const
+    const RendererTarget * Renderer::getRendererTarget() const
     {
-        return m_pRenderTarget;
+        return m_pRendererTarget;
     }
 
-    void Renderer::setRenderTarget(const RenderTarget * pRenderTarget)
+    void Renderer::setRendererTarget(const RendererTarget * pRendererTarget)
     {
-        if (m_pRenderTarget != pRenderTarget) {
-            m_pRenderTarget = pRenderTarget;
+        if (m_pRendererTarget != pRendererTarget) {
+            m_pRendererTarget = pRendererTarget;
             uint32_t framebufferWidth = 0u;
             uint32_t framebufferHeight = 0u;
-            if (pRenderTarget != nullptr) {
-                framebufferWidth = pRenderTarget->getFramebufferWidth();
-                framebufferHeight = pRenderTarget->getFramebufferHeight();
+            if (pRendererTarget != nullptr) {
+                framebufferWidth = pRendererTarget->getFramebufferWidth();
+                framebufferHeight = pRendererTarget->getFramebufferHeight();
             }
             if (m_framebufferWidth != framebufferWidth ||
                     m_framebufferHeight != framebufferHeight)
@@ -104,8 +104,8 @@ namespace vg
             }
         }
         if (m_pPostRenderTarget != nullptr)
-            m_pPostRenderTarget->setClearValues(pRenderTarget->getClearValues()
-                , pRenderTarget->getClearValueCount());
+            m_pPostRenderTarget->setClearValues(pRendererTarget->getClearValues()
+                , pRendererTarget->getClearValueCount());
     }
 
     void Renderer::enablePreZ()
@@ -400,9 +400,9 @@ namespace vg
                 );
             
             //post render cmd buffer
-            pRenderTarget = m_pRenderTarget;
-            pRenderPass = isFirstScene ? m_pRenderTarget->getFirstRenderPass() : m_pRenderTarget->getSecondRenderPass();
-            pFramebuffer = isFirstScene ? m_pRenderTarget->getFirstFramebuffer() : m_pRenderTarget->getSecondFramebuffer();
+            pRenderTarget = m_pRendererTarget;
+            pRenderPass = isFirstScene ? m_pRendererTarget->getFirstRenderPass() : m_pRendererTarget->getSecondRenderPass();
+            pFramebuffer = isFirstScene ? m_pRendererTarget->getFirstFramebuffer() : m_pRendererTarget->getSecondFramebuffer();
             m_renderBinder.bindForRenderPassBegin(pRenderTarget
                 , pRenderPass
                 , pFramebuffer
@@ -415,9 +415,9 @@ namespace vg
             const vk::RenderPass *pRenderPass;
             const vk::Framebuffer *pFramebuffer;
             //trunk cmd buffer
-            pRenderTarget = m_pRenderTarget;
-            pRenderPass = isFirstScene ? m_pRenderTarget->getFirstRenderPass() : m_pRenderTarget->getSecondRenderPass();
-            pFramebuffer = isFirstScene ? m_pRenderTarget->getFirstFramebuffer() : m_pRenderTarget->getSecondFramebuffer();
+            pRenderTarget = m_pRendererTarget;
+            pRenderPass = isFirstScene ? m_pRendererTarget->getFirstRenderPass() : m_pRendererTarget->getSecondRenderPass();
+            pFramebuffer = isFirstScene ? m_pRendererTarget->getFirstFramebuffer() : m_pRendererTarget->getSecondFramebuffer();
             m_renderBinder.bindForRenderPassBegin(pRenderTarget
                 , pRenderPass
                 , pFramebuffer

@@ -10,13 +10,11 @@ namespace vg
         , vk::Format colorImageFormat
         , vk::Format depthStencilImageFormat
         )
-        : BaseRenderTarget(framebufferWidth, framebufferHeight)
+        : OnceRenderTarget(framebufferWidth, framebufferHeight)
         , m_colorImageFormat(colorImageFormat)
         , m_depthStencilImageFormat(depthStencilImageFormat)
         , m_pColorAttachment()
         , m_pDepthStencilAttachment()
-        , m_pRenderPass()
-        , m_pFramebuffer()
     {
         _createObjs();
 
@@ -50,16 +48,6 @@ namespace vg
     const TextureDepthStencilAttachment *PostRenderTarget::getDepthStencilAttachment() const
     {
         return m_pDepthStencilAttachment.get();
-    }
-        
-    const vk::RenderPass *PostRenderTarget::getRenderPass() const
-    {
-        return m_pRenderPass.get();
-    }
-
-    const vk::Framebuffer *PostRenderTarget::getFramebuffer() const
-    {
-        return m_pFramebuffer.get();
     }
 
     void PostRenderTarget::_createObjs()

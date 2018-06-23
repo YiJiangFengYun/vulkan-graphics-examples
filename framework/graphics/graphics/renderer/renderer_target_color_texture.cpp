@@ -1,12 +1,12 @@
-#include "graphics/renderer/render_target_color_texture.hpp"
+#include "graphics/renderer/renderer_target_color_texture.hpp"
 
 #include "graphics/app/app.hpp"
 #include "graphics/texture/texture_depth_stencil_attachment.hpp"
 
 namespace vg
 {
-    ColorTexRenderTarget::ColorTexRenderTarget(BaseColorAttachment *pColorAttachmentTex)
-        : RenderTarget(pColorAttachmentTex->getColorAttachmentWidth()
+    ColorTexRendererTarget::ColorTexRendererTarget(BaseColorAttachment *pColorAttachmentTex)
+        : RendererTarget(pColorAttachmentTex->getColorAttachmentWidth()
             , pColorAttachmentTex->getColorAttachmentHeight()
             , pColorAttachmentTex->getColorAttachmentFormat()
             , DEFAULT_DEPTH_STENCIL_FORMAT
@@ -28,7 +28,7 @@ namespace vg
         setClearValues(clearValues.data(), static_cast<uint32_t>(clearValues.size()));
     }
 
-    void ColorTexRenderTarget::_createRenderPass()
+    void ColorTexRendererTarget::_createRenderPass()
     {
         vk::AttachmentDescription colorAttachment = {
             vk::AttachmentDescriptionFlags(),     //flags
@@ -114,16 +114,14 @@ namespace vg
         };
 
         auto pDevice = pApp->getDevice();
-        m_pFirstColorTexRenderPass = fd::createRenderPass(pDevice, createInfo);
-        m_pFirstRenderPass = m_pFirstColorTexRenderPass.get();
+        m_pFirstRenderPass = fd::createRenderPass(pDevice, createInfo);
 
         colorAttachment.loadOp = vk::AttachmentLoadOp::eLoad;
         attachments = { colorAttachment, depthAttachment };
-        m_pSecondColorTexRenderPass = fd::createRenderPass(pDevice, createInfo);
-        m_pSecondRenderPass = m_pSecondColorTexRenderPass.get();
+        m_pSecondRenderPass = fd::createRenderPass(pDevice, createInfo);
     }
 
-    void ColorTexRenderTarget::_createDepthStencilTex()
+    void ColorTexRendererTarget::_createDepthStencilTex()
     {
         auto pTex = new TextureDepthStencilAttachment(
                 m_depthStencilImageFormat,
@@ -133,7 +131,7 @@ namespace vg
         m_pDepthStencilAttachment = std::shared_ptr<BaseDepthStencilAttachment>(pTex);
     }
         
-    void ColorTexRenderTarget::_createFramebuffer()
+    void ColorTexRendererTarget::_createFramebuffer()
     {
         auto pDevice = pApp->getDevice();
         {
@@ -150,8 +148,7 @@ namespace vg
                 1u                                              //layers
             };
     
-            m_pFirstColorTexFramebuffer = fd::createFrameBuffer(pDevice, createInfo);
-            m_pFirstFramebuffer = m_pFirstColorTexFramebuffer.get();
+            m_pFirstFramebuffer = fd::createFrameBuffer(pDevice, createInfo);
         }
 
         {
@@ -168,8 +165,7 @@ namespace vg
                 1u                                              //layers
             };
     
-            m_pSecondColorTexFramebuffer = fd::createFrameBuffer(pDevice, createInfo);
-            m_pSecondFramebuffer = m_pSecondColorTexFramebuffer.get();
+            m_pSecondFramebuffer = fd::createFrameBuffer(pDevice, createInfo);
         }
         
     }

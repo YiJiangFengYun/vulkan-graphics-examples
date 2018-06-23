@@ -23,32 +23,36 @@ namespace vg
         fd::Rect2D m_renderArea;
         std::vector<vk::ClearValue> m_clearValues;
     };
-    class RenderTarget : public BaseRenderTarget
+
+    class OnceRenderTarget : public BaseRenderTarget
     {
     public:
-        static const vk::Format DEFAULT_DEPTH_STENCIL_FORMAT;
 
-        RenderTarget(uint32_t framebufferWidth = 0u
+        OnceRenderTarget(uint32_t framebufferWidth = 0u
             , uint32_t framebufferHeight = 0u
-            , vk::Format colorImageFormat = vk::Format::eUndefined
-            , vk::Format depthStencilImageFormat = DEFAULT_DEPTH_STENCIL_FORMAT
             );
-        vk::Format getColorImageFormat() const;
-        vk::Format getDepthStencilImageFormat() const;
+        const vk::RenderPass * getRenderPass() const;
+        const vk::Framebuffer * getFramebuffer() const;
+    protected:
+        std::shared_ptr<vk::RenderPass> m_pRenderPass;
+        std::shared_ptr<vk::Framebuffer> m_pFramebuffer;
+    };
+    
+    class MultiRenderTarget : public BaseRenderTarget
+    {
+    public:
+        MultiRenderTarget(uint32_t framebufferWidth = 0u
+            , uint32_t framebufferHeight = 0u
+            );
         const vk::RenderPass * getFirstRenderPass() const;
         const vk::RenderPass * getSecondRenderPass() const;
         const vk::Framebuffer * getFirstFramebuffer() const;
         const vk::Framebuffer * getSecondFramebuffer() const;
     protected:
-        
-        vk::Format m_colorImageFormat;
-        vk::Format m_depthStencilImageFormat;
-        
-        vk::RenderPass * m_pFirstRenderPass;
-        vk::RenderPass * m_pSecondRenderPass;
-        vk::Framebuffer * m_pFirstFramebuffer;
-        vk::Framebuffer * m_pSecondFramebuffer;
-        
+        std::shared_ptr<vk::RenderPass> m_pFirstRenderPass;
+        std::shared_ptr<vk::RenderPass> m_pSecondRenderPass;
+        std::shared_ptr<vk::Framebuffer> m_pFirstFramebuffer;
+        std::shared_ptr<vk::Framebuffer> m_pSecondFramebuffer;
     };
 } //vg
 

@@ -34,11 +34,11 @@ namespace vg
     }
 
     template <SpaceType SPACE_TYPE>
-    const Projector<SPACE_TYPE> *Camera<SPACE_TYPE>::getDirector() const
+    const Projector<SPACE_TYPE> *Camera<SPACE_TYPE>::getProjector() const
     {
-        Projector<SPACE_TYPE> *pDirector = dynamic_cast<Projector<SPACE_TYPE> *>(m_pProjector.get());
-        pDirector->setLocalToWorldMatrix(m_pTransform->getMatrixLocalToWorld());
-        return pDirector;
+        Projector<SPACE_TYPE> *pProjector = dynamic_cast<Projector<SPACE_TYPE> *>(m_pProjector.get());
+        pProjector->setLocalToWorldMatrix(m_pTransform->getMatrixLocalToWorld());
+        return pProjector;
     }
 
     //template instantiation

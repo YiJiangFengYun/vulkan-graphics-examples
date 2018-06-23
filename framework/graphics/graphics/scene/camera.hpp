@@ -22,7 +22,7 @@ namespace vg
     public:
         Camera();
         typename Projector<SPACE_TYPE>::MatrixType getProjMatrix() const;
-        const Projector<SPACE_TYPE> *getDirector() const;
+        const Projector<SPACE_TYPE> *getProjector() const;
     };
 } //namespace kgs
 

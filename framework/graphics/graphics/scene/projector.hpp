@@ -24,7 +24,7 @@ namespace vg
         Projector();
         MatrixType getProjMatrix() const;
         MatrixType getTransformMatrix() const;
-        MatrixType getLocalToWorldMatix() const;
+        MatrixType getLocalToWorldMatrix() const;
         MatrixType getWorldToLocalMatrix() const;
         void setTransformMatrix(const MatrixType &matrix);
         void setLocalToWorldMatrix(const MatrixType &matrix);

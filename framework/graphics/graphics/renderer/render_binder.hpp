@@ -4,7 +4,7 @@
 #include "graphics/global.hpp"
 #include "graphics/material/material.hpp"
 #include "graphics/scene/visual_object.hpp"
-#include "graphics/scene/camera.hpp"
+#include "graphics/scene/projector.hpp"
 #include "graphics/scene/scene.hpp"
 #include "graphics/post_render/post_render.hpp"
 #include "graphics/renderer/renderer_option.hpp"
@@ -36,7 +36,7 @@ namespace vg
         void bindForRenderPassEnd(CmdBuffer *pCmdBuffer);
 
         void bind(BaseScene *pScene = nullptr
-            , BaseCamera *pCamera = nullptr
+            , const BaseProjector *pProjector = nullptr
             , const PreZTarget *pPreZTarget = nullptr
             , CmdBuffer *pPreZCmdBuffer = nullptr
             , CmdBuffer *pBranchCmdBuffer = nullptr
@@ -67,7 +67,7 @@ namespace vg
         void _syncLightData(BaseScene *pScene);
 
         void _bind(BaseScene *pScene
-            , BaseCamera *pCamera
+            , const BaseProjector *pProjector
             , const PreZTarget *pPreZTarget = nullptr
             , CmdBuffer *pPreZCmdBuffer = nullptr
             , CmdBuffer *pBranchCmdBuffer = nullptr
@@ -79,7 +79,7 @@ namespace vg
             );
 
         void _bindScene2(Scene<SpaceType::SPACE_2> *pScene
-            , Camera<SpaceType::SPACE_2> *pCamera
+            , const Projector<SpaceType::SPACE_2> *pProjector
             , const PreZTarget *pPreZTarget = nullptr
             , CmdBuffer *pPreZCmdBuffer = nullptr
             , CmdBuffer *pBranchCmdBuffer = nullptr
@@ -88,7 +88,7 @@ namespace vg
             );
 
         void _bindScene3(Scene<SpaceType::SPACE_3> *pScene
-            , Camera<SpaceType::SPACE_3> *pCamera
+            , const Projector<SpaceType::SPACE_3> *pProjector
             , const PreZTarget *pPreZTarget = nullptr
             , CmdBuffer *pPreZCmdBuffer = nullptr
             , CmdBuffer *pBranchCmdBuffer = nullptr

@@ -425,7 +425,7 @@ namespace vg
                 );
         }
         m_renderBinder.bind(pScene
-            , pCamera
+            , pCamera->getProjectorBase()
             , preZEnable ? m_pPreZTarget.get() : nullptr
             , preZEnable ? m_pPreZCmdBuffer.get() : nullptr
             , & m_branchCmdBuffer

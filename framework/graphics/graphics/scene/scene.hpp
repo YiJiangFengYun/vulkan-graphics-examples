@@ -60,6 +60,7 @@ namespace vg
     {
     public:
         using ObjectType = Object<SPACE_TYPE>;
+        using ProjectorType = Projector<SPACE_TYPE>;
         using VisualObjectType = VisualObject<SPACE_TYPE>;
         using CameraType = Camera<SPACE_TYPE>;
         using LightType = Light<SPACE_TYPE>;
@@ -105,22 +106,22 @@ namespace vg
 
         /*Get projective matrix with camera, it will change origin projective matrix of the camera
           with handed type info.*/
-        virtual MatrixType getProjMatrix(const CameraType *pCamera) const = 0;
-        virtual BoundsType getViewBoundsInWorld(const CameraType *pCamera) const = 0;
+        virtual MatrixType getProjMatrix(const ProjectorType *pProjector) const = 0;
+        virtual BoundsType getProjectionBoundsInWorld(const ProjectorType *pProjector) const = 0;
         /**
          * This bounds is in object coordinate system. 
          **/
-        virtual Bool32 isInView(const CameraType *pCamera
+        virtual Bool32 isInProjection(const ProjectorType *pProjector
             , const TransformType *pTransform
             , BoundsType bounds
-            , fd::Rect2D *viewRect = nullptr) const = 0;
+            , fd::Rect2D *projectionRect = nullptr) const = 0;
         
         /**
          * This bounds is in world coorindate system.
          **/
-        virtual Bool32 isInView(const CameraType *pCamera
+        virtual Bool32 isInProjection(const ProjectorType *pProjector
             , BoundsType bounds
-            , fd::Rect2D *viewRect = nullptr) const = 0;
+            , fd::Rect2D *projectionRect = nullptr) const = 0;
 
     protected:
 

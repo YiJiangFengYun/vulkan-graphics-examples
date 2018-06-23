@@ -10,16 +10,16 @@ namespace vg
     {
     public:
         Scene2();
-        virtual MatrixType getProjMatrix(const CameraType *pCamera) const override;
-        virtual BoundsType getViewBoundsInWorld(const CameraType *pCamera) const override;
-        virtual Bool32 isInView(const CameraType *pCamera
+        virtual MatrixType getProjMatrix(const ProjectorType *pProjector) const override;
+        virtual BoundsType getProjectionBoundsInWorld(const ProjectorType *pProjector) const override;
+        virtual Bool32 isInProjection(const ProjectorType *pProjector
             , const TransformType *pTransform
             , BoundsType bounds
-            , fd::Rect2D *viewRect = nullptr) const override;
+            , fd::Rect2D *projectionRect = nullptr) const override;
         
-        virtual Bool32 isInView(const CameraType *pCamera
+        virtual Bool32 isInProjection(const ProjectorType *pProjector
             , BoundsType bounds
-            , fd::Rect2D *viewRect = nullptr) const override;
+            , fd::Rect2D *projectionRect = nullptr) const override;
     private:
     };
 

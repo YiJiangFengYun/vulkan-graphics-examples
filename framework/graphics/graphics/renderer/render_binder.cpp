@@ -8,7 +8,7 @@ namespace vg
         , uint32_t &PVObjIndex
         , const Transform<SpaceType::SPACE_2> *pTransform
         , Scene<SpaceType::SPACE_2> *pScene
-        , Camera<SpaceType::SPACE_2> *pCamera
+        , const Projector<SpaceType::SPACE_2> *pProjector
 #ifdef USE_WORLD_BOUNDS
         , const fd::Bounds<SpaceTypeInfo<SpaceType::SPACE_2>::PointType> *pBounds
 #endif
@@ -90,7 +90,7 @@ namespace vg
     }
 
     void RenderBinder::bind(BaseScene *pScene
-        , BaseCamera *pCamera
+        , const BaseProjector *pProjector
         , const PreZTarget *pPreZTarget
         , CmdBuffer *pPreZCmdBuffer
         , CmdBuffer *pBranchCmdBuffer
@@ -104,7 +104,7 @@ namespace vg
         _beginBind();
         _syncLightData(pScene);
         _bind(pScene, 
-            pCamera,
+            pProjector,
             pPreZTarget,
             pPreZCmdBuffer, 
             pBranchCmdBuffer, 
@@ -250,7 +250,7 @@ namespace vg
     }
 
     void RenderBinder::_bind(BaseScene *pScene
-        , BaseCamera *pCamera
+        , const BaseProjector *pProjector
         , const PreZTarget *pPreZTarget
         , CmdBuffer *pPreZCmdBuffer
         , CmdBuffer *pBranchCmdBuffer
@@ -267,7 +267,7 @@ namespace vg
         if (pScene->getSpaceType() == SpaceType::SPACE_2)
         {
             _bindScene2(dynamic_cast<Scene<SpaceType::SPACE_2> *>(pScene), 
-                dynamic_cast<Camera<SpaceType::SPACE_2> *>(pCamera),
+                dynamic_cast<const Projector<SpaceType::SPACE_2> *>(pProjector),
                 pPreZTarget,
                 pPreZCmdBuffer,
                 pBranchCmdBuffer,                    
@@ -277,7 +277,7 @@ namespace vg
         } else if (pScene->getSpaceType() == SpaceType::SPACE_3)
         {
             _bindScene3(dynamic_cast<Scene<SpaceType::SPACE_3> *>(pScene), 
-                dynamic_cast<Camera<SpaceType::SPACE_3> *>(pCamera), 
+                dynamic_cast<const Projector<SpaceType::SPACE_3> *>(pProjector), 
                 pPreZTarget,
                 pPreZCmdBuffer,
                 pBranchCmdBuffer,                    
@@ -350,7 +350,7 @@ namespace vg
     }
 
     void RenderBinder::_bindScene2(Scene<SpaceType::SPACE_2> *pScene
-        , Camera<SpaceType::SPACE_2> *pCamera
+        , const Projector<SpaceType::SPACE_2> *pProjector
         , const PreZTarget *pPreZTarget
         , CmdBuffer *pPreZCmdBuffer
         , CmdBuffer *pBranchCmdBuffer
@@ -368,13 +368,13 @@ namespace vg
         fd::CostTimer preparingCommonMatrixsCostTimer(fd::CostTimer::TimerType::ONCE);
         preparingCommonMatrixsCostTimer.begin();
 #endif //DEBUG and VG_ENABLE_COST_TIMER
-        auto projMatrix3x3 = pScene->getProjMatrix(pCamera);
+        auto projMatrix3x3 = pScene->getProjMatrix(pProjector);
         auto projMatrix = tranMat3ToMat4(projMatrix3x3);
 #ifdef USE_WORLD_BOUNDS
-        auto boundsOfViewInWorld = pScene->getViewBoundsInWorld(pCamera);
+        auto boundsOfViewInWorld = pScene->getViewBoundsInWorld(pProjector);
 #endif
         
-        auto viewMatrix3x3 = pCamera->getTransform()->getMatrixWorldToLocal();
+        auto viewMatrix3x3 = pProjector->getWorldToLocalMatrix();
         auto viewMatrix = tranMat3ToMat4(viewMatrix3x3);
 #if defined(DEBUG) && defined(VG_ENABLE_COST_TIMER)
         preparingCommonMatrixsCostTimer.end();
@@ -392,7 +392,7 @@ namespace vg
         visibilityCheckCostTimer.begin();
 #endif //DEBUG and VG_ENABLE_COST_TIMER
 
-        //flat visual objects and filter them that is out of camera with its bounds.
+        //flat visual objects and filter them that is out of projection with its bounds.
         //allocate enough space for array to storage points.
         std::vector<SceneType::VisualObjectType *> validVisualObjects(visualObjectCount);
         uint32_t validVisualObjectCount(0u);
@@ -401,7 +401,7 @@ namespace vg
             , validVisualObjectCount
             , pRoot.get()
             , pScene
-            , pCamera
+            , pProjector
 #ifdef USE_WORLD_BOUNDS
             , &boundsOfViewInWorld
 #endif //USE_WORLD_BOUNDS
@@ -504,7 +504,7 @@ namespace vg
         , uint32_t &PVObjIndex
         , const Transform<SpaceType::SPACE_2> *pTransform
         , Scene<SpaceType::SPACE_2> *pScene
-        , Camera<SpaceType::SPACE_2> *pCamera
+        , const Projector<SpaceType::SPACE_2> *pProjector
 #ifdef USE_WORLD_BOUNDS
         , const fd::Bounds<SpaceTypeInfo<SpaceType::SPACE_2>::PointType> *pViewBoundsInWorld
 #endif
@@ -521,7 +521,7 @@ namespace vg
                 , PVObjIndex
                 , pChild
                 , pScene
-                , pCamera
+                , pProjector
 #ifdef USE_WORLD_BOUNDS
                 , pViewBoundsInWorld
 #endif //USE_WORLD_BOUNDS
@@ -542,16 +542,16 @@ namespace vg
                 pVisualObjectOfChild->setHasClipRect(VG_FALSE);
             }
             else {
-                //Filter obj out of camera view.
+                //Filter obj out of projection.
                 auto boundsOfChild = dynamic_cast<Mesh<MeshDimType::SPACE_2> *>(pMeshOfChild)->getBounds();
 #ifdef USE_WORLD_BOUNDS
                 auto boundsOfChildInWorld = tranBoundsToNewSpace<Vector2>(boundsOfChild, pChild->getMatrixLocalToWorld(), VG_FALSE);
 #endif //USE_WORLD_BOUNDS
-                fd::Rect2D clipRect;    
+                fd::Rect2D clipRect;
 #ifdef USE_WORLD_BOUNDS
-                if (pViewBoundsInWorld->isIntersects(boundsOfChildInWorld) && pScene->isInView(pCamera, boundsOfChildInWorld, &clipRect) == VG_TRUE)
+                if (pViewBoundsInWorld->isIntersects(boundsOfChildInWorld) && pScene->isInProjection(pProjector, boundsOfChildInWorld, &clipRect) == VG_TRUE)
 #else 
-                if (pScene->isInView(pCamera, pChild, boundsOfChild, &clipRect) == VG_TRUE)
+                if (pScene->isInProjection(pProjector, pChild, boundsOfChild, &clipRect) == VG_TRUE)
 #endif //USE_WORLD_BOUNDS
                 {
                     arrPVObjs[PVObjIndex++] = pVisualObjectOfChild;
@@ -569,7 +569,7 @@ namespace vg
     }
 
     void RenderBinder::_bindScene3(Scene<SpaceType::SPACE_3> *pScene
-        , Camera<SpaceType::SPACE_3> *pCamera
+        , const Projector<SpaceType::SPACE_3> *pProjector
         , const PreZTarget *pPreZTarget
         , CmdBuffer *pPreZCmdBuffer
         , CmdBuffer *pBranchCmdBuffer
@@ -590,13 +590,13 @@ namespace vg
         preparingCommonMatrixsCostTimer.begin();
 #endif //DEBUG and VG_ENABLE_COST_TIMER
 
-        auto projMatrix = pScene->getProjMatrix(pCamera);
+        auto projMatrix = pScene->getProjMatrix(pProjector);
 
 #ifdef USE_WORLD_BOUNDS
-        auto boundsOfViewInWorld = pScene->getViewBoundsInWorld(pCamera);
+        auto boundsOfViewInWorld = pScene->getViewBoundsInWorld(pProjector);
 #endif
 
-        auto viewMatrix = pCamera->getTransform()->getMatrixWorldToLocal();
+        auto viewMatrix = pProjector->getWorldToLocalMatrix();
 #if defined(DEBUG) && defined(VG_ENABLE_COST_TIMER)
         preparingCommonMatrixsCostTimer.end();
         VG_COST_TIME_LOG(plog::debug) << "Preparing common matrixs cost time: " 
@@ -610,7 +610,7 @@ namespace vg
         
         //----------Preparing render.
 
-        //Filter visualObject is out of camera with its bounds.
+        //Filter visualObject is out of projection with its bounds.
 #if defined(DEBUG) && defined(VG_ENABLE_COST_TIMER)
         fd::CostTimer visibilityCheckCostTimer(fd::CostTimer::TimerType::ONCE);
         visibilityCheckCostTimer.begin();
@@ -642,9 +642,9 @@ namespace vg
                 fd::Rect2D clipRect;
 #ifdef USE_WORLD_BOUNDS
                 if (boundsOfViewInWorld.isIntersects(boundsInWorld) == FD_TRUE && 
-                    pScene->isInView(pCamera, boundsInWorld, &clipRect) == VG_TRUE)
+                    pScene->isInProjection(pProjector, boundsInWorld, &clipRect) == VG_TRUE)
 #else 
-                if (pScene->isInView(pCamera, pTransform, bounds, &clipRect) == VG_TRUE)
+                if (pScene->isInProjection(pProjector, pTransform, bounds, &clipRect) == VG_TRUE)
 #endif //USE_WORLD_BOUNDS
                 {
                     validVisualObjects[validVisualObjectCount++] = pVisualObject;
@@ -717,7 +717,7 @@ namespace vg
         
                 using PointType = SpaceTypeInfo<SpaceType::SPACE_3>::PointType;
                 using MatrixVectorType = SpaceTypeInfo<SpaceType::SPACE_3>::MatrixVectorType;
-                //transform point from model coordinate system to camera coordinate system.
+                //transform point from model coordinate system to projector coordinate system.
                 pos1 = mvMatrix1 * MatrixVectorType(pos1, 1.0f);
                 pos2 = mvMatrix2 * MatrixVectorType(pos2, 1.0f);
         
@@ -1107,33 +1107,4 @@ namespace vg
         }
         m_bindedObjectCount = 0u;
     }
-
-
-
-
-
-    // RenderBinder::BindForSceneVisualizationInfo::BindForSceneVisualizationInfo(BaseScene *pScene
-    //     , BaseCamera *pCamera
-    //     , const PreZTarget *pPreZTarget
-    //     , CmdBuffer *pPreZCmdBuffer
-    //     , CmdBuffer *pBranchCmdBuffer
-    //     , CmdBuffer *pTrunkWaitBarrierCmdBuffer            
-    //     , CmdBuffer *pTrunkRenderPassCmdBuffer
-    //     , PostRender *pPostRender
-    //     , const PostRenderTarget *pPostRenderTarget
-    //     , CmdBuffer *pPostRenderCmdBuffer
-    //     )
-    //     : pScene(pScene)
-    //     , pCamera(pCamera)
-    //     , pPreZTarget(pPreZTarget)
-    //     , pPreZCmdBuffer(pPreZCmdBuffer)
-    //     , pBranchCmdBuffer(pBranchCmdBuffer)
-    //     , pTrunkWaitBarrierCmdBuffer(pTrunkWaitBarrierCmdBuffer)
-    //     , pTrunkRenderPassCmdBuffer(pTrunkRenderPassCmdBuffer)
-    //     , pPostRender(pPostRender)
-    //     , pPostRenderTarget(pPostRenderTarget)
-    //     , pPostRenderCmdBuffer(pPostRenderCmdBuffer)
-    // {
-
-    // }
 } //vg

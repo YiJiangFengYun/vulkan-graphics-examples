@@ -38,7 +38,7 @@ namespace vg
     }
 
     template <SpaceType SPACE_TYPE>
-    typename Projector<SPACE_TYPE>::MatrixType Projector<SPACE_TYPE>::getLocalToWorldMatix() const
+    typename Projector<SPACE_TYPE>::MatrixType Projector<SPACE_TYPE>::getLocalToWorldMatrix() const
     {
         return m_localToWorldMatrix;
     }

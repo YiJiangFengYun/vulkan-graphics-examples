@@ -12,9 +12,9 @@ namespace vg
 
     }
 
-    Scene3::MatrixType Scene3::getProjMatrix(const CameraType *pCamera) const
+    Scene3::MatrixType Scene3::getProjMatrix(const ProjectorType *pProjector) const
     {
-        auto projMatrix = pCamera->getProjMatrix();
+        auto projMatrix = pProjector->getProjMatrix();
         if (m_isRightHand == VG_FALSE)
         {
             projMatrix[1][1] *= -1;
@@ -28,18 +28,18 @@ namespace vg
         return projMatrix;
     }
 
-    Scene3::BoundsType Scene3::getViewBoundsInWorld(const CameraType *pCamera) const
+    Scene3::BoundsType Scene3::getProjectionBoundsInWorld(const ProjectorType *pProjector) const
     {
         using PointType = typename SpaceTypeInfo<SpaceType::SPACE_3>::PointType;
         using MatrixVectorType = typename SpaceTypeInfo<SpaceType::SPACE_3>::MatrixVectorType;
         BoundsType bounds;
-        if (pCamera->getIsOrthographic() == VG_FALSE)
+        if (pProjector->getIsOrthographic() == VG_FALSE)
         {
-            const Camera3 *pCamera3 = dynamic_cast<const Camera3 *>(pCamera);
-            auto tanHalfFovy = glm::tan(pCamera3->getFovY() / 2.0f);
-            float minZ = pCamera3->getZNear();
-            float maxZ = pCamera3->getZFar();
-            float maxX = maxZ * pCamera3->getAspect() * tanHalfFovy;
+            const Projector3 *pProjector3 = dynamic_cast<const Projector3 *>(pProjector);
+            auto tanHalfFovy = glm::tan(pProjector3->getFovY() / 2.0f);
+            float minZ = pProjector3->getZNear();
+            float maxZ = pProjector3->getZFar();
+            float maxX = maxZ * pProjector3->getAspect() * tanHalfFovy;
             float minX = -maxX;
             float maxY = maxZ * tanHalfFovy;
             float minY = -maxY;
@@ -47,59 +47,60 @@ namespace vg
         }
         else
         {
-            const CameraOP3 *pCameraOP3 = dynamic_cast<const CameraOP3 *>(pCamera);
-            bounds = pCameraOP3->getViewBounds();
+            const ProjectorOP3 *pProjectorOP3 = dynamic_cast<const ProjectorOP3 *>(pProjector);
+            bounds = pProjectorOP3->getViewBounds();
         }
 
-        //matrix from camera local to world.
-        auto matrix = pCamera->getTransform()->getMatrixLocalToWorld();
+        //matrix from local to world.
+        auto matrix = pProjector->getLocalToWorldMatrix();
         auto boundsInWorld = tranBoundsToNewSpace<PointType>(bounds, matrix, VG_FALSE);
 
         return boundsInWorld;
     }
 
-    Bool32 Scene3::isInView(const CameraType *pCamera
+    Bool32 Scene3::isInProjection(const ProjectorType *pProjector
         , const TransformType *pTransform
         , BoundsType bounds
-        , fd::Rect2D *viewRect) const
+        , fd::Rect2D *projectionRect
+        ) const
     {
-        if (pCamera->getIsOrthographic() == VG_TRUE) 
+        if (pProjector->getIsOrthographic() == VG_TRUE) 
         {
             //get MVP matrix.
-            auto mvpMatrix = getProjMatrix(pCamera) * pCamera->getTransform()->getMatrixWorldToLocal() * pTransform->getMatrixLocalToWorld();
-            auto boundsInView = tranBoundsToNewSpace<PointType>(bounds, mvpMatrix, VG_FALSE);
-            BoundsType boundsOfView(PointType(-1.0f, -1.0f, 0.0f), PointType(1.0f, 1.0f, 1.0f));
-            BoundsType intersectionInView;        
-            Bool32 isInsideCameraView = VG_FALSE;
-            ////check if it is inside camera view.
-            if (boundsOfView.intersects(boundsInView, &intersectionInView))
+            auto mvpMatrix = getProjMatrix(pProjector) * pProjector->getWorldToLocalMatrix() * pTransform->getMatrixLocalToWorld();
+            auto boundsInProjection = tranBoundsToNewSpace<PointType>(bounds, mvpMatrix, VG_FALSE);
+            BoundsType boundsOfProjection(PointType(-1.0f, -1.0f, 0.0f), PointType(1.0f, 1.0f, 1.0f));
+            BoundsType intersectionInProjection;        
+            Bool32 isInsideProjection = VG_FALSE;
+            ////check if it is inside projection view.
+            if (boundsOfProjection.intersects(boundsInProjection, &intersectionInProjection))
             {
-                isInsideCameraView = VG_TRUE;
-                if (viewRect != nullptr)
+                isInsideProjection = VG_TRUE;
+                if (projectionRect != nullptr)
                 {
-                    auto min = intersectionInView.getMin();
-                    auto size = intersectionInView.getSize();
-                    (*viewRect).x = min.x;
-                    (*viewRect).y = min.y;
-                    (*viewRect).width = size.x;
-                    (*viewRect).height = size.y;
+                    auto min = intersectionInProjection.getMin();
+                    auto size = intersectionInProjection.getSize();
+                    projectionRect->x = min.x;
+                    projectionRect->y = min.y;
+                    projectionRect->width = size.x;
+                    projectionRect->height = size.y;
                 }
             }
-            return isInsideCameraView;
+            return isInsideProjection;
         }
         else 
         {
             //avoid error of calculating result projected bounds when bounds cross with z = 0 plane,
             //we should separate to multiply step to caluclate result bounds.
-            //1.first, we should get mv matrix to calculate bounds in camera space.
-            auto mvMatrix = pCamera->getTransform()->getMatrixWorldToLocal() * pTransform->getMatrixLocalToWorld();
-            auto boundsInCamera = tranBoundsToNewSpace<PointType>(bounds, mvMatrix, VG_FALSE);
+            //1.first, we should get mv matrix to calculate bounds in projectior local space.
+            auto mvMatrix = pProjector->getWorldToLocalMatrix() * pTransform->getMatrixLocalToWorld();
+            auto boundsInProjectorLocal = tranBoundsToNewSpace<PointType>(bounds, mvMatrix, VG_FALSE);
             //2.then, we clip bounds by z far and z near planes.
-            auto min = boundsInCamera.getMin();
-            auto max = boundsInCamera.getMax();
-            const Camera3 *pCamera3 = dynamic_cast<const Camera3 *>(pCamera);
-            auto zNear = pCamera3->getZNear();
-            auto zFar = pCamera3->getZFar();
+            auto min = boundsInProjectorLocal.getMin();
+            auto max = boundsInProjectorLocal.getMax();
+            const Projector3 *pProjector3 = dynamic_cast<const Projector3 *>(pProjector);
+            auto zNear = pProjector3->getZNear();
+            auto zFar = pProjector3->getZFar();
             if (min.z < zNear)
             {
                 min.z = zNear;
@@ -110,72 +111,73 @@ namespace vg
                 max.z = zFar;
                 if (min.z > zFar) min.z = zFar;
             }
-            boundsInCamera.setMinMax(min, max);
-            //3. final, we get bounds in normalize device space.
-            auto projMatrx = getProjMatrix(pCamera);
-            auto boundsInView = tranBoundsToNewSpace<PointType>(boundsInCamera, projMatrx, VG_TRUE);
-            BoundsType boundsOfView(PointType(-1.0f, -1.0f, 0.0f), PointType(1.0f, 1.0f, 1.0f));
-            BoundsType intersectionInView;        
-            Bool32 isInsideCameraView = VG_FALSE;
-            ////check if it is inside camera view.
-            if (boundsOfView.intersects(boundsInView, &intersectionInView))
+            boundsInProjectorLocal.setMinMax(min, max);
+            //3. final, we get bounds in normalize device space (projection space).
+            auto projMatrx = getProjMatrix(pProjector);
+            auto boundsInProjection = tranBoundsToNewSpace<PointType>(boundsInProjectorLocal, projMatrx, VG_TRUE);
+            BoundsType boundsOfProjection(PointType(-1.0f, -1.0f, 0.0f), PointType(1.0f, 1.0f, 1.0f));
+            BoundsType intersectionInProjection;        
+            Bool32 isInsideProjection = VG_FALSE;
+            ////check if it is inside projection.
+            if (boundsOfProjection.intersects(boundsInProjection, &intersectionInProjection))
             {
-                isInsideCameraView = VG_TRUE;
-                if (viewRect != nullptr)
+                isInsideProjection = VG_TRUE;
+                if (projectionRect != nullptr)
                 {
-                    auto min = intersectionInView.getMin();
-                    auto size = intersectionInView.getSize();
-                    (*viewRect).x = min.x;
-                    (*viewRect).y = min.y;
-                    (*viewRect).width = size.x;
-                    (*viewRect).height = size.y;
+                    auto min = intersectionInProjection.getMin();
+                    auto size = intersectionInProjection.getSize();
+                    projectionRect->x = min.x;
+                    projectionRect->y = min.y;
+                    projectionRect->width = size.x;
+                    projectionRect->height = size.y;
                 }
             }
-            return isInsideCameraView;            
+            return isInsideProjection;
         }
     }
 
-    Bool32 Scene3::isInView(const CameraType *pCamera
+    Bool32 Scene3::isInProjection(const ProjectorType *pProjector
         , BoundsType bounds
-        , fd::Rect2D *viewRect) const
+        , fd::Rect2D *projectionRect
+        ) const
     {
-        if (pCamera->getIsOrthographic() == VG_TRUE) 
+        if (pProjector->getIsOrthographic() == VG_TRUE) 
         {
             //get MVP matrix.
-            auto vpMatrix = getProjMatrix(pCamera) * pCamera->getTransform()->getMatrixWorldToLocal();
-            auto boundsInView = tranBoundsToNewSpace<PointType>(bounds, vpMatrix, VG_FALSE);
-            BoundsType boundsOfView(PointType(-1.0f, -1.0f, 0.0f), PointType(1.0f, 1.0f, 1.0f));
-            BoundsType intersectionInView;        
-            Bool32 isInsideCameraView = VG_FALSE;
-            ////check if it is inside camera view.
-            if (boundsOfView.intersects(boundsInView, &intersectionInView))
+            auto vpMatrix = getProjMatrix(pProjector) * pProjector->getWorldToLocalMatrix();
+            auto boundsInProjection = tranBoundsToNewSpace<PointType>(bounds, vpMatrix, VG_FALSE);
+            BoundsType boundsOfProjection(PointType(-1.0f, -1.0f, 0.0f), PointType(1.0f, 1.0f, 1.0f));
+            BoundsType intersectionInProjection;
+            Bool32 isInsideProjection = VG_FALSE;
+            ////check if it is inside projection.
+            if (boundsOfProjection.intersects(boundsInProjection, &intersectionInProjection))
             {
-                isInsideCameraView = VG_TRUE;
-                if (viewRect != nullptr)
+                isInsideProjection = VG_TRUE;
+                if (projectionRect != nullptr)
                 {
-                    auto min = intersectionInView.getMin();
-                    auto size = intersectionInView.getSize();
-                    (*viewRect).x = min.x;
-                    (*viewRect).y = min.y;
-                    (*viewRect).width = size.x;
-                    (*viewRect).height = size.y;
+                    auto min = intersectionInProjection.getMin();
+                    auto size = intersectionInProjection.getSize();
+                    projectionRect->x = min.x;
+                    projectionRect->y = min.y;
+                    projectionRect->width = size.x;
+                    projectionRect->height = size.y;
                 }
             }
-            return isInsideCameraView;
+            return isInsideProjection;
         }
         else 
         {
             //avoid error of calculating result projected bounds when bounds cross with z = 0 plane,
             //we should separate to multiply step to caluclate result bounds.
-            //1.first, we should get mv matrix to calculate bounds in camera space.
-            auto vMatrix = pCamera->getTransform()->getMatrixWorldToLocal();
-            auto boundsInCamera = tranBoundsToNewSpace<PointType>(bounds, vMatrix, VG_FALSE);
+            //1.first, we should get mv matrix to calculate bounds in projector local space.
+            auto vMatrix = pProjector->getWorldToLocalMatrix();
+            auto boundsInProjectorLocal = tranBoundsToNewSpace<PointType>(bounds, vMatrix, VG_FALSE);
             //2.then, we clip bounds by z far and z near planes.
-            auto min = boundsInCamera.getMin();
-            auto max = boundsInCamera.getMax();
-            const Camera3 *pCamera3 = dynamic_cast<const Camera3 *>(pCamera);
-            auto zNear = pCamera3->getZNear();
-            auto zFar = pCamera3->getZFar();
+            auto min = boundsInProjectorLocal.getMin();
+            auto max = boundsInProjectorLocal.getMax();
+            const Projector3 *pProjector3 = dynamic_cast<const Projector3 *>(pProjector);
+            auto zNear = pProjector3->getZNear();
+            auto zFar = pProjector3->getZFar();
             if (min.z < zNear)
             {
                 min.z = zNear;
@@ -186,28 +188,28 @@ namespace vg
                 max.z = zFar;
                 if (min.z > zFar) min.z = zFar;
             }
-            boundsInCamera.setMinMax(min, max);
-            //3. final, we get bounds in normalize device space.
-            auto projMatrx = getProjMatrix(pCamera);
-            auto boundsInView = tranBoundsToNewSpace<PointType>(boundsInCamera, projMatrx, VG_TRUE);
-            BoundsType boundsOfView(PointType(-1.0f, -1.0f, 0.0f), PointType(1.0f, 1.0f, 1.0f));
-            BoundsType intersectionInView;        
-            Bool32 isInsideCameraView = VG_FALSE;
-            ////check if it is inside camera view.
-            if (boundsOfView.intersects(boundsInView, &intersectionInView))
+            boundsInProjectorLocal.setMinMax(min, max);
+            //3. final, we get bounds in normalize device space (projection space).
+            auto projMatrx = getProjMatrix(pProjector);
+            auto boundsInProjection = tranBoundsToNewSpace<PointType>(boundsInProjectorLocal, projMatrx, VG_TRUE);
+            BoundsType boundsOfProjection(PointType(-1.0f, -1.0f, 0.0f), PointType(1.0f, 1.0f, 1.0f));
+            BoundsType intersectionInProjection;
+            Bool32 isInsideProjection = VG_FALSE;
+            ////check if it is inside projection.
+            if (boundsOfProjection.intersects(boundsInProjection, &intersectionInProjection))
             {
-                isInsideCameraView = VG_TRUE;
-                if (viewRect != nullptr)
+                isInsideProjection = VG_TRUE;
+                if (projectionRect != nullptr)
                 {
-                    auto min = intersectionInView.getMin();
-                    auto size = intersectionInView.getSize();
-                    (*viewRect).x = min.x;
-                    (*viewRect).y = min.y;
-                    (*viewRect).width = size.x;
-                    (*viewRect).height = size.y;
+                    auto min = intersectionInProjection.getMin();
+                    auto size = intersectionInProjection.getSize();
+                    projectionRect->x = min.x;
+                    projectionRect->y = min.y;
+                    projectionRect->width = size.x;
+                    projectionRect->height = size.y;
                 }
             }
-            return isInsideCameraView;            
+            return isInsideProjection;
         }
     }
 

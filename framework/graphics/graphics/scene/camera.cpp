@@ -19,6 +19,11 @@ namespace vg
         return m_pProjector->getIsOrthographic();
     }
 
+    const BaseProjector *BaseCamera::getProjectorBase() const
+    {
+        return m_pProjector.get();
+    }
+
     template <SpaceType SPACE_TYPE>
     Camera<SPACE_TYPE>::Camera()
         : BaseCamera()
@@ -31,6 +36,14 @@ namespace vg
     typename Projector<SPACE_TYPE>::MatrixType Camera<SPACE_TYPE>::getProjMatrix() const
     {
         return (dynamic_cast<Projector<SPACE_TYPE> *>(m_pProjector.get()))->getProjMatrix();
+    }
+
+    template <SpaceType SPACE_TYPE>
+    const BaseProjector *Camera<SPACE_TYPE>::getProjectorBase() const
+    {
+        Projector<SPACE_TYPE> *pProjector = dynamic_cast<Projector<SPACE_TYPE> *>(m_pProjector.get());
+        pProjector->setLocalToWorldMatrix(m_pTransform->getMatrixLocalToWorld());
+        return pProjector;
     }
 
     template <SpaceType SPACE_TYPE>

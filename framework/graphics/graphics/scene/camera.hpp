@@ -12,6 +12,7 @@ namespace vg
         BaseCamera();
         virtual ~BaseCamera();
         Bool32 getIsOrthographic() const;
+        virtual const BaseProjector *getProjectorBase() const;
     protected:
         std::shared_ptr<BaseProjector> m_pProjector;
     };
@@ -22,6 +23,7 @@ namespace vg
     public:
         Camera();
         typename Projector<SPACE_TYPE>::MatrixType getProjMatrix() const;
+        virtual const BaseProjector *getProjectorBase() const override;
         const Projector<SPACE_TYPE> *getProjector() const;
     };
 } //namespace kgs

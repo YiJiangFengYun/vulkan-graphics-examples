@@ -451,19 +451,21 @@ namespace vg
             //trunk cmd buffer
             m_renderBinder.bindForRenderPassEnd(&m_trunkRenderPassCmdBuffer);
         }
+
+        CMDParser::ResultInfo cmdParseResult;
          
         //record ...
         // pre z
         if (preZEnable)
         {
-            resultInfo.drawCount += m_pPreZCmdBuffer->getCmdCount();
             CMDParser::record(m_pPreZCmdBuffer.get()
                 , m_pCommandBuffer.get()
                 , &m_pipelineCache
+                , &cmdParseResult
                 );
+            resultInfo.drawCount += cmdParseResult.drawCount;
         }
         //branch render pass.
-        CMDParser::ResultInfo cmdParseResult;
         CMDParser::record(&m_branchCmdBuffer,
             m_pCommandBuffer.get(),
             &m_pipelineCache,
@@ -474,18 +476,21 @@ namespace vg
         CMDParser::recordTrunkWaitBarrier(&m_trunkWaitBarrierCmdBuffer,
             m_pCommandBuffer.get());
         //trunk render pass.
-        resultInfo.drawCount += m_trunkRenderPassCmdBuffer.getCmdCount();
         CMDParser::record(&m_trunkRenderPassCmdBuffer
             , m_pCommandBuffer.get()
             , &m_pipelineCache
+            , &cmdParseResult
             );
+        resultInfo.drawCount += cmdParseResult.drawCount;
         //post render record
         if (postRenderEnable)
         {
             CMDParser::record(m_pPostRenderCmdbuffer.get()
                 , m_pCommandBuffer.get()
                 , &m_pipelineCache
+                , &cmdParseResult
                 );
+            resultInfo.drawCount += cmdParseResult.drawCount;
         }      
         if (preZEnable)
         {

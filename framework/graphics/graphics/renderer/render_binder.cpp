@@ -14,6 +14,44 @@ namespace vg
 #endif
         );
 
+    RenderBinderInfo::RenderBinderInfo(Bool32 firstScene
+        , Bool32 preZEnable
+        , Bool32 postRenderEnable
+        , BaseScene *pScene
+        , const BaseProjector *pProjector
+        , PostRender *pPostRender
+
+        , const PreZTarget *pPreZTarget
+        , const PostRenderTarget *pPostRenderTarget
+        , const RendererTarget *pRendererTarget
+
+        , CmdBuffer *pPreZCmdBuffer
+        , CmdBuffer *pBranchCmdBuffer
+        , CmdBuffer *pTrunkWaitBarrierCmdBuffer
+        , CmdBuffer *pTrunkRenderPassCmdBuffer
+        , CmdBuffer *pPostRenderCmdBuffer
+        )
+        : firstScene(firstScene)
+        , preZEnable(preZEnable)
+        , postRenderEnable(postRenderEnable)
+
+        , pScene(pScene)
+        , pProjector(pProjector)
+        , pPostRender(pPostRender)
+
+        , pPreZTarget(pPreZTarget)
+        , pPostRenderTarget(pPostRenderTarget)
+        , pRendererTarget(pRendererTarget)
+
+        , pPreZCmdBuffer(pPreZCmdBuffer)
+        , pBranchCmdBuffer(pBranchCmdBuffer)
+        , pTrunkWaitBarrierCmdBuffer(pTrunkWaitBarrierCmdBuffer)
+        , pTrunkRenderPassCmdBuffer(pTrunkRenderPassCmdBuffer)
+        , pPostRenderCmdBuffer(pPostRenderCmdBuffer)
+    {
+
+    }
+
     RenderBinder::RenderBinder(uint32_t framebufferWidth
         , uint32_t framebufferHeight
         )
@@ -58,62 +96,10 @@ namespace vg
         m_lightDataBufferCache.begin();
     }
 
-    void RenderBinder::bindForRenderPassBegin(const BaseRenderTarget *pRenderTarget
-        , const vk::RenderPass *pRenderPass
-        , const vk::Framebuffer *pFramebuffer
-        , CmdBuffer *pCmdBuffer
-        )
-    {
-        const auto framebufferWidth = pRenderTarget->getFramebufferWidth();
-        const auto framebufferHeight = pRenderTarget->getFramebufferHeight();
-        const auto renderArea = pRenderTarget->getRenderArea();
-        RenderPassBeginInfo beginInfo;
-        beginInfo.pRenderPass = pRenderPass;
-        beginInfo.pFramebuffer = pFramebuffer;
-        beginInfo.framebufferWidth = framebufferWidth;
-        beginInfo.framebufferHeight = framebufferHeight;
-        beginInfo.renderArea = pRenderTarget->getRenderArea();
-        beginInfo.clearValueCount = pRenderTarget->getClearValueCount();
-        beginInfo.pClearValues = pRenderTarget->getClearValues();
-
-        CmdInfo cmdInfo;
-        cmdInfo.pRenderPassBeginInfo = &beginInfo;
-        pCmdBuffer->addCmd(cmdInfo);
-    }
-
-    void RenderBinder::bindForRenderPassEnd(CmdBuffer *pCmdBuffer)
-    {
-        RenderPassEndInfo endInfo;
-        CmdInfo cmdInfo;
-        cmdInfo.pRenderPassEndInfo = &endInfo;
-        pCmdBuffer->addCmd(cmdInfo);
-    }
-
-    void RenderBinder::bind(BaseScene *pScene
-        , const BaseProjector *pProjector
-        , const PreZTarget *pPreZTarget
-        , CmdBuffer *pPreZCmdBuffer
-        , CmdBuffer *pBranchCmdBuffer
-        , CmdBuffer *pTrunkWaitBarrierCmdBuffer        
-        , CmdBuffer *pTrunkRenderPassCmdBuffer
-        , PostRender *pPostRender
-        , const PostRenderTarget *pPostRenderTarget
-        , CmdBuffer *pPostRenderCmdBuffer
-        )
+    void RenderBinder::bind(RenderBinderInfo info)
     {
         _beginBind();
-        _syncLightData(pScene);
-        _bind(pScene, 
-            pProjector,
-            pPreZTarget,
-            pPreZCmdBuffer, 
-            pBranchCmdBuffer, 
-            pTrunkWaitBarrierCmdBuffer, 
-            pTrunkRenderPassCmdBuffer,
-            pPostRender,
-            pPostRenderTarget,
-            pPostRenderCmdBuffer
-            );
+        _bind(info);
         _endBind();
     }
 
@@ -125,6 +111,105 @@ namespace vg
     void RenderBinder::_beginBind()
     {
         m_bindedObjectCount = 0u;
+    }
+
+    void RenderBinder::_endBind()
+    {
+        for (uint32_t i = 0; i < m_bindedObjectCount; ++i) {
+            m_bindedObjects[i]->endBind();
+        }
+        m_bindedObjectCount = 0u;
+    }
+
+    void RenderBinder::_bind(RenderBinderInfo info)
+    {
+        _syncLightData(info.pScene);
+        _bindForRenderPassBegin(info);
+        //scene make cmds.
+        if (info.pScene->getSpaceType() == SpaceType::SPACE_2)
+        {
+            _bindScene2(dynamic_cast<Scene<SpaceType::SPACE_2> *>(info.pScene), 
+                dynamic_cast<const Projector<SpaceType::SPACE_2> *>(info.pProjector),
+                info.preZEnable ? info.pPreZTarget : nullptr,
+                info.preZEnable ? info.pPreZCmdBuffer : nullptr,
+                info.pBranchCmdBuffer,                    
+                info.pTrunkWaitBarrierCmdBuffer,
+                info.pTrunkRenderPassCmdBuffer
+                );
+        } 
+        else if (info.pScene->getSpaceType() == SpaceType::SPACE_3)
+        {
+            _bindScene3(dynamic_cast<Scene<SpaceType::SPACE_3> *>(info.pScene), 
+                dynamic_cast<const Projector<SpaceType::SPACE_3> *>(info.pProjector), 
+                info.preZEnable ? info.pPreZTarget : nullptr,
+                info.preZEnable ? info.pPreZCmdBuffer : nullptr,
+                info.pBranchCmdBuffer,                    
+                info.pTrunkWaitBarrierCmdBuffer,
+                info.pTrunkRenderPassCmdBuffer
+                );
+        } 
+        else 
+        {
+            //todo
+        }
+        //post render make cmds.
+        if (info.postRenderEnable)
+        {
+            auto pMaterial = info.pPostRender->getMaterial();
+            auto passCount = pMaterial->getPassCount();
+            for (uint32_t i = 0; i < passCount; ++i)
+            {
+                auto pPass = pMaterial->getPassWithIndex(i);
+                auto buildInDataInfo = pPass->getBuildInDataInfo();
+                auto buildInComponentCount = buildInDataInfo.componentCount;
+                for (uint32_t j = 0; j < buildInComponentCount; ++j)
+                {
+                    if ((*(buildInDataInfo.pComponent + j)).type == Pass::BuildInDataType::POST_RENDER_RESULT)
+                    {
+                        auto pColorTex = info.pPostRenderTarget->getColorAttachment();
+                        vg::PassTextureInfo::TextureInfo itemInfo = {
+                            pColorTex,
+                            nullptr,
+                            nullptr,
+                            vk::ImageLayout::eUndefined,
+                        };
+                        PassTextureInfo info = {
+                            1u,
+                            &itemInfo,
+                            VG_PASS_POST_RENDER_TEXTURE_BINDING_PRIORITY,
+                            vg::ImageDescriptorType::COMBINED_IMAGE_SAMPLER,
+                            vk::ShaderStageFlagBits::eFragment,
+                        };
+                        if (pPass->hasTexture(VG_PASS_POST_RENDER_TEXTURE_NAME) == VG_FALSE)
+                        {
+                            pPass->addTexture(VG_PASS_POST_RENDER_TEXTURE_NAME, info);
+                        }
+                        else
+                        {
+                            pPass->setTexture(VG_PASS_POST_RENDER_TEXTURE_NAME, info);
+                        }
+                        pPass->apply();
+                        break;
+                    }
+                }
+            }
+            PostRender::BindInfo bindInfo = {
+                m_framebufferWidth,
+                m_framebufferHeight,
+            };
+            PostRender::BindResult result = {
+                info.pPostRenderCmdBuffer,
+            };
+            
+            info.pPostRender->beginBind(bindInfo, &result);
+        }
+        //post render end bind
+        if (info.postRenderEnable)
+        {
+            info.pPostRender->endBind();
+        }
+
+        _bindForRenderPassEnd(info);
     }
 
     void RenderBinder::_syncLightData(BaseScene *pScene)
@@ -249,104 +334,83 @@ namespace vg
 
     }
 
-    void RenderBinder::_bind(BaseScene *pScene
-        , const BaseProjector *pProjector
-        , const PreZTarget *pPreZTarget
-        , CmdBuffer *pPreZCmdBuffer
-        , CmdBuffer *pBranchCmdBuffer
-        , CmdBuffer *pTrunkWaitBarrierCmdBuffer        
-        , CmdBuffer *pTrunkRenderPassCmdBuffer
-        , PostRender *pPostRender
-        , const PostRenderTarget *pPostRenderTarget
-        , CmdBuffer *pPostRenderCmdBuffer
-        )
+    void RenderBinder::_bindForRenderPassBegin(RenderBinderInfo info)
     {
-        _beginBind();
-            
-        //scene make cmds.
-        if (pScene->getSpaceType() == SpaceType::SPACE_2)
+        //bind render pass begin.
+        if (info.preZEnable)
         {
-            _bindScene2(dynamic_cast<Scene<SpaceType::SPACE_2> *>(pScene), 
-                dynamic_cast<const Projector<SpaceType::SPACE_2> *>(pProjector),
-                pPreZTarget,
-                pPreZCmdBuffer,
-                pBranchCmdBuffer,                    
-                pTrunkWaitBarrierCmdBuffer,
-                pTrunkRenderPassCmdBuffer
+            //pre z cmd buffer
+            const BaseRenderTarget *pRenderTarget;
+            const vk::RenderPass *pRenderPass;
+            const vk::Framebuffer *pFramebuffer;
+            pRenderTarget = info.pPreZTarget;
+            pRenderPass = info.pPreZTarget->getRenderPass();
+            pFramebuffer = info.pPreZTarget->getFramebuffer();
+            _renderPassBegin(pRenderTarget
+                , pRenderPass
+                , pFramebuffer
+                , info.pPreZCmdBuffer
                 );
-        } else if (pScene->getSpaceType() == SpaceType::SPACE_3)
+        }
+        if (info.postRenderEnable)
         {
-            _bindScene3(dynamic_cast<Scene<SpaceType::SPACE_3> *>(pScene), 
-                dynamic_cast<const Projector<SpaceType::SPACE_3> *>(pProjector), 
-                pPreZTarget,
-                pPreZCmdBuffer,
-                pBranchCmdBuffer,                    
-                pTrunkWaitBarrierCmdBuffer,
-                pTrunkRenderPassCmdBuffer
+            const BaseRenderTarget *pRenderTarget;
+            const vk::RenderPass *pRenderPass;
+            const vk::Framebuffer *pFramebuffer;
+            //trunk cmd buffer
+            pRenderTarget = info.pPostRenderTarget;
+            pRenderPass = info.pPostRenderTarget->getRenderPass();
+            pFramebuffer = info.pPostRenderTarget->getFramebuffer();
+            _renderPassBegin(pRenderTarget
+                , pRenderPass
+                , pFramebuffer
+                , info.pTrunkRenderPassCmdBuffer
                 );
-        } else {
-            //todo
-        }
-        //post render make cmds.
-        if (pPostRender != nullptr && pPostRenderTarget != nullptr && pPostRenderCmdBuffer != nullptr &&
-            pPostRender->isValidBindToRender() == VG_TRUE
-            )
-        {
-            auto pMaterial = pPostRender->getMaterial();
-            auto passCount = pMaterial->getPassCount();
-            for (uint32_t i = 0; i < passCount; ++i)
-            {
-                auto pPass = pMaterial->getPassWithIndex(i);
-                auto buildInDataInfo = pPass->getBuildInDataInfo();
-                auto buildInComponentCount = buildInDataInfo.componentCount;
-                for (uint32_t j = 0; j < buildInComponentCount; ++j)
-                {
-                    if ((*(buildInDataInfo.pComponent + j)).type == Pass::BuildInDataType::POST_RENDER_RESULT)
-                    {
-                        auto pColorTex = pPostRenderTarget->getColorAttachment();
-                        vg::PassTextureInfo::TextureInfo itemInfo = {
-                            pColorTex,
-                            nullptr,
-                            nullptr,
-                            vk::ImageLayout::eUndefined,
-                        };
-                        PassTextureInfo info = {
-                            1u,
-                            &itemInfo,
-                            VG_PASS_POST_RENDER_TEXTURE_BINDING_PRIORITY,
-                            vg::ImageDescriptorType::COMBINED_IMAGE_SAMPLER,
-                            vk::ShaderStageFlagBits::eFragment,
-                        };
-                        if (pPass->hasTexture(VG_PASS_POST_RENDER_TEXTURE_NAME) == VG_FALSE)
-                        {
-                            pPass->addTexture(VG_PASS_POST_RENDER_TEXTURE_NAME, info);
-                        }
-                        else
-                        {
-                            pPass->setTexture(VG_PASS_POST_RENDER_TEXTURE_NAME, info);
-                        }
-                        pPass->apply();
-                        break;
-                    }
-                }
-            }
-            PostRender::BindInfo bindInfo = {
-                m_framebufferWidth,
-                m_framebufferHeight,
-            };
-            PostRender::BindResult result = {
-                pPostRenderCmdBuffer,
-            };
             
-            pPostRender->beginBind(bindInfo, &result);
+            //post render cmd buffer
+            pRenderTarget = info.pRendererTarget;
+            pRenderPass = info.firstScene ? info.pRendererTarget->getFirstRenderPass() : info.pRendererTarget->getSecondRenderPass();
+            pFramebuffer = info.firstScene ? info.pRendererTarget->getFirstFramebuffer() : info.pRendererTarget->getSecondFramebuffer();
+            _renderPassBegin(pRenderTarget
+                , pRenderPass
+                , pFramebuffer
+                , info.pPostRenderCmdBuffer
+                );
         }
-        //post render end bind
-        if (pPostRender != nullptr && pPostRenderTarget != nullptr && pPostRenderCmdBuffer != nullptr &&
-            pPostRender->isValidBindToRender() == VG_TRUE)
+        else
         {
-            pPostRender->endBind();
+            const BaseRenderTarget *pRenderTarget;
+            const vk::RenderPass *pRenderPass;
+            const vk::Framebuffer *pFramebuffer;
+            //trunk cmd buffer
+            pRenderTarget = info.pRendererTarget;
+            pRenderPass = info.firstScene ? info.pRendererTarget->getFirstRenderPass() : info.pRendererTarget->getSecondRenderPass();
+            pFramebuffer = info.firstScene ? info.pRendererTarget->getFirstFramebuffer() : info.pRendererTarget->getSecondFramebuffer();
+            _renderPassBegin(pRenderTarget
+                , pRenderPass
+                , pFramebuffer
+                , info.pTrunkRenderPassCmdBuffer
+                );
         }
-        _endBind();    
+    }
+
+    void RenderBinder::_bindForRenderPassEnd(RenderBinderInfo info)
+    {
+        //bind render pass end.
+        if (info.preZEnable) _renderPassEnd(info.pPreZCmdBuffer);
+        if (info.postRenderEnable)
+        {
+            //trunk cmd buffer
+            _renderPassEnd(info.pTrunkRenderPassCmdBuffer);
+            
+            //post render cmd buffer
+            _renderPassEnd(info.pPostRenderCmdBuffer);
+        }
+        else
+        {
+            //trunk cmd buffer
+            _renderPassEnd(info.pTrunkRenderPassCmdBuffer);
+        }
     }
 
     void RenderBinder::_bindScene2(Scene<SpaceType::SPACE_2> *pScene
@@ -427,13 +491,12 @@ namespace vg
         {
             auto pVisualObject = validVisualObjects[i];
             auto modelMatrix = tranMat3ToMat4(pVisualObject->getTransform()->getMatrixLocalToWorld());
-            if (pPreZCmdBuffer != nullptr && pPreZTarget != nullptr) 
+            if (pPreZCmdBuffer != nullptr) 
             {
                 _setPreZBuildInData(pVisualObject
                     , modelMatrix
                     , viewMatrix
                     , projMatrix
-                    , pPreZTarget
 #if defined(DEBUG) && defined(VG_ENABLE_COST_TIMER)
                     , preparingBuildInDataCostTimer
 #endif //DEBUG and VG_ENABLE_COST_TIMER    
@@ -736,13 +799,12 @@ namespace vg
             {
                 auto pVisualObject = queues[typeIndex][objectIndex];
                 auto modelMatrix = pVisualObject->getTransform()->getMatrixLocalToWorld();
-                if (pPreZCmdBuffer != nullptr && pPreZTarget != nullptr) 
+                if (pPreZCmdBuffer != nullptr) 
                 {
                     _setPreZBuildInData(pVisualObject
                         , modelMatrix
                         , viewMatrix
                         , projMatrix
-                        , pPreZTarget
 #if defined(DEBUG) && defined(VG_ENABLE_COST_TIMER)
                         , preparingBuildInDataCostTimer
 #endif //DEBUG and VG_ENABLE_COST_TIMER    
@@ -815,7 +877,6 @@ namespace vg
         , Matrix4x4 modelMatrix
         , Matrix4x4 viewMatrix
         , Matrix4x4 projMatrix
-        , const PreZTarget *pPreZTarget
 #if defined(DEBUG) && defined(VG_ENABLE_COST_TIMER)
         , fd::CostTimer * pPreparingBuildInDataCostTimer
 #endif //DEBUG and VG_ENABLE_COST_TIMER
@@ -829,8 +890,7 @@ namespace vg
         {
             auto pMaterial = pVisualObject->getMaterial(materialIndex);
             //pre z pass.
-            if (pPreZTarget != nullptr && 
-                pMaterial->getPreZPass() != nullptr)
+            if (pMaterial->getPreZPass() != nullptr)
             {
                 auto pPreZPass = pMaterial->getPreZPass();
                 auto pPassOfPreZPass = pPreZPass->getPass();
@@ -1100,11 +1160,34 @@ namespace vg
         ++m_bindedObjectCount;
     }
 
-    void RenderBinder::_endBind()
+    void RenderBinder::_renderPassBegin(const BaseRenderTarget *pRenderTarget
+        , const vk::RenderPass *pRenderPass
+        , const vk::Framebuffer *pFramebuffer
+        , CmdBuffer *pCmdBuffer
+        )
     {
-        for (uint32_t i = 0; i < m_bindedObjectCount; ++i) {
-            m_bindedObjects[i]->endBind();
-        }
-        m_bindedObjectCount = 0u;
+        const auto framebufferWidth = pRenderTarget->getFramebufferWidth();
+        const auto framebufferHeight = pRenderTarget->getFramebufferHeight();
+        const auto renderArea = pRenderTarget->getRenderArea();
+        RenderPassBeginInfo beginInfo;
+        beginInfo.pRenderPass = pRenderPass;
+        beginInfo.pFramebuffer = pFramebuffer;
+        beginInfo.framebufferWidth = framebufferWidth;
+        beginInfo.framebufferHeight = framebufferHeight;
+        beginInfo.renderArea = pRenderTarget->getRenderArea();
+        beginInfo.clearValueCount = pRenderTarget->getClearValueCount();
+        beginInfo.pClearValues = pRenderTarget->getClearValues();
+
+        CmdInfo cmdInfo;
+        cmdInfo.pRenderPassBeginInfo = &beginInfo;
+        pCmdBuffer->addCmd(cmdInfo);
+    }
+
+    void RenderBinder::_renderPassEnd(CmdBuffer *pCmdBuffer)
+    {
+        RenderPassEndInfo endInfo;
+        CmdInfo cmdInfo;
+        cmdInfo.pRenderPassEndInfo = &endInfo;
+        pCmdBuffer->addCmd(cmdInfo);
     }
 } //vg

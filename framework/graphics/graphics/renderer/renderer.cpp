@@ -368,89 +368,25 @@ namespace vg
         {
             m_pPostRenderCmdbuffer->begin();
         }
-        //bind render pass begin.
-        if (preZEnable)
-        {
-            //pre z cmd buffer
-            const BaseRenderTarget *pRenderTarget;
-            const vk::RenderPass *pRenderPass;
-            const vk::Framebuffer *pFramebuffer;
-            pRenderTarget = m_pPreZTarget.get();
-            pRenderPass = m_pPreZTarget->getRenderPass();
-            pFramebuffer = m_pPreZTarget->getFramebuffer();
-            m_renderBinder.bindForRenderPassBegin(pRenderTarget
-                , pRenderPass
-                , pFramebuffer
-                , m_pPreZCmdBuffer.get()
-                );
-        }
-        if (postRenderEnable)
-        {
-            const BaseRenderTarget *pRenderTarget;
-            const vk::RenderPass *pRenderPass;
-            const vk::Framebuffer *pFramebuffer;
-            //trunk cmd buffer
-            pRenderTarget = m_pPostRenderTarget.get();
-            pRenderPass = m_pPostRenderTarget->getRenderPass();
-            pFramebuffer = m_pPostRenderTarget->getFramebuffer();
-            m_renderBinder.bindForRenderPassBegin(pRenderTarget
-                , pRenderPass
-                , pFramebuffer
-                , &m_trunkRenderPassCmdBuffer
-                );
-            
-            //post render cmd buffer
-            pRenderTarget = m_pRendererTarget;
-            pRenderPass = isFirstScene ? m_pRendererTarget->getFirstRenderPass() : m_pRendererTarget->getSecondRenderPass();
-            pFramebuffer = isFirstScene ? m_pRendererTarget->getFirstFramebuffer() : m_pRendererTarget->getSecondFramebuffer();
-            m_renderBinder.bindForRenderPassBegin(pRenderTarget
-                , pRenderPass
-                , pFramebuffer
-                , m_pPostRenderCmdbuffer.get()
-                );
-        }
-        else
-        {
-            const BaseRenderTarget *pRenderTarget;
-            const vk::RenderPass *pRenderPass;
-            const vk::Framebuffer *pFramebuffer;
-            //trunk cmd buffer
-            pRenderTarget = m_pRendererTarget;
-            pRenderPass = isFirstScene ? m_pRendererTarget->getFirstRenderPass() : m_pRendererTarget->getSecondRenderPass();
-            pFramebuffer = isFirstScene ? m_pRendererTarget->getFirstFramebuffer() : m_pRendererTarget->getSecondFramebuffer();
-            m_renderBinder.bindForRenderPassBegin(pRenderTarget
-                , pRenderPass
-                , pFramebuffer
-                , &m_trunkRenderPassCmdBuffer
-                );
-        }
-        m_renderBinder.bind(pScene
-            , pCamera->getProjectorBase()
-            , preZEnable ? m_pPreZTarget.get() : nullptr
-            , preZEnable ? m_pPreZCmdBuffer.get() : nullptr
-            , & m_branchCmdBuffer
-            , & m_trunkWaitBarrierCmdBuffer
-            , & m_trunkRenderPassCmdBuffer
-            , postRenderEnable ? pPostRender : nullptr
-            , postRenderEnable ? m_pPostRenderTarget.get() : nullptr
-            , postRenderEnable ? m_pPostRenderCmdbuffer.get() : nullptr
-            );
-        
-        //bind render pass end.
-        if (preZEnable) m_renderBinder.bindForRenderPassEnd(m_pPreZCmdBuffer.get());
-        if (postRenderEnable)
-        {
-            //trunk cmd buffer
-            m_renderBinder.bindForRenderPassEnd(&m_trunkRenderPassCmdBuffer);
-            
-            //post render cmd buffer
-            m_renderBinder.bindForRenderPassEnd(m_pPostRenderCmdbuffer.get());
-        }
-        else
-        {
-            //trunk cmd buffer
-            m_renderBinder.bindForRenderPassEnd(&m_trunkRenderPassCmdBuffer);
-        }
+
+        RenderBinderInfo bindInfo = {
+            isFirstScene,
+            preZEnable,
+            postRenderEnable,
+            pScene,
+            pCamera->getProjectorBase(),
+            postRenderEnable ? pPostRender : nullptr,
+            preZEnable ? m_pPreZTarget.get() : nullptr,
+            postRenderEnable ? m_pPostRenderTarget.get() : nullptr,
+            m_pRendererTarget,
+            preZEnable ? m_pPreZCmdBuffer.get() : nullptr,
+            &m_branchCmdBuffer,
+            &m_trunkWaitBarrierCmdBuffer,
+            &m_trunkRenderPassCmdBuffer,
+            postRenderEnable ? m_pPostRenderCmdbuffer.get() : nullptr,
+        };
+
+        m_renderBinder.bind(bindInfo);
 
         CMDParser::ResultInfo cmdParseResult;
          
@@ -491,7 +427,8 @@ namespace vg
                 , &cmdParseResult
                 );
             resultInfo.drawCount += cmdParseResult.drawCount;
-        }      
+        }
+
         if (preZEnable)
         {
             m_pPreZCmdBuffer->end();

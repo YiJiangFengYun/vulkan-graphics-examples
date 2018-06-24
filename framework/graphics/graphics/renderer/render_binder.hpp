@@ -11,10 +11,48 @@
 #include "graphics/render_target/render_target.hpp"
 #include "graphics/renderer/pre_z_target.hpp"
 #include "graphics/renderer/post_render_target.hpp"
+#include "graphics/renderer/renderer_target.hpp"
 #include "graphics/util/frame_object_cache.hpp"
 
 namespace vg
 {
+    struct RenderBinderInfo {
+        Bool32 firstScene;
+        Bool32 preZEnable;
+        Bool32 postRenderEnable;
+
+        BaseScene *pScene;
+        const BaseProjector *pProjector;
+        PostRender *pPostRender;
+
+        const PreZTarget *pPreZTarget;
+        const PostRenderTarget *pPostRenderTarget;
+        const RendererTarget *pRendererTarget;
+
+        CmdBuffer *pPreZCmdBuffer;
+        CmdBuffer *pBranchCmdBuffer;
+        CmdBuffer *pTrunkWaitBarrierCmdBuffer;
+        CmdBuffer *pTrunkRenderPassCmdBuffer;
+        CmdBuffer *pPostRenderCmdBuffer;
+
+        RenderBinderInfo(Bool32 firstScene = VG_TRUE
+            , Bool32 preZEnable = VG_FALSE
+            , Bool32 postRenderEnable = VG_FALSE
+            , BaseScene *pScene = nullptr
+            , const BaseProjector *pProjector = nullptr
+            , PostRender *pPostRender = nullptr
+    
+            , const PreZTarget *pPreZTarget = nullptr
+            , const PostRenderTarget *pPostRenderTarget = nullptr
+            , const RendererTarget *pRendererTarget = nullptr
+    
+            , CmdBuffer *pPreZCmdBuffer = nullptr
+            , CmdBuffer *pBranchCmdBuffer = nullptr
+            , CmdBuffer *pTrunkWaitBarrierCmdBuffer = nullptr
+            , CmdBuffer *pTrunkRenderPassCmdBuffer = nullptr
+            , CmdBuffer *pPostRenderCmdBuffer = nullptr
+            );
+    };
     class RenderBinder 
     {
     public:
@@ -28,24 +66,7 @@ namespace vg
 
         void begin();
 
-        void bindForRenderPassBegin(const BaseRenderTarget *pRenderTarget
-            , const vk::RenderPass *pRenderPass
-            , const vk::Framebuffer *pFramebuffer
-            , CmdBuffer *pCmdBuffer
-            );
-        void bindForRenderPassEnd(CmdBuffer *pCmdBuffer);
-
-        void bind(BaseScene *pScene = nullptr
-            , const BaseProjector *pProjector = nullptr
-            , const PreZTarget *pPreZTarget = nullptr
-            , CmdBuffer *pPreZCmdBuffer = nullptr
-            , CmdBuffer *pBranchCmdBuffer = nullptr
-            , CmdBuffer *pTrunkWaitBarrierCmdBuffer = nullptr
-            , CmdBuffer *pTrunkRenderPassCmdBuffer = nullptr
-            , PostRender *pPostRender = nullptr
-            , const PostRenderTarget *pPostRenderTarget = nullptr
-            , CmdBuffer *pPostRenderCmdBuffer = nullptr
-            );
+        void bind(RenderBinderInfo info);
         
         void end();
 
@@ -64,19 +85,15 @@ namespace vg
 
         void _beginBind();
 
+        void _bind(RenderBinderInfo info);
+
+        void _endBind();
+
         void _syncLightData(BaseScene *pScene);
 
-        void _bind(BaseScene *pScene
-            , const BaseProjector *pProjector
-            , const PreZTarget *pPreZTarget = nullptr
-            , CmdBuffer *pPreZCmdBuffer = nullptr
-            , CmdBuffer *pBranchCmdBuffer = nullptr
-            , CmdBuffer *pTrunkWaitBarrierCmdBuffer = nullptr            
-            , CmdBuffer *pTrunkRenderPassCmdBuffer = nullptr
-            , PostRender *pPostRender = nullptr
-            , const PostRenderTarget *pPostRenderTarget = nullptr
-            , CmdBuffer *pPostRenderCmdBuffer = nullptr
-            );
+        void _bindForRenderPassBegin(RenderBinderInfo info);
+
+        void _bindForRenderPassEnd(RenderBinderInfo info);
 
         void _bindScene2(Scene<SpaceType::SPACE_2> *pScene
             , const Projector<SpaceType::SPACE_2> *pProjector
@@ -100,7 +117,6 @@ namespace vg
             , Matrix4x4 modelMatrix
             , Matrix4x4 viewMatrix
             , Matrix4x4 projMatrix
-            , const PreZTarget *pPreZTarget
 #if defined(DEBUG) && defined(VG_ENABLE_COST_TIMER)
             , fd::CostTimer * pPreparingBuildInDataCostTimer
 #endif //DEBUG and VG_ENABLE_COST_TIMER
@@ -122,7 +138,12 @@ namespace vg
             , BaseVisualObject::BindResult *pResult
             );
 
-        void _endBind();
+        void _renderPassBegin(const BaseRenderTarget *pRenderTarget
+            , const vk::RenderPass *pRenderPass
+            , const vk::Framebuffer *pFramebuffer
+            , CmdBuffer *pCmdBuffer
+            );
+        void _renderPassEnd(CmdBuffer *pCmdBuffer);
     };
 } //vg
 

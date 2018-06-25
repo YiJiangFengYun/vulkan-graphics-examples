@@ -1,63 +1,72 @@
-#include "graphics/renderer/pre_z_target.hpp"
+#include "graphics/renderer/renderer_post_render_target.hpp"
 
 namespace vg
 {
-    const vk::Format PreZTarget::DEFAULT_DEPTH_FORMAT(vk::Format::eD32Sfloat);
-
-    PreZTarget::PreZTarget(uint32_t framebufferWidth
+    RendererPostRenderTarget::RendererPostRenderTarget(uint32_t framebufferWidth
         , uint32_t framebufferHeight
-        , vk::Format depthImageFormat
+        , vk::Format colorImageFormat
+        , vk::Format depthStencilImageFormat
         )
-        : OnceRenderTarget(framebufferWidth, framebufferHeight)
-        , m_depthImageFormat(depthImageFormat)
-        , m_pDepthAttachment()
+        : PostRenderTarget(framebufferWidth, framebufferHeight)
     {
         _createObjs();
-        vk::ClearValue clearValueDepthStencil = {
-            vk::ClearDepthStencilValue(1.0f, 0)
-        };
-        setClearValues(&clearValueDepthStencil, 1u);
     }
 
-    vk::Format PreZTarget::getDepthImageFormat() const
-    {
-        return m_depthImageFormat;
-    }
-
-    const Texture2DDepthAttachment *PreZTarget::getDepthAttachment() const
-    {
-        return m_pDepthAttachment.get();
-    }
-
-    void PreZTarget::_createObjs()
+    void RendererPostRenderTarget::_createObjs()
     {
         auto pDevice = pApp->getDevice();
         const auto framebufferWidth = m_framebufferWidth;
         const auto framebufferHeight = m_framebufferHeight;
-        //depth attachment
-        auto pTex = new Texture2DDepthAttachment(
-                m_depthImageFormat,
-                framebufferWidth,
-                framebufferHeight
-                );
-        m_pDepthAttachment = std::shared_ptr<Texture2DDepthAttachment>(pTex);
+        //color attachment
+        auto pColorTex = new Texture2DColorAttachment(
+            m_colorImageFormat,
+            framebufferWidth,
+            framebufferHeight
+            );
+        m_pColorAttachment = std::shared_ptr<BaseColorAttachment>(pColorTex);
+
+        auto pDepthStencilTex = new TextureDepthStencilAttachment(
+            m_depthStencilImageFormat,
+            framebufferWidth,
+            framebufferHeight
+            );
+        m_pDepthStencilAttachment = std::shared_ptr<BaseDepthStencilAttachment>(pDepthStencilTex);
 
         //render pass.
-        vk::AttachmentDescription depthAttachmentDes = {
+        auto pImage = dynamic_cast<Texture2DColorAttachment *>(m_pColorAttachment.get())->getImage();
+        vk::AttachmentDescription colorAttachmentDes = {
             vk::AttachmentDescriptionFlags(),
-            m_depthImageFormat,
+            m_colorImageFormat,
             vk::SampleCountFlagBits::e1,
             vk::AttachmentLoadOp::eClear,
             vk::AttachmentStoreOp::eStore,
             vk::AttachmentLoadOp::eDontCare,
             vk::AttachmentStoreOp::eDontCare,
             vk::ImageLayout::eUndefined,
-            m_pDepthAttachment->getDepthStencilAttachmentLayout(),
+            pImage->getInfo().layout,
         };
 
-        vk::AttachmentReference depthAttachmentRef = {
-            uint32_t(0),
-            vk::ImageLayout::eDepthStencilAttachmentOptimal
+        pImage = dynamic_cast<TextureDepthStencilAttachment *>(m_pDepthStencilAttachment.get())->getImage();
+        vk::AttachmentDescription depthStencilAttachmentDes = {
+            vk::AttachmentDescriptionFlags(),
+            m_depthStencilImageFormat,
+            vk::SampleCountFlagBits::e1,
+            vk::AttachmentLoadOp::eClear,
+            vk::AttachmentStoreOp::eDontCare,
+            vk::AttachmentLoadOp::eDontCare,
+            vk::AttachmentStoreOp::eDontCare,
+            vk::ImageLayout::eUndefined,
+            pImage->getInfo().layout,
+        };
+
+        vk::AttachmentReference colorAttachmentRef = {
+            0u,
+            vk::ImageLayout::eColorAttachmentOptimal,
+        };
+
+        vk::AttachmentReference depthStencilAttachmentRef = {
+            1u,
+            vk::ImageLayout::eDepthStencilAttachmentOptimal,
         };
 
         vk::SubpassDescription subpass = {
@@ -65,10 +74,10 @@ namespace vg
             vk::PipelineBindPoint::eGraphics,    //pipelineBindPoint
             0,                                   //inputAttachmentCount
             nullptr,                             //pInputAttachments
-            0,                                   //colorAttachmentCount
-            nullptr,                 //pColorAttachments
+            1,                                   //colorAttachmentCount
+            &colorAttachmentRef,                 //pColorAttachments
             nullptr,                             //pResolveAttachments
-            &depthAttachmentRef,                 //pDepthStencilAttachment
+            &depthStencilAttachmentRef,          //pDepthStencilAttachment
             0,                                   //preserveAttachmentCount
             nullptr                              //pPreserveAttachments
         };
@@ -79,24 +88,24 @@ namespace vg
                 VK_SUBPASS_EXTERNAL,                                  
                 0,                                                    
                 vk::PipelineStageFlagBits::eTopOfPipe,                
-                vk::PipelineStageFlagBits::eEarlyFragmentTests | vk::PipelineStageFlagBits::eLateFragmentTests,    
+                vk::PipelineStageFlagBits::eColorAttachmentOutput, 
                 vk::AccessFlagBits::eShaderRead,                                    
-                vk::AccessFlagBits::eDepthStencilAttachmentRead | vk::AccessFlagBits::eDepthStencilAttachmentWrite,       
+                vk::AccessFlagBits::eColorAttachmentRead | vk::AccessFlagBits::eColorAttachmentWrite,       
                 vk::DependencyFlagBits::eByRegion                     
             },
             vk::SubpassDependency
             {
                 0,                                                    
                 VK_SUBPASS_EXTERNAL,                                  
-                vk::PipelineStageFlagBits::eEarlyFragmentTests | vk::PipelineStageFlagBits::eLateFragmentTests,    
+                vk::PipelineStageFlagBits::eColorAttachmentOutput,    
                 vk::PipelineStageFlagBits::eBottomOfPipe,             
-                vk::AccessFlagBits::eDepthStencilAttachmentRead | vk::AccessFlagBits::eDepthStencilAttachmentWrite,
+                vk::AccessFlagBits::eColorAttachmentRead | vk::AccessFlagBits::eColorAttachmentWrite,
                 vk::AccessFlagBits::eShaderRead,                      
                 vk::DependencyFlagBits::eByRegion         
             }
         };
 
-        std::array<vk::AttachmentDescription, 1> attachmentDess = { depthAttachmentDes };
+        std::array<vk::AttachmentDescription, 2> attachmentDess = { colorAttachmentDes, depthStencilAttachmentDes };
         vk::RenderPassCreateInfo renderPassCreateInfo = {
             vk::RenderPassCreateFlags(),
             static_cast<uint32_t>(attachmentDess.size()),
@@ -110,8 +119,9 @@ namespace vg
         m_pRenderPass = fd::createRenderPass(pDevice, renderPassCreateInfo);
 
         //frame buffer.
-        std::array<vk::ImageView, 1> attachments = {
-             *(m_pDepthAttachment->getDepthStencilAttachmentImageView()),
+        std::array<vk::ImageView, 2> attachments = {
+             *(m_pColorAttachment->getColorAttachmentImageView()),
+             *(m_pDepthStencilAttachment->getDepthStencilAttachmentImageView()),
         };
 
         vk::FramebufferCreateInfo frameBufferCreateInfo = {

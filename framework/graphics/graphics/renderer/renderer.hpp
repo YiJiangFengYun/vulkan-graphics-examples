@@ -12,8 +12,8 @@
 #include "graphics/renderer/pipeline_cache.hpp"
 #include "graphics/renderer/renderer_target.hpp"
 #include "graphics/post_render/post_render.hpp"
-#include "graphics/renderer/pre_z_target.hpp"
-#include "graphics/renderer/post_render_target.hpp"
+#include "graphics/renderer/renderer_pre_z_target.hpp"
+#include "graphics/renderer/renderer_post_render_target.hpp"
 #include "graphics/renderer/render_binder.hpp"
 
 //todo: batch mesh,
@@ -97,12 +97,12 @@ namespace vg
 
         //pre z pass
         Bool32 m_preZEnable;
-        std::shared_ptr<PreZTarget> m_pPreZTarget;
+        std::shared_ptr<RendererPreZTarget> m_pPreZTarget;
         std::shared_ptr<CmdBuffer> m_pPreZCmdBuffer;
 
         //post render
         Bool32 m_postRenderEnable;
-        std::shared_ptr<PostRenderTarget> m_pPostRenderTarget;
+        std::shared_ptr<RendererPostRenderTarget> m_pPostRenderTarget;
         std::shared_ptr<CmdBuffer> m_pPostRenderCmdbuffer;
         
         CmdBuffer m_trunkRenderPassCmdBuffer;

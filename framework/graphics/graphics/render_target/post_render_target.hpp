@@ -2,8 +2,7 @@
 #define VG_POST_RENDER_TARGET_HPP
 
 #include "graphics/global.hpp"
-#include "graphics/texture/texture_2d.hpp"
-#include "graphics/texture/texture_depth_stencil_attachment.hpp"
+#include "graphics/texture/attachment.hpp"
 #include "graphics/render_target/render_target.hpp"
 
 namespace vg
@@ -20,14 +19,13 @@ namespace vg
             );
         vk::Format getColorImageFormat() const;
         vk::Format getDepthStencilImageFormat() const;
-        const Texture2DColorAttachment *getColorAttachment() const;
-        const TextureDepthStencilAttachment *getDepthStencilAttachment() const;
-    private:
+        const BaseColorAttachment *getColorAttachment() const;
+        const BaseDepthStencilAttachment *getDepthStencilAttachment() const;
+    protected:
         vk::Format m_colorImageFormat;
         vk::Format m_depthStencilImageFormat;
-        std::shared_ptr<Texture2DColorAttachment> m_pColorAttachment;
-        std::shared_ptr<TextureDepthStencilAttachment> m_pDepthStencilAttachment;
-        void _createObjs();
+        std::shared_ptr<BaseColorAttachment> m_pColorAttachment;
+        std::shared_ptr<BaseDepthStencilAttachment> m_pDepthStencilAttachment;
     };
 } //vg
 

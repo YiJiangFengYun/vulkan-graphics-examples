@@ -2,7 +2,7 @@
 #define VG_PRE_Z_TARGET_HPP
 
 #include "graphics/global.hpp"
-#include "graphics/texture/texture_2d.hpp"
+#include "graphics/texture/attachment.hpp"
 #include "graphics/render_target/render_target.hpp"
 
 namespace vg
@@ -17,11 +17,10 @@ namespace vg
             );
         
         vk::Format getDepthImageFormat() const;
-        const Texture2DDepthAttachment *getDepthAttachment() const;
-    private:
+        const BaseDepthStencilAttachment *getDepthAttachment() const;
+    protected:
         vk::Format m_depthImageFormat;
-        std::shared_ptr<Texture2DDepthAttachment> m_pDepthAttachment;
-        void _createObjs();
+        std::shared_ptr<BaseDepthStencilAttachment> m_pDepthAttachment;
     };
 } //vg
 

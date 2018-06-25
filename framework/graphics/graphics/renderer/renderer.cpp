@@ -512,8 +512,8 @@ namespace vg
 
     void Renderer::_createPreZObjs()
     {
-        m_pPreZTarget = std::shared_ptr<PreZTarget>{
-            new PreZTarget{
+        m_pPreZTarget = std::shared_ptr<RendererPreZTarget>{
+            new RendererPreZTarget{
                 m_framebufferWidth,
                 m_framebufferHeight,
             }
@@ -532,8 +532,8 @@ namespace vg
 
     void Renderer::_createPostRenderObjs()
     {
-        m_pPostRenderTarget = std::shared_ptr<PostRenderTarget>{
-            new PostRenderTarget{
+        m_pPostRenderTarget = std::shared_ptr<RendererPostRenderTarget>{
+            new RendererPostRenderTarget{
                 m_framebufferWidth,
                 m_framebufferHeight,
             }

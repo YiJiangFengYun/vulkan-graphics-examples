@@ -9,9 +9,8 @@
 #include "graphics/post_render/post_render.hpp"
 #include "graphics/renderer/renderer_option.hpp"
 #include "graphics/render_target/render_target.hpp"
-#include "graphics/renderer/pre_z_target.hpp"
-#include "graphics/renderer/post_render_target.hpp"
-#include "graphics/renderer/renderer_target.hpp"
+#include "graphics/render_target/pre_z_target.hpp"
+#include "graphics/render_target/post_render_target.hpp"
 #include "graphics/util/frame_object_cache.hpp"
 
 namespace vg
@@ -27,7 +26,7 @@ namespace vg
 
         const PreZTarget *pPreZTarget;
         const PostRenderTarget *pPostRenderTarget;
-        const RendererTarget *pRendererTarget;
+        const MultiRenderTarget *pRendererTarget;
 
         CmdBuffer *pPreZCmdBuffer;
         CmdBuffer *pBranchCmdBuffer;
@@ -44,7 +43,7 @@ namespace vg
     
             , const PreZTarget *pPreZTarget = nullptr
             , const PostRenderTarget *pPostRenderTarget = nullptr
-            , const RendererTarget *pRendererTarget = nullptr
+            , const MultiRenderTarget *pRendererTarget = nullptr
     
             , CmdBuffer *pPreZCmdBuffer = nullptr
             , CmdBuffer *pBranchCmdBuffer = nullptr
@@ -100,7 +99,7 @@ namespace vg
             , const PreZTarget *pPreZTarget = nullptr
             , CmdBuffer *pPreZCmdBuffer = nullptr
             , CmdBuffer *pBranchCmdBuffer = nullptr
-            , CmdBuffer *pTrunkWaitBarrierCmdBuffer = nullptr            
+            , CmdBuffer *pTrunkWaitBarrierCmdBuffer = nullptr
             , CmdBuffer *pTrunkRenderPassCmdBuffer = nullptr
             );
 
@@ -109,7 +108,7 @@ namespace vg
             , const PreZTarget *pPreZTarget = nullptr
             , CmdBuffer *pPreZCmdBuffer = nullptr
             , CmdBuffer *pBranchCmdBuffer = nullptr
-            , CmdBuffer *pTrunkWaitBarrierCmdBuffer = nullptr            
+            , CmdBuffer *pTrunkWaitBarrierCmdBuffer = nullptr
             , CmdBuffer *pTrunkRenderPassCmdBuffer = nullptr
             );
 

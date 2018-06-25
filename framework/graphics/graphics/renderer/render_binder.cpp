@@ -23,7 +23,7 @@ namespace vg
 
         , const PreZTarget *pPreZTarget
         , const PostRenderTarget *pPostRenderTarget
-        , const RendererTarget *pRendererTarget
+        , const MultiRenderTarget *pRendererTarget
 
         , CmdBuffer *pPreZCmdBuffer
         , CmdBuffer *pBranchCmdBuffer
@@ -166,7 +166,7 @@ namespace vg
                 {
                     if ((*(buildInDataInfo.pComponent + j)).type == Pass::BuildInDataType::POST_RENDER_RESULT)
                     {
-                        auto pColorTex = info.pPostRenderTarget->getColorAttachment();
+                        auto pColorTex = dynamic_cast<const Texture *>(info.pPostRenderTarget->getColorAttachment());
                         vg::PassTextureInfo::TextureInfo itemInfo = {
                             pColorTex,
                             nullptr,
@@ -1111,7 +1111,7 @@ namespace vg
                         if (pPreZTarget != nullptr)
                         {
                             vg::PassTextureInfo::TextureInfo itemInfo = {
-                                pPreZTarget->getDepthAttachment(),
+                                dynamic_cast<const Texture *>(pPreZTarget->getDepthAttachment()),
                                 nullptr,
                                 nullptr,
                                 vk::ImageLayout::eUndefined,

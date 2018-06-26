@@ -114,11 +114,13 @@ namespace vg
         };
 
         auto pDevice = pApp->getDevice();
-        m_pFirstRenderPass = fd::createRenderPass(pDevice, createInfo);
+        m_pMyFirstRenderPass = fd::createRenderPass(pDevice, createInfo);
+        m_pFirstRenderPass = m_pMyFirstRenderPass.get();
 
         colorAttachment.loadOp = vk::AttachmentLoadOp::eLoad;
         attachments = { colorAttachment, depthAttachment };
-        m_pSecondRenderPass = fd::createRenderPass(pDevice, createInfo);
+        m_pMySecondRenderPass = fd::createRenderPass(pDevice, createInfo);
+        m_pSecondRenderPass = m_pMySecondRenderPass.get();
     }
 
     void ColorTexRendererTarget::_createDepthStencilTex()
@@ -128,7 +130,8 @@ namespace vg
                 m_framebufferWidth,
                 m_framebufferHeight
                 );
-        m_pDepthStencilAttachment = std::shared_ptr<BaseDepthStencilAttachment>(pTex);
+        m_pMyDepthStencilAttachment = std::shared_ptr<TextureDepthStencilAttachment>(pTex);
+        m_pDepthStencilAttachment = m_pMyDepthStencilAttachment.get();
     }
         
     void ColorTexRendererTarget::_createFramebuffer()
@@ -147,8 +150,9 @@ namespace vg
                 m_framebufferHeight,                            //height
                 1u                                              //layers
             };
-    
-            m_pFirstFramebuffer = fd::createFrameBuffer(pDevice, createInfo);
+
+            m_pMyFirstFramebuffer = fd::createFrameBuffer(pDevice, createInfo);
+            m_pFirstFramebuffer = m_pMyFirstFramebuffer.get();
         }
 
         {
@@ -164,8 +168,9 @@ namespace vg
                 m_framebufferHeight,                            //height
                 1u                                              //layers
             };
-    
-            m_pSecondFramebuffer = fd::createFrameBuffer(pDevice, createInfo);
+
+            m_pMySecondFramebuffer = fd::createFrameBuffer(pDevice, createInfo);
+            m_pSecondFramebuffer = m_pMySecondFramebuffer.get();
         }
         
     }

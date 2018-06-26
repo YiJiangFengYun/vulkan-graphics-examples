@@ -2,7 +2,7 @@
 #define VG_RENDERER_TARGET_COLOR_TEXTURE_HPP
 
 #include "graphics/renderer/renderer_target.hpp"
-#include "graphics/texture/attachment.hpp"
+#include "graphics/texture/texture_depth_stencil_attachment.hpp"
 
 namespace vg
 {
@@ -13,7 +13,11 @@ namespace vg
     private:
         //Renderer will render to color texture when it is not null.
         BaseColorAttachment *m_pColorAttchment;
-        std::shared_ptr<BaseDepthStencilAttachment> m_pDepthStencilAttachment;
+        std::shared_ptr<TextureDepthStencilAttachment> m_pMyDepthStencilAttachment;
+        std::shared_ptr<vk::RenderPass> m_pMyFirstRenderPass;
+        std::shared_ptr<vk::RenderPass> m_pMySecondRenderPass;
+        std::shared_ptr<vk::Framebuffer> m_pMyFirstFramebuffer;
+        std::shared_ptr<vk::Framebuffer> m_pMySecondFramebuffer;
         void _createRenderPass();
         void _createDepthStencilTex();
         void _createFramebuffer();

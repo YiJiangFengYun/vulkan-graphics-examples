@@ -23,17 +23,19 @@ namespace vg
             framebufferWidth,
             framebufferHeight
             );
-        m_pColorAttachment = std::shared_ptr<BaseColorAttachment>(pColorTex);
+        m_pMyColorAttachment = std::shared_ptr<Texture2DColorAttachment>(pColorTex);
+        m_pColorAttachment = m_pMyColorAttachment.get();
 
         auto pDepthStencilTex = new TextureDepthStencilAttachment(
             m_depthStencilImageFormat,
             framebufferWidth,
             framebufferHeight
             );
-        m_pDepthStencilAttachment = std::shared_ptr<BaseDepthStencilAttachment>(pDepthStencilTex);
+        m_pMyDepthStencilAttachment = std::shared_ptr<TextureDepthStencilAttachment>(pDepthStencilTex);
+        m_pDepthStencilAttachment = m_pMyDepthStencilAttachment.get();
 
         //render pass.
-        auto pImage = dynamic_cast<Texture2DColorAttachment *>(m_pColorAttachment.get())->getImage();
+        auto pImage = dynamic_cast<Texture2DColorAttachment *>(m_pColorAttachment)->getImage();
         vk::AttachmentDescription colorAttachmentDes = {
             vk::AttachmentDescriptionFlags(),
             m_colorImageFormat,
@@ -46,7 +48,7 @@ namespace vg
             pImage->getInfo().layout,
         };
 
-        pImage = dynamic_cast<TextureDepthStencilAttachment *>(m_pDepthStencilAttachment.get())->getImage();
+        pImage = dynamic_cast<TextureDepthStencilAttachment *>(m_pDepthStencilAttachment)->getImage();
         vk::AttachmentDescription depthStencilAttachmentDes = {
             vk::AttachmentDescriptionFlags(),
             m_depthStencilImageFormat,
@@ -116,7 +118,8 @@ namespace vg
             dependencies.data()
         };
 
-        m_pRenderPass = fd::createRenderPass(pDevice, renderPassCreateInfo);
+        m_pMyRenderPass = fd::createRenderPass(pDevice, renderPassCreateInfo);
+        m_pRenderPass = m_pMyRenderPass.get();
 
         //frame buffer.
         std::array<vk::ImageView, 2> attachments = {
@@ -134,6 +137,7 @@ namespace vg
             1u,                                  
         };
 
-        m_pFramebuffer = fd::createFrameBuffer(pDevice, frameBufferCreateInfo);
+        m_pMyFramebuffer = fd::createFrameBuffer(pDevice, frameBufferCreateInfo);
+        m_pFramebuffer = m_pMyFramebuffer.get();
     }
 } //vg

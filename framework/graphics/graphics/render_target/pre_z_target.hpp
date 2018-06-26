@@ -20,7 +20,7 @@ namespace vg
         const BaseDepthStencilAttachment *getDepthAttachment() const;
     protected:
         vk::Format m_depthImageFormat;
-        std::shared_ptr<BaseDepthStencilAttachment> m_pDepthAttachment;
+        BaseDepthStencilAttachment *m_pDepthAttachment;
     };
 } //vg
 

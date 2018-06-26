@@ -37,8 +37,8 @@ namespace vg
     void SurfaceRendererTarget::setImageIndex(uint32_t imageIndex)
     {
         m_imageIndex = imageIndex;
-        m_pFirstFramebuffer = m_pFirstFramebuffers[m_imageIndex];
-        m_pSecondFramebuffer = m_pSecondFramebuffers[m_imageIndex];
+        m_pFirstFramebuffer = m_pFirstFramebuffers[m_imageIndex].get();
+        m_pSecondFramebuffer = m_pSecondFramebuffers[m_imageIndex].get();
     }
 
     void SurfaceRendererTarget::_createRenderPass()
@@ -137,14 +137,14 @@ namespace vg
         auto pDevice = pApp->getDevice();
 
         m_pFirstSurfaceRenderPass = fd::createRenderPass(pDevice, createInfo);
-        m_pFirstRenderPass = m_pFirstSurfaceRenderPass;
+        m_pFirstRenderPass = m_pFirstSurfaceRenderPass.get();
 
         colorAttachment.loadOp = vk::AttachmentLoadOp::eLoad;
         colorAttachment.initialLayout = vk::ImageLayout::ePresentSrcKHR;
         attachments = { colorAttachment, depthAttachment };
 
         m_pSecondSurfaceRenderPass = fd::createRenderPass(pDevice, createInfo);
-        m_pSecondRenderPass = m_pSecondSurfaceRenderPass; 
+        m_pSecondRenderPass = m_pSecondSurfaceRenderPass.get(); 
     }
 
     void SurfaceRendererTarget::_createDepthStencilTex()
@@ -154,7 +154,8 @@ namespace vg
                 m_framebufferWidth,
                 m_framebufferHeight
                 );
-        m_pDepthStencilAttachment = std::shared_ptr<BaseDepthStencilAttachment>(pTex);
+        m_pMyDepthStencilAttachment = std::shared_ptr<TextureDepthStencilAttachment>(pTex);
+        m_pDepthStencilAttachment = m_pMyDepthStencilAttachment.get();
     }
 
     void SurfaceRendererTarget::_createFramebuffers()
@@ -180,7 +181,7 @@ namespace vg
                 m_pFirstFramebuffers[imageIndex] = fd::createFrameBuffer(pDevice, createInfo);
             }
     
-            m_pFirstFramebuffer = m_pFirstFramebuffers[m_imageIndex];
+            m_pFirstFramebuffer = m_pFirstFramebuffers[m_imageIndex].get();
         }
 
         {
@@ -203,7 +204,7 @@ namespace vg
                 m_pSecondFramebuffers[imageIndex] = fd::createFrameBuffer(pDevice, createInfo);
             }
     
-            m_pSecondFramebuffer = m_pSecondFramebuffers[m_imageIndex];
+            m_pSecondFramebuffer = m_pSecondFramebuffers[m_imageIndex].get();
         }
     }
 } //vg

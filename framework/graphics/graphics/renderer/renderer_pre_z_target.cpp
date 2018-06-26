@@ -22,7 +22,9 @@ namespace vg
                 framebufferWidth,
                 framebufferHeight
                 );
-        m_pDepthAttachment = std::shared_ptr<BaseDepthStencilAttachment>(pTex);
+
+        m_pMyDepthAttachment = std::shared_ptr<Texture2DDepthAttachment>(pTex);
+        m_pDepthAttachment = m_pMyDepthAttachment.get();
 
         //render pass.
         vk::AttachmentDescription depthAttachmentDes = {
@@ -89,7 +91,8 @@ namespace vg
             dependencies.data()
         };
 
-        m_pRenderPass = fd::createRenderPass(pDevice, renderPassCreateInfo);
+        m_pMyRenderPass = fd::createRenderPass(pDevice, renderPassCreateInfo);
+        m_pRenderPass = m_pMyRenderPass.get();
 
         //frame buffer.
         std::array<vk::ImageView, 1> attachments = {
@@ -106,6 +109,7 @@ namespace vg
             1u,                                  
         };
 
-        m_pFramebuffer = fd::createFrameBuffer(pDevice, frameBufferCreateInfo);
+        m_pMyFramebuffer = fd::createFrameBuffer(pDevice, frameBufferCreateInfo);
+        m_pFramebuffer = m_pMyFramebuffer.get();
     }
 } //vg

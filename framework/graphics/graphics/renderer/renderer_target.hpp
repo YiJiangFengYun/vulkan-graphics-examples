@@ -3,6 +3,7 @@
 
 #include "graphics/global.hpp"
 #include "graphics/render_target/render_target.hpp"
+#include "graphics/texture/attachment.hpp"
 
 namespace vg
 {
@@ -21,6 +22,8 @@ namespace vg
     protected:
         vk::Format m_colorImageFormat;
         vk::Format m_depthStencilImageFormat;
+        BaseColorAttachment *m_pColorAttachment;
+        BaseDepthStencilAttachment *m_pDepthStencilAttachment;
     };
 } //vg
 

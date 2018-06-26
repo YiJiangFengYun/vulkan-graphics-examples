@@ -82,12 +82,12 @@ namespace vg
         
     const vk::RenderPass * OnceRenderTarget::getRenderPass() const
     {
-        return m_pRenderPass.get();
+        return m_pRenderPass;
     }
 
     const vk::Framebuffer * OnceRenderTarget::getFramebuffer() const
     {
-        return m_pFramebuffer.get();
+        return m_pFramebuffer;
     }
 
     MultiRenderTarget::MultiRenderTarget(uint32_t framebufferWidth
@@ -106,22 +106,22 @@ namespace vg
         
     const vk::RenderPass * MultiRenderTarget::getFirstRenderPass() const
     {
-        return m_pFirstRenderPass.get();
+        return m_pFirstRenderPass;
     }
         
     const vk::RenderPass * MultiRenderTarget::getSecondRenderPass() const
     {
-        return m_pSecondRenderPass.get();
+        return m_pSecondRenderPass;
     }
         
     const vk::Framebuffer * MultiRenderTarget::getFirstFramebuffer() const
     {
-        return m_pFirstFramebuffer.get();
+        return m_pFirstFramebuffer;
     }
         
     const vk::Framebuffer * MultiRenderTarget::getSecondFramebuffer() const
     {
-        return m_pSecondFramebuffer.get();
+        return m_pSecondFramebuffer;
     }
 
 } //vg

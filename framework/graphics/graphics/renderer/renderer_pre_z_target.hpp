@@ -15,6 +15,9 @@ namespace vg
             , vk::Format depthImageFormat = PreZTarget::DEFAULT_DEPTH_FORMAT
             );
     private:
+        std::shared_ptr<Texture2DDepthAttachment> m_pMyDepthAttachment;
+        std::shared_ptr<vk::RenderPass> m_pMyRenderPass;
+        std::shared_ptr<vk::Framebuffer> m_pMyFramebuffer;
         void _createObjs();
     };
 } //vg

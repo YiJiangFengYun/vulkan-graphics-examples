@@ -1,7 +1,7 @@
 #ifndef VG_RENDERER_TARGET_SURFACE_HPP
 #define VG_RENDERER_TARGET_SURFACE_HPP
 
-#include "graphics/texture/attachment.hpp"
+#include "graphics/texture/texture_depth_stencil_attachment.hpp"
 #include "graphics/renderer/renderer_target.hpp"
 
 namespace vg
@@ -16,7 +16,7 @@ namespace vg
             , uint32_t swapchainImageHeight);
         void setImageIndex(uint32_t imageIndex);
     private:
-        std::shared_ptr<BaseDepthStencilAttachment> m_pDepthStencilAttachment;    
+        std::shared_ptr<TextureDepthStencilAttachment> m_pMyDepthStencilAttachment;    
         std::shared_ptr<vk::RenderPass> m_pFirstSurfaceRenderPass;
         std::shared_ptr<vk::RenderPass> m_pSecondSurfaceRenderPass;
         std::vector<std::shared_ptr<vk::Framebuffer>> m_pFirstFramebuffers;        

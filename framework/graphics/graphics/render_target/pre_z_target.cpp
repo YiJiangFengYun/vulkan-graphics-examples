@@ -25,6 +25,6 @@ namespace vg
 
     const BaseDepthStencilAttachment *PreZTarget::getDepthAttachment() const
     {
-        return m_pDepthAttachment.get();
+        return m_pDepthAttachment;
     }
 } //vg

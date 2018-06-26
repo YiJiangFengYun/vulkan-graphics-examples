@@ -12,6 +12,8 @@ namespace vg
         : MultiRenderTarget(framebufferWidth, framebufferHeight)
         , m_colorImageFormat(colorImageFormat)
         , m_depthStencilImageFormat(depthStencilImageFormat)
+        , m_pColorAttachment()
+        , m_pDepthStencilAttachment()
     {
         
     }

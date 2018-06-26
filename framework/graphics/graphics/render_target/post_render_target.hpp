@@ -24,8 +24,8 @@ namespace vg
     protected:
         vk::Format m_colorImageFormat;
         vk::Format m_depthStencilImageFormat;
-        std::shared_ptr<BaseColorAttachment> m_pColorAttachment;
-        std::shared_ptr<BaseDepthStencilAttachment> m_pDepthStencilAttachment;
+        BaseColorAttachment *m_pColorAttachment;
+        BaseDepthStencilAttachment *m_pDepthStencilAttachment;
     };
 } //vg
 

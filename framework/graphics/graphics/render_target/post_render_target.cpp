@@ -40,11 +40,11 @@ namespace vg
         
     const BaseColorAttachment *PostRenderTarget::getColorAttachment() const
     {
-        return m_pColorAttachment.get();
+        return m_pColorAttachment;
     }
 
     const BaseDepthStencilAttachment *PostRenderTarget::getDepthStencilAttachment() const
     {
-        return m_pDepthStencilAttachment.get();
+        return m_pDepthStencilAttachment;
     }
 } //vg

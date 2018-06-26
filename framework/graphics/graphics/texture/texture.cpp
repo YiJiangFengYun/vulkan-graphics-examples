@@ -502,159 +502,24 @@ namespace vg
 
     void Texture::_updateArrayLayer()
     {
-        uint32_t arraylayers;
-        switch (m_type)
-        {
-        case TextureType::TEX_1D:
-        case TextureType::TEX_2D:
-        case TextureType::TEX_2D_COLOR_ATTACHMENT:
-        case TextureType::TEX_2D_DEPTH_STENCIL_ATTACHMENT:
-        case TextureType::TEX_2D_DEPTH_ATTACHMENT:
-        case TextureType::TEX_3D:
-        case TextureType::COLOR_ATTACHMENT:
-        case TextureType::DEPTH_STENCIL_ATTACHMENT:
-        {
-            arraylayers = 1U;
-            break;
-        }
-        case TextureType::TEX_1D_ARRAY:
-        case TextureType::TEX_2D_ARRAY:
-        {
-            arraylayers = m_arrayLength;
-            break;
-        }
-        case TextureType::CUBE:
-        {
-            arraylayers = static_cast<uint32_t>(CubemapFace::RANGE_SIZE);
-            break;
-        }
-        case TextureType::CUBE_ARRARY:
-        {
-            arraylayers = static_cast<uint32_t>(CubemapFace::RANGE_SIZE) * m_arrayLength;
-            break;
-        }
-        default:
-            throw std::logic_error("Lack of caculating compatible array layer and flag at creating iamge for texture when texture type is " + mapTextureTypeToName[m_type]);
-            break;
-        }
-
-        m_arrayLayers = arraylayers;
+        m_arrayLayers = getTexArrayLayers(m_type, m_arrayLength);
     }
 
     void Texture::_createImage(Bool32 importContent)
     {
-#ifdef DEBUG
-        Bool32 isFind;
-#endif // DEBUG
-
         vk::ImageType vkImageType;
-#ifdef DEBUG
-        isFind = VG_FALSE;
-#endif // DEBUG
-
-        for (const auto& item : arrTextureTypeToVKImageType)
-        {
-            if (item.first == m_type)
-            {
-                vkImageType = item.second;
-#ifdef DEBUG
-                isFind = VG_TRUE;
-#endif // DEBUG
-            }
-        }
-
-#ifdef DEBUG
-        if (isFind == VG_FALSE)
-        {
-            throw std::logic_error("Invalid texture type at creating image for texture.");
-        }
-#endif // DEBUG
+        vkImageType = arrTextureTypeToVKImageType[static_cast<size_t>(m_type)].second;
 
 
 #ifdef DEBUG
         //check whether other arguments is compatibility with texture type.
-        switch (m_type)
-        {
-        case TextureType::TEX_1D:
-        case TextureType::TEX_1D_ARRAY:
-        {
-            if (m_width == 0) throw std::invalid_argument("Invalid width argument at creating image for texture.");
-            if (m_height != 1) throw std::invalid_argument("Invalid height argument at creating image for texture.");
-            if (m_depth != 1) throw std::invalid_argument("Invalide depth argument at creating image for texture.");
-            break;
-        }
-        case TextureType::TEX_2D:
-        case TextureType::TEX_2D_ARRAY:
-        case TextureType::COLOR_ATTACHMENT:
-        case TextureType::DEPTH_STENCIL_ATTACHMENT:
-        case TextureType::TEX_2D_COLOR_ATTACHMENT:
-        case TextureType::TEX_2D_DEPTH_STENCIL_ATTACHMENT:
-        case TextureType::TEX_2D_DEPTH_ATTACHMENT:
-        {
-            if (m_width == 0) throw std::invalid_argument("Invalid width argument at creating image for texture.");
-            if (m_height == 0) throw std::invalid_argument("Invalid height argument at creating image for texture.");
-            if (m_depth != 1) throw std::invalid_argument("Invalide depth argument at creating image for texture.");
-            break;
-        }
-        case TextureType::CUBE:
-        case TextureType::CUBE_ARRARY:
-        {
-            if (m_width == 0) throw std::invalid_argument("Invalid width argument at creating image for texture.");
-            if (m_width != m_height) throw std::invalid_argument("Invalid width and height argument at creating image for texture, because they is not equal.");
-            if (m_depth != 1) throw std::invalid_argument("Invalide depth argument at creating image for texture.");
-            break;
-        }
-        case TextureType::TEX_3D:
-        {
-            if (m_width == 0) throw std::invalid_argument("Invalid width argument at creating image for texture.");
-            if (m_height == 0) throw std::invalid_argument("Invalid height argument at creating image for texture.");
-            if (m_depth == 0) throw std::invalid_argument("Invalid depth argument at creating image for texture.");
-            break;
-        }
-        default:
-            throw std::logic_error("Lack of checking argument at creating iamge for texture when texture type is " + mapTextureTypeToName[m_type]);
-            break;
-        }
+        checkTexImageSize(m_type, m_width, m_height, m_depth);
 
 #endif // DEBUG
 
         //caculate compatible array layer and flag.
         vk::ImageCreateFlags flags;
-        switch (m_type)
-        {
-        case TextureType::TEX_1D:
-        case TextureType::TEX_2D:
-        case TextureType::TEX_2D_COLOR_ATTACHMENT:
-        case TextureType::TEX_2D_DEPTH_STENCIL_ATTACHMENT:
-        case TextureType::TEX_2D_DEPTH_ATTACHMENT:
-        case TextureType::TEX_3D:
-        {
-            break;
-        }
-        case TextureType::TEX_1D_ARRAY:
-        case TextureType::TEX_2D_ARRAY:
-        {
-            break;
-        }
-        case TextureType::COLOR_ATTACHMENT:
-        case TextureType::DEPTH_STENCIL_ATTACHMENT:
-        {
-            break;
-        }
-        case TextureType::CUBE:
-        {
-            flags |= vk::ImageCreateFlagBits::eCubeCompatible;
-            break;
-        }
-        case TextureType::CUBE_ARRARY:
-        {
-            flags |= vk::ImageCreateFlagBits::eCubeCompatible;
-            break;
-        }
-        default:
-            throw std::logic_error("Lack of caculating compatible array layer and flag at creating iamge for texture when texture type is " + mapTextureTypeToName[m_type]);
-            break;
-        }
+        flags |= arrTextureTypeToImageCreateFlags[static_cast<size_t>(m_type)].second;
 
         vk::ImageUsageFlags usage = m_usageFlags;
         if (importContent)
@@ -685,31 +550,9 @@ namespace vg
     void Texture::_createImageView()
     {
        if (m_isCreateDefaultImageView == VG_FALSE) return;
-#ifdef DEBUG
-        Bool32 isFind;
-#endif // DEBUG
         vk::ImageViewType vkImageViewType;
-#ifdef DEBUG
-        isFind = VG_FALSE;
-#endif // DEBUG
+        vkImageViewType = arrTextureTypeToVKImageViewType[static_cast<size_t>(m_type)].second;
 
-        for (const auto& item : arrTextureTypeToVKImageViewType)
-        {
-            if (item.first == m_type)
-            {
-                vkImageViewType = item.second;
-#ifdef DEBUG
-                isFind = VG_TRUE;
-#endif // DEBUG
-            }
-        }
-
-#ifdef DEBUG
-        if (isFind == VG_FALSE)
-        {
-            throw std::invalid_argument("Invalid type argument at creating image view for texture.");
-        }
-#endif // DEBUG
         ImageViewInfo info = {
             vk::ImageViewCreateFlags(),
             *(m_pImage->getImage()),
@@ -925,31 +768,9 @@ namespace vg
 
     vk::ImageViewType Texture::_getImageViewType() const
     {
-#ifdef DEBUG
-        Bool32 isFind;
-#endif // DEBUG
         vk::ImageViewType vkImageViewType;
-#ifdef DEBUG
-        isFind = VG_FALSE;
-#endif // DEBUG
+        vkImageViewType = arrTextureTypeToVKImageViewType[static_cast<size_t>(m_type)].second;
 
-        for (const auto& item : arrTextureTypeToVKImageViewType)
-        {
-            if (item.first == m_type)
-            {
-                vkImageViewType = item.second;
-#ifdef DEBUG
-                isFind = VG_TRUE;
-#endif // DEBUG
-            }
-        }
-
-#ifdef DEBUG
-        if (isFind == VG_FALSE)
-        {
-            throw std::invalid_argument("Invalid type argument at creating image view for texture.");
-        }
-#endif // DEBUG
         return vkImageViewType;
     }
 

@@ -22,8 +22,11 @@ namespace vg
         TEX_2D_COLOR_ATTACHMENT,
         TEX_2D_DEPTH_STENCIL_ATTACHMENT,
         TEX_2D_DEPTH_ATTACHMENT,
+        CUBE_COLOR_ATTACHMENT,
+        CUBE_DEPTH_STENCIL_ATTACHMENT,
+        CUBE_DEPTH_ATTACHMENT,
         BEGIN_RANGE = TEX_1D,
-        END_RANGE = TEX_2D_DEPTH_ATTACHMENT,
+        END_RANGE = CUBE_DEPTH_ATTACHMENT,
         RANGE_SIZE = (END_RANGE - BEGIN_RANGE + 1)
     };
 
@@ -40,9 +43,12 @@ namespace vg
         RANGE_SIZE = (END_RANGE - BEGIN_RANGE + 1)
     };
 
-    extern std::map<TextureType, std::string> mapTextureTypeToName;
+    extern std::array<std::pair<TextureType, std::string>, static_cast<size_t>(TextureType::RANGE_SIZE)> arrTextureTypeToNames;
     extern std::array<std::pair<TextureType, vk::ImageType>, static_cast<size_t>(TextureType::RANGE_SIZE)> arrTextureTypeToVKImageType;
     extern std::array<std::pair<TextureType, vk::ImageViewType>, static_cast<size_t>(TextureType::RANGE_SIZE)> arrTextureTypeToVKImageViewType;
+    extern std::array<std::pair<TextureType, vk::ImageCreateFlags>, static_cast<size_t>(TextureType::RANGE_SIZE)> arrTextureTypeToImageCreateFlags;
+    extern void checkTexImageSize(TextureType type, uint32_t width, uint32_t height, uint32_t depth);
+    extern uint32_t getTexArrayLayers(TextureType type, uint32_t arrayLength);
 }
 
 

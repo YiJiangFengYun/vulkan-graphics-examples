@@ -17,10 +17,10 @@ namespace vg
             );
         
         vk::Format getDepthImageFormat() const;
-        const BaseDepthStencilAttachment *getDepthAttachment() const;
+        const vk::ImageView *getDepthAttachment() const;
     protected:
         vk::Format m_depthImageFormat;
-        BaseDepthStencilAttachment *m_pDepthAttachment;
+        const vk::ImageView *m_pDepthAttachment;
     };
 } //vg
 

@@ -19,13 +19,13 @@ namespace vg
             );
         vk::Format getColorImageFormat() const;
         vk::Format getDepthStencilImageFormat() const;
-        const BaseColorAttachment *getColorAttachment() const;
-        const BaseDepthStencilAttachment *getDepthStencilAttachment() const;
+        const vk::ImageView *getColorAttachment() const;
+        const vk::ImageView *getDepthStencilAttachment() const;
     protected:
         vk::Format m_colorImageFormat;
         vk::Format m_depthStencilImageFormat;
-        BaseColorAttachment *m_pColorAttachment;
-        BaseDepthStencilAttachment *m_pDepthStencilAttachment;
+        const vk::ImageView *m_pColorAttachment;
+        const vk::ImageView *m_pDepthStencilAttachment;
     };
 } //vg
 

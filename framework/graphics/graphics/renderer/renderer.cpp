@@ -379,6 +379,8 @@ namespace vg
             preZEnable ? m_pPreZTarget.get() : nullptr,
             postRenderEnable ? m_pPostRenderTarget.get() : nullptr,
             m_pRendererTarget,
+            preZEnable ? m_pPreZTarget->getDepthTargetTexture() : nullptr,
+            postRenderEnable ? m_pPostRenderTarget->getColorTargetTexture() : nullptr,
             preZEnable ? m_pPreZCmdBuffer.get() : nullptr,
             &m_branchCmdBuffer,
             &m_trunkWaitBarrierCmdBuffer,

@@ -25,6 +25,9 @@ namespace vg
         , const PostRenderTarget *pPostRenderTarget
         , const MultiRenderTarget *pRendererTarget
 
+        , const Texture *pPreZResultTex
+        , const Texture *pPostRenderTex
+
         , CmdBuffer *pPreZCmdBuffer
         , CmdBuffer *pBranchCmdBuffer
         , CmdBuffer *pTrunkWaitBarrierCmdBuffer
@@ -42,6 +45,9 @@ namespace vg
         , pPreZTarget(pPreZTarget)
         , pPostRenderTarget(pPostRenderTarget)
         , pRendererTarget(pRendererTarget)
+
+        , pPreZResultTex(pPreZResultTex)
+        , pPostRenderTex(pPostRenderTex)
 
         , pPreZCmdBuffer(pPreZCmdBuffer)
         , pBranchCmdBuffer(pBranchCmdBuffer)
@@ -130,7 +136,7 @@ namespace vg
         {
             _bindScene2(dynamic_cast<Scene<SpaceType::SPACE_2> *>(info.pScene), 
                 dynamic_cast<const Projector<SpaceType::SPACE_2> *>(info.pProjector),
-                info.preZEnable ? info.pPreZTarget : nullptr,
+                info.preZEnable ? info.pPreZResultTex : nullptr,
                 info.preZEnable ? info.pPreZCmdBuffer : nullptr,
                 info.pBranchCmdBuffer,                    
                 info.pTrunkWaitBarrierCmdBuffer,
@@ -141,7 +147,7 @@ namespace vg
         {
             _bindScene3(dynamic_cast<Scene<SpaceType::SPACE_3> *>(info.pScene), 
                 dynamic_cast<const Projector<SpaceType::SPACE_3> *>(info.pProjector), 
-                info.preZEnable ? info.pPreZTarget : nullptr,
+                info.preZEnable ? info.pPreZResultTex : nullptr,
                 info.preZEnable ? info.pPreZCmdBuffer : nullptr,
                 info.pBranchCmdBuffer,                    
                 info.pTrunkWaitBarrierCmdBuffer,
@@ -166,7 +172,7 @@ namespace vg
                 {
                     if ((*(buildInDataInfo.pComponent + j)).type == Pass::BuildInDataType::POST_RENDER_RESULT)
                     {
-                        auto pColorTex = dynamic_cast<const Texture *>(info.pPostRenderTarget->getColorAttachment());
+                        auto pColorTex = info.pPostRenderTex;
                         vg::PassTextureInfo::TextureInfo itemInfo = {
                             pColorTex,
                             nullptr,
@@ -415,7 +421,7 @@ namespace vg
 
     void RenderBinder::_bindScene2(Scene<SpaceType::SPACE_2> *pScene
         , const Projector<SpaceType::SPACE_2> *pProjector
-        , const PreZTarget *pPreZTarget
+        , const Texture *pPreZResultTex
         , CmdBuffer *pPreZCmdBuffer
         , CmdBuffer *pBranchCmdBuffer
         , CmdBuffer *pTrunkWaitBarrierCmdBuffer        
@@ -509,7 +515,7 @@ namespace vg
                     , viewMatrix
                     , projMatrix
                     , pScene
-                    , pPreZTarget
+                    , pPreZResultTex
 #if defined(DEBUG) && defined(VG_ENABLE_COST_TIMER)
                     , preparingBuildInDataCostTimer
 #endif //DEBUG and VG_ENABLE_COST_TIMER    
@@ -633,7 +639,7 @@ namespace vg
 
     void RenderBinder::_bindScene3(Scene<SpaceType::SPACE_3> *pScene
         , const Projector<SpaceType::SPACE_3> *pProjector
-        , const PreZTarget *pPreZTarget
+        , const Texture *pPreZResultTex
         , CmdBuffer *pPreZCmdBuffer
         , CmdBuffer *pBranchCmdBuffer
         , CmdBuffer *pTrunkWaitBarrierCmdBuffer        
@@ -817,7 +823,7 @@ namespace vg
                         , viewMatrix
                         , projMatrix
                         , pScene
-                        , pPreZTarget
+                        , pPreZResultTex
 #if defined(DEBUG) && defined(VG_ENABLE_COST_TIMER)
                         , preparingBuildInDataCostTimer
 #endif //DEBUG and VG_ENABLE_COST_TIMER    
@@ -977,7 +983,7 @@ namespace vg
         , Matrix4x4 viewMatrix
         , Matrix4x4 projMatrix
         , BaseScene *pScene
-        , const PreZTarget *pPreZTarget
+        , const Texture *pPreZResultTex
 #if defined(DEBUG) && defined(VG_ENABLE_COST_TIMER)
         , fd::CostTimer * pPreparingBuildInDataCostTimer
 #endif //DEBUG and VG_ENABLE_COST_TIMER
@@ -1108,10 +1114,10 @@ namespace vg
                     }
                     else if (type == Pass::BuildInDataType::PRE_Z_DEPTH_RESULT)
                     {
-                        if (pPreZTarget != nullptr)
+                        if (pPreZResultTex != nullptr)
                         {
                             vg::PassTextureInfo::TextureInfo itemInfo = {
-                                dynamic_cast<const Texture *>(pPreZTarget->getDepthAttachment()),
+                                pPreZResultTex,
                                 nullptr,
                                 nullptr,
                                 vk::ImageLayout::eUndefined,

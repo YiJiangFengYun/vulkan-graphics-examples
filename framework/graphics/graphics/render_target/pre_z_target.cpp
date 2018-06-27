@@ -23,7 +23,7 @@ namespace vg
         return m_depthImageFormat;
     }
 
-    const BaseDepthStencilAttachment *PreZTarget::getDepthAttachment() const
+    const vk::ImageView *PreZTarget::getDepthAttachment() const
     {
         return m_pDepthAttachment;
     }

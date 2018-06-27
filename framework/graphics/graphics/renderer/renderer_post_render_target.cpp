@@ -12,6 +12,16 @@ namespace vg
         _createObjs();
     }
 
+    const Texture2DColorAttachment *RendererPostRenderTarget::getColorTargetTexture() const
+    {
+        return m_pColorTargetTex.get();
+    }
+        
+    const TextureDepthStencilAttachment *RendererPostRenderTarget::getDepthStencilTargetTexture() const
+    {
+        return m_pDepthStencilTargetTex.get();
+    }
+
     void RendererPostRenderTarget::_createObjs()
     {
         auto pDevice = pApp->getDevice();
@@ -23,19 +33,19 @@ namespace vg
             framebufferWidth,
             framebufferHeight
             );
-        m_pMyColorAttachment = std::shared_ptr<Texture2DColorAttachment>(pColorTex);
-        m_pColorAttachment = m_pMyColorAttachment.get();
+        m_pColorTargetTex = std::shared_ptr<Texture2DColorAttachment>(pColorTex);
+        m_pColorAttachment = m_pColorTargetTex->getImageView()->getImageView();
 
         auto pDepthStencilTex = new TextureDepthStencilAttachment(
             m_depthStencilImageFormat,
             framebufferWidth,
             framebufferHeight
             );
-        m_pMyDepthStencilAttachment = std::shared_ptr<TextureDepthStencilAttachment>(pDepthStencilTex);
-        m_pDepthStencilAttachment = m_pMyDepthStencilAttachment.get();
+        m_pDepthStencilTargetTex = std::shared_ptr<TextureDepthStencilAttachment>(pDepthStencilTex);
+        m_pDepthStencilAttachment = m_pDepthStencilTargetTex->getImageView()->getImageView();
 
         //render pass.
-        auto pImage = dynamic_cast<Texture2DColorAttachment *>(m_pColorAttachment)->getImage();
+        auto pImage = m_pColorTargetTex->getImage();
         vk::AttachmentDescription colorAttachmentDes = {
             vk::AttachmentDescriptionFlags(),
             m_colorImageFormat,
@@ -48,7 +58,7 @@ namespace vg
             pImage->getInfo().layout,
         };
 
-        pImage = dynamic_cast<TextureDepthStencilAttachment *>(m_pDepthStencilAttachment)->getImage();
+        pImage = m_pDepthStencilTargetTex->getImage();
         vk::AttachmentDescription depthStencilAttachmentDes = {
             vk::AttachmentDescriptionFlags(),
             m_depthStencilImageFormat,
@@ -123,8 +133,8 @@ namespace vg
 
         //frame buffer.
         std::array<vk::ImageView, 2> attachments = {
-             *(m_pColorAttachment->getColorAttachmentImageView()),
-             *(m_pDepthStencilAttachment->getDepthStencilAttachmentImageView()),
+             *m_pColorAttachment,
+             *m_pDepthStencilAttachment,
         };
 
         vk::FramebufferCreateInfo frameBufferCreateInfo = {

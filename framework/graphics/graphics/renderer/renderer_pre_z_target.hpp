@@ -14,8 +14,9 @@ namespace vg
             , uint32_t framebufferHeight = 0u
             , vk::Format depthImageFormat = PreZTarget::DEFAULT_DEPTH_FORMAT
             );
+        const Texture2DDepthAttachment *getDepthTargetTexture() const;
     private:
-        std::shared_ptr<Texture2DDepthAttachment> m_pMyDepthAttachment;
+        std::shared_ptr<Texture2DDepthAttachment> m_pDepthTargetTex;
         std::shared_ptr<vk::RenderPass> m_pMyRenderPass;
         std::shared_ptr<vk::Framebuffer> m_pMyFramebuffer;
         void _createObjs();

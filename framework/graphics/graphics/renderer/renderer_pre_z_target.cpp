@@ -11,6 +11,11 @@ namespace vg
         _createObjs();
     }
 
+    const Texture2DDepthAttachment *RendererPreZTarget::getDepthTargetTexture() const
+    {
+        return m_pDepthTargetTex.get();
+    }
+
     void RendererPreZTarget::_createObjs()
     {
         auto pDevice = pApp->getDevice();
@@ -23,8 +28,8 @@ namespace vg
                 framebufferHeight
                 );
 
-        m_pMyDepthAttachment = std::shared_ptr<Texture2DDepthAttachment>(pTex);
-        m_pDepthAttachment = m_pMyDepthAttachment.get();
+        m_pDepthTargetTex = std::shared_ptr<Texture2DDepthAttachment>(pTex);
+        m_pDepthAttachment = m_pDepthTargetTex->getImageView()->getImageView();
 
         //render pass.
         vk::AttachmentDescription depthAttachmentDes = {
@@ -36,7 +41,7 @@ namespace vg
             vk::AttachmentLoadOp::eDontCare,
             vk::AttachmentStoreOp::eDontCare,
             vk::ImageLayout::eUndefined,
-            m_pDepthAttachment->getDepthStencilAttachmentLayout(),
+            vk::ImageLayout::eDepthStencilReadOnlyOptimal
         };
 
         vk::AttachmentReference depthAttachmentRef = {
@@ -96,7 +101,7 @@ namespace vg
 
         //frame buffer.
         std::array<vk::ImageView, 1> attachments = {
-             *(m_pDepthAttachment->getDepthStencilAttachmentImageView()),
+             *m_pDepthAttachment,
         };
 
         vk::FramebufferCreateInfo frameBufferCreateInfo = {

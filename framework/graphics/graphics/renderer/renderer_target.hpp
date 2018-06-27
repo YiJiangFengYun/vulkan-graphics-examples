@@ -22,8 +22,8 @@ namespace vg
     protected:
         vk::Format m_colorImageFormat;
         vk::Format m_depthStencilImageFormat;
-        BaseColorAttachment *m_pColorAttachment;
-        BaseDepthStencilAttachment *m_pDepthStencilAttachment;
+        const vk::ImageView *m_pColorAttachment;
+        const vk::ImageView *m_pDepthStencilAttachment;
     };
 } //vg
 

@@ -28,6 +28,9 @@ namespace vg
         const PostRenderTarget *pPostRenderTarget;
         const MultiRenderTarget *pRendererTarget;
 
+        const Texture *pPreZResultTex;
+        const Texture *pPostRenderTex;
+
         CmdBuffer *pPreZCmdBuffer;
         CmdBuffer *pBranchCmdBuffer;
         CmdBuffer *pTrunkWaitBarrierCmdBuffer;
@@ -44,6 +47,9 @@ namespace vg
             , const PreZTarget *pPreZTarget = nullptr
             , const PostRenderTarget *pPostRenderTarget = nullptr
             , const MultiRenderTarget *pRendererTarget = nullptr
+
+            , const Texture *pPreZResultTex = nullptr
+            , const Texture *pPostRenderTex = nullptr
     
             , CmdBuffer *pPreZCmdBuffer = nullptr
             , CmdBuffer *pBranchCmdBuffer = nullptr
@@ -96,7 +102,7 @@ namespace vg
 
         void _bindScene2(Scene<SpaceType::SPACE_2> *pScene
             , const Projector<SpaceType::SPACE_2> *pProjector
-            , const PreZTarget *pPreZTarget = nullptr
+            , const Texture *pPreZResultTex = nullptr
             , CmdBuffer *pPreZCmdBuffer = nullptr
             , CmdBuffer *pBranchCmdBuffer = nullptr
             , CmdBuffer *pTrunkWaitBarrierCmdBuffer = nullptr
@@ -105,7 +111,7 @@ namespace vg
 
         void _bindScene3(Scene<SpaceType::SPACE_3> *pScene
             , const Projector<SpaceType::SPACE_3> *pProjector
-            , const PreZTarget *pPreZTarget = nullptr
+            , const Texture *pPreZResultTex = nullptr
             , CmdBuffer *pPreZCmdBuffer = nullptr
             , CmdBuffer *pBranchCmdBuffer = nullptr
             , CmdBuffer *pTrunkWaitBarrierCmdBuffer = nullptr
@@ -126,7 +132,7 @@ namespace vg
             , Matrix4x4 viewMatrix
             , Matrix4x4 projMatrix
             , BaseScene *pScene            
-            , const PreZTarget *pPreZTarget
+            , const Texture *pPreZResultTex
 #if defined(DEBUG) && defined(VG_ENABLE_COST_TIMER)
         , fd::CostTimer * pPreparingBuildInDataCostTimer
 #endif //DEBUG and VG_ENABLE_COST_TIMER

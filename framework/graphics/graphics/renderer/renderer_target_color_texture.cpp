@@ -131,7 +131,7 @@ namespace vg
                 m_framebufferHeight
                 );
         m_pMyDepthStencilAttachment = std::shared_ptr<TextureDepthStencilAttachment>(pTex);
-        m_pDepthStencilAttachment = m_pMyDepthStencilAttachment.get();
+        m_pDepthStencilAttachment = m_pMyDepthStencilAttachment->getImageView()->getImageView();
     }
         
     void ColorTexRendererTarget::_createFramebuffer()
@@ -139,7 +139,7 @@ namespace vg
         auto pDevice = pApp->getDevice();
         {
             std::array<vk::ImageView, 2> attachments;
-            attachments = { *m_pColorAttchment->getColorAttachmentImageView(), *m_pDepthStencilAttachment->getDepthStencilAttachmentImageView() };
+            attachments = { *m_pColorAttchment->getColorAttachmentImageView(), *m_pDepthStencilAttachment };
     
             vk::FramebufferCreateInfo createInfo = {
                 vk::FramebufferCreateFlags(),                   //flags
@@ -157,7 +157,7 @@ namespace vg
 
         {
             std::array<vk::ImageView, 2> attachments;
-            attachments = { *m_pColorAttchment->getColorAttachmentImageView(), *m_pDepthStencilAttachment->getDepthStencilAttachmentImageView() };
+            attachments = { *m_pColorAttchment->getColorAttachmentImageView(), *m_pDepthStencilAttachment };
     
             vk::FramebufferCreateInfo createInfo = {
                 vk::FramebufferCreateFlags(),                   //flags

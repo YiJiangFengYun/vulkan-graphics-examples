@@ -16,9 +16,11 @@ namespace vg
             , vk::Format colorImageFormat = DEFAULT_COLOR_FORMAT
             , vk::Format depthStencilImageFormat = PostRenderTarget::DEFAULT_DEPTH_STENCIL_FORMAT
             );
+        const Texture2DColorAttachment *getColorTargetTexture() const;
+        const TextureDepthStencilAttachment *getDepthStencilTargetTexture() const;
     private:
-        std::shared_ptr<Texture2DColorAttachment> m_pMyColorAttachment;
-        std::shared_ptr<TextureDepthStencilAttachment> m_pMyDepthStencilAttachment;
+        std::shared_ptr<Texture2DColorAttachment> m_pColorTargetTex;
+        std::shared_ptr<TextureDepthStencilAttachment> m_pDepthStencilTargetTex;
         std::shared_ptr<vk::RenderPass> m_pMyRenderPass;
         std::shared_ptr<vk::Framebuffer> m_pMyFramebuffer;
         void _createObjs();

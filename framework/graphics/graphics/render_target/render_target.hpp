@@ -53,10 +53,6 @@ namespace vg
         vk::RenderPass *m_pSecondRenderPass;
         vk::Framebuffer *m_pFirstFramebuffer;
         vk::Framebuffer *m_pSecondFramebuffer;
-        // std::shared_ptr<vk::RenderPass> m_pFirstRenderPass;
-        // std::shared_ptr<vk::RenderPass> m_pSecondRenderPass;
-        // std::shared_ptr<vk::Framebuffer> m_pFirstFramebuffer;
-        // std::shared_ptr<vk::Framebuffer> m_pSecondFramebuffer;
     };
 } //vg
 

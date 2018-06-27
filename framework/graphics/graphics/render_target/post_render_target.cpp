@@ -38,12 +38,12 @@ namespace vg
         return m_depthStencilImageFormat;
     }
         
-    const BaseColorAttachment *PostRenderTarget::getColorAttachment() const
+    const vk::ImageView *PostRenderTarget::getColorAttachment() const
     {
         return m_pColorAttachment;
     }
 
-    const BaseDepthStencilAttachment *PostRenderTarget::getDepthStencilAttachment() const
+    const vk::ImageView *PostRenderTarget::getDepthStencilAttachment() const
     {
         return m_pDepthStencilAttachment;
     }

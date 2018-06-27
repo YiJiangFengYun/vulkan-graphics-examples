@@ -155,7 +155,7 @@ namespace vg
                 m_framebufferHeight
                 );
         m_pMyDepthStencilAttachment = std::shared_ptr<TextureDepthStencilAttachment>(pTex);
-        m_pDepthStencilAttachment = m_pMyDepthStencilAttachment.get();
+        m_pDepthStencilAttachment = m_pMyDepthStencilAttachment->getImageView()->getImageView();
     }
 
     void SurfaceRendererTarget::_createFramebuffers()
@@ -166,7 +166,7 @@ namespace vg
             for (uint32_t imageIndex = 0; imageIndex < m_swapchainImageViewCount; ++imageIndex)
             {
                 std::array<vk::ImageView, 2> attachments;
-                attachments = { *(m_pSwapchainImageViews + imageIndex), *m_pDepthStencilAttachment->getDepthStencilAttachmentImageView() };
+                attachments = { *(m_pSwapchainImageViews + imageIndex), *m_pDepthStencilAttachment};
         
                 vk::FramebufferCreateInfo createInfo = {
                     vk::FramebufferCreateFlags(),                   //flags
@@ -189,7 +189,7 @@ namespace vg
             for (uint32_t imageIndex = 0; imageIndex < m_swapchainImageViewCount; ++imageIndex)
             {
                 std::array<vk::ImageView, 2> attachments;
-                attachments = { *(m_pSwapchainImageViews + imageIndex), *m_pDepthStencilAttachment->getDepthStencilAttachmentImageView() };
+                attachments = { *(m_pSwapchainImageViews + imageIndex), *m_pDepthStencilAttachment};
         
                 vk::FramebufferCreateInfo createInfo = {
                     vk::FramebufferCreateFlags(),                   //flags

@@ -135,10 +135,7 @@ namespace vg
     {
     public:
         BaseLight();
-        virtual void memcpyLightData(void *pDst) const = 0;
-        virtual const Texture *getTexture(uint32_t index) const = 0;
         void apply();
-
         LightExportInfo getExportInfo() const;
     protected:
         LightData m_data;

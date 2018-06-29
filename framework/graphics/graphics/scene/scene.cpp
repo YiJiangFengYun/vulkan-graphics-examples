@@ -2,7 +2,7 @@
 
 namespace vg
 {
-    LightInfo::LightInfo(uint32_t bindingPriority
+    SceneLightRegisterInfo::SceneLightRegisterInfo(uint32_t bindingPriority
         , uint32_t maxCount
         , uint32_t dataSize
         , uint32_t textureCount
@@ -78,12 +78,12 @@ namespace vg
         return m_arrRegisteredLights;
     }
 
-    const std::unordered_map<std::type_index, LightInfo> BaseScene::getMapRegisteredLights() const
+    const std::unordered_map<std::type_index, SceneLightRegisterInfo> BaseScene::getMapRegisteredLights() const
     {
         return m_mapRegisteredLights;
     }
 
-    void BaseScene::registerLight(const std::type_info &lightTypeInfo, const LightInfo &lightInfo)
+    void BaseScene::registerLight(const std::type_info &lightTypeInfo, const SceneLightRegisterInfo &lightInfo)
     {
         _registerLight(lightTypeInfo, lightInfo);
     }
@@ -103,7 +103,7 @@ namespace vg
         _endRender();
     }
 
-    void BaseScene::_registerLight(const std::type_info &lightTypeInfo, const LightInfo &lightInfo)
+    void BaseScene::_registerLight(const std::type_info &lightTypeInfo, const SceneLightRegisterInfo &lightInfo)
     {
         {
             const auto &iterator = m_mapRegisteredLights.find(std::type_index(lightTypeInfo));
@@ -375,7 +375,7 @@ namespace vg
     }
 
     template <SpaceType SPACE_TYPE>
-    void Scene<SPACE_TYPE>::_registerLight(const std::type_info &lightTypeInfo, const LightInfo &lightInfo)
+    void Scene<SPACE_TYPE>::_registerLight(const std::type_info &lightTypeInfo, const SceneLightRegisterInfo &lightInfo)
     {
         BaseScene::_registerLight(lightTypeInfo, lightInfo);
     }

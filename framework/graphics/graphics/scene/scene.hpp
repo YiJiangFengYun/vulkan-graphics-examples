@@ -15,12 +15,12 @@
 #define VG_DEFAULT_SCENE_MAX_LIGHT_COUNT 10u
 namespace vg
 {
-    struct LightInfo {
+    struct SceneLightRegisterInfo {
         uint32_t bindingPriority;
         uint32_t maxCount;
         uint32_t dataSize;
         uint32_t textureCount;
-        LightInfo(uint32_t bindingPriority = 0u
+        SceneLightRegisterInfo(uint32_t bindingPriority = 0u
             , uint32_t maxCount = VG_DEFAULT_SCENE_MAX_LIGHT_COUNT
             , uint32_t dataSize = 0u
             , uint32_t textureCount = 0u
@@ -38,8 +38,8 @@ namespace vg
         uint32_t getRegisterLightCount() const;
         Bool32 isHasRegisterLight(const std::type_info &lightTypeInfo) const;
         const std::vector<const std::type_info *> getArrRegisteredLights() const;
-        const std::unordered_map<std::type_index, LightInfo> getMapRegisteredLights() const;
-        void registerLight(const std::type_info &lightTypeInfo, const LightInfo &lightInfo);
+        const std::unordered_map<std::type_index, SceneLightRegisterInfo> getMapRegisteredLights() const;
+        void registerLight(const std::type_info &lightTypeInfo, const SceneLightRegisterInfo &lightInfo);
         void unregisterLight(const std::type_info &lightTypeInfo);
         void beginRender();
         void endRender();
@@ -47,9 +47,9 @@ namespace vg
         SpaceType m_spaceType;
         Bool32 m_isRightHand;
         std::vector<const std::type_info *> m_arrRegisteredLights;
-        std::unordered_map<std::type_index, LightInfo> m_mapRegisteredLights;
+        std::unordered_map<std::type_index, SceneLightRegisterInfo> m_mapRegisteredLights;
 
-        virtual void _registerLight(const std::type_info &lightTypeInfo, const LightInfo &lightInfo);
+        virtual void _registerLight(const std::type_info &lightTypeInfo, const SceneLightRegisterInfo &lightInfo);
         virtual void _unregisterLight(const std::type_info &lightTypeInfo);
         virtual void _beginRender();
         virtual void _endRender();
@@ -137,7 +137,7 @@ namespace vg
         std::unordered_map<InstanceID, LightType *> m_mapTransformIdToLights;
         std::unordered_map<std::type_index, std::vector<LightType *>> m_mapLightGroups;
 
-        virtual void _registerLight(const std::type_info &lightTypeInfo, const LightInfo &lightInfo) override;
+        virtual void _registerLight(const std::type_info &lightTypeInfo, const SceneLightRegisterInfo &lightInfo) override;
         virtual void _unregisterLight(const std::type_info &lightTypeInfo) override;
 
         virtual void _beginRender() override;

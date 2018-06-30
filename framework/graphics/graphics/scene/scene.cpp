@@ -17,7 +17,7 @@ namespace vg
 
     BaseScene::BaseScene()
         : Base(BaseType::SCENE)
-        , m_isRightHand(VG_FALSE)
+        , m_space()
         , m_arrRegisteredLights()
         , m_mapRegisteredLights()
     {
@@ -26,41 +26,32 @@ namespace vg
 
     SpaceType BaseScene::getSpaceType() const
     {
-        return m_spaceType;
+        return m_space.spaceType;
     }
 
     Bool32 BaseScene::getIsRightHand() const
     {
-        return m_isRightHand;
+        return m_space.rightHand;
     }
 
     Bool32 BaseScene::getIsLeftHand() const
     {
-       if (m_isRightHand)
-       {
-           return VG_FALSE;
-       }
-       else
-       {
-           return VG_TRUE;
-       }
+        return ! m_space.rightHand;
     }
 
     void BaseScene::setIsRightHand(Bool32 isRightHand)
     {
-        m_isRightHand = isRightHand;
+        m_space.rightHand = isRightHand;
     }
 
     void BaseScene::setIsLeftHand(Bool32 isLeftHand)
     {
-        if (isLeftHand)
-        {
-            m_isRightHand = VG_FALSE;
-        }
-        else
-        {
-            m_isRightHand = VG_TRUE;
-        }
+        m_space.rightHand = ! isLeftHand;
+    }
+
+    const Space &BaseScene::getSpace() const
+    {
+        return m_space;
     }
 
     uint32_t BaseScene::getRegisterLightCount() const
@@ -145,7 +136,7 @@ namespace vg
         : BaseScene()
         , pRootTransform(new TransformType())
     {
-        m_spaceType = SPACE_TYPE;
+        m_space.spaceType = SPACE_TYPE;
     }
 
     template <SpaceType SPACE_TYPE>
@@ -436,6 +427,7 @@ namespace vg
         if (pTarget->getTransform()->getChildCount())
             throw std::invalid_argument("Target should not own chilren.");
 #endif // DEBUG
+        pTarget->addToSpace(m_space);
         //construct hierarchy data.
         if (pParent != nullptr)
         {

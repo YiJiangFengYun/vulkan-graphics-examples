@@ -15,17 +15,7 @@ namespace vg
     Scene3::MatrixType Scene3::getProjMatrix(const ProjectorType *pProjector) const
     {
         auto projMatrix = pProjector->getProjMatrix();
-        if (m_isRightHand == VG_FALSE)
-        {
-            projMatrix[1][1] *= -1;
-        }
-        else
-        {
-            vg::Vector3 eulerAngles = vg::Vector3(glm::radians(-90.0f), 0.0f, 0.0f);
-            vg::Quaternion changeToGLCoord = vg::Quaternion(eulerAngles);
-            projMatrix = projMatrix * glm::toMat4(changeToGLCoord);
-        }
-        return projMatrix;
+        return m_space.getVulkanProjMatrix(projMatrix);
     }
 
     Scene3::BoundsType Scene3::getProjectionBoundsInWorld(const ProjectorType *pProjector) const
@@ -36,14 +26,28 @@ namespace vg
         if (pProjector->getIsOrthographic() == VG_FALSE)
         {
             const Projector3 *pProjector3 = dynamic_cast<const Projector3 *>(pProjector);
-            auto tanHalfFovy = glm::tan(pProjector3->getFovY() / 2.0f);
-            float minZ = pProjector3->getZNear();
-            float maxZ = pProjector3->getZFar();
-            float maxX = maxZ * pProjector3->getAspect() * tanHalfFovy;
-            float minX = -maxX;
-            float maxY = maxZ * tanHalfFovy;
-            float minY = -maxY;
-            bounds.setMinMax(PointType(minX, minY, minZ), PointType(maxX, maxY, maxZ));
+            auto tanHalfFovy = glm::tan(pProjector3->getFov() / 2.0f);
+            if (pProjector3->getSpace().rightHand == VG_TRUE)
+            {
+                float minY = pProjector3->getDepthNear();
+                float maxY = pProjector3->getDepthFar();
+                float maxX = maxY * pProjector3->getAspect() * tanHalfFovy;
+                float minX = -maxX;
+                float maxZ = maxY * tanHalfFovy;
+                float minZ = -maxZ;
+                bounds.setMinMax(PointType(minX, minY, minZ), PointType(maxX, maxY, maxZ));
+            }
+            else
+            {
+                float minZ = pProjector3->getDepthNear();
+                float maxZ = pProjector3->getDepthFar();
+                float maxX = maxZ * pProjector3->getAspect() * tanHalfFovy;
+                float minX = -maxX;
+                float maxY = maxZ * tanHalfFovy;
+                float minY = -maxY;
+                bounds.setMinMax(PointType(minX, minY, minZ), PointType(maxX, maxY, maxZ));
+            }
+            
         }
         else
         {
@@ -99,17 +103,35 @@ namespace vg
             auto min = boundsInProjectorLocal.getMin();
             auto max = boundsInProjectorLocal.getMax();
             const Projector3 *pProjector3 = dynamic_cast<const Projector3 *>(pProjector);
-            auto zNear = pProjector3->getZNear();
-            auto zFar = pProjector3->getZFar();
-            if (min.z < zNear)
+            if (pProjector3->getSpace().rightHand == VG_TRUE)
             {
-                min.z = zNear;
-                if (max.z < zNear) max.z = zNear;
+                auto yNear = pProjector3->getDepthNear();
+                auto yFar = pProjector3->getDepthFar();
+                if (min.y < yNear)
+                {
+                    min.y = yNear;
+                    if (max.y < yNear) max.y = yNear;
+                }
+                if (max.y > yFar)
+                {
+                    max.y = yFar;
+                    if (min.y > yFar) min.y = yFar;
+                }
             }
-            if (max.z > zFar)
+            else
             {
-                max.z = zFar;
-                if (min.z > zFar) min.z = zFar;
+                auto zNear = pProjector3->getDepthNear();
+                auto zFar = pProjector3->getDepthFar();
+                if (min.z < zNear)
+                {
+                    min.z = zNear;
+                    if (max.z < zNear) max.z = zNear;
+                }
+                if (max.z > zFar)
+                {
+                    max.z = zFar;
+                    if (min.z > zFar) min.z = zFar;
+                }
             }
             boundsInProjectorLocal.setMinMax(min, max);
             //3. final, we get bounds in normalize device space (projection space).
@@ -172,22 +194,41 @@ namespace vg
             //1.first, we should get mv matrix to calculate bounds in projector local space.
             auto vMatrix = pProjector->getWorldToLocalMatrix();
             auto boundsInProjectorLocal = tranBoundsToNewSpace<PointType>(bounds, vMatrix, VG_FALSE);
-            //2.then, we clip bounds by z far and z near planes.
+            //2.then, we clip bounds by depth far and depth near planes.
             auto min = boundsInProjectorLocal.getMin();
             auto max = boundsInProjectorLocal.getMax();
             const Projector3 *pProjector3 = dynamic_cast<const Projector3 *>(pProjector);
-            auto zNear = pProjector3->getZNear();
-            auto zFar = pProjector3->getZFar();
-            if (min.z < zNear)
+            if (pProjector3->getSpace().rightHand == VG_TRUE)
             {
-                min.z = zNear;
-                if (max.z < zNear) max.z = zNear;
-            }
-            if (max.z > zFar)
+                auto yNear = pProjector3->getDepthNear();
+                auto yFar = pProjector3->getDepthFar();
+                if (min.y < yNear)
+                {
+                    min.y = yNear;
+                    if (max.y < yNear) max.y = yNear;
+                }
+                if (max.y > yFar)
+                {
+                    max.y = yFar;
+                    if (min.y > yFar) min.y = yFar;
+                }
+            } 
+            else
             {
-                max.z = zFar;
-                if (min.z > zFar) min.z = zFar;
+                auto zNear = pProjector3->getDepthNear();
+                auto zFar = pProjector3->getDepthFar();
+                if (min.z < zNear)
+                {
+                    min.z = zNear;
+                    if (max.z < zNear) max.z = zNear;
+                }
+                if (max.z > zFar)
+                {
+                    max.z = zFar;
+                    if (min.z > zFar) min.z = zFar;
+                }
             }
+            
             boundsInProjectorLocal.setMinMax(min, max);
             //3. final, we get bounds in normalize device space (projection space).
             auto projMatrx = getProjMatrix(pProjector);

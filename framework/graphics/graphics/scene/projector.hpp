@@ -12,8 +12,11 @@ namespace vg
         BaseProjector();
         virtual ~BaseProjector();
         Bool32 getIsOrthographic() const;
+        const Space &getSpace() const;
+        void setSpace(const Space &space);
     protected:
         Bool32 m_isOrthographic;
+        Space m_space;
     };
 
     template <SpaceType SPACE_TYPE>
@@ -69,22 +72,22 @@ namespace vg
     class Projector3 : public Projector<SpaceType::SPACE_3>
     {
     public:
-        static const float DEFAULT_FOVY;
+        static const float DEFAULT_FOV;
         static const float DEFAULT_ASPECT;
-        static const float DEFAULT_Z_NEAR;
-        static const float DEFAULT_Z_FAR;
+        static const float DEFAULT_DEPTH_NEAR;
+        static const float DEFAULT_DEPTH_FAR;
         Projector3();
-        void updateProj(float fovy, float aspect, float zNear, float zFar);
-        float getFovY() const;
-        void setFovY(float fovy);
+        void updateProj(float fov, float aspect, float depthNear, float depthFar);
+        float getFov() const;
+        void setFov(float fov);
         float getAspect() const;
         void setAspect(float aspect);
-        float getZNear() const;
-        void setZNear(float zNear);
-        float getZFar() const;
-        void setZFar(float zFar);
+        float getDepthNear() const;
+        void setDepthNear(float depthNear);
+        float getDepthFar() const;
+        void setDepthFar(float depthFar);
     private:
-        float m_fovy, m_aspect, m_zNear, m_zFar;
+        float m_fov, m_aspect, m_depthNear, m_depthFar;
     };
 } // vg
 

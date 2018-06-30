@@ -19,6 +19,16 @@ namespace vg
         return m_isOrthographic;
     }
 
+    const Space &BaseProjector::getSpace() const
+    {
+        return m_space;
+    }
+        
+    void BaseProjector::setSpace(const Space &space)
+    {
+        m_space = space;
+    }
+
     template <SpaceType SPACE_TYPE>
     Projector<SPACE_TYPE>::Projector()
         : BaseProjector()
@@ -128,37 +138,37 @@ namespace vg
             , 1.0f };
     }
 
-    const float Projector3::DEFAULT_FOVY = glm::radians(45.0f);
+    const float Projector3::DEFAULT_FOV = glm::radians(45.0f);
     const float Projector3::DEFAULT_ASPECT = 1.0f;
-    const float Projector3::DEFAULT_Z_NEAR = 0.1f;
-    const float Projector3::DEFAULT_Z_FAR = 10.0f;
+    const float Projector3::DEFAULT_DEPTH_NEAR = 0.1f;
+    const float Projector3::DEFAULT_DEPTH_FAR = 10.0f;
     Projector3::Projector3()
         : Projector<SpaceType::SPACE_3>()
-        , m_fovy(DEFAULT_FOVY)
+        , m_fov(DEFAULT_FOV)
         , m_aspect(DEFAULT_ASPECT)
-        , m_zNear(DEFAULT_Z_NEAR)
-        , m_zFar(DEFAULT_Z_FAR)
+        , m_depthNear(DEFAULT_DEPTH_NEAR)
+        , m_depthFar(DEFAULT_DEPTH_FAR)
     {
-        m_projMatrix = glm::perspective(m_fovy, m_aspect, m_zNear, m_zFar);
+        m_projMatrix = glm::perspective(m_fov, m_aspect, m_depthNear, m_depthFar);
     }
 
-    void Projector3::updateProj(float fovy, float aspect, float zNear, float zFar)
+    void Projector3::updateProj(float fov, float aspect, float depthNear, float depthFar)
     {
-        m_fovy = fovy;
+        m_fov = fov;
         m_aspect = aspect;
-        m_zNear = zNear;
-        m_zFar = zFar;
-        m_projMatrix = glm::perspective(m_fovy, m_aspect, m_zNear, m_zFar);
+        m_depthNear = depthNear;
+        m_depthFar = depthFar;
+        m_projMatrix = glm::perspective(m_fov, m_aspect, m_depthNear, m_depthFar);
     }
 
-    float Projector3::getFovY() const
+    float Projector3::getFov() const
     {
-        return m_fovy;
+        return m_fov;
     }
 
-    void Projector3::setFovY(float fovy)
+    void Projector3::setFov(float fov)
     {
-        m_fovy = fovy;
+        m_fov = fov;
     }
 
     float Projector3::getAspect() const
@@ -171,23 +181,24 @@ namespace vg
         m_aspect = aspect;
     }
 
-    float Projector3::getZNear() const
+    float Projector3::getDepthNear() const
     {
-        return m_zNear;
+        return m_depthNear;
     }
 
-    void Projector3::setZNear(float zNear)
+    void Projector3::setDepthNear(float depthNear)
     {
-        m_zNear = zNear;
+        m_depthNear = depthNear;
     }
 
-    float Projector3::getZFar() const
+    float Projector3::getDepthFar() const
     {
-        return m_zFar;
+        return m_depthFar;
     }
 
-    void Projector3::setZFar(float zFar)
+    void Projector3::setDepthFar(float depthFar)
     {
-        m_zFar = zFar;
+        m_depthFar = depthFar;
     }
+
 }

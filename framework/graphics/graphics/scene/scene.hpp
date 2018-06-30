@@ -35,6 +35,7 @@ namespace vg
         Bool32 getIsLeftHand() const;
         void setIsRightHand(Bool32 isRightHand);
         void setIsLeftHand(Bool32 isLeftHand);
+        const Space &getSpace() const;
         uint32_t getRegisterLightCount() const;
         Bool32 isHasRegisterLight(const std::type_info &lightTypeInfo) const;
         const std::vector<const std::type_info *> getArrRegisteredLights() const;
@@ -44,8 +45,7 @@ namespace vg
         void beginRender();
         void endRender();
     protected:
-        SpaceType m_spaceType;
-        Bool32 m_isRightHand;
+        Space m_space;
         std::vector<const std::type_info *> m_arrRegisteredLights;
         std::unordered_map<std::type_index, SceneLightRegisterInfo> m_mapRegisteredLights;
 

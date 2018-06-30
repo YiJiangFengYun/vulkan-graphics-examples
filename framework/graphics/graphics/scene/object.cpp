@@ -4,6 +4,8 @@ namespace vg
 {
 //BaseObject
     BaseObject::BaseObject()
+        : m_objectType(ObjectType::UNDEFINED)
+        , m_space()
     {
 
     }
@@ -11,6 +13,16 @@ namespace vg
     ObjectType BaseObject::getObjectType()
     {
         return m_objectType;
+    }
+
+    void BaseObject::addToSpace(const Space &space)
+    {
+        _addToSpace(space);
+    }
+
+    const Space &BaseObject::getSpace() const
+    {
+        return m_space;
     }
 
     void BaseObject::beginRender()
@@ -31,6 +43,11 @@ namespace vg
     void BaseObject::_endRender()
     {
 
+    }
+
+    void BaseObject::_addToSpace(const Space &space)
+    {
+        m_space = space;
     }
 
 

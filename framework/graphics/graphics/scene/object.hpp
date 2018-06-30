@@ -24,14 +24,17 @@ namespace vg
     public:
         BaseObject();
         ObjectType getObjectType();
-
+        //This method is called in scene when it is added to this scene.
+        void addToSpace(const Space &space);
+        const Space &getSpace() const;
         void beginRender();
         void endRender();
     protected:
         ObjectType m_objectType;
-
+        Space m_space;
         virtual void _beginRender();
         virtual void _endRender();
+        virtual void _addToSpace(const Space &space);
     };
 
     //This class is used for object dimension space features.

@@ -6,7 +6,6 @@ namespace vg
         : Base(BaseType::SCENE_OBJECT)
         , m_pProjector()
     {
-
     }
 
     BaseCamera::~BaseCamera()
@@ -52,6 +51,12 @@ namespace vg
         Projector<SPACE_TYPE> *pProjector = dynamic_cast<Projector<SPACE_TYPE> *>(m_pProjector.get());
         pProjector->setLocalToWorldMatrix(m_pTransform->getMatrixLocalToWorld());
         return pProjector;
+    }
+
+    template <SpaceType SPACE_TYPE>
+    void Camera<SPACE_TYPE>::_addToSpace()
+    {
+        m_pProjector->setSpace(m_space);
     }
 
     //template instantiation

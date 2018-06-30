@@ -257,7 +257,6 @@ namespace vg
         }
         
         //Allocate memory and copy ligth data to it.
-        //Create light pass texture infos.
         std::vector<Byte> memory(totalSize);
         uint32_t offset = 0u;
         uint32_t lightTypeOffset = 0u;

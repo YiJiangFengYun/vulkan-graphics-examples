@@ -14,7 +14,7 @@ namespace vg
     Scene2::MatrixType Scene2::getProjMatrix(const ProjectorType *pProjector) const
     {
         auto projMatrix = pProjector->getProjMatrix();
-        if (m_isRightHand == VG_FALSE)
+        if (m_space.rightHand == VG_FALSE)
         {
             projMatrix[1][1] *= -1;
             return projMatrix;

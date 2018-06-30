@@ -8,6 +8,7 @@ namespace vg
 {
     enum class SpaceType
     {
+        UNDEFINED,
         SPACE_2,
         SPACE_3,
         BEGIN_RANGE = SPACE_2,
@@ -62,6 +63,18 @@ namespace vg
 
     template<>
     const SpaceTypeInfo<SpaceType::SPACE_3>::VectorType SpaceConstInfo<SpaceType::SPACE_3>::UP_VECTOR = { 0.0f, 1.0f, 0.0f };
+
+
+    struct Space
+    {
+    public:
+        SpaceType spaceType;
+        Bool32    rightHand;
+        Space(SpaceType spaceType = SpaceType::UNDEFINED
+            , Bool32 rightHand = VG_FALSE);
+        Matrix4x4 getVulkanProjMatrix(Matrix4x4 projMatrix) const;
+    private:
+    };
 } //namespace kgs
 
 #endif // !VG_SCENE_OPTION_H

@@ -17,7 +17,7 @@ namespace vg
         , T *pParent
     )
     {
-        if (_isHasObject(pTarget, map)) return;        
+        if (_isHasObject(pTarget, map)) return;
         _addObjectSetObjectOnly(dynamic_cast<ObjectType *>(pTarget), root, pParent);
         _addObjectAddSceneDataOnly(pTarget, arr, map, mapTransformToObjs);
     }

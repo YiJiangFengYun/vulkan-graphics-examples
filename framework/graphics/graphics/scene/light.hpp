@@ -4,6 +4,13 @@
 #include "graphics/texture/texture.hpp"
 #include "graphics/scene/object.hpp"
 
+#define VG_LIGHT_DATA_TRANSFORM_NAME "_base"
+#define VG_LIGHT_TEXTURE_DEPTH_NAME "_tex_depth"
+
+#define VG_LIGHT_DATA_TRANSFORM_LAYOUT_PRIORITY 0
+
+#define VG_LIGHT_TEXTURE_DEPTH_BINDING_PRIORITY 0
+
 namespace vg
 {
     struct LightDataInfo {
@@ -183,12 +190,10 @@ namespace vg
     class Light : public BaseLight, public Object<SPACE_TYPE>
     {
     public:
-        Light()
-            : BaseLight()
-            , Object<SPACE_TYPE>()
-        {
-            m_objectType = ObjectType::LIGHT;
-        }
+        Light();
+    protected:
+        virtual void _beginRender() override;
+        virtual void _endRender() override;
     };
 } //namespace kgs
 

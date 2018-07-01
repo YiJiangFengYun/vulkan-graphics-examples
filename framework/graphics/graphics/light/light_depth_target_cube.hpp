@@ -36,13 +36,14 @@ namespace vg
 
         vk::Format getDepthImageFormat() const;
         const TextureCubeDepthAttachment *getDepthTargetTexture() const;
-        const PFaceTargetArray &getFaceTargets() const;
+        const std::array<const LightDepthCubeFaceTarget *, static_cast<size_t>(CubemapFace::RANGE_SIZE)> &getFaceTargets() const;
     private:
         uint32_t m_framebufferWidth;
         uint32_t m_framebufferHeight;
         vk::Format m_depthImageFormat;
         std::shared_ptr<TextureCubeDepthAttachment> m_pDepthTargetTex;
         PFaceTargetArray m_pFaceTargets;
+        std::array<const LightDepthCubeFaceTarget *, static_cast<size_t>(CubemapFace::RANGE_SIZE)> m_refFaceTargets;
         void _createObjs();
     };
 } //vg

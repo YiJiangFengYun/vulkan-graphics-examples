@@ -118,6 +118,7 @@ namespace vg
         , m_depthImageFormat(depthImageFormat)
         , m_pDepthTargetTex()
         , m_pFaceTargets()
+        , m_refFaceTargets()
     {
         _createObjs();
     }
@@ -132,9 +133,9 @@ namespace vg
         return m_pDepthTargetTex.get();
     }
 
-    const typename LightDepthCubeTargets::PFaceTargetArray &LightDepthCubeTargets::getFaceTargets() const
+    const std::array<const LightDepthCubeFaceTarget *, static_cast<size_t>(CubemapFace::RANGE_SIZE)> &LightDepthCubeTargets::getFaceTargets() const
     {
-        return m_pFaceTargets;
+        return m_refFaceTargets;
     }
 
     void LightDepthCubeTargets::_createObjs()
@@ -177,6 +178,10 @@ namespace vg
                 m_depthImageFormat,
                 faceImageViews[i]->getImageView(),
             }};
+        }
+
+        for (uint32_t i = 0; i < faceCount; ++i) {
+            m_refFaceTargets[i] = m_pFaceTargets[i].get();
         }
     }
 } //vg

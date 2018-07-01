@@ -406,6 +406,8 @@ namespace vg
             }
 
             m_dataChanged = VG_FALSE;
+            m_dataContentChanged = VG_FALSE;
+            m_dataContentChanges.clear();
         }
 
         if (m_dataContentChanged)
@@ -456,4 +458,43 @@ namespace vg
             }
         }
     }
+
+    template <SpaceType SPACE_TYPE>
+    Light<SPACE_TYPE>::Light()
+        : BaseLight()
+        , Object<SPACE_TYPE>()
+    {
+        m_objectType = ObjectType::LIGHT;
+    }
+
+    template <SpaceType SPACE_TYPE>
+    void Light<SPACE_TYPE>::_beginRender()
+    {
+        //sync transfrom data.
+        auto matrix = m_pTransform->getMatrixLocalToWorld();
+        if (m_data.hasData(VG_LIGHT_DATA_TRANSFORM_NAME)) {
+            LightDataInfo dataInfo = {
+                VG_LIGHT_DATA_TRANSFORM_LAYOUT_PRIORITY
+            };
+            m_data.addData(VG_LIGHT_DATA_TRANSFORM_NAME, dataInfo, matrix);
+            m_dataChanged = VG_TRUE;
+        } else {
+            m_data.setData(VG_LIGHT_DATA_TRANSFORM_NAME, matrix);
+        }
+        m_dataContentChanged = VG_TRUE;
+        m_dataContentChanges[VG_LIGHT_DATA_TRANSFORM_NAME] = VG_TRUE;
+        _apply();
+
+
+    }
+
+    template <SpaceType SPACE_TYPE>
+    void Light<SPACE_TYPE>::_endRender()
+    {
+
+    }
+
+    //template instantiation
+    template class Light<SpaceType::SPACE_2>;
+    template class Light<SpaceType::SPACE_3>;
 }

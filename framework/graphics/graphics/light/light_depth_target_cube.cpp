@@ -8,7 +8,7 @@ namespace vg
         , vk::Format depthImageFormat
         , const vk::ImageView *pFaceImageView
         )
-        : PreZTarget(framebufferWidth, framebufferHeight, depthImageFormat)
+        : PreDepthTarget(framebufferWidth, framebufferHeight, depthImageFormat)
         , m_pFaceImageView(pFaceImageView)
     {
         _createObjs();

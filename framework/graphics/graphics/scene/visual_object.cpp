@@ -23,12 +23,12 @@ namespace vg
     {
     }
 
-    BaseVisualObject::BindResult::BindResult(CmdBuffer *pPreZCmdBuffer
+    BaseVisualObject::BindResult::BindResult(CmdBuffer *pPreDepthCmdBuffer
         , CmdBuffer *pBranchCmdBuffer
         , CmdBuffer *pTrunkRenderPassCmdBuffer
         , CmdBuffer *pTrunkWaitBarrierCmdBuffer
         )
-        : pPreZCmdBuffer(pPreZCmdBuffer)
+        : pPreDepthCmdBuffer(pPreDepthCmdBuffer)
         , pBranchCmdBuffer(pBranchCmdBuffer)
         , pTrunkRenderPassCmdBuffer(pTrunkRenderPassCmdBuffer)
         , pTrunkWaitBarrierCmdBuffer(pTrunkWaitBarrierCmdBuffer)
@@ -213,8 +213,8 @@ namespace vg
     
             Material::BindResult resultForVisualizer;
 
-            if (result.pPreZCmdBuffer != nullptr)
-                resultForVisualizer.pPreZCmdBuffer = result.pPreZCmdBuffer;
+            if (result.pPreDepthCmdBuffer != nullptr)
+                resultForVisualizer.pPreDepthCmdBuffer = result.pPreDepthCmdBuffer;
             if (result.pBranchCmdBuffer != nullptr)
                 resultForVisualizer.pBranchCmdBuffer = result.pBranchCmdBuffer;
             if (result.pTrunkRenderPassCmdBuffer != nullptr)

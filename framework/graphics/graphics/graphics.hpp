@@ -29,7 +29,7 @@
 #include <graphics/pass/pass.hpp>
 #include <graphics/pass/shader.hpp>
 
-#include <graphics/pre_z_pass/pre_z_pass.hpp>
+#include <graphics/pre_depth_pass/pre_depth_pass.hpp>
 
 #include <graphics/post_render/post_render.hpp>
 

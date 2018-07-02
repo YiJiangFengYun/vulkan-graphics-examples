@@ -1,10 +1,10 @@
-#include "graphics/render_target/pre_z_target.hpp"
+#include "graphics/render_target/pre_depth_target.hpp"
 
 namespace vg
 {
-    const vk::Format PreZTarget::DEFAULT_DEPTH_FORMAT(vk::Format::eD32Sfloat);
+    const vk::Format PreDepthTarget::DEFAULT_DEPTH_FORMAT(vk::Format::eD32Sfloat);
 
-    PreZTarget::PreZTarget(uint32_t framebufferWidth
+    PreDepthTarget::PreDepthTarget(uint32_t framebufferWidth
         , uint32_t framebufferHeight
         , vk::Format depthImageFormat
         )
@@ -18,12 +18,12 @@ namespace vg
         setClearValues(&clearValueDepthStencil, 1u);
     }
 
-    vk::Format PreZTarget::getDepthImageFormat() const
+    vk::Format PreDepthTarget::getDepthImageFormat() const
     {
         return m_depthImageFormat;
     }
 
-    const vk::ImageView *PreZTarget::getDepthAttachment() const
+    const vk::ImageView *PreDepthTarget::getDepthAttachment() const
     {
         return m_pDepthAttachment;
     }

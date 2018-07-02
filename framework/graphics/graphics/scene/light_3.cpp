@@ -4,7 +4,7 @@ namespace vg
 {
     LightDepthRenderInfo::LightDepthRenderInfo(uint32_t renderCount
         , const BaseProjector *const *pProjectors
-        , const PreZTarget *const *pDepthTargets
+        , const PreDepthTarget *const *pDepthTargets
         )
         : renderCount(renderCount)
         , pProjectors(pProjectors)

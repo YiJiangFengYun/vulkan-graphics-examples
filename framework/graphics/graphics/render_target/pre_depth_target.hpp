@@ -1,5 +1,5 @@
-#ifndef VG_PRE_Z_TARGET_HPP
-#define VG_PRE_Z_TARGET_HPP
+#ifndef VG_PRE_DEPTH_TARGET_HPP
+#define VG_PRE_DEPTH_TARGET_HPP
 
 #include "graphics/global.hpp"
 #include "graphics/texture/attachment.hpp"
@@ -7,11 +7,11 @@
 
 namespace vg
 {
-    class PreZTarget : public OnceRenderTarget
+    class PreDepthTarget : public OnceRenderTarget
     {
     public:
         static const vk::Format DEFAULT_DEPTH_FORMAT;
-        PreZTarget(uint32_t framebufferWidth = 0u
+        PreDepthTarget(uint32_t framebufferWidth = 0u
             , uint32_t framebufferHeight = 0u
             , vk::Format depthImageFormat = DEFAULT_DEPTH_FORMAT
             );
@@ -24,4 +24,4 @@ namespace vg
     };
 } //vg
 
-#endif //VG_PRE_Z_TARGET_HPP
+#endif //VG_PRE_DEPTH_TARGET_HPP

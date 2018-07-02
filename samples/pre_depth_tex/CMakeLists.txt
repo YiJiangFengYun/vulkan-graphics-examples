@@ -1,6 +1,6 @@
 # add the binary tree directory to the search path for include files
 # include_directories( ${CMAKE_CURRENT_BINARY_DIR} )
-set(EXE_NAME "pre_z_tex")
+set(EXE_NAME "pre_depth_tex")
 file(GLOB_RECURSE HEADERS *.hpp *.inl)
 file(GLOB_RECURSE SOURCES *.cpp)
 
@@ -10,7 +10,7 @@ if(SOURCES)
     target_link_libraries(${EXE_NAME} ${LIBRARIES})
     set_property(TARGET ${EXE_NAME} PROPERTY FOLDER ${FOLDER_NAME})
         
-    set(COMMON_SHADER_NAMES ${COMMON_SHADER_NAMES} "pre_z_tex_show")
+    set(COMMON_SHADER_NAMES ${COMMON_SHADER_NAMES} "pre_depth_tex_show")
     set(SHADERS_DIR "${SHADERS_DIR}/${EXE_NAME}")
     set(RESOURCES_OUTPUT_DIR "${CMAKE_CURRENT_BINARY_DIR}")
     res_process("${EXE_NAME}" "${RESOURCES_OUTPUT_DIR}" "${RESOURCES_DIR}" "${SHADERS_DIR}" "${COMMON_SHADER_NAMES}")

@@ -4,7 +4,7 @@
 #include "graphics/scene/space_info.hpp"
 #include "graphics/scene/light.hpp"
 #include "graphics/scene/projector.hpp"
-#include "graphics/render_target/pre_z_target.hpp"
+#include "graphics/render_target/pre_depth_target.hpp"
 
 namespace vg
 {
@@ -12,11 +12,11 @@ namespace vg
     {
         uint32_t renderCount;
         const BaseProjector *const *pProjectors;
-        const PreZTarget *const *pDepthTargets;
+        const PreDepthTarget *const *pDepthTargets;
 
         LightDepthRenderInfo(uint32_t renderCount = 0u
             , const BaseProjector *const *pProjectors = nullptr
-            , const PreZTarget *const *pDepthTargets = nullptr
+            , const PreDepthTarget *const *pDepthTargets = nullptr
             );
     };
 

@@ -34,12 +34,12 @@ namespace vg
     {
     }
 
-    Material::BindResult::BindResult(CmdBuffer *pPreZCmdBuffer
+    Material::BindResult::BindResult(CmdBuffer *pPreDepthCmdBuffer
         , CmdBuffer *pBranchCmdBuffer
         , CmdBuffer *pTrunkRenderPassCmdBuffer
         , CmdBuffer *pTrunkWaitBarrierCmdBuffer
         )
-        : pPreZCmdBuffer(pPreZCmdBuffer)
+        : pPreDepthCmdBuffer(pPreDepthCmdBuffer)
         , pBranchCmdBuffer(pBranchCmdBuffer)
         , pTrunkRenderPassCmdBuffer(pTrunkRenderPassCmdBuffer)
         , pTrunkWaitBarrierCmdBuffer(pTrunkWaitBarrierCmdBuffer)
@@ -57,10 +57,10 @@ namespace vg
     }
 
     Material::MaterialCreateInfo::MaterialCreateInfo(Bool32 onlyOnce
-        , Bool32 createPreZPass
+        , Bool32 createPreDepthPass
         )
         : onlyOnce(onlyOnce)
-        , createPreZPass(createPreZPass) 
+        , createPreDepthPass(createPreDepthPass) 
 
     {
 
@@ -77,7 +77,7 @@ namespace vg
         , m_mapPasses()
         , m_pMainShader()
         , m_pMainPass()
-        , m_pPreZPass()
+        , m_pPreDepthPass()
     {
         m_pMainShader = std::shared_ptr<vg::Shader>{new vg::Shader()};
         m_pMainPass = std::shared_ptr<vg::Pass>{ new vg::Pass(m_pMainShader.get())};
@@ -87,8 +87,8 @@ namespace vg
     Material::Material(MaterialCreateInfo createInfo)
         : Material(createInfo.onlyOnce)
     {
-        if (createInfo.createPreZPass) {
-            m_pPreZPass = std::shared_ptr<PreZPass>{new PreZPass()};
+        if (createInfo.createPreDepthPass) {
+            m_pPreDepthPass = std::shared_ptr<PreDepthPass>{new PreDepthPass()};
         }
     }
 
@@ -147,14 +147,14 @@ namespace vg
         return m_pMainPass.get();
     }
 
-    const PreZPass * Material::getPreZPass() const
+    const PreDepthPass * Material::getPreDepthPass() const
     {
-        return m_pPreZPass.get();
+        return m_pPreDepthPass.get();
     }
 
-    PreZPass * Material::getPreZPass()
+    PreDepthPass * Material::getPreDepthPass()
     {
-        return m_pPreZPass.get();
+        return m_pPreDepthPass.get();
     }
 
     void Material::apply()
@@ -163,9 +163,9 @@ namespace vg
         {
             item.second->apply();
         }
-        if (m_pPreZPass != nullptr)
+        if (m_pPreDepthPass != nullptr)
         {
-            m_pPreZPass->apply();
+            m_pPreDepthPass->apply();
         }
     }
 
@@ -198,7 +198,7 @@ namespace vg
         }
 
         auto &result = *pResult;
-        if (m_pPreZPass != nullptr && result.pPreZCmdBuffer != nullptr)
+        if (m_pPreDepthPass != nullptr && result.pPreDepthCmdBuffer != nullptr)
         {
             RenderPassInfo trunkRenderPassInfo;
             trunkRenderPassInfo.pRenderPass = nullptr;
@@ -207,7 +207,7 @@ namespace vg
             trunkRenderPassInfo.framebufferHeight = info.trunkFramebufferHeight;
             trunkRenderPassInfo.projMatrix = *(info.pProjMatrix);
             trunkRenderPassInfo.viewMatrix = *(info.pViewMatrix);
-            trunkRenderPassInfo.pPass = m_pPreZPass->getPass();
+            trunkRenderPassInfo.pPass = m_pPreDepthPass->getPass();
             trunkRenderPassInfo.modelMatrix = *(info.pModelMatrix);
             trunkRenderPassInfo.pMesh = info.pMesh;
             trunkRenderPassInfo.subMeshIndex = info.subMeshIndex;
@@ -215,7 +215,7 @@ namespace vg
             trunkRenderPassInfo.scissor = info.hasClipRect ? info.clipRect : fd::Rect2D();
             CmdInfo cmdInfo;
             cmdInfo.pRenderPassInfo = &trunkRenderPassInfo;
-            result.pPreZCmdBuffer->addCmd(cmdInfo);
+            result.pPreDepthCmdBuffer->addCmd(cmdInfo);
         }
 
         _beginBind(info, pResult);

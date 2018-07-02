@@ -1,4 +1,4 @@
-#include "pre_z_tex/window.hpp"
+#include "pre_depth_tex/window.hpp"
 
 #include <iostream>
 #include <gli/gli.hpp>
@@ -35,7 +35,7 @@ void Window::_init()
     _createModel();
     _createMaterial();
     _initScene();
-    _enablePreZ();
+    _enablePreDepth();
 }
 
 void Window::_initState()
@@ -46,7 +46,7 @@ void Window::_initState()
     m_cameraRotation = vg::Vector3(glm::radians(0.0f), glm::radians(0.0f), glm::radians(0.0f));
     m_otherInfo.zNear = 0.01f;
     m_otherInfo.zFar = 100.0f;
-    m_preZScene = VG_TRUE;
+    m_preDepthScene = VG_TRUE;
 }
 
 void Window::_createModel()
@@ -83,26 +83,26 @@ void Window::_createMaterial()
 
         auto pShader = pMaterial->getMainShader();
         auto pPass = pMaterial->getMainPass();
-        auto pPreZPass = pMaterial->getPreZPass();
+        auto pPreDepthPass = pMaterial->getPreDepthPass();
         
         //shader
-        pShader->load("shaders/pre_z_tex/pre_z_tex_show.vert.spv",
-            "shaders/pre_z_tex/pre_z_tex_show.frag.spv");
+        pShader->load("shaders/pre_depth_tex/pre_depth_tex_show.vert.spv",
+            "shaders/pre_depth_tex/pre_depth_tex_show.frag.spv");
 
         pPass->setCullMode(vk::CullModeFlagBits::eBack);
         pPass->setFrontFace(vk::FrontFace::eCounterClockwise);
 
-        pPreZPass->setCullMode(vk::CullModeFlagBits::eBack);
-        pPreZPass->setFrontFace(vk::FrontFace::eClockwise);
+        pPreDepthPass->setCullMode(vk::CullModeFlagBits::eBack);
+        pPreDepthPass->setFrontFace(vk::FrontFace::eClockwise);
 
         vk::PipelineDepthStencilStateCreateInfo depthStencilState = {};
         depthStencilState.depthTestEnable = VG_TRUE;
         depthStencilState.depthWriteEnable = VG_TRUE;
         depthStencilState.depthCompareOp = vk::CompareOp::eLessOrEqual;
-        pPreZPass->setDepthStencilInfo(depthStencilState);
+        pPreDepthPass->setDepthStencilInfo(depthStencilState);
         
         vg::Pass::BuildInDataInfo::Component buildInDataCmps[1] = {
-            {vg::Pass::BuildInDataType::PRE_Z_DEPTH_RESULT},
+            {vg::Pass::BuildInDataType::PRE_DEPTH_DEPTH_RESULT},
         };
         vg::Pass::BuildInDataInfo buildInData;
         buildInData.componentCount = 1u;
@@ -131,20 +131,20 @@ void Window::_initScene()
     }
 }
 
-void Window::_enablePreZ()
+void Window::_enablePreDepth()
 {
-    m_pRenderer->enablePreZ();
+    m_pRenderer->enablePreDepth();
 }
 
 void Window::_onUpdate()
 {
     ParentWindowType::_onUpdate();
 
-    if (m_otherInfo.zNear != m_pCamera->getZNear() ||
-        m_otherInfo.zFar != m_pCamera->getZFar()) 
+    if (m_otherInfo.zNear != m_pCamera->getDepthNear() ||
+        m_otherInfo.zFar != m_pCamera->getDepthFar()) 
     {
-        m_otherInfo.zNear = m_pCamera->getZNear();
-        m_otherInfo.zFar = m_pCamera->getZFar();
+        m_otherInfo.zNear = m_pCamera->getDepthNear();
+        m_otherInfo.zFar = m_pCamera->getDepthFar();
         m_pMaterial->getMainPass()->setData("other_info", m_otherInfo);
         m_pMaterial->apply();
     }

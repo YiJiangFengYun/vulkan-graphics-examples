@@ -35,11 +35,11 @@ namespace vg
     
         struct BindResult
         {
-           CmdBuffer *pPreZCmdBuffer;
+           CmdBuffer *pPreDepthCmdBuffer;
            CmdBuffer *pBranchCmdBuffer;
            CmdBuffer *pTrunkRenderPassCmdBuffer;
            CmdBuffer *pTrunkWaitBarrierCmdBuffer;
-           BindResult(CmdBuffer *pPreZCmdBuffer = nullptr
+           BindResult(CmdBuffer *pPreDepthCmdBuffer = nullptr
                , CmdBuffer *pBranchCmdBuffer = nullptr
                , CmdBuffer *pTrunkRenderPassCmdBuffer = nullptr
                , CmdBuffer *pTrunkWaitBarrierCmdBuffer = nullptr

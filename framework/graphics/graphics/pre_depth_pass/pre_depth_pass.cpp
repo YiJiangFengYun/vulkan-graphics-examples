@@ -1,14 +1,14 @@
-#include "graphics/pre_z_pass/pre_z_pass.hpp"
+#include "graphics/pre_depth_pass/pre_depth_pass.hpp"
 
 namespace vg
 {
-    const void * PreZPass::DEFAULT_VERT_SHADER_CODE = (const void *)VG_PRE_Z_VERT_CODE;
-    const uint32_t PreZPass::DEFAULT_VERT_SHADER_CODE_SIZE = VG_PRE_Z_VERT_CODE_LEN;
-    const void * PreZPass::DEFAULT_FRAG_SHADER_CODE = (const void *)VG_PRE_Z_FRAG_CODE;
-    const uint32_t PreZPass::DEFAULT_FRAG_SHADER_CODE_SIZE = VG_PRE_Z_FRAG_CODE_LEN;
+    const void * PreDepthPass::DEFAULT_VERT_SHADER_CODE = (const void *)VG_PRE_DEPTH_VERT_CODE;
+    const uint32_t PreDepthPass::DEFAULT_VERT_SHADER_CODE_SIZE = VG_PRE_DEPTH_VERT_CODE_LEN;
+    const void * PreDepthPass::DEFAULT_FRAG_SHADER_CODE = (const void *)VG_PRE_DEPTH_FRAG_CODE;
+    const uint32_t PreDepthPass::DEFAULT_FRAG_SHADER_CODE_SIZE = VG_PRE_DEPTH_FRAG_CODE_LEN;
 
-    PreZPass::PreZPass()
-        : Base(BaseType::PRE_Z_PASS)
+    PreDepthPass::PreDepthPass()
+        : Base(BaseType::PRE_DEPTH_PASS)
         , m_pShader()
         , m_pPass()
     {
@@ -19,82 +19,82 @@ namespace vg
         _init();
     }
 
-    void PreZPass::setVertShaderModule(vk::ShaderModule * pVertShaderModule)
+    void PreDepthPass::setVertShaderModule(vk::ShaderModule * pVertShaderModule)
     {
         m_pShader->setVertShaderModule(pVertShaderModule);
     }
 
-    void PreZPass::setBuildInDataInfo(Pass::BuildInDataInfo info)
+    void PreDepthPass::setBuildInDataInfo(Pass::BuildInDataInfo info)
     {
         m_pPass->setBuildInDataInfo(info);
     }
 
-    void PreZPass::_setBuildInMatrixData(Pass::BuildInDataType type, Matrix4x4 matrix)
+    void PreDepthPass::_setBuildInMatrixData(Pass::BuildInDataType type, Matrix4x4 matrix)
     {
         m_pPass->setBuildInMatrixData(type, matrix);
     }
 
-    void PreZPass::setPolygonMode(vk::PolygonMode polygonMode)
+    void PreDepthPass::setPolygonMode(vk::PolygonMode polygonMode)
     {
         m_pPass->setPolygonMode(polygonMode);
     }
 
-    void PreZPass::setCullMode(vk::CullModeFlags cullMode)
+    void PreDepthPass::setCullMode(vk::CullModeFlags cullMode)
     {
         m_pPass->setCullMode(cullMode);
     }
 
-    void PreZPass::setFrontFace(vk::FrontFace frontFace)
+    void PreDepthPass::setFrontFace(vk::FrontFace frontFace)
     {
         m_pPass->setFrontFace(frontFace);
     }
 
-    void PreZPass::setLineWidth(float lineWidth)
+    void PreDepthPass::setLineWidth(float lineWidth)
     {
         m_pPass->setLineWidth(lineWidth);
     }
 
-    void PreZPass::setViewport(const fd::Viewport &viewport)
+    void PreDepthPass::setViewport(const fd::Viewport &viewport)
     {
         m_pPass->setViewport(viewport);
     }
 
-    void PreZPass::setScissor(const fd::Rect2D &scissor)
+    void PreDepthPass::setScissor(const fd::Rect2D &scissor)
     {
         m_pPass->setScissor(scissor);
     }
 
-    void PreZPass::setDepthStencilInfo(const vk::PipelineDepthStencilStateCreateInfo &value)
+    void PreDepthPass::setDepthStencilInfo(const vk::PipelineDepthStencilStateCreateInfo &value)
     {
         m_pPass->setDepthStencilInfo(value);
     }
 
-    void PreZPass::setDefaultInputAssemblyState(vk::PipelineInputAssemblyStateCreateInfo & value)
+    void PreDepthPass::setDefaultInputAssemblyState(vk::PipelineInputAssemblyStateCreateInfo & value)
     {
         m_pPass->setDefaultInputAssemblyState(value);
     }
 
-    void PreZPass::setVertexInputFilterInfo(const Pass::VertexInputFilterInfo &value)
+    void PreDepthPass::setVertexInputFilterInfo(const Pass::VertexInputFilterInfo &value)
     {
         m_pPass->setVertexInputFilterInfo(value);
     }
 
-    void PreZPass::apply()
+    void PreDepthPass::apply()
     {
         m_pPass->apply();
     }
 
-    const Shader * PreZPass::getShader() const
+    const Shader * PreDepthPass::getShader() const
     {
         return m_pShader.get();
     }
 
-    const Pass * PreZPass::getPass() const
+    const Pass * PreDepthPass::getPass() const
     {
         return m_pPass.get();
     }
 
-    void PreZPass::_init()
+    void PreDepthPass::_init()
     {
         vg::Pass::BuildInDataInfo::Component buildInDataCmp = {
                 {vg::Pass::BuildInDataType::MATRIX_OBJECT_TO_NDC},

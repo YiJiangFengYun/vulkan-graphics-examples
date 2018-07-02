@@ -1,22 +1,22 @@
-#include "graphics/renderer/renderer_pre_z_target.hpp"
+#include "graphics/renderer/renderer_pre_depth_target.hpp"
 
 namespace vg
 {
-    RendererPreZTarget::RendererPreZTarget(uint32_t framebufferWidth
+    RendererPreDepthTarget::RendererPreDepthTarget(uint32_t framebufferWidth
         , uint32_t framebufferHeight
         , vk::Format depthImageFormat
         )
-        : PreZTarget(framebufferWidth, framebufferHeight, depthImageFormat)
+        : PreDepthTarget(framebufferWidth, framebufferHeight, depthImageFormat)
     {
         _createObjs();
     }
 
-    const Texture2DDepthAttachment *RendererPreZTarget::getDepthTargetTexture() const
+    const Texture2DDepthAttachment *RendererPreDepthTarget::getDepthTargetTexture() const
     {
         return m_pDepthTargetTex.get();
     }
 
-    void RendererPreZTarget::_createObjs()
+    void RendererPreDepthTarget::_createObjs()
     {
         auto pDevice = pApp->getDevice();
         const auto framebufferWidth = m_framebufferWidth;

@@ -35,7 +35,7 @@ namespace vg
         {
             pProjector->updateProj(glm::radians(90.0f), 1.0f, std::min(0.001f, radius), radius);
             Matrix4x4 transform(1.0f);
-            if (m_space.rightHand == true)
+            if (m_space.rightHand == VG_TRUE)
             {
                 switch (index)
                 {
@@ -122,7 +122,7 @@ namespace vg
         LightDepthRenderInfo info = {
             static_cast<uint32_t>(CubemapFace::RANGE_SIZE),
             reinterpret_cast<const BaseProjector *const *>(m_refProjectors.data()),
-            reinterpret_cast<const PreZTarget *const *>(m_cubeTargets.getFaceTargets().data()),
+            reinterpret_cast<const PreDepthTarget *const *>(m_cubeTargets.getFaceTargets().data()),
         };
         return info;
     }

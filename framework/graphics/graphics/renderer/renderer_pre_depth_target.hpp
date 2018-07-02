@@ -1,18 +1,18 @@
-#ifndef VG_RENDERER_PRE_Z_TARGET_HPP
-#define VG_RENDERER_PRE_Z_TARGET_HPP
+#ifndef VG_RENDERER_PRE_DEPTH_TARGET_HPP
+#define VG_RENDERER_PRE_DEPTH_TARGET_HPP
 
 #include "graphics/global.hpp"
 #include "graphics/texture/texture_2d.hpp"
-#include "graphics/render_target/pre_z_target.hpp"
+#include "graphics/render_target/pre_depth_target.hpp"
 
 namespace vg
 {
-    class RendererPreZTarget : public PreZTarget
+    class RendererPreDepthTarget : public PreDepthTarget
     {
     public:
-        RendererPreZTarget(uint32_t framebufferWidth = 0u
+        RendererPreDepthTarget(uint32_t framebufferWidth = 0u
             , uint32_t framebufferHeight = 0u
-            , vk::Format depthImageFormat = PreZTarget::DEFAULT_DEPTH_FORMAT
+            , vk::Format depthImageFormat = DEFAULT_DEPTH_FORMAT
             );
         const Texture2DDepthAttachment *getDepthTargetTexture() const;
     private:
@@ -23,4 +23,4 @@ namespace vg
     };
 } //vg
 
-#endif //VG_RENDERER_PRE_Z_TARGET_HPP
+#endif //VG_RENDERER_PRE_DEPTH_TARGET_HPP

@@ -31,7 +31,7 @@ private:
     void _createModel();
     void _createMaterial();
     void _initScene();
-    void _enablePreZ();
+    void _enablePreDepth();
 
     virtual void _onUpdate() override;
 };

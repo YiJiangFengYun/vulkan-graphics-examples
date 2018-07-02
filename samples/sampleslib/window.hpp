@@ -91,7 +91,7 @@ namespace sampleslib
         std::vector<std::shared_ptr<SceneType>> m_pScenes;
         std::shared_ptr<SceneType> m_pScene;
         std::shared_ptr<CameraType> m_pCamera;
-        vg::Bool32 m_preZScene;
+        vg::Bool32 m_preDepthScene;
 
         virtual void _onResize() override;
         virtual void _onPreReCreateSwapchain() override;

@@ -14,7 +14,7 @@ namespace vg
 
         SHADER,
         PASS,
-        PRE_Z_PASS,
+        PRE_DEPTH_PASS,
         MATERIAL,
 
         VERTEX_DATA,

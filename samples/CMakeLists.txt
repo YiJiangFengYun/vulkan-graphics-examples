@@ -24,7 +24,7 @@ add_subdirectory(specialization_constants)
 add_subdirectory(off_screen)
 add_subdirectory(passes)
 add_subdirectory(outline)
-add_subdirectory(pre_z_tex)
+add_subdirectory(pre_depth_tex)
 add_subdirectory(post_render)
 add_subdirectory(triangle_2d)
 

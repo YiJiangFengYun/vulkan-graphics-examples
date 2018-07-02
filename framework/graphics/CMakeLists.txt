@@ -10,17 +10,17 @@ option(VG_ENABLE_COST_TIMER "Enable cost timer for the important step." OFF)
 
 set(LIBRARY_NAME "graphics")
 
-compile_shader("${CMAKE_CURRENT_SOURCE_DIR}/shader" "pre_z")
+compile_shader("${CMAKE_CURRENT_SOURCE_DIR}/shader" "pre_depth")
 add_custom_command (
-  OUTPUT "${CMAKE_CURRENT_SOURCE_DIR}/${LIBRARY_NAME}/pre_z_pass/pre_z_vert_code.c"
-  COMMAND "embed_file_to_code" "VG_PRE_Z_VERT_CODE" "${CMAKE_CURRENT_SOURCE_DIR}/shader/pre_z.vert.spv" "${CMAKE_CURRENT_SOURCE_DIR}/${LIBRARY_NAME}/pre_z_pass/pre_z_vert_code.c"
-  MAIN_DEPENDENCY "${CMAKE_CURRENT_SOURCE_DIR}/shader/pre_z.vert.spv"
+  OUTPUT "${CMAKE_CURRENT_SOURCE_DIR}/${LIBRARY_NAME}/pre_depth_pass/pre_depth_vert_code.c"
+  COMMAND "embed_file_to_code" "VG_PRE_DEPTH_VERT_CODE" "${CMAKE_CURRENT_SOURCE_DIR}/shader/pre_depth.vert.spv" "${CMAKE_CURRENT_SOURCE_DIR}/${LIBRARY_NAME}/pre_depth_pass/pre_depth_vert_code.c"
+  MAIN_DEPENDENCY "${CMAKE_CURRENT_SOURCE_DIR}/shader/pre_depth.vert.spv"
   DEPENDS "embed_file_to_code"
 )
 add_custom_command (
-  OUTPUT "${CMAKE_CURRENT_SOURCE_DIR}/${LIBRARY_NAME}/pre_z_pass/pre_z_frag_code.c"
-  COMMAND "embed_file_to_code" "VG_PRE_Z_FRAG_CODE" "${CMAKE_CURRENT_SOURCE_DIR}/shader/pre_z.frag.spv" "${CMAKE_CURRENT_SOURCE_DIR}/${LIBRARY_NAME}/pre_z_pass/pre_z_frag_code.c"
-  MAIN_DEPENDENCY "${CMAKE_CURRENT_SOURCE_DIR}/shader/pre_z.frag.spv"
+  OUTPUT "${CMAKE_CURRENT_SOURCE_DIR}/${LIBRARY_NAME}/pre_depth_pass/pre_depth_frag_code.c"
+  COMMAND "embed_file_to_code" "VG_PRE_DEPTH_FRAG_CODE" "${CMAKE_CURRENT_SOURCE_DIR}/shader/pre_depth.frag.spv" "${CMAKE_CURRENT_SOURCE_DIR}/${LIBRARY_NAME}/pre_depth_pass/pre_depth_frag_code.c"
+  MAIN_DEPENDENCY "${CMAKE_CURRENT_SOURCE_DIR}/shader/pre_depth.frag.spv"
   DEPENDS "embed_file_to_code"
 )
 
@@ -31,8 +31,8 @@ configure_file(
 set(INCLUDE_DIRS ${INCLUDE_DIRS} "${CMAKE_CURRENT_SOURCE_DIR}")
 file(GLOB_RECURSE HEADERS "${LIBRARY_NAME}/*.hpp" "${LIBRARY_NAME}/*.inl")
 file(GLOB_RECURSE SOURCES "${LIBRARY_NAME}/*.cpp" "${LIBRARY_NAME}/*.c")
-set(SOURCES ${SOURCES} "${CMAKE_CURRENT_SOURCE_DIR}/${LIBRARY_NAME}/pre_z_pass/pre_z_vert_code.c")
-set(SOURCES ${SOURCES} "${CMAKE_CURRENT_SOURCE_DIR}/${LIBRARY_NAME}/pre_z_pass/pre_z_frag_code.c")
+set(SOURCES ${SOURCES} "${CMAKE_CURRENT_SOURCE_DIR}/${LIBRARY_NAME}/pre_depth_pass/pre_depth_vert_code.c")
+set(SOURCES ${SOURCES} "${CMAKE_CURRENT_SOURCE_DIR}/${LIBRARY_NAME}/pre_depth_pass/pre_depth_frag_code.c")
 include_directories(${INCLUDE_DIRS})
 add_library(${LIBRARY_NAME} STATIC ${HEADERS} ${SOURCES})
 set_property(TARGET ${LIBRARY_NAME} PROPERTY FOLDER ${FOLDER_NAME})

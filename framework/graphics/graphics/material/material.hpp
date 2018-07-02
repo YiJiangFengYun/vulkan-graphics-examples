@@ -5,7 +5,7 @@
 #include "graphics/global.hpp"
 #include "graphics/util/util.hpp"
 #include "graphics/pass/pass.hpp"
-#include "graphics/pre_z_pass/pre_z_pass.hpp"
+#include "graphics/pre_depth_pass/pre_depth_pass.hpp"
 #include "graphics/texture/texture.hpp"
 #include "graphics/material/material_data.hpp"
 #include "graphics/material/cmd.hpp"
@@ -50,11 +50,11 @@ namespace vg
     
         struct BindResult
         {
-            CmdBuffer *pPreZCmdBuffer;
+            CmdBuffer *pPreDepthCmdBuffer;
             CmdBuffer *pBranchCmdBuffer;
             CmdBuffer *pTrunkRenderPassCmdBuffer;
             CmdBuffer *pTrunkWaitBarrierCmdBuffer;
-            BindResult(CmdBuffer *pPreZCmdBuffer = nullptr
+            BindResult(CmdBuffer *pPreDepthCmdBuffer = nullptr
                 , CmdBuffer *pBranchCmdBuffer = nullptr
                 , CmdBuffer *pTrunkRenderPassCmdBuffer = nullptr
                 , CmdBuffer *pTrunkWaitBarrierCmdBuffer = nullptr
@@ -73,8 +73,8 @@ namespace vg
         struct MaterialCreateInfo
         {
             Bool32 onlyOnce;
-            Bool32 createPreZPass;
-            MaterialCreateInfo(Bool32 onlyOnce = VG_FALSE, Bool32 createPreZPass = VG_FALSE);
+            Bool32 createPreDepthPass;
+            MaterialCreateInfo(Bool32 onlyOnce = VG_FALSE, Bool32 createPreDepthPass = VG_FALSE);
         };
 
         Material(Bool32 onlyOnce = VG_FALSE);
@@ -94,8 +94,8 @@ namespace vg
         Pass *getMainPass();
         
 
-        const PreZPass * getPreZPass() const;
-        PreZPass * getPreZPass();
+        const PreDepthPass * getPreDepthPass() const;
+        PreDepthPass * getPreDepthPass();
 
         MaterialShowType getShowType();
         void setRenderQueueType(MaterialShowType type);
@@ -116,7 +116,7 @@ namespace vg
         std::shared_ptr<Shader> m_pMainShader; 
         std::shared_ptr<Pass> m_pMainPass;
 
-        std::shared_ptr<PreZPass> m_pPreZPass;
+        std::shared_ptr<PreDepthPass> m_pPreDepthPass;
 
         std::vector<Pass *> m_arrPasses;
         std::unordered_map<InstanceID, Pass *> m_mapPasses;

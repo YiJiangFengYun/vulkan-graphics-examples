@@ -12,7 +12,7 @@
 #include "graphics/renderer/pipeline_cache.hpp"
 #include "graphics/renderer/renderer_target.hpp"
 #include "graphics/post_render/post_render.hpp"
-#include "graphics/renderer/renderer_pre_z_target.hpp"
+#include "graphics/renderer/renderer_pre_depth_target.hpp"
 #include "graphics/renderer/renderer_post_render_target.hpp"
 #include "graphics/renderer/render_binder.hpp"
 
@@ -28,11 +28,11 @@ namespace vg
         struct SceneInfo {
             BaseScene *pScene;
             BaseCamera *pCamera;
-            Bool32 preZ;
+            Bool32 preDepth;
             PostRender * pPostRender;
             SceneInfo(BaseScene *pScene = nullptr
                 , BaseCamera *pCamera = nullptr
-                , Bool32 preZ = VG_FALSE
+                , Bool32 preDepth = VG_FALSE
                 , PostRender * pPostRender = nullptr);
         };
 
@@ -69,8 +69,8 @@ namespace vg
         const RendererTarget * getRendererTarget() const;
         void setRendererTarget(const RendererTarget * pRendererTarget);
 
-        void enablePreZ();
-        void disablePreZ();
+        void enablePreDepth();
+        void disablePreDepth();
 
         void enablePostRender();
         void disablePostRender();
@@ -96,9 +96,9 @@ namespace vg
         RenderBinder m_renderBinder;
 
         //pre z pass
-        Bool32 m_preZEnable;
-        std::shared_ptr<RendererPreZTarget> m_pPreZTarget;
-        std::shared_ptr<CmdBuffer> m_pPreZCmdBuffer;
+        Bool32 m_preDepthEnable;
+        std::shared_ptr<RendererPreDepthTarget> m_pPreDepthTarget;
+        std::shared_ptr<CmdBuffer> m_pPreDepthCmdBuffer;
 
         //post render
         Bool32 m_postRenderEnable;
@@ -135,8 +135,8 @@ namespace vg
         void _recordCommandBufferForBegin();
         void _recordCommandBufferForEnd();
         
-        void _createPreZObjs();
-        void _destroyPreZObjs();
+        void _createPreDepthObjs();
+        void _destroyPreDepthObjs();
         void _createPostRenderObjs();
         void _destroyPostRenderObjs();
 

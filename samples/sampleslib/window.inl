@@ -31,7 +31,7 @@ namespace sampleslib
         , m_lastFPS(0u)
         , m_lastDrawCount(0u)
         , m_sceneCount(1u)
-        , m_preZScene(VG_FALSE)
+        , m_preDepthScene(VG_FALSE)
     {
         
     }
@@ -250,7 +250,7 @@ namespace sampleslib
         {
             sceneInfos[i].pScene = m_pScenes[i].get();
             sceneInfos[i].pCamera = m_pCamera.get();
-            sceneInfos[i].preZ = m_preZScene;
+            sceneInfos[i].preDepth = m_preDepthScene;
         }
         uint32_t oldSceneCount = info.sceneInfoCount;
         info.sceneInfoCount = info.sceneInfoCount + sceneCount;

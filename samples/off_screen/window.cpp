@@ -82,10 +82,10 @@ void Window::_createSceneOffScreen()
 {
     m_pSceneOffScreen = std::shared_ptr<vg::Scene3>(new vg::Scene3());
     m_pCameraOffScreen = std::shared_ptr<vg::Camera3>(new vg::Camera3());
-    m_pCameraOffScreen->updateProj(m_pCamera->getFovY(),
+    m_pCameraOffScreen->updateProj(m_pCamera->getFov(),
         m_pCamera->getAspect(),
-        m_pCamera->getZNear(),
-        m_pCamera->getZFar());
+        m_pCamera->getDepthNear(),
+        m_pCamera->getDepthFar());
     m_pSceneOffScreen->addCamera(m_pCameraOffScreen.get());
 }
 

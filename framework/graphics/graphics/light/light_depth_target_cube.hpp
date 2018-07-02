@@ -2,12 +2,12 @@
 #define VG_LIGHT_DEPTH_TARGET_CUBE_HPP
 
 #include "graphics/global.hpp"
-#include "graphics/render_target/pre_z_target.hpp"
+#include "graphics/render_target/pre_depth_target.hpp"
 #include "graphics/texture/texture_cube.hpp"
 
 namespace vg
 {
-    class LightDepthCubeFaceTarget : public PreZTarget
+    class LightDepthCubeFaceTarget : public PreDepthTarget
     {
     public:
         LightDepthCubeFaceTarget(uint32_t framebufferWidth = 0u

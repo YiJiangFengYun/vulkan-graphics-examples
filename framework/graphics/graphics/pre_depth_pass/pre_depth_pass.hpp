@@ -1,5 +1,5 @@
-#ifndef VG_PRE_Z_PASS_HPP
-#define VG_PRE_Z_PASS_HPP
+#ifndef VG_PRE_DEPTH_PASS_HPP
+#define VG_PRE_DEPTH_PASS_HPP
 
 #include "graphics/global.hpp"
 #include "graphics/base.hpp"
@@ -8,11 +8,11 @@
 
 namespace vg
 {
-    extern "C" const unsigned char VG_PRE_Z_VERT_CODE[];
-    extern "C" const size_t VG_PRE_Z_VERT_CODE_LEN;
-    extern "C" const unsigned char VG_PRE_Z_FRAG_CODE[];
-    extern "C" const size_t VG_PRE_Z_FRAG_CODE_LEN;
-    class PreZPass : public Base
+    extern "C" const unsigned char VG_PRE_DEPTH_VERT_CODE[];
+    extern "C" const size_t VG_PRE_DEPTH_VERT_CODE_LEN;
+    extern "C" const unsigned char VG_PRE_DEPTH_FRAG_CODE[];
+    extern "C" const size_t VG_PRE_DEPTH_FRAG_CODE_LEN;
+    class PreDepthPass : public Base
     {
     public:
         static const void * DEFAULT_VERT_SHADER_CODE;
@@ -20,7 +20,7 @@ namespace vg
         static const void * DEFAULT_FRAG_SHADER_CODE;
         static const uint32_t DEFAULT_FRAG_SHADER_CODE_SIZE;
 
-        PreZPass();
+        PreDepthPass();
 
         void setVertShaderModule(vk::ShaderModule * pVertShaderModule);
 
@@ -57,4 +57,4 @@ namespace vg
     };
 } //vg
 
-#endif //VG_PRE_Z_PASS_HPP
+#endif //VG_PRE_DEPTH_PASS_HPP

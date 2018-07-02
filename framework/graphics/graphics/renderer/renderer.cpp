@@ -11,12 +11,12 @@ namespace vg
 {
     Renderer::SceneInfo::SceneInfo(BaseScene *pScene
         , BaseCamera *pCamera
-        , Bool32 preZ
+        , Bool32 preDepth
         , PostRender * pPostRender
         )
         : pScene(pScene)
         , pCamera(pCamera)
-        , preZ(preZ)
+        , preDepth(preDepth)
         , pPostRender(pPostRender)
     {
 
@@ -60,9 +60,9 @@ namespace vg
         , m_framebufferHeight(0u)
         , m_renderBinder()
         //pre z
-        , m_preZEnable(VG_FALSE)
-        , m_pPreZTarget()
-        , m_pPreZCmdBuffer()
+        , m_preDepthEnable(VG_FALSE)
+        , m_pPreDepthTarget()
+        , m_pPreDepthCmdBuffer()
         //post render
         , m_postRenderEnable(VG_FALSE)
         , m_pPostRenderTarget()
@@ -108,24 +108,24 @@ namespace vg
                 , pRendererTarget->getClearValueCount());
     }
 
-    void Renderer::enablePreZ()
+    void Renderer::enablePreDepth()
     {
-        if (m_preZEnable == VG_FALSE)
+        if (m_preDepthEnable == VG_FALSE)
         {
-            m_preZEnable = VG_TRUE;
+            m_preDepthEnable = VG_TRUE;
             if (m_framebufferWidth != 0u && m_framebufferHeight != 0u)
             {
-                _createPreZObjs();
+                _createPreDepthObjs();
             }
         }
     }
 
-    void Renderer::disablePreZ()
+    void Renderer::disablePreDepth()
     {
-        if (m_preZEnable == VG_TRUE)
+        if (m_preDepthEnable == VG_TRUE)
         {
-            m_preZEnable = VG_FALSE;
-            _destroyPreZObjs();
+            m_preDepthEnable = VG_FALSE;
+            _destroyPreDepthObjs();
         }
     }
 
@@ -197,15 +197,15 @@ namespace vg
         m_framebufferHeight = height;
         m_renderBinder.setFramebufferWidth(width);
         m_renderBinder.setFramebufferHeight(height);
-        if (m_preZEnable) 
+        if (m_preDepthEnable) 
         {
             if (width != 0u && height != 0u)
             {
-                _createPreZObjs();
+                _createPreDepthObjs();
             }
             else
             {
-                _destroyPreZObjs();
+                _destroyPreDepthObjs();
             }
         }
         if (m_postRenderEnable)
@@ -349,7 +349,7 @@ namespace vg
         auto pScene = sceneInfo.pScene;
         auto pCamera = sceneInfo.pCamera;
         auto pPostRender = sceneInfo.pPostRender;
-        Bool32 preZEnable = m_preZEnable == VG_TRUE && sceneInfo.preZ == VG_TRUE;
+        Bool32 preDepthEnable = m_preDepthEnable == VG_TRUE && sceneInfo.preDepth == VG_TRUE;
         Bool32 postRenderEnable = m_postRenderEnable == VG_TRUE && 
             sceneInfo.pPostRender != nullptr &&
             sceneInfo.pPostRender->isValidBindToRender() == VG_TRUE;
@@ -357,9 +357,9 @@ namespace vg
         fd::CostTimer preparingSceneCostTimer(fd::CostTimer::TimerType::ONCE);
         preparingSceneCostTimer.begin();
 #endif //DEBUG and VG_ENABLE_COST_TIMER
-        if (preZEnable)
+        if (preDepthEnable)
         {
-            m_pPreZCmdBuffer->begin();
+            m_pPreDepthCmdBuffer->begin();
         }
         m_branchCmdBuffer.begin();
         m_trunkWaitBarrierCmdBuffer.begin();                        
@@ -371,17 +371,17 @@ namespace vg
 
         RenderBinderInfo bindInfo = {
             isFirstScene,
-            preZEnable,
+            preDepthEnable,
             postRenderEnable,
             pScene,
             pCamera->getProjectorBase(),
             postRenderEnable ? pPostRender : nullptr,
-            preZEnable ? m_pPreZTarget.get() : nullptr,
+            preDepthEnable ? m_pPreDepthTarget.get() : nullptr,
             postRenderEnable ? m_pPostRenderTarget.get() : nullptr,
             m_pRendererTarget,
-            preZEnable ? m_pPreZTarget->getDepthTargetTexture() : nullptr,
+            preDepthEnable ? m_pPreDepthTarget->getDepthTargetTexture() : nullptr,
             postRenderEnable ? m_pPostRenderTarget->getColorTargetTexture() : nullptr,
-            preZEnable ? m_pPreZCmdBuffer.get() : nullptr,
+            preDepthEnable ? m_pPreDepthCmdBuffer.get() : nullptr,
             &m_branchCmdBuffer,
             &m_trunkWaitBarrierCmdBuffer,
             &m_trunkRenderPassCmdBuffer,
@@ -394,9 +394,9 @@ namespace vg
          
         //record ...
         // pre z
-        if (preZEnable)
+        if (preDepthEnable)
         {
-            CMDParser::record(m_pPreZCmdBuffer.get()
+            CMDParser::record(m_pPreDepthCmdBuffer.get()
                 , m_pCommandBuffer.get()
                 , &m_pipelineCache
                 , &cmdParseResult
@@ -431,9 +431,9 @@ namespace vg
             resultInfo.drawCount += cmdParseResult.drawCount;
         }
 
-        if (preZEnable)
+        if (preDepthEnable)
         {
-            m_pPreZCmdBuffer->end();
+            m_pPreDepthCmdBuffer->end();
         }
         m_trunkRenderPassCmdBuffer.end();
         m_trunkWaitBarrierCmdBuffer.end();
@@ -512,24 +512,24 @@ namespace vg
         VG_LOG(plog::debug) << "Post allocate command buffer from pool." << std::endl;
     }
 
-    void Renderer::_createPreZObjs()
+    void Renderer::_createPreDepthObjs()
     {
-        m_pPreZTarget = std::shared_ptr<RendererPreZTarget>{
-            new RendererPreZTarget{
+        m_pPreDepthTarget = std::shared_ptr<RendererPreDepthTarget>{
+            new RendererPreDepthTarget{
                 m_framebufferWidth,
                 m_framebufferHeight,
             }
         };
 
-        m_pPreZCmdBuffer = std::shared_ptr<CmdBuffer>{
+        m_pPreDepthCmdBuffer = std::shared_ptr<CmdBuffer>{
             new CmdBuffer{}
         };
     }
 
-    void Renderer::_destroyPreZObjs()
+    void Renderer::_destroyPreDepthObjs()
     {
-        m_pPreZTarget = nullptr;
-        m_pPreZCmdBuffer = nullptr;
+        m_pPreDepthTarget = nullptr;
+        m_pPreDepthCmdBuffer = nullptr;
     }
 
     void Renderer::_createPostRenderObjs()

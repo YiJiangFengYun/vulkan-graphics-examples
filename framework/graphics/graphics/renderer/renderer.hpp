@@ -69,6 +69,12 @@ namespace vg
         const RendererTarget * getRendererTarget() const;
         void setRendererTarget(const RendererTarget * pRendererTarget);
 
+        void enableLighting();
+        void disableLighting();
+
+        void enableShadow();
+        void disableShadow();
+
         void enablePreDepth();
         void disablePreDepth();
 
@@ -94,6 +100,11 @@ namespace vg
         uint32_t m_framebufferHeight;
         
         RenderBinder m_renderBinder;
+
+        // light shadow.
+        Bool32 m_lightingEnable;
+        Bool32 m_shadowEnable;
+        std::shared_ptr<CmdBuffer> m_pLightDepthCmdBuffer;
 
         //pre z pass
         Bool32 m_preDepthEnable;
@@ -123,8 +134,6 @@ namespace vg
         virtual Bool32 _isValidForRender() const;
 
         virtual void _renderScene(const SceneInfo &sceneInfo, Bool32 isFirstScene, RenderResultInfo &resultInfo);
-        void _renderSceneLights(const SceneInfo &sceneInfo, RenderResultInfo &resultInfo);
-        void _renderSceneVisualization(const SceneInfo &sceneInfo, Bool32 isFirstScene, RenderResultInfo &resultInfo);
 
         
         void _createCommandPool();
@@ -135,6 +144,8 @@ namespace vg
         void _recordCommandBufferForBegin();
         void _recordCommandBufferForEnd();
         
+        void _createLightingObjs();
+        void _destroyLightingObjs();
         void _createPreDepthObjs();
         void _destroyPreDepthObjs();
         void _createPostRenderObjs();

@@ -1,6 +1,7 @@
 #include "graphics/renderer/render_binder.hpp"
 
 #include "graphics/util/gemo_util.hpp"
+#include "graphics/scene/light_3.hpp"
 
 namespace vg
 {
@@ -14,9 +15,12 @@ namespace vg
 #endif
         );
 
-    RenderBinderInfo::RenderBinderInfo(Bool32 firstScene
+    RenderBinderInfo::RenderBinderInfo(Bool32 lightingEnable
+        , Bool32 shadowEnable
         , Bool32 preDepthEnable
         , Bool32 postRenderEnable
+
+        , Bool32 firstScene
         , BaseScene *pScene
         , const BaseProjector *pProjector
         , PostRender *pPostRender
@@ -28,16 +32,19 @@ namespace vg
         , const Texture *pPreDepthResultTex
         , const Texture *pPostRenderTex
 
+        , CmdBuffer *pLightDepthCmdBuffer
         , CmdBuffer *pPreDepthCmdBuffer
         , CmdBuffer *pBranchCmdBuffer
         , CmdBuffer *pTrunkWaitBarrierCmdBuffer
         , CmdBuffer *pTrunkRenderPassCmdBuffer
         , CmdBuffer *pPostRenderCmdBuffer
         )
-        : firstScene(firstScene)
+        : lightingEnable(lightingEnable)
+        , shadowEnable(shadowEnable) 
         , preDepthEnable(preDepthEnable)
         , postRenderEnable(postRenderEnable)
 
+        , firstScene(firstScene)
         , pScene(pScene)
         , pProjector(pProjector)
         , pPostRender(pPostRender)
@@ -49,6 +56,7 @@ namespace vg
         , pPreDepthResultTex(pPreDepthResultTex)
         , pPostRenderTex(pPostRenderTex)
 
+        , pLightDepthCmdBuffer(pLightDepthCmdBuffer)
         , pPreDepthCmdBuffer(pPreDepthCmdBuffer)
         , pBranchCmdBuffer(pBranchCmdBuffer)
         , pTrunkWaitBarrierCmdBuffer(pTrunkWaitBarrierCmdBuffer)
@@ -145,6 +153,10 @@ namespace vg
         } 
         else if (info.pScene->getSpaceType() == SpaceType::SPACE_3)
         {
+            _bindForLightDepth(dynamic_cast<Scene<SpaceType::SPACE_3> *>(info.pScene), 
+                dynamic_cast<const Projector<SpaceType::SPACE_3> *>(info.pProjector),
+                info.pLightDepthCmdBuffer
+                );
             _bindScene3(dynamic_cast<Scene<SpaceType::SPACE_3> *>(info.pScene), 
                 dynamic_cast<const Projector<SpaceType::SPACE_3> *>(info.pProjector), 
                 info.preDepthEnable ? info.pPreDepthResultTex : nullptr,
@@ -216,6 +228,33 @@ namespace vg
         }
 
         _bindForRenderPassEnd(info);
+    }
+
+    void RenderBinder::_bindForLightDepth(Scene<SpaceType::SPACE_3> *pScene
+        , const Projector<SpaceType::SPACE_3> *pProjector
+        , CmdBuffer *pPreDepthCmdBuffer
+        )
+    {
+        uint32_t lightCount = pScene->getLightCount();
+        for (uint32_t i = 0u; i < lightCount; ++i) {
+           Light3 *pLight = dynamic_cast<Light3 *>(pScene->getLightWithIndex(i));
+           auto depthRenderInfo = pLight->getDepthRenderInfo();
+           for (uint32_t j = 0; j < depthRenderInfo.renderCount; ++j) {
+                const PreDepthTarget *pRenderTarget = dynamic_cast<const PreDepthTarget *>(*(depthRenderInfo.pDepthTargets + j));
+                _renderPassBegin(pRenderTarget
+                 , pRenderTarget->getRenderPass()
+                 , pRenderTarget->getFramebuffer()
+                 , pPreDepthCmdBuffer
+                 );
+                _bindScene3(pScene
+                    , dynamic_cast<const Projector<SpaceType::SPACE_3> *>(*(depthRenderInfo.pProjectors + j))
+                    , nullptr
+                    , pPreDepthCmdBuffer
+                    );
+                _renderPassEnd(pPreDepthCmdBuffer);
+           }
+            
+        }
     }
 
     void RenderBinder::_syncLightData(BaseScene *pScene)

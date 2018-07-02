@@ -16,10 +16,12 @@
 namespace vg
 {
     struct RenderBinderInfo {
-        Bool32 firstScene;
+        Bool32 lightingEnable;
+        Bool32 shadowEnable;
         Bool32 preDepthEnable;
         Bool32 postRenderEnable;
 
+        Bool32 firstScene;
         BaseScene *pScene;
         const BaseProjector *pProjector;
         PostRender *pPostRender;
@@ -31,15 +33,19 @@ namespace vg
         const Texture *pPreDepthResultTex;
         const Texture *pPostRenderTex;
 
+        CmdBuffer *pLightDepthCmdBuffer;
         CmdBuffer *pPreDepthCmdBuffer;
         CmdBuffer *pBranchCmdBuffer;
         CmdBuffer *pTrunkWaitBarrierCmdBuffer;
         CmdBuffer *pTrunkRenderPassCmdBuffer;
         CmdBuffer *pPostRenderCmdBuffer;
 
-        RenderBinderInfo(Bool32 firstScene = VG_TRUE
+        RenderBinderInfo(Bool32 lightingEnable = VG_FALSE
+            , Bool32 shadowEnable = VG_FALSE
             , Bool32 preDepthEnable = VG_FALSE
             , Bool32 postRenderEnable = VG_FALSE
+
+            , Bool32 firstScene = VG_TRUE
             , BaseScene *pScene = nullptr
             , const BaseProjector *pProjector = nullptr
             , PostRender *pPostRender = nullptr
@@ -50,7 +56,8 @@ namespace vg
 
             , const Texture *pPreDepthResultTex = nullptr
             , const Texture *pPostRenderTex = nullptr
-    
+
+            , CmdBuffer *pLightDepthCmdBuffer = nullptr
             , CmdBuffer *pPreDepthCmdBuffer = nullptr
             , CmdBuffer *pBranchCmdBuffer = nullptr
             , CmdBuffer *pTrunkWaitBarrierCmdBuffer = nullptr
@@ -93,6 +100,10 @@ namespace vg
         void _bind(RenderBinderInfo info);
 
         void _endBind();
+
+        void _bindForLightDepth(Scene<SpaceType::SPACE_3> *pScene
+            , const Projector<SpaceType::SPACE_3> *pProjector
+            , CmdBuffer *pPreDepthCmdBuffer = nullptr);
 
         void _syncLightData(BaseScene *pScene);
 

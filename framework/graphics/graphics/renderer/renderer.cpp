@@ -59,6 +59,10 @@ namespace vg
         , m_framebufferWidth(0u)
         , m_framebufferHeight(0u)
         , m_renderBinder()
+        //shadow
+        , m_lightingEnable(VG_FALSE)
+        , m_shadowEnable(VG_FALSE)
+        , m_pLightDepthCmdBuffer()
         //pre z
         , m_preDepthEnable(VG_FALSE)
         , m_pPreDepthTarget()
@@ -106,6 +110,48 @@ namespace vg
         if (m_pPostRenderTarget != nullptr)
             m_pPostRenderTarget->setClearValues(pRendererTarget->getClearValues()
                 , pRendererTarget->getClearValueCount());
+    }
+
+    void Renderer::enableLighting()
+    {
+        if (m_lightingEnable == VG_FALSE)
+        {
+            m_lightingEnable = VG_TRUE;
+            if (m_shadowEnable == VG_TRUE)
+            {
+                _createLightingObjs();
+            }
+        }
+    }
+        
+    void Renderer::disableLighting()
+    {
+        if (m_lightingEnable == VG_TRUE)
+        {
+            m_lightingEnable = VG_FALSE;
+            _destroyLightingObjs();
+        }
+    }
+
+    void Renderer::enableShadow()
+    {
+        if (m_shadowEnable == VG_FALSE)
+        {
+            m_shadowEnable = VG_TRUE;
+            if (m_lightingEnable == VG_TRUE)
+            {
+                _createLightingObjs();
+            }
+        }
+    }
+
+    void Renderer::disableShadow()
+    {
+        if (m_shadowEnable == VG_TRUE)
+        {
+            m_shadowEnable = VG_FALSE;
+            _destroyLightingObjs();
+        }
     }
 
     void Renderer::enablePreDepth()
@@ -333,22 +379,11 @@ namespace vg
 
     void Renderer::_renderScene(const SceneInfo &sceneInfo, Bool32 isFirstScene, RenderResultInfo &resultInfo)
     {
-        _renderSceneLights(sceneInfo, resultInfo);
-        _renderSceneVisualization(sceneInfo, isFirstScene, resultInfo);
-    }
-
-    //Render scene light depth
-    void Renderer::_renderSceneLights(const SceneInfo &sceneInfo, RenderResultInfo &resultInfo)
-    {
-        const auto pScene = sceneInfo.pScene;
-        
-    }
-
-    void Renderer::_renderSceneVisualization(const SceneInfo &sceneInfo, Bool32 isFirstScene, RenderResultInfo &resultInfo)
-    {
         auto pScene = sceneInfo.pScene;
         auto pCamera = sceneInfo.pCamera;
         auto pPostRender = sceneInfo.pPostRender;
+        Bool32 lightingEnable = m_lightingEnable;
+        Bool32 shadowEnable = m_shadowEnable;
         Bool32 preDepthEnable = m_preDepthEnable == VG_TRUE && sceneInfo.preDepth == VG_TRUE;
         Bool32 postRenderEnable = m_postRenderEnable == VG_TRUE && 
             sceneInfo.pPostRender != nullptr &&
@@ -370,17 +405,24 @@ namespace vg
         }
 
         RenderBinderInfo bindInfo = {
-            isFirstScene,
+            lightingEnable,
+            shadowEnable,
             preDepthEnable,
             postRenderEnable,
+
+            isFirstScene,
             pScene,
             pCamera->getProjectorBase(),
             postRenderEnable ? pPostRender : nullptr,
+
             preDepthEnable ? m_pPreDepthTarget.get() : nullptr,
             postRenderEnable ? m_pPostRenderTarget.get() : nullptr,
             m_pRendererTarget,
+
             preDepthEnable ? m_pPreDepthTarget->getDepthTargetTexture() : nullptr,
             postRenderEnable ? m_pPostRenderTarget->getColorTargetTexture() : nullptr,
+
+            lightingEnable && shadowEnable ? m_pLightDepthCmdBuffer.get() : nullptr,
             preDepthEnable ? m_pPreDepthCmdBuffer.get() : nullptr,
             &m_branchCmdBuffer,
             &m_trunkWaitBarrierCmdBuffer,
@@ -510,6 +552,18 @@ namespace vg
         VG_LOG(plog::debug) << "Pre allocate command buffer from pool." << std::endl;
         m_pCommandBuffer = fd::allocateCommandBuffer(pDevice, pCommandPool.get(), allocateInfo);
         VG_LOG(plog::debug) << "Post allocate command buffer from pool." << std::endl;
+    }
+
+    void Renderer::_createLightingObjs()
+    {
+        m_pLightDepthCmdBuffer = std::shared_ptr<CmdBuffer>{
+            new CmdBuffer{},
+        };
+    }
+
+    void Renderer::_destroyLightingObjs()
+    {
+        m_pLightDepthCmdBuffer = nullptr;
     }
 
     void Renderer::_createPreDepthObjs()

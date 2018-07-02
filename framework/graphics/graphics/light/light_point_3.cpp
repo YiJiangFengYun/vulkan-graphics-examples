@@ -18,7 +18,8 @@ namespace vg
         , uint32_t depthTextureWidth
         , uint32_t depthTextureHeight
         )
-        : m_cubeTargets(depthTextureWidth
+        : Light3()
+        , m_cubeTargets(depthTextureWidth
             , depthTextureHeight
             )
         , m_pProjectors()

@@ -3,6 +3,7 @@
 namespace vg
 {
      LightAmbient3::LightAmbient3()
+         : Light3()
      {
 
      }

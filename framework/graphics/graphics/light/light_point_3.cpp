@@ -116,6 +116,16 @@ namespace vg
         {
             m_refProjectors[i] = m_pProjectors[i].get();
         }
+
+        if (m_data.hasData("light_radius") == VG_FALSE)
+        {
+            LightDataInfo info = {
+                VG_LIGHT_DATA_OTHER_MIN_LAYOUT_PRIORITY,
+            };
+            m_data.addData("light_radius", info, radius);
+        } else {
+            m_data.setData("light_radius", radius);
+        }
     }
 
     LightDepthRenderInfo LightPoint3::getDepthRenderInfo() const

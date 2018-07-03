@@ -47,6 +47,11 @@
 #include <graphics/scene/visual_object_2.hpp>
 #include <graphics/scene/visual_object_3.hpp>
 
+#include <graphics/light/light_point_3.hpp>
+#include <graphics/light/light_ambient_3.hpp>
+#include <graphics/light/light_direct_3.hpp>
+#include <graphics/light/light_spot_3.hpp>
+
 #include <graphics/util/queue_family.hpp>
 #include <graphics/util/swapchain_info.hpp>
 #include <graphics/util/util.hpp>

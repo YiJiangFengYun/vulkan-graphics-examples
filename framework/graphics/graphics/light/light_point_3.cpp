@@ -25,6 +25,8 @@ namespace vg
         , m_pProjectors()
         , m_refProjectors()
     {
+
+        //set projectors.
         uint32_t size = static_cast<uint32_t>(m_pProjectors.size());
         for (uint32_t i = 0; i < size; ++i)
         {
@@ -117,15 +119,33 @@ namespace vg
             m_refProjectors[i] = m_pProjectors[i].get();
         }
 
+        //add radius to light data.
         if (m_data.hasData("light_radius") == VG_FALSE)
         {
             LightDataInfo info = {
                 VG_LIGHT_DATA_OTHER_MIN_LAYOUT_PRIORITY,
             };
             m_data.addData("light_radius", info, radius);
+            m_dataChanged = VG_TRUE;
         } else {
             m_data.setData("light_radius", radius);
         }
+        m_dataContentChanged = VG_TRUE;
+        m_dataContentChanges["light_radius"] = VG_TRUE;
+
+        //add cube depth texture to light textures.
+        LightTextureInfo texInfo = {
+            VG_LIGHT_TEXTURE_DEPTH_BINDING_PRIORITY,
+            m_cubeTargets.getDepthTargetTexture(),
+            };
+        if (m_data.hasData(VG_LIGHT_TEXTURE_DEPTH_NAME) == VG_FALSE)
+        {
+            m_data.addTexture(VG_LIGHT_TEXTURE_DEPTH_NAME, texInfo);
+        } else {
+            m_data.setTexture(VG_LIGHT_TEXTURE_DEPTH_NAME, texInfo);
+        }
+        m_textureChanged = VG_TRUE;
+        _apply();
     }
 
     LightDepthRenderInfo LightPoint3::getDepthRenderInfo() const

@@ -137,7 +137,12 @@ namespace vg
 
     void RenderBinder::_bind(RenderBinderInfo info)
     {
-        _syncLightData(info.pScene);
+        m_lightingEnable = info.lightingEnable;
+        m_shadowEnable = info.shadowEnable;
+        if (info.lightingEnable == VG_TRUE)
+        {
+            _syncLightData(info.pScene);
+        }
         _bindForRenderPassBegin(info);
         //scene make cmds.
         if (info.pScene->getSpaceType() == SpaceType::SPACE_2)
@@ -153,10 +158,13 @@ namespace vg
         } 
         else if (info.pScene->getSpaceType() == SpaceType::SPACE_3)
         {
-            _bindForLightDepth(dynamic_cast<Scene<SpaceType::SPACE_3> *>(info.pScene), 
-                dynamic_cast<const Projector<SpaceType::SPACE_3> *>(info.pProjector),
-                info.pLightDepthCmdBuffer
+            if (info.lightingEnable == VG_TRUE && info.shadowEnable == VG_TRUE)
+            {
+                _bindForLightDepth(dynamic_cast<Scene<SpaceType::SPACE_3> *>(info.pScene),
+                    dynamic_cast<const Projector<SpaceType::SPACE_3> *>(info.pProjector),
+                    info.pLightDepthCmdBuffer
                 );
+            }
             _bindScene3(dynamic_cast<Scene<SpaceType::SPACE_3> *>(info.pScene), 
                 dynamic_cast<const Projector<SpaceType::SPACE_3> *>(info.pProjector), 
                 info.preDepthEnable ? info.pPreDepthResultTex : nullptr,
@@ -294,6 +302,10 @@ namespace vg
         {
             m_lightTextureInfos.resize(static_cast<uint32_t>(totalTextureBindingCount));
         }
+        if (static_cast<uint32_t>(m_lightPassTextureInfos.size()) < totalTextureBindingCount)
+        {
+            m_lightPassTextureInfos.resize(static_cast<uint32_t>(totalTextureBindingCount));
+        }
         
         //Allocate memory and copy ligth data to it.
         std::vector<Byte> memory(totalSize);
@@ -307,13 +319,13 @@ namespace vg
             BaseLight * const *lightGroup;
             if (pScene->getSpaceType() == SpaceType::SPACE_2) 
             {
-                auto lightGroup2 = dynamic_cast<Scene<SpaceType::SPACE_2> *>(pScene)->getLightGroup(*pLightTypeInfo);
+                auto &lightGroup2 = dynamic_cast<Scene<SpaceType::SPACE_2> *>(pScene)->getLightGroup(*pLightTypeInfo);
                 lightGroupSize = static_cast<uint32_t>(lightGroup2.size());
                 lightGroup = reinterpret_cast<BaseLight * const *>(lightGroup2.data());
             }
             else
             {
-                auto lightGroup3 = dynamic_cast<Scene<SpaceType::SPACE_3> *>(pScene)->getLightGroup(*pLightTypeInfo);
+                auto &lightGroup3 = dynamic_cast<Scene<SpaceType::SPACE_3> *>(pScene)->getLightGroup(*pLightTypeInfo);
                 lightGroupSize = static_cast<uint32_t>(lightGroup3.size());
                 lightGroup = reinterpret_cast<BaseLight * const *>(lightGroup3.data());
             }
@@ -542,7 +554,6 @@ namespace vg
                     , modelMatrix
                     , viewMatrix
                     , projMatrix
-                    , pScene
                     , pPreDepthResultTex
 #if defined(DEBUG) && defined(VG_ENABLE_COST_TIMER)
                     , preparingBuildInDataCostTimer
@@ -850,7 +861,6 @@ namespace vg
                         , modelMatrix
                         , viewMatrix
                         , projMatrix
-                        , pScene
                         , pPreDepthResultTex
 #if defined(DEBUG) && defined(VG_ENABLE_COST_TIMER)
                         , preparingBuildInDataCostTimer
@@ -1010,7 +1020,6 @@ namespace vg
         , Matrix4x4 modelMatrix
         , Matrix4x4 viewMatrix
         , Matrix4x4 projMatrix
-        , BaseScene *pScene
         , const Texture *pPreDepthResultTex
 #if defined(DEBUG) && defined(VG_ENABLE_COST_TIMER)
         , fd::CostTimer * pPreparingBuildInDataCostTimer
@@ -1100,7 +1109,7 @@ namespace vg
                     else if (type == Pass::BuildInDataType::LIGHTS_DATA)
                     {
                         //light data buffer.
-                        if (m_lightTypeCount > 0)
+                        if (m_lightingEnable && m_lightTypeCount > 0)
                         {
                             vg::PassBufferInfo::BufferInfo itemInfo = {
                                 m_pCurrLightDataBuffer,
@@ -1122,22 +1131,24 @@ namespace vg
                             {
                                 pPass->setBuffer(VG_PASS_LIGHT_DATA_BUFFER_NAME, info);
                             }
-                        }
-                        //light textures.
-                        auto lightPassTextureInfos = m_lightPassTextureInfos;
-                        uint32_t textureInfoCount = static_cast<uint32_t>(lightPassTextureInfos.size());
-                        for (uint32_t textureInfoIndex = 0u; textureInfoIndex < textureInfoCount; ++textureInfoIndex)
-                        {
-                            std::string name = VG_PASS_LIGHT_TEXTURE_NAME + std::to_string(textureInfoIndex);
-                            if (pPass->hasTexture(name) == VG_FALSE) 
+
+                            //light textures.
+                            auto lightPassTextureInfos = m_lightPassTextureInfos;
+                            uint32_t textureInfoCount = static_cast<uint32_t>(lightPassTextureInfos.size());
+                            for (uint32_t textureInfoIndex = 0u; textureInfoIndex < textureInfoCount; ++textureInfoIndex)
                             {
-                                pPass->addTexture(name, lightPassTextureInfos[textureInfoIndex]);
-                            }
-                            else
-                            {
-                                pPass->setTexture(name, lightPassTextureInfos[textureInfoIndex]);
+                                std::string name = VG_PASS_LIGHT_TEXTURE_NAME + std::to_string(textureInfoIndex);
+                                if (pPass->hasTexture(name) == VG_FALSE) 
+                                {
+                                    pPass->addTexture(name, lightPassTextureInfos[textureInfoIndex]);
+                                }
+                                else
+                                {
+                                    pPass->setTexture(name, lightPassTextureInfos[textureInfoIndex]);
+                                }
                             }
                         }
+
 
                     }
                     else if (type == Pass::BuildInDataType::PRE_DEPTH_DEPTH_RESULT)

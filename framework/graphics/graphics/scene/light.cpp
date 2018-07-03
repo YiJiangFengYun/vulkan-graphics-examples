@@ -472,7 +472,7 @@ namespace vg
     {
         //sync transfrom data.
         auto matrix = m_pTransform->getMatrixLocalToWorld();
-        if (m_data.hasData(VG_LIGHT_DATA_TRANSFORM_NAME)) {
+        if (m_data.hasData(VG_LIGHT_DATA_TRANSFORM_NAME) == VG_FALSE) {
             LightDataInfo dataInfo = {
                 VG_LIGHT_DATA_TRANSFORM_LAYOUT_PRIORITY
             };

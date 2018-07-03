@@ -34,6 +34,7 @@ void Window::_init()
 {
     ParentWindowType::_init();
     _createModel();
+    _createLights();
     _createMaterial();
     _initScene();
 }

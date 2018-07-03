@@ -89,6 +89,8 @@ namespace vg
         uint32_t m_bindedObjectCount;
 
         //light data buffer.
+        Bool32 m_lightingEnable;
+        Bool32 m_shadowEnable;
         FrameObjectCache<InstanceID, std::shared_ptr<BufferData>> m_lightDataBufferCache;
         BufferData *m_pCurrLightDataBuffer;
         uint32_t m_lightTypeCount;
@@ -142,7 +144,6 @@ namespace vg
             , Matrix4x4 modelMatrix
             , Matrix4x4 viewMatrix
             , Matrix4x4 projMatrix
-            , BaseScene *pScene            
             , const Texture *pPreDepthResultTex
 #if defined(DEBUG) && defined(VG_ENABLE_COST_TIMER)
         , fd::CostTimer * pPreparingBuildInDataCostTimer

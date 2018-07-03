@@ -301,7 +301,7 @@ namespace vg
     Bool32 Scene<SPACE_TYPE>::isHasLight(const LightType *pTarget) const
     {
 #ifdef DEBUG
-        if (isHasRegisterLight(typeid(*pTarget)))
+        if (isHasRegisterLight(typeid(*pTarget)) == VG_FALSE)
             throw std::invalid_argument("The light type is not registered.");
 #endif //DEBUG
         return _isHasObject<LightType>(pTarget, m_mapPLights);
@@ -312,7 +312,7 @@ namespace vg
     {
         const auto &typeInfo = typeid(*pTarget);
 #ifdef DEBUG
-        if (isHasRegisterLight(typeInfo))
+        if (isHasRegisterLight(typeInfo) == VG_FALSE)
             throw std::invalid_argument("The light type is not registered.");
 #endif //DEBUG
         const auto &lightInfo = m_mapRegisteredLights[std::type_index(typeInfo)];
@@ -336,7 +336,7 @@ namespace vg
     {
         const auto &typeInfo = typeid(*pTarget);        
 #ifdef DEBUG
-        if (isHasRegisterLight(typeInfo))
+        if (isHasRegisterLight(typeInfo) == VG_FALSE)
             throw std::invalid_argument("The light type is not registered.");
 #endif //DEBUG
         _removeObject<LightType>(pTarget
@@ -351,7 +351,7 @@ namespace vg
     }
 
     template <SpaceType SPACE_TYPE>
-    const std::vector<typename Scene<SPACE_TYPE>::LightType *> Scene<SPACE_TYPE>::getLightGroup(const std::type_info &lightTypeInfo)
+    const std::vector<typename Scene<SPACE_TYPE>::LightType *> &Scene<SPACE_TYPE>::getLightGroup(const std::type_info &lightTypeInfo)
     {
         auto typeIndex = std::type_index(lightTypeInfo);
         auto iterator = m_mapLightGroups.find(typeIndex);

@@ -28,6 +28,7 @@ layout (binding = 2) uniform samplerCube shadowMaps[MAX_LIGHT_COUNT];
 
 void main() 
 {   
+    outFragColor = vec4(0.0);
     for(uint i = 0;i < lightData.lightCount && i < MAX_LIGHT_COUNT; ++i)
     {
         vec4 resultColor = vec4(0.0);

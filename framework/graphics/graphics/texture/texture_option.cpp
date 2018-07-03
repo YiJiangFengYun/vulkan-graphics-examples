@@ -151,7 +151,7 @@ namespace vg
         case TextureType::CUBE_ARRARY:
         {
             if (width == 0) throw std::invalid_argument("Invalid width argument at creating image for texture.");
-            if (width != height) throw std::invalid_argument("Invalid width and height argument at creating image for texture, because they is not equal.");
+            if (height == 0) throw std::invalid_argument("Invalid height argument at creating image for texture.");
             if (depth != 1) throw std::invalid_argument("Invalide depth argument at creating image for texture.");
             break;
         }

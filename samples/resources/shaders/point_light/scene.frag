@@ -4,7 +4,7 @@
 #extension GL_ARB_shading_language_420pack : enable
 
 #define EPSILON 0.001
-#define MAX_LIGHT_COUNT 10
+#define MAX_LIGHT_COUNT 2
 
 layout (location = 0) in vec3 inNormal;
 layout (location = 1) in vec3 inColor;

@@ -37,6 +37,8 @@ void Window::_init()
     _createLights();
     _createMaterial();
     _initScene();
+    _enableLighting();
+    _enableShadow();
 }
 
 void Window::_initState()
@@ -134,6 +136,16 @@ void Window::_initScene()
     };
     m_pScene->registerLight(light_type_info, registerInfo);
     m_pScene->addLight(m_pPointLight.get());
+}
+
+void Window::_enableLighting()
+{
+    m_pRenderer->enableLighting();
+}
+
+void Window::_enableShadow()
+{
+    m_pRenderer->enableShadow();
 }
 
 void Window::_onUpdate()

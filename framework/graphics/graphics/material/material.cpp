@@ -248,24 +248,26 @@ namespace vg
 
     void Material::_beginBind(const BindInfo info, BindResult *pResult) const
     {
-        auto &result = *pResult;
-        RenderPassInfo trunkRenderPassInfo;
-        trunkRenderPassInfo.pRenderPass = nullptr;
-        trunkRenderPassInfo.pFramebuffer = nullptr;            
-        trunkRenderPassInfo.framebufferWidth = info.trunkFramebufferWidth;
-        trunkRenderPassInfo.framebufferHeight = info.trunkFramebufferHeight;
-        trunkRenderPassInfo.projMatrix = *(info.pProjMatrix);
-        trunkRenderPassInfo.viewMatrix = *(info.pViewMatrix);
-        trunkRenderPassInfo.pPass = *m_arrPasses.data();
-        trunkRenderPassInfo.modelMatrix = *(info.pModelMatrix);
-        trunkRenderPassInfo.pMesh = info.pMesh;
-        trunkRenderPassInfo.subMeshIndex = info.subMeshIndex;
-        trunkRenderPassInfo.viewport = fd::Viewport();
-        trunkRenderPassInfo.scissor = info.hasClipRect ? info.clipRect : fd::Rect2D();
-        CmdInfo cmdInfo;
-        cmdInfo.pRenderPassInfo = &trunkRenderPassInfo;
-        result.pTrunkRenderPassCmdBuffer->addCmd(cmdInfo);
-        
+        if (pResult->pTrunkRenderPassCmdBuffer != nullptr)
+        {
+            auto &result = *pResult;
+            RenderPassInfo trunkRenderPassInfo;
+            trunkRenderPassInfo.pRenderPass = nullptr;
+            trunkRenderPassInfo.pFramebuffer = nullptr;
+            trunkRenderPassInfo.framebufferWidth = info.trunkFramebufferWidth;
+            trunkRenderPassInfo.framebufferHeight = info.trunkFramebufferHeight;
+            trunkRenderPassInfo.projMatrix = *(info.pProjMatrix);
+            trunkRenderPassInfo.viewMatrix = *(info.pViewMatrix);
+            trunkRenderPassInfo.pPass = *m_arrPasses.data();
+            trunkRenderPassInfo.modelMatrix = *(info.pModelMatrix);
+            trunkRenderPassInfo.pMesh = info.pMesh;
+            trunkRenderPassInfo.subMeshIndex = info.subMeshIndex;
+            trunkRenderPassInfo.viewport = fd::Viewport();
+            trunkRenderPassInfo.scissor = info.hasClipRect ? info.clipRect : fd::Rect2D();
+            CmdInfo cmdInfo;
+            cmdInfo.pRenderPassInfo = &trunkRenderPassInfo;
+            result.pTrunkRenderPassCmdBuffer->addCmd(cmdInfo);
+        }
     }
     
     void Material::_endBind(const EndBindInfo info) const

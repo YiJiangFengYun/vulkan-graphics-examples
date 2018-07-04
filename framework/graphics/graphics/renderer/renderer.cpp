@@ -435,6 +435,16 @@ namespace vg
         CMDParser::ResultInfo cmdParseResult;
          
         //record ...
+        //light depth 
+        if (lightingEnable && shadowEnable)
+        {
+            CMDParser::record(m_pLightDepthCmdBuffer.get()
+                , m_pCommandBuffer.get()
+                , &m_pipelineCache
+                , &cmdParseResult
+            );
+            resultInfo.drawCount += cmdParseResult.drawCount;
+        }
         // pre z
         if (preDepthEnable)
         {

@@ -15,7 +15,7 @@ layout (binding = 0) uniform BuildIn
     vec4 viewPos;
 } _buildIn;
 
-#define MAX_LIGHT_COUNT 10
+#define MAX_LIGHT_COUNT 2
 struct PointLight
 {
     mat4 lightTransform;

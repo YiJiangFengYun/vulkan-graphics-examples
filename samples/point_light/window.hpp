@@ -4,7 +4,7 @@
 #include "sampleslib/window.hpp"
 #include "sampleslib/scene_assimp.hpp"
 
-#define MAX_LIGHT_COUNT 10
+#define MAX_LIGHT_COUNT 2
 
 class Window : public sampleslib::Window<vg::SpaceType::SPACE_3>
 {
@@ -29,6 +29,8 @@ private:
     void _createLights();
     void _createMaterial();
     void _initScene();
+    void _enableLighting();
+    void _enableShadow();
     virtual void _onUpdate() override;
 };
 

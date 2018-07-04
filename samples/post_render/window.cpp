@@ -316,12 +316,9 @@ void Window::_initPostRender()
             pShader->load("shaders/post_render/mutlply_color.vert.spv", 
                 "shaders/post_render/mutlply_color.frag.spv");
             //pass
-            vg::Pass::BuildInDataInfo::Component buildInDataCmps[1] = {
-                    {vg::Pass::BuildInDataType::POST_RENDER_RESULT},
-                };
             vg::Pass::BuildInDataInfo buildInDataInfo;
-            buildInDataInfo.componentCount = 1u;
-            buildInDataInfo.pComponent = buildInDataCmps;
+            buildInDataInfo.componentCount = 0u;
+            buildInDataInfo.pComponent = nullptr;
             pPass->setBuildInDataInfo(buildInDataInfo);
             pPass->setCullMode(vk::CullModeFlagBits::eNone);
             vg::PassDataInfo multiplyColorDataInfo = {

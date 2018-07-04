@@ -101,12 +101,9 @@ void Window::_createMaterial()
         depthStencilState.depthCompareOp = vk::CompareOp::eLessOrEqual;
         pPreDepthPass->setDepthStencilInfo(depthStencilState);
         
-        vg::Pass::BuildInDataInfo::Component buildInDataCmps[1] = {
-            {vg::Pass::BuildInDataType::PRE_DEPTH_DEPTH_RESULT},
-        };
         vg::Pass::BuildInDataInfo buildInData;
-        buildInData.componentCount = 1u;
-        buildInData.pComponent = buildInDataCmps;
+        buildInData.componentCount = 0u;
+        buildInData.pComponent = nullptr;
         pPass->setBuildInDataInfo(buildInData);
 
         vg::PassDataInfo otherDataInfo = {

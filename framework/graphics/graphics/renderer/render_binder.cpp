@@ -186,39 +186,33 @@ namespace vg
             for (uint32_t i = 0; i < passCount; ++i)
             {
                 auto pPass = pMaterial->getPassWithIndex(i);
-                auto buildInDataInfo = pPass->getBuildInDataInfo();
-                auto buildInComponentCount = buildInDataInfo.componentCount;
-                for (uint32_t j = 0; j < buildInComponentCount; ++j)
+                auto pColorTex = info.pPostRenderTex;
+                vg::PassTextureInfo::TextureInfo itemInfo = {
+                    pColorTex,
+                    nullptr,
+                    nullptr,
+                    vk::ImageLayout::eUndefined,
+                };
+                PassTextureInfo info = {
+                    1u,
+                    &itemInfo,
+                    VG_PASS_POST_RENDER_TEXTURE_BINDING_PRIORITY,
+                    vg::ImageDescriptorType::COMBINED_IMAGE_SAMPLER,
+                    vk::ShaderStageFlagBits::eFragment,
+                };
+                if (pPass->hasTexture(VG_PASS_POST_RENDER_TEXTURE_NAME) == VG_FALSE)
                 {
-                    if ((*(buildInDataInfo.pComponent + j)).type == Pass::BuildInDataType::POST_RENDER_RESULT)
-                    {
-                        auto pColorTex = info.pPostRenderTex;
-                        vg::PassTextureInfo::TextureInfo itemInfo = {
-                            pColorTex,
-                            nullptr,
-                            nullptr,
-                            vk::ImageLayout::eUndefined,
-                        };
-                        PassTextureInfo info = {
-                            1u,
-                            &itemInfo,
-                            VG_PASS_POST_RENDER_TEXTURE_BINDING_PRIORITY,
-                            vg::ImageDescriptorType::COMBINED_IMAGE_SAMPLER,
-                            vk::ShaderStageFlagBits::eFragment,
-                        };
-                        if (pPass->hasTexture(VG_PASS_POST_RENDER_TEXTURE_NAME) == VG_FALSE)
-                        {
-                            pPass->addTexture(VG_PASS_POST_RENDER_TEXTURE_NAME, info);
-                        }
-                        else
-                        {
-                            pPass->setTexture(VG_PASS_POST_RENDER_TEXTURE_NAME, info);
-                        }
-                        pPass->apply();
-                        break;
-                    }
+                    pPass->addTexture(VG_PASS_POST_RENDER_TEXTURE_NAME, info);
                 }
+                else
+                {
+                    pPass->setTexture(VG_PASS_POST_RENDER_TEXTURE_NAME, info);
+                }
+                pPass->apply();
             }
+
+            
+
             PostRender::BindInfo bindInfo = {
                 m_framebufferWidth,
                 m_framebufferHeight,
@@ -1106,77 +1100,70 @@ namespace vg
                     {
                         pPass->setBuildInMatrixData(type, projMatrix);
                     }
-                    else if (type == Pass::BuildInDataType::LIGHTS_DATA)
+                }
+
+                //light data buffer.
+                if (m_lightingEnable && m_lightTypeCount > 0)
+                {
+                    vg::PassBufferInfo::BufferInfo itemInfo = {
+                        m_pCurrLightDataBuffer,
+                        0u,
+                        m_pCurrLightDataBuffer->getBufferSize(),
+                    };
+                    PassBufferInfo info = {
+                        1u,
+                        &itemInfo,
+                        VG_PASS_LIGHT_DATA_BUFFER_BINDING_PRIORITY,
+                        vg::BufferDescriptorType::UNIFORM_BUFFER,
+                        vk::ShaderStageFlagBits::eVertex | vk::ShaderStageFlagBits::eFragment
+                    };
+                    if (pPass->hasBuffer(VG_PASS_LIGHT_DATA_BUFFER_NAME) == VG_FALSE)
                     {
-                        //light data buffer.
-                        if (m_lightingEnable && m_lightTypeCount > 0)
-                        {
-                            vg::PassBufferInfo::BufferInfo itemInfo = {
-                                m_pCurrLightDataBuffer,
-                                0u,
-                                m_pCurrLightDataBuffer->getBufferSize(),
-                            };
-                            PassBufferInfo info = {
-                                1u,
-                                &itemInfo,
-                                VG_PASS_LIGHT_DATA_BUFFER_BINDING_PRIORITY,
-                                vg::BufferDescriptorType::UNIFORM_BUFFER,
-                                vk::ShaderStageFlagBits::eVertex | vk::ShaderStageFlagBits::eFragment
-                            };
-                            if (pPass->hasBuffer(VG_PASS_LIGHT_DATA_BUFFER_NAME) == VG_FALSE)
-                            {
-                                pPass->addBuffer(VG_PASS_LIGHT_DATA_BUFFER_NAME, info);
-                            }
-                            else
-                            {
-                                pPass->setBuffer(VG_PASS_LIGHT_DATA_BUFFER_NAME, info);
-                            }
-
-                            //light textures.
-                            auto lightPassTextureInfos = m_lightPassTextureInfos;
-                            uint32_t textureInfoCount = static_cast<uint32_t>(lightPassTextureInfos.size());
-                            for (uint32_t textureInfoIndex = 0u; textureInfoIndex < textureInfoCount; ++textureInfoIndex)
-                            {
-                                std::string name = VG_PASS_LIGHT_TEXTURE_NAME + std::to_string(textureInfoIndex);
-                                if (pPass->hasTexture(name) == VG_FALSE) 
-                                {
-                                    pPass->addTexture(name, lightPassTextureInfos[textureInfoIndex]);
-                                }
-                                else
-                                {
-                                    pPass->setTexture(name, lightPassTextureInfos[textureInfoIndex]);
-                                }
-                            }
-                        }
-
-
+                        pPass->addBuffer(VG_PASS_LIGHT_DATA_BUFFER_NAME, info);
                     }
-                    else if (type == Pass::BuildInDataType::PRE_DEPTH_DEPTH_RESULT)
+                    else
                     {
-                        if (pPreDepthResultTex != nullptr)
+                        pPass->setBuffer(VG_PASS_LIGHT_DATA_BUFFER_NAME, info);
+                    }
+                    //light textures.
+                    auto lightPassTextureInfos = m_lightPassTextureInfos;
+                    uint32_t textureInfoCount = static_cast<uint32_t>(lightPassTextureInfos.size());
+                    for (uint32_t textureInfoIndex = 0u; textureInfoIndex < textureInfoCount; ++textureInfoIndex)
+                    {
+                        std::string name = VG_PASS_LIGHT_TEXTURE_NAME + std::to_string(textureInfoIndex);
+                        if (pPass->hasTexture(name) == VG_FALSE) 
                         {
-                            vg::PassTextureInfo::TextureInfo itemInfo = {
-                                pPreDepthResultTex,
-                                nullptr,
-                                nullptr,
-                                vk::ImageLayout::eUndefined,
-                            };
-                            PassTextureInfo info = {
-                                1u,
-                                &itemInfo,
-                                VG_PASS_PRE_DEPTH_TEXTURE_BINDING_PRIORITY,
-                                vg::ImageDescriptorType::COMBINED_IMAGE_SAMPLER,
-                                vk::ShaderStageFlagBits::eFragment,
-                            };
-                            if (pPass->hasTexture(VG_PASS_PRE_DEPTH_TEXTURE_NAME) == VG_FALSE)
-                            {
-                                pPass->addTexture(VG_PASS_PRE_DEPTH_TEXTURE_NAME, info);
-                            }
-                            else
-                            {
-                                pPass->setTexture(VG_PASS_PRE_DEPTH_TEXTURE_NAME, info);
-                            }
+                            pPass->addTexture(name, lightPassTextureInfos[textureInfoIndex]);
                         }
+                        else
+                        {
+                            pPass->setTexture(name, lightPassTextureInfos[textureInfoIndex]);
+                        }
+                    }
+                }
+
+                if (pPreDepthResultTex != nullptr)
+                {
+                    vg::PassTextureInfo::TextureInfo itemInfo = {
+                        pPreDepthResultTex,
+                        nullptr,
+                        nullptr,
+                        vk::ImageLayout::eUndefined,
+                    };
+                    PassTextureInfo info = {
+                        1u,
+                        &itemInfo,
+                        VG_PASS_PRE_DEPTH_TEXTURE_BINDING_PRIORITY,
+                        vg::ImageDescriptorType::COMBINED_IMAGE_SAMPLER,
+                        vk::ShaderStageFlagBits::eFragment,
+                    };
+                    if (pPass->hasTexture(VG_PASS_PRE_DEPTH_TEXTURE_NAME) == VG_FALSE)
+                    {
+                        pPass->addTexture(VG_PASS_PRE_DEPTH_TEXTURE_NAME, info);
+                    }
+                    else
+                    {
+                        pPass->setTexture(VG_PASS_PRE_DEPTH_TEXTURE_NAME, info);
                     }
                 }
 

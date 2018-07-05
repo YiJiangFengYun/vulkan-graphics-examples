@@ -160,11 +160,6 @@ namespace vg
         , fd::Rect2D scissor
         , const CmdDraw *pCmdDraw
         , const CmdDrawIndexed *pCmdDrawIndexed
-#if defined(DEBUG) && defined(VG_ENABLE_COST_TIMER)
-        , fd::CostTimer *pPreparingBuildInDataCostTimer
-        , fd::CostTimer *pPreparingPipelineCostTimer
-        , fd::CostTimer *pPreparingCommandBufferCostTimer
-#endif //DEBUG and VG_ENABLE_COST_TIMER
         )
         : pRenderPass(pRenderPass)
         , subPassIndex(subPassIndex)
@@ -181,11 +176,6 @@ namespace vg
         , scissor(scissor)
         , pCmdDraw(pCmdDraw)
         , pCmdDrawIndexed(pCmdDrawIndexed)
-#if defined(DEBUG) && defined(VG_ENABLE_COST_TIMER)
-        , pPreparingBuildInDataCostTimer(pPreparingBuildInDataCostTimer)
-        , pPreparingPipelineCostTimer(pPreparingPipelineCostTimer)
-        , pPreparingCommandBufferCostTimer(pPreparingCommandBufferCostTimer)
-#endif //DEBUG and VG_ENABLE_COST_TIMER
     {    
     }
 

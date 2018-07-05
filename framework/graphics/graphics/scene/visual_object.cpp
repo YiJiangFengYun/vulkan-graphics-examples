@@ -6,20 +6,11 @@ namespace vg
         , uint32_t trunkFramebufferHeight
         , const Matrix4x4 *pProjMatrix
         , const Matrix4x4 *pViewMatrix
-#if defined(DEBUG) && defined(VG_ENABLE_COST_TIMER)
-        , fd::CostTimer *pPreparingPipelineCostTimer
-        , fd::CostTimer *pPreparingCommandBufferCostTimer
-#endif //DEBUG and VG_ENABLE_COST_TIMER
         )
         : trunkFramebufferWidth(trunkFramebufferWidth)
         , trunkFramebufferHeight(trunkFramebufferHeight)
         , pProjMatrix(pProjMatrix)
         , pViewMatrix(pViewMatrix)
-        
-#if defined(DEBUG) && defined(VG_ENABLE_COST_TIMER)
-        , pPreparingPipelineCostTimer(pPreparingPipelineCostTimer)
-        , pPreparingCommandBufferCostTimer(pPreparingCommandBufferCostTimer)
-#endif //DEBUG and VG_ENABLE_COST_TIMER
     {
     }
 
@@ -205,10 +196,6 @@ namespace vg
                 subMeshIndex,
                 m_hasClipRect,
                 m_hasClipRect ? *(m_clipRects.data() + i) : fd::Rect2D(),
-#if defined(DEBUG) && defined(VG_ENABLE_COST_TIMER)
-                info.pPreparingPipelineCostTimer,
-                info.pPreparingCommandBufferCostTimer,
-#endif //DEBUG and VG_ENABLE_COST_TIMER
                 };
     
             Material::BindResult resultForVisualizer;

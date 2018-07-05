@@ -152,7 +152,6 @@ namespace vg
         , PipelineCache *pPipelineCache
         , ResultInfo *pResult)
     {
-
         const auto &renderPassInfo = *pRenderPassInfo;
         auto pMesh = renderPassInfo.pMesh;
 
@@ -169,19 +168,12 @@ namespace vg
         if (stageInfos.size() != 0)
         {
             std::shared_ptr<vk::Pipeline> pPipeline;
-#if defined(DEBUG) && defined(VG_ENABLE_COST_TIMER)
-            renderPassInfo.pPreparingPipelineCostTimer->begin();
-#endif //DEBUG and VG_ENABLE_COST_TIMER
             _createPipeline(renderPassInfo.pRenderPass,
                 renderPassInfo.pMesh,
                 subMeshIndex, 
                 pPass, 
                 pPipelineCache,
                 pPipeline);
-#if defined(DEBUG) && defined(VG_ENABLE_COST_TIMER)
-            renderPassInfo.pPreparingPipelineCostTimer->end();
-            renderPassInfo.pPreparingCommandBufferCostTimer->begin();
-#endif //DEBUG and VG_ENABLE_COST_TIMER
             _recordCommandBuffer(pPipeline.get(),
                 pCommandBuffer,
                 renderPassInfo.framebufferWidth,
@@ -194,9 +186,6 @@ namespace vg
                 renderPassInfo.pCmdDraw,
                 renderPassInfo.pCmdDrawIndexed
             );
-#if defined(DEBUG) && defined(VG_ENABLE_COST_TIMER)
-            renderPassInfo.pPreparingCommandBufferCostTimer->end();
-#endif //DEBUG and VG_ENABLE_COST_TIMER
         }
         else
         {

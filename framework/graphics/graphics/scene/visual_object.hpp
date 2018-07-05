@@ -17,19 +17,11 @@ namespace vg
             uint32_t trunkFramebufferHeight;
             const Matrix4x4 *pProjMatrix;
             const Matrix4x4 *pViewMatrix;
-#if defined(DEBUG) && defined(VG_ENABLE_COST_TIMER)
-            fd::CostTimer *pPreparingPipelineCostTimer;
-            fd::CostTimer *pPreparingCommandBufferCostTimer;
-#endif //DEBUG and VG_ENABLE_COST_TIMER
 
             BindInfo( uint32_t trunkFramebufferWidth = 0u
                 , uint32_t trunkFramebufferHeight = 0u
                 , const Matrix4x4 *pProjMatrix = nullptr
                 , const Matrix4x4 *pViewMatrix = nullptr
-#if defined(DEBUG) && defined(VG_ENABLE_COST_TIMER)
-                , fd::CostTimer *pPreparingPipelineCostTimer = nullptr
-                , fd::CostTimer *pPreparingCommandBufferCostTimer = nullptr
-#endif //DEBUG and VG_ENABLE_COST_TIMER
                 );
         };
     

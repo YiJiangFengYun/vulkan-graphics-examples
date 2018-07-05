@@ -520,8 +520,6 @@ namespace vg
                 <<  std::endl;
         
         fd::CostTimer preparingBuildInDataCostTimer(fd::CostTimer::TimerType::ACCUMULATION);
-        fd::CostTimer preparingPipelineCostTimer(fd::CostTimer::TimerType::ACCUMULATION);
-        fd::CostTimer preparingCommandBufferCostTimer(fd::CostTimer::TimerType::ACCUMULATION);
 #endif //DEBUG and VG_ENABLE_COST_TIMER
 
         //------Doing render.
@@ -538,7 +536,7 @@ namespace vg
                     , viewMatrix
                     , projMatrix
 #if defined(DEBUG) && defined(VG_ENABLE_COST_TIMER)
-                    , preparingBuildInDataCostTimer
+                    , &preparingBuildInDataCostTimer
 #endif //DEBUG and VG_ENABLE_COST_TIMER    
                 );    
             }
@@ -550,7 +548,7 @@ namespace vg
                     , projMatrix
                     , pPreDepthResultTex
 #if defined(DEBUG) && defined(VG_ENABLE_COST_TIMER)
-                    , preparingBuildInDataCostTimer
+                    , &preparingBuildInDataCostTimer
 #endif //DEBUG and VG_ENABLE_COST_TIMER    
                     );
             }
@@ -559,10 +557,6 @@ namespace vg
                 framebufferHeight,
                 &projMatrix,
                 &viewMatrix,
-#if defined(DEBUG) && defined(VG_ENABLE_COST_TIMER)
-                &preparingPipelineCostTimer,
-                &preparingCommandBufferCostTimer,
-#endif //DEBUG and VG_ENABLE_COST_TIMER    
                 };
 
             BaseVisualObject::BindResult result;
@@ -574,31 +568,11 @@ namespace vg
         }
         
 #if defined(DEBUG) && defined(VG_ENABLE_COST_TIMER)
-        VG_COST_TIME_LOG(plog::debug) << "Pre object recording callback cost time: "
-            << preObjectRecordingCallBackCostTimer.costTimer
-            << "ms, scene id: " << pScene->getID()
-            << ", scene type: " << (pScene->getSpaceType() == SpaceType::SPACE_3 ? "space3" : "space2")
-            << std::endl;
         VG_COST_TIME_LOG(plog::debug) << "Preparing buildin data cost time: " 
             << preparingBuildInDataCostTimer.costTimer 
             << "ms, scene id: " << pScene->getID() 
             << ", scene type: " << (pScene->getSpaceType() == SpaceType::SPACE_3 ? "space3" : "space2") 
             <<  std::endl;
-        VG_COST_TIME_LOG(plog::debug) << "Preparing pipeline cost time: " 
-            << preparingPipelineCostTimer.costTimer 
-            << "ms, scene id: " << pScene->getID() 
-            << ", scene type: " << (pScene->getSpaceType() == SpaceType::SPACE_3 ? "space3" : "space2") 
-            <<  std::endl;
-        VG_COST_TIME_LOG(plog::debug) << "Preparing command buffer cost time: " 
-            << preparingCommandBufferCostTimer.costTimer 
-            << "ms, scene id: " << pScene->getID() 
-            << ", scene type: " << (pScene->getSpaceType() == SpaceType::SPACE_3 ? "space3" : "space2") 
-            <<  std::endl;
-        VG_COST_TIME_LOG(plog::debug) << "Post object recording callback cost time: "
-            << postObjectRecordingCallBackCostTimer.costTimer
-            << "ms, scene id: " << pScene->getID()
-            << ", scene type: " << (pScene->getSpaceType() == SpaceType::SPACE_3 ? "space3" : "space2")
-            << std::endl;
 #endif //DEBUG and VG_ENABLE_COST_TIMER
     }
 
@@ -845,7 +819,7 @@ namespace vg
                         , viewMatrix
                         , projMatrix
 #if defined(DEBUG) && defined(VG_ENABLE_COST_TIMER)
-                        , preparingBuildInDataCostTimer
+                        , &preparingBuildInDataCostTimer
 #endif //DEBUG and VG_ENABLE_COST_TIMER    
                     );    
                 }
@@ -857,7 +831,7 @@ namespace vg
                         , projMatrix
                         , pPreDepthResultTex
 #if defined(DEBUG) && defined(VG_ENABLE_COST_TIMER)
-                        , preparingBuildInDataCostTimer
+                        , &preparingBuildInDataCostTimer
 #endif //DEBUG and VG_ENABLE_COST_TIMER    
                     );
                 }
@@ -866,11 +840,7 @@ namespace vg
                     framebufferWidth,
                     framebufferHeight,
                     &projMatrix,
-                    &viewMatrix,
-#if defined(DEBUG) && defined(VG_ENABLE_COST_TIMER)
-                    &preparingPipelineCostTimer,
-                    &preparingCommandBufferCostTimer,
-#endif //DEBUG and VG_ENABLE_COST_TIMER    
+                    &viewMatrix, 
                     };
 
                 BaseVisualObject::BindResult result;

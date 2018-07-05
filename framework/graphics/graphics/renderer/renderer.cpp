@@ -389,7 +389,10 @@ namespace vg
             sceneInfo.pPostRender != nullptr &&
             sceneInfo.pPostRender->isValidBindToRender() == VG_TRUE;
 #if defined(DEBUG) && defined(VG_ENABLE_COST_TIMER)
+        fd::CostTimer bindSceneCostTimer(fd::CostTimer::TimerType::ONCE);
+        fd::CostTimer recordSceneCostTimer(fd::CostTimer::TimerType::ONCE);
         fd::CostTimer preparingSceneCostTimer(fd::CostTimer::TimerType::ONCE);
+        bindSceneCostTimer.begin();
         preparingSceneCostTimer.begin();
 #endif //DEBUG and VG_ENABLE_COST_TIMER
         if (preDepthEnable)
@@ -431,6 +434,11 @@ namespace vg
         };
 
         m_renderBinder.bind(bindInfo);
+
+#if defined(DEBUG) && defined(VG_ENABLE_COST_TIMER)
+        bindSceneCostTimer.end();
+        recordSceneCostTimer.begin();
+#endif //DEBUG and VG_ENABLE_COST_TIMER
 
         CMDParser::ResultInfo cmdParseResult;
          
@@ -496,7 +504,18 @@ namespace vg
         }
 
 #if defined(DEBUG) && defined(VG_ENABLE_COST_TIMER)
+        recordSceneCostTimer.end();
         preparingSceneCostTimer.end();
+        VG_COST_TIME_LOG(plog::debug) << "Bind scene cost time: " 
+            << bindSceneCostTimer.costTimer 
+            << "ms, scene id: " << pScene->getID() 
+            << ", scene type: " << (pScene->getSpaceType() == SpaceType::SPACE_3 ? "space3" : "space2") 
+            <<  std::endl;
+        VG_COST_TIME_LOG(plog::debug) << "Record scene cost time: " 
+            << recordSceneCostTimer.costTimer 
+            << "ms, scene id: " << pScene->getID() 
+            << ", scene type: " << (pScene->getSpaceType() == SpaceType::SPACE_3 ? "space3" : "space2") 
+            <<  std::endl;
         VG_COST_TIME_LOG(plog::debug) << "Preparing scene cost time: " 
             << preparingSceneCostTimer.costTimer 
             << "ms, scene id: " << pScene->getID() 

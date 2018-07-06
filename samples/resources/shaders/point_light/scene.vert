@@ -45,11 +45,11 @@ void main()
     
     vec4 pos = _buildIn.matrixObjectToWorld * vec4(inPos.xyz, 1.0);
     outNormal = mat3(_buildIn.matrixObjectToWorld) * inNormal.xyz;
-    for(uint i = 0;i < lightData.lightCount && i < MAX_LIGHT_COUNT; ++i)
-    {
-        vec4 lightPos = lightData.lights[i].lightTransform * vec4(0.0, 0.0, 0.0, 1.0);
-        outLightVec[i] = pos.xyz - lightPos.xyz;
-    }
+    // for(uint i = 0;i < lightData.lightCount && i < MAX_LIGHT_COUNT; ++i)
+    // {
+    //     vec4 lightPos = lightData.lights[i].lightTransform * vec4(0.0, 0.0, 0.0, 1.0);
+    //     outLightVec[i] = pos.xyz - lightPos.xyz;
+    // }
     outViewVec = _buildIn.viewPos.xyz - pos.xyz;
 }
 

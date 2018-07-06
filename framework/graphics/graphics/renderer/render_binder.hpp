@@ -135,9 +135,6 @@ namespace vg
             , Matrix4x4 modelMatrix
             , Matrix4x4 viewMatrix
             , Matrix4x4 projMatrix
-#if defined(DEBUG) && defined(VG_ENABLE_COST_TIMER)
-            , fd::CostTimer * pPreparingBuildInDataCostTimer
-#endif //DEBUG and VG_ENABLE_COST_TIMER
             );
 
         void _setBuildInData(BaseVisualObject * pVisualObject
@@ -145,9 +142,6 @@ namespace vg
             , Matrix4x4 viewMatrix
             , Matrix4x4 projMatrix
             , const Texture *pPreDepthResultTex
-#if defined(DEBUG) && defined(VG_ENABLE_COST_TIMER)
-        , fd::CostTimer * pPreparingBuildInDataCostTimer
-#endif //DEBUG and VG_ENABLE_COST_TIMER
         );
 
         void _bindVisualObject(BaseVisualObject *pVisublObject

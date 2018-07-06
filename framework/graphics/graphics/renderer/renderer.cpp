@@ -532,9 +532,6 @@ namespace vg
         };
 
         m_pCommandBuffer->begin(beginInfo);
-        VG_LOG(plog::debug) << "Post begin command buffer for render." << std::endl;
-
-        
     }
 
     void Renderer::_recordCommandBufferForEnd()

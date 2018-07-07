@@ -6,11 +6,14 @@
 #include "graphics/scene/projector.hpp"
 #include "graphics/render_target/pre_depth_target.hpp"
 
-#define VG_LIGHT_DATA_TRANSFORM_NAME "_base"
+#define VG_LIGHT_DATA_TRANSFORM_NAME "_transform"
+#define VG_LIGHT_DATA_PROJECTION_NAME "_projection"
+
 #define VG_LIGHT_TEXTURE_DEPTH_NAME "_tex_depth"
 
 #define VG_LIGHT_DATA_TRANSFORM_LAYOUT_PRIORITY 0
-#define VG_LIGHT_DATA_OTHER_MIN_LAYOUT_PRIORITY 1
+#define VG_LIGHT_DATA_PROJECTION_LAYOUT_PRORITY 1
+#define VG_LIGHT_DATA_OTHER_MIN_LAYOUT_PRIORITY 2
 
 #define VG_LIGHT_TEXTURE_DEPTH_BINDING_PRIORITY 0
 #define VG_LIGHT_TEXTURE_OTHER_MIN_BINDING_PRIORITY 1
@@ -223,6 +226,8 @@ namespace vg
     
     };
 
+    //transform of light
+    #define LIGHT_DATA_BASE_SIZE static_cast<uint32_t>(sizeof(vg::Matrix4x4))
     template <SpaceType SPACE_TYPE>
     class DimLight : public BaseLight, public Object<SPACE_TYPE>
     {

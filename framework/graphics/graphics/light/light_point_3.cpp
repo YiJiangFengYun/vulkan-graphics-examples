@@ -10,10 +10,7 @@ namespace vg
         , uint32_t depthTextureWidth
         , uint32_t depthTextureHeight
         )
-        : Light3<static_cast<uint32_t>(sizeof(vg::Matrix4x4))       //transform of light.
-            + static_cast<uint32_t>(sizeof(vg::Vector4))                                 //for radius
-            , 1u                                                                         //for depth texture
-            >()
+        : Light3()
         , m_radius(radius)
         , m_cubeTargets(depthTextureWidth
             , depthTextureHeight

@@ -7,10 +7,10 @@
 
 namespace vg
 {
-    class LightPoint3 : public Light3<static_cast<uint32_t>(sizeof(vg::Matrix4x4))       //transform of light.
-            + static_cast<uint32_t>(sizeof(vg::Vector4))                                 //for radius
-            , 1u                                                                         //for depth texture
-            >
+    //transform of light + radius
+    #define LIGHT_POINT3_DATA_SIZE LIGHT_DATA_BASE_SIZE + static_cast<uint32_t>(sizeof(vg::Vector4))
+    #define LIGHT_POINT3_TEXTURE_COUNT 1u //depth texture.
+    class LightPoint3 : public Light3<LIGHT_POINT3_DATA_SIZE, LIGHT_POINT3_TEXTURE_COUNT>
     {
     public:
         static const uint32_t DEFAULT_DEPTH_TEXTURE_WIDTH;

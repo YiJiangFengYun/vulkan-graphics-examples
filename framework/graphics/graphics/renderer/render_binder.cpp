@@ -247,7 +247,7 @@ namespace vg
 
         uint32_t lightCount = pScene->getLightCount();
         for (uint32_t i = 0u; i < lightCount; ++i) {
-           Light3 *pLight = dynamic_cast<Light3 *>(pScene->getLightWithIndex(i));
+           auto *pLight = pScene->getLightWithIndex(i);
 
 #if defined(DEBUG) && defined(VG_ENABLE_COST_TIMER)
         exportDepthRenderInfoCostTimer.begin();

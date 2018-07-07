@@ -5,7 +5,8 @@
 
 namespace vg
 {
-    class LightAmbient3 : public Light3
+    extern const LightRegisterInfo LIGHT_AMBIENT3_REGISTER_INFO;
+    class LightAmbient3 : public Light3<LIGHT_AMBIENT3_REGISTER_INFO>
     {
     public:
         LightAmbient3();

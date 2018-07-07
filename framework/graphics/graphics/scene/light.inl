@@ -106,4 +106,71 @@ namespace vg
         };
         setValue(name, sizeInfo, mapDataSizeInfos);
     }
+
+
+    template <const LightRegisterInfo &registerInfo>
+    LightRegistrable<registerInfo>::LightRegistrable()
+    {
+
+    }
+
+    // template <const LightRegisterInfo &registerInfo>
+    // const LightRegisterInfo RegistrableLight<registerInfo>::registerInfo = registerInfo;
+
+
+    template <SpaceType SPACE_TYPE>
+    DimLight<SPACE_TYPE>::DimLight()
+        : Object<SPACE_TYPE>()
+        , BaseLight()
+    {
+        m_objectType = ObjectType::LIGHT;
+    }
+
+    template <SpaceType SPACE_TYPE>
+    void DimLight<SPACE_TYPE>::_beginRender()
+    {
+        //sync transfrom data.
+        auto matrix = m_pTransform->getMatrixLocalToWorld();
+        if (m_data.hasData(VG_LIGHT_DATA_TRANSFORM_NAME) == VG_FALSE) {
+            LightDataInfo dataInfo = {
+                VG_LIGHT_DATA_TRANSFORM_LAYOUT_PRIORITY
+            };
+            m_data.addData(VG_LIGHT_DATA_TRANSFORM_NAME, dataInfo, matrix);
+            m_dataChanged = VG_TRUE;
+        } else {
+            m_data.setData(VG_LIGHT_DATA_TRANSFORM_NAME, matrix);
+        }
+        m_dataContentChanged = VG_TRUE;
+        m_dataContentChanges[VG_LIGHT_DATA_TRANSFORM_NAME] = VG_TRUE;
+        _apply();
+
+
+    }
+
+    template <SpaceType SPACE_TYPE>
+    void DimLight<SPACE_TYPE>::_endRender()
+    {
+
+    }
+
+    template <SpaceType SPACE_TYPE, const LightRegisterInfo &registerInfo>
+    Light<SPACE_TYPE, registerInfo>::Light()
+        : DimLight<SPACE_TYPE>()
+        , LightRegistrable<registerInfo>()
+    {
+        
+    }
+
+    template <SpaceType SPACE_TYPE, const LightRegisterInfo &registerInfo>
+    LightExportInfo Light<SPACE_TYPE, registerInfo>::getExportInfo() const
+    {
+        LightExportInfo exportInfo;
+        exportInfo.dataSize = static_cast<uint32_t>(m_dataMemoryBuffer.size());
+        exportInfo.pData = static_cast<const void *>(m_dataMemoryBuffer.data());
+        exportInfo.textureCount = static_cast<uint32_t>(m_textureInfos.size());
+        exportInfo.pTextureInfos = m_textureInfos.data();
+        return exportInfo;
+    }
+
+    
 } //vg

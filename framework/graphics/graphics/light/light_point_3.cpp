@@ -2,9 +2,15 @@
 
 namespace vg
 {
+    extern const LightRegisterInfo LIGHT_POINT3_REGISTER_INFO = {
+        static_cast<uint32_t>(sizeof(vg::Matrix4x4)) +       //transform of light.
+            static_cast<uint32_t>(sizeof(vg::Vector4)),      //for radius
+        1u,
+    };
     const uint32_t LightPoint3::DEFAULT_DEPTH_TEXTURE_WIDTH = 1280u;
     const uint32_t LightPoint3::DEFAULT_DEPTH_TEXTURE_HEIGHT = 1280u;
     const float LightPoint3::DEFAULT_RADIUS = 100.0f;
+
     LightPoint3::LightPoint3(float radius
         , uint32_t depthTextureWidth
         , uint32_t depthTextureHeight

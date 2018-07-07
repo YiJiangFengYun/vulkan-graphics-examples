@@ -304,6 +304,29 @@ namespace vg
         return *this;
     }
 
+    LightRegisterInfo::LightRegisterInfo(uint32_t dataSize
+        , uint32_t textureCount
+        )
+        : dataSize(dataSize)
+        , textureCount(textureCount)
+    {
+
+    }
+
+    LightRegisterInfo::LightRegisterInfo(const LightRegisterInfo &target)
+        : dataSize(target.dataSize)
+        , textureCount(target.textureCount)
+    {
+
+    }
+        
+    LightRegisterInfo &LightRegisterInfo::operator=(const LightRegisterInfo &target)
+    {
+        dataSize = target.dataSize;
+        textureCount = target.textureCount;
+        return *this;
+    }
+
 
 //Light
     BaseLight::BaseLight()
@@ -324,16 +347,6 @@ namespace vg
     void BaseLight::apply()
     {
         _apply();
-    }
-
-    LightExportInfo BaseLight::getExportInfo() const
-    {
-        LightExportInfo exportInfo;
-        exportInfo.dataSize = static_cast<uint32_t>(m_dataMemoryBuffer.size());
-        exportInfo.pData = static_cast<const void *>(m_dataMemoryBuffer.data());
-        exportInfo.textureCount = static_cast<uint32_t>(m_textureInfos.size());
-        exportInfo.pTextureInfos = m_textureInfos.data();
-        return exportInfo;
     }
 
     BaseLight::DataSortInfo::DataSortInfo(std::string name
@@ -458,43 +471,4 @@ namespace vg
             }
         }
     }
-
-    template <SpaceType SPACE_TYPE>
-    Light<SPACE_TYPE>::Light()
-        : BaseLight()
-        , Object<SPACE_TYPE>()
-    {
-        m_objectType = ObjectType::LIGHT;
-    }
-
-    template <SpaceType SPACE_TYPE>
-    void Light<SPACE_TYPE>::_beginRender()
-    {
-        //sync transfrom data.
-        auto matrix = m_pTransform->getMatrixLocalToWorld();
-        if (m_data.hasData(VG_LIGHT_DATA_TRANSFORM_NAME) == VG_FALSE) {
-            LightDataInfo dataInfo = {
-                VG_LIGHT_DATA_TRANSFORM_LAYOUT_PRIORITY
-            };
-            m_data.addData(VG_LIGHT_DATA_TRANSFORM_NAME, dataInfo, matrix);
-            m_dataChanged = VG_TRUE;
-        } else {
-            m_data.setData(VG_LIGHT_DATA_TRANSFORM_NAME, matrix);
-        }
-        m_dataContentChanged = VG_TRUE;
-        m_dataContentChanges[VG_LIGHT_DATA_TRANSFORM_NAME] = VG_TRUE;
-        _apply();
-
-
-    }
-
-    template <SpaceType SPACE_TYPE>
-    void Light<SPACE_TYPE>::_endRender()
-    {
-
-    }
-
-    //template instantiation
-    template class Light<SpaceType::SPACE_2>;
-    template class Light<SpaceType::SPACE_3>;
 }

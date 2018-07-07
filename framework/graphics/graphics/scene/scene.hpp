@@ -63,7 +63,7 @@ namespace vg
         using ProjectorType = Projector<SPACE_TYPE>;
         using VisualObjectType = VisualObject<SPACE_TYPE>;
         using CameraType = Camera<SPACE_TYPE>;
-        using LightType = Light<SPACE_TYPE>;
+        using LightType = DimLight<SPACE_TYPE>;
         using TransformType = Transform<SPACE_TYPE>;
         using BoundsType = fd::Bounds<typename SpaceTypeInfo<SPACE_TYPE>::PointType>;
 

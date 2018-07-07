@@ -3,6 +3,8 @@
 
 #include "graphics/texture/texture.hpp"
 #include "graphics/scene/object.hpp"
+#include "graphics/scene/projector.hpp"
+#include "graphics/render_target/pre_depth_target.hpp"
 
 #define VG_LIGHT_DATA_TRANSFORM_NAME "_base"
 #define VG_LIGHT_TEXTURE_DEPTH_NAME "_tex_depth"
@@ -140,12 +142,35 @@ namespace vg
         LightExportInfo &operator=(const LightExportInfo &target);
     };
 
+    struct LightRegisterInfo {
+        uint32_t dataSize;
+        uint32_t textureCount;
+        LightRegisterInfo(uint32_t dataSize = 0u
+            , uint32_t textureCount = 0u
+            );
+        LightRegisterInfo(const LightRegisterInfo &target);
+        LightRegisterInfo &operator=(const LightRegisterInfo &target);
+    };
+
+    struct LightDepthRenderInfo
+    {
+        uint32_t renderCount;
+        const BaseProjector *const *pProjectors;
+        const PreDepthTarget *const *pDepthTargets;
+
+        LightDepthRenderInfo(uint32_t renderCount = 0u
+            , const BaseProjector *const *pProjectors = nullptr
+            , const PreDepthTarget *const *pDepthTargets = nullptr
+            );
+    };
+
     class BaseLight : public Base
     {
     public:
         BaseLight();
         void apply();
-        LightExportInfo getExportInfo() const;
+        virtual LightExportInfo getExportInfo() const = 0;
+        virtual LightDepthRenderInfo getDepthRenderInfo() const = 0;
     protected:
         LightData m_data;
         Bool32 m_dataChanged;
@@ -188,14 +213,34 @@ namespace vg
         virtual void _apply();
     };
 
-    template <SpaceType SPACE_TYPE>
-    class Light : public BaseLight, public Object<SPACE_TYPE>
+    template <const LightRegisterInfo &registerInfo>
+    class LightRegistrable
     {
     public:
-        Light();
+        // static const LightRegisterInfo registerInfo;
+        LightRegistrable();
+    protected:
+    
+    };
+
+    template <SpaceType SPACE_TYPE>
+    class DimLight : public Object<SPACE_TYPE>, public BaseLight
+    {
+    public:
+        DimLight();
     protected:
         virtual void _beginRender() override;
         virtual void _endRender() override;
+    };
+
+    template <SpaceType SPACE_TYPE, const LightRegisterInfo &registerInfo>
+    class Light : public DimLight<SPACE_TYPE>, public LightRegistrable<registerInfo>
+    {
+    public:
+        Light();
+        virtual LightExportInfo getExportInfo() const override;
+    protected:
+        
     };
 } //namespace kgs
 

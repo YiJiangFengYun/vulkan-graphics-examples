@@ -6,7 +6,8 @@
 
 namespace vg
 {
-    class Light2 : public Light<SpaceType::SPACE_2>
+    template <const LightRegisterInfo &registerInfo>
+    class Light2 : public Light<SpaceType::SPACE_2, registerInfo>
     {
     public:
         Light2();
@@ -14,4 +15,5 @@ namespace vg
 
 } //namespace kgs
 
+#include "graphics/scene/light_2.inl"
 #endif // !VG_LIGHT_2_H

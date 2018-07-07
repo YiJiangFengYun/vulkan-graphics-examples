@@ -6,7 +6,8 @@
 
 namespace vg
 {
-    class LightSpot3 : public Light3
+    extern const LightRegisterInfo LIGHT_SPOT3_REGISTER_INFO;
+    class LightSpot3 : public Light3<LIGHT_SPOT3_REGISTER_INFO>
     {
     public:
         static const uint32_t DEFAULT_DEPTH_TEXTURE_WIDTH;

@@ -6,8 +6,8 @@
 
 namespace vg
 {
-    template <const LightRegisterInfo &registerInfo>
-    class Light2 : public Light<SpaceType::SPACE_2, registerInfo>
+    template <uint32_t DATA_SIZE, uint32_t TEXTURE_COUNT>
+    class Light2 : public Light<SpaceType::SPACE_2, DATA_SIZE, TEXTURE_COUNT>
     {
     public:
         Light2();

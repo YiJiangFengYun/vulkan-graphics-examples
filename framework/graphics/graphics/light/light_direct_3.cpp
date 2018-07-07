@@ -2,7 +2,6 @@
 
 namespace vg
 {
-    extern const LightRegisterInfo LIGHT_DIRECT3_REGISTER_INFO = {};
     LightDirect3::LightDirect3()
         : Light3()
     {

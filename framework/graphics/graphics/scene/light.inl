@@ -108,14 +108,14 @@ namespace vg
     }
 
 
-    template <const LightRegisterInfo &registerInfo>
-    LightRegistrable<registerInfo>::LightRegistrable()
+    template <uint32_t DATA_SIZE, uint32_t TEXTURE_COUNT>
+    LightRegistrable<DATA_SIZE, TEXTURE_COUNT>::LightRegistrable()
     {
 
     }
 
-    // template <const LightRegisterInfo &registerInfo>
-    // const LightRegisterInfo RegistrableLight<registerInfo>::registerInfo = registerInfo;
+    template <uint32_t DATA_SIZE, uint32_t TEXTURE_COUNT>
+    const LightRegisterInfo LightRegistrable<DATA_SIZE, TEXTURE_COUNT>::registerInfo = {DATA_SIZE, TEXTURE_COUNT};
 
 
     template <SpaceType SPACE_TYPE>
@@ -153,16 +153,16 @@ namespace vg
 
     }
 
-    template <SpaceType SPACE_TYPE, const LightRegisterInfo &registerInfo>
-    Light<SPACE_TYPE, registerInfo>::Light()
+    template <SpaceType SPACE_TYPE, uint32_t DATA_SIZE, uint32_t TEXTURE_COUNT>
+    Light<SPACE_TYPE, DATA_SIZE, TEXTURE_COUNT>::Light()
         : DimLight<SPACE_TYPE>()
-        , LightRegistrable<registerInfo>()
+        , LightRegistrable<DATA_SIZE, TEXTURE_COUNT>()
     {
         
     }
 
-    template <SpaceType SPACE_TYPE, const LightRegisterInfo &registerInfo>
-    LightExportInfo Light<SPACE_TYPE, registerInfo>::getExportInfo() const
+    template <SpaceType SPACE_TYPE, uint32_t DATA_SIZE, uint32_t TEXTURE_COUNT>
+    LightExportInfo Light<SPACE_TYPE, DATA_SIZE, TEXTURE_COUNT>::getExportInfo() const
     {
         LightExportInfo exportInfo;
         exportInfo.dataSize = static_cast<uint32_t>(m_dataMemoryBuffer.size());

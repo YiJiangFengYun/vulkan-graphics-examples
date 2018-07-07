@@ -6,8 +6,10 @@
 
 namespace vg
 {
-    extern const LightRegisterInfo LIGHT_SPOT3_REGISTER_INFO;
-    class LightSpot3 : public Light3<LIGHT_SPOT3_REGISTER_INFO>
+    class LightSpot3 : public Light3<static_cast<uint32_t>(sizeof(vg::Matrix4x4))       //transform of light.
+            + static_cast<uint32_t>(sizeof(vg::Vector4))                                 //for radius
+            , 1u                                                                         //for depth texture
+            >
     {
     public:
         static const uint32_t DEFAULT_DEPTH_TEXTURE_WIDTH;

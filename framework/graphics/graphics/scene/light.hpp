@@ -213,18 +213,18 @@ namespace vg
         virtual void _apply();
     };
 
-    template <const LightRegisterInfo &registerInfo>
+    template <uint32_t DATA_SIZE, uint32_t TEXTURE_COUNT>
     class LightRegistrable
     {
     public:
-        // static const LightRegisterInfo registerInfo;
+        static const LightRegisterInfo registerInfo;
         LightRegistrable();
     protected:
     
     };
 
     template <SpaceType SPACE_TYPE>
-    class DimLight : public Object<SPACE_TYPE>, public BaseLight
+    class DimLight : public BaseLight, public Object<SPACE_TYPE>
     {
     public:
         DimLight();
@@ -233,8 +233,8 @@ namespace vg
         virtual void _endRender() override;
     };
 
-    template <SpaceType SPACE_TYPE, const LightRegisterInfo &registerInfo>
-    class Light : public DimLight<SPACE_TYPE>, public LightRegistrable<registerInfo>
+    template <SpaceType SPACE_TYPE, uint32_t DATA_SIZE, uint32_t TEXTURE_COUNT>
+    class Light : public DimLight<SPACE_TYPE>, public LightRegistrable<DATA_SIZE, TEXTURE_COUNT>
     {
     public:
         Light();

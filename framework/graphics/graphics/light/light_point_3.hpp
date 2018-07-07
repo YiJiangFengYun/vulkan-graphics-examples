@@ -13,13 +13,13 @@ namespace vg
         static const uint32_t DEFAULT_DEPTH_TEXTURE_WIDTH;
         static const uint32_t DEFAULT_DEPTH_TEXTURE_HEIGHT;
         static const float DEFAULT_RADIUS;
-        LightPoint3();
-        LightPoint3(float radius = 0.0f
-            , uint32_t depthTextureWidth = 0u
-            , uint32_t depthTextureHeight = 0u
+        LightPoint3(float radius = DEFAULT_RADIUS
+            , uint32_t depthTextureWidth = DEFAULT_DEPTH_TEXTURE_WIDTH
+            , uint32_t depthTextureHeight = DEFAULT_DEPTH_TEXTURE_HEIGHT
             );
         virtual LightDepthRenderInfo getDepthRenderInfo() const override;
     protected:
+        float m_radius;
         LightDepthCubeTargets m_cubeTargets;
         std::array<std::shared_ptr<Projector3>, static_cast<size_t>(CubemapFace::RANGE_SIZE)> m_pProjectors;
         std::array<const Projector3 *, static_cast<size_t>(CubemapFace::RANGE_SIZE)> m_refProjectors;

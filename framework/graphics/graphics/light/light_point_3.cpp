@@ -3,22 +3,14 @@
 namespace vg
 {
     const uint32_t LightPoint3::DEFAULT_DEPTH_TEXTURE_WIDTH = 1280u;
-    const uint32_t LightPoint3::DEFAULT_DEPTH_TEXTURE_HEIGHT = 720u;
+    const uint32_t LightPoint3::DEFAULT_DEPTH_TEXTURE_HEIGHT = 1280u;
     const float LightPoint3::DEFAULT_RADIUS = 100.0f;
-    LightPoint3::LightPoint3()
-        : LightPoint3(DEFAULT_RADIUS
-            , DEFAULT_DEPTH_TEXTURE_WIDTH
-            , DEFAULT_DEPTH_TEXTURE_HEIGHT
-            )
-    {
-        
-    }
-
     LightPoint3::LightPoint3(float radius
         , uint32_t depthTextureWidth
         , uint32_t depthTextureHeight
         )
         : Light3()
+        , m_radius(radius)
         , m_cubeTargets(depthTextureWidth
             , depthTextureHeight
             )
@@ -138,7 +130,7 @@ namespace vg
             VG_LIGHT_TEXTURE_DEPTH_BINDING_PRIORITY,
             m_cubeTargets.getDepthTargetTexture(),
             };
-        if (m_data.hasData(VG_LIGHT_TEXTURE_DEPTH_NAME) == VG_FALSE)
+        if (m_data.hasTexture(VG_LIGHT_TEXTURE_DEPTH_NAME) == VG_FALSE)
         {
             m_data.addTexture(VG_LIGHT_TEXTURE_DEPTH_NAME, texInfo);
         } else {

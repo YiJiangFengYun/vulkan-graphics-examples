@@ -234,8 +234,8 @@ namespace vg
     public:
         DimLight();
     protected:
-        virtual void _beginRender() override;
-        virtual void _endRender() override;
+        virtual void _beginRender();
+        virtual void _endRender();
     };
 
     template <SpaceType SPACE_TYPE, uint32_t DATA_SIZE, uint32_t TEXTURE_COUNT>

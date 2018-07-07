@@ -6,6 +6,7 @@
 
 namespace vg
 {
+    #define LIGHT_SPOT3_DATA_RADIUS_NAME "light_radius"
     //transform of light + projection of light + radius
     #define LIGHT_SPOT3_DATA_SIZE LIGHT_DATA_BASE_SIZE + + static_cast<uint32_t>(sizeof(vg::Matrix4x4)) + static_cast<uint32_t>(sizeof(vg::Vector4))
     #define LIGHT_SPOT3_TEXTURE_COUNT 1u //depth texture.
@@ -29,6 +30,8 @@ namespace vg
         const LightDepthTarget2D *m_refDepthTarget;
         std::shared_ptr<Projector3> m_pProjector;
         const Projector3 *m_refProjector;
+
+        virtual void _beginRender();
     };
 } //vg
 

@@ -28,18 +28,18 @@ namespace vg
         m_refProjector = m_pProjector.get();
 
         //add radius to lgiht data
-        if (m_data.hasData("light_radius") == VG_FALSE)
+        if (m_data.hasData(LIGHT_SPOT3_DATA_RADIUS_NAME) == VG_FALSE)
         {
             LightDataInfo info = {
                 VG_LIGHT_DATA_OTHER_MIN_LAYOUT_PRIORITY,
             };
-            m_data.addData("light_radius", info, radius);
+            m_data.addData(LIGHT_SPOT3_DATA_RADIUS_NAME, info, radius);
             m_dataChanged = VG_TRUE;
         } else {
-            m_data.setData("light_radius", radius);
+            m_data.setData(LIGHT_SPOT3_DATA_RADIUS_NAME, radius);
         }
         m_dataContentChanged = VG_TRUE;
-        m_dataContentChanges["light_radius"] = VG_TRUE;
+        m_dataContentChanges[LIGHT_SPOT3_DATA_RADIUS_NAME] = VG_TRUE;
 
         //add the depth texture to light textures.
         LightTextureInfo texInfo = {
@@ -64,5 +64,23 @@ namespace vg
             reinterpret_cast<const PreDepthTarget *const *>(&m_refDepthTarget),
         };
         return info;
+    }
+
+    void LightSpot3::_beginRender()
+    {
+        //sync projection data.
+        auto matrix = m_space.getVulkanProjMatrix(m_pProjector->getProjMatrix());
+        if (m_data.hasData(VG_LIGHT_DATA_PROJECTION_NAME) == VG_FALSE) {
+            LightDataInfo dataInfo = {
+                VG_LIGHT_DATA_PROJECTION_LAYOUT_PRORITY
+            };
+            m_data.addData(VG_LIGHT_DATA_PROJECTION_NAME, dataInfo, matrix);
+            m_dataChanged = VG_TRUE;
+        } else {
+            m_data.setData(VG_LIGHT_DATA_PROJECTION_NAME, matrix);
+        }
+        m_dataContentChanged = VG_TRUE;
+        m_dataContentChanges[VG_LIGHT_DATA_PROJECTION_NAME] = VG_TRUE;
+        _apply();
     }
 } //vg

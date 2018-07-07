@@ -1,4 +1,4 @@
-#include "point_light/window.hpp"
+#include "spot_light/window.hpp"
 
 #include <iostream>
 
@@ -13,7 +13,7 @@ Window::Window(uint32_t width
         )
     , m_assimpScene()
     , m_pMaterial()
-    , m_pPointLight()
+    , m_pSpotLight()
 {
     _init();
 }
@@ -25,7 +25,7 @@ Window::Window(std::shared_ptr<GLFWwindow> pWindow
         )
     , m_assimpScene()
     , m_pMaterial()
-    , m_pPointLight()
+    , m_pSpotLight()
 {
     _init();
 }
@@ -69,9 +69,8 @@ void Window::_createModel()
 
 void Window::_createLights()
 {
-    m_pPointLight = std::shared_ptr<vg::LightPoint3>{new vg::LightPoint3(10.0f
-        , m_width, m_height)};
-    m_pPointLight->getTransform()->setLocalPosition(vg::Vector3(25.0f, 5.0f, 5.0f));
+    m_pSpotLight = std::shared_ptr<vg::LightSpot3>{ new vg::LightSpot3()};
+    m_pSpotLight->getTransform()->setLocalPosition(vg::Vector3(25.0f, 5.0f, 5.0f));
 }
 
 void Window::_createMaterial()
@@ -110,6 +109,7 @@ void Window::_createMaterial()
             VG_PASS_OTHER_DATA_MIN_LAYOUT_PRIORITY,
             vk::ShaderStageFlagBits::eVertex,
         };
+        //view poss
         pPass->addData("other_data", otherDataInfo, m_pCamera->getTransform()->getPosition());
         pPass->apply();
         
@@ -129,7 +129,7 @@ void Window::_initScene()
     }
 
     {
-        const auto &light_type_info = typeid(vg::LightPoint3);
+        const auto &light_type_info = typeid(vg::LightSpot3);
         vg::SceneLightRegisterInfo registerInfo = {
             0u,
             MAX_LIGHT_COUNT,
@@ -137,7 +137,7 @@ void Window::_initScene()
             vg::LightPoint3::registerInfo.textureCount,
         };
         m_pScene->registerLight(light_type_info, registerInfo);
-        m_pScene->addLight(m_pPointLight.get());
+        m_pScene->addLight(m_pSpotLight.get());
     }
 }
 

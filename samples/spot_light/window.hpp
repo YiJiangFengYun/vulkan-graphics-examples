@@ -22,7 +22,7 @@ private:
     sampleslib::AssimpScene m_assimpScene;
     std::shared_ptr<vg::Material> m_pMaterial;
 
-    std::shared_ptr<vg::LightPoint3> m_pPointLight;
+    std::shared_ptr<vg::LightSpot3> m_pSpotLight;
 
     virtual void _init() override;
     virtual void _initState() override;

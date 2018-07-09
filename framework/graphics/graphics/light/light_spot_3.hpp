@@ -31,7 +31,7 @@ namespace vg
         std::shared_ptr<Projector3> m_pProjector;
         const Projector3 *m_refProjector;
 
-        virtual void _beginRender();
+        virtual void _beginRender() override;
     };
 } //vg
 

@@ -320,6 +320,7 @@ namespace vg
             return lightInfo1.bindingPriority - lightInfo2.bindingPriority;
         });
 
+        uint32_t vectorSize = static_cast<uint32_t>(sizeof(Vector4));
         //count total size of light data.        
         //count total texture binding count.
         uint32_t totalSize = 0u;
@@ -330,7 +331,7 @@ namespace vg
             uint32_t maxLightCount = lightInfo.maxCount;
             uint32_t textureCount = lightInfo.textureCount;
             //space for count variable.
-            totalSize += static_cast<uint32_t>(sizeof(uint32_t));
+            totalSize += vectorSize;
             //space for data of this type lights.
             totalSize += lightInfo.dataSize * maxLightCount;
             totalTextureBindingCount += textureCount;
@@ -371,7 +372,7 @@ namespace vg
             uint32_t lightCount = static_cast<uint32_t>(lightGroupSize);
             //copy data to buffer
             memcpy(memory.data() + offset, &lightCount, sizeof(uint32_t));
-            offset += static_cast<uint32_t>(sizeof(uint32_t));
+            offset += vectorSize;
             for (uint32_t lightIndex = 0u; lightIndex < lightGroupSize; ++lightIndex)
             {
                 auto pLight = *(lightGroup + lightIndex);
@@ -409,7 +410,7 @@ namespace vg
                 lightPassTextureInfo.pTextures = lightTextureInfos.data();
                 ++lightBindingOffset;
             }
-            lightTypeOffset += static_cast<uint32_t>(sizeof(uint32_t));
+            lightTypeOffset += vectorSize;
             lightTypeOffset += lightInfo.dataSize * lightInfo.maxCount;
             //offet should be entire block memory for last light types because light count may be is less than max light count.
             offset = lightTypeOffset;

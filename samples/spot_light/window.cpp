@@ -138,8 +138,8 @@ void Window::_initScene()
         vg::SceneLightRegisterInfo registerInfo = {
             0u,
             MAX_LIGHT_COUNT,
-            vg::LightPoint3::registerInfo.dataSize,
-            vg::LightPoint3::registerInfo.textureCount,
+            vg::LightSpot3::registerInfo.dataSize,
+            vg::LightSpot3::registerInfo.textureCount,
         };
         m_pScene->registerLight(light_type_info, registerInfo);
         m_pScene->addLight(m_pSpotLight.get());

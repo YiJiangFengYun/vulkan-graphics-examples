@@ -92,8 +92,8 @@ void Window::_createMaterial()
         auto pPass = pMaterial->getMainPass();
         
         //shader
-        pShader->load("shaders/point_light/scene.vert.spv",
-            "shaders/point_light/scene.frag.spv");
+        pShader->load("shaders/spot_light/scene.vert.spv",
+            "shaders/spot_light/scene.frag.spv");
         //pass
         vg::Pass::BuildInDataInfo::Component buildInDataCmps[2] = {
                 {vg::Pass::BuildInDataType::MATRIX_OBJECT_TO_NDC},

@@ -78,8 +78,13 @@ void Window::_createMaterial()
     auto & pApp = vg::pApp;
     {
         //material
+        vg::Material::MaterialCreateInfo createInfo = {
+            VG_FALSE,
+            VG_TRUE,
+        };
+
         auto & pMaterial = m_pMaterial;
-        pMaterial = std::shared_ptr<vg::Material>(new vg::Material());
+        pMaterial = std::shared_ptr<vg::Material>(new vg::Material(createInfo));
         pMaterial->setRenderPriority(0u);
         pMaterial->setRenderQueueType(vg::MaterialShowType::OPAQUE);
 

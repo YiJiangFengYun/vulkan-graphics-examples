@@ -395,6 +395,10 @@ namespace vg
         bindSceneCostTimer.begin();
         preparingSceneCostTimer.begin();
 #endif //DEBUG and VG_ENABLE_COST_TIMER
+        if (lightingEnable)
+        {
+            m_pLightDepthCmdBuffer->begin();
+        }
         if (preDepthEnable)
         {
             m_pPreDepthCmdBuffer->begin();
@@ -491,6 +495,10 @@ namespace vg
             resultInfo.drawCount += cmdParseResult.drawCount;
         }
 
+        if (lightingEnable)
+        {
+            m_pLightDepthCmdBuffer->end();
+        }
         if (preDepthEnable)
         {
             m_pPreDepthCmdBuffer->end();

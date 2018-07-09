@@ -1198,7 +1198,6 @@ namespace vg
 
         const auto framebufferWidth = pRenderTarget->getFramebufferWidth();
         const auto framebufferHeight = pRenderTarget->getFramebufferHeight();
-        const auto renderArea = pRenderTarget->getRenderArea();
         RenderPassBeginInfo beginInfo;
         beginInfo.pRenderPass = pRenderPass;
         beginInfo.pFramebuffer = pFramebuffer;

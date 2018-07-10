@@ -118,6 +118,7 @@ namespace vg
             , uint32_t presentQueueCount
         );
         void _createCommandPool();
+        void _reportDeviceInfo();
     };
 
     extern std::shared_ptr<Application> pApp;    

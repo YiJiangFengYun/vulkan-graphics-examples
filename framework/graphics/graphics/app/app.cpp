@@ -160,6 +160,7 @@ namespace vg
             , presentQueueCount
         );
         _createCommandPool();
+        _reportDeviceInfo();
     }
 
     std::string Application::getAppName() const
@@ -562,6 +563,14 @@ namespace vg
             m_graphicsFamily
         };
         m_pCommandPoolForResetBuffer = fd::createCommandPool(m_pDevice.get(), createInfoForResetBuffer);
+    }
+
+    void Application::_reportDeviceInfo()
+    {
+        auto properties = m_pPhysicalDevice->getProperties();
+        auto limits = properties.limits;
+        VG_LOG(plog::info) << "Physical device limits--max vertex output components: " << limits.maxVertexOutputComponents << std::endl;
+        VG_LOG(plog::info) << "Physical device limits--max fragment input components: " << limits.maxFragmentInputComponents << std::endl;
     }
 
     std::shared_ptr<Application> pApp = nullptr;

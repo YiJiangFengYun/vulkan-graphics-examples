@@ -217,9 +217,9 @@ namespace vg
             cmdInfo.pRenderPassInfo = &trunkRenderPassInfo;
             result.pPreDepthCmdBuffer->addCmd(cmdInfo);
         } 
-        else if (m_pPreDepthPass == nullptr)
+        else if (m_pPreDepthPass == nullptr && result.pPreDepthCmdBuffer != nullptr)
         {
-            VG_LOG(plog::warning) << "Pre depth cmd buffer is empty when pre depth pass of material exist. " << std::endl;
+            VG_LOG(plog::warning) << "Pre depth pass of material is empty when pre depth cmd buffer exist. " << std::endl;
         }
 
         _beginBind(info, pResult);

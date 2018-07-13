@@ -304,3 +304,8 @@ build/
 .vscode/
 *.discard
 *.spv
+
+
+# generated files.
+framework/graphics/graphics/pre_depth_pass/pre_depth_frag_code.c
+framework/graphics/graphics/pre_depth_pass/pre_depth_vert_code.c

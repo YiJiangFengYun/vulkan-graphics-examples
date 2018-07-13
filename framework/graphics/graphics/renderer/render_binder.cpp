@@ -387,8 +387,8 @@ namespace vg
             //create pass texture infos.
             for (uint32_t textureIndex = 0; textureIndex < lightInfo.textureCount; ++textureIndex)
             {
-                auto lightTextureInfos = m_lightTextureInfos[lightBindingOffset];
-                auto lightPassTextureInfo = m_lightPassTextureInfos[lightBindingOffset];
+                auto &lightTextureInfos = m_lightTextureInfos[lightBindingOffset];
+                auto &lightPassTextureInfo = m_lightPassTextureInfos[lightBindingOffset];
                 lightPassTextureInfo.textureCount = lightCount;
                 lightPassTextureInfo.descriptorType = vg::ImageDescriptorType::COMBINED_IMAGE_SAMPLER;
                 lightPassTextureInfo.stageFlags = vk::ShaderStageFlagBits::eFragment;
@@ -396,7 +396,7 @@ namespace vg
                 if (static_cast<uint32_t>(lightTextureInfos.size()) < lightCount)
                     lightTextureInfos.resize(static_cast<uint32_t>(lightCount));
                 for (uint32_t lightIndex = 0; lightIndex < lightCount; ++lightIndex) {
-                    auto pLight = *(lightGroup + lightIndex);
+                    auto &pLight = *(lightGroup + lightIndex);
                     auto lightExportInfo = pLight->getExportInfo();
                     //chek if light count of the light is qual to light count of its type registed.
                     if (lightExportInfo.textureCount != lightInfo.textureCount)
@@ -1124,7 +1124,7 @@ namespace vg
                         pPass->setBuffer(VG_PASS_LIGHT_DATA_BUFFER_NAME, info);
                     }
                     //light textures.
-                    auto lightPassTextureInfos = m_lightPassTextureInfos;
+                    auto &lightPassTextureInfos = m_lightPassTextureInfos;
                     uint32_t textureInfoCount = static_cast<uint32_t>(lightPassTextureInfos.size());
                     for (uint32_t textureInfoIndex = 0u; textureInfoIndex < textureInfoCount; ++textureInfoIndex)
                     {

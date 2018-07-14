@@ -369,6 +369,7 @@ namespace vg
                 lightGroup = reinterpret_cast<BaseLight * const *>(lightGroup3.data());
             }
 
+            uint32_t maxLightCount = lightInfo.maxCount;
             uint32_t lightCount = static_cast<uint32_t>(lightGroupSize);
             //copy data to buffer
             memcpy(memory.data() + offset, &lightCount, sizeof(uint32_t));
@@ -389,13 +390,16 @@ namespace vg
             {
                 auto &lightTextureInfos = m_lightTextureInfos[lightBindingOffset];
                 auto &lightPassTextureInfo = m_lightPassTextureInfos[lightBindingOffset];
-                lightPassTextureInfo.textureCount = lightCount;
+                lightPassTextureInfo.textureCount = maxLightCount;
                 lightPassTextureInfo.descriptorType = vg::ImageDescriptorType::COMBINED_IMAGE_SAMPLER;
                 lightPassTextureInfo.stageFlags = vk::ShaderStageFlagBits::eFragment;
                 lightPassTextureInfo.bindingPriority = VG_PASS_LIGHT_TEXTURE_MIN_BINDING_PRIORITY + lightBindingOffset;
-                if (static_cast<uint32_t>(lightTextureInfos.size()) < lightCount)
-                    lightTextureInfos.resize(static_cast<uint32_t>(lightCount));
-                for (uint32_t lightIndex = 0; lightIndex < lightCount; ++lightIndex) {
+
+                if (static_cast<uint32_t>(lightTextureInfos.size()) < maxLightCount)
+                    lightTextureInfos.resize(static_cast<size_t>(maxLightCount));
+
+                uint32_t lightIndex;
+                for (lightIndex = 0u; lightIndex < lightCount; ++lightIndex) {
                     auto &pLight = *(lightGroup + lightIndex);
                     auto lightExportInfo = pLight->getExportInfo();
                     //chek if light count of the light is qual to light count of its type registed.
@@ -407,6 +411,13 @@ namespace vg
                     lightTextureInfos[lightIndex].pSampler = textureInfo.pSampler;
                     lightTextureInfos[lightIndex].imageLayout = textureInfo.imageLayout;
                 }
+                for (; lightIndex < maxLightCount; ++lightIndex) {
+                    lightTextureInfos[lightIndex].pTexture = nullptr;
+                    lightTextureInfos[lightIndex].pImageView = nullptr;
+                    lightTextureInfos[lightIndex].pSampler = nullptr;
+                    lightTextureInfos[lightIndex].imageLayout = vk::ImageLayout::eUndefined;
+                }
+
                 lightPassTextureInfo.pTextures = lightTextureInfos.data();
                 ++lightBindingOffset;
             }

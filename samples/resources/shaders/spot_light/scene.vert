@@ -24,7 +24,10 @@ struct SpotLight
 };
 
 layout (binding = 1) uniform LightData {
-    float lightCount;
+    uint lightCount;
+    float _dummy_y;
+    float _dummy_z;
+    float _dummy_w;
     SpotLight lights[MAX_LIGHT_COUNT];
 } lightData;
 
@@ -48,13 +51,13 @@ void main()
     vec4 pos = _buildIn.matrixObjectToWorld * vec4(inPos.xyz, 1.0);
     outNormal = mat3(_buildIn.matrixObjectToWorld) * inNormal.xyz;
     outViewVec = _buildIn.viewPos.xyz - pos.xyz;
-     // for(uint i = 0;i < lightData.lightCount && i < MAX_LIGHT_COUNT; ++i)
-    // {
-    //     vec4 lightPos = lightData.lights[i].lightTransform * vec4(0.0, 0.0, 0.0, 1.0);
-    //     outLightVec[i] = pos.xyz - lightPos.xyz;
-     //    mat4 lightViewMatrix = inverse(lightData.light[i].lightTransform);
-    //     mat4 lightMVP = lightData.light[i].lightProjection * lightViewMatrix;
-    //     outShadowCoord[i] = lightMVP * pos;
-    // }
+     for(uint i = 0;i < lightData.lightCount && i < MAX_LIGHT_COUNT; ++i)
+    {
+        vec4 lightPos = lightData.lights[i].lightTransform * vec4(0.0, 0.0, 0.0, 1.0);
+        outLightVec[i] = pos.xyz - lightPos.xyz;
+        mat4 lightViewMatrix = inverse(lightData.lights[i].lightTransform);
+        mat4 lightMVP = lightData.lights[i].lightProjection * lightViewMatrix;
+        outShadowCoord[i] = lightMVP * pos;
+    }
 }
 

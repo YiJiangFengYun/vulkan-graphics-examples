@@ -23,7 +23,10 @@ struct PointLight
 };
 
 layout (binding = 1) uniform LightData {
-    float lightCount;
+    uint lightCount;
+    float _dummy_y;
+    float _dummy_z;
+    float _dummy_w;
     PointLight lights[MAX_LIGHT_COUNT];
 } lightData;
 

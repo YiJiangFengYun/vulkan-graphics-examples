@@ -64,13 +64,19 @@ void Window::_createModel()
     createInfo.layoutComponentCount = layoutCount;
     createInfo.pLayoutComponent = layouts;
     createInfo.offset = vg::Vector3(0.0f, 0.0f, 0.0f);
+    createInfo.scale = vg::Vector3(4.0f);
     m_assimpScene.init(createInfo);
 }
 
 void Window::_createLights()
 {
-    m_pSpotLight = std::shared_ptr<vg::LightSpot3>{ new vg::LightSpot3()};
-    m_pSpotLight->getTransform()->setLocalPosition(vg::Vector3(25.0f, 5.0f, 5.0f));
+    m_pSpotLight = std::shared_ptr<vg::LightSpot3>{ new vg::LightSpot3(glm::radians(45.0f), 100.0f)};
+
+    auto position = vg::Vector3(0.0f, 20.0f, -5.0f);
+    auto rotationMatrix = glm::toMat4(glm::rotation(vg::Vector3(0.0f, 0.0f, 1.0f), glm::normalize(-position)));
+    auto translateMatrix = glm::translate(glm::mat4(1.0f), position);
+    auto lookAtMatrix = translateMatrix * rotationMatrix;
+    m_pSpotLight->getTransform()->setLocalMatrix(lookAtMatrix);
 }
 
 void Window::_createMaterial()
@@ -117,6 +123,15 @@ void Window::_createMaterial()
         //view poss
         pPass->addData("other_data", otherDataInfo, m_pCamera->getTransform()->getPosition());
         pPass->apply();
+
+        auto pPreDepthPass = pMaterial->getPreDepthPass();
+        pPreDepthPass->setFrontFace(vk::FrontFace::eClockwise);
+        pPreDepthPass->setCullMode(vk::CullModeFlagBits::eBack);
+        depthStencilState.depthTestEnable = VG_TRUE;
+        depthStencilState.depthWriteEnable = VG_TRUE;
+        depthStencilState.depthCompareOp = vk::CompareOp::eLessOrEqual;
+        pPreDepthPass->setDepthStencilInfo(depthStencilState);
+        pPreDepthPass->apply();
         
         pMaterial->apply();
     }

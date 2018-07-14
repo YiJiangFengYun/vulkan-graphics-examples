@@ -20,7 +20,10 @@ struct SpotLight
 };
 
 layout (binding = 1) uniform LightData {
-    float lightCount;
+    uint lightCount;
+    float _dummy_y;
+    float _dummy_z;
+    float _dummy_w;
     SpotLight lights[MAX_LIGHT_COUNT];
 } lightData;
 
@@ -30,38 +33,40 @@ layout (binding = 2) uniform sampler2D shadowMaps[MAX_LIGHT_COUNT];
 
 float textureProj(uint index, vec4 P, vec2 off)
 {
-	float strength = 1.0;
 	vec4 shadowCoord = P / P.w;
-	if ( shadowCoord.z > -1.0 && shadowCoord.z < 1.0 ) 
+	if ( shadowCoord.z > 0.0 && shadowCoord.z < 1.0 ) 
 	{
+	    float strength = 1.0;
 		float dist = texture(shadowMaps[index], shadowCoord.st + off ).r;
 		if ( shadowCoord.w > 0.0 && dist < shadowCoord.z ) 
 		{
-			strength = 0.0;
+			strength = 0.1;
 		}
+	    return strength;
 	}
-	return strength;
+    return 0.1;
 }
 
 void main() 
 {   
-    outFragColor = vec4(inColor, 1.0);
-    // for(uint i = 0;i < lightData.lightCount && i < MAX_LIGHT_COUNT; ++i)
-    // {
-    //     float strength = textureProj(i, inShadowCoord[i], vec2(0.0));
+    outFragColor = vec4(0.0, 0.0, 0.0, 1.0);
+    for(uint i = 0;i < lightData.lightCount && i < MAX_LIGHT_COUNT; ++i)
+    {
+        float strength = textureProj(i, inShadowCoord[i], vec2(0.0));
 
-    //     vec4 resultColor = vec4(0.0);
-    //     vec3 N = normalize(inNormal);
-    //     vec3 L = normalize(inLightVec[i]);
-    //     vec3 V = normalize(inViewVec);
-    //     vec3 R = normalize(reflect(L, N));
-    //     vec3 diffuse = max(dot(N, -L), 0.0) * inColor;
-    //     resultColor = vec4(diffuse, 1.0);
-    //     float dist = length(inLightVec[i]);
-    //     // Check if out of light area.
-    //     float radius = lightData.lights[i].radius;
-    //     strength = (dist <= radius + EPSILON) ? strength : 0.0;
-    //     resultColor.rgb *= strength;
-    //     outFragColor += resultColor;
-    // }
+        vec3 resultColor = vec3(0.0);
+        vec3 N = normalize(inNormal);
+        vec3 L = normalize(inLightVec[i]);
+        vec3 V = normalize(inViewVec);
+        vec3 R = normalize(reflect(L, N));
+        vec3 diffuse = max(dot(N, -L), 0.0) * inColor;
+        resultColor = diffuse;
+        float dist = length(inLightVec[i]);
+        // Check if out of light area.
+        float radius = lightData.lights[i].radius;
+        strength = (dist <= radius + EPSILON) ? strength : 0.1;
+        resultColor.rgb *= strength;
+        outFragColor.rgb += resultColor;
+    }
+    // outFragColor = vec4(inColor, 1.0);
 }

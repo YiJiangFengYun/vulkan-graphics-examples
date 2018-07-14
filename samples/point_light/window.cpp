@@ -64,6 +64,7 @@ void Window::_createModel()
     createInfo.layoutComponentCount = layoutCount;
     createInfo.pLayoutComponent = layouts;
     createInfo.offset = vg::Vector3(0.0f, 0.0f, 0.0f);
+    createInfo.scale = vg::Vector3(4.0f);
     m_assimpScene.init(createInfo);
 }
 
@@ -116,6 +117,15 @@ void Window::_createMaterial()
         };
         pPass->addData("other_data", otherDataInfo, m_pCamera->getTransform()->getPosition());
         pPass->apply();
+
+        auto pPreDepthPass = pMaterial->getPreDepthPass();
+        pPreDepthPass->setFrontFace(vk::FrontFace::eClockwise);
+        pPreDepthPass->setCullMode(vk::CullModeFlagBits::eBack);
+        depthStencilState.depthTestEnable = VG_TRUE;
+        depthStencilState.depthWriteEnable = VG_TRUE;
+        depthStencilState.depthCompareOp = vk::CompareOp::eLessOrEqual;
+        pPreDepthPass->setDepthStencilInfo(depthStencilState);
+        pPreDepthPass->apply();
         
         pMaterial->apply();
     }

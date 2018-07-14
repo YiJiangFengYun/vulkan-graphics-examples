@@ -66,12 +66,8 @@ namespace vg
 
     }
 
-    RenderBinder::RenderBinder(uint32_t framebufferWidth
-        , uint32_t framebufferHeight
-        )
-        : m_framebufferWidth(framebufferWidth)
-        , m_framebufferHeight(framebufferHeight)
-        , m_bindedObjects()
+    RenderBinder::RenderBinder()
+        : m_bindedObjects()
         , m_bindedObjectCount(0u)
         //light data buffer
         , m_lightDataBufferCache([](const vg::InstanceID &sceneID) {
@@ -84,26 +80,6 @@ namespace vg
         , m_lightPassTextureInfos()
         , m_lightTextureInfos()
     {}
-
-     uint32_t RenderBinder::getFramebufferWidth() const
-     {
-         return m_framebufferWidth;
-     }
-
-    void RenderBinder::setFramebufferWidth(uint32_t value)
-    {
-        m_framebufferWidth = value;
-    }
-
-    uint32_t RenderBinder::getFramebufferHeight() const
-    {
-        return m_framebufferHeight;
-    }
-
-    void RenderBinder::setFramebufferHeight(uint32_t value)
-    {
-        m_framebufferHeight = value;
-    }
 
     void RenderBinder::begin()
     {
@@ -149,6 +125,10 @@ namespace vg
         {
             _bindScene2(dynamic_cast<Scene<SpaceType::SPACE_2> *>(info.pScene), 
                 dynamic_cast<const Projector<SpaceType::SPACE_2> *>(info.pProjector),
+                info.preDepthEnable ? info.pPreDepthTarget : nullptr,
+                info.postRenderEnable ? 
+                    dynamic_cast<const BaseRenderTarget *>(info.pPostRenderTarget) : 
+                    dynamic_cast<const BaseRenderTarget *>(info.pRendererTarget),
                 info.preDepthEnable ? info.pPreDepthResultTex : nullptr,
                 info.preDepthEnable ? info.pPreDepthCmdBuffer : nullptr,
                 info.pBranchCmdBuffer,                    
@@ -166,7 +146,11 @@ namespace vg
                 );
             }
             _bindScene3(dynamic_cast<Scene<SpaceType::SPACE_3> *>(info.pScene), 
-                dynamic_cast<const Projector<SpaceType::SPACE_3> *>(info.pProjector), 
+                dynamic_cast<const Projector<SpaceType::SPACE_3> *>(info.pProjector),
+                info.preDepthEnable ? info.pPreDepthTarget : nullptr,
+                info.postRenderEnable ? 
+                    dynamic_cast<const BaseRenderTarget *>(info.pPostRenderTarget) : 
+                    dynamic_cast<const BaseRenderTarget *>(info.pRendererTarget),
                 info.preDepthEnable ? info.pPreDepthResultTex : nullptr,
                 info.preDepthEnable ? info.pPreDepthCmdBuffer : nullptr,
                 info.pBranchCmdBuffer,                    
@@ -211,11 +195,10 @@ namespace vg
                 pPass->apply();
             }
 
-            
-
+            ;
             PostRender::BindInfo bindInfo = {
-                m_framebufferWidth,
-                m_framebufferHeight,
+                info.pRendererTarget->getFramebufferWidth(),
+                info.pRendererTarget->getFramebufferHeight(),
             };
             PostRender::BindResult result = {
                 info.pPostRenderCmdBuffer,
@@ -270,6 +253,8 @@ namespace vg
                  );
                 _bindScene3(pScene
                     , dynamic_cast<const Projector<SpaceType::SPACE_3> *>(*(depthRenderInfo.pProjectors + j))
+                    , pRenderTarget
+                    , nullptr
                     , nullptr
                     , pPreDepthCmdBuffer
                     );
@@ -520,6 +505,8 @@ namespace vg
 
     void RenderBinder::_bindScene2(Scene<SpaceType::SPACE_2> *pScene
         , const Projector<SpaceType::SPACE_2> *pProjector
+        , const BaseRenderTarget *pPreDepthTarget
+        , const BaseRenderTarget *pRenderTarget
         , const Texture *pPreDepthResultTex
         , CmdBuffer *pPreDepthCmdBuffer
         , CmdBuffer *pBranchCmdBuffer
@@ -584,8 +571,6 @@ namespace vg
         fd::CostTimer bindObjectCostTimer(fd::CostTimer::TimerType::ACCUMULATION);
 #endif //DEBUG and VG_ENABLE_COST_TIMER
         //------Doing render.
-        const auto framebufferWidth = m_framebufferWidth;
-        const auto framebufferHeight = m_framebufferHeight;    
         for (uint32_t i = 0u; i < validVisualObjectCount; ++i)
         {
             auto pVisualObject = validVisualObjects[i];
@@ -623,8 +608,10 @@ namespace vg
                 bindObjectCostTimer.begin();
 #endif //DEBUG and VG_ENABLE_COST_TIMER
             BaseVisualObject::BindInfo info = {
-                framebufferWidth,
-                framebufferHeight,
+                pPreDepthTarget != nullptr ? pPreDepthTarget->getFramebufferWidth() : 0u,
+                pPreDepthTarget != nullptr ? pPreDepthTarget->getFramebufferHeight() : 0u,
+                pRenderTarget != nullptr ? pRenderTarget->getFramebufferWidth() : 0u,
+                pRenderTarget != nullptr ? pRenderTarget->getFramebufferHeight() : 0u,
                 &projMatrix,
                 &viewMatrix,
                 };
@@ -719,6 +706,8 @@ namespace vg
 
     void RenderBinder::_bindScene3(Scene<SpaceType::SPACE_3> *pScene
         , const Projector<SpaceType::SPACE_3> *pProjector
+        , const BaseRenderTarget *pPreDepthTarget
+        , const BaseRenderTarget *pRenderTarget
         , const Texture *pPreDepthResultTex
         , CmdBuffer *pPreDepthCmdBuffer
         , CmdBuffer *pBranchCmdBuffer
@@ -868,8 +857,6 @@ namespace vg
         fd::CostTimer bindObjectCostTimer(fd::CostTimer::TimerType::ACCUMULATION);
 #endif //DEBUG and VG_ENABLE_COST_TIMER
         //-----Doing render
-        const auto framebufferWidth = m_framebufferWidth;
-        const auto framebufferHeight = m_framebufferHeight;
         for (uint32_t typeIndex = 0u; typeIndex < queueTypeCount; ++typeIndex)
         {
             auto queueLength = queueLengths[typeIndex];
@@ -910,8 +897,10 @@ namespace vg
                 bindObjectCostTimer.begin();
 #endif //DEBUG and VG_ENABLE_COST_TIMER
                 BaseVisualObject::BindInfo info = {
-                    framebufferWidth,
-                    framebufferHeight,
+                    pPreDepthTarget != nullptr ? pPreDepthTarget->getFramebufferWidth() : 0u,
+                    pPreDepthTarget != nullptr ? pPreDepthTarget->getFramebufferHeight() : 0u,
+                    pRenderTarget != nullptr ? pRenderTarget->getFramebufferWidth() : 0u,
+                    pRenderTarget != nullptr ? pRenderTarget->getFramebufferHeight() : 0u,
                     &projMatrix,
                     &viewMatrix, 
                     };

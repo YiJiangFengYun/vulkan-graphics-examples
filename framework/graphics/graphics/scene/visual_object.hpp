@@ -13,12 +13,16 @@ namespace vg
     public:
         struct BindInfo 
         {
+            uint32_t preDepthFramebufferWidth;
+            uint32_t preDepthFramebufferHeight;
             uint32_t trunkFramebufferWidth;
             uint32_t trunkFramebufferHeight;
             const Matrix4x4 *pProjMatrix;
             const Matrix4x4 *pViewMatrix;
 
-            BindInfo( uint32_t trunkFramebufferWidth = 0u
+            BindInfo(uint32_t preDepthFramebufferWidth = 0u
+                , uint32_t preDepthFramebufferHeight = 0u
+                , uint32_t trunkFramebufferWidth = 0u
                 , uint32_t trunkFramebufferHeight = 0u
                 , const Matrix4x4 *pProjMatrix = nullptr
                 , const Matrix4x4 *pViewMatrix = nullptr

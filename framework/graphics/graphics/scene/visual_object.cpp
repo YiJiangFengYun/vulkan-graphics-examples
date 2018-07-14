@@ -2,12 +2,16 @@
 
 namespace vg
 {
-    BaseVisualObject::BindInfo::BindInfo(uint32_t trunkFramebufferWidth
+    BaseVisualObject::BindInfo::BindInfo(uint32_t preDepthFramebufferWidth
+        , uint32_t preDepthFramebufferHeight
+        , uint32_t trunkFramebufferWidth
         , uint32_t trunkFramebufferHeight
         , const Matrix4x4 *pProjMatrix
         , const Matrix4x4 *pViewMatrix
         )
-        : trunkFramebufferWidth(trunkFramebufferWidth)
+        : preDepthFramebufferWidth(preDepthFramebufferWidth)
+        , preDepthFramebufferHeight(preDepthFramebufferHeight)
+        , trunkFramebufferWidth(trunkFramebufferWidth)
         , trunkFramebufferHeight(trunkFramebufferHeight)
         , pProjMatrix(pProjMatrix)
         , pViewMatrix(pViewMatrix)
@@ -186,6 +190,8 @@ namespace vg
             if (pMaterial == nullptr) continue;
             uint32_t subMeshIndex = subMeshOffset + i;
             Material::BindInfo infoForVisualizer = {
+                info.preDepthFramebufferWidth,
+                info.preDepthFramebufferHeight,
                 info.trunkFramebufferWidth,
                 info.trunkFramebufferHeight,
                 info.pProjMatrix,

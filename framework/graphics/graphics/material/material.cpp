@@ -2,7 +2,9 @@
 
 namespace vg
 {
-    Material::BindInfo::BindInfo(uint32_t trunkFramebufferWidth
+    Material::BindInfo::BindInfo(uint32_t preDepthFramebufferWidth
+        , uint32_t preDepthFramebufferHeight
+        , uint32_t trunkFramebufferWidth
         , uint32_t trunkFramebufferHeight
         , const Matrix4x4 *pProjMatrix
         , const Matrix4x4 *pViewMatrix
@@ -19,6 +21,8 @@ namespace vg
         )
         : pProjMatrix(pProjMatrix)
         , pViewMatrix(pViewMatrix)
+        , preDepthFramebufferWidth(preDepthFramebufferWidth)
+        , preDepthFramebufferHeight(preDepthFramebufferHeight)
         , trunkFramebufferWidth(trunkFramebufferWidth)
         , trunkFramebufferHeight(trunkFramebufferHeight)
         , objectID(objectID)
@@ -203,8 +207,8 @@ namespace vg
             RenderPassInfo trunkRenderPassInfo;
             trunkRenderPassInfo.pRenderPass = nullptr;
             trunkRenderPassInfo.pFramebuffer = nullptr;            
-            trunkRenderPassInfo.framebufferWidth = info.trunkFramebufferWidth;
-            trunkRenderPassInfo.framebufferHeight = info.trunkFramebufferHeight;
+            trunkRenderPassInfo.framebufferWidth = info.preDepthFramebufferWidth;
+            trunkRenderPassInfo.framebufferHeight = info.preDepthFramebufferHeight;
             trunkRenderPassInfo.projMatrix = *(info.pProjMatrix);
             trunkRenderPassInfo.viewMatrix = *(info.pViewMatrix);
             trunkRenderPassInfo.pPass = m_pPreDepthPass->getPass();

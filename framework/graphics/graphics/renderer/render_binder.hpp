@@ -68,13 +68,7 @@ namespace vg
     class RenderBinder 
     {
     public:
-        RenderBinder(uint32_t framebufferWidth = 0u
-            , uint32_t framebufferHeight = 0u
-            );
-        uint32_t getFramebufferWidth() const;
-        void setFramebufferWidth(uint32_t value);
-        uint32_t getFramebufferHeight() const;
-        void setFramebufferHeight(uint32_t value);
+        RenderBinder();
 
         void begin();
 
@@ -83,8 +77,8 @@ namespace vg
         void end();
 
     private:
-        uint32_t m_framebufferWidth;
-        uint32_t m_framebufferHeight;
+        // uint32_t m_framebufferWidth;
+        // uint32_t m_framebufferHeight;
         std::vector<BaseVisualObject *> m_bindedObjects;
         uint32_t m_bindedObjectCount;
 
@@ -115,6 +109,8 @@ namespace vg
 
         void _bindScene2(Scene<SpaceType::SPACE_2> *pScene
             , const Projector<SpaceType::SPACE_2> *pProjector
+            , const BaseRenderTarget *pPreDepthTarget
+            , const BaseRenderTarget *pRenderTarget
             , const Texture *pPreDepthResultTex = nullptr
             , CmdBuffer *pPreDepthCmdBuffer = nullptr
             , CmdBuffer *pBranchCmdBuffer = nullptr
@@ -124,6 +120,8 @@ namespace vg
 
         void _bindScene3(Scene<SpaceType::SPACE_3> *pScene
             , const Projector<SpaceType::SPACE_3> *pProjector
+            , const BaseRenderTarget *pPreDepthTarget
+            , const BaseRenderTarget *pRenderTarget
             , const Texture *pPreDepthResultTex = nullptr
             , CmdBuffer *pPreDepthCmdBuffer = nullptr
             , CmdBuffer *pBranchCmdBuffer = nullptr

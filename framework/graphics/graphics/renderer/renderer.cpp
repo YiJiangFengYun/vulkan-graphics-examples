@@ -241,8 +241,6 @@ namespace vg
     {
         m_framebufferWidth = width;
         m_framebufferHeight = height;
-        m_renderBinder.setFramebufferWidth(width);
-        m_renderBinder.setFramebufferHeight(height);
         if (m_preDepthEnable) 
         {
             if (width != 0u && height != 0u)

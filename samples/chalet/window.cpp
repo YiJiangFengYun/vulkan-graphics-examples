@@ -31,6 +31,11 @@ namespace chalet
         _init();
     }
 
+    void Window::_initState()
+    {
+        m_cameraPosition = vg::Vector3(2.0f, 2.0f, 2.0f);
+    }
+
     void Window::_init()
     {
         ParentWindowType::_init();
@@ -286,8 +291,5 @@ namespace chalet
         pTransform->setLocalRotation(glm::angleAxis(glm::radians(90.0f) * time, vg::Vector3(0.0f, 0.0f, 1.0f)));
         pTransformOfBounds->setLocalRotation(glm::angleAxis(glm::radians(90.0f) * time, vg::Vector3(0.0f, 0.0f, 1.0f)));
 
-        pTransform = m_pCamera->getTransform();
-        //pTransform->setLocalPosition(kgs::Vector3(2.0f, 2.0f, 2.0f));
-        pTransform->lookAt2(vg::Vector3(2.0f, 2.0f, 2.0f), vg::Vector3(0.0f, 0.0f, 0.0f), vg::Vector3(0.0f, 0.0f, 1.0f));
     }
 }

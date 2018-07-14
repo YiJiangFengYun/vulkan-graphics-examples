@@ -8,27 +8,27 @@ namespace vg
 
     }
 
-    void Transform3::lookAt(const PointType& worldTarget, const VectorType& worldUp)
-    {
-        auto matrix = glm::lookAt(getPosition(), worldTarget, worldUp);
-        if (m_pParent != nullptr)
-        {
-            auto m = _getMatrixLocalToWorld(VG_FALSE);
-            matrix = glm::inverse(m) * matrix;
-        }
-        setLocalMatrixInverse(matrix);
-    }
+    // void Transform3::lookAt(const PointType& worldTarget, const VectorType& worldUp)
+    // {
+    //     auto matrix = glm::lookAt(getPosition(), worldTarget, worldUp);
+    //     if (m_pParent != nullptr)
+    //     {
+    //         auto m = _getMatrixLocalToWorld(VG_FALSE);
+    //         matrix = glm::inverse(m) * matrix;
+    //     }
+    //     setLocalMatrixInverse(matrix);
+    // }
 
-    void Transform3::lookAt2(const PointType& worldEye, const PointType& worldTarget, const VectorType& worldUp)
-    {
-        auto matrix = glm::lookAt(worldEye, worldTarget, worldUp);
-        if (m_pParent != nullptr)
-        {
-            auto m = _getMatrixLocalToWorld(VG_FALSE);
-            matrix = glm::inverse(m) * matrix;
-        }
-        setLocalMatrixInverse(matrix);
-    }
+    // void Transform3::lookAt2(const PointType& worldEye, const PointType& worldTarget, const VectorType& worldUp)
+    // {
+    //     auto matrix = glm::lookAt(worldEye, worldTarget, worldUp);
+    //     if (m_pParent != nullptr)
+    //     {
+    //         auto m = _getMatrixLocalToWorld(VG_FALSE);
+    //         matrix = glm::inverse(m) * matrix;
+    //     }
+    //     setLocalMatrixInverse(matrix);
+    // }
 
     void Transform3::rotateAround(const PointType& point, const VectorType& axis, const float& angle, const VectorType& scale)
     {

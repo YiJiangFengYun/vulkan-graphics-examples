@@ -46,7 +46,7 @@ namespace chalet
         std::shared_ptr<vg::Material> m_pMaterialOfBounds;
 
         virtual void _init() override;
-        
+        virtual void _initState() override;
         void _loadModel();
         void _createMesh();
         void _createTexture();

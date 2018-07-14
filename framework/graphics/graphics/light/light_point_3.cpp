@@ -26,11 +26,68 @@ namespace vg
             m_pProjectors[i] = std::shared_ptr<Projector3>{new Projector3()};
         }
         //six projector is: x(+-), y(+-) and z(+-).
-        uint32_t index = 0u;
         for (auto &pProjector : m_pProjectors)
         {
             pProjector->updateProj(glm::radians(90.0f), 1.0f, std::min(0.001f, radius), radius);
-            Matrix4x4 transform(1.0f);
+        }
+        _syncProjectorTransform();
+
+        for (uint32_t i = 0; i < size; ++i)
+        {
+            m_refProjectors[i] = m_pProjectors[i].get();
+        }
+
+        //add radius to light data.
+        if (m_data.hasData("light_radius") == VG_FALSE)
+        {
+            LightDataInfo info = {
+                VG_LIGHT_DATA_OTHER_MIN_LAYOUT_PRIORITY,
+            };
+            m_data.addData("light_radius", info, radius);
+            m_dataChanged = VG_TRUE;
+        } else {
+            m_data.setData("light_radius", radius);
+        }
+        m_dataContentChanged = VG_TRUE;
+        m_dataContentChanges["light_radius"] = VG_TRUE;
+
+        //add cube depth texture to light textures.
+        LightTextureInfo texInfo = {
+            VG_LIGHT_TEXTURE_DEPTH_BINDING_PRIORITY,
+            m_cubeTargets.getDepthTargetTexture(),
+            };
+        if (m_data.hasTexture(VG_LIGHT_TEXTURE_DEPTH_NAME) == VG_FALSE)
+        {
+            m_data.addTexture(VG_LIGHT_TEXTURE_DEPTH_NAME, texInfo);
+        } else {
+            m_data.setTexture(VG_LIGHT_TEXTURE_DEPTH_NAME, texInfo);
+        }
+        m_textureChanged = VG_TRUE;
+        _apply();
+    }
+
+    LightDepthRenderInfo LightPoint3::getDepthRenderInfo() const
+    {
+        LightDepthRenderInfo info = {
+            static_cast<uint32_t>(CubemapFace::RANGE_SIZE),
+            reinterpret_cast<const BaseProjector *const *>(m_refProjectors.data()),
+            reinterpret_cast<const PreDepthTarget *const *>(m_cubeTargets.getFaceTargets().data()),
+        };
+        return info;
+    }
+
+    void LightPoint3::_beginRender()
+    {
+        Light3::_beginRender();
+        _syncProjectorTransform();
+    }
+
+    void LightPoint3::_syncProjectorTransform()
+    {
+        uint32_t index = 0u;
+        for (auto &pProjector : m_pProjectors)
+        {
+            auto transform = m_pTransform->getMatrixLocalToWorld();
             if (m_space.rightHand == VG_TRUE)
             {
                 switch (index)
@@ -106,48 +163,5 @@ namespace vg
             pProjector->setTransformMatrix(transform);
             ++index;
         }
-
-        for (uint32_t i = 0; i < size; ++i)
-        {
-            m_refProjectors[i] = m_pProjectors[i].get();
-        }
-
-        //add radius to light data.
-        if (m_data.hasData("light_radius") == VG_FALSE)
-        {
-            LightDataInfo info = {
-                VG_LIGHT_DATA_OTHER_MIN_LAYOUT_PRIORITY,
-            };
-            m_data.addData("light_radius", info, radius);
-            m_dataChanged = VG_TRUE;
-        } else {
-            m_data.setData("light_radius", radius);
-        }
-        m_dataContentChanged = VG_TRUE;
-        m_dataContentChanges["light_radius"] = VG_TRUE;
-
-        //add cube depth texture to light textures.
-        LightTextureInfo texInfo = {
-            VG_LIGHT_TEXTURE_DEPTH_BINDING_PRIORITY,
-            m_cubeTargets.getDepthTargetTexture(),
-            };
-        if (m_data.hasTexture(VG_LIGHT_TEXTURE_DEPTH_NAME) == VG_FALSE)
-        {
-            m_data.addTexture(VG_LIGHT_TEXTURE_DEPTH_NAME, texInfo);
-        } else {
-            m_data.setTexture(VG_LIGHT_TEXTURE_DEPTH_NAME, texInfo);
-        }
-        m_textureChanged = VG_TRUE;
-        _apply();
-    }
-
-    LightDepthRenderInfo LightPoint3::getDepthRenderInfo() const
-    {
-        LightDepthRenderInfo info = {
-            static_cast<uint32_t>(CubemapFace::RANGE_SIZE),
-            reinterpret_cast<const BaseProjector *const *>(m_refProjectors.data()),
-            reinterpret_cast<const PreDepthTarget *const *>(m_cubeTargets.getFaceTargets().data()),
-        };
-        return info;
     }
 } //vg

@@ -69,6 +69,10 @@ namespace vg
     void LightSpot3::_beginRender()
     {
         Light3::_beginRender();
+
+        //sync transform between camera and projector.
+        m_pProjector->setLocalToWorldMatrix(m_pTransform->getMatrixLocalToWorld());
+
         //sync projection data.
         auto matrix = m_space.getVulkanProjMatrix(m_pProjector->getProjMatrix());
         if (m_data.hasData(VG_LIGHT_DATA_PROJECTION_NAME) == VG_FALSE) {

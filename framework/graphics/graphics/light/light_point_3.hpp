@@ -27,6 +27,10 @@ namespace vg
         LightDepthCubeTargets m_cubeTargets;
         std::array<std::shared_ptr<Projector3>, static_cast<size_t>(CubemapFace::RANGE_SIZE)> m_pProjectors;
         std::array<const Projector3 *, static_cast<size_t>(CubemapFace::RANGE_SIZE)> m_refProjectors;
+
+        virtual void _beginRender() override;
+
+        void _syncProjectorTransform();
     };
 } //vg
 

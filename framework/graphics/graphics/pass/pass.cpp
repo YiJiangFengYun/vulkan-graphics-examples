@@ -846,7 +846,7 @@ namespace vg
         }
 
         if (m_descriptorSetChanged) {
-            m_layoutBindingCount = 0u;
+            // m_layoutBindingCount = 0u;
             uint32_t currBinding = 0u;
 
             //first part descriptors is build data.

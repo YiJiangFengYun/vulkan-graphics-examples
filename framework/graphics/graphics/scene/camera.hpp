@@ -27,6 +27,8 @@ namespace vg
         const Projector<SPACE_TYPE> *getProjector() const;
     protected:
         virtual void _addToSpace();
+
+        virtual void _beginRender() override;
     };
 } //namespace kgs
 

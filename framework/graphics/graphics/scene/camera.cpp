@@ -41,7 +41,6 @@ namespace vg
     const BaseProjector *Camera<SPACE_TYPE>::getProjectorBase() const
     {
         Projector<SPACE_TYPE> *pProjector = dynamic_cast<Projector<SPACE_TYPE> *>(m_pProjector.get());
-        pProjector->setLocalToWorldMatrix(m_pTransform->getMatrixLocalToWorld());
         return pProjector;
     }
 
@@ -49,7 +48,6 @@ namespace vg
     const Projector<SPACE_TYPE> *Camera<SPACE_TYPE>::getProjector() const
     {
         Projector<SPACE_TYPE> *pProjector = dynamic_cast<Projector<SPACE_TYPE> *>(m_pProjector.get());
-        pProjector->setLocalToWorldMatrix(m_pTransform->getMatrixLocalToWorld());
         return pProjector;
     }
 
@@ -57,6 +55,14 @@ namespace vg
     void Camera<SPACE_TYPE>::_addToSpace()
     {
         m_pProjector->setSpace(m_space);
+    }
+
+    template <SpaceType SPACE_TYPE>
+    void Camera<SPACE_TYPE>::_beginRender()
+    {
+        Object<SPACE_TYPE>::_beginRender();
+        Projector<SPACE_TYPE> *pProjector = dynamic_cast<Projector<SPACE_TYPE> *>(m_pProjector.get());
+        pProjector->setLocalToWorldMatrix(m_pTransform->getMatrixLocalToWorld());
     }
 
     //template instantiation

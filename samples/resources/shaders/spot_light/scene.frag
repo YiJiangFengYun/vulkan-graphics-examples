@@ -17,6 +17,9 @@ struct SpotLight
     mat4 lightTransform;
     mat4 lightProjection;
     float radius;
+    float _dummy_y;
+    float _dummy_z;
+    float _dummy_w;
 };
 
 layout (binding = 1) uniform LightData {

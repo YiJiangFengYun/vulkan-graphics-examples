@@ -360,6 +360,16 @@ namespace vg
         _apply();
     }
 
+    LightExportInfo BaseLight::getExportInfo() const
+    {
+        LightExportInfo exportInfo;
+        exportInfo.dataSize = static_cast<uint32_t>(m_dataMemoryBuffer.size());
+        exportInfo.pData = static_cast<const void *>(m_dataMemoryBuffer.data());
+        exportInfo.textureCount = static_cast<uint32_t>(m_textureInfos.size());
+        exportInfo.pTextureInfos = m_textureInfos.data();
+        return exportInfo;
+    }
+
     BaseLight::DataSortInfo::DataSortInfo(std::string name
         , uint32_t layoutPriority
         , uint32_t size

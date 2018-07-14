@@ -161,16 +161,5 @@ namespace vg
         
     }
 
-    template <SpaceType SPACE_TYPE, uint32_t DATA_SIZE, uint32_t TEXTURE_COUNT>
-    LightExportInfo Light<SPACE_TYPE, DATA_SIZE, TEXTURE_COUNT>::getExportInfo() const
-    {
-        LightExportInfo exportInfo;
-        exportInfo.dataSize = static_cast<uint32_t>(m_dataMemoryBuffer.size());
-        exportInfo.pData = static_cast<const void *>(m_dataMemoryBuffer.data());
-        exportInfo.textureCount = static_cast<uint32_t>(m_textureInfos.size());
-        exportInfo.pTextureInfos = m_textureInfos.data();
-        return exportInfo;
-    }
-
     
 } //vg

@@ -172,7 +172,7 @@ namespace vg
     public:
         BaseLight();
         void apply();
-        virtual LightExportInfo getExportInfo() const = 0;
+        virtual LightExportInfo getExportInfo() const;
         virtual LightDepthRenderInfo getDepthRenderInfo() const = 0;
     protected:
         LightData m_data;
@@ -243,7 +243,6 @@ namespace vg
     {
     public:
         Light();
-        virtual LightExportInfo getExportInfo() const override;
     protected:
         
     };

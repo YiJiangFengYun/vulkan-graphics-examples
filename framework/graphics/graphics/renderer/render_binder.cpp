@@ -407,7 +407,7 @@ namespace vg
                 ++lightBindingOffset;
             }
             lightTypeOffset += vectorSize;
-            lightTypeOffset += lightInfo.dataSize * lightInfo.maxCount;
+            lightTypeOffset += lightInfo.dataSize * maxLightCount;
             //offet should be entire block memory for last light types because light count may be is less than max light count.
             offset = lightTypeOffset;
         }

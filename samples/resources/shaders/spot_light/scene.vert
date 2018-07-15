@@ -59,8 +59,8 @@ void main()
         vec4 lightPos = lightData.lights[i].lightTransform * vec4(0.0, 0.0, 0.0, 1.0);
         outLightVec[i] = pos.xyz - lightPos.xyz;
         mat4 lightViewMatrix = inverse(lightData.lights[i].lightTransform);
-        mat4 lightMVP = lightData.lights[i].lightProjection * lightViewMatrix;
-        outShadowCoord[i] = lightMVP * pos;
+        mat4 lightVP = lightData.lights[i].lightProjection * lightViewMatrix;
+        outShadowCoord[i] = lightVP * pos;
     }
 }
 

@@ -14,15 +14,7 @@ namespace vg
     Scene2::MatrixType Scene2::getProjMatrix(const ProjectorType *pProjector) const
     {
         auto projMatrix = pProjector->getProjMatrix();
-        if (m_space.rightHand == VG_FALSE)
-        {
-            projMatrix[1][1] *= -1;
-            return projMatrix;
-        }
-        else
-        {
-            return projMatrix;
-        }
+        return m_space.getVulkanProjMatrix(projMatrix);
     }
 
     Scene2::BoundsType Scene2::getProjectionBoundsInWorld(const ProjectorType *pProjector) const

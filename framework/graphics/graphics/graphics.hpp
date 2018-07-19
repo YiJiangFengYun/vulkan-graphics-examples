@@ -55,6 +55,7 @@
 #include <graphics/util/queue_family.hpp>
 #include <graphics/util/swapchain_info.hpp>
 #include <graphics/util/util.hpp>
+#include <graphics/util/gemo_util.hpp>
 
 #include <graphics/module.hpp>
 

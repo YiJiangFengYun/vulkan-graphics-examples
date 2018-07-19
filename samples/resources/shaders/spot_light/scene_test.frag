@@ -50,8 +50,8 @@ float textureProj(uint index, vec4 P, vec2 off)
 
 float LinearizeDepth(float depth)
 {
-  float n = 0.001; // camera z near
-  float f = 10.0; // camera z far
+  float n = 0.1; // camera z near
+  float f = 100.0; // camera z far
   float z = depth;
   return n / (f - z * (f - n));    
 }
@@ -64,7 +64,7 @@ void main()
     {
         // vec2 uv = (inShadowCoord[i] / inShadowCoord[i].w).st;
         float depth = texture(shadowMaps[i], inUV).r;
-        outFragColor.rgb = vec3(LinearizeDepth(depth));
+        outFragColor.rgb = vec3(1.0 - LinearizeDepth(depth));
     }
 
     // for(uint i = 0;i < lightData.lightCount && i < MAX_LIGHT_COUNT; ++i)

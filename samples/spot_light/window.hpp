@@ -32,7 +32,9 @@ private:
     void _initScene();
     void _enableLighting();
     void _enableShadow();
+    void _updateLights();
     virtual void _onUpdate() override;
+
 };
 
 #endif // !WINDOW_

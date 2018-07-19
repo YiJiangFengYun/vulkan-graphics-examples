@@ -39,6 +39,16 @@ void Window::_init()
     _initScene();
     _enableLighting();
     _enableShadow();
+
+    glfwSetKeyCallback(m_pWindow.get(), [](GLFWwindow *glfwWindow, int key, int scancode, int action, int mods)
+    {
+        Window* const instance = (Window*)glfwGetWindowUserPointer(glfwWindow);
+
+        if (action == GLFW_PRESS && key == GLFW_KEY_SPACE)
+        {
+            instance->m_isPause = ! instance->m_isPause;
+        }
+    });
 }
 
 void Window::_initState()
@@ -47,6 +57,7 @@ void Window::_initState()
     m_cameraZoom = -15.0f;
     /// Build a quaternion from euler angles (pitch, yaw, roll), in radians.
     m_cameraRotation = vg::Vector3(glm::radians(0.0f), glm::radians(0.0f), glm::radians(0.0f));
+    m_timerSpeedFactor = 0.1f;
 }
 
 void Window::_createModel()
@@ -70,13 +81,9 @@ void Window::_createModel()
 
 void Window::_createLights()
 {
-    m_pSpotLight = std::shared_ptr<vg::LightSpot3>{ new vg::LightSpot3(glm::radians(45.0f), 100.0f)};
+    m_pSpotLight = std::shared_ptr<vg::LightSpot3>{ new vg::LightSpot3(glm::radians(45.0f), 100.0f, 2048, 2048, vk::Format::eD16Unorm)};
 
-    auto position = vg::Vector3(0.0f, 20.0f, -5.0f);
-    auto rotationMatrix = glm::toMat4(glm::rotation(vg::Vector3(0.0f, 0.0f, 1.0f), glm::normalize(-position)));
-    auto translateMatrix = glm::translate(glm::mat4(1.0f), position);
-    auto lookAtMatrix = translateMatrix * rotationMatrix;
-    m_pSpotLight->getTransform()->setLocalMatrix(lookAtMatrix);
+    _updateLights();
 }
 
 void Window::_createMaterial()
@@ -171,9 +178,25 @@ void Window::_enableShadow()
     m_pRenderer->enableShadow();
 }
 
+void Window::_updateLights()
+{
+    auto position = vg::Vector3(0.0f, 50.0f, 25.0f);
+
+    position.x = cos(glm::radians(m_passedTime * 360.0f)) * 40.0f + position.x;
+    position.y = - sin(glm::radians(m_passedTime * 360.0f)) * 20.0f + position.y;
+    position.z = sin(glm::radians(m_passedTime * 360.0f)) * 5.0f + position.z;
+
+    // auto rotationMatrix = glm::toMat4(glm::rotation(vg::Vector3(0.0f, 0.0f, 1.0f), glm::normalize(-position)));
+    // auto translateMatrix = glm::translate(glm::mat4(1.0f), position);
+    // auto lookAtMatrix = translateMatrix * rotationMatrix;
+    m_pSpotLight->getTransform()->lookAt2(position, vg::Vector3(0.0f), vg::Vector3(0.0, 1.0, 0.0));
+}
+
 void Window::_onUpdate()
 {
     ParentWindowType::_onUpdate();
+
+    _updateLights();
 
     auto & pMaterial = m_pMaterial;
     auto pPass = pMaterial->getMainPass();

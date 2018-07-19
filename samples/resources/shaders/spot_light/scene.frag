@@ -37,12 +37,10 @@ layout (binding = 2) uniform sampler2D shadowMaps[MAX_LIGHT_COUNT];
 float textureProj(uint index, vec4 P, vec2 off)
 {
 	vec4 shadowCoord = P / P.w;
-    vec2 coord = shadowCoord.st;
-    coord.st = (coord.st + 1.0) / 2.0;
 	if ( shadowCoord.z > 0.0 && shadowCoord.z < 1.0 ) 
 	{
 	    float strength = 1.0;
-		float dist = texture(shadowMaps[index], coord.st + off ).r;
+		float dist = texture(shadowMaps[index], shadowCoord.st + off ).r;
 		if ( shadowCoord.w > 0.0 && dist < shadowCoord.z ) 
 		{
 			strength = 0.1;

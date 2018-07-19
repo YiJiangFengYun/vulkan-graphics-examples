@@ -45,6 +45,12 @@ out gl_PerVertex
     vec4 gl_Position;
 };
 
+const mat4 texMat = mat4( 
+	0.5, 0.0, 0.0, 0.0,
+	0.0, 0.5, 0.0, 0.0,
+	0.0, 0.0, 1.0, 0.0,
+	0.5, 0.5, 0.0, 1.0 );
+
 void main() 
 {
     outColor = inColor;
@@ -59,8 +65,8 @@ void main()
         vec4 lightPos = lightData.lights[i].lightTransform * vec4(0.0, 0.0, 0.0, 1.0);
         outLightVec[i] = pos.xyz - lightPos.xyz;
         mat4 lightViewMatrix = inverse(lightData.lights[i].lightTransform);
-        mat4 lightVP = lightData.lights[i].lightProjection * lightViewMatrix;
-        outShadowCoord[i] = lightVP * pos;
+        mat4 lightTVP = texMat * lightData.lights[i].lightProjection * lightViewMatrix;
+        outShadowCoord[i] = lightTVP * pos;
     }
 }
 

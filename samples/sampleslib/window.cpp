@@ -89,7 +89,7 @@ namespace sampleslib
     template <>
     void Window<vg::SpaceType::SPACE_3>::_updateCamera()
     {
-        m_pCamera->updateProj(glm::radians(60.0f), m_cameraAspect, 0.001f, 256.0f);
+        m_pCamera->updateProj(glm::radians(60.0f), m_cameraAspect, 1.0f, 256.0f);
 
         auto matrix = glm::mat4(1.0f);
         matrix = glm::translate(matrix, glm::vec3(0.0f, 0.0f, m_cameraZoom));

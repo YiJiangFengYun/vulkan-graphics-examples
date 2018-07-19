@@ -17,10 +17,12 @@ namespace vg
         static const uint32_t DEFAULT_DEPTH_TEXTURE_HEIGHT;
         static const float DEFAULT_RADIUS;
         static const float DEFAULT_FOV;
+        static const vk::Format DEFAULT_FORMAT;
         LightSpot3(float fov = DEFAULT_FOV
             , float radius = DEFAULT_RADIUS
             , uint32_t depthTextureWidth = DEFAULT_DEPTH_TEXTURE_WIDTH
             , uint32_t depthTextureHeight = DEFAULT_DEPTH_TEXTURE_HEIGHT
+            , vk::Format format = DEFAULT_FORMAT
             );
         virtual LightDepthRenderInfo getDepthRenderInfo() const override;
     protected:

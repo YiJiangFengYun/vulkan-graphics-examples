@@ -6,10 +6,12 @@ namespace vg
     const uint32_t LightSpot3::DEFAULT_DEPTH_TEXTURE_HEIGHT = 1280u;
     const float LightSpot3::DEFAULT_RADIUS = 100.0f;
     const float LightSpot3::DEFAULT_FOV = glm::radians(45.0f);
+    static const vk::Format DEFAULT_FORMAT = vk::Format::eD32Sfloat;
     LightSpot3::LightSpot3(float fov
         , float radius
         , uint32_t depthTextureWidth
         , uint32_t depthTextureHeight
+        , vk::Format format
         )
         : Light3()
         , m_fov(fov)
@@ -19,10 +21,10 @@ namespace vg
         , m_pProjector()
         , m_refProjector()
     {
-        m_pDepthTarget = std::shared_ptr<LightDepthTarget2D>{ new LightDepthTarget2D(depthTextureWidth, depthTextureHeight)};
+        m_pDepthTarget = std::shared_ptr<LightDepthTarget2D>{ new LightDepthTarget2D(depthTextureWidth, depthTextureHeight, format)};
         m_refDepthTarget = m_pDepthTarget.get();
         m_pProjector = std::shared_ptr<Projector3>{new Projector3()};
-        m_pProjector->updateProj(fov, 1.0f, std::min(0.001f, radius), radius);
+        m_pProjector->updateProj(fov, 1.0f, std::min(1.0f, radius), radius);
         Matrix4x4 transform(1.0f);
         m_pProjector->setTransformMatrix(transform);
         m_refProjector = m_pProjector.get();

@@ -28,7 +28,7 @@ namespace vg
         //six projector is: x(+-), y(+-) and z(+-).
         for (auto &pProjector : m_pProjectors)
         {
-            pProjector->updateProj(glm::radians(90.0f), 1.0f, std::min(0.001f, radius), radius);
+            pProjector->updateProj(glm::radians(90.0f), 1.0f, std::min(1.0f, radius), radius);
         }
         _syncProjectorTransform();
 

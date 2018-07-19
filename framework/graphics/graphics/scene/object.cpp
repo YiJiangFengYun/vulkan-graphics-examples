@@ -75,8 +75,15 @@ namespace vg
         : BaseObject()
         , DimObject<SPACE_TYPE>()
     {
-
+        m_pTransform->setSpace(m_space);
     }
+
+    template <SpaceType SPACE_TYPE>
+    void Object<SPACE_TYPE>::_addToSpace(const Space &space)
+    {
+        m_pTransform->setSpace(space);
+    }
+
 
     //template instantiation
     template class Object<SpaceType::SPACE_2>;

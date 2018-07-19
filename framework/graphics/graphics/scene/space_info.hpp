@@ -28,12 +28,6 @@ namespace vg
         using RotationDimType = void;
     };
 
-    template<SpaceType type>
-    struct SpaceConstInfo
-    {
-        static const typename SpaceTypeInfo<type>::VectorType UP_VECTOR;
-    };
-
     template<>
     struct SpaceTypeInfo<SpaceType::SPACE_2>
     {
@@ -57,13 +51,6 @@ namespace vg
         using RotationType = Quaternion;
         using RotationDimType = Vector3;
     };
-
-    template<>
-    const SpaceTypeInfo<SpaceType::SPACE_2>::VectorType SpaceConstInfo<SpaceType::SPACE_2>::UP_VECTOR = { 0.0f, 1.0f };
-
-    template<>
-    const SpaceTypeInfo<SpaceType::SPACE_3>::VectorType SpaceConstInfo<SpaceType::SPACE_3>::UP_VECTOR = { 0.0f, 1.0f, 0.0f };
-
 
     struct Space
     {

@@ -13,8 +13,10 @@ namespace vg
     {
     public:
         BaseTransform();
+        const Space &getSpace() const;
+        void setSpace(const Space &space);
     protected:
-
+        Space m_space;
     };
 
     template <SpaceType SPACE_TYPE>

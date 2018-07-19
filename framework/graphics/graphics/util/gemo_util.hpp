@@ -6,6 +6,19 @@
 namespace vg
 {
     extern Matrix4x4 tranMat3ToMat4(Matrix3x3 srcMat);
+    extern Matrix4x4 lookAtRH
+	(
+		const Vector3 &eye,
+		const Vector3 &center,
+		const Vector3 &up
+	);
+
+	extern Matrix4x4 lookAtLH
+	(
+		const Vector3 &eye,
+		const Vector3 &center,
+		const Vector3 &up
+	);
 
     template <typename PointType>
     fd::Bounds<typename PointType> tranBoundsToNewSpace(

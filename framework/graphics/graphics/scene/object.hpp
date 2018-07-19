@@ -55,6 +55,7 @@ namespace vg
     {
     public:
         Object();
+        virtual void _addToSpace(const Space &space) override;
     protected:
         
     };

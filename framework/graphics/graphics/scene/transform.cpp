@@ -5,8 +5,19 @@ namespace vg
 //BaesTransform
     BaseTransform::BaseTransform()
         : Base(BaseType::TRANSFORM)
+        , m_space()
     {
 
+    }
+
+    const Space &BaseTransform::getSpace() const
+    {
+        return m_space;
+    }
+       
+    void BaseTransform::setSpace(const Space &space)
+    {
+        m_space = space;
     }
 
 //Transform

@@ -84,7 +84,9 @@ namespace vg
 
             uint32_t componentCount;
             Component *pComponent;
-            BuildInDataInfo();
+            BuildInDataInfo(uint32_t componentCount = 0u, Component *pComponent = nullptr);
+            BuildInDataInfo(const BuildInDataInfo &target);
+            BuildInDataInfo &operator=(const BuildInDataInfo &target);
         };
 
         struct _BuildInDataCache
@@ -96,17 +98,17 @@ namespace vg
             Matrix4x4 matrixView;
             Matrix4x4 matrixProjection;
 
-            _BuildInDataCache();
-
-            _BuildInDataCache(Matrix4x4 matrixObjectToNDC
-                , Color mainColor
-                , Matrix4x4 matrixObjectToWorld
-                , Matrix4x4 matrixObjectToView
-                , Matrix4x4 matrixView
-                , Matrix4x4 matrixProjection);
+            _BuildInDataCache(Matrix4x4 matrixObjectToNDC = Matrix4x4(1.0f)
+                , Color mainColor = Color(1.0f)
+                , Matrix4x4 matrixObjectToWorld = Matrix4x4(1.0f)
+                , Matrix4x4 matrixObjectToView = Matrix4x4(1.0f)
+                , Matrix4x4 matrixView = Matrix4x4(1.0f)
+                , Matrix4x4 matrixProjection = Matrix4x4(1.0f)
+                );
 
             _BuildInDataCache(const _BuildInDataCache &target);
             _BuildInDataCache(const _BuildInDataCache &&target);
+            _BuildInDataCache &operator=(const _BuildInDataCache &target);
         };
 
         using PipelineStateID = uint32_t; 
@@ -121,6 +123,8 @@ namespace vg
                 , uint32_t size = 0u
                 , const void *pData = nullptr
                 );
+            PushConstantUpdateInfo(const PushConstantUpdateInfo &target);
+            PushConstantUpdateInfo &operator=(const PushConstantUpdateInfo &target);
         };
 
         struct VertexInputFilterInfo
@@ -131,7 +135,11 @@ namespace vg
 
             VertexInputFilterInfo(Bool32 filterEnable = VG_FALSE
                 , uint32_t locationCount = 0u
-                , uint32_t * pLocations = nullptr);
+                , uint32_t * pLocations = nullptr
+                );
+
+            VertexInputFilterInfo(const VertexInputFilterInfo &target);
+            VertexInputFilterInfo &operator=(const VertexInputFilterInfo &target);
         };
 
         Pass();

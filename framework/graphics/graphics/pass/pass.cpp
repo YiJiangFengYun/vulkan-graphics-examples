@@ -2,11 +2,25 @@
 
 namespace vg
 {
-    Pass::BuildInDataInfo::BuildInDataInfo()
-        : componentCount(0u)
-        , pComponent(nullptr)
+    Pass::BuildInDataInfo::BuildInDataInfo(uint32_t componentCount, Component *pComponent)
+        : componentCount(componentCount)
+        , pComponent(pComponent)
     {
 
+    }
+
+    Pass::BuildInDataInfo::BuildInDataInfo(const BuildInDataInfo &target)
+        : componentCount(target.componentCount)
+        , pComponent(target.pComponent)
+    {
+
+    }
+    
+    Pass::BuildInDataInfo &Pass::BuildInDataInfo::operator=(const BuildInDataInfo &target)
+    {
+        componentCount = target.componentCount;
+        pComponent = target.pComponent;
+        return *this;
     }
 
     const std::array<uint32_t, static_cast<size_t>(Pass::BuildInDataType::COUNT)> Pass::buildInDataTypeSizes = {
@@ -31,6 +45,24 @@ namespace vg
 
     }
 
+    Pass::PushConstantUpdateInfo::PushConstantUpdateInfo(const PushConstantUpdateInfo &target)
+        : stageFlags(target.stageFlags)
+        , offset(target.offset)
+        , size(target.size)
+        , pData(target.pData)
+    {
+        
+    }
+            
+    Pass::PushConstantUpdateInfo &Pass::PushConstantUpdateInfo::operator=(const PushConstantUpdateInfo &target)
+    {
+        stageFlags = target.stageFlags;
+        offset = target.offset;
+        size = target.size;
+        pData = target.pData;
+        return *this;
+    }
+
     Pass::VertexInputFilterInfo::VertexInputFilterInfo(Bool32 filterEnable
         , uint32_t locationCount
         , uint32_t * pBindings
@@ -40,6 +72,22 @@ namespace vg
         , pLocations(pLocations)
     {
 
+    }
+
+    Pass::VertexInputFilterInfo::VertexInputFilterInfo(const VertexInputFilterInfo &target)
+        : filterEnable(target.filterEnable)
+        , locationCount(target.locationCount)
+        , pLocations(target.pLocations)
+    {
+
+    }
+    
+    Pass::VertexInputFilterInfo &Pass::VertexInputFilterInfo::operator=(const VertexInputFilterInfo &target)
+    {
+        filterEnable = target.filterEnable;
+        locationCount = target.locationCount;
+        pLocations = target.pLocations;
+        return *this;
     }
 
     Bool32 Pass::_compareDataInfo(const DataSortInfo &item1, const DataSortInfo &item2)
@@ -1519,18 +1567,7 @@ namespace vg
             }
         }
     }
-
-    Pass::_BuildInDataCache::_BuildInDataCache()
-        : matrixObjectToNDC(1.0f)
-        , mainColor(1.0f, 1.0f, 1.0f, 1.0f)
-        , matrixObjectToWorld(1.0f)
-        , matrixObjectToView(1.0f)
-        , matrixView(1.0f)
-        , matrixProjection(1.0f)
-    {
-
-    }
-
+    
     Pass::_BuildInDataCache::_BuildInDataCache(Matrix4x4 matrixObjectToNDC
         , Color mainColor
         , Matrix4x4 matrixObjectToWorld
@@ -1556,6 +1593,17 @@ namespace vg
         , matrixProjection(target.matrixProjection)
     {
 
+    }
+
+    Pass::_BuildInDataCache &Pass::_BuildInDataCache::operator=(const _BuildInDataCache &target)
+    {
+        matrixObjectToNDC = target.matrixObjectToNDC;
+        mainColor = target.mainColor;
+        matrixObjectToWorld = target.matrixObjectToWorld;
+        matrixObjectToView = target.matrixObjectToView;
+        matrixView = target.matrixView;
+        matrixProjection = target.matrixProjection;
+        return *this;
     }
 
     Pass::_BuildInDataCache::_BuildInDataCache(const _BuildInDataCache &&target)

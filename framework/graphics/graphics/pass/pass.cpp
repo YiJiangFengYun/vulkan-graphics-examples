@@ -90,6 +90,84 @@ namespace vg
         return *this;
     }
 
+    Pass::DepthBiasInfo::DepthBiasInfo(Bool32 enable
+        , Bool32 dynamic
+        , float constantFactor
+        , float clamp
+        , float slopeFactor
+        )
+        : enable(enable)
+        , dynamic(dynamic)
+        , constantFactor(constantFactor)
+        , clamp(clamp)
+        , slopeFactor(slopeFactor)
+    {
+
+    }
+            
+    Pass::DepthBiasInfo::DepthBiasInfo(const DepthBiasInfo &target)
+        : enable(target.enable)
+        , dynamic(target.dynamic)
+        , constantFactor(target.constantFactor)
+        , clamp(target.clamp)
+        , slopeFactor(target.slopeFactor)
+    {
+
+    }
+            
+    Pass::DepthBiasInfo &Pass::DepthBiasInfo::operator=(const DepthBiasInfo &target)
+    {
+        enable = target.enable;
+        dynamic = target.dynamic;
+        constantFactor = target.constantFactor;
+        clamp = target.clamp;
+        slopeFactor = target.slopeFactor;
+        return *this;
+    }
+
+    Bool32 Pass::DepthBiasInfo::operator==(const DepthBiasInfo &target) const
+    {
+        if (enable == target.enable && 
+            dynamic == target.dynamic &&
+            constantFactor == target.constantFactor &&
+            clamp == target.clamp &&
+            slopeFactor == target.slopeFactor
+            ) return VG_TRUE;
+        return VG_FALSE;
+    }
+
+    Bool32 Pass::DepthBiasInfo::operator!=(const DepthBiasInfo &target) const
+    {
+        return ! ((*this) == target);
+    }
+
+    Pass::DepthBiasUpdateInfo::DepthBiasUpdateInfo(float constantFactor
+        , float clamp
+        , float slopeFactor
+        )
+        : constantFactor(constantFactor)
+        , clamp(clamp)
+        , slopeFactor(slopeFactor)
+    {
+
+    }
+    
+    Pass::DepthBiasUpdateInfo::DepthBiasUpdateInfo(const DepthBiasUpdateInfo &target)
+        : constantFactor(target.constantFactor)
+        , clamp(target.clamp)
+        , slopeFactor(target.slopeFactor)
+    {
+
+    }
+            
+    Pass::DepthBiasUpdateInfo &Pass::DepthBiasUpdateInfo::operator=(const DepthBiasUpdateInfo &target)
+    {
+        constantFactor = target.constantFactor;
+        clamp = target.clamp;
+        slopeFactor = target.slopeFactor;
+        return *this;
+    }
+
     Bool32 Pass::_compareDataInfo(const DataSortInfo &item1, const DataSortInfo &item2)
     {
         uint32_t shaderStageValue1 = static_cast<uint32_t>(item1.shaderStageFlags);
@@ -154,6 +232,8 @@ namespace vg
         , m_buildInDataCache()
         , m_vertexInputFilterInfo()
         , m_vertexInputFilterLocations()
+        , m_depthBiasInfo()
+        , m_depthBiasUpdateInfo()
 
         //Applied
         , m_sortDataSet(_compareDataInfo)
@@ -729,6 +809,29 @@ namespace vg
         m_vertexInputFilterInfo = value;
         m_vertexInputFilterInfo.pLocations = m_vertexInputFilterLocations.data();
         _updatePipelineStateID();
+    }
+
+    const Pass::DepthBiasInfo &Pass::getDepthBiasInfo() const
+    {
+        return m_depthBiasInfo;
+    }
+
+    void Pass::setDepthBiasInfo(const DepthBiasInfo &value)
+    {
+        if (m_depthBiasInfo != value) {
+            m_depthBiasInfo = value;
+            _updatePipelineStateID();
+        }
+    }
+
+    const Pass::DepthBiasUpdateInfo &Pass::getDepthBiasUpdateInfo() const
+    {
+        return m_depthBiasUpdateInfo;
+    }
+
+    void Pass::setDepthBiasUpdateInfo(const DepthBiasUpdateInfo &value)
+    {
+        m_depthBiasUpdateInfo = value;
     }
 
     const BufferData &Pass::getBufferData() const

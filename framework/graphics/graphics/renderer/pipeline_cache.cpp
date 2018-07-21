@@ -306,6 +306,7 @@ namespace vg
         auto cullMode = pPass->getCullMode();
         auto frontFace = pPass->getFrontFace();
         auto lineWidth = pPass->getLineWidth();
+        auto &depthBiasInfo = pPass->getDepthBiasInfo();
         //Rasterization info.
         vk::PipelineRasterizationStateCreateInfo rasterizationStateCreateInfo = {
             vk::PipelineRasterizationStateCreateFlags(),  //flags
@@ -314,10 +315,10 @@ namespace vg
             polygonMode,                                  //polygonMode
             cullMode,                                     //cullMode
             frontFace,                                    //frontFace
-            VK_FALSE,                                     //depthBiasEnable
-            0.0f,                                         //depthBiasConstantFactor
-            0.0f,                                         //depthBiasClamp
-            0.0f,                                         //depthBiasSlopeFactor
+            depthBiasInfo.enable,                         //depthBiasEnable
+            depthBiasInfo.constantFactor,                 //depthBiasConstantFactor
+            depthBiasInfo.clamp,                          //depthBiasClamp
+            depthBiasInfo.slopeFactor,                    //depthBiasSlopeFactor
             lineWidth                                     //lineWidth
         };
         createInfo.pRasterizationState = &rasterizationStateCreateInfo;
@@ -389,6 +390,11 @@ namespace vg
             vk::DynamicState::eScissor,
             vk::DynamicState::eLineWidth
         };
+
+        if (depthBiasInfo.dynamic == VG_TRUE) {
+            dynamicStates.resize(dynamicStates.size() + 1u);
+            dynamicStates[dynamicStates.size() - 1u] = vk::DynamicState::eDepthBias;
+        }
 
         vk::PipelineDynamicStateCreateInfo dynamicStateCreateInfo = {
             vk::PipelineDynamicStateCreateFlags(),

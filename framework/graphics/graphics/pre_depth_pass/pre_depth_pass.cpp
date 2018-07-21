@@ -79,6 +79,16 @@ namespace vg
         m_pPass->setVertexInputFilterInfo(value);
     }
 
+    void PreDepthPass::setDepthBiasInfo(const Pass::DepthBiasInfo &value)
+    {
+        m_pPass->setDepthBiasInfo(value);
+    }
+
+    void PreDepthPass::setDepthBiasUpdateInfo(const Pass::DepthBiasUpdateInfo &value)
+    {
+        m_pPass->setDepthBiasUpdateInfo(value);
+    }
+
     void PreDepthPass::apply()
     {
         m_pPass->apply();

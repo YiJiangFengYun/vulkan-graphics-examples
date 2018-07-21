@@ -45,6 +45,10 @@ namespace vg
 
         void setVertexInputFilterInfo(const Pass::VertexInputFilterInfo &value);
 
+        void setDepthBiasInfo(const Pass::DepthBiasInfo &value);
+
+        void setDepthBiasUpdateInfo(const Pass::DepthBiasUpdateInfo &value);
+
         void apply();
 
         const Shader * getShader() const;

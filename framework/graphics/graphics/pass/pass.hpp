@@ -142,6 +142,40 @@ namespace vg
             VertexInputFilterInfo &operator=(const VertexInputFilterInfo &target);
         };
 
+        struct DepthBiasInfo
+        {
+            Bool32 enable;
+            Bool32 dynamic;
+            float constantFactor;
+            float clamp;
+            float slopeFactor;
+            DepthBiasInfo(Bool32 enable = VG_FALSE
+                , Bool32 dynamic = VG_FALSE
+                , float constantFactor = 0.0f
+                , float clamp = 0.0f
+                , float slopeFactor = 0.0f
+                );
+            DepthBiasInfo(const DepthBiasInfo &target);
+            DepthBiasInfo &operator=(const DepthBiasInfo &target);
+            Bool32 operator==(const DepthBiasInfo &target) const;
+            Bool32 operator!=(const DepthBiasInfo &target) const;
+        };
+
+        //When depth bias is dynamic, it is used to update used depth bias values.
+        struct DepthBiasUpdateInfo
+        {
+            float constantFactor;
+            float clamp;
+            float slopeFactor;
+
+            DepthBiasUpdateInfo(float constantFactor = 0.0f
+                , float clamp = 0.0f
+                , float slopeFactor = 0.0f
+                );
+            DepthBiasUpdateInfo(const DepthBiasUpdateInfo &target);
+            DepthBiasUpdateInfo &operator=(const DepthBiasUpdateInfo &target);
+        };
+
         Pass();
         Pass(Shader *pShader);
         ~Pass();
@@ -305,6 +339,12 @@ namespace vg
         const VertexInputFilterInfo &getVertexInputFilter() const;
         void setVertexInputFilterInfo(const VertexInputFilterInfo &value);
 
+        const DepthBiasInfo &getDepthBiasInfo() const;
+        void setDepthBiasInfo(const DepthBiasInfo &value);
+
+        const DepthBiasUpdateInfo &getDepthBiasUpdateInfo() const;
+        void setDepthBiasUpdateInfo(const DepthBiasUpdateInfo &value);
+
         const BufferData &getBufferData() const;
         const vk::DescriptorSetLayout *getDescriptorSetLayout() const;
         const vk::DescriptorPool *getDescriptorPool() const;
@@ -356,6 +396,9 @@ namespace vg
 
         VertexInputFilterInfo m_vertexInputFilterInfo;
         std::vector<uint32_t> m_vertexInputFilterLocations;
+
+        DepthBiasInfo m_depthBiasInfo;
+        DepthBiasUpdateInfo m_depthBiasUpdateInfo;
 
         ////////applied data
 

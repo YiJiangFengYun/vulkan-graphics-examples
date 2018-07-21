@@ -301,6 +301,19 @@ namespace vg
             );
         }
 
+        //depth bias
+        auto &depthBiasInfo = pPass->getDepthBiasInfo();
+        auto &depthBiasUpdateInfo = pPass->getDepthBiasUpdateInfo();
+        if (depthBiasInfo.enable == VG_TRUE && 
+            depthBiasInfo.dynamic == VG_TRUE
+            ) 
+        {
+            pCommandBuffer->setDepthBias(depthBiasUpdateInfo.constantFactor,
+                depthBiasUpdateInfo.clamp,
+                depthBiasUpdateInfo.slopeFactor
+            );
+        }
+
 
         pCommandBuffer->bindPipeline(vk::PipelineBindPoint::eGraphics, *pPipeline);
 

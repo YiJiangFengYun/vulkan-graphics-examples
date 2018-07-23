@@ -469,6 +469,7 @@ namespace vgim
             vk::ImageLayout::eUndefined,
         };
         vg::PassTextureInfo info = {
+            vg::SamplerTextureType::TEX_2D,
             1u,
             &itemInfo,
             VG_PASS_OTHER_MIN_BINDING_PRIORITY,

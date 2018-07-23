@@ -202,6 +202,7 @@ void Window::_createMaterial()
             vk::ImageLayout::eUndefined,
         };
         vg::PassTextureInfo mainTextureInfo = {
+            vg::SamplerTextureType::TEX_2D,
             1u,
             &itemInfo,
             VG_PASS_OTHER_MIN_BINDING_PRIORITY,
@@ -261,6 +262,7 @@ void Window::_createMaterial()
             vk::ImageLayout::eUndefined,
         };
         vg::PassTextureInfo mainTextureInfo = {
+            vg::SamplerTextureType::TEX_2D,
             1u,
             &itemInfo,
             VG_PASS_OTHER_MIN_BINDING_PRIORITY,

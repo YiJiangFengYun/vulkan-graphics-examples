@@ -60,12 +60,14 @@ namespace vg
             TextureInfo(const TextureInfo &);
             TextureInfo& operator=(const TextureInfo &);
         };
+        SamplerTextureType textureType;
         uint32_t textureCount;
         const TextureInfo *pTextures;
         uint32_t bindingPriority;
         ImageDescriptorType descriptorType;
         vk::ShaderStageFlags stageFlags;
-        PassTextureInfo(uint32_t textureCount = 0u
+        PassTextureInfo(SamplerTextureType textureType = SamplerTextureType::TEX_1D
+            , uint32_t textureCount = 0u
             , const TextureInfo *pTextures = nullptr
             , uint32_t bindingPriority = 0u
             , ImageDescriptorType descriptorType = ImageDescriptorType::COMBINED_IMAGE_SAMPLER
@@ -76,11 +78,13 @@ namespace vg
     };
 
     struct PassTextureData {
+        SamplerTextureType textureType;
         std::vector<PassTextureInfo::TextureInfo> textures;
         uint32_t bindingPriority;
         ImageDescriptorType descriptorType;
         vk::ShaderStageFlags stageFlags;
-        PassTextureData(std::vector<PassTextureInfo::TextureInfo> textures = {}
+        PassTextureData(SamplerTextureType textureType = SamplerTextureType::TEX_1D
+            , std::vector<PassTextureInfo::TextureInfo> textures = {}
             , uint32_t bindingPriority = 0u
             , ImageDescriptorType descriptorType = ImageDescriptorType::COMBINED_IMAGE_SAMPLER
             , vk::ShaderStageFlags stageFlags = vk::ShaderStageFlagBits::eFragment

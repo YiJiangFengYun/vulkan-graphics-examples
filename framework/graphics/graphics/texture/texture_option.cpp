@@ -168,4 +168,9 @@ namespace vg
             break;
         }
     }
+
+    vk::ImageViewType tranSamplerTextureTypeToVKImageViewType(SamplerTextureType type)
+    {
+        return static_cast<vk::ImageViewType>(type);
+    }
 }

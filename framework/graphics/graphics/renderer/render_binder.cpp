@@ -178,6 +178,7 @@ namespace vg
                     vk::ImageLayout::eUndefined,
                 };
                 PassTextureInfo info = {
+                    vg::SamplerTextureType::TEX_2D,
                     1u,
                     &itemInfo,
                     VG_PASS_POST_RENDER_TEXTURE_BINDING_PRIORITY,
@@ -1149,6 +1150,7 @@ namespace vg
                         vk::ImageLayout::eUndefined,
                     };
                     PassTextureInfo info = {
+                        vg::SamplerTextureType::TEX_2D,
                         1u,
                         &itemInfo,
                         VG_PASS_PRE_DEPTH_TEXTURE_BINDING_PRIORITY,

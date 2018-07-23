@@ -83,12 +83,14 @@ namespace vg
         return *this;
     }
 
-    PassTextureData::PassTextureData(std::vector<PassTextureInfo::TextureInfo> textures
+    PassTextureData::PassTextureData(SamplerTextureType textureType
+        , std::vector<PassTextureInfo::TextureInfo> textures
         , uint32_t bindingPriority
         , ImageDescriptorType descriptorType
         , vk::ShaderStageFlags stageFlags
         )
-        : textures(textures)
+        : textureType(textureType)
+        , textures(textures)
         , bindingPriority(bindingPriority)
         , descriptorType(descriptorType)
         , stageFlags(stageFlags)
@@ -97,7 +99,8 @@ namespace vg
     }
         
     PassTextureData::PassTextureData(const PassTextureData &target)
-        : textures(target.textures)
+        : textureType(target.textureType)
+        , textures(target.textures)
         , bindingPriority(target.bindingPriority)
         , descriptorType(target.descriptorType)
         , stageFlags(target.stageFlags)
@@ -106,7 +109,8 @@ namespace vg
     }
         
     PassTextureData::PassTextureData(const PassTextureInfo &target)
-        : textures()
+        : textureType(target.textureType)
+        , textures()
         , bindingPriority(target.bindingPriority)
         , descriptorType(target.descriptorType)
         , stageFlags(target.stageFlags)
@@ -118,6 +122,7 @@ namespace vg
         
     PassTextureData &PassTextureData::operator=(const PassTextureData &target)
     {
+        textureType = target.textureType;
         textures = target.textures;
         bindingPriority = target.bindingPriority;
         descriptorType = target.descriptorType;
@@ -127,6 +132,7 @@ namespace vg
         
     PassTextureData &PassTextureData::operator=(const PassTextureInfo &target)
     {
+        textureType = target.textureType;
         textures.resize(target.textureCount);
         memcpy(textures.data(), target.pTextures, 
             sizeof(PassTextureInfo::TextureInfo) * static_cast<size_t>(target.textureCount));
@@ -140,6 +146,7 @@ namespace vg
     PassTextureInfo PassTextureData::getTextureInfo() const
     {
         PassTextureInfo result = {
+            textureType,
             static_cast<uint32_t>(textures.size()),
             textures.data(),
             bindingPriority,
@@ -149,13 +156,15 @@ namespace vg
         return result;
     }
 
-    PassTextureInfo::PassTextureInfo(uint32_t textureCount
+    PassTextureInfo::PassTextureInfo(SamplerTextureType textureType
+        , uint32_t textureCount
         , const TextureInfo *pTextures
         , uint32_t bindingPriority
         , ImageDescriptorType descriptorType
         , vk::ShaderStageFlags stageFlags
         )
-        : textureCount(textureCount)
+        : textureType(textureType)
+        , textureCount(textureCount)
         , pTextures(pTextures)
         , bindingPriority(bindingPriority)
         , descriptorType(descriptorType)
@@ -165,7 +174,8 @@ namespace vg
     }
 
     PassTextureInfo::PassTextureInfo(const PassTextureInfo &target)
-        : textureCount(target.textureCount)
+        : textureType(target.textureType)
+        , textureCount(target.textureCount)
         , pTextures(target.pTextures)
         , bindingPriority(target.bindingPriority)
         , descriptorType(target.descriptorType)
@@ -176,6 +186,7 @@ namespace vg
 
     PassTextureInfo& PassTextureInfo::operator=(const PassTextureInfo &target)
     {
+        textureType = target.textureType;
         textureCount = target.textureCount;
         pTextures = target.pTextures;
         bindingPriority = target.bindingPriority;

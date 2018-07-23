@@ -43,6 +43,18 @@ namespace vg
         RANGE_SIZE = (END_RANGE - BEGIN_RANGE + 1)
     };
 
+    enum SamplerTextureType {
+        TEX_1D = vk::ImageViewType::e1D,
+        TEX_2D = vk::ImageViewType::e2D,
+        TEX_3D = vk::ImageViewType::e3D,
+        TEX_CUBE = vk::ImageViewType::eCube,
+        TEX_1D_ARRAY = vk::ImageViewType::e1DArray,
+        TEX_2D_ARRAY = vk::ImageViewType::e2DArray,
+        TEX_2D_CUBE_ARRAY = vk::ImageViewType::eCubeArray
+    };
+
+    extern vk::ImageViewType tranSamplerTextureTypeToVKImageViewType(SamplerTextureType type);
+
     extern std::array<std::pair<TextureType, std::string>, static_cast<size_t>(TextureType::RANGE_SIZE)> arrTextureTypeToNames;
     extern std::array<std::pair<TextureType, vk::ImageType>, static_cast<size_t>(TextureType::RANGE_SIZE)> arrTextureTypeToVKImageType;
     extern std::array<std::pair<TextureType, vk::ImageViewType>, static_cast<size_t>(TextureType::RANGE_SIZE)> arrTextureTypeToVKImageViewType;

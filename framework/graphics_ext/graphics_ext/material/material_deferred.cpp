@@ -554,6 +554,7 @@ namespace vge
                     vk::ImageLayout::eUndefined,
                 };
                 vg::PassTextureInfo info = {
+                    vg::SamplerTextureType::TEX_2D,
                     1u,
                     &itemInfo,
                     i + 1, //0 is own by build in buffer data of pass.
@@ -575,6 +576,7 @@ namespace vge
                     vk::ImageLayout::eUndefined,
                 };
                 vg::PassTextureInfo info = {
+                    vg::SamplerTextureType::TEX_2D,
                     1u,
                     &itemInfo,
                     0u,
@@ -592,6 +594,7 @@ namespace vge
                     vk::ImageLayout::eUndefined,
                 };
                 vg::PassTextureInfo info = {
+                    vg::SamplerTextureType::TEX_2D,
                     1u,
                     &itemInfo,
                     1u,

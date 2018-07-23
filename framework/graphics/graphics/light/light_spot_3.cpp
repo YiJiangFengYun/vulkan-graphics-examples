@@ -29,7 +29,7 @@ namespace vg
         m_pProjector->setTransformMatrix(transform);
         m_refProjector = m_pProjector.get();
 
-        //add radius to lgiht data
+        //add range to lgiht data
         if (m_data.hasData(LIGHT_SPOT3_DATA_RANGE_NAME) == VG_FALSE)
         {
             LightDataInfo info = {
@@ -89,7 +89,7 @@ namespace vg
     {
         m_range = range;
         m_pProjector->updateProj(m_fov, 1.0f, std::min(1.0f, range), range);
-        //add radius to lgiht data
+        //add range to lgiht data
         if (m_data.hasData(LIGHT_SPOT3_DATA_RANGE_NAME) == VG_FALSE)
         {
             LightDataInfo info = {

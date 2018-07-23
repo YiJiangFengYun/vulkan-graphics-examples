@@ -4,14 +4,14 @@ namespace vg
 {
     const uint32_t LightPoint3::DEFAULT_DEPTH_TEXTURE_WIDTH = 1280u;
     const uint32_t LightPoint3::DEFAULT_DEPTH_TEXTURE_HEIGHT = 1280u;
-    const float LightPoint3::DEFAULT_RADIUS = 100.0f;
+    const float LightPoint3::DEFAULT_RANGE = 100.0f;
 
-    LightPoint3::LightPoint3(float radius
+    LightPoint3::LightPoint3(float range
         , uint32_t depthTextureWidth
         , uint32_t depthTextureHeight
         )
         : Light3()
-        , m_radius(radius)
+        , m_range(range)
         , m_cubeTargets(depthTextureWidth
             , depthTextureHeight
             )
@@ -28,7 +28,7 @@ namespace vg
         //six projector is: x(+-), y(+-) and z(+-).
         for (auto &pProjector : m_pProjectors)
         {
-            pProjector->updateProj(glm::radians(90.0f), 1.0f, std::min(1.0f, radius), radius);
+            pProjector->updateProj(glm::radians(90.0f), 1.0f, std::min(1.0f, range), range);
         }
         _syncProjectorTransform();
 
@@ -37,19 +37,19 @@ namespace vg
             m_refProjectors[i] = m_pProjectors[i].get();
         }
 
-        //add radius to light data.
-        if (m_data.hasData("light_radius") == VG_FALSE)
+        //add range to light data.
+        if (m_data.hasData(LIGHT_POINT3_DATA_RANGE_NAME) == VG_FALSE)
         {
             LightDataInfo info = {
                 VG_LIGHT_DATA_OTHER_MIN_LAYOUT_PRIORITY,
             };
-            m_data.addData("light_radius", info, radius);
+            m_data.addData(LIGHT_POINT3_DATA_RANGE_NAME, info, range);
             m_dataChanged = VG_TRUE;
         } else {
-            m_data.setData("light_radius", radius);
+            m_data.setData(LIGHT_POINT3_DATA_RANGE_NAME, range);
         }
         m_dataContentChanged = VG_TRUE;
-        m_dataContentChanges["light_radius"] = VG_TRUE;
+        m_dataContentChanges[LIGHT_POINT3_DATA_RANGE_NAME] = VG_TRUE;
 
         //add cube depth texture to light textures.
         LightTextureInfo texInfo = {
@@ -74,6 +74,34 @@ namespace vg
             reinterpret_cast<const PreDepthTarget *const *>(m_cubeTargets.getFaceTargets().data()),
         };
         return info;
+    }
+
+    float LightPoint3::getRange() const
+    {
+        return m_range;
+    }
+
+    void LightPoint3::setRange(float range)
+    {
+        m_range = range;
+        for (auto &pProjector : m_pProjectors)
+        {
+            pProjector->updateProj(glm::radians(90.0f), 1.0f, std::min(1.0f, range), range);
+        }
+        //add range to light data.
+        if (m_data.hasData(LIGHT_POINT3_DATA_RANGE_NAME) == VG_FALSE)
+        {
+            LightDataInfo info = {
+                VG_LIGHT_DATA_OTHER_MIN_LAYOUT_PRIORITY,
+            };
+            m_data.addData(LIGHT_POINT3_DATA_RANGE_NAME, info, range);
+            m_dataChanged = VG_TRUE;
+        } else {
+            m_data.setData(LIGHT_POINT3_DATA_RANGE_NAME, range);
+        }
+        m_dataContentChanged = VG_TRUE;
+        m_dataContentChanges[LIGHT_POINT3_DATA_RANGE_NAME] = VG_TRUE;
+        _apply();
     }
 
     void LightPoint3::_beginRender()

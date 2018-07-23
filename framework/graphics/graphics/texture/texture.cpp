@@ -168,10 +168,12 @@ namespace vg
 
     }
 
-    Texture::ImageViewCreateInfo::ImageViewCreateInfo(vk::ComponentMapping components
+    Texture::ImageViewCreateInfo::ImageViewCreateInfo(vk::ImageViewType viewType
+        , vk::ComponentMapping components
         , vk::ImageSubresourceRange subResourceRange
         )
-        : components(components)
+        : viewType(viewType)
+        , components(components)
         , subResourceRange(subResourceRange)
     {
 
@@ -373,6 +375,16 @@ namespace vg
         return m_mipMap;
     }
 
+    vk::ImageType Texture::getImageType() const
+    {
+        return arrTextureTypeToVKImageType[static_cast<size_t>(m_type)].second;
+    }
+
+    vk::ImageViewType Texture::getImageViewType() const
+    {
+        return arrTextureTypeToVKImageViewType[static_cast<size_t>(m_type)].second;
+    }
+
     const Texture::Image *Texture::getImage() const
     {
         return m_pImage.get();
@@ -404,11 +416,10 @@ namespace vg
             throw std::invalid_argument(errorStr);
         }
 #endif //DEBUG
-
         ImageViewInfo info = {
             vk::ImageViewCreateFlags(),
             *(m_pImage->getImage()),
-            _getImageViewType(),
+            createInfo.viewType,
             m_format,
             createInfo.components,
             createInfo.subResourceRange,
@@ -764,14 +775,6 @@ namespace vg
 
             endSingleTimeCommands(pCommandBuffer);
         }
-    }
-
-    vk::ImageViewType Texture::_getImageViewType() const
-    {
-        vk::ImageViewType vkImageViewType;
-        vkImageViewType = arrTextureTypeToVKImageViewType[static_cast<size_t>(m_type)].second;
-
-        return vkImageViewType;
     }
 
     void Texture::_createBuffer(vk::DeviceSize size, vk::BufferUsageFlags usage, vk::MemoryPropertyFlags properties,

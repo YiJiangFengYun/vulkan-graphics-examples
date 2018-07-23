@@ -283,6 +283,7 @@ namespace vge
             //Create depth only image view for sampling from shader in trunk pass.
             auto pImage = m_pDepthStencilAttachment->getImage();
             vg::Texture::ImageViewCreateInfo info = {
+                m_pDepthStencilAttachment->getImageViewType(),
                 vk::ComponentMapping(),
                 {
                     vk::ImageAspectFlagBits::eDepth,

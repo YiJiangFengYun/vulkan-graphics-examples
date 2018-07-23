@@ -164,6 +164,7 @@ namespace vg
                 1u,                                       //layerCount
             };
             Texture::ImageViewCreateInfo createInfo = {
+                vk::ImageViewType::e2D,
                 vk::ComponentMapping(),
                 subResRange,
             };

@@ -107,10 +107,12 @@ namespace vg
         };
 
         struct ImageViewCreateInfo {
+            vk::ImageViewType viewType;
             vk::ComponentMapping components;
             vk::ImageSubresourceRange subResourceRange;
 
-            ImageViewCreateInfo(vk::ComponentMapping components = vk::ComponentMapping()
+            ImageViewCreateInfo(vk::ImageViewType viewType = vk::ImageViewType()
+                , vk::ComponentMapping components = vk::ComponentMapping()
                 , vk::ImageSubresourceRange subResourceRange = vk::ImageSubresourceRange()
                 );
         };
@@ -218,6 +220,8 @@ namespace vg
 
         TextureType getType() const;
         Bool32 getIsMipmap() const;
+        vk::ImageType getImageType() const;
+        vk::ImageViewType getImageViewType() const;
         const Image *getImage() const;
         const ImageView *getImageView() const;
         const Sampler *getSampler() const;
@@ -267,8 +271,6 @@ namespace vg
             , uint32_t size
             , Bool32 cacheMemory = VG_FALSE
             , Bool32 createMipmaps = VG_FALSE);
-
-        vk::ImageViewType _getImageViewType() const;
 
         void _createBuffer(vk::DeviceSize size, vk::BufferUsageFlags usage, vk::MemoryPropertyFlags properties,
             std::shared_ptr<vk::Buffer>& pBuffer, std::shared_ptr<vk::DeviceMemory>& pBufferMemory);

@@ -4,18 +4,18 @@ namespace vg
 {
     const uint32_t LightSpot3::DEFAULT_DEPTH_TEXTURE_WIDTH = 1280u;
     const uint32_t LightSpot3::DEFAULT_DEPTH_TEXTURE_HEIGHT = 1280u;
-    const float LightSpot3::DEFAULT_RADIUS = 100.0f;
+    const float LightSpot3::DEFAULT_RANGE = 100.0f;
     const float LightSpot3::DEFAULT_FOV = glm::radians(45.0f);
     static const vk::Format DEFAULT_FORMAT = vk::Format::eD32Sfloat;
     LightSpot3::LightSpot3(float fov
-        , float radius
+        , float range
         , uint32_t depthTextureWidth
         , uint32_t depthTextureHeight
         , vk::Format format
         )
         : Light3()
         , m_fov(fov)
-        , m_radius(radius)
+        , m_range(range)
         , m_pDepthTarget()
         , m_refDepthTarget()
         , m_pProjector()
@@ -24,24 +24,24 @@ namespace vg
         m_pDepthTarget = std::shared_ptr<LightDepthTarget2D>{ new LightDepthTarget2D(depthTextureWidth, depthTextureHeight, format)};
         m_refDepthTarget = m_pDepthTarget.get();
         m_pProjector = std::shared_ptr<Projector3>{new Projector3()};
-        m_pProjector->updateProj(fov, 1.0f, std::min(1.0f, radius), radius);
+        m_pProjector->updateProj(fov, 1.0f, std::min(1.0f, range), range);
         Matrix4x4 transform(1.0f);
         m_pProjector->setTransformMatrix(transform);
         m_refProjector = m_pProjector.get();
 
         //add radius to lgiht data
-        if (m_data.hasData(LIGHT_SPOT3_DATA_RADIUS_NAME) == VG_FALSE)
+        if (m_data.hasData(LIGHT_SPOT3_DATA_RANGE_NAME) == VG_FALSE)
         {
             LightDataInfo info = {
                 VG_LIGHT_DATA_OTHER_MIN_LAYOUT_PRIORITY,
             };
-            m_data.addData(LIGHT_SPOT3_DATA_RADIUS_NAME, info, radius);
+            m_data.addData(LIGHT_SPOT3_DATA_RANGE_NAME, info, range);
             m_dataChanged = VG_TRUE;
         } else {
-            m_data.setData(LIGHT_SPOT3_DATA_RADIUS_NAME, radius);
+            m_data.setData(LIGHT_SPOT3_DATA_RANGE_NAME, range);
         }
         m_dataContentChanged = VG_TRUE;
-        m_dataContentChanges[LIGHT_SPOT3_DATA_RADIUS_NAME] = VG_TRUE;
+        m_dataContentChanges[LIGHT_SPOT3_DATA_RANGE_NAME] = VG_TRUE;
 
         //add the depth texture to light textures.
         LightTextureInfo texInfo = {
@@ -66,6 +66,43 @@ namespace vg
             reinterpret_cast<const PreDepthTarget *const *>(&m_refDepthTarget),
         };
         return info;
+    }
+
+    float LightSpot3::getFOV() const
+    {
+        return m_fov;
+    }
+
+    void LightSpot3::setFOV(float value)
+    {
+        m_fov = value;
+        auto range = m_range;
+        m_pProjector->updateProj(m_fov, 1.0f, std::min(1.0f, range), range);
+    }
+
+    float LightSpot3::getRange() const
+    {
+        return m_range;
+    }
+
+    void LightSpot3::setRange(float range)
+    {
+        m_range = range;
+        m_pProjector->updateProj(m_fov, 1.0f, std::min(1.0f, range), range);
+        //add radius to lgiht data
+        if (m_data.hasData(LIGHT_SPOT3_DATA_RANGE_NAME) == VG_FALSE)
+        {
+            LightDataInfo info = {
+                VG_LIGHT_DATA_OTHER_MIN_LAYOUT_PRIORITY,
+            };
+            m_data.addData(LIGHT_SPOT3_DATA_RANGE_NAME, info, range);
+            m_dataChanged = VG_TRUE;
+        } else {
+            m_data.setData(LIGHT_SPOT3_DATA_RANGE_NAME, range);
+        }
+        m_dataContentChanged = VG_TRUE;
+        m_dataContentChanges[LIGHT_SPOT3_DATA_RANGE_NAME] = VG_TRUE;
+         _apply();
     }
 
     void LightSpot3::_beginRender()

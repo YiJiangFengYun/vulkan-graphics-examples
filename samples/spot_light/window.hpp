@@ -6,6 +6,10 @@
 
 #define MAX_LIGHT_COUNT 2
 
+#define MIN_LIGHT_RANGE 10.0f
+#define MAX_LIGHT_RANGE 200.0f
+#define DEFAULT_LIGHT_RANGE 100.0f
+
 class Window : public sampleslib::Window<vg::SpaceType::SPACE_3>
 {
 public:
@@ -22,6 +26,7 @@ private:
     sampleslib::AssimpScene m_assimpScene;
     std::shared_ptr<vg::Material> m_pMaterial;
 
+    float m_lightRange;
     std::shared_ptr<vg::LightSpot3> m_pSpotLight;
 
     virtual void _init() override;

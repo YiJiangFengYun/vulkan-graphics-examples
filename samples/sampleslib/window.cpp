@@ -79,6 +79,16 @@ namespace sampleslib
                 
             }
         });
+
+        glfwSetKeyCallback(m_pWindow.get(), [](GLFWwindow *glfwWindow, int key, int scancode, int action, int mods)
+        {
+            Window* const instance = (Window*)glfwGetWindowUserPointer(glfwWindow);
+    
+            if (action == GLFW_PRESS && key == GLFW_KEY_SPACE)
+            {
+                instance->m_isPause = ! instance->m_isPause;
+            }
+        });
     }
 
     template<>
@@ -103,7 +113,7 @@ namespace sampleslib
         auto epsilon = std::numeric_limits<float>::epsilon();
         if (glm::length(m_cameraPosition) > epsilon)
         {
-            lookAtMatrix = vg::lookAtLH(m_cameraPosition, vg::Vector3(0.0f), vg::Vector3(0.0f, 1.0f, 0.0f));
+            lookAtMatrix = glm::inverse(vg::lookAtLH(m_cameraPosition, vg::Vector3(0.0f), vg::Vector3(0.0f, 1.0f, 0.0f)));
         }
 
         auto worldRotationMatrix = glm::mat4(1.0f);
@@ -111,7 +121,7 @@ namespace sampleslib
         worldRotationMatrix = glm::rotate(worldRotationMatrix, m_worldRotation.y, glm::vec3(0.0f, 1.0f, 0.0f));
         worldRotationMatrix = glm::rotate(worldRotationMatrix, m_worldRotation.z, glm::vec3(0.0f, 1.0f, 0.0f));
 
-        vg::Matrix4x4 localMatrix = worldRotationMatrix * lookAtMatrix * rotationMatrix * matrix;
+        vg::Matrix4x4 localMatrix = glm::inverse(worldRotationMatrix) * lookAtMatrix * rotationMatrix * matrix;
         
         // auto lookAtMatrix = glm::lookAt(m_cameraPosition, vg::Vector3(0.0f), vg::Vector3(0.0f, 1.0f, 0.0f));
         // auto localMatrix = lookAtMatrix * rotationMatrix * matrix;

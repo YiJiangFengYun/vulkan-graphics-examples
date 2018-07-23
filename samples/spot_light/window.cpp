@@ -39,16 +39,6 @@ void Window::_init()
     _initScene();
     _enableLighting();
     _enableShadow();
-
-    glfwSetKeyCallback(m_pWindow.get(), [](GLFWwindow *glfwWindow, int key, int scancode, int action, int mods)
-    {
-        Window* const instance = (Window*)glfwGetWindowUserPointer(glfwWindow);
-
-        if (action == GLFW_PRESS && key == GLFW_KEY_SPACE)
-        {
-            instance->m_isPause = ! instance->m_isPause;
-        }
-    });
 }
 
 void Window::_initState()
@@ -58,6 +48,7 @@ void Window::_initState()
     /// Build a quaternion from euler angles (pitch, yaw, roll), in radians.
     m_cameraRotation = vg::Vector3(glm::radians(0.0f), glm::radians(0.0f), glm::radians(0.0f));
     m_timerSpeedFactor = 0.1f;
+    m_lightRange = DEFAULT_LIGHT_RANGE;
 }
 
 void Window::_createModel()
@@ -81,7 +72,7 @@ void Window::_createModel()
 
 void Window::_createLights()
 {
-    m_pSpotLight = std::shared_ptr<vg::LightSpot3>{ new vg::LightSpot3(glm::radians(45.0f), 100.0f, 2048, 2048, vk::Format::eD16Unorm)};
+    m_pSpotLight = std::shared_ptr<vg::LightSpot3>{ new vg::LightSpot3(glm::radians(45.0f), m_lightRange, 2048, 2048, vk::Format::eD16Unorm)};
 
     _updateLights();
 }
@@ -215,4 +206,16 @@ void Window::_onUpdate()
     auto pPass = pMaterial->getMainPass();
     pPass->setData("other_data", m_pCamera->getTransform()->getPosition());
     pPass->apply();
+
+#ifdef USE_IMGUI_BIND
+    auto pos = m_lastWinPos;
+    auto size = m_lastWinSize;
+    ImGui::SetNextWindowPos(ImVec2(pos.x, pos.y + size.y + 10));
+    ImGui::SetNextWindowSize(ImVec2(0, 0));
+    ImGui::Begin("Settings", nullptr, ImGuiWindowFlags_AlwaysAutoResize | ImGuiWindowFlags_NoResize | ImGuiWindowFlags_NoMove);
+    if (ImGui::SliderFloat("Radius", &m_lightRange, MIN_LIGHT_RANGE, MAX_LIGHT_RANGE)) {
+        m_pSpotLight->setRange(m_lightRange);
+    }
+    ImGui::End();
+#endif //USE_IMGUI_BIND
 }

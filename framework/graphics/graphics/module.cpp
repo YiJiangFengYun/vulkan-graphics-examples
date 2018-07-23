@@ -46,14 +46,14 @@ namespace vg
             , optionalPhysicalDeviceFeatures
             );
 
-        createDefaultTexture();
+        createDefaultTextures();
         
         isInited = VG_TRUE;
     }
 
     void moduleDestory()
     {
-        destroyDefaultTexture();
+        destroyDefaultTextures();
         pApp = nullptr;
         //fd::moduleDestroy();
         isInited = VG_FALSE;

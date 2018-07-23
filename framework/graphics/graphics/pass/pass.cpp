@@ -1082,12 +1082,13 @@ namespace vg
                         bindingInfo.descriptorType = tranImageDescriptorTypeToVK(textureData.descriptorType);
                         bindingInfo.stageFlags = textureData.stageFlags;
                         auto textureCount = static_cast<uint32_t>(textureData.textures.size());
+                        auto pDefaultTexture = getDefaultTexture(tranSamplerTextureTypeToVKImageViewType(textureData.textureType));
                         bindingInfo.descriptorCount = textureCount;
                         updateDesSetInfo.imageInfos.resize(textureCount);
                         for (uint32_t i = 0; i < textureCount; ++i)
                         {
                             auto oneTexInfo = textureData.textures[i];
-                            const auto pTexture = oneTexInfo.pTexture != nullptr ? oneTexInfo.pTexture : pDefaultTexture2D.get();
+                            const auto pTexture = oneTexInfo.pTexture != nullptr ? oneTexInfo.pTexture : pDefaultTexture;
                             vk::ImageView imageView;
                             if (oneTexInfo.pTexture != nullptr) {
                                 if (oneTexInfo.pImageView != nullptr) {

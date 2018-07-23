@@ -47,6 +47,7 @@ void Window::_initState()
     m_cameraZoom = -15.0f;
     /// Build a quaternion from euler angles (pitch, yaw, roll), in radians.
     m_cameraRotation = vg::Vector3(glm::radians(0.0f), glm::radians(0.0f), glm::radians(0.0f));
+    m_lightRange = DEFAULT_LIGHT_RANGE;
 }
 
 void Window::_createModel()
@@ -70,8 +71,8 @@ void Window::_createModel()
 
 void Window::_createLights()
 {
-    m_pPointLight = std::shared_ptr<vg::LightPoint3>{new vg::LightPoint3(10.0f
-        , m_width, m_height)};
+    m_pPointLight = std::shared_ptr<vg::LightPoint3>{new vg::LightPoint3(m_lightRange
+        , 2048, 2048)};
     m_pPointLight->getTransform()->setLocalPosition(vg::Vector3(25.0f, 5.0f, 5.0f));
 }
 
@@ -111,6 +112,7 @@ void Window::_createMaterial()
         depthStencilState.depthWriteEnable = VG_TRUE;
         depthStencilState.depthCompareOp = vk::CompareOp::eLessOrEqual;
         pPass->setDepthStencilInfo(depthStencilState);
+
         vg::PassDataInfo otherDataInfo = {
             VG_PASS_OTHER_DATA_MIN_LAYOUT_PRIORITY,
             vk::ShaderStageFlagBits::eVertex,
@@ -125,6 +127,17 @@ void Window::_createMaterial()
         depthStencilState.depthWriteEnable = VG_TRUE;
         depthStencilState.depthCompareOp = vk::CompareOp::eLessOrEqual;
         pPreDepthPass->setDepthStencilInfo(depthStencilState);
+
+        //depth bias
+        vg::Pass::DepthBiasInfo depthBiasInfo = {
+            VG_TRUE,
+            VG_FALSE,
+            1.25f,
+            0.0f,
+            1.75f,
+        };
+        pPreDepthPass->setDepthBiasInfo(depthBiasInfo);
+
         pPreDepthPass->apply();
         
         pMaterial->apply();
@@ -173,4 +186,16 @@ void Window::_onUpdate()
     auto pPass = pMaterial->getMainPass();
     pPass->setData("other_data", m_pCamera->getTransform()->getPosition());
     pPass->apply();
+
+#ifdef USE_IMGUI_BIND
+    auto pos = m_lastWinPos;
+    auto size = m_lastWinSize;
+    ImGui::SetNextWindowPos(ImVec2(pos.x, pos.y + size.y + 10));
+    ImGui::SetNextWindowSize(ImVec2(0, 0));
+    ImGui::Begin("Settings", nullptr, ImGuiWindowFlags_AlwaysAutoResize | ImGuiWindowFlags_NoResize | ImGuiWindowFlags_NoMove);
+    if (ImGui::SliderFloat("Range", &m_lightRange, MIN_LIGHT_RANGE, MAX_LIGHT_RANGE)) {
+        m_pPointLight->setRange(m_lightRange);
+    }
+    ImGui::End();
+#endif //USE_IMGUI_BIND
 }

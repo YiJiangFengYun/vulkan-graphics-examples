@@ -53,7 +53,7 @@ float textureProj(uint index, vec4 P, vec2 off)
 void main() 
 {   
     outFragColor = vec4(0.0, 0.0, 0.0, 1.0);
-    for(uint i = 0;i < lightData.lightCount && i < MAX_LIGHT_COUNT; ++i)
+    for(uint i = 0; i < lightData.lightCount && i < MAX_LIGHT_COUNT; ++i)
     {
         float strength = textureProj(i, inShadowCoord[i], vec2(0.0));
 
@@ -71,5 +71,4 @@ void main()
         resultColor.rgb *= strength;
         outFragColor.rgb += resultColor;
     }
-    // outFragColor = vec4(inColor, 1.0);
 }

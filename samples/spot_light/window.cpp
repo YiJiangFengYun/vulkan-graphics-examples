@@ -213,7 +213,7 @@ void Window::_onUpdate()
     ImGui::SetNextWindowPos(ImVec2(pos.x, pos.y + size.y + 10));
     ImGui::SetNextWindowSize(ImVec2(0, 0));
     ImGui::Begin("Settings", nullptr, ImGuiWindowFlags_AlwaysAutoResize | ImGuiWindowFlags_NoResize | ImGuiWindowFlags_NoMove);
-    if (ImGui::SliderFloat("Radius", &m_lightRange, MIN_LIGHT_RANGE, MAX_LIGHT_RANGE)) {
+    if (ImGui::SliderFloat("Range", &m_lightRange, MIN_LIGHT_RANGE, MAX_LIGHT_RANGE)) {
         m_pSpotLight->setRange(m_lightRange);
     }
     ImGui::End();

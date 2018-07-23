@@ -36,13 +36,15 @@ namespace vg
     };
 
     struct LightTextureInfo {
+        SamplerTextureType textureType;
         uint32_t bindingPriority;
         const Texture *pTexture;
         const Texture::ImageView *pImageView;
         const Texture::Sampler *pSampler;
         vk::ImageLayout imageLayout;
 
-        LightTextureInfo(uint32_t bindingPriority = 0u
+        LightTextureInfo(SamplerTextureType textureType = SamplerTextureType::TEX_1D
+            , uint32_t bindingPriority = 0u
             , const Texture *pTexture = nullptr
             , const Texture::ImageView *pImageView = nullptr
             , const Texture::Sampler *pSampler = nullptr
@@ -118,11 +120,13 @@ namespace vg
 
     struct LightExportTextureInfo
     {
+        SamplerTextureType textureType;
         const Texture *pTexture;
         const Texture::ImageView *pImageView;
         const Texture::Sampler *pSampler;
         vk::ImageLayout imageLayout;
-        LightExportTextureInfo(const Texture *pTexture = nullptr
+        LightExportTextureInfo(SamplerTextureType textureType = SamplerTextureType::TEX_1D
+            , const Texture *pTexture = nullptr
             , const Texture::ImageView *pImageView = nullptr
             , const Texture::Sampler *pSampler = nullptr
             , vk::ImageLayout imageLayout = vk::ImageLayout()

@@ -46,13 +46,15 @@ namespace vg
         return static_cast<uint32_t>(std::ceil(size / minOffsetAlignment) * minOffsetAlignment);
     }
 
-    LightTextureInfo::LightTextureInfo(uint32_t bindingPriority
+    LightTextureInfo::LightTextureInfo(SamplerTextureType textureType
+        , uint32_t bindingPriority
         , const Texture *pTexture
         , const Texture::ImageView *pImageView
         , const Texture::Sampler *pSampler
         , vk::ImageLayout imageLayout
         )
-        : bindingPriority(bindingPriority)
+        : textureType(textureType)
+        , bindingPriority(bindingPriority)
         , pTexture(pTexture)
         , pImageView(pImageView)
         , pSampler(pSampler)
@@ -62,7 +64,8 @@ namespace vg
     }
 
     LightTextureInfo::LightTextureInfo(const LightTextureInfo &target)
-        : bindingPriority(target.bindingPriority)
+        : textureType(target.textureType)
+        , bindingPriority(target.bindingPriority)
         , pTexture(target.pTexture)
         , pImageView(target.pImageView)
         , pSampler(target.pSampler)
@@ -73,6 +76,7 @@ namespace vg
         
     LightTextureInfo &LightTextureInfo::operator=(const LightTextureInfo &target)
     {
+        textureType = target.textureType;
         bindingPriority = target.bindingPriority;
         pTexture = target.pTexture;
         pImageView = target.pImageView;
@@ -242,12 +246,14 @@ namespace vg
     }
 
 
-    LightExportTextureInfo::LightExportTextureInfo(const Texture *pTexture
+    LightExportTextureInfo::LightExportTextureInfo(SamplerTextureType textureType
+        , const Texture *pTexture
         , const Texture::ImageView *pImageView
         , const Texture::Sampler *pSampler
         , vk::ImageLayout imageLayout
         )
-        : pTexture(pTexture)
+        : textureType(textureType)
+        , pTexture(pTexture)
         , pImageView(pImageView)
         , pSampler(pSampler)
         , imageLayout(imageLayout)
@@ -256,7 +262,8 @@ namespace vg
     }
         
     LightExportTextureInfo::LightExportTextureInfo(const LightExportTextureInfo &target)
-        : pTexture(target.pTexture)
+        : textureType(target.textureType)
+        , pTexture(target.pTexture)
         , pImageView(target.pImageView)
         , pSampler(target.pSampler)
         , imageLayout(target.imageLayout)
@@ -266,6 +273,7 @@ namespace vg
         
     LightExportTextureInfo &LightExportTextureInfo::operator=(const LightExportTextureInfo &target)
     {
+        textureType = target.textureType;
         pTexture = target.pTexture;
         pImageView = target.pImageView;
         pSampler = target.pSampler;
@@ -484,6 +492,7 @@ namespace vg
             for (const auto &info : sortInfos)
             {
                 const auto &pTextureInfo = info.pTextureInfo;
+                textureInfos[index].textureType = pTextureInfo->textureType;
                 textureInfos[index].pTexture = pTextureInfo->pTexture;
                 textureInfos[index].pImageView = pTextureInfo->pImageView;
                 textureInfos[index].pSampler = pTextureInfo->pSampler;

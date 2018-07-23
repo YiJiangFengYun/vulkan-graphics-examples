@@ -381,6 +381,12 @@ namespace vg
                 lightPassTextureInfo.stageFlags = vk::ShaderStageFlagBits::eFragment;
                 lightPassTextureInfo.bindingPriority = VG_PASS_LIGHT_TEXTURE_MIN_BINDING_PRIORITY + lightBindingOffset;
 
+                //set texture type for pass texture info.
+                auto pFirstLight = *(lightGroup + 0);
+                auto firstLightExportInfo = pFirstLight->getExportInfo();
+                auto &firstLightTextureInfo = *(firstLightExportInfo.pTextureInfos + textureIndex);
+                lightPassTextureInfo.textureType = firstLightTextureInfo.textureType;
+
                 if (static_cast<uint32_t>(lightTextureInfos.size()) < maxLightCount)
                     lightTextureInfos.resize(static_cast<size_t>(maxLightCount));
 

@@ -53,6 +53,7 @@ namespace vg
 
         //add cube depth texture to light textures.
         LightTextureInfo texInfo = {
+            SamplerTextureType::TEX_CUBE,
             VG_LIGHT_TEXTURE_DEPTH_BINDING_PRIORITY,
             m_cubeTargets.getDepthTargetTexture(),
             };

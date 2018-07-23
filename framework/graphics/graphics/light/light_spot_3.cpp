@@ -45,6 +45,7 @@ namespace vg
 
         //add the depth texture to light textures.
         LightTextureInfo texInfo = {
+            SamplerTextureType::TEX_2D,
             VG_LIGHT_TEXTURE_DEPTH_BINDING_PRIORITY,
             m_pDepthTarget->getDepthTargetTexture()
             };

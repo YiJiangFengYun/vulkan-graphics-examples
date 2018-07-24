@@ -117,18 +117,19 @@ namespace vg
         for (auto &pProjector : m_pProjectors)
         {
             auto transform = m_pTransform->getMatrixLocalToWorld();
+            auto rotationTransform = Matrix4x4(1.0f);
             if (m_space.rightHand == VG_TRUE)
             {
                 switch (index)
                 {
                     case static_cast<uint32_t>(CubemapFace::POSITIVE_X): //+x
                     {
-                        transform = glm::rotate(transform, glm::radians(-90.0f), Vector3(0.0f, 0.0f, 1.0f));
+                        rotationTransform = glm::rotate(rotationTransform, glm::radians(-90.0f), Vector3(0.0f, 0.0f, 1.0f));
                         break;
                     }
                     case static_cast<uint32_t>(CubemapFace::NEGATIVE_X): //-x
                     {
-                        transform = glm::rotate(transform, glm::radians(90.0f), Vector3(0.0f, 0.0f, 1.0f));
+                        rotationTransform = glm::rotate(rotationTransform, glm::radians(90.0f), Vector3(0.0f, 0.0f, 1.0f));
                         break;
                     }
                     case static_cast<uint32_t>(CubemapFace::POSITIVE_Y): //+y
@@ -138,17 +139,17 @@ namespace vg
                     }
                     case static_cast<uint32_t>(CubemapFace::NEGATIVE_Y): //-y
                     {
-                        transform = glm::rotate(transform, glm::radians(180.0f), Vector3(0.0f, 0.0f, 1.0f));
+                        rotationTransform = glm::rotate(rotationTransform, glm::radians(180.0f), Vector3(0.0f, 0.0f, 1.0f));
                         break;
                     }
                     case static_cast<uint32_t>(CubemapFace::POSITIVE_Z): //+z
                     {
-                        transform = glm::rotate(transform, glm::radians(90.0f), Vector3(1.0f, 0.0f, 0.0f));
+                        rotationTransform = glm::rotate(rotationTransform, glm::radians(90.0f), Vector3(1.0f, 0.0f, 0.0f));
                         break;
                     }
                     case static_cast<uint32_t>(CubemapFace::NEGATIVE_Z): //-z
                     {
-                        transform = glm::rotate(transform, glm::radians(-90.0f), Vector3(1.0f, 0.0f, 0.0f));
+                        rotationTransform = glm::rotate(rotationTransform, glm::radians(-90.0f), Vector3(1.0f, 0.0f, 0.0f));
                         break;
                     }
                 }
@@ -159,22 +160,22 @@ namespace vg
                 {
                     case static_cast<uint32_t>(CubemapFace::POSITIVE_X): //+x
                     {
-                        transform = glm::rotate(transform, glm::radians(90.0f), Vector3(0.0f, 1.0f, 0.0f));
+                        rotationTransform = glm::rotate(rotationTransform, glm::radians(90.0f), Vector3(0.0f, 1.0f, 0.0f));
                         break;
                     }
                     case static_cast<uint32_t>(CubemapFace::NEGATIVE_X): //-x
                     {
-                        transform = glm::rotate(transform, glm::radians(-90.0f), Vector3(0.0f, 1.0f, 0.0f));
+                        rotationTransform = glm::rotate(rotationTransform, glm::radians(-90.0f), Vector3(0.0f, 1.0f, 0.0f));
                         break;
                     }
                     case static_cast<uint32_t>(CubemapFace::POSITIVE_Y): //+y
                     {
-                        transform = glm::rotate(transform, glm::radians(-90.0f), Vector3(1.0f, 0.0f, 0.0f));
+                        rotationTransform = glm::rotate(rotationTransform, glm::radians(-90.0f), Vector3(1.0f, 0.0f, 0.0f));
                         break;
                     }
                     case static_cast<uint32_t>(CubemapFace::NEGATIVE_Y): //-y
                     {
-                        transform = glm::rotate(transform, glm::radians(90.0f), Vector3(1.0f, 0.0f, 0.0f));
+                        rotationTransform = glm::rotate(rotationTransform, glm::radians(90.0f), Vector3(1.0f, 0.0f, 0.0f));
                         break;
                     }
                     case static_cast<uint32_t>(CubemapFace::POSITIVE_Z): //+z
@@ -184,12 +185,12 @@ namespace vg
                     }
                     case static_cast<uint32_t>(CubemapFace::NEGATIVE_Z): //-z
                     {
-                        transform = glm::rotate(transform, glm::radians(180.0f), Vector3(0.0f, 1.0f, 0.0f));
+                        rotationTransform = glm::rotate(rotationTransform, glm::radians(180.0f), Vector3(0.0f, 1.0f, 0.0f));
                         break;
                     }
                 }
             }
-            pProjector->setTransformMatrix(transform);
+            pProjector->setTransformMatrix(transform * rotationTransform);
             ++index;
         }
     }

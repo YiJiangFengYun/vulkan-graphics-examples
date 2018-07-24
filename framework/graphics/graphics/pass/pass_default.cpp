@@ -56,6 +56,8 @@ namespace vg
             depthStencilState.depthWriteEnable = VG_TRUE;
             depthStencilState.depthCompareOp = vk::CompareOp::eLessOrEqual;
             pDefaultPreDepthPass->setDepthStencilInfo(depthStencilState);
+
+            pDefaultPreDepthPass->apply();
         }
 
         //Light depth shader and pass.
@@ -85,6 +87,8 @@ namespace vg
             depthStencilState.depthWriteEnable = VG_TRUE;
             depthStencilState.depthCompareOp = vk::CompareOp::eLessOrEqual;
             pDefaultLightDepthPass->setDepthStencilInfo(depthStencilState);
+
+            pDefaultLightDepthPass->apply();
         }
 
         //Light point distance shader and pass.
@@ -115,6 +119,8 @@ namespace vg
             depthStencilState.depthWriteEnable = VG_TRUE;
             depthStencilState.depthCompareOp = vk::CompareOp::eLessOrEqual;
             pDefaultLightPointDistPass->setDepthStencilInfo(depthStencilState);
+
+            pDefaultLightPointDistPass->apply();
         }
         
     }

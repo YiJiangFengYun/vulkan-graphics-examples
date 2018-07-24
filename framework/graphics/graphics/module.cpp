@@ -47,13 +47,14 @@ namespace vg
             );
 
         createDefaultTextures();
-        
+        createDefaultPasses();
         isInited = VG_TRUE;
     }
 
     void moduleDestory()
     {
         destroyDefaultTextures();
+        destroyDefaultPasses();
         pApp = nullptr;
         //fd::moduleDestroy();
         isInited = VG_FALSE;

@@ -2,7 +2,7 @@
 #extension GL_ARB_separate_shader_objects : enable
 #extension GL_ARB_shading_language_420pack : enable
         
-layout (location = 0) in vec4 inPos;
+layout (location = 0) in vec3 inPos;
 layout (binding = 0) uniform BuildIn
 {
     mat4 matrixToNDC;
@@ -14,5 +14,5 @@ out gl_PerVertex
 };
 void main()
 {
-    gl_Position = _buildIn.matrixToNDC * inPos;
+    gl_Position = _buildIn.matrixToNDC * vec4(inPos, 1.0);
 }

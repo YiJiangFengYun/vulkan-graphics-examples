@@ -92,15 +92,6 @@ void Window::_createMaterial()
         pPass->setCullMode(vk::CullModeFlagBits::eBack);
         pPass->setFrontFace(vk::FrontFace::eCounterClockwise);
 
-        pPreDepthPass->setCullMode(vk::CullModeFlagBits::eBack);
-        pPreDepthPass->setFrontFace(vk::FrontFace::eClockwise);
-
-        vk::PipelineDepthStencilStateCreateInfo depthStencilState = {};
-        depthStencilState.depthTestEnable = VG_TRUE;
-        depthStencilState.depthWriteEnable = VG_TRUE;
-        depthStencilState.depthCompareOp = vk::CompareOp::eLessOrEqual;
-        pPreDepthPass->setDepthStencilInfo(depthStencilState);
-        
         vg::Pass::BuildInDataInfo buildInData;
         buildInData.componentCount = 0u;
         buildInData.pComponent = nullptr;
@@ -112,6 +103,16 @@ void Window::_createMaterial()
         };
 
         pPass->addData("other_info", otherDataInfo, m_otherInfo);
+
+
+        pPreDepthPass->setCullMode(vk::CullModeFlagBits::eBack);
+        pPreDepthPass->setFrontFace(vk::FrontFace::eClockwise);
+
+        vk::PipelineDepthStencilStateCreateInfo depthStencilState = {};
+        depthStencilState.depthTestEnable = VG_TRUE;
+        depthStencilState.depthWriteEnable = VG_TRUE;
+        depthStencilState.depthCompareOp = vk::CompareOp::eLessOrEqual;
+        pPreDepthPass->setDepthStencilInfo(depthStencilState);
         
         pMaterial->apply();
     }

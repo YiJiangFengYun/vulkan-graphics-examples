@@ -117,8 +117,10 @@ namespace vg
         std::shared_ptr<InstanceID> m_pBindTargetID; 
         MaterialShowType m_renderQueueType;
         uint32_t m_renderPriority;
-        std::shared_ptr<Shader> m_pMainShader; 
-        std::shared_ptr<Pass> m_pMainPass;
+        Shader *m_pMainShader; 
+        Pass *m_pMainPass;
+        std::shared_ptr<Shader> m_pMyMainShader; 
+        std::shared_ptr<Pass> m_pMyMainPass;
 
         std::shared_ptr<PreDepthPass> m_pPreDepthPass;
 

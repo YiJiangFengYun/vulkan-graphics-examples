@@ -81,11 +81,15 @@ namespace vg
         , m_mapPasses()
         , m_pMainShader()
         , m_pMainPass()
+        , m_pMyMainShader()
+        , m_pMyMainPass()
         , m_pPreDepthPass()
     {
-        m_pMainShader = std::shared_ptr<vg::Shader>{new vg::Shader()};
-        m_pMainPass = std::shared_ptr<vg::Pass>{ new vg::Pass(m_pMainShader.get())};
-        _addPass(m_pMainPass.get());
+        m_pMyMainShader = std::shared_ptr<vg::Shader>{new vg::Shader()};
+        m_pMyMainPass = std::shared_ptr<vg::Pass>{ new vg::Pass(m_pMyMainShader.get())};
+        m_pMainShader = m_pMyMainShader.get();
+        m_pMainPass = m_pMyMainPass.get();
+        _addPass(m_pMainPass);
     }
 
     Material::Material(MaterialCreateInfo createInfo)
@@ -133,22 +137,22 @@ namespace vg
 
     const Shader *Material::getMainShader() const 
     {
-        return m_pMainShader.get();
+        return m_pMainShader;
     }
 
     Shader *Material::getMainShader()
     {
-        return m_pMainShader.get();
+        return m_pMainShader;
     }
 
     const Pass *Material::getMainPass() const
     {
-        return m_pMainPass.get();
+        return m_pMainPass;
     }
 
     Pass *Material::getMainPass()
     {
-        return m_pMainPass.get();
+        return m_pMainPass;
     }
 
     const PreDepthPass * Material::getPreDepthPass() const

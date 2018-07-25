@@ -47,8 +47,8 @@ namespace vge
 
     void MaterialDeferred::_beginBind(const BindInfo info, BindResult *pResult) const
     {
-        uint32_t trunkFramebufferWidth = info.trunkFramebufferWidth;
-        uint32_t trunkFramebufferHeight = info.trunkFramebufferHeight;
+        uint32_t trunkFramebufferWidth = info.framebufferWidth;
+        uint32_t trunkFramebufferHeight = info.framebufferHeight;
         uint32_t framebufferWidth = m_info.framebufferWidth;
         uint32_t framebufferHeight = m_info.framebufferHeight;
 
@@ -226,11 +226,11 @@ namespace vge
             vg::RenderPassInfo trunkRenderPassInfo;
             trunkRenderPassInfo.pRenderPass = nullptr;
             trunkRenderPassInfo.pFramebuffer = nullptr;
-            trunkRenderPassInfo.framebufferWidth = info.trunkFramebufferWidth;
-            trunkRenderPassInfo.framebufferHeight = info.trunkFramebufferHeight;
+            trunkRenderPassInfo.framebufferWidth = info.framebufferWidth;
+            trunkRenderPassInfo.framebufferHeight = info.framebufferHeight;
             trunkRenderPassInfo.projMatrix = vg::Matrix4x4(1.0f);
             trunkRenderPassInfo.viewMatrix = vg::Matrix4x4(1.0f);
-            trunkRenderPassInfo.pPass = m_pMainPass.get();
+            trunkRenderPassInfo.pPass = m_pMainPass;
             trunkRenderPassInfo.modelMatrix = vg::Matrix4x4(1.0f);
             trunkRenderPassInfo.pMesh = pRectMesh;
             trunkRenderPassInfo.subMeshIndex = 0u;
@@ -525,7 +525,7 @@ namespace vge
     
         //main pass
         {
-            auto pPass = m_pMainPass.get();
+            auto pPass = m_pMainPass;
             pPass->setPolygonMode(vk::PolygonMode::eFill);
             pPass->setCullMode(vk::CullModeFlagBits::eNone);
             pPass->setFrontFace(vk::FrontFace::eCounterClockwise);
@@ -567,7 +567,7 @@ namespace vge
         }
 
         {
-            auto pPass = m_pMainPass.get();
+            auto pPass = m_pMainPass;
             {
                 vg::PassTextureInfo::TextureInfo itemInfo = {
                     m_pColorAttachment.get(),

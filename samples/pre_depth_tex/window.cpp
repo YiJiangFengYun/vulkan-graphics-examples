@@ -75,7 +75,6 @@ void Window::_createMaterial()
         auto & pMaterial = m_pMaterial;
         vg::Material::MaterialCreateInfo materialCreateInfo = {
             VG_FALSE,
-            VG_TRUE,
         };
         pMaterial = std::shared_ptr<vg::Material>(new vg::Material(materialCreateInfo));
         pMaterial->setRenderPriority(0u);
@@ -83,7 +82,6 @@ void Window::_createMaterial()
 
         auto pShader = pMaterial->getMainShader();
         auto pPass = pMaterial->getMainPass();
-        auto pPreDepthPass = pMaterial->getPreDepthPass();
         
         //shader
         pShader->load("shaders/pre_depth_tex/pre_depth_tex_show.vert.spv",
@@ -103,16 +101,6 @@ void Window::_createMaterial()
         };
 
         pPass->addData("other_info", otherDataInfo, m_otherInfo);
-
-
-        pPreDepthPass->setCullMode(vk::CullModeFlagBits::eBack);
-        pPreDepthPass->setFrontFace(vk::FrontFace::eClockwise);
-
-        vk::PipelineDepthStencilStateCreateInfo depthStencilState = {};
-        depthStencilState.depthTestEnable = VG_TRUE;
-        depthStencilState.depthWriteEnable = VG_TRUE;
-        depthStencilState.depthCompareOp = vk::CompareOp::eLessOrEqual;
-        pPreDepthPass->setDepthStencilInfo(depthStencilState);
         
         pMaterial->apply();
     }
@@ -125,6 +113,7 @@ void Window::_initScene()
     {
         object->setMaterialCount(1u);
         object->setMaterial(m_pMaterial.get());
+        object->setPreDepthMaterial(vg::pDefaultPreDepthMaterial.get());
         m_pScene->addVisualObject(object.get());        
     }
 }

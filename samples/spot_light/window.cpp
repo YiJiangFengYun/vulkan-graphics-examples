@@ -1,6 +1,7 @@
 #include "spot_light/window.hpp"
 
 #include <iostream>
+#include <typeinfo>
 
 
 Window::Window(uint32_t width
@@ -84,7 +85,6 @@ void Window::_createMaterial()
         //material
         vg::Material::MaterialCreateInfo createInfo = {
             VG_FALSE,
-            VG_TRUE,
         };
 
         auto & pMaterial = m_pMaterial;
@@ -123,26 +123,26 @@ void Window::_createMaterial()
         pPass->addData("other_data", otherDataInfo, m_pCamera->getTransform()->getPosition());
         pPass->apply();
 
-        auto pPreDepthPass = pMaterial->getPreDepthPass();
-        pPreDepthPass->setFrontFace(vk::FrontFace::eClockwise);
-        pPreDepthPass->setCullMode(vk::CullModeFlagBits::eBack);
+        // auto pPreDepthPass = pMaterial->getPreDepthPass();
+        // pPreDepthPass->setFrontFace(vk::FrontFace::eClockwise);
+        // pPreDepthPass->setCullMode(vk::CullModeFlagBits::eBack);
 
-        depthStencilState.depthTestEnable = VG_TRUE;
-        depthStencilState.depthWriteEnable = VG_TRUE;
-        depthStencilState.depthCompareOp = vk::CompareOp::eLessOrEqual;
-        pPreDepthPass->setDepthStencilInfo(depthStencilState);
+        // depthStencilState.depthTestEnable = VG_TRUE;
+        // depthStencilState.depthWriteEnable = VG_TRUE;
+        // depthStencilState.depthCompareOp = vk::CompareOp::eLessOrEqual;
+        // pPreDepthPass->setDepthStencilInfo(depthStencilState);
 
-        //depth bias
-        vg::Pass::DepthBiasInfo depthBiasInfo = {
-            VG_TRUE,
-            VG_FALSE,
-            1.25f,
-            0.0f,
-            1.75f,
-        };
-        pPreDepthPass->setDepthBiasInfo(depthBiasInfo);
+        // //depth bias
+        // vg::Pass::DepthBiasInfo depthBiasInfo = {
+        //     VG_TRUE,
+        //     VG_FALSE,
+        //     1.25f,
+        //     0.0f,
+        //     1.75f,
+        // };
+        // pPreDepthPass->setDepthBiasInfo(depthBiasInfo);
 
-        pPreDepthPass->apply();
+        // pPreDepthPass->apply();
         
         pMaterial->apply();
     }
@@ -156,6 +156,7 @@ void Window::_initScene()
     {
         object->setMaterialCount(1u);
         object->setMaterial(m_pMaterial.get());
+        object->setLightingMaterial(typeid(vg::LightSpot3), vg::pDefaultLightDepthMaterial.get());
         m_pScene->addVisualObject(object.get());
     }
 

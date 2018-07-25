@@ -88,6 +88,16 @@ namespace vg
             depthStencilState.depthCompareOp = vk::CompareOp::eLessOrEqual;
             pDefaultLightDepthPass->setDepthStencilInfo(depthStencilState);
 
+            //depth bias
+            vg::Pass::DepthBiasInfo depthBiasInfo = {
+                VG_TRUE,
+                VG_FALSE,
+                1.0f,
+                0.0f,
+                1.0f,
+            };
+            pDefaultLightDepthPass->setDepthBiasInfo(depthBiasInfo);
+
             pDefaultLightDepthPass->apply();
         }
 

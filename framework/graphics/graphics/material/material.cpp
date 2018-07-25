@@ -2,10 +2,8 @@
 
 namespace vg
 {
-    Material::BindInfo::BindInfo(uint32_t preDepthFramebufferWidth
-        , uint32_t preDepthFramebufferHeight
-        , uint32_t trunkFramebufferWidth
-        , uint32_t trunkFramebufferHeight
+    Material::BindInfo::BindInfo(uint32_t framebufferWidth
+        , uint32_t framebufferHeight
         , const Matrix4x4 *pProjMatrix
         , const Matrix4x4 *pViewMatrix
         , InstanceID objectID
@@ -21,10 +19,8 @@ namespace vg
         )
         : pProjMatrix(pProjMatrix)
         , pViewMatrix(pViewMatrix)
-        , preDepthFramebufferWidth(preDepthFramebufferWidth)
-        , preDepthFramebufferHeight(preDepthFramebufferHeight)
-        , trunkFramebufferWidth(trunkFramebufferWidth)
-        , trunkFramebufferHeight(trunkFramebufferHeight)
+        , framebufferWidth(framebufferWidth)
+        , framebufferHeight(framebufferHeight)
         , objectID(objectID)
         , pModelMatrix(pModelMatrix)
         , pMesh(pMesh)
@@ -38,13 +34,11 @@ namespace vg
     {
     }
 
-    Material::BindResult::BindResult(CmdBuffer *pPreDepthCmdBuffer
-        , CmdBuffer *pBranchCmdBuffer
+    Material::BindResult::BindResult(CmdBuffer *pBranchCmdBuffer
         , CmdBuffer *pTrunkRenderPassCmdBuffer
         , CmdBuffer *pTrunkWaitBarrierCmdBuffer
         )
-        : pPreDepthCmdBuffer(pPreDepthCmdBuffer)
-        , pBranchCmdBuffer(pBranchCmdBuffer)
+        : pBranchCmdBuffer(pBranchCmdBuffer)
         , pTrunkRenderPassCmdBuffer(pTrunkRenderPassCmdBuffer)
         , pTrunkWaitBarrierCmdBuffer(pTrunkWaitBarrierCmdBuffer)
     {
@@ -60,11 +54,8 @@ namespace vg
 
     }
 
-    Material::MaterialCreateInfo::MaterialCreateInfo(Bool32 onlyOnce
-        , Bool32 createPreDepthPass
-        )
+    Material::MaterialCreateInfo::MaterialCreateInfo(Bool32 onlyOnce)
         : onlyOnce(onlyOnce)
-        , createPreDepthPass(createPreDepthPass) 
 
     {
 
@@ -83,7 +74,6 @@ namespace vg
         , m_pMainPass()
         , m_pMyMainShader()
         , m_pMyMainPass()
-        , m_pPreDepthPass()
     {
         m_pMyMainShader = std::shared_ptr<vg::Shader>{new vg::Shader()};
         m_pMyMainPass = std::shared_ptr<vg::Pass>{ new vg::Pass(m_pMyMainShader.get())};
@@ -95,9 +85,6 @@ namespace vg
     Material::Material(MaterialCreateInfo createInfo)
         : Material(createInfo.onlyOnce)
     {
-        if (createInfo.createPreDepthPass) {
-            m_pPreDepthPass = std::shared_ptr<PreDepthPass>{new PreDepthPass()};
-        }
     }
 
     Material::~Material()
@@ -155,25 +142,11 @@ namespace vg
         return m_pMainPass;
     }
 
-    const PreDepthPass * Material::getPreDepthPass() const
-    {
-        return m_pPreDepthPass.get();
-    }
-
-    PreDepthPass * Material::getPreDepthPass()
-    {
-        return m_pPreDepthPass.get();
-    }
-
     void Material::apply()
     {
         for (const auto& item : m_mapPasses)
         {
             item.second->apply();
-        }
-        if (m_pPreDepthPass != nullptr)
-        {
-            m_pPreDepthPass->apply();
         }
     }
 
@@ -203,31 +176,6 @@ namespace vg
             if (*m_pBindTargetID != 0) 
                 throw std::runtime_error("The material binding is only once, but it was used to repeatedly bind.");
             *m_pBindTargetID = info.objectID;
-        }
-
-        auto &result = *pResult;
-        if (m_pPreDepthPass != nullptr && result.pPreDepthCmdBuffer != nullptr)
-        {
-            RenderPassInfo trunkRenderPassInfo;
-            trunkRenderPassInfo.pRenderPass = nullptr;
-            trunkRenderPassInfo.pFramebuffer = nullptr;            
-            trunkRenderPassInfo.framebufferWidth = info.preDepthFramebufferWidth;
-            trunkRenderPassInfo.framebufferHeight = info.preDepthFramebufferHeight;
-            trunkRenderPassInfo.projMatrix = *(info.pProjMatrix);
-            trunkRenderPassInfo.viewMatrix = *(info.pViewMatrix);
-            trunkRenderPassInfo.pPass = m_pPreDepthPass->getPass();
-            trunkRenderPassInfo.modelMatrix = *(info.pModelMatrix);
-            trunkRenderPassInfo.pMesh = info.pMesh;
-            trunkRenderPassInfo.subMeshIndex = info.subMeshIndex;
-            trunkRenderPassInfo.viewport = fd::Viewport();
-            trunkRenderPassInfo.scissor = info.hasClipRect ? info.clipRect : fd::Rect2D();
-            CmdInfo cmdInfo;
-            cmdInfo.pRenderPassInfo = &trunkRenderPassInfo;
-            result.pPreDepthCmdBuffer->addCmd(cmdInfo);
-        } 
-        else if (m_pPreDepthPass == nullptr && result.pPreDepthCmdBuffer != nullptr)
-        {
-            VG_LOG(plog::warning) << "Pre depth pass of material is empty when pre depth cmd buffer exist. " << std::endl;
         }
 
         _beginBind(info, pResult);
@@ -266,8 +214,8 @@ namespace vg
             RenderPassInfo trunkRenderPassInfo;
             trunkRenderPassInfo.pRenderPass = nullptr;
             trunkRenderPassInfo.pFramebuffer = nullptr;
-            trunkRenderPassInfo.framebufferWidth = info.trunkFramebufferWidth;
-            trunkRenderPassInfo.framebufferHeight = info.trunkFramebufferHeight;
+            trunkRenderPassInfo.framebufferWidth = info.framebufferWidth;
+            trunkRenderPassInfo.framebufferHeight = info.framebufferHeight;
             trunkRenderPassInfo.projMatrix = *(info.pProjMatrix);
             trunkRenderPassInfo.viewMatrix = *(info.pViewMatrix);
             trunkRenderPassInfo.pPass = *m_arrPasses.data();

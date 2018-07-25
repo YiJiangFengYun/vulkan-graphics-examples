@@ -67,7 +67,11 @@ namespace vg
     }
 
     RenderBinder::RenderBinder()
-        : m_bindedObjects()
+        : m_bindedObjectsForLighting()
+        , m_bindedObjectCountForLighting(0u)
+        , m_bindedObjectsForPreDepth()
+        , m_bindedObjectCountForPreDepth(0u)
+        , m_bindedObjects()
         , m_bindedObjectCount(0u)
         //light data buffer
         , m_lightDataBufferCache([](const vg::InstanceID &sceneID) {
@@ -105,7 +109,20 @@ namespace vg
 
     void RenderBinder::_endBind()
     {
-        for (uint32_t i = 0; i < m_bindedObjectCount; ++i) {
+        for (uint32_t i = 0; i < m_bindedObjectCountForLighting; ++i)
+        {
+            m_bindedObjectsForLighting[i]->endBind();
+        }
+        m_bindedObjectCountForLighting = 0u;
+
+        for (uint32_t i = 0; i < m_bindedObjectCountForPreDepth; ++i)
+        {
+            m_bindedObjectsForPreDepth[i]->endBind();
+        }
+        m_bindedObjectCountForPreDepth = 0u;
+
+        for (uint32_t i = 0; i < m_bindedObjectCount; ++i) 
+        {
             m_bindedObjects[i]->endBind();
         }
         m_bindedObjectCount = 0u;
@@ -123,7 +140,8 @@ namespace vg
         //scene make cmds.
         if (info.pScene->getSpaceType() == SpaceType::SPACE_2)
         {
-            _bindScene2(dynamic_cast<Scene<SpaceType::SPACE_2> *>(info.pScene), 
+            _bindScene2(nullptr,
+                dynamic_cast<Scene<SpaceType::SPACE_2> *>(info.pScene), 
                 dynamic_cast<const Projector<SpaceType::SPACE_2> *>(info.pProjector),
                 info.preDepthEnable ? info.pPreDepthTarget : nullptr,
                 info.postRenderEnable ? 
@@ -145,7 +163,8 @@ namespace vg
                     info.pLightDepthCmdBuffer
                 );
             }
-            _bindScene3(dynamic_cast<Scene<SpaceType::SPACE_3> *>(info.pScene), 
+            _bindScene3(nullptr,
+                dynamic_cast<Scene<SpaceType::SPACE_3> *>(info.pScene), 
                 dynamic_cast<const Projector<SpaceType::SPACE_3> *>(info.pProjector),
                 info.preDepthEnable ? info.pPreDepthTarget : nullptr,
                 info.postRenderEnable ? 
@@ -252,9 +271,13 @@ namespace vg
                  , pRenderTarget->getFramebuffer()
                  , pPreDepthCmdBuffer
                  );
-                _bindScene3(pScene
+                _bindScene3(pLight
+                    , pScene
                     , dynamic_cast<const Projector<SpaceType::SPACE_3> *>(*(depthRenderInfo.pProjectors + j))
+                    , nullptr
                     , pRenderTarget
+                    , nullptr
+                    , nullptr
                     , nullptr
                     , nullptr
                     , pPreDepthCmdBuffer
@@ -510,7 +533,8 @@ namespace vg
         }
     }
 
-    void RenderBinder::_bindScene2(Scene<SpaceType::SPACE_2> *pScene
+    void RenderBinder::_bindScene2(BaseLight *pLight
+        , Scene<SpaceType::SPACE_2> *pScene
         , const Projector<SpaceType::SPACE_2> *pProjector
         , const BaseRenderTarget *pPreDepthTarget
         , const BaseRenderTarget *pRenderTarget
@@ -587,10 +611,13 @@ namespace vg
 #if defined(DEBUG) && defined(VG_ENABLE_COST_TIMER)
                 preparingBuildInDataCostTimer.begin();
 #endif //DEBUG and VG_ENABLE_COST_TIMER
-                _setPreDepthBuildInData(pVisualObject
+                _setBuildInData(nullptr
+                    , VG_TRUE
+                    , pVisualObject
                     , modelMatrix
                     , viewMatrix
-                    , projMatrix   
+                    , projMatrix
+                    , nullptr
                 );
 #if defined(DEBUG) && defined(VG_ENABLE_COST_TIMER)
                 preparingBuildInDataCostTimer.end();
@@ -601,7 +628,9 @@ namespace vg
 #if defined(DEBUG) && defined(VG_ENABLE_COST_TIMER)
                 preparingBuildInDataCostTimer.begin();
 #endif //DEBUG and VG_ENABLE_COST_TIMER
-                _setBuildInData(pVisualObject
+                _setBuildInData(pLight
+                    , VG_FALSE
+                    , pVisualObject
                     , modelMatrix
                     , viewMatrix
                     , projMatrix
@@ -614,21 +643,38 @@ namespace vg
 #if defined(DEBUG) && defined(VG_ENABLE_COST_TIMER)
                 bindObjectCostTimer.begin();
 #endif //DEBUG and VG_ENABLE_COST_TIMER
-            BaseVisualObject::BindInfo info = {
-                pPreDepthTarget != nullptr ? pPreDepthTarget->getFramebufferWidth() : 0u,
-                pPreDepthTarget != nullptr ? pPreDepthTarget->getFramebufferHeight() : 0u,
-                pRenderTarget != nullptr ? pRenderTarget->getFramebufferWidth() : 0u,
-                pRenderTarget != nullptr ? pRenderTarget->getFramebufferHeight() : 0u,
-                &projMatrix,
-                &viewMatrix,
-                };
+            if (pPreDepthCmdBuffer != nullptr) 
+            {
+                BaseVisualObject::BindInfo info = {
+                    pPreDepthTarget->getFramebufferWidth(),
+                    pPreDepthTarget->getFramebufferHeight(),
+                    &projMatrix,
+                    &viewMatrix,
+                    };
+                
+                BaseVisualObject::BindResult result;
+                result.pTrunkRenderPassCmdBuffer = pPreDepthCmdBuffer;
+                result.pBranchCmdBuffer = nullptr;
+                result.pTrunkWaitBarrierCmdBuffer = nullptr;
+                _bindVisualObject(VG_FALSE, VG_TRUE, pVisualObject, info, &result);
+            }
 
-            BaseVisualObject::BindResult result;
-            result.pPreDepthCmdBuffer = pPreDepthCmdBuffer;
-            result.pTrunkRenderPassCmdBuffer = pTrunkRenderPassCmdBuffer;
-            result.pBranchCmdBuffer = pBranchCmdBuffer;
-            result.pTrunkWaitBarrierCmdBuffer = pTrunkWaitBarrierCmdBuffer;
-            _bindVisualObject(pVisualObject, info, &result);
+            if (pTrunkRenderPassCmdBuffer != nullptr)
+            {
+                BaseVisualObject::BindInfo info = {
+                    pRenderTarget != nullptr ? pRenderTarget->getFramebufferWidth() : 0u,
+                    pRenderTarget != nullptr ? pRenderTarget->getFramebufferHeight() : 0u,
+                    &projMatrix,
+                    &viewMatrix,
+                    };
+    
+                BaseVisualObject::BindResult result;
+                result.pTrunkRenderPassCmdBuffer = pTrunkRenderPassCmdBuffer;
+                result.pBranchCmdBuffer = pBranchCmdBuffer;
+                result.pTrunkWaitBarrierCmdBuffer = pTrunkWaitBarrierCmdBuffer;
+                _bindVisualObject(pLight, VG_FALSE, pVisualObject, info, &result);
+            }
+            
 #if defined(DEBUG) && defined(VG_ENABLE_COST_TIMER)
                 bindObjectCostTimer.end();
 #endif //DEBUG and VG_ENABLE_COST_TIMER
@@ -711,7 +757,8 @@ namespace vg
         }
     }
 
-    void RenderBinder::_bindScene3(Scene<SpaceType::SPACE_3> *pScene
+    void RenderBinder::_bindScene3(BaseLight *pLight
+        , Scene<SpaceType::SPACE_3> *pScene
         , const Projector<SpaceType::SPACE_3> *pProjector
         , const BaseRenderTarget *pPreDepthTarget
         , const BaseRenderTarget *pRenderTarget
@@ -876,10 +923,13 @@ namespace vg
 #if defined(DEBUG) && defined(VG_ENABLE_COST_TIMER)
                 preparingBuildInDataCostTimer.begin();
 #endif //DEBUG and VG_ENABLE_COST_TIMER
-                    _setPreDepthBuildInData(pVisualObject
+                    _setBuildInData(nullptr
+                        , VG_TRUE
+                        , pVisualObject
                         , modelMatrix
                         , viewMatrix
-                        , projMatrix  
+                        , projMatrix
+                        , nullptr
                     );
 #if defined(DEBUG) && defined(VG_ENABLE_COST_TIMER)
                 preparingBuildInDataCostTimer.end();
@@ -890,7 +940,9 @@ namespace vg
 #if defined(DEBUG) && defined(VG_ENABLE_COST_TIMER)
                 preparingBuildInDataCostTimer.begin();
 #endif //DEBUG and VG_ENABLE_COST_TIMER
-                    _setBuildInData(pVisualObject
+                    _setBuildInData(pLight
+                        , VG_FALSE
+                        , pVisualObject
                         , modelMatrix
                         , viewMatrix
                         , projMatrix
@@ -903,21 +955,39 @@ namespace vg
 #if defined(DEBUG) && defined(VG_ENABLE_COST_TIMER)
                 bindObjectCostTimer.begin();
 #endif //DEBUG and VG_ENABLE_COST_TIMER
-                BaseVisualObject::BindInfo info = {
-                    pPreDepthTarget != nullptr ? pPreDepthTarget->getFramebufferWidth() : 0u,
-                    pPreDepthTarget != nullptr ? pPreDepthTarget->getFramebufferHeight() : 0u,
-                    pRenderTarget != nullptr ? pRenderTarget->getFramebufferWidth() : 0u,
-                    pRenderTarget != nullptr ? pRenderTarget->getFramebufferHeight() : 0u,
-                    &projMatrix,
-                    &viewMatrix, 
-                    };
-
-                BaseVisualObject::BindResult result;
-                result.pPreDepthCmdBuffer = pPreDepthCmdBuffer;
-                result.pTrunkRenderPassCmdBuffer = pTrunkRenderPassCmdBuffer;
-                result.pBranchCmdBuffer = pBranchCmdBuffer;
-                result.pTrunkWaitBarrierCmdBuffer = pTrunkWaitBarrierCmdBuffer;
-                _bindVisualObject(pVisualObject, info, &result);
+                if (pPreDepthCmdBuffer != nullptr) 
+                {
+                    BaseVisualObject::BindInfo info = {
+                        pPreDepthTarget->getFramebufferWidth(),
+                        pPreDepthTarget->getFramebufferHeight(),
+                        &projMatrix,
+                        &viewMatrix,
+                        };
+                    
+                    BaseVisualObject::BindResult result;
+                    result.pTrunkRenderPassCmdBuffer = pPreDepthCmdBuffer;
+                    result.pBranchCmdBuffer = nullptr;
+                    result.pTrunkWaitBarrierCmdBuffer = nullptr;
+                    _bindVisualObject(VG_FALSE, VG_TRUE, pVisualObject, info, &result);
+                }
+    
+                if (pTrunkRenderPassCmdBuffer != nullptr)
+                {
+                    BaseVisualObject::BindInfo info = {
+                        pRenderTarget != nullptr ? pRenderTarget->getFramebufferWidth() : 0u,
+                        pRenderTarget != nullptr ? pRenderTarget->getFramebufferHeight() : 0u,
+                        &projMatrix,
+                        &viewMatrix,
+                        };
+        
+                    BaseVisualObject::BindResult result;
+                    result.pTrunkRenderPassCmdBuffer = pTrunkRenderPassCmdBuffer;
+                    result.pBranchCmdBuffer = pBranchCmdBuffer;
+                    result.pTrunkWaitBarrierCmdBuffer = pTrunkWaitBarrierCmdBuffer;
+                    _bindVisualObject(pLight, VG_FALSE, pVisualObject, info, &result);
+                    
+                }
+                
 #if defined(DEBUG) && defined(VG_ENABLE_COST_TIMER)
                 bindObjectCostTimer.end();
 #endif //DEBUG and VG_ENABLE_COST_TIMER
@@ -932,96 +1002,9 @@ namespace vg
 #endif //DEBUG and VG_ENABLE_COST_TIMER
     }
 
-    void RenderBinder::_setPreDepthBuildInData(BaseVisualObject * pVisualObject
-        , Matrix4x4 modelMatrix
-        , Matrix4x4 viewMatrix
-        , Matrix4x4 projMatrix
-        )
-    {
-        uint32_t materialCount = pVisualObject->getMaterialCount();
-        for (uint32_t materialIndex = 0u; materialIndex < materialCount; ++materialIndex)
-        {
-            auto pMaterial = pVisualObject->getMaterial(materialIndex);
-            //pre z pass.
-            if (pMaterial->getPreDepthPass() != nullptr)
-            {
-                auto pPreDepthPass = pMaterial->getPreDepthPass();
-                auto pPassOfPreDepthPass = pPreDepthPass->getPass();
-                Bool32 hasMatrixObjectToNDC = VG_FALSE;
-                Bool32 hasMatrixObjectToWorld = VG_FALSE;
-                Bool32 hasMatrixObjectToView = VG_FALSE;
-                Bool32 hasMatrixView = VG_FALSE;
-                Bool32 hasMatrixProjection = VG_FALSE;
-                //update building in matrix variable.
-                auto info = pPassOfPreDepthPass->getBuildInDataInfo();
-                uint32_t componentCount = info.componentCount;
-                for (uint32_t componentIndex = 0u; componentIndex < componentCount; ++componentIndex)
-                {
-                    Pass::BuildInDataType type = (*(info.pComponent + componentIndex)).type;
-                    if (type == Pass::BuildInDataType::MATRIX_OBJECT_TO_NDC)
-                    {
-                        hasMatrixObjectToNDC = VG_TRUE;
-                    }
-                    else if (type == Pass::BuildInDataType::MATRIX_OBJECT_TO_WORLD)
-                    {
-                        hasMatrixObjectToWorld = VG_TRUE;
-                    }
-                    else if (type == Pass::BuildInDataType::MATRIX_OBJECT_TO_VIEW)
-                    {
-                        hasMatrixObjectToView = VG_TRUE;
-                    }
-                    else if (type == Pass::BuildInDataType::MATRIX_VIEW)
-                    {
-                        hasMatrixView = VG_TRUE;
-                    }
-                    else if (type == Pass::BuildInDataType::MATRIX_PROJECTION)
-                    {
-                        hasMatrixProjection = VG_TRUE;
-                    }
-                }
-                
-                Matrix4x4 mvMatrix;
-                Matrix4x4 mvpMatrix;
-                if (hasMatrixObjectToView || hasMatrixObjectToNDC)
-                {
-                    mvMatrix = viewMatrix * modelMatrix;
-                }
-                
-                if (hasMatrixObjectToNDC)
-                {
-                    mvpMatrix = projMatrix * mvMatrix;
-                }
-                //update building in matrix variable.
-                for (uint32_t componentIndex = 0u; componentIndex < componentCount; ++componentIndex)
-                {
-                    Pass::BuildInDataType type = (*(info.pComponent + componentIndex)).type;
-                    if (type == Pass::BuildInDataType::MATRIX_OBJECT_TO_NDC)
-                    {
-                        pPreDepthPass->_setBuildInMatrixData(type, mvpMatrix);
-                    }
-                    else if (type == Pass::BuildInDataType::MATRIX_OBJECT_TO_WORLD)
-                    {
-                        pPreDepthPass->_setBuildInMatrixData(type, modelMatrix);
-                    }
-                    else if (type == Pass::BuildInDataType::MATRIX_OBJECT_TO_VIEW)
-                    {
-                        pPreDepthPass->_setBuildInMatrixData(type, mvMatrix);
-                    }
-                    else if (type == Pass::BuildInDataType::MATRIX_VIEW)
-                    {
-                        pPreDepthPass->_setBuildInMatrixData(type, viewMatrix);
-                    }
-                    else if (type == Pass::BuildInDataType::MATRIX_PROJECTION)
-                    {
-                        pPreDepthPass->_setBuildInMatrixData(type, projMatrix);
-                    }
-                }
-                pPreDepthPass->apply();
-            }
-        }
-    }
-
-    void RenderBinder::_setBuildInData(BaseVisualObject * pVisualObject
+    void RenderBinder::_setBuildInData(BaseLight *pLight
+        , Bool32 isPreDepth
+        , BaseVisualObject * pVisualObject
         , Matrix4x4 modelMatrix
         , Matrix4x4 viewMatrix
         , Matrix4x4 projMatrix
@@ -1031,7 +1014,21 @@ namespace vg
         uint32_t materialCount = pVisualObject->getMaterialCount();
         for (uint32_t materialIndex = 0u; materialIndex < materialCount; ++materialIndex)
         {
-            auto pMaterial = pVisualObject->getMaterial(materialIndex);
+            Material *pMaterial;
+            if (pLight != nullptr)
+            {
+                const auto &typeInfo = typeid(*pLight);
+                pMaterial = pVisualObject->getLightingMaterial(typeInfo, materialIndex);
+            }
+            else if (isPreDepth)
+            {
+                pMaterial = pVisualObject->getPreDepthMaterial(materialIndex);
+            }
+            else
+            {
+                pMaterial = pVisualObject->getMaterial(materialIndex);
+            }
+            
             auto passCount = pMaterial->getPassCount();
             for (uint32_t passIndex = 0u; passIndex < passCount; ++passIndex)
             {
@@ -1107,69 +1104,72 @@ namespace vg
                     }
                 }
 
-                //light data buffer.
-                if (m_lightingEnable && m_lightTypeCount > 0)
-                {
-                    vg::PassBufferInfo::BufferInfo itemInfo = {
-                        m_pCurrLightDataBuffer,
-                        0u,
-                        m_pCurrLightDataBuffer->getBufferSize(),
-                    };
-                    PassBufferInfo info = {
-                        1u,
-                        &itemInfo,
-                        VG_PASS_LIGHT_DATA_BUFFER_BINDING_PRIORITY,
-                        vg::BufferDescriptorType::UNIFORM_BUFFER,
-                        vk::ShaderStageFlagBits::eVertex | vk::ShaderStageFlagBits::eFragment
-                    };
-                    if (pPass->hasBuffer(VG_PASS_LIGHT_DATA_BUFFER_NAME) == VG_FALSE)
+                if (isPreDepth == VG_FALSE && pLight == nullptr)
+                {                
+                    //light data buffer.
+                    if (m_lightingEnable && m_lightTypeCount > 0)
                     {
-                        pPass->addBuffer(VG_PASS_LIGHT_DATA_BUFFER_NAME, info);
-                    }
-                    else
-                    {
-                        pPass->setBuffer(VG_PASS_LIGHT_DATA_BUFFER_NAME, info);
-                    }
-                    //light textures.
-                    auto &lightPassTextureInfos = m_lightPassTextureInfos;
-                    uint32_t textureInfoCount = static_cast<uint32_t>(lightPassTextureInfos.size());
-                    for (uint32_t textureInfoIndex = 0u; textureInfoIndex < textureInfoCount; ++textureInfoIndex)
-                    {
-                        std::string name = VG_PASS_LIGHT_TEXTURE_NAME + std::to_string(textureInfoIndex);
-                        if (pPass->hasTexture(name) == VG_FALSE) 
+                        vg::PassBufferInfo::BufferInfo itemInfo = {
+                            m_pCurrLightDataBuffer,
+                            0u,
+                            m_pCurrLightDataBuffer->getBufferSize(),
+                        };
+                        PassBufferInfo info = {
+                            1u,
+                            &itemInfo,
+                            VG_PASS_LIGHT_DATA_BUFFER_BINDING_PRIORITY,
+                            vg::BufferDescriptorType::UNIFORM_BUFFER,
+                            vk::ShaderStageFlagBits::eVertex | vk::ShaderStageFlagBits::eFragment
+                        };
+                        if (pPass->hasBuffer(VG_PASS_LIGHT_DATA_BUFFER_NAME) == VG_FALSE)
                         {
-                            pPass->addTexture(name, lightPassTextureInfos[textureInfoIndex]);
+                            pPass->addBuffer(VG_PASS_LIGHT_DATA_BUFFER_NAME, info);
                         }
                         else
                         {
-                            pPass->setTexture(name, lightPassTextureInfos[textureInfoIndex]);
+                            pPass->setBuffer(VG_PASS_LIGHT_DATA_BUFFER_NAME, info);
+                        }
+                        //light textures.
+                        auto &lightPassTextureInfos = m_lightPassTextureInfos;
+                        uint32_t textureInfoCount = static_cast<uint32_t>(lightPassTextureInfos.size());
+                        for (uint32_t textureInfoIndex = 0u; textureInfoIndex < textureInfoCount; ++textureInfoIndex)
+                        {
+                            std::string name = VG_PASS_LIGHT_TEXTURE_NAME + std::to_string(textureInfoIndex);
+                            if (pPass->hasTexture(name) == VG_FALSE) 
+                            {
+                                pPass->addTexture(name, lightPassTextureInfos[textureInfoIndex]);
+                            }
+                            else
+                            {
+                                pPass->setTexture(name, lightPassTextureInfos[textureInfoIndex]);
+                            }
                         }
                     }
-                }
-
-                if (pPreDepthResultTex != nullptr)
-                {
-                    vg::PassTextureInfo::TextureInfo itemInfo = {
-                        pPreDepthResultTex,
-                        nullptr,
-                        nullptr,
-                        vk::ImageLayout::eUndefined,
-                    };
-                    PassTextureInfo info = {
-                        vg::SamplerTextureType::TEX_2D,
-                        1u,
-                        &itemInfo,
-                        VG_PASS_PRE_DEPTH_TEXTURE_BINDING_PRIORITY,
-                        vg::ImageDescriptorType::COMBINED_IMAGE_SAMPLER,
-                        vk::ShaderStageFlagBits::eFragment,
-                    };
-                    if (pPass->hasTexture(VG_PASS_PRE_DEPTH_TEXTURE_NAME) == VG_FALSE)
+    
+                    if (pPreDepthResultTex != nullptr)
                     {
-                        pPass->addTexture(VG_PASS_PRE_DEPTH_TEXTURE_NAME, info);
-                    }
-                    else
-                    {
-                        pPass->setTexture(VG_PASS_PRE_DEPTH_TEXTURE_NAME, info);
+                        vg::PassTextureInfo::TextureInfo itemInfo = {
+                            pPreDepthResultTex,
+                            nullptr,
+                            nullptr,
+                            vk::ImageLayout::eUndefined,
+                        };
+                        PassTextureInfo info = {
+                            vg::SamplerTextureType::TEX_2D,
+                            1u,
+                            &itemInfo,
+                            VG_PASS_PRE_DEPTH_TEXTURE_BINDING_PRIORITY,
+                            vg::ImageDescriptorType::COMBINED_IMAGE_SAMPLER,
+                            vk::ShaderStageFlagBits::eFragment,
+                        };
+                        if (pPass->hasTexture(VG_PASS_PRE_DEPTH_TEXTURE_NAME) == VG_FALSE)
+                        {
+                            pPass->addTexture(VG_PASS_PRE_DEPTH_TEXTURE_NAME, info);
+                        }
+                        else
+                        {
+                            pPass->setTexture(VG_PASS_PRE_DEPTH_TEXTURE_NAME, info);
+                        }
                     }
                 }
 
@@ -1178,20 +1178,47 @@ namespace vg
         }
     }
 
-    void RenderBinder::_bindVisualObject(BaseVisualObject *pVisublObject
+    void RenderBinder::_bindVisualObject(BaseLight *pLight
+        , Bool32 isPreDepth
+        , BaseVisualObject *pVisublObject
         , BaseVisualObject::BindInfo & bindInfo
         , BaseVisualObject::BindResult *pResult
         )
     {
-        pVisublObject->beginBind(bindInfo, pResult);
-        if (static_cast<uint32_t>(m_bindedObjects.size()) == m_bindedObjectCount) {
-            auto newSize = getNextCapacity(static_cast<uint32_t>(m_bindedObjects.size()));
-            m_bindedObjects.resize(newSize);
+        if (pLight != nullptr)
+        {
+            const auto &typeInfo = typeid(*pLight);
+            pVisublObject->beginBindForLighting(typeInfo, bindInfo, pResult);
+            if (static_cast<uint32_t>(m_bindedObjectsForLighting.size()) == m_bindedObjectCountForLighting) {
+                auto newSize = getNextCapacity(static_cast<uint32_t>(m_bindedObjectsForLighting.size()));
+                m_bindedObjectsForLighting.resize(newSize);
+            }
+    
+            m_bindedObjectsForLighting[m_bindedObjectCountForLighting] = pVisublObject;
+            ++m_bindedObjectCountForLighting;
+
+        } else if (isPreDepth) 
+        {
+            pVisublObject->beginBindForPreDepth(bindInfo, pResult);
+            if (static_cast<uint32_t>(m_bindedObjectsForPreDepth.size()) == m_bindedObjectCountForPreDepth) {
+                auto newSize = getNextCapacity(static_cast<uint32_t>(m_bindedObjectsForPreDepth.size()));
+                m_bindedObjectsForPreDepth.resize(newSize);
+            }
+    
+            m_bindedObjectsForPreDepth[m_bindedObjectCountForPreDepth] = pVisublObject;
+            ++m_bindedObjectCountForPreDepth;
+
+        } else {
+            pVisublObject->beginBind(bindInfo, pResult);
+            if (static_cast<uint32_t>(m_bindedObjects.size()) == m_bindedObjectCount) {
+                auto newSize = getNextCapacity(static_cast<uint32_t>(m_bindedObjects.size()));
+                m_bindedObjects.resize(newSize);
+            }
+    
+            m_bindedObjects[m_bindedObjectCount] = pVisublObject;
+    
+            ++m_bindedObjectCount;
         }
-
-        m_bindedObjects[m_bindedObjectCount] = pVisublObject;
-
-        ++m_bindedObjectCount;
     }
 
     void RenderBinder::_renderPassBegin(const BaseRenderTarget *pRenderTarget

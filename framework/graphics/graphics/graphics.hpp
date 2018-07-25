@@ -25,15 +25,14 @@
 #include <graphics/mesh/mesh_2.hpp>
 #include <graphics/mesh/mesh_3.hpp>
 
-
-#include <graphics/pass/pass.hpp>
 #include <graphics/pass/shader.hpp>
-
-#include <graphics/pre_depth_pass/pre_depth_pass.hpp>
-
-#include <graphics/post_render/post_render.hpp>
+#include <graphics/pass/pass.hpp>
+#include <graphics/pass/pass_default.hpp>
 
 #include <graphics/material/material.hpp>
+#include <graphics/material/material_default.hpp>
+
+#include <graphics/post_render/post_render.hpp>
 
 #include <graphics/renderer/renderer.hpp>
 #include <graphics/renderer/renderer_target_surface.hpp>

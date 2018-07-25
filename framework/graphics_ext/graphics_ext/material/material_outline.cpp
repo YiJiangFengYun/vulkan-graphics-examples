@@ -54,11 +54,11 @@ namespace vge
             vg::RenderPassInfo trunkRenderPassInfo;
             trunkRenderPassInfo.pRenderPass = nullptr;
             trunkRenderPassInfo.pFramebuffer = nullptr;
-            trunkRenderPassInfo.framebufferWidth = info.trunkFramebufferWidth;
-            trunkRenderPassInfo.framebufferHeight = info.trunkFramebufferHeight;
+            trunkRenderPassInfo.framebufferWidth = info.framebufferWidth;
+            trunkRenderPassInfo.framebufferHeight = info.framebufferHeight;
             trunkRenderPassInfo.projMatrix = *(info.pProjMatrix);
             trunkRenderPassInfo.viewMatrix = *(info.pViewMatrix);
-            trunkRenderPassInfo.pPass = m_pMainPass.get();
+            trunkRenderPassInfo.pPass = m_pMainPass;
             trunkRenderPassInfo.modelMatrix = *(info.pModelMatrix);
             trunkRenderPassInfo.pMesh = info.pMesh;
             trunkRenderPassInfo.subMeshIndex = info.subMeshIndex;
@@ -75,8 +75,8 @@ namespace vge
             vg::RenderPassInfo trunkRenderPassInfo;
             trunkRenderPassInfo.pRenderPass = nullptr;
             trunkRenderPassInfo.pFramebuffer = nullptr;
-            trunkRenderPassInfo.framebufferWidth = info.trunkFramebufferWidth;
-            trunkRenderPassInfo.framebufferHeight = info.trunkFramebufferHeight;
+            trunkRenderPassInfo.framebufferWidth = info.framebufferWidth;
+            trunkRenderPassInfo.framebufferHeight = info.framebufferHeight;
             trunkRenderPassInfo.projMatrix = *(info.pProjMatrix);
             trunkRenderPassInfo.viewMatrix = *(info.pViewMatrix);
             trunkRenderPassInfo.pPass = m_pPassOutline.get();

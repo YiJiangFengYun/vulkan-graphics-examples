@@ -5,7 +5,6 @@
 #include "graphics/global.hpp"
 #include "graphics/util/util.hpp"
 #include "graphics/pass/pass.hpp"
-#include "graphics/pre_depth_pass/pre_depth_pass.hpp"
 #include "graphics/texture/texture.hpp"
 #include "graphics/material/material_data.hpp"
 #include "graphics/material/cmd.hpp"
@@ -16,10 +15,8 @@ namespace vg
     public:
         struct BindInfo 
         {
-            uint32_t preDepthFramebufferWidth;
-            uint32_t preDepthFramebufferHeight;
-            uint32_t trunkFramebufferWidth;
-            uint32_t trunkFramebufferHeight;
+            uint32_t framebufferWidth;
+            uint32_t framebufferHeight;
             const Matrix4x4 *pProjMatrix;
             const Matrix4x4 *pViewMatrix;
             InstanceID objectID;
@@ -33,10 +30,8 @@ namespace vg
             fd::CostTimer *pPreparingCommandBufferCostTimer;
 #endif //DEBUG and VG_ENABLE_COST_TIMER
 
-            BindInfo(uint32_t preDepthFramebufferWidth = 0u
-                , uint32_t preDepthFramebufferHeight = 0u
-                , uint32_t trunkFramebufferWidth = 0u
-                , uint32_t trunkFramebufferHeight = 0u
+            BindInfo( uint32_t framebufferWidth = 0u
+                , uint32_t framebufferHeight = 0u
                 , const Matrix4x4 *pProjMatrix = nullptr
                 , const Matrix4x4 *pViewMatrix = nullptr
                 , InstanceID objectID = 0
@@ -54,12 +49,10 @@ namespace vg
     
         struct BindResult
         {
-            CmdBuffer *pPreDepthCmdBuffer;
             CmdBuffer *pBranchCmdBuffer;
             CmdBuffer *pTrunkRenderPassCmdBuffer;
             CmdBuffer *pTrunkWaitBarrierCmdBuffer;
-            BindResult(CmdBuffer *pPreDepthCmdBuffer = nullptr
-                , CmdBuffer *pBranchCmdBuffer = nullptr
+            BindResult(CmdBuffer *pBranchCmdBuffer = nullptr
                 , CmdBuffer *pTrunkRenderPassCmdBuffer = nullptr
                 , CmdBuffer *pTrunkWaitBarrierCmdBuffer = nullptr
                 );
@@ -77,8 +70,7 @@ namespace vg
         struct MaterialCreateInfo
         {
             Bool32 onlyOnce;
-            Bool32 createPreDepthPass;
-            MaterialCreateInfo(Bool32 onlyOnce = VG_FALSE, Bool32 createPreDepthPass = VG_FALSE);
+            MaterialCreateInfo(Bool32 onlyOnce = VG_FALSE);
         };
 
         Material(Bool32 onlyOnce = VG_FALSE);
@@ -97,10 +89,6 @@ namespace vg
         const Pass *getMainPass() const;
         Pass *getMainPass();
         
-
-        const PreDepthPass * getPreDepthPass() const;
-        PreDepthPass * getPreDepthPass();
-
         MaterialShowType getShowType();
         void setRenderQueueType(MaterialShowType type);
         uint32_t getRenderPriority();
@@ -121,8 +109,6 @@ namespace vg
         Pass *m_pMainPass;
         std::shared_ptr<Shader> m_pMyMainShader; 
         std::shared_ptr<Pass> m_pMyMainPass;
-
-        std::shared_ptr<PreDepthPass> m_pPreDepthPass;
 
         std::vector<Pass *> m_arrPasses;
         std::unordered_map<InstanceID, Pass *> m_mapPasses;

@@ -1,6 +1,8 @@
 #ifndef VG_VISUAL_OBJECT_H
 #define VG_VISUAL_OBJECT_H
 
+#include <typeinfo>
+#include <typeindex>
 #include "graphics/scene/space_info.hpp"
 #include "graphics/scene/object.hpp"
 #include "graphics/mesh/mesh.hpp"
@@ -13,17 +15,13 @@ namespace vg
     public:
         struct BindInfo 
         {
-            uint32_t preDepthFramebufferWidth;
-            uint32_t preDepthFramebufferHeight;
-            uint32_t trunkFramebufferWidth;
-            uint32_t trunkFramebufferHeight;
+            uint32_t framebufferWidth;
+            uint32_t framebufferHeight;
             const Matrix4x4 *pProjMatrix;
             const Matrix4x4 *pViewMatrix;
 
-            BindInfo(uint32_t preDepthFramebufferWidth = 0u
-                , uint32_t preDepthFramebufferHeight = 0u
-                , uint32_t trunkFramebufferWidth = 0u
-                , uint32_t trunkFramebufferHeight = 0u
+            BindInfo(uint32_t framebufferWidth = 0u
+                , uint32_t framebufferHeight = 0u
                 , const Matrix4x4 *pProjMatrix = nullptr
                 , const Matrix4x4 *pViewMatrix = nullptr
                 );
@@ -31,12 +29,10 @@ namespace vg
     
         struct BindResult
         {
-           CmdBuffer *pPreDepthCmdBuffer;
            CmdBuffer *pBranchCmdBuffer;
            CmdBuffer *pTrunkRenderPassCmdBuffer;
            CmdBuffer *pTrunkWaitBarrierCmdBuffer;
-           BindResult(CmdBuffer *pPreDepthCmdBuffer = nullptr
-               , CmdBuffer *pBranchCmdBuffer = nullptr
+           BindResult(CmdBuffer *pBranchCmdBuffer = nullptr
                , CmdBuffer *pTrunkRenderPassCmdBuffer = nullptr
                , CmdBuffer *pTrunkWaitBarrierCmdBuffer = nullptr
                );
@@ -47,12 +43,22 @@ namespace vg
         virtual ~BaseVisualObject();
 
         uint32_t getMaterialCount() const;
-        const Material *getMaterial(uint32_t index = 0) const;
-        Material *getMaterial(uint32_t index = 0);
-        
         void setMaterialCount(uint32_t count);
-        void setMaterial(fd::ArrayProxy<Material *> pMaterials, uint32_t offset = 0);
-        void setMaterial(Material * pMaterial);
+
+        const Material *getMaterial(uint32_t index = 0u) const;
+        Material *getMaterial(uint32_t index = 0);
+        void setMaterial(fd::ArrayProxy<Material *> pMaterials, uint32_t offset = 0u);
+        void setMaterial(Material *pMaterial);
+
+        const Material *getPreDepthMaterial(uint32_t index = 0u) const;
+        Material *getPreDepthMaterial(uint32_t index = 0);
+        void setPreDepthMaterial(fd::ArrayProxy<Material *> pMaterials, uint32_t offset = 0u);
+        void setPreDepthMaterial(Material *pMaterial);
+
+        const Material *getLightingMaterial(const std::type_info &lightTypeInfo, uint32_t index = 0u) const;
+        Material *getLightingMaterial(const std::type_info &lightTypeInfo, uint32_t index = 0);
+        void setLightingMaterial(const std::type_info &lightTypeInfo, fd::ArrayProxy<Material *> pMaterials, uint32_t offset = 0u);
+        void setLightingMaterial(const std::type_info &lightTypeInfo, Material *pMaterial);
 
         const BaseMesh *getMesh() const;
         BaseMesh *getMesh();
@@ -72,12 +78,19 @@ namespace vg
         void updateClipRects(fd::ArrayProxy<fd::Rect2D> rects, uint32_t offset = 0u);
         void updateClipRects(fd::Rect2D rect, uint32_t count, uint32_t offset = 0u);
 
+        void beginBindForPreDepth(const BindInfo info, BindResult *pResult) const;
+        void endBindForPreDepth() const;
         void beginBind(const BindInfo info, BindResult *pResult) const;
         void endBind() const;
+        void beginBindForLighting(const std::type_info &lightTypeInfo, const BindInfo info, BindResult *pResult) const;
+        void endBindForLighting(const std::type_info &lightTypeInfo) const;
 
     protected:
         uint32_t m_materialCount;
         std::vector<Material *> m_pMaterials;
+        std::vector<Material *> m_pPreDepthMaterials;
+        std::unordered_map<std::type_index, std::vector<Material *>> m_mapPLightingMaterials;
+
         BaseMesh *m_pMesh;
         int32_t m_subMeshOffset;
         int32_t m_subMeshCount;
@@ -86,7 +99,12 @@ namespace vg
         //Valid range of ClipRect is [(0, 0), (1, 1)]
         std::vector<fd::Rect2D> m_clipRects;
         void _asyncMeshData();
+        void _resizeLightingMaterialMap();
         virtual Matrix4x4 _getModelMatrix() const = 0;
+
+        void _checkPreDepthMaterialValid(uint32_t index) const;
+        void _checkLightingMaterialValid(const std::type_info &lightTypeInfo, uint32_t index) const;
+        void _checkMaterialValid(uint32_t index) const;
     };
 
     template <SpaceType SPACE_TYPE>

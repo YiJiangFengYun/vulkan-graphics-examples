@@ -79,6 +79,10 @@ namespace vg
     private:
         // uint32_t m_framebufferWidth;
         // uint32_t m_framebufferHeight;
+        std::vector<BaseVisualObject *> m_bindedObjectsForLighting;
+        uint32_t m_bindedObjectCountForLighting;
+        std::vector<BaseVisualObject *> m_bindedObjectsForPreDepth;
+        uint32_t m_bindedObjectCountForPreDepth;
         std::vector<BaseVisualObject *> m_bindedObjects;
         uint32_t m_bindedObjectCount;
 
@@ -107,10 +111,11 @@ namespace vg
 
         void _bindForRenderPassEnd(RenderBinderInfo info);
 
-        void _bindScene2(Scene<SpaceType::SPACE_2> *pScene
+        void _bindScene2(BaseLight *pLight
+            , Scene<SpaceType::SPACE_2> *pScene
             , const Projector<SpaceType::SPACE_2> *pProjector
-            , const BaseRenderTarget *pPreDepthTarget
-            , const BaseRenderTarget *pRenderTarget
+            , const BaseRenderTarget *pPreDepthTarget = nullptr
+            , const BaseRenderTarget *pRenderTarget = nullptr
             , const Texture *pPreDepthResultTex = nullptr
             , CmdBuffer *pPreDepthCmdBuffer = nullptr
             , CmdBuffer *pBranchCmdBuffer = nullptr
@@ -118,31 +123,30 @@ namespace vg
             , CmdBuffer *pTrunkRenderPassCmdBuffer = nullptr
             );
 
-        void _bindScene3(Scene<SpaceType::SPACE_3> *pScene
+        void _bindScene3(BaseLight *pLight
+            , Scene<SpaceType::SPACE_3> *pScene
             , const Projector<SpaceType::SPACE_3> *pProjector
-            , const BaseRenderTarget *pPreDepthTarget
-            , const BaseRenderTarget *pRenderTarget
+            , const BaseRenderTarget *pPreDepthTarget = nullptr
+            , const BaseRenderTarget *pRenderTarget = nullptr
             , const Texture *pPreDepthResultTex = nullptr
             , CmdBuffer *pPreDepthCmdBuffer = nullptr
             , CmdBuffer *pBranchCmdBuffer = nullptr
             , CmdBuffer *pTrunkWaitBarrierCmdBuffer = nullptr
             , CmdBuffer *pTrunkRenderPassCmdBuffer = nullptr
             );
-
-        void _setPreDepthBuildInData(BaseVisualObject * pVisualObject
-            , Matrix4x4 modelMatrix
-            , Matrix4x4 viewMatrix
-            , Matrix4x4 projMatrix
-            );
-
-        void _setBuildInData(BaseVisualObject * pVisualObject
+            
+        void _setBuildInData(BaseLight *pLight
+            , Bool32 isPreDepth
+            , BaseVisualObject * pVisualObject
             , Matrix4x4 modelMatrix
             , Matrix4x4 viewMatrix
             , Matrix4x4 projMatrix
             , const Texture *pPreDepthResultTex
         );
 
-        void _bindVisualObject(BaseVisualObject *pVisublObject
+        void _bindVisualObject(BaseLight *pLight
+            , Bool32 isPreDepth
+            , BaseVisualObject *pVisublObject
             , BaseVisualObject::BindInfo & bindInfo
             , BaseVisualObject::BindResult *pResult
             );

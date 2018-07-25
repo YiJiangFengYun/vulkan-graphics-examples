@@ -48,6 +48,7 @@ namespace vg
 
         createDefaultTextures();
         createDefaultPasses();
+        createDefaultMaterials();
         isInited = VG_TRUE;
     }
 
@@ -55,6 +56,7 @@ namespace vg
     {
         destroyDefaultTextures();
         destroyDefaultPasses();
+        destroyDefaultMaterials();
         pApp = nullptr;
         //fd::moduleDestroy();
         isInited = VG_FALSE;

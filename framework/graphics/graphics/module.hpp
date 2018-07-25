@@ -5,6 +5,7 @@
 #include "graphics/app/app.hpp"
 #include "graphics/texture/texture_default.hpp"
 #include "graphics/pass/pass_default.hpp"
+#include "graphics/material/material_default.hpp"
 
 namespace vg
 {

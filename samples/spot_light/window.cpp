@@ -156,7 +156,7 @@ void Window::_initScene()
     {
         object->setMaterialCount(1u);
         object->setMaterial(m_pMaterial.get());
-        object->setLightingMaterial(typeid(vg::LightSpot3), vg::pDefaultLightDepthMaterial.get());
+        object->setLightingMaterial(typeid(vg::LightSpot3), vg::pDefaultLightingDepthMaterial.get());
         m_pScene->addVisualObject(object.get());
     }
 

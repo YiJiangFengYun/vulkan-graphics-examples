@@ -7,8 +7,8 @@
 namespace vg
 {
     extern std::shared_ptr<Material> pDefaultPreDepthMaterial;
-    extern std::shared_ptr<Material> pDefaultLightDepthMaterial;
-    extern std::shared_ptr<Material> pDefaultLightPointDistMaterial;
+    extern std::shared_ptr<Material> pDefaultLightingDepthMaterial;
+    extern std::shared_ptr<Material> pDefaultLightingPointDistMaterial;
 
     extern void createDefaultMaterials();
     extern void destroyDefaultMaterials();

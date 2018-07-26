@@ -7,10 +7,10 @@ namespace vg
 {
     extern std::shared_ptr<Shader> pDefaultPreDepthShader;
     extern std::shared_ptr<Pass> pDefaultPreDepthPass;
-    extern std::shared_ptr<Shader> pDefaultLightDepthShader;
-    extern std::shared_ptr<Pass> pDefaultLightDepthPass;
-    extern std::shared_ptr<Shader> pDefaultLightPointDistShader;
-    extern std::shared_ptr<Pass> pDefaultLightPointDistPass;
+    extern std::shared_ptr<Shader> pDefaultLightingDepthShader;
+    extern std::shared_ptr<Pass> pDefaultLightingDepthPass;
+    extern std::shared_ptr<Shader> pDefaultLightingPointDistShader;
+    extern std::shared_ptr<Pass> pDefaultLightingPointDistPass;
 
     extern void createDefaultPasses();
     extern void destroyDefaultPasses();

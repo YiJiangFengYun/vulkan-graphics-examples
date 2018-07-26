@@ -3,8 +3,8 @@
 namespace vg
 {
     std::shared_ptr<Material> pDefaultPreDepthMaterial = nullptr;
-    std::shared_ptr<Material> pDefaultLightDepthMaterial = nullptr;
-    std::shared_ptr<Material> pDefaultLightPointDistMaterial = nullptr;
+    std::shared_ptr<Material> pDefaultLightingDepthMaterial = nullptr;
+    std::shared_ptr<Material> pDefaultLightingPointDistMaterial = nullptr;
 
     class MaterialForDefault : public vg::Material
     {
@@ -33,23 +33,23 @@ namespace vg
             pDefaultPreDepthMaterial = std::shared_ptr<Material>{
                 new MaterialForDefault()
             };
-            dynamic_cast<MaterialForDefault *>(pDefaultPreDepthMaterial.get())->setMainPass(pDefaultLightDepthPass.get());
+            dynamic_cast<MaterialForDefault *>(pDefaultPreDepthMaterial.get())->setMainPass(pDefaultLightingDepthPass.get());
         }
 
         //Light depth material.
         {
-            pDefaultLightDepthMaterial = std::shared_ptr<Material>{
+            pDefaultLightingDepthMaterial = std::shared_ptr<Material>{
                 new MaterialForDefault()
             };
-            dynamic_cast<MaterialForDefault *>(pDefaultLightDepthMaterial.get())->setMainPass(pDefaultLightDepthPass.get());
+            dynamic_cast<MaterialForDefault *>(pDefaultLightingDepthMaterial.get())->setMainPass(pDefaultLightingDepthPass.get());
         }
 
         //Light point distance material
         {
-            pDefaultLightPointDistMaterial = std::shared_ptr<Material>{
+            pDefaultLightingPointDistMaterial = std::shared_ptr<Material>{
                 new MaterialForDefault()
             };
-            dynamic_cast<MaterialForDefault *>(pDefaultLightPointDistMaterial.get())->setMainPass(pDefaultLightPointDistPass.get());
+            dynamic_cast<MaterialForDefault *>(pDefaultLightingPointDistMaterial.get())->setMainPass(pDefaultLightingPointDistPass.get());
         }
         
     }
@@ -57,7 +57,7 @@ namespace vg
     void destroyDefaultMaterials()
     {
         pDefaultPreDepthMaterial = nullptr;
-        pDefaultLightDepthMaterial = nullptr;
-        pDefaultLightPointDistMaterial = nullptr;
+        pDefaultLightingDepthMaterial = nullptr;
+        pDefaultLightingPointDistMaterial = nullptr;
     }
 } //vg

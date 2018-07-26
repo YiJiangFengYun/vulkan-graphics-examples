@@ -26,32 +26,32 @@ add_custom_command (
 )
 
 #Light depth default shader.
-compile_shader("${CMAKE_CURRENT_SOURCE_DIR}/shader" "light_depth_default")
+compile_shader("${CMAKE_CURRENT_SOURCE_DIR}/shader" "lighting_depth_default")
 add_custom_command (
-  OUTPUT "${CMAKE_CURRENT_SOURCE_DIR}/${LIBRARY_NAME}/pass/light_depth_vert_default_code.c"
-  COMMAND "embed_file_to_code" "VG_LIGHT_DEPTH_VERT_DEFAULT_CODE" "${CMAKE_CURRENT_SOURCE_DIR}/shader/light_depth_default.vert.spv" "${CMAKE_CURRENT_SOURCE_DIR}/${LIBRARY_NAME}/pass/light_depth_vert_default_code.c"
-  MAIN_DEPENDENCY "${CMAKE_CURRENT_SOURCE_DIR}/shader/light_depth_default.vert.spv"
+  OUTPUT "${CMAKE_CURRENT_SOURCE_DIR}/${LIBRARY_NAME}/pass/lighting_depth_vert_default_code.c"
+  COMMAND "embed_file_to_code" "VG_LIGHTING_DEPTH_VERT_DEFAULT_CODE" "${CMAKE_CURRENT_SOURCE_DIR}/shader/lighting_depth_default.vert.spv" "${CMAKE_CURRENT_SOURCE_DIR}/${LIBRARY_NAME}/pass/lighting_depth_vert_default_code.c"
+  MAIN_DEPENDENCY "${CMAKE_CURRENT_SOURCE_DIR}/shader/lighting_depth_default.vert.spv"
   DEPENDS "embed_file_to_code"
 )
 add_custom_command (
-  OUTPUT "${CMAKE_CURRENT_SOURCE_DIR}/${LIBRARY_NAME}/pass/light_depth_frag_default_code.c"
-  COMMAND "embed_file_to_code" "VG_LIGHT_DEPTH_FRAG_DEFAULT_CODE" "${CMAKE_CURRENT_SOURCE_DIR}/shader/light_depth_default.frag.spv" "${CMAKE_CURRENT_SOURCE_DIR}/${LIBRARY_NAME}/pass/light_depth_frag_default_code.c"
-  MAIN_DEPENDENCY "${CMAKE_CURRENT_SOURCE_DIR}/shader/light_depth_default.frag.spv"
+  OUTPUT "${CMAKE_CURRENT_SOURCE_DIR}/${LIBRARY_NAME}/pass/lighting_depth_frag_default_code.c"
+  COMMAND "embed_file_to_code" "VG_LIGHTING_DEPTH_FRAG_DEFAULT_CODE" "${CMAKE_CURRENT_SOURCE_DIR}/shader/lighting_depth_default.frag.spv" "${CMAKE_CURRENT_SOURCE_DIR}/${LIBRARY_NAME}/pass/lighting_depth_frag_default_code.c"
+  MAIN_DEPENDENCY "${CMAKE_CURRENT_SOURCE_DIR}/shader/lighting_depth_default.frag.spv"
   DEPENDS "embed_file_to_code"
 )
 
 #Light point distance default shader.
-compile_shader("${CMAKE_CURRENT_SOURCE_DIR}/shader" "light_point_dist_default")
+compile_shader("${CMAKE_CURRENT_SOURCE_DIR}/shader" "lighting_point_dist_default")
 add_custom_command (
-  OUTPUT "${CMAKE_CURRENT_SOURCE_DIR}/${LIBRARY_NAME}/pass/light_point_dist_vert_default_code.c"
-  COMMAND "embed_file_to_code" "VG_LIGHT_POINT_DIST_VERT_DEFAULT_CODE" "${CMAKE_CURRENT_SOURCE_DIR}/shader/light_point_dist_default.vert.spv" "${CMAKE_CURRENT_SOURCE_DIR}/${LIBRARY_NAME}/pass/light_point_dist_vert_default_code.c"
-  MAIN_DEPENDENCY "${CMAKE_CURRENT_SOURCE_DIR}/shader/light_point_dist_default.vert.spv"
+  OUTPUT "${CMAKE_CURRENT_SOURCE_DIR}/${LIBRARY_NAME}/pass/lighting_point_dist_vert_default_code.c"
+  COMMAND "embed_file_to_code" "VG_LIGHTING_POINT_DIST_VERT_DEFAULT_CODE" "${CMAKE_CURRENT_SOURCE_DIR}/shader/lighting_point_dist_default.vert.spv" "${CMAKE_CURRENT_SOURCE_DIR}/${LIBRARY_NAME}/pass/lighting_point_dist_vert_default_code.c"
+  MAIN_DEPENDENCY "${CMAKE_CURRENT_SOURCE_DIR}/shader/lighting_point_dist_default.vert.spv"
   DEPENDS "embed_file_to_code"
 )
 add_custom_command (
-  OUTPUT "${CMAKE_CURRENT_SOURCE_DIR}/${LIBRARY_NAME}/pass/light_point_dist_frag_default_code.c"
-  COMMAND "embed_file_to_code" "VG_LIGHT_POINT_DIST_FRAG_DEFAULT_CODE" "${CMAKE_CURRENT_SOURCE_DIR}/shader/light_point_dist_default.frag.spv" "${CMAKE_CURRENT_SOURCE_DIR}/${LIBRARY_NAME}/pass/light_point_dist_frag_default_code.c"
-  MAIN_DEPENDENCY "${CMAKE_CURRENT_SOURCE_DIR}/shader/light_point_dist_default.frag.spv"
+  OUTPUT "${CMAKE_CURRENT_SOURCE_DIR}/${LIBRARY_NAME}/pass/lighting_point_dist_frag_default_code.c"
+  COMMAND "embed_file_to_code" "VG_LIGHTING_POINT_DIST_FRAG_DEFAULT_CODE" "${CMAKE_CURRENT_SOURCE_DIR}/shader/lighting_point_dist_default.frag.spv" "${CMAKE_CURRENT_SOURCE_DIR}/${LIBRARY_NAME}/pass/lighting_point_dist_frag_default_code.c"
+  MAIN_DEPENDENCY "${CMAKE_CURRENT_SOURCE_DIR}/shader/lighting_point_dist_default.frag.spv"
   DEPENDS "embed_file_to_code"
 )
 
@@ -65,10 +65,10 @@ file(GLOB_RECURSE HEADERS "${LIBRARY_NAME}/*.hpp" "${LIBRARY_NAME}/*.inl")
 file(GLOB_RECURSE SOURCES "${LIBRARY_NAME}/*.cpp" "${LIBRARY_NAME}/*.c")
 set(SOURCES ${SOURCES} "${CMAKE_CURRENT_SOURCE_DIR}/${LIBRARY_NAME}/pass/pre_depth_vert_default_code.c")
 set(SOURCES ${SOURCES} "${CMAKE_CURRENT_SOURCE_DIR}/${LIBRARY_NAME}/pass/pre_depth_frag_default_code.c")
-set(SOURCES ${SOURCES} "${CMAKE_CURRENT_SOURCE_DIR}/${LIBRARY_NAME}/pass/light_depth_vert_default_code.c")
-set(SOURCES ${SOURCES} "${CMAKE_CURRENT_SOURCE_DIR}/${LIBRARY_NAME}/pass/light_depth_frag_default_code.c")
-set(SOURCES ${SOURCES} "${CMAKE_CURRENT_SOURCE_DIR}/${LIBRARY_NAME}/pass/light_point_dist_vert_default_code.c")
-set(SOURCES ${SOURCES} "${CMAKE_CURRENT_SOURCE_DIR}/${LIBRARY_NAME}/pass/light_point_dist_frag_default_code.c")
+set(SOURCES ${SOURCES} "${CMAKE_CURRENT_SOURCE_DIR}/${LIBRARY_NAME}/pass/lighting_depth_vert_default_code.c")
+set(SOURCES ${SOURCES} "${CMAKE_CURRENT_SOURCE_DIR}/${LIBRARY_NAME}/pass/lighting_depth_frag_default_code.c")
+set(SOURCES ${SOURCES} "${CMAKE_CURRENT_SOURCE_DIR}/${LIBRARY_NAME}/pass/lighting_point_dist_vert_default_code.c")
+set(SOURCES ${SOURCES} "${CMAKE_CURRENT_SOURCE_DIR}/${LIBRARY_NAME}/pass/lighting_point_dist_frag_default_code.c")
 include_directories(${INCLUDE_DIRS})
 add_library(${LIBRARY_NAME} STATIC ${HEADERS} ${SOURCES})
 set_property(TARGET ${LIBRARY_NAME} PROPERTY FOLDER ${FOLDER_NAME})

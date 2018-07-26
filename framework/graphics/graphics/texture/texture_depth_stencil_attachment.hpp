@@ -31,6 +31,32 @@ namespace vg
         virtual void _init(Bool32 importContent) override;
         void _checkDepthFormat();
     };
+
+    class TextureDepthAttachment : public Texture, public BaseDepthStencilAttachment
+    {
+    public:
+        TextureDepthAttachment(vk::Format format
+            , uint32_t width
+            , uint32_t height
+            , Bool32 isInputUsage = VG_FALSE
+            , vk::ImageUsageFlags additionalUsage = vk::ImageUsageFlags()
+            , Bool32 defaultImageView = VG_TRUE
+            , Bool32 defaultSampler = VG_TRUE
+            );
+        ~TextureDepthAttachment();
+        uint32_t getWidth() const;
+        uint32_t getHeight() const;
+        virtual uint32_t getDepthStencilAttachmentWidth() const override;
+        virtual uint32_t getDepthStencilAttachmentHeight() const override;
+        virtual uint32_t getDepthStencilAttachmentLayers() const override;
+        virtual const vk::Format getDepthStencilAttachmentFormat() const override;
+        virtual const vk::ImageLayout getDepthStencilAttachmentLayout() const override;
+        virtual const vk::ImageView *getDepthStencilAttachmentImageView() const override;
+    private:
+        TextureDepthAttachment() = delete;
+        virtual void _init(Bool32 importContent) override;
+        void _checkDepthFormat();
+    };
 } //namespace kgs
 
 #endif // !VG_TEX_DEPTH_STENCIL_ATTACHMENT_H

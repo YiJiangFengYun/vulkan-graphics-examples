@@ -13,6 +13,7 @@ namespace vg
         std::pair<TextureType, std::string>{TextureType::CUBE_ARRARY, "Texture Cube Array"},
         std::pair<TextureType, std::string>{TextureType::COLOR_ATTACHMENT, "Texture Color Attachment"},
         std::pair<TextureType, std::string>{TextureType::DEPTH_STENCIL_ATTACHMENT, "Texture Depth Stencil Attachment"},
+        std::pair<TextureType, std::string>{TextureType::DEPTH_ATTACHMENT, "Texture Depth Attachment"},
         std::pair<TextureType, std::string>{TextureType::TEX_2D_COLOR_ATTACHMENT, "Texture 2D And Color Attachment"},
         std::pair<TextureType, std::string>{TextureType::TEX_2D_DEPTH_STENCIL_ATTACHMENT, "Texture 2D and Depth Stencil Attachment"},
         std::pair<TextureType, std::string>{TextureType::TEX_2D_DEPTH_ATTACHMENT, "Texture 2D and Depth Attachment"},
@@ -31,6 +32,7 @@ namespace vg
         std::pair<TextureType, vk::ImageType>(TextureType::CUBE_ARRARY, vk::ImageType::e2D),
         std::pair<TextureType, vk::ImageType>(TextureType::COLOR_ATTACHMENT, vk::ImageType::e2D),
         std::pair<TextureType, vk::ImageType>(TextureType::DEPTH_STENCIL_ATTACHMENT, vk::ImageType::e2D),
+        std::pair<TextureType, vk::ImageType>(TextureType::DEPTH_ATTACHMENT, vk::ImageType::e2D),
         std::pair<TextureType, vk::ImageType>(TextureType::TEX_2D_COLOR_ATTACHMENT, vk::ImageType::e2D),
         std::pair<TextureType, vk::ImageType>(TextureType::TEX_2D_DEPTH_STENCIL_ATTACHMENT, vk::ImageType::e2D),
         std::pair<TextureType, vk::ImageType>(TextureType::TEX_2D_DEPTH_ATTACHMENT, vk::ImageType::e2D),
@@ -49,6 +51,7 @@ namespace vg
         std::pair<TextureType, vk::ImageViewType>(TextureType::CUBE_ARRARY, vk::ImageViewType::eCubeArray),
         std::pair<TextureType, vk::ImageViewType>(TextureType::COLOR_ATTACHMENT, vk::ImageViewType::e2D),
         std::pair<TextureType, vk::ImageViewType>(TextureType::DEPTH_STENCIL_ATTACHMENT, vk::ImageViewType::e2D),
+        std::pair<TextureType, vk::ImageViewType>(TextureType::DEPTH_ATTACHMENT, vk::ImageViewType::e2D),
         std::pair<TextureType, vk::ImageViewType>(TextureType::TEX_2D_COLOR_ATTACHMENT, vk::ImageViewType::e2D),
         std::pair<TextureType, vk::ImageViewType>(TextureType::TEX_2D_DEPTH_STENCIL_ATTACHMENT, vk::ImageViewType::e2D),
         std::pair<TextureType, vk::ImageViewType>(TextureType::TEX_2D_DEPTH_ATTACHMENT, vk::ImageViewType::e2D),
@@ -67,6 +70,7 @@ namespace vg
         std::pair<TextureType, vk::ImageCreateFlags>(TextureType::CUBE_ARRARY, vk::ImageCreateFlagBits::eCubeCompatible),
         std::pair<TextureType, vk::ImageCreateFlags>(TextureType::COLOR_ATTACHMENT, vk::ImageCreateFlags()),
         std::pair<TextureType, vk::ImageCreateFlags>(TextureType::DEPTH_STENCIL_ATTACHMENT, vk::ImageCreateFlags()),
+        std::pair<TextureType, vk::ImageCreateFlags>(TextureType::DEPTH_ATTACHMENT, vk::ImageCreateFlags()),
         std::pair<TextureType, vk::ImageCreateFlags>(TextureType::TEX_2D_COLOR_ATTACHMENT, vk::ImageCreateFlags()),
         std::pair<TextureType, vk::ImageCreateFlags>(TextureType::TEX_2D_DEPTH_STENCIL_ATTACHMENT, vk::ImageCreateFlags()),
         std::pair<TextureType, vk::ImageCreateFlags>(TextureType::TEX_2D_DEPTH_ATTACHMENT, vk::ImageCreateFlags()),
@@ -88,6 +92,7 @@ namespace vg
         case TextureType::TEX_3D:
         case TextureType::COLOR_ATTACHMENT:
         case TextureType::DEPTH_STENCIL_ATTACHMENT:
+        case TextureType::DEPTH_ATTACHMENT:
         {
             arraylayers = 1U;
             break;
@@ -135,6 +140,7 @@ namespace vg
         case TextureType::TEX_2D_ARRAY:
         case TextureType::COLOR_ATTACHMENT:
         case TextureType::DEPTH_STENCIL_ATTACHMENT:
+        case TextureType::DEPTH_ATTACHMENT:
         case TextureType::TEX_2D_COLOR_ATTACHMENT:
         case TextureType::TEX_2D_DEPTH_STENCIL_ATTACHMENT:
         case TextureType::TEX_2D_DEPTH_ATTACHMENT:

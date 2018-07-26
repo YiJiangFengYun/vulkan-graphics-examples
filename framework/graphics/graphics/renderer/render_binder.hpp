@@ -142,6 +142,7 @@ namespace vg
             , Matrix4x4 viewMatrix
             , Matrix4x4 projMatrix
             , const Texture *pPreDepthResultTex
+            , Vector4 viewerPos
         );
 
         void _bindVisualObject(BaseLight *pLight

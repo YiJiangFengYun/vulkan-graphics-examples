@@ -6,6 +6,7 @@
 namespace vg
 {
     extern Matrix4x4 tranMat3ToMat4(Matrix3x3 srcMat);
+    extern Vector4 tranVec3ToVec4(Vector3 srcVec);
     extern Matrix4x4 lookAtRH
 	(
 		const Vector3 &eye,

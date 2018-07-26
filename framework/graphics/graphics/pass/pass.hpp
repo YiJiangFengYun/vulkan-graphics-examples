@@ -29,7 +29,8 @@ namespace vg
             MATRIX_OBJECT_TO_VIEW = 3,
             MATRIX_VIEW = 4,
             MATRIX_PROJECTION = 5,
-            COUNT = 6
+            POS_VIEWER = 6,
+            COUNT = 7
         };
 
         template<BuildInDataType type>
@@ -97,6 +98,7 @@ namespace vg
             Matrix4x4 matrixObjectToView;
             Matrix4x4 matrixView;
             Matrix4x4 matrixProjection;
+            Vector4 posViewer;
 
             _BuildInDataCache(Matrix4x4 matrixObjectToNDC = Matrix4x4(1.0f)
                 , Color mainColor = Color(1.0f)
@@ -104,6 +106,7 @@ namespace vg
                 , Matrix4x4 matrixObjectToView = Matrix4x4(1.0f)
                 , Matrix4x4 matrixView = Matrix4x4(1.0f)
                 , Matrix4x4 matrixProjection = Matrix4x4(1.0f)
+                , Vector4 posViewer = Vector4(0.0f, 0.0f, 0.0f, 1.0f)
                 );
 
             _BuildInDataCache(const _BuildInDataCache &target);
@@ -240,7 +243,8 @@ namespace vg
         void setBuildInDataInfo(BuildInDataInfo info);
         const BuildInDataInfo &getBuildInDataInfo() const;
 
-        void setBuildInMatrixData(BuildInDataType type, Matrix4x4 matrix);
+        void setBuildInDataMatrix4x4(BuildInDataType type, Matrix4x4 matrix);
+        void setBuildInDataVector4(BuildInDataType type, Vector4 vector);
 
         vk::PolygonMode getPolygonMode() const;
         void setPolygonMode(vk::PolygonMode polygonMode);

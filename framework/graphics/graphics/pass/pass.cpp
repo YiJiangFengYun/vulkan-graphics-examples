@@ -447,9 +447,15 @@ namespace vg
          return m_buildInDataInfo;
      }
 
-    void Pass::setBuildInMatrixData(BuildInDataType type, Matrix4x4 matrix)
+    void Pass::setBuildInDataMatrix4x4(BuildInDataType type, Matrix4x4 matrix)
     {
         _updateBuildInData(type, matrix);
+    }
+
+
+    void Pass::setBuildInDataVector4(BuildInDataType type, Vector4 vector)
+    {
+        _updateBuildInData(type, vector);
     }
 
 
@@ -1677,13 +1683,16 @@ namespace vg
         , Matrix4x4 matrixObjectToWorld
         , Matrix4x4 matrixObjectToView
         , Matrix4x4 matrixView
-        , Matrix4x4 matrixProjection)
+        , Matrix4x4 matrixProjection
+        , Vector4 posViewer
+        )
         : matrixObjectToNDC(matrixObjectToNDC)
         , mainColor(mainColor)
         , matrixObjectToWorld(matrixObjectToWorld)
         , matrixObjectToView(matrixObjectToView)
         , matrixView(matrixView)
         , matrixProjection(matrixProjection)
+        , posViewer(posViewer)
     {
 
     }
@@ -1695,6 +1704,7 @@ namespace vg
         , matrixObjectToView(target.matrixObjectToView)
         , matrixView(target.matrixView)
         , matrixProjection(target.matrixProjection)
+        , posViewer(target.posViewer)
     {
 
     }
@@ -1707,6 +1717,7 @@ namespace vg
         matrixObjectToView = target.matrixObjectToView;
         matrixView = target.matrixView;
         matrixProjection = target.matrixProjection;
+        posViewer = target.posViewer;
         return *this;
     }
 
@@ -1717,6 +1728,7 @@ namespace vg
         , matrixObjectToView(target.matrixObjectToView)
         , matrixView(target.matrixView)
         , matrixProjection(target.matrixProjection)
+        , posViewer(target.posViewer)
     {
     }
 

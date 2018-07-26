@@ -12,6 +12,11 @@ namespace vg
         return resultMat;
     }
 
+    Vector4 tranVec3ToVec4(Vector3 srcVec)
+    {
+        return Vector4(srcVec.x, srcVec.y, 0.0f, srcVec.z);
+    }
+
     Matrix4x4 lookAtRH
 	(
 		const Vector3 &eye,

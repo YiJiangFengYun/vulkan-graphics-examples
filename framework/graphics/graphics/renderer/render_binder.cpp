@@ -560,9 +560,10 @@ namespace vg
 #ifdef USE_WORLD_BOUNDS
         auto boundsOfViewInWorld = pScene->getViewBoundsInWorld(pProjector);
 #endif
-        
+        auto viewerPos3x3 = pProjector->getLocalToWorldMatrix() * Vector3(0.0f, 0.0f, 1.0f);
         auto viewMatrix3x3 = pProjector->getWorldToLocalMatrix();
         auto viewMatrix = tranMat3ToMat4(viewMatrix3x3);
+        auto viewerPos = tranVec3ToVec4(viewerPos3x3);
 #if defined(DEBUG) && defined(VG_ENABLE_COST_TIMER)
         preparingCommonMatrixsCostTimer.end();
         VG_COST_TIME_LOG(plog::debug) << "Preparing common matrixs cost time: " 
@@ -618,6 +619,7 @@ namespace vg
                     , viewMatrix
                     , projMatrix
                     , nullptr
+                    , viewerPos
                 );
 #if defined(DEBUG) && defined(VG_ENABLE_COST_TIMER)
                 preparingBuildInDataCostTimer.end();
@@ -635,6 +637,7 @@ namespace vg
                     , viewMatrix
                     , projMatrix
                     , pPreDepthResultTex
+                    , viewerPos
                     );
 #if defined(DEBUG) && defined(VG_ENABLE_COST_TIMER)
                 preparingBuildInDataCostTimer.end();
@@ -787,7 +790,7 @@ namespace vg
 #ifdef USE_WORLD_BOUNDS
         auto boundsOfViewInWorld = pScene->getViewBoundsInWorld(pProjector);
 #endif
-
+        auto viewerPos = pProjector->getLocalToWorldMatrix() * Vector4(0.0f, 0.0f, 0.0f, 1.0f);
         auto viewMatrix = pProjector->getWorldToLocalMatrix();
 #if defined(DEBUG) && defined(VG_ENABLE_COST_TIMER)
         preparingCommonMatrixsCostTimer.end();
@@ -930,6 +933,7 @@ namespace vg
                         , viewMatrix
                         , projMatrix
                         , nullptr
+                        , viewerPos
                     );
 #if defined(DEBUG) && defined(VG_ENABLE_COST_TIMER)
                 preparingBuildInDataCostTimer.end();
@@ -947,6 +951,7 @@ namespace vg
                         , viewMatrix
                         , projMatrix
                         , pPreDepthResultTex
+                        , viewerPos
                     );
 #if defined(DEBUG) && defined(VG_ENABLE_COST_TIMER)
                 preparingBuildInDataCostTimer.end();
@@ -1009,6 +1014,7 @@ namespace vg
         , Matrix4x4 viewMatrix
         , Matrix4x4 projMatrix
         , const Texture *pPreDepthResultTex
+        , Vector4 viewerPos
     )
     {
         uint32_t materialCount = pVisualObject->getMaterialCount();
@@ -1039,6 +1045,7 @@ namespace vg
                 Bool32 hasMatrixObjectToView = VG_FALSE;
                 Bool32 hasMatrixView = VG_FALSE;
                 Bool32 hasMatrixProjection = VG_FALSE;
+                Bool32 hasViewerPos = VG_TRUE;
                 //update building in matrix variable.
                 auto info = pPass->getBuildInDataInfo();
                 uint32_t componentCount = info.componentCount;
@@ -1065,6 +1072,10 @@ namespace vg
                     {
                         hasMatrixProjection = VG_TRUE;
                     }
+                    else if (type == Pass::BuildInDataType::POS_VIEWER)
+                    {
+                        hasViewerPos = VG_TRUE;
+                    }
                 }
                 
                 Matrix4x4 mvMatrix;
@@ -1084,23 +1095,27 @@ namespace vg
                     Pass::BuildInDataType type = (*(info.pComponent + componentIndex)).type;
                     if (type == Pass::BuildInDataType::MATRIX_OBJECT_TO_NDC)
                     {
-                        pPass->setBuildInMatrixData(type, mvpMatrix);
+                        pPass->setBuildInDataMatrix4x4(type, mvpMatrix);
                     }
                     else if (type == Pass::BuildInDataType::MATRIX_OBJECT_TO_WORLD)
                     {
-                        pPass->setBuildInMatrixData(type, modelMatrix);
+                        pPass->setBuildInDataMatrix4x4(type, modelMatrix);
                     }
                     else if (type == Pass::BuildInDataType::MATRIX_OBJECT_TO_VIEW)
                     {
-                        pPass->setBuildInMatrixData(type, mvMatrix);
+                        pPass->setBuildInDataMatrix4x4(type, mvMatrix);
                     }
                     else if (type == Pass::BuildInDataType::MATRIX_VIEW)
                     {
-                        pPass->setBuildInMatrixData(type, viewMatrix);
+                        pPass->setBuildInDataMatrix4x4(type, viewMatrix);
                     }
                     else if (type == Pass::BuildInDataType::MATRIX_PROJECTION)
                     {
-                        pPass->setBuildInMatrixData(type, projMatrix);
+                        pPass->setBuildInDataMatrix4x4(type, projMatrix);
+                    }
+                    else if (type == Pass::BuildInDataType::POS_VIEWER)
+                    {
+                        pPass->setBuildInDataVector4(type, viewerPos);
                     }
                 }
 

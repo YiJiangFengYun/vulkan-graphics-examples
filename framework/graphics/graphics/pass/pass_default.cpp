@@ -112,12 +112,13 @@ namespace vg
                 };
             pDefaultLightingPointDistPass = std::shared_ptr<Pass>{ new Pass(pDefaultLightingPointDistShader.get()) };
     
-            vg::Pass::BuildInDataInfo::Component buildInDataCmps[2] = {
+            vg::Pass::BuildInDataInfo::Component buildInDataCmps[3] = {
                     {vg::Pass::BuildInDataType::MATRIX_OBJECT_TO_NDC},
                     {vg::Pass::BuildInDataType::MATRIX_OBJECT_TO_WORLD},
+                    {vg::Pass::BuildInDataType::POS_VIEWER},
                 };
             vg::Pass::BuildInDataInfo buildInDataInfo;
-            buildInDataInfo.componentCount = 2u;
+            buildInDataInfo.componentCount = 3u;
             buildInDataInfo.pComponent = buildInDataCmps;
             pDefaultLightingPointDistPass->setBuildInDataInfo(buildInDataInfo);
 

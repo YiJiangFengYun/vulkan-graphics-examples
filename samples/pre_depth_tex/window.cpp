@@ -46,7 +46,6 @@ void Window::_initState()
     m_cameraRotation = vg::Vector3(glm::radians(0.0f), glm::radians(0.0f), glm::radians(0.0f));
     m_otherInfo.zNear = 0.01f;
     m_otherInfo.zFar = 100.0f;
-    m_preDepthScene = VG_TRUE;
 }
 
 void Window::_createModel()
@@ -120,6 +119,7 @@ void Window::_initScene()
 
 void Window::_enablePreDepth()
 {
+    m_preDepthScene = VG_TRUE;
     m_pRenderer->enablePreDepth();
 }
 

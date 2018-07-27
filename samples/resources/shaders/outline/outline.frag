@@ -3,7 +3,7 @@
 #extension GL_ARB_separate_shader_objects : enable
 #extension GL_ARB_shading_language_420pack : enable
 
-layout (binding = 1) uniform Data
+layout (binding = 2) uniform Data
 {
     vec4 outlineColor;
 } dataFrag;

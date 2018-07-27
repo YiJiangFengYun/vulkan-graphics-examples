@@ -9,8 +9,12 @@ layout (location = 2) in vec3 inNormal;
 layout (binding = 0) uniform Data 
 {
     mat4 matrixToNDC;
-    vec4 outlineWidth;    //(float storaged in x position)
 } dataVert;
+
+layout (binding = 1) uniform SetInfo
+{
+    vec4 outlineWidth;    //(float storaged in x position)
+} setInfo;
 
 out gl_PerVertex
 {
@@ -20,6 +24,6 @@ out gl_PerVertex
 void main() 
 {
     // Extrude along normal
-    vec4 pos = vec4(inPos.xyz + inNormal * dataVert.outlineWidth.x, inPos.w);
+    vec4 pos = vec4(inPos.xyz + inNormal * setInfo.outlineWidth.x, inPos.w);
     gl_Position = dataVert.matrixToNDC * pos;
 }

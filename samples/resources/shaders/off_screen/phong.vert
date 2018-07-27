@@ -11,8 +11,11 @@ layout (location = 3) in vec3 inNormal;
 layout(binding = 0) uniform BuildIn {
     mat4 matrixObjectToNDC;
     mat4 matrixObjectToView;
-    vec4 lightPos;
 } _buildIn;
+
+layout(binding = 1) uniform OtherInfo {
+    vec4 lightPos;
+} otherInfo;
 
 layout (location = 0) out vec3 outNormal;
 layout (location = 1) out vec3 outColor;
@@ -31,7 +34,7 @@ void main()
     outColor = inColor;
     gl_Position = _buildIn.matrixObjectToNDC * inPos;
     outPos = vec3(_buildIn.matrixObjectToView * inPos);
-    outLightVec = normalize(_buildIn.lightPos.xyz - outPos);
+    outLightVec = normalize(otherInfo.lightPos.xyz - outPos);
 
     // Clip against reflection plane
     // vec4 clipPlane = vec4(0.0, -1.0, 0.0, 1.5);

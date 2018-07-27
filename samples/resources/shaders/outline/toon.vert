@@ -11,8 +11,12 @@ layout (binding = 0) uniform BuildIn
 {
     mat4 matrixToNDC;
     mat4 matrixToWorld;
-    vec4 lightPos;    
 } _buildIn;
+
+layout (binding = 1) uniform LightInfo
+{
+    vec4 lightPos;
+} lightInfo;
 
 layout (location = 0) out vec3 outNormal;
 layout (location = 1) out vec3 outColor;
@@ -29,6 +33,6 @@ void main()
     gl_Position = _buildIn.matrixToNDC * vec4(inPos.xyz, 1.0);
     outNormal = mat3(_buildIn.matrixToWorld) * inNormal;
     vec4 pos = _buildIn.matrixToWorld * vec4(inPos, 1.0);
-    vec4 lPos = _buildIn.matrixToWorld * _buildIn.lightPos;
+    vec4 lPos = _buildIn.matrixToWorld * lightInfo.lightPos;
     outLightVec = vec3(lPos - pos);
 }

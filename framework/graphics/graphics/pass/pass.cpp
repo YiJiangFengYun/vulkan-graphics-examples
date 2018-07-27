@@ -170,8 +170,22 @@ namespace vg
 
     Bool32 Pass::_compareDataInfo(const DataSortInfo &item1, const DataSortInfo &item2)
     {
-        uint32_t shaderStageValue1 = static_cast<uint32_t>(item1.shaderStageFlags);
-        uint32_t shaderStageValue2 = static_cast<uint32_t>(item2.shaderStageFlags);
+        uint32_t shaderStageValue1;
+        if ((item1.shaderStageFlags & vk::ShaderStageFlagBits::eAll) == vk::ShaderStageFlagBits::eAll) {
+            shaderStageValue1 = -2;
+        } else if ((item1.shaderStageFlags & vk::ShaderStageFlagBits::eAllGraphics) == vk::ShaderStageFlagBits::eAllGraphics) {
+            shaderStageValue1 = -1;
+        } else { 
+            shaderStageValue1 = static_cast<uint32_t>(item1.shaderStageFlags);
+        }
+        uint32_t shaderStageValue2;
+        if ((item2.shaderStageFlags & vk::ShaderStageFlagBits::eAll) == vk::ShaderStageFlagBits::eAll) {
+            shaderStageValue2 = -2;
+        } else if ((item2.shaderStageFlags & vk::ShaderStageFlagBits::eAllGraphics) == vk::ShaderStageFlagBits::eAllGraphics) {
+            shaderStageValue2 = -1;
+        } else {
+            shaderStageValue2 = static_cast<uint32_t>(item2.shaderStageFlags);
+        }
         int32_t result = static_cast<int32_t>(shaderStageValue1) - static_cast<int32_t>(shaderStageValue2);
         if (result > 0) {
             return VG_FALSE;
@@ -1559,7 +1573,7 @@ namespace vg
         {
             PassDataInfo info = {
                 VG_PASS_BUILDIN_DATA_LAYOUT_PRIORITY,
-                vk::ShaderStageFlagBits::eVertex,
+                vk::ShaderStageFlagBits::eAllGraphics,
             };
             PassDataSizeInfo sizeInfo = {
                 size,

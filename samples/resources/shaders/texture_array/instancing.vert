@@ -15,14 +15,17 @@ struct Instance
 layout(binding = 0) uniform BuildIn {
     mat4 matrixProjection;
     mat4 matrixView;
-    Instance instance[8];
 } _buildIn;
+
+layout(binding = 1) uniform OtherInfo {
+    Instance instance[8];
+} otherInfo;
 
 layout (location = 0) out vec3 outUV;
 
 void main() 
 {
-    outUV = vec3(inUV, _buildIn.instance[gl_InstanceIndex].arrayIndex.x);
-    mat4 modelView = _buildIn.matrixView * _buildIn.instance[gl_InstanceIndex].model;
+    outUV = vec3(inUV, otherInfo.instance[gl_InstanceIndex].arrayIndex.x);
+    mat4 modelView = _buildIn.matrixView * otherInfo.instance[gl_InstanceIndex].model;
     gl_Position = _buildIn.matrixProjection * modelView * inPos;
 }

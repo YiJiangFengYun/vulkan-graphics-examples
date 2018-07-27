@@ -11,8 +11,11 @@ layout (location = 3) in vec3 inColor;
 layout(binding = 0) uniform BuildIn {
     mat4 matrixObjectToNDC;
     mat4 matrixObjectToView;
-    vec4 lightPos;    
 } _buildIn;
+
+layout(binding = 1) uniform OtherInfo {
+    vec4 lightPos;    
+} otherInfo;
 
 layout (location = 0) out vec3 outNormal;
 layout (location = 1) out vec3 outColor;
@@ -34,7 +37,7 @@ void main()
     
     vec4 pos = _buildIn.matrixObjectToView * vec4(inPos, 1.0);
     outNormal = mat3(_buildIn.matrixObjectToView) * inNormal;
-    vec4 lPos = _buildIn.matrixObjectToView * _buildIn.lightPos;
+    vec4 lPos = _buildIn.matrixObjectToView * otherInfo.lightPos;
     outLightVec = lPos.xyz - pos.xyz;
     outViewVec = -pos.xyz;        
 }

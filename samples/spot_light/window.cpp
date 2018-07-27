@@ -99,12 +99,13 @@ void Window::_createMaterial()
         pShader->load("shaders/spot_light/scene.vert.spv",
             "shaders/spot_light/scene.frag.spv");
         //pass
-        vg::Pass::BuildInDataInfo::Component buildInDataCmps[2] = {
+        vg::Pass::BuildInDataInfo::Component buildInDataCmps[3] = {
                 {vg::Pass::BuildInDataType::MATRIX_OBJECT_TO_NDC},
                 {vg::Pass::BuildInDataType::MATRIX_OBJECT_TO_WORLD},
+                {vg::Pass::BuildInDataType::POS_VIEWER},
             };
         vg::Pass::BuildInDataInfo buildInDataInfo;
-        buildInDataInfo.componentCount = 2u;
+        buildInDataInfo.componentCount = 3u;
         buildInDataInfo.pComponent = buildInDataCmps;
         pPass->setBuildInDataInfo(buildInDataInfo);
         pPass->setCullMode(vk::CullModeFlagBits::eBack);
@@ -120,7 +121,6 @@ void Window::_createMaterial()
             vk::ShaderStageFlagBits::eVertex,
         };
         //view poss
-        pPass->addData("other_data", otherDataInfo, m_pCamera->getTransform()->getPosition());
         pPass->apply();
 
         // auto pPreDepthPass = pMaterial->getPreDepthPass();
@@ -202,11 +202,6 @@ void Window::_onUpdate()
     ParentWindowType::_onUpdate();
 
     _updateLights();
-
-    auto & pMaterial = m_pMaterial;
-    auto pPass = pMaterial->getMainPass();
-    pPass->setData("other_data", m_pCamera->getTransform()->getPosition());
-    pPass->apply();
 
 #ifdef USE_IMGUI_BIND
     auto pos = m_lastWinPos;

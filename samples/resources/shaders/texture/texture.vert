@@ -11,9 +11,12 @@ layout(binding = 0) uniform BuildIn {
     mat4 matrixObjectToNDC;
     vec4 mainColor;
     mat4 matrixObjectToWorld;
+} _buildIn;
+
+layout(binding = 1) uniform OtherInfo {
     vec4 viewPos;
     float lodBias;
-} _buildIn;
+} otherInfo;
 
 layout (location = 0) out vec2 outUV;
 layout (location = 1) out float outLodBias;
@@ -29,7 +32,7 @@ out gl_PerVertex
 void main() 
 {
     outUV = inUV;
-    outLodBias = _buildIn.lodBias;
+    outLodBias = otherInfo.lodBias;
 
     vec3 worldPos = vec3(_buildIn.matrixObjectToWorld * vec4(inPos, 1.0));
 
@@ -39,5 +42,5 @@ void main()
     vec3 lightPos = vec3(0.0);
     vec3 lPos = lightPos;
     outLightVec = lPos - worldPos.xyz;
-    outViewVec = _buildIn.viewPos.xyz - worldPos.xyz;        
+    outViewVec = otherInfo.viewPos.xyz - worldPos.xyz;        
 }

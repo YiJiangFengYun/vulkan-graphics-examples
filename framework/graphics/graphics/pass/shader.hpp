@@ -16,17 +16,26 @@ namespace vg
     public:
         Shader();
         Shader(const std::string &vertShaderPath, const std::string &fragShaderPath);
+        Shader(const std::string &vertShaderPath, const std::string &geomShaderPath, const std::string &fragShaderPath);
         Shader(const void *codeVertShader, uint32_t sizeVertShader, const void *codeFragShader, uint32_t sizeFragShader);
+        Shader(const void *codeVertShader, uint32_t sizeVertShader, const void *codeGeomShader, uint32_t sizeGeomShader, const void *codeFragShader, uint32_t sizeFragShader);
         Shader(const uint32_t *codeVertShader, uint32_t sizeVertShader, const uint32_t *codeFragShader, uint32_t sizeFragShader);
+        Shader(const uint32_t *codeVertShader, uint32_t sizeVertShader, const uint32_t *codeGeomShader, uint32_t sizeGeomShader, const uint32_t *codeFragShader, uint32_t sizeFragShader);
         Shader(vk::ShaderModule * pVertShaderModule, vk::ShaderModule * pFragShaderModule);
+        Shader(vk::ShaderModule * pVertShaderModule, vk::ShaderModule * pGeomShaderModule, vk::ShaderModule * pFragShaderModule);
         ~Shader();
 
         void load(const std::string &vertShaderPath, const std::string &fragShaderPath);
+        void load(const std::string &vertShaderPath, const std::string &geomShaderPath, const std::string &fragShaderPath);
         void load(const void *codeVertShader, uint32_t sizeVertShader, const void *codeFragShader, uint32_t sizeFragShader);
+        void load(const void *codeVertShader, uint32_t sizeVertShader, const void *codeGeomShader, uint32_t sizeGeomShader, const void *codeFragShader, uint32_t sizeFragShader);
         void load(const uint32_t *codeVertShader, uint32_t sizeVertShader, const uint32_t *codeFragShader, uint32_t sizeFragShader);
+        void load(const uint32_t *codeVertShader, uint32_t sizeVertShader, const uint32_t *codeGeomShader, uint32_t sizeGeomShader, const uint32_t *codeFragShader, uint32_t sizeFragShader);
 
         const vk::ShaderModule *getVertShaderModule() const;
         void setVertShaderModule(vk::ShaderModule * pVertShaderModule);
+        const vk::ShaderModule *getGeomShaderModule() const;
+        void setGeomShaderModule(vk::ShaderModule * pGeomShaderModule);
         const vk::ShaderModule *getFragShaderModule() const;
         void setFragShaderModule(vk::ShaderModule * pFragShaderModule);
 
@@ -34,11 +43,14 @@ namespace vg
 
     private:
         vk::ShaderModule *m_pVertShaderModule;
+        vk::ShaderModule *m_pGeomShaderModule;
         vk::ShaderModule *m_pFragShaderModule;
         //compositions
         std::string m_vertShaderPath;
+        std::string m_geomShaderPath;
         std::string m_fragShaderPath;
         std::shared_ptr<vk::ShaderModule> m_pMyVertShaderModule;
+        std::shared_ptr<vk::ShaderModule> m_pMyGeomShaderModule;
         std::shared_ptr<vk::ShaderModule> m_pMyFragShaderModule;
 
         //aggregations.

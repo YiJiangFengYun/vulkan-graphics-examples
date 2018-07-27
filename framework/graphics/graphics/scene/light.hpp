@@ -163,11 +163,11 @@ namespace vg
     {
         uint32_t renderCount;
         const BaseProjector *const *pProjectors;
-        const PreDepthTarget *const *pDepthTargets;
+        const OnceRenderTarget *const *pDepthTargets;
 
         LightDepthRenderInfo(uint32_t renderCount = 0u
             , const BaseProjector *const *pProjectors = nullptr
-            , const PreDepthTarget *const *pDepthTargets = nullptr
+            , const OnceRenderTarget *const *pDepthTargets = nullptr
             );
     };
 

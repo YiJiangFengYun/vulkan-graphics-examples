@@ -72,7 +72,7 @@ namespace vg
         LightDepthRenderInfo info = {
             static_cast<uint32_t>(CubemapFace::RANGE_SIZE),
             reinterpret_cast<const BaseProjector *const *>(m_refProjectors.data()),
-            reinterpret_cast<const PreDepthTarget *const *>(m_cubeTargets.getFaceTargets().data()),
+            reinterpret_cast<const OnceRenderTarget *const *>(m_cubeTargets.getFaceTargets().data()),
         };
         return info;
     }

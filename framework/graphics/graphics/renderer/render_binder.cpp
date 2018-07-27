@@ -265,7 +265,7 @@ namespace vg
 #endif //DEBUG and VG_ENABLE_COST_TIMER
         
            for (uint32_t j = 0; j < depthRenderInfo.renderCount; ++j) {
-                const PreDepthTarget *pRenderTarget = dynamic_cast<const PreDepthTarget *>(*(depthRenderInfo.pDepthTargets + j));
+                const OnceRenderTarget *pRenderTarget = dynamic_cast<const OnceRenderTarget *>(*(depthRenderInfo.pDepthTargets + j));
                 _renderPassBegin(pRenderTarget
                  , pRenderTarget->getRenderPass()
                  , pRenderTarget->getFramebuffer()

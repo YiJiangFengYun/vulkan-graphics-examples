@@ -64,7 +64,7 @@ namespace vg
         LightDepthRenderInfo info = {
             1u,
             reinterpret_cast<const BaseProjector *const *>(&m_refProjector),
-            reinterpret_cast<const PreDepthTarget *const *>(&m_refDepthTarget),
+            reinterpret_cast<const OnceRenderTarget *const *>(&m_refDepthTarget),
         };
         return info;
     }

@@ -25,7 +25,7 @@ layout (binding = 0) uniform BuildIn
 layout(location = 0) in vec3 inWorldPoses[];
 layout(location = 1) in vec3 inViewPoses[];
 
-layout(triangle_strip, max_vertices = 3) out;
+layout(triangle_strip, max_vertices = 18) out;
 out gl_PerVertex
 {
     vec4 gl_Position;
@@ -66,7 +66,7 @@ void emitLayerVertices(int layer)
     vec4 pos0 = _buildIn.cubeFaceTransform[layer] * vec4(inViewPoses[0].xyz, 1.0);
     vec4 pos1 = _buildIn.cubeFaceTransform[layer] * vec4(inViewPoses[1].xyz, 1.0);
     vec4 pos2 = _buildIn.cubeFaceTransform[layer] * vec4(inViewPoses[2].xyz, 1.0);
-    if (inView(pos0) || inView(pos1) || inView(pos2)) 
+    // if (inView(pos0) || inView(pos1) || inView(pos2)) 
     {
         gl_Position = _buildIn.matrixProjection * pos0;
         outWorldPos = inWorldPoses[0];

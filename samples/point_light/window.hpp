@@ -24,7 +24,12 @@ public:
     );
 private:
     sampleslib::AssimpScene m_assimpScene;
+    std::shared_ptr<vg::DimSepMesh3> m_pBoxMesh;
+    std::shared_ptr<vg::VisualObject3> m_pBoxObj;
     std::shared_ptr<vg::Material> m_pMaterial;
+    std::shared_ptr<vg::Material> m_pBoxMaterial;
+
+    vg::Matrix4x4 m_boxTransform;
 
     float m_lightRange;
     std::shared_ptr<vg::LightPoint3> m_pPointLight;
@@ -37,6 +42,7 @@ private:
     void _initScene();
     void _enableLighting();
     void _enableShadow();
+    void _updateLights();
     virtual void _onUpdate() override;
 };
 

@@ -12,9 +12,13 @@ int main() {
     static plog::DebugOutputAppender<plog::TxtFormatter> debugOutputAppender;
     plog::init(plog::debug, &debugOutputAppender);
 
+    vg::PhysicalDeviceFeatures requiredFeatures;
+    requiredFeatures.geometryShader = VG_TRUE;
+
+    vg::PhysicalDeviceFeaturePriorities optionalFeatures;
 
     App app;
-    app.init<Window>(WINDOW_WIDTH, WINDOW_HEIGHT, "point light");
+    app.init<Window>(WINDOW_WIDTH, WINDOW_HEIGHT, "point light", requiredFeatures, optionalFeatures);
 
     LOG(plog::debug) << "Initialization completed." << std::endl;
 

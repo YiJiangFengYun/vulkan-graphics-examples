@@ -128,10 +128,20 @@ namespace vg
         _apply();
     }
 
+    const LightDistTargetCube *LightPoint3::getLightDistTargetCube() const
+    {
+        return m_pDistTarget.get();
+    }
+
     void LightPoint3::_beginRender()
     {
         Light3::_beginRender();
-        auto transform = m_pTransform->getMatrixLocalToWorld();
+        //Projector only use translation of transform.
+        Matrix4x4 transform = Matrix4x4(1.0f);
+        auto pos = m_pTransform->getLocalPosition();
+        transform = glm::translate(transform, pos);
         m_pProjector->setTransformMatrix(transform);
+
+        m_pProjector->setTransformMatrix(m_pTransform->getMatrixLocalToWorld());
     }
 } //vg

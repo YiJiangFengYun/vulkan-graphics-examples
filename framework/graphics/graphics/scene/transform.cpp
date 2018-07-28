@@ -212,7 +212,7 @@ namespace vg
     template <SpaceType SPACE_TYPE>
     typename Transform<SPACE_TYPE>::PointType Transform<SPACE_TYPE>::getPosition() const
     {
-        return _getMatrixLocalToWorld(VG_FALSE) * MatrixVectorType(m_localPosition, 0.0);
+        return _getMatrixLocalToWorld(VG_FALSE) * MatrixVectorType(m_localPosition, 1.0);
     }
 
     template <SpaceType SPACE_TYPE>

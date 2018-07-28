@@ -19,11 +19,11 @@ layout (binding = 0) uniform BuildIn
 
 layout (location = 0) in vec3 inWorldPos;
 
-layout (location = 0) out float outFragColor;
+layout (location = 0) out vec4 outFragColor;
 
 void main() 
 {
     float d = distance(inWorldPos.xyz, _buildIn.lightPos.xyz);
-    // outFragColor = d;
-    outFragColor = length(1.0);
+    outFragColor = vec4(d, 0.0, 0.0, 1.0);
+    outFragColor = vec4(1.0);
 }

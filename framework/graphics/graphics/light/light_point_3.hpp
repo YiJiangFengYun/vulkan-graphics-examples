@@ -35,6 +35,7 @@ namespace vg
         virtual LightDepthRenderInfo getDepthRenderInfo() const override;
         float getRange() const;
         void setRange(float value);
+        const LightDistTargetCube *getLightDistTargetCube() const;
     protected:
         float m_range;
         std::shared_ptr<LightDistTargetCube> m_pDistTarget;

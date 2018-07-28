@@ -115,34 +115,7 @@ void Window::_createMaterial()
         depthStencilState.depthWriteEnable = VG_TRUE;
         depthStencilState.depthCompareOp = vk::CompareOp::eLessOrEqual;
         pPass->setDepthStencilInfo(depthStencilState);
-
-        vg::PassDataInfo otherDataInfo = {
-            VG_PASS_OTHER_DATA_MIN_LAYOUT_PRIORITY,
-            vk::ShaderStageFlagBits::eVertex,
-        };
-        //view poss
         pPass->apply();
-
-        // auto pPreDepthPass = pMaterial->getPreDepthPass();
-        // pPreDepthPass->setFrontFace(vk::FrontFace::eClockwise);
-        // pPreDepthPass->setCullMode(vk::CullModeFlagBits::eBack);
-
-        // depthStencilState.depthTestEnable = VG_TRUE;
-        // depthStencilState.depthWriteEnable = VG_TRUE;
-        // depthStencilState.depthCompareOp = vk::CompareOp::eLessOrEqual;
-        // pPreDepthPass->setDepthStencilInfo(depthStencilState);
-
-        // //depth bias
-        // vg::Pass::DepthBiasInfo depthBiasInfo = {
-        //     VG_TRUE,
-        //     VG_FALSE,
-        //     1.25f,
-        //     0.0f,
-        //     1.75f,
-        // };
-        // pPreDepthPass->setDepthBiasInfo(depthBiasInfo);
-
-        // pPreDepthPass->apply();
         
         pMaterial->apply();
     }

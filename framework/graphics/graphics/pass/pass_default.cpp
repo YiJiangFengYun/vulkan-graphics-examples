@@ -17,6 +17,8 @@ namespace vg
     //light point distance
     extern "C" const unsigned char VG_LIGHTING_POINT_DIST_VERT_DEFAULT_CODE[];
     extern "C" const size_t VG_LIGHTING_POINT_DIST_VERT_DEFAULT_CODE_LEN;
+    extern "C" const unsigned char VG_LIGHTING_POINT_DIST_GEOM_DEFAULT_CODE[];
+    extern "C" const size_t VG_LIGHTING_POINT_DIST_GEOM_DEFAULT_CODE_LEN;
     extern "C" const unsigned char VG_LIGHTING_POINT_DIST_FRAG_DEFAULT_CODE[];
     extern "C" const size_t VG_LIGHTING_POINT_DIST_FRAG_DEFAULT_CODE_LEN;
 
@@ -106,19 +108,22 @@ namespace vg
             pDefaultLightingPointDistShader = std::shared_ptr<Shader>{ 
                 new Shader{VG_LIGHTING_POINT_DIST_VERT_DEFAULT_CODE, 
                            VG_LIGHTING_POINT_DIST_VERT_DEFAULT_CODE_LEN,
+                           VG_LIGHTING_POINT_DIST_GEOM_DEFAULT_CODE,
+                           VG_LIGHTING_POINT_DIST_GEOM_DEFAULT_CODE_LEN,
                            VG_LIGHTING_POINT_DIST_FRAG_DEFAULT_CODE,
                            VG_LIGHTING_POINT_DIST_FRAG_DEFAULT_CODE_LEN,
                     } 
                 };
             pDefaultLightingPointDistPass = std::shared_ptr<Pass>{ new Pass(pDefaultLightingPointDistShader.get()) };
     
-            vg::Pass::BuildInDataInfo::Component buildInDataCmps[3] = {
-                    {vg::Pass::BuildInDataType::MATRIX_OBJECT_TO_NDC},
+            vg::Pass::BuildInDataInfo::Component buildInDataCmps[4] = {
                     {vg::Pass::BuildInDataType::MATRIX_OBJECT_TO_WORLD},
+                    {vg::Pass::BuildInDataType::MATRIX_OBJECT_TO_VIEW},
+                    {vg::Pass::BuildInDataType::MATRIX_PROJECTION},
                     {vg::Pass::BuildInDataType::POS_VIEWER},
                 };
             vg::Pass::BuildInDataInfo buildInDataInfo;
-            buildInDataInfo.componentCount = 3u;
+            buildInDataInfo.componentCount = 4u;
             buildInDataInfo.pComponent = buildInDataCmps;
             pDefaultLightingPointDistPass->setBuildInDataInfo(buildInDataInfo);
 

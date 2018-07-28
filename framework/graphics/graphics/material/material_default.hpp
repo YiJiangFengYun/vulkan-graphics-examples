@@ -25,7 +25,6 @@ namespace vg
     public:
         MaterialLightingPointDistDefault();
     private:
-        virtual void _beginBind(const BindInfo info, BindResult *pResult) const override;
     };
 
     extern std::shared_ptr<MaterialPreDepthDefault> pDefaultPreDepthMaterial;

@@ -49,6 +49,12 @@ add_custom_command (
   DEPENDS "embed_file_to_code"
 )
 add_custom_command (
+  OUTPUT "${CMAKE_CURRENT_SOURCE_DIR}/${LIBRARY_NAME}/pass/lighting_point_dist_geom_default_code.c"
+  COMMAND "embed_file_to_code" "VG_LIGHTING_POINT_DIST_GEOM_DEFAULT_CODE" "${CMAKE_CURRENT_SOURCE_DIR}/shader/lighting_point_dist_default.geom.spv" "${CMAKE_CURRENT_SOURCE_DIR}/${LIBRARY_NAME}/pass/lighting_point_dist_geom_default_code.c"
+  MAIN_DEPENDENCY "${CMAKE_CURRENT_SOURCE_DIR}/shader/lighting_point_dist_default.geom.spv"
+  DEPENDS "embed_file_to_code"
+)
+add_custom_command (
   OUTPUT "${CMAKE_CURRENT_SOURCE_DIR}/${LIBRARY_NAME}/pass/lighting_point_dist_frag_default_code.c"
   COMMAND "embed_file_to_code" "VG_LIGHTING_POINT_DIST_FRAG_DEFAULT_CODE" "${CMAKE_CURRENT_SOURCE_DIR}/shader/lighting_point_dist_default.frag.spv" "${CMAKE_CURRENT_SOURCE_DIR}/${LIBRARY_NAME}/pass/lighting_point_dist_frag_default_code.c"
   MAIN_DEPENDENCY "${CMAKE_CURRENT_SOURCE_DIR}/shader/lighting_point_dist_default.frag.spv"
@@ -68,6 +74,7 @@ set(SOURCES ${SOURCES} "${CMAKE_CURRENT_SOURCE_DIR}/${LIBRARY_NAME}/pass/pre_dep
 set(SOURCES ${SOURCES} "${CMAKE_CURRENT_SOURCE_DIR}/${LIBRARY_NAME}/pass/lighting_depth_vert_default_code.c")
 set(SOURCES ${SOURCES} "${CMAKE_CURRENT_SOURCE_DIR}/${LIBRARY_NAME}/pass/lighting_depth_frag_default_code.c")
 set(SOURCES ${SOURCES} "${CMAKE_CURRENT_SOURCE_DIR}/${LIBRARY_NAME}/pass/lighting_point_dist_vert_default_code.c")
+set(SOURCES ${SOURCES} "${CMAKE_CURRENT_SOURCE_DIR}/${LIBRARY_NAME}/pass/lighting_point_dist_geom_default_code.c")
 set(SOURCES ${SOURCES} "${CMAKE_CURRENT_SOURCE_DIR}/${LIBRARY_NAME}/pass/lighting_point_dist_frag_default_code.c")
 include_directories(${INCLUDE_DIRS})
 add_library(${LIBRARY_NAME} STATIC ${HEADERS} ${SOURCES})

@@ -39,32 +39,6 @@ namespace vg
         _addPass(m_pMainPass);
     }
 
-    void MaterialLightingPointDistDefault::_beginBind(const BindInfo info, BindResult *pResult) const
-    {
-        for (uint32_t i = 0; i < 6u; ++i)
-        {
-            vg::RenderPassInfo trunkRenderPassInfo;
-            trunkRenderPassInfo.pRenderPass = nullptr;
-            trunkRenderPassInfo.pFramebuffer = nullptr;
-            trunkRenderPassInfo.subPassIndex = i;
-            trunkRenderPassInfo.framebufferWidth = info.framebufferWidth;
-            trunkRenderPassInfo.framebufferHeight = info.framebufferHeight;
-            trunkRenderPassInfo.projMatrix = *(info.pProjMatrix);
-            trunkRenderPassInfo.viewMatrix = *(info.pViewMatrix);
-            trunkRenderPassInfo.pPass = m_pMainPass;
-            trunkRenderPassInfo.modelMatrix = *(info.pModelMatrix);
-            trunkRenderPassInfo.pMesh = info.pMesh;
-            trunkRenderPassInfo.subMeshIndex = info.subMeshIndex;
-            trunkRenderPassInfo.viewport = fd::Viewport();
-            trunkRenderPassInfo.scissor = info.hasClipRect ? info.clipRect : fd::Rect2D();
-
-            vg::CmdInfo cmdInfo;
-            cmdInfo.pRenderPassInfo = &trunkRenderPassInfo;
-
-            pResult->pTrunkRenderPassCmdBuffer->addCmd(cmdInfo);
-        }
-    }
-
     void createDefaultMaterials()
     {
         //Pre depth material.

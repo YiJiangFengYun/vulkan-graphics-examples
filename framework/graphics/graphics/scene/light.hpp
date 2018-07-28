@@ -164,10 +164,14 @@ namespace vg
         uint32_t renderCount;
         const BaseProjector *const *pProjectors;
         const OnceRenderTarget *const *pDepthTargets;
+        const void *pData;
+        uint32_t dataSize;
 
         LightDepthRenderInfo(uint32_t renderCount = 0u
             , const BaseProjector *const *pProjectors = nullptr
             , const OnceRenderTarget *const *pDepthTargets = nullptr
+            , const void *pData = nullptr
+            , uint32_t dataSize = 0u
             );
     };
 

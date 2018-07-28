@@ -338,10 +338,14 @@ namespace vg
     LightDepthRenderInfo::LightDepthRenderInfo(uint32_t renderCount
         , const BaseProjector *const *pProjectors
         , const OnceRenderTarget *const *pDepthTargets
+        , const void *pData
+        , uint32_t dataSize
         )
         : renderCount(renderCount)
         , pProjectors(pProjectors)
         , pDepthTargets(pDepthTargets)
+        , pData(pData)
+        , dataSize(dataSize)
     {
 
     }

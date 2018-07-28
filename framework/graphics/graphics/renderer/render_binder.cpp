@@ -1186,6 +1186,20 @@ namespace vg
                             pPass->setTexture(VG_PASS_PRE_DEPTH_TEXTURE_NAME, info);
                         }
                     }
+                } else if (pLight != nullptr)
+                {
+                    //set data of LightDepthRenderInfo to pass.
+                    auto renderInfo = pLight->getDepthRenderInfo();
+                    PassDataInfo dataInfo = {
+                        VG_PASS_LIGHT_RENDER_DATA_LAYOUT_PRIORITY,
+                        vk::ShaderStageFlagBits::eAllGraphics
+                    };
+                    if (pPass->hasData(VG_PASS_LIGHT_RENDER_DATA_NAME) == VG_FALSE)
+                    {
+                        pPass->addData(VG_PASS_LIGHT_RENDER_DATA_NAME, dataInfo, renderInfo.pData, renderInfo.dataSize);
+                    } else {
+                        pPass->setData(VG_PASS_LIGHT_RENDER_DATA_NAME, renderInfo.pData, renderInfo.dataSize, 0u);
+                    }
                 }
 
                 pPass->apply();

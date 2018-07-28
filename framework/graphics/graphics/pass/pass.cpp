@@ -411,7 +411,7 @@ namespace vg
         m_dataChanged;
     }
 
-    void Pass::addData(const std::string name, const PassDataInfo &info, void *src, uint32_t size)
+    void Pass::addData(const std::string name, const PassDataInfo &info, const void *src, uint32_t size)
     {
         m_data.addData(name, info, src, size);
         m_dataChanged = VG_TRUE;
@@ -428,7 +428,7 @@ namespace vg
         m_dataChanged = VG_TRUE;
     }
         
-    void Pass::setData(const std::string name, void *src, uint32_t size, uint32_t offset)
+    void Pass::setData(const std::string name, const void *src, uint32_t size, uint32_t offset)
     {
         m_data.setData(name, src, size, offset);
         m_dataContentChanged = VG_TRUE;

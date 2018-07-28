@@ -507,7 +507,7 @@ namespace vg
         addValue(name, sizeInfo, mapDataSizeInfos);
     }
 
-    void PassData::addData(const std::string name, const PassDataInfo &info, void *src, uint32_t size)
+    void PassData::addData(const std::string name, const PassDataInfo &info, const void *src, uint32_t size)
     {
         std::vector<Byte> temp(size);
         if (size != 0u && src != nullptr) memcpy(temp.data(), src, size);
@@ -534,7 +534,7 @@ namespace vg
         setValue(name, sizeInfo, mapDataSizeInfos);
     }
 
-    void PassData::setData(const std::string name, void *src, uint32_t size, uint32_t offset)
+    void PassData::setData(const std::string name, const void *src, uint32_t size, uint32_t offset)
     {
         const auto& iterator = mapDatas.find(name);
         if (iterator == mapDatas.cend())

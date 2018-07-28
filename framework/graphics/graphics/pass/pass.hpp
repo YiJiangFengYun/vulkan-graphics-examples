@@ -210,10 +210,10 @@ namespace vg
         void removeData(std::string name);
 
         void addData(const std::string name, const PassDataInfo &info, const PassDataSizeInfo &sizeInfo);
-        void addData(const std::string name, const PassDataInfo &info, void *src, uint32_t size);
+        void addData(const std::string name, const PassDataInfo &info, const void *src, uint32_t size);
         void getData(const std::string name, void *dst, uint32_t size, uint32_t offset) const;
         void setData(const std::string name, const PassDataInfo &info, const PassDataSizeInfo &sizeInfo);
-        void setData(const std::string name, void *src, uint32_t size, uint32_t offset);
+        void setData(const std::string name, const void *src, uint32_t size, uint32_t offset);
 
         template<typename T>
         void addData(const std::string name, const PassDataInfo &info, const T &value);

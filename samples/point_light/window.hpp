@@ -29,8 +29,6 @@ private:
     std::shared_ptr<vg::Material> m_pMaterial;
     std::shared_ptr<vg::Material> m_pBoxMaterial;
 
-    vg::Matrix4x4 m_boxTransform;
-
     float m_lightRange;
     std::shared_ptr<vg::LightPoint3> m_pPointLight;
 

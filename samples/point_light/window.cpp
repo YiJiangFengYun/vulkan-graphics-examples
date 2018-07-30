@@ -17,7 +17,6 @@ Window::Window(uint32_t width
     , m_pMaterial()
     , m_pBoxMaterial()
     , m_pPointLight()
-    , m_boxTransform(1.0f)
 {
     _init();
 }
@@ -33,7 +32,6 @@ Window::Window(std::shared_ptr<GLFWwindow> pWindow
     , m_pMaterial()
     , m_pBoxMaterial()
     , m_pPointLight()
-    , m_boxTransform(1.0)
 {
     _init();
 }
@@ -52,10 +50,10 @@ void Window::_init()
 void Window::_initState()
 {
     ParentWindowType::_initState();
-    m_cameraZoom = -15.0f;
+    m_cameraZoom = -50.0f;
     /// Build a quaternion from euler angles (pitch, yaw, roll), in radians.
     m_cameraRotation = vg::Vector3(glm::radians(0.0f), glm::radians(0.0f), glm::radians(0.0f));
-    m_timerSpeedFactor = 0.1f;
+    m_cameraPosition = vg::Vector3(0.0f, 20.0f, 20.0f);
     m_lightRange = DEFAULT_LIGHT_RANGE;
 }
 
@@ -70,16 +68,24 @@ void Window::_createModel()
             sampleslib::AssimpScene::VertexLayoutComponent::VERTEX_COMPONENT_NORMAL,
         };
         sampleslib::AssimpScene::CreateInfo createInfo;
-        createInfo.fileName = "models/vulkanscene_shadow.dae";
+        createInfo.fileName = "models/shadowscene_fire.dae";
         createInfo.isCreateObject = VG_TRUE;
         createInfo.layoutComponentCount = layoutCount;
         createInfo.pLayoutComponent = layouts;
         createInfo.offset = vg::Vector3(0.0f, 0.0f, 0.0f);
-        createInfo.scale = vg::Vector3(4.0f);
+        createInfo.scale = vg::Vector3(1.0f);
         m_assimpScene.init(createInfo);
+
+        const auto &objects = m_assimpScene.getObjects();
+        for (const auto &object : objects)
+        {
+            vg::Matrix4x4 matrix = vg::Matrix4x4(1.0f);
+            matrix = glm::rotate(matrix, glm::radians(120.0f), vg::Vector3(0.0f, 1.0f, 0.0f));
+            object->getTransform()->setLocalMatrix(matrix);
+        }
     }
     
-    //box
+    // box
     {
         std::vector<vg::Vector3> tempPositions = { 
             { -1.0f, -1.0f,  1.0f }, 
@@ -225,14 +231,14 @@ void Window::_createMaterial()
 
 void Window::_initScene()
 {
-    // {
-    //     auto pObj = m_pBoxObj;
-    //     pObj->setMaterialCount(1u);
-    //     pObj->setMaterial(m_pBoxMaterial.get());
-    //     pObj->setLightingMaterial(typeid(vg::LightPoint3), vg::pDefaultLightingPointDistMaterial.get());
-    //     m_pScene->addVisualObject(pObj.get());
+    {
+        auto pObj = m_pBoxObj;
+        pObj->setMaterialCount(1u);
+        pObj->setMaterial(m_pBoxMaterial.get());
+        pObj->setLightingMaterial(typeid(vg::LightPoint3), vg::pDefaultLightingPointDistMaterial.get());
+        m_pScene->addVisualObject(pObj.get());
         
-    // }
+    }
     {
         const auto &objects = m_assimpScene.getObjects();
         for (const auto &object : objects)
@@ -269,31 +275,34 @@ void Window::_enableShadow()
 
 void Window::_updateLights()
 {
-    auto position = vg::Vector3(0.0f, 50.0f, 25.0f);
+    // auto position = vg::Vector3(0.0f, 25.0f, 10.0f);
 
-    position.x = cos(glm::radians(m_passedTime * 360.0f)) * 40.0f + position.x;
-    position.y = - sin(glm::radians(m_passedTime * 360.0f)) * 20.0f + position.y;
-    position.z = sin(glm::radians(m_passedTime * 360.0f)) * 5.0f + position.z;
+    // position.x = cos(glm::radians(m_passedTime * 360.0f)) * 40.0f + position.x;
+    // position.y = - sin(glm::radians(m_passedTime * 360.0f)) * 20.0f + position.y;
+    // position.z = sin(glm::radians(m_passedTime * 360.0f)) * 5.0f + position.z;
 
-    // auto rotationMatrix = glm::toMat4(glm::rotation(vg::Vector3(0.0f, 0.0f, 1.0f), glm::normalize(-position)));
-    // auto translateMatrix = glm::translate(glm::mat4(1.0f), position);
-    // auto lookAtMatrix = translateMatrix * rotationMatrix;
+    vg::Vector3 position = vg::Vector3(0.0f);
+    position.y = 10.0f;
+    position.x = sin(glm::radians(m_passedTime * 360.0f)) * 1.0f;
+	position.z = cos(glm::radians(m_passedTime * 360.0f)) * 1.0f;
+
     m_pPointLight->getTransform()->lookAt2(position, vg::Vector3(0.0f), vg::Vector3(0.0, 1.0, 0.0));
+    // m_pPointLight->getTransform()->setLocalPosition(position);
 }
 
 void Window::_onUpdate()
 {
     ParentWindowType::_onUpdate();
 
-    // {
-    //     vg::Matrix4x4 tranform(1.0f);
-    //     tranform = glm::translate(tranform, vg::Vector3(-10.0f, 0.0f, 0.0f));
-    //     tranform = glm::rotate(tranform, m_passedTime * glm::radians(360.0f), vg::Vector3(1.0f, 0.0f, 0.0f));
-    //     // tranform = glm::rotate(tranform, m_passedTime * glm::radians(360.0f), vg::Vector3(0.0f, 1.0f, 0.0f));
-    //     m_boxTransform = tranform;
-    //     m_pBoxObj->getTransform()->setLocalMatrix(m_boxTransform);
+    {
+        vg::Matrix4x4 transform(1.0f);
+        transform = glm::translate(transform, vg::Vector3(-10.0f, 20.0f, 0.0f));
+        transform = glm::rotate(transform, m_passedTime * glm::radians(360.0f), vg::Vector3(1.0f, 0.0f, 0.0f));
+        transform = glm::rotate(transform, m_passedTime * glm::radians(360.0f), vg::Vector3(0.0f, 1.0f, 0.0f));
+        transform = glm::scale(transform, vg::Vector3(3.0f));
+        m_pBoxObj->getTransform()->setLocalMatrix(transform);
         
-    // }
+    }
 
     _updateLights();
 

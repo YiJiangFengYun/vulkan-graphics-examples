@@ -24,7 +24,7 @@ namespace vg
         m_pDepthTarget = std::shared_ptr<LightDepthTarget2D>{ new LightDepthTarget2D(depthTextureWidth, depthTextureHeight, format)};
         m_refDepthTarget = m_pDepthTarget.get();
         m_pProjector = std::shared_ptr<Projector3>{new Projector3()};
-        m_pProjector->updateProj(fov, 1.0f, std::min(1.0f, range), range);
+        _resetProjector();
         Matrix4x4 transform(1.0f);
         m_pProjector->setTransformMatrix(transform);
         m_refProjector = m_pProjector.get();
@@ -89,7 +89,7 @@ namespace vg
     void LightSpot3::setRange(float range)
     {
         m_range = range;
-        m_pProjector->updateProj(m_fov, 1.0f, std::min(1.0f, range), range);
+        _resetProjector();
         //add range to lgiht data
         if (m_data.hasData(LIGHT_SPOT3_DATA_RANGE_NAME) == VG_FALSE)
         {
@@ -127,5 +127,10 @@ namespace vg
         m_dataContentChanged = VG_TRUE;
         m_dataContentChanges[VG_LIGHT_DATA_PROJECTION_NAME] = VG_TRUE;
         _apply();
+    }
+
+    void LightSpot3::_resetProjector()
+    {
+        m_pProjector->updateProj(m_fov, 1.0f, std::min(1.0f, m_range), m_range);
     }
 } //vg

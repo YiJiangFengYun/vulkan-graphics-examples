@@ -38,6 +38,8 @@ namespace vg
         const Projector3 *m_refProjector;
 
         virtual void _beginRender() override;
+
+        void _resetProjector();
     };
 } //vg
 

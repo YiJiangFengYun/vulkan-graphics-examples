@@ -55,7 +55,7 @@ void main()
         resultColor.rgb *= shadow * strength;
         outFragColor.rgb += resultColor.rgb;
 
-        outFragColor.rgb = vec3(sampledDist);
+        // outFragColor.rgb = vec3(sampledDist + 0.1);
     }
     
 }

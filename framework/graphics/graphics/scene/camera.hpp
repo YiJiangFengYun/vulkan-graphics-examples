@@ -11,7 +11,7 @@ namespace vg
     public:
         BaseCamera();
         virtual ~BaseCamera();
-        Bool32 getIsOrthographic() const;
+        Bool32 getOrthographic() const;
         virtual const BaseProjector *getProjectorBase() const;
     protected:
         std::shared_ptr<BaseProjector> m_pProjector;

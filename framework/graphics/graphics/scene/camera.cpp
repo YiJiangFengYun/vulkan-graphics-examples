@@ -13,9 +13,9 @@ namespace vg
         
     }
 
-    Bool32 BaseCamera::getIsOrthographic() const
+    Bool32 BaseCamera::getOrthographic() const
     {
-        return m_pProjector->getIsOrthographic();
+        return m_pProjector->getOrthographic();
     }
 
     const BaseProjector *BaseCamera::getProjectorBase() const

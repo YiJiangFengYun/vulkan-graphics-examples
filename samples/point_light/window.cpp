@@ -225,14 +225,14 @@ void Window::_createMaterial()
 
 void Window::_initScene()
 {
-    {
-        auto pObj = m_pBoxObj;
-        pObj->setMaterialCount(1u);
-        pObj->setMaterial(m_pBoxMaterial.get());
-        pObj->setLightingMaterial(typeid(vg::LightPoint3), vg::pDefaultLightingPointDistMaterial.get());
-        m_pScene->addVisualObject(pObj.get());
+    // {
+    //     auto pObj = m_pBoxObj;
+    //     pObj->setMaterialCount(1u);
+    //     pObj->setMaterial(m_pBoxMaterial.get());
+    //     pObj->setLightingMaterial(typeid(vg::LightPoint3), vg::pDefaultLightingPointDistMaterial.get());
+    //     m_pScene->addVisualObject(pObj.get());
         
-    }
+    // }
     {
         const auto &objects = m_assimpScene.getObjects();
         for (const auto &object : objects)
@@ -285,15 +285,15 @@ void Window::_onUpdate()
 {
     ParentWindowType::_onUpdate();
 
-    {
-        vg::Matrix4x4 tranform(1.0f);
-        tranform = glm::translate(tranform, vg::Vector3(-10.0f, 0.0f, 0.0f));
-        tranform = glm::rotate(tranform, m_passedTime * glm::radians(360.0f), vg::Vector3(1.0f, 0.0f, 0.0f));
-        // tranform = glm::rotate(tranform, m_passedTime * glm::radians(360.0f), vg::Vector3(0.0f, 1.0f, 0.0f));
-        m_boxTransform = tranform;
-        m_pBoxObj->getTransform()->setLocalMatrix(m_boxTransform);
+    // {
+    //     vg::Matrix4x4 tranform(1.0f);
+    //     tranform = glm::translate(tranform, vg::Vector3(-10.0f, 0.0f, 0.0f));
+    //     tranform = glm::rotate(tranform, m_passedTime * glm::radians(360.0f), vg::Vector3(1.0f, 0.0f, 0.0f));
+    //     // tranform = glm::rotate(tranform, m_passedTime * glm::radians(360.0f), vg::Vector3(0.0f, 1.0f, 0.0f));
+    //     m_boxTransform = tranform;
+    //     m_pBoxObj->getTransform()->setLocalMatrix(m_boxTransform);
         
-    }
+    // }
 
     _updateLights();
 

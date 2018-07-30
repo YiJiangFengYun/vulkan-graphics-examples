@@ -44,6 +44,8 @@ namespace vg
         const Projector3 *m_refProjector;
         LightDepthRenderData m_depthRenderData;
         virtual void _beginRender() override;
+
+        void _resetProjector();
     };
 } //vg
 

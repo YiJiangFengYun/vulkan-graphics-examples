@@ -140,9 +140,9 @@ namespace vg
             vg::Pass::DepthBiasInfo depthBiasInfo = {
                 VG_TRUE,
                 VG_FALSE,
-                1.0f,
+                2.0f,
                 0.0f,
-                1.0f,
+                2.0f,
             };
             pDefaultLightingPointDistPass->setDepthBiasInfo(depthBiasInfo);
 

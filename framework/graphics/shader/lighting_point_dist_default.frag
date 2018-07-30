@@ -25,5 +25,5 @@ void main()
 {
     float d = distance(inWorldPos.xyz, _buildIn.lightPos.xyz);
     outFragColor = vec4(d, 0.0, 0.0, 1.0);
-    outFragColor = vec4(1.0);
+    // outFragColor = vec4(1.0);
 }

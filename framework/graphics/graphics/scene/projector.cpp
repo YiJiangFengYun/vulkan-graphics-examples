@@ -2,9 +2,12 @@
 
 namespace vg
 {
-    BaseProjector::BaseProjector()
+    BaseProjector::BaseProjector(Bool32 orthographic
+        , Bool32 omniDirectional
+        )
         : Base(BaseType::SCENE_OBJECT)
-        , m_isOrthographic(VG_FALSE)
+        , m_orthographic(orthographic)
+        , m_omniDirectional(omniDirectional)
     {
 
     }
@@ -14,9 +17,14 @@ namespace vg
 
     }
     
-    Bool32 BaseProjector::getIsOrthographic() const
+    Bool32 BaseProjector::getOrthographic() const
     {
-        return m_isOrthographic;
+        return m_orthographic;
+    }
+
+    Bool32 BaseProjector::getOmniDirectional() const
+    {
+        return m_omniDirectional;
     }
 
     const Space &BaseProjector::getSpace() const
@@ -30,8 +38,10 @@ namespace vg
     }
 
     template <SpaceType SPACE_TYPE>
-    Projector<SPACE_TYPE>::Projector()
-        : BaseProjector()
+    Projector<SPACE_TYPE>::Projector(Bool32 orthographic
+        , Bool32 omniDirectional
+        )
+        : BaseProjector(orthographic, omniDirectional)
     {
     }
 
@@ -78,11 +88,10 @@ namespace vg
     template class Projector<SpaceType::SPACE_3>;
 
     template <SpaceType SPACE_TYPE>
-    ProjectorOP<SPACE_TYPE>::ProjectorOP()
-        : Projector<SPACE_TYPE>()
+    ProjectorOP<SPACE_TYPE>::ProjectorOP(Bool32 omniDirectional)
+        : Projector<SPACE_TYPE>(VG_TRUE, omniDirectional)
         , m_viewBounds(BoundsType::ValueType(-1.0f), BoundsType::ValueType(1.0f))
     {
-        m_isOrthographic = VG_TRUE;
     }
 
     template <SpaceType SPACE_TYPE>
@@ -102,8 +111,8 @@ namespace vg
     template class ProjectorOP<SpaceType::SPACE_2>;
     template class ProjectorOP<SpaceType::SPACE_3>;
 
-    ProjectorOP2::ProjectorOP2()
-        : ProjectorOP<SpaceType::SPACE_2>()
+    ProjectorOP2::ProjectorOP2(Bool32 omniDirectional)
+        : ProjectorOP<SpaceType::SPACE_2>(omniDirectional)
     {
         _applyProj();
     }
@@ -118,8 +127,8 @@ namespace vg
         // m_projMatrix[1][1] *= -1;
     }
 
-    ProjectorOP3::ProjectorOP3()
-        : ProjectorOP<SpaceType::SPACE_3>()
+    ProjectorOP3::ProjectorOP3(Bool32 omniDirectional)
+        : ProjectorOP<SpaceType::SPACE_3>(omniDirectional)
     {
         m_viewBounds = { {-1.0f, -1.0f, 0.0f}, {1.0f, 1.0f, 1.0f} };
         _applyProj();
@@ -127,6 +136,9 @@ namespace vg
 
     void ProjectorOP3::_applyProj()
     {
+        if (m_viewBounds.getMin().z < 0) {
+            throw std::runtime_error("The min z of the view bounds of ProjectorOP3 must not smaller than 0.");
+        }
         auto min = m_viewBounds.getMin();
         auto max = m_viewBounds.getMax();
         m_projMatrix[0] = { 2.0f / (max.x - min.x), 0.0f, 0.0f, 0.0f };
@@ -142,8 +154,8 @@ namespace vg
     const float Projector3::DEFAULT_ASPECT = 1.0f;
     const float Projector3::DEFAULT_DEPTH_NEAR = 0.1f;
     const float Projector3::DEFAULT_DEPTH_FAR = 10.0f;
-    Projector3::Projector3()
-        : Projector<SpaceType::SPACE_3>()
+    Projector3::Projector3(Bool32 omniDirectional)
+        : Projector<SpaceType::SPACE_3>(VG_FALSE, omniDirectional)
         , m_fov(DEFAULT_FOV)
         , m_aspect(DEFAULT_ASPECT)
         , m_depthNear(DEFAULT_DEPTH_NEAR)

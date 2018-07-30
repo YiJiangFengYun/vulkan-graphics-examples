@@ -25,8 +25,8 @@ namespace vg
         , m_depthRenderData()
     {
         //projector
-        m_pProjector = std::shared_ptr<Projector3>{new Projector3()};
-        m_pProjector->updateProj(glm::radians(90.0f), 1.0f, std::min(1.0f, range), range);
+        m_pProjector = std::shared_ptr<Projector3>{new Projector3(VG_TRUE)};
+        _resetProjector();
         m_refProjector = m_pProjector.get();
         //depth render target
         m_pDistTarget = std::shared_ptr<LightDistTargetCube>{
@@ -52,7 +52,7 @@ namespace vg
         {
             faceTransforms[static_cast<size_t>(CubemapFace::POSITIVE_X)] = glm::inverse(glm::rotate(identifyMatrix, glm::radians(90.0f), Vector3(0.0f, 1.0f, 0.0f)));
             faceTransforms[static_cast<size_t>(CubemapFace::NEGATIVE_X)] = glm::inverse(glm::rotate(identifyMatrix, glm::radians(-90.0f), Vector3(0.0f, 1.0f, 0.0f)));
-            faceTransforms[static_cast<size_t>(CubemapFace::POSITIVE_Y)] = glm::inverse(glm::rotate(identifyMatrix, glm::radians(-90.0f), Vector3(1.0f, 0.0f, 0.0f)));;
+            faceTransforms[static_cast<size_t>(CubemapFace::POSITIVE_Y)] = glm::inverse(glm::rotate(identifyMatrix, glm::radians(-90.0f), Vector3(1.0f, 0.0f, 0.0f)));
             faceTransforms[static_cast<size_t>(CubemapFace::NEGATIVE_Y)] = glm::inverse(glm::rotate(identifyMatrix, glm::radians(90.0f), Vector3(1.0f, 0.0f, 0.0f)));
             faceTransforms[static_cast<size_t>(CubemapFace::POSITIVE_Z)] = identifyMatrix;
             faceTransforms[static_cast<size_t>(CubemapFace::NEGATIVE_Z)] = glm::inverse(glm::rotate(identifyMatrix, glm::radians(180.0f), Vector3(0.0f, 1.0f, 0.0f)));
@@ -111,7 +111,7 @@ namespace vg
     void LightPoint3::setRange(float range)
     {
         m_range = range;
-        m_pProjector->updateProj(glm::radians(90.0f), 1.0f, std::min(1.0f, range), range);
+        _resetProjector();
         //add range to light data.
         if (m_data.hasData(LIGHT_POINT3_DATA_RANGE_NAME) == VG_FALSE)
         {
@@ -142,6 +142,13 @@ namespace vg
         transform = glm::translate(transform, pos);
         m_pProjector->setTransformMatrix(transform);
 
-        m_pProjector->setTransformMatrix(m_pTransform->getMatrixLocalToWorld());
+        //m_pProjector->setTransformMatrix(m_pTransform->getMatrixLocalToWorld());
+    }
+
+    void LightPoint3::_resetProjector()
+    {
+        float f = m_range;
+        float n = std::min(1.0f, f);
+        m_pProjector->updateProj(glm::radians(90.0f), 1.0f, n, f);
     }
 } //vg

@@ -9,13 +9,17 @@ namespace vg
     class BaseProjector : public Base
     {
     public:
-        BaseProjector();
+        BaseProjector(Bool32 orthographic = VG_FALSE
+            , Bool32 omniDirectional = VG_FALSE
+            );
         virtual ~BaseProjector();
-        Bool32 getIsOrthographic() const;
+        Bool32 getOrthographic() const;
+        Bool32 getOmniDirectional() const;
         const Space &getSpace() const;
         void setSpace(const Space &space);
     protected:
-        Bool32 m_isOrthographic;
+        Bool32 m_orthographic;
+        Bool32 m_omniDirectional;
         Space m_space;
     };
 
@@ -24,7 +28,9 @@ namespace vg
     {
     public:
         using MatrixType = typename SpaceTypeInfo<SPACE_TYPE>::MatrixType;
-        Projector();
+        Projector(Bool32 orthographic = VG_FALSE
+            , Bool32 omniDirectional = VG_FALSE
+            );
         MatrixType getProjMatrix() const;
         MatrixType getTransformMatrix() const;
         MatrixType getLocalToWorldMatrix() const;
@@ -42,7 +48,7 @@ namespace vg
     {
     public:
         using BoundsType = fd::Bounds<typename SpaceTypeInfo<SPACE_TYPE>::PointType>;        
-        ProjectorOP();
+        ProjectorOP(Bool32 omniDirectional = VG_FALSE);
         void updateProj(BoundsType viewBounds);
         BoundsType getViewBounds() const;
     protected:
@@ -55,7 +61,7 @@ namespace vg
     class ProjectorOP2 : public ProjectorOP<SpaceType::SPACE_2>
     {
     public:
-        ProjectorOP2();
+        ProjectorOP2(Bool32 omniDirectional = VG_FALSE);
         virtual void _applyProj() override;
     private:
 
@@ -64,7 +70,7 @@ namespace vg
     class ProjectorOP3 : public ProjectorOP<SpaceType::SPACE_3>
     {
     public:
-        ProjectorOP3();
+        ProjectorOP3(Bool32 omniDirectional = VG_FALSE);
     private:
         virtual void _applyProj() override;
     };
@@ -76,7 +82,7 @@ namespace vg
         static const float DEFAULT_ASPECT;
         static const float DEFAULT_DEPTH_NEAR;
         static const float DEFAULT_DEPTH_FAR;
-        Projector3();
+        Projector3(Bool32 omniDirectional = VG_FALSE);
         void updateProj(float fov, float aspect, float depthNear, float depthFar);
         float getFov() const;
         void setFov(float fov);

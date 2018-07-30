@@ -66,7 +66,7 @@ void emitLayerVertices(int layer)
     vec4 pos0 = _buildIn.cubeFaceTransform[layer] * vec4(inViewPoses[0].xyz, 1.0);
     vec4 pos1 = _buildIn.cubeFaceTransform[layer] * vec4(inViewPoses[1].xyz, 1.0);
     vec4 pos2 = _buildIn.cubeFaceTransform[layer] * vec4(inViewPoses[2].xyz, 1.0);
-    // if (inView(pos0) || inView(pos1) || inView(pos2)) 
+    if (inView(pos0) || inView(pos1) || inView(pos2)) 
     {
         gl_Position = _buildIn.matrixProjection * pos0;
         outWorldPos = inWorldPoses[0];

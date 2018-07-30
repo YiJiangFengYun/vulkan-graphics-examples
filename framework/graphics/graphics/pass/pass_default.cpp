@@ -137,14 +137,14 @@ namespace vg
             pDefaultLightingPointDistPass->setDepthStencilInfo(depthStencilState);
 
             //depth bias
-            vg::Pass::DepthBiasInfo depthBiasInfo = {
-                VG_TRUE,
-                VG_FALSE,
-                2.0f,
-                0.0f,
-                2.0f,
-            };
-            pDefaultLightingPointDistPass->setDepthBiasInfo(depthBiasInfo);
+            // vg::Pass::DepthBiasInfo depthBiasInfo = {
+            //     VG_TRUE,
+            //     VG_FALSE,
+            //     1.0f,
+            //     0.0f,
+            //     1.0f,
+            // };
+            // pDefaultLightingPointDistPass->setDepthBiasInfo(depthBiasInfo);
 
             pDefaultLightingPointDistPass->apply();
         }

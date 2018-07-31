@@ -51,7 +51,7 @@ void main()
         float shadow = (dist <= sampledDist + EPSILON) ? 1.0 : 0.1;
         // Check if out of light area.
         float radius = lightData.lights[i].radius;
-        float strength = (dist <= radius + EPSILON) ? 1.0 : 0.1;
+        float strength = (max(radius - dist, 0.0)) / radius;
         resultColor.rgb *= shadow * strength;
         outFragColor.rgb += resultColor.rgb;
     }

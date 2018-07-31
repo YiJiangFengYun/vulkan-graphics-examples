@@ -170,6 +170,12 @@ void Window::_updateLights()
     m_pSpotLight->getTransform()->lookAt2(position, vg::Vector3(0.0f), vg::Vector3(0.0, 1.0, 0.0));
 }
 
+void Window::_onPostReCreateSwapchain()
+{
+    _enableLighting();
+    _enableShadow();
+}
+
 void Window::_onUpdate()
 {
     ParentWindowType::_onUpdate();

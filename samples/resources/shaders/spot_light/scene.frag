@@ -43,11 +43,11 @@ float textureProj(uint index, vec4 P, vec2 off)
 		float dist = texture(shadowMaps[index], shadowCoord.st + off ).r;
 		if ( shadowCoord.w > 0.0 && dist < shadowCoord.z ) 
 		{
-			strength = 0.1;
+			strength = 0.0;
 		}
 	    return strength;
 	}
-    return 0.1;
+    return 0.0;
 }
 
 void main() 
@@ -67,7 +67,7 @@ void main()
         float dist = length(inLightVec[i]);
         // Check if out of light area.
         float radius = lightData.lights[i].radius;
-        strength = (dist <= radius + EPSILON) ? strength : 0.1;
+        strength = (max(radius - dist, 0.0)) / radius * strength;
         resultColor.rgb *= strength;
         outFragColor.rgb += resultColor;
     }

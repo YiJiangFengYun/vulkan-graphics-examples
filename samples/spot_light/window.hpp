@@ -38,6 +38,8 @@ private:
     void _enableLighting();
     void _enableShadow();
     void _updateLights();
+
+    virtual void _onPostReCreateSwapchain() override;
     virtual void _onUpdate() override;
 
 };

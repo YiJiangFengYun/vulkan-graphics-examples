@@ -32,33 +32,33 @@ out gl_PerVertex
 };
 layout(location = 0) out vec3 outWorldPos;
 
-bool inView(vec4 view_pos)
-{
-    uint res = 1;
-    if (_buildIn.rightHand) 
-    {
-        res *= uint(step(_buildIn.depthNear, view_pos.y));
-        res *= uint(step(view_pos.y, _buildIn.depthFar));
-        float zMax = TAN_HALF_FOV * view_pos.y;
-        float xMax = zMax * ASPECT;
-        res *= uint(step(-xMax, view_pos.x));
-        res *= uint(step(view_pos.x, xMax));
-        res *= uint(step(-zMax, view_pos.z));
-        res *= uint(step(view_pos.z, zMax));
-    }
-    else
-    {
-        res *= uint(step(_buildIn.depthNear, view_pos.z));
-        res *= uint(step(view_pos.z, _buildIn.depthFar));
-        float yMax = TAN_HALF_FOV * view_pos.z;
-        float xMax = yMax * ASPECT;
-        res *= uint(step(-xMax, view_pos.x));
-        res *= uint(step(view_pos.x, xMax));
-        res *= uint(step(-yMax, view_pos.y));
-        res *= uint(step(view_pos.y, yMax));
-    }
-    return bool(res);
-}
+// bool inView(vec4 view_pos)
+// {
+//     uint res = 1;
+//     if (_buildIn.rightHand) 
+//     {
+//         res *= uint(step(_buildIn.depthNear, view_pos.y));
+//         res *= uint(step(view_pos.y, _buildIn.depthFar));
+//         float zMax = TAN_HALF_FOV * view_pos.y;
+//         float xMax = zMax * ASPECT;
+//         res *= uint(step(-xMax, view_pos.x));
+//         res *= uint(step(view_pos.x, xMax));
+//         res *= uint(step(-zMax, view_pos.z));
+//         res *= uint(step(view_pos.z, zMax));
+//     }
+//     else
+//     {
+//         res *= uint(step(_buildIn.depthNear, view_pos.z));
+//         res *= uint(step(view_pos.z, _buildIn.depthFar));
+//         float yMax = TAN_HALF_FOV * view_pos.z;
+//         float xMax = yMax * ASPECT;
+//         res *= uint(step(-xMax, view_pos.x));
+//         res *= uint(step(view_pos.x, xMax));
+//         res *= uint(step(-yMax, view_pos.y));
+//         res *= uint(step(view_pos.y, yMax));
+//     }
+//     return bool(res);
+// }
 
 void emitLayerVertices(int layer)
 {
@@ -66,7 +66,8 @@ void emitLayerVertices(int layer)
     vec4 pos0 = _buildIn.cubeFaceTransform[layer] * vec4(inViewPoses[0].xyz, 1.0);
     vec4 pos1 = _buildIn.cubeFaceTransform[layer] * vec4(inViewPoses[1].xyz, 1.0);
     vec4 pos2 = _buildIn.cubeFaceTransform[layer] * vec4(inViewPoses[2].xyz, 1.0);
-    if (inView(pos0) || inView(pos1) || inView(pos2)) 
+    //This is error because the triangle may be bigger than view frustum and out of view frustum, but they has middle area is in the view frustum 
+    // if (inView(pos0) || inView(pos1) || inView(pos2)) 
     {
         gl_Position = _buildIn.matrixProjection * pos0;
         outWorldPos = inWorldPoses[0];

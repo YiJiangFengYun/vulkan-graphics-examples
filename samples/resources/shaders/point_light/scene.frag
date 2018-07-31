@@ -54,8 +54,6 @@ void main()
         float strength = (dist <= radius + EPSILON) ? 1.0 : 0.1;
         resultColor.rgb *= shadow * strength;
         outFragColor.rgb += resultColor.rgb;
-
-        // outFragColor.rgb = vec3(sampledDist + 0.1);
     }
     
 }

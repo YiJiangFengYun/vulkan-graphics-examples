@@ -17,6 +17,7 @@ Window::Window(uint32_t width
     , m_pMaterial()
     , m_pBoxMaterial()
     , m_pPointLight()
+    , m_lightY(DEFAULT_LIGHT_Y)
 {
     _init();
 }
@@ -32,6 +33,7 @@ Window::Window(std::shared_ptr<GLFWwindow> pWindow
     , m_pMaterial()
     , m_pBoxMaterial()
     , m_pPointLight()
+    , m_lightY(DEFAULT_LIGHT_Y)
 {
     _init();
 }
@@ -50,7 +52,7 @@ void Window::_init()
 void Window::_initState()
 {
     ParentWindowType::_initState();
-    m_cameraZoom = -50.0f;
+    m_cameraZoom = -10.0f;
     /// Build a quaternion from euler angles (pitch, yaw, roll), in radians.
     m_cameraRotation = vg::Vector3(glm::radians(0.0f), glm::radians(0.0f), glm::radians(0.0f));
     m_cameraPosition = vg::Vector3(0.0f, 20.0f, 20.0f);
@@ -231,14 +233,14 @@ void Window::_createMaterial()
 
 void Window::_initScene()
 {
-    {
-        auto pObj = m_pBoxObj;
-        pObj->setMaterialCount(1u);
-        pObj->setMaterial(m_pBoxMaterial.get());
-        pObj->setLightingMaterial(typeid(vg::LightPoint3), vg::pDefaultLightingPointDistMaterial.get());
-        m_pScene->addVisualObject(pObj.get());
+    // {
+    //     auto pObj = m_pBoxObj;
+    //     pObj->setMaterialCount(1u);
+    //     pObj->setMaterial(m_pBoxMaterial.get());
+    //     pObj->setLightingMaterial(typeid(vg::LightPoint3), vg::pDefaultLightingPointDistMaterial.get());
+    //     m_pScene->addVisualObject(pObj.get());
         
-    }
+    // }
     {
         const auto &objects = m_assimpScene.getObjects();
         for (const auto &object : objects)
@@ -282,12 +284,18 @@ void Window::_updateLights()
     // position.z = sin(glm::radians(m_passedTime * 360.0f)) * 5.0f + position.z;
 
     vg::Vector3 position = vg::Vector3(0.0f);
-    position.y = 10.0f;
-    position.x = sin(glm::radians(m_passedTime * 360.0f)) * 1.0f;
-	position.z = cos(glm::radians(m_passedTime * 360.0f)) * 1.0f;
+    position.y = m_lightY;
+    position.x = sin(glm::radians(m_passedTime * 360.0f)) * 0.3f;
+	position.z = cos(glm::radians(m_passedTime * 360.0f)) * 0.3f;
 
     m_pPointLight->getTransform()->lookAt2(position, vg::Vector3(0.0f), vg::Vector3(0.0, 1.0, 0.0));
     // m_pPointLight->getTransform()->setLocalPosition(position);
+}
+
+void Window::_onPostReCreateSwapchain()
+{
+    _enableLighting();
+    _enableShadow();
 }
 
 void Window::_onUpdate()
@@ -297,8 +305,8 @@ void Window::_onUpdate()
     {
         vg::Matrix4x4 transform(1.0f);
         transform = glm::translate(transform, vg::Vector3(-10.0f, 20.0f, 0.0f));
-        transform = glm::rotate(transform, m_passedTime * glm::radians(360.0f), vg::Vector3(1.0f, 0.0f, 0.0f));
-        transform = glm::rotate(transform, m_passedTime * glm::radians(360.0f), vg::Vector3(0.0f, 1.0f, 0.0f));
+        //transform = glm::rotate(transform, m_passedTime * glm::radians(360.0f), vg::Vector3(1.0f, 0.0f, 0.0f));
+        //transform = glm::rotate(transform, m_passedTime * glm::radians(360.0f), vg::Vector3(0.0f, 1.0f, 0.0f));
         transform = glm::scale(transform, vg::Vector3(3.0f));
         m_pBoxObj->getTransform()->setLocalMatrix(transform);
         
@@ -314,6 +322,8 @@ void Window::_onUpdate()
     ImGui::Begin("Settings", nullptr, ImGuiWindowFlags_AlwaysAutoResize | ImGuiWindowFlags_NoResize | ImGuiWindowFlags_NoMove);
     if (ImGui::SliderFloat("Range", &m_lightRange, MIN_LIGHT_RANGE, MAX_LIGHT_RANGE)) {
         m_pPointLight->setRange(m_lightRange);
+    }
+    if (ImGui::SliderFloat("LightY", &m_lightY, MIN_LIGHT_Y, MAX_LIGHT_Y)) {
     }
     ImGui::End();
 #endif //USE_IMGUI_BIND

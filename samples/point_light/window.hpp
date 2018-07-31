@@ -9,6 +9,10 @@
 #define MIN_LIGHT_RANGE 10.0f
 #define MAX_LIGHT_RANGE 200.0f
 #define DEFAULT_LIGHT_RANGE 100.0f
+#define MIN_LIGHT_Y 0.0f
+#define MAX_LIGHT_Y 30.0f
+#define DEFAULT_LIGHT_Y 12.0f
+
 
 class Window : public sampleslib::Window<vg::SpaceType::SPACE_3>
 {
@@ -32,6 +36,8 @@ private:
     float m_lightRange;
     std::shared_ptr<vg::LightPoint3> m_pPointLight;
 
+    float m_lightY;
+
     virtual void _init() override;
     virtual void _initState() override;
     void _createModel();
@@ -41,6 +47,8 @@ private:
     void _enableLighting();
     void _enableShadow();
     void _updateLights();
+
+    virtual void _onPostReCreateSwapchain() override;
     virtual void _onUpdate() override;
 };
 

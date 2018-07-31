@@ -148,7 +148,7 @@ namespace vg
     void LightPoint3::_resetProjector()
     {
         float f = m_range;
-        float n = std::min(1.0f, f);
+        float n = std::min(0.1f, f);
         m_pProjector->updateProj(glm::radians(90.0f), 1.0f, n, f);
     }
 } //vg

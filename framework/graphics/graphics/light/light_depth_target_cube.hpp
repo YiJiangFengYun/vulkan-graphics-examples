@@ -4,7 +4,6 @@
 #include "graphics/global.hpp"
 #include "graphics/render_target/pre_depth_target.hpp"
 #include "graphics/texture/texture_cube.hpp"
-#include "graphics/texture/texture_depth_stencil_attachment.hpp"
 
 namespace vg
 {
@@ -21,12 +20,12 @@ namespace vg
         vk::Format getColorImageFormat() const;
         vk::Format getDepthImageFormat() const;
         const TextureCubeColorAttachment *getColorTargetTexture() const;
-        const TextureDepthAttachment *getDepthTargetTexture() const;
+        const TextureCubeDepthAttachment *getDepthTargetTexture() const;
     private:
         vk::Format m_colorImageFormat;
         vk::Format m_depthImageFormat;
         std::shared_ptr<TextureCubeColorAttachment> m_pColorTargetTex;
-        std::shared_ptr<TextureDepthAttachment> m_pDepthTargetTex;
+        std::shared_ptr<TextureCubeDepthAttachment> m_pDepthTargetTex;
         std::shared_ptr<vk::RenderPass> m_pMyRenderPass;
         std::shared_ptr<vk::Framebuffer> m_pMyFramebuffer;
         void _createObjs();

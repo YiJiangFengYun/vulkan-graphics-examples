@@ -43,7 +43,7 @@ namespace vg
         return m_pColorTargetTex.get();
     }
 
-    const TextureDepthAttachment *LightDistTargetCube::getDepthTargetTexture() const
+    const TextureCubeDepthAttachment *LightDistTargetCube::getDepthTargetTexture() const
     {
         return m_pDepthTargetTex.get();
     }
@@ -161,12 +161,12 @@ namespace vg
 
         m_pColorTargetTex = std::shared_ptr<TextureCubeColorAttachment>(pColorTex);
 
-        auto pDepthTex = new TextureDepthAttachment(m_depthImageFormat,
+        auto pDepthTex = new TextureCubeDepthAttachment(m_depthImageFormat,
             framebufferWidth,
             framebufferHeight
             );
         
-        m_pDepthTargetTex = std::shared_ptr<TextureDepthAttachment>(pDepthTex);
+        m_pDepthTargetTex = std::shared_ptr<TextureCubeDepthAttachment>(pDepthTex);
 
         //frame buffer.
         std::array<vk::ImageView, 2u> attachments = {

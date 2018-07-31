@@ -326,7 +326,8 @@ namespace vg
         std::sort(arrRegisteredLights.begin(), arrRegisteredLights.end(), [&](const std::type_info *item1, const std::type_info *item2) {
             const auto &lightInfo1 = mapReigsteredLights[std::type_index(*item1)];
             const auto &lightInfo2 = mapReigsteredLights[std::type_index(*item2)];
-            return lightInfo1.bindingPriority - lightInfo2.bindingPriority;
+            auto result = static_cast<int32_t>(lightInfo1.bindingPriority) - static_cast<int32_t>(lightInfo2.bindingPriority);
+            return result < 0;
         });
 
         uint32_t vectorSize = static_cast<uint32_t>(sizeof(Vector4));

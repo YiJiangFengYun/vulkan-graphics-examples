@@ -317,7 +317,8 @@ namespace vg
 #endif //DEBUG
         const auto &lightInfo = m_mapRegisteredLights[std::type_index(typeInfo)];
 #ifdef DEBUG
-        if (getLightCount() == lightInfo.maxCount)
+        const auto &lightGroup = getLightGroup(typeInfo);
+        if (static_cast<uint32_t>(lightGroup.size()) == lightInfo.maxCount)
             throw std::runtime_error("Light count of the scene must not more than max light count of the scene.");
 #endif //DEBUG
         _addObject<LightType>(pTarget
@@ -353,15 +354,11 @@ namespace vg
     template <SpaceType SPACE_TYPE>
     const std::vector<typename Scene<SPACE_TYPE>::LightType *> &Scene<SPACE_TYPE>::getLightGroup(const std::type_info &lightTypeInfo)
     {
-        auto typeIndex = std::type_index(lightTypeInfo);
-        auto iterator = m_mapLightGroups.find(typeIndex);
-        if (iterator == m_mapLightGroups.end()) 
-        {
-            throw std::invalid_argument("The light type group don't exist!");
+        if (isHasRegisterLight(lightTypeInfo) == VG_FALSE) {
+            throw std::invalid_argument("The light type don't be registered!");
         }
-        else
-        {
-            return iterator->second;
+        else {
+            return m_mapLightGroups[std::type_index(lightTypeInfo)];
         }
     }
 

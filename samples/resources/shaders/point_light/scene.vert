@@ -23,6 +23,8 @@ struct PointLight
     float _dummy_y;
     float _dummy_z;
     float _dummy_w;
+    vec3 strength;
+    float _dumy_w_2;
 };
 
 layout (binding = 1) uniform LightData {

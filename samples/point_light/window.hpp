@@ -28,12 +28,13 @@ public:
     );
 private:
     sampleslib::AssimpScene m_assimpScene;
-    std::shared_ptr<vg::DimSepMesh3> m_pBoxMesh;
-    std::shared_ptr<vg::VisualObject3> m_pBoxObj;
+    // std::shared_ptr<vg::DimSepMesh3> m_pBoxMesh;
+    // std::shared_ptr<vg::VisualObject3> m_pBoxObj;
     std::shared_ptr<vg::Material> m_pMaterial;
-    std::shared_ptr<vg::Material> m_pBoxMaterial;
+    // std::shared_ptr<vg::Material> m_pBoxMaterial;
 
     float m_lightRange;
+    vg::Vector3 m_lightStrength;
     std::shared_ptr<vg::LightPoint3> m_pPointLight;
 
     float m_lightY;

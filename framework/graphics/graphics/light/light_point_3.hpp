@@ -7,12 +7,15 @@
 
 namespace vg
 {
-    #define LIGHT_POINT3_DATA_RANGE_NAME "light_range"
-    //transform of light + radius
-    #define LIGHT_POINT3_DATA_SIZE LIGHT_DATA_BASE_SIZE + static_cast<uint32_t>(sizeof(vg::Vector4))
-    #define LIGHT_POINT3_TEXTURE_COUNT 1u //depth texture.
+    #define VG_LIGHT_POINT3_DATA_RANGE_NAME "light_range"
+    #define VG_LIGHT_POINT3_DATA_RANGE_LAYOUT_PRIORITY VG_LIGHT_DATA_OTHER_MIN_LAYOUT_PRIORITY + 0
+    #define VG_LIGHT_POINT3_DATA_STRENGTH_NAME "light_strength"
+    #define VG_LIGHT_POINT3_DATA_STRENGTH_LAYOUT_PRIORITY VG_LIGHT_DATA_OTHER_MIN_LAYOUT_PRIORITY + 1
+    //transform of light + range + strength
+    #define VG_LIGHT_POINT3_DATA_SIZE LIGHT_DATA_BASE_SIZE + static_cast<uint32_t>(sizeof(vg::Vector4)) + static_cast<uint32_t>(sizeof(vg::Vector4))
+    #define VG_LIGHT_POINT3_TEXTURE_COUNT 1u //depth texture.
 
-    class LightPoint3 : public Light3<LIGHT_POINT3_DATA_SIZE, LIGHT_POINT3_TEXTURE_COUNT>
+    class LightPoint3 : public Light3<VG_LIGHT_POINT3_DATA_SIZE, VG_LIGHT_POINT3_TEXTURE_COUNT>
     {
     public:
         struct LightDepthRenderData {
@@ -35,9 +38,12 @@ namespace vg
         virtual LightDepthRenderInfo getDepthRenderInfo() const override;
         float getRange() const;
         void setRange(float value);
+        vg::Vector3 getStrength() const;
+        void setStrength(vg::Vector3 value);
         const LightDistTargetCube *getLightDistTargetCube() const;
     protected:
         float m_range;
+        vg::Vector3 m_strength;
         std::shared_ptr<LightDistTargetCube> m_pDistTarget;
         const LightDistTargetCube *m_refDistTarget;
         std::shared_ptr<Projector3> m_pProjector;
@@ -45,7 +51,10 @@ namespace vg
         LightDepthRenderData m_depthRenderData;
         virtual void _beginRender() override;
 
-        void _resetProjector();
+        void _setProjector();
+        void _setRange();
+        void _setStrength();
+        void _setDistTexture();
     };
 } //vg
 

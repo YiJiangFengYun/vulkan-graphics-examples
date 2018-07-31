@@ -18,6 +18,8 @@ struct PointLight
     float _dummy_y;
     float _dummy_z;
     float _dummy_w;
+    vec3 strength;
+    float _dumy_w_2;
 };
 
 layout (binding = 1) uniform LightData {
@@ -52,7 +54,7 @@ void main()
         // Check if out of light area.
         float radius = lightData.lights[i].radius;
         float strength = (max(radius - dist, 0.0)) / radius;
-        resultColor.rgb *= shadow * strength;
+        resultColor.rgb *= shadow * strength * lightData.lights[i].strength;
         outFragColor.rgb += resultColor.rgb;
     }
     

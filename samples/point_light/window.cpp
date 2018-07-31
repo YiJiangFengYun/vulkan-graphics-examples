@@ -12,12 +12,14 @@ Window::Window(uint32_t width
         , title
         )
     , m_assimpScene()
-    , m_pBoxMesh()
-    , m_pBoxObj()
+    // , m_pBoxMesh()
+    // , m_pBoxObj()
     , m_pMaterial()
-    , m_pBoxMaterial()
+    // , m_pBoxMaterial()
     , m_pPointLight()
+    , m_lightRange(DEFAULT_LIGHT_RANGE)
     , m_lightY(DEFAULT_LIGHT_Y)
+    , m_lightStrength(1.0f)
 {
     _init();
 }
@@ -28,12 +30,14 @@ Window::Window(std::shared_ptr<GLFWwindow> pWindow
         , pSurface
         )
     , m_assimpScene()
-    , m_pBoxMesh()
-    , m_pBoxObj()
+    // , m_pBoxMesh()
+    // , m_pBoxObj()
     , m_pMaterial()
-    , m_pBoxMaterial()
+    // , m_pBoxMaterial()
     , m_pPointLight()
+    , m_lightRange(DEFAULT_LIGHT_RANGE)
     , m_lightY(DEFAULT_LIGHT_Y)
+    , m_lightStrength(1.0f)
 {
     _init();
 }
@@ -88,51 +92,52 @@ void Window::_createModel()
     }
     
     // box
-    {
-        std::vector<vg::Vector3> tempPositions = { 
-            { -1.0f, -1.0f,  1.0f }, 
-            {  1.0f, -1.0f,  1.0f }, 
-            {  1.0f,  1.0f,  1.0f }, 
-            { -1.0f,  1.0f,  1.0f }, 
-            { -1.0f, -1.0f, -1.0f }, 
-            {  1.0f, -1.0f, -1.0f },
-            {  1.0f,  1.0f, -1.0f },
-            { -1.0f,  1.0f, -1.0f },
-        };
+    // {
+    //     std::vector<vg::Vector3> tempPositions = { 
+    //         { -1.0f, -1.0f,  1.0f }, 
+    //         {  1.0f, -1.0f,  1.0f }, 
+    //         {  1.0f,  1.0f,  1.0f }, 
+    //         { -1.0f,  1.0f,  1.0f }, 
+    //         { -1.0f, -1.0f, -1.0f }, 
+    //         {  1.0f, -1.0f, -1.0f },
+    //         {  1.0f,  1.0f, -1.0f },
+    //         { -1.0f,  1.0f, -1.0f },
+    //     };
     
-        std::vector<vg::Vector4> tempColors = {
-            { 1.0f, 0.0f, 0.0f, 1.0f },
-            { 0.0f, 1.0f, 0.0f, 1.0f },
-            { 0.0f, 0.0f, 1.0f, 1.0f },
-            { 0.0f, 0.0f, 0.0f, 1.0f },
-            { 1.0f, 0.0f, 0.0f, 1.0f },
-            { 0.0f, 1.0f, 0.0f, 1.0f },
-            { 0.0f, 0.0f, 1.0f, 1.0f },
-            { 0.0f, 0.0f, 0.0f, 1.0f },
-        };
+    //     std::vector<vg::Vector4> tempColors = {
+    //         { 1.0f, 0.0f, 0.0f, 1.0f },
+    //         { 0.0f, 1.0f, 0.0f, 1.0f },
+    //         { 0.0f, 0.0f, 1.0f, 1.0f },
+    //         { 0.0f, 0.0f, 0.0f, 1.0f },
+    //         { 1.0f, 0.0f, 0.0f, 1.0f },
+    //         { 0.0f, 1.0f, 0.0f, 1.0f },
+    //         { 0.0f, 0.0f, 1.0f, 1.0f },
+    //         { 0.0f, 0.0f, 0.0f, 1.0f },
+    //     };
         
-        std::vector<uint32_t> tempIndices = {
-            0,1,2, 2,3,0, 1,5,6, 6,2,1, 7,6,5, 5,4,7, 4,0,3, 3,7,4, 4,5,1, 1,0,4, 3,2,6, 6,7,3,
-        };
+    //     std::vector<uint32_t> tempIndices = {
+    //         0,1,2, 2,3,0, 1,5,6, 6,2,1, 7,6,5, 5,4,7, 4,0,3, 3,7,4, 4,5,1, 1,0,4, 3,2,6, 6,7,3,
+    //     };
 
-        auto pMesh = static_cast<std::shared_ptr<vg::DimSepMesh3>>(new vg::DimSepMesh3());
-        pMesh->setVertexCount(static_cast<uint32_t>(tempPositions.size()));
-        pMesh->addPositions(tempPositions);
-        pMesh->addColors(tempColors);
-        pMesh->setIndices(tempIndices, vg::PrimitiveTopology::TRIANGLE_LIST, 0u);
-        pMesh->apply(VG_TRUE);
-        m_pBoxMesh = pMesh;
+    //     auto pMesh = static_cast<std::shared_ptr<vg::DimSepMesh3>>(new vg::DimSepMesh3());
+    //     pMesh->setVertexCount(static_cast<uint32_t>(tempPositions.size()));
+    //     pMesh->addPositions(tempPositions);
+    //     pMesh->addColors(tempColors);
+    //     pMesh->setIndices(tempIndices, vg::PrimitiveTopology::TRIANGLE_LIST, 0u);
+    //     pMesh->apply(VG_TRUE);
+    //     m_pBoxMesh = pMesh;
 
-        auto obj = std::shared_ptr<vg::VisualObject3>(new vg::VisualObject3());
-        obj->setMesh(pMesh.get());
-        m_pBoxObj = obj;
-    }
+    //     auto obj = std::shared_ptr<vg::VisualObject3>(new vg::VisualObject3());
+    //     obj->setMesh(pMesh.get());
+    //     m_pBoxObj = obj;
+    // }
 }
 
 void Window::_createLights()
 {
     m_pPointLight = std::shared_ptr<vg::LightPoint3>{new vg::LightPoint3(m_lightRange
         , 2048, 2048)};
+    m_pPointLight->setStrength(m_lightStrength);
     _updateLights();
 }
 
@@ -177,57 +182,57 @@ void Window::_createMaterial()
         pMaterial->apply();
     }
 
-    {
-        //material
-        auto & pMaterial = m_pBoxMaterial;
-        pMaterial = std::shared_ptr<vg::Material>(new vg::Material());
-        pMaterial->setRenderPriority(0u);
-        pMaterial->setRenderQueueType(vg::MaterialShowType::OPAQUE);
-        auto pShader = pMaterial->getMainShader();
-        auto pPass = pMaterial->getMainPass();
+    // {
+    //     //material
+    //     auto & pMaterial = m_pBoxMaterial;
+    //     pMaterial = std::shared_ptr<vg::Material>(new vg::Material());
+    //     pMaterial->setRenderPriority(0u);
+    //     pMaterial->setRenderQueueType(vg::MaterialShowType::OPAQUE);
+    //     auto pShader = pMaterial->getMainShader();
+    //     auto pPass = pMaterial->getMainPass();
         
-        //shader
-        pShader->load("shaders/point_light/cube.vert.spv",
-            "shaders/point_light/cube.frag.spv");
-        //pass
-        const uint32_t componentCount = 1u;
-        vg::Pass::BuildInDataInfo::Component buildInDataCmps[componentCount] = {
-            {vg::Pass::BuildInDataType::MATRIX_OBJECT_TO_NDC},
-        };
-        vg::Pass::BuildInDataInfo buildInDataInfo;
-        buildInDataInfo.componentCount = componentCount;
-        buildInDataInfo.pComponent = buildInDataCmps;
-        pPass->setBuildInDataInfo(buildInDataInfo);
-        pPass->setCullMode(vk::CullModeFlagBits::eBack);
-        pPass->setFrontFace(vk::FrontFace::eClockwise);
+    //     //shader
+    //     pShader->load("shaders/point_light/cube.vert.spv",
+    //         "shaders/point_light/cube.frag.spv");
+    //     //pass
+    //     const uint32_t componentCount = 1u;
+    //     vg::Pass::BuildInDataInfo::Component buildInDataCmps[componentCount] = {
+    //         {vg::Pass::BuildInDataType::MATRIX_OBJECT_TO_NDC},
+    //     };
+    //     vg::Pass::BuildInDataInfo buildInDataInfo;
+    //     buildInDataInfo.componentCount = componentCount;
+    //     buildInDataInfo.pComponent = buildInDataCmps;
+    //     pPass->setBuildInDataInfo(buildInDataInfo);
+    //     pPass->setCullMode(vk::CullModeFlagBits::eBack);
+    //     pPass->setFrontFace(vk::FrontFace::eClockwise);
 
-        vk::PipelineDepthStencilStateCreateInfo depthStencilState = {};
-        depthStencilState.depthTestEnable = VG_TRUE;
-        depthStencilState.depthWriteEnable = VG_TRUE;
-        depthStencilState.depthCompareOp = vk::CompareOp::eLessOrEqual;
-        pPass->setDepthStencilInfo(depthStencilState);
+    //     vk::PipelineDepthStencilStateCreateInfo depthStencilState = {};
+    //     depthStencilState.depthTestEnable = VG_TRUE;
+    //     depthStencilState.depthWriteEnable = VG_TRUE;
+    //     depthStencilState.depthCompareOp = vk::CompareOp::eLessOrEqual;
+    //     pPass->setDepthStencilInfo(depthStencilState);
 
-        auto pCubeTex = m_pPointLight->getLightDistTargetCube()->getColorTargetTexture();
+    //     auto pCubeTex = m_pPointLight->getLightDistTargetCube()->getColorTargetTexture();
 
-        vg::PassTextureInfo::TextureInfo itemInfo = {
-            pCubeTex,
-            nullptr,
-            pCubeTex->getSampler(),
-            vk::ImageLayout::eUndefined,
-        };
-        vg::PassTextureInfo mainTextureInfo = {
-            vg::SamplerTextureType::TEX_CUBE,
-            1u,
-            &itemInfo,
-            VG_PASS_OTHER_MIN_BINDING_PRIORITY,
-            vg::ImageDescriptorType::COMBINED_IMAGE_SAMPLER,
-            vk::ShaderStageFlagBits::eFragment,
-        };
-        pPass->addTexture("main_texture", mainTextureInfo);
-        pPass->apply();
+    //     vg::PassTextureInfo::TextureInfo itemInfo = {
+    //         pCubeTex,
+    //         nullptr,
+    //         pCubeTex->getSampler(),
+    //         vk::ImageLayout::eUndefined,
+    //     };
+    //     vg::PassTextureInfo mainTextureInfo = {
+    //         vg::SamplerTextureType::TEX_CUBE,
+    //         1u,
+    //         &itemInfo,
+    //         VG_PASS_OTHER_MIN_BINDING_PRIORITY,
+    //         vg::ImageDescriptorType::COMBINED_IMAGE_SAMPLER,
+    //         vk::ShaderStageFlagBits::eFragment,
+    //     };
+    //     pPass->addTexture("main_texture", mainTextureInfo);
+    //     pPass->apply();
         
-        pMaterial->apply();
-    }
+    //     pMaterial->apply();
+    // }
 
 }
 
@@ -302,15 +307,15 @@ void Window::_onUpdate()
 {
     ParentWindowType::_onUpdate();
 
-    {
-        vg::Matrix4x4 transform(1.0f);
-        transform = glm::translate(transform, vg::Vector3(-10.0f, 20.0f, 0.0f));
-        //transform = glm::rotate(transform, m_passedTime * glm::radians(360.0f), vg::Vector3(1.0f, 0.0f, 0.0f));
-        //transform = glm::rotate(transform, m_passedTime * glm::radians(360.0f), vg::Vector3(0.0f, 1.0f, 0.0f));
-        transform = glm::scale(transform, vg::Vector3(3.0f));
-        m_pBoxObj->getTransform()->setLocalMatrix(transform);
+    // {
+    //     vg::Matrix4x4 transform(1.0f);
+    //     transform = glm::translate(transform, vg::Vector3(-10.0f, 20.0f, 0.0f));
+    //     //transform = glm::rotate(transform, m_passedTime * glm::radians(360.0f), vg::Vector3(1.0f, 0.0f, 0.0f));
+    //     //transform = glm::rotate(transform, m_passedTime * glm::radians(360.0f), vg::Vector3(0.0f, 1.0f, 0.0f));
+    //     transform = glm::scale(transform, vg::Vector3(3.0f));
+    //     m_pBoxObj->getTransform()->setLocalMatrix(transform);
         
-    }
+    // }
 
     _updateLights();
 
@@ -320,10 +325,13 @@ void Window::_onUpdate()
     ImGui::SetNextWindowPos(ImVec2(pos.x, pos.y + size.y + 10));
     ImGui::SetNextWindowSize(ImVec2(0, 0));
     ImGui::Begin("Settings", nullptr, ImGuiWindowFlags_AlwaysAutoResize | ImGuiWindowFlags_NoResize | ImGuiWindowFlags_NoMove);
-    if (ImGui::SliderFloat("Range", &m_lightRange, MIN_LIGHT_RANGE, MAX_LIGHT_RANGE)) {
+    if (ImGui::SliderFloat("Light Range", &m_lightRange, MIN_LIGHT_RANGE, MAX_LIGHT_RANGE)) {
         m_pPointLight->setRange(m_lightRange);
     }
-    if (ImGui::SliderFloat("LightY", &m_lightY, MIN_LIGHT_Y, MAX_LIGHT_Y)) {
+    if (ImGui::SliderFloat("Light Y", &m_lightY, MIN_LIGHT_Y, MAX_LIGHT_Y)) {
+    }
+    if (ImGui::ColorPicker4("Light Strength", reinterpret_cast<float *>(&m_lightStrength))) {
+        m_pPointLight->setStrength(m_lightStrength);
     }
     ImGui::End();
 #endif //USE_IMGUI_BIND

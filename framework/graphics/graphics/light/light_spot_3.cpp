@@ -16,6 +16,7 @@ namespace vg
         : Light3()
         , m_fov(fov)
         , m_range(range)
+        , m_strength(1.0f)
         , m_pDepthTarget()
         , m_refDepthTarget()
         , m_pProjector()
@@ -24,38 +25,18 @@ namespace vg
         m_pDepthTarget = std::shared_ptr<LightDepthTarget2D>{ new LightDepthTarget2D(depthTextureWidth, depthTextureHeight, format)};
         m_refDepthTarget = m_pDepthTarget.get();
         m_pProjector = std::shared_ptr<Projector3>{new Projector3()};
-        _resetProjector();
+        _setProjector();
         Matrix4x4 transform(1.0f);
         m_pProjector->setTransformMatrix(transform);
         m_refProjector = m_pProjector.get();
 
         //add range to lgiht data
-        if (m_data.hasData(LIGHT_SPOT3_DATA_RANGE_NAME) == VG_FALSE)
-        {
-            LightDataInfo info = {
-                VG_LIGHT_DATA_OTHER_MIN_LAYOUT_PRIORITY,
-            };
-            m_data.addData(LIGHT_SPOT3_DATA_RANGE_NAME, info, range);
-            m_dataChanged = VG_TRUE;
-        } else {
-            m_data.setData(LIGHT_SPOT3_DATA_RANGE_NAME, range);
-        }
-        m_dataContentChanged = VG_TRUE;
-        m_dataContentChanges[LIGHT_SPOT3_DATA_RANGE_NAME] = VG_TRUE;
+        _setRange();
+
+        _setStrength();
 
         //add the depth texture to light textures.
-        LightTextureInfo texInfo = {
-            SamplerTextureType::TEX_2D,
-            VG_LIGHT_TEXTURE_DEPTH_BINDING_PRIORITY,
-            m_pDepthTarget->getDepthTargetTexture()
-            };
-        if (m_data.hasTexture(VG_LIGHT_TEXTURE_DEPTH_NAME) == VG_FALSE)
-        {
-            m_data.addTexture(VG_LIGHT_TEXTURE_DEPTH_NAME, texInfo);
-        } else {
-            m_data.setTexture(VG_LIGHT_TEXTURE_DEPTH_NAME, texInfo);
-        }
-        m_textureChanged = VG_TRUE;
+        _setDepthTexture();
         _apply();
     }
 
@@ -89,21 +70,21 @@ namespace vg
     void LightSpot3::setRange(float range)
     {
         m_range = range;
-        _resetProjector();
-        //add range to lgiht data
-        if (m_data.hasData(LIGHT_SPOT3_DATA_RANGE_NAME) == VG_FALSE)
-        {
-            LightDataInfo info = {
-                VG_LIGHT_DATA_OTHER_MIN_LAYOUT_PRIORITY,
-            };
-            m_data.addData(LIGHT_SPOT3_DATA_RANGE_NAME, info, range);
-            m_dataChanged = VG_TRUE;
-        } else {
-            m_data.setData(LIGHT_SPOT3_DATA_RANGE_NAME, range);
-        }
-        m_dataContentChanged = VG_TRUE;
-        m_dataContentChanges[LIGHT_SPOT3_DATA_RANGE_NAME] = VG_TRUE;
-         _apply();
+        _setProjector();
+        _setRange();
+        _apply();
+    }
+
+    vg::Vector3 LightSpot3::getStrength() const
+    {
+        return m_strength;
+    }
+
+    void LightSpot3::setStrength(vg::Vector3 value)
+    {
+        m_strength = value;
+        _setStrength();
+        _apply();
     }
 
     void LightSpot3::_beginRender()
@@ -112,8 +93,34 @@ namespace vg
 
         //sync transform between camera and projector.
         m_pProjector->setLocalToWorldMatrix(m_pTransform->getMatrixLocalToWorld());
-
         //sync projection data.
+        _setProjection();
+        _apply();
+    }
+
+    void LightSpot3::_setProjector()
+    {
+        m_pProjector->updateProj(m_fov, 1.0f, std::min(1.0f, m_range), m_range);
+    }
+
+    void LightSpot3::_setRange()
+    {
+        if (m_data.hasData(VG_LIGHT_SPOT3_DATA_RANGE_NAME) == VG_FALSE)
+        {
+            LightDataInfo info = {
+                VG_LIGHT_SPOT3_DATA_RANGE_LAYOUT_PRIORITY,
+            };
+            m_data.addData(VG_LIGHT_SPOT3_DATA_RANGE_NAME, info, m_range);
+            m_dataChanged = VG_TRUE;
+        } else {
+            m_data.setData(VG_LIGHT_SPOT3_DATA_RANGE_NAME, m_range);
+        }
+        m_dataContentChanged = VG_TRUE;
+        m_dataContentChanges[VG_LIGHT_SPOT3_DATA_RANGE_NAME] = VG_TRUE;
+    }
+
+    void LightSpot3::_setProjection()
+    {
         auto matrix = m_space.getVulkanProjMatrix(m_pProjector->getProjMatrix());
         if (m_data.hasData(VG_LIGHT_DATA_PROJECTION_NAME) == VG_FALSE) {
             LightDataInfo dataInfo = {
@@ -126,11 +133,37 @@ namespace vg
         }
         m_dataContentChanged = VG_TRUE;
         m_dataContentChanges[VG_LIGHT_DATA_PROJECTION_NAME] = VG_TRUE;
-        _apply();
     }
 
-    void LightSpot3::_resetProjector()
+    void LightSpot3::_setStrength()
     {
-        m_pProjector->updateProj(m_fov, 1.0f, std::min(1.0f, m_range), m_range);
+        if (m_data.hasData(VG_LIGHT_SPOT3_DATA_STRENGTH_NAME) == VG_FALSE)
+        {
+            LightDataInfo info = {
+                VG_LIGHT_SPOT3_DATA_STRENGTH_LAYOUT_PRIORITY,
+            };
+            m_data.addData(VG_LIGHT_SPOT3_DATA_STRENGTH_NAME, info, m_strength);
+            m_dataChanged = VG_TRUE;
+        } else {
+            m_data.setData(VG_LIGHT_SPOT3_DATA_STRENGTH_NAME, m_strength);
+        }
+        m_dataContentChanged = VG_TRUE;
+        m_dataContentChanges[VG_LIGHT_SPOT3_DATA_STRENGTH_NAME] = VG_TRUE;
+    }
+
+    void LightSpot3::_setDepthTexture()
+    {
+        LightTextureInfo texInfo = {
+            SamplerTextureType::TEX_2D,
+            VG_LIGHT_TEXTURE_DEPTH_BINDING_PRIORITY,
+            m_pDepthTarget->getDepthTargetTexture()
+            };
+        if (m_data.hasTexture(VG_LIGHT_TEXTURE_DEPTH_NAME) == VG_FALSE)
+        {
+            m_data.addTexture(VG_LIGHT_TEXTURE_DEPTH_NAME, texInfo);
+        } else {
+            m_data.setTexture(VG_LIGHT_TEXTURE_DEPTH_NAME, texInfo);
+        }
+        m_textureChanged = VG_TRUE;
     }
 } //vg

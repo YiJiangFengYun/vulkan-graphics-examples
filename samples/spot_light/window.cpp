@@ -15,6 +15,8 @@ Window::Window(uint32_t width
     , m_assimpScene()
     , m_pMaterial()
     , m_pSpotLight()
+    , m_lightRange(DEFAULT_LIGHT_RANGE)
+    , m_lightStrength(1.0f)
 {
     _init();
 }
@@ -27,6 +29,8 @@ Window::Window(std::shared_ptr<GLFWwindow> pWindow
     , m_assimpScene()
     , m_pMaterial()
     , m_pSpotLight()
+    , m_lightRange(DEFAULT_LIGHT_RANGE)
+    , m_lightStrength(1.0f)
 {
     _init();
 }
@@ -74,7 +78,7 @@ void Window::_createModel()
 void Window::_createLights()
 {
     m_pSpotLight = std::shared_ptr<vg::LightSpot3>{ new vg::LightSpot3(glm::radians(45.0f), m_lightRange, 2048, 2048, vk::Format::eD16Unorm)};
-
+    m_pSpotLight->setStrength(m_lightStrength);
     _updateLights();
 }
 
@@ -188,8 +192,11 @@ void Window::_onUpdate()
     ImGui::SetNextWindowPos(ImVec2(pos.x, pos.y + size.y + 10));
     ImGui::SetNextWindowSize(ImVec2(0, 0));
     ImGui::Begin("Settings", nullptr, ImGuiWindowFlags_AlwaysAutoResize | ImGuiWindowFlags_NoResize | ImGuiWindowFlags_NoMove);
-    if (ImGui::SliderFloat("Range", &m_lightRange, MIN_LIGHT_RANGE, MAX_LIGHT_RANGE)) {
+    if (ImGui::SliderFloat("Light Range", &m_lightRange, MIN_LIGHT_RANGE, MAX_LIGHT_RANGE)) {
         m_pSpotLight->setRange(m_lightRange);
+    }
+    if (ImGui::ColorPicker4("Light Strength", reinterpret_cast<float *>(&m_lightStrength))) {
+        m_pSpotLight->setStrength(m_lightStrength);
     }
     ImGui::End();
 #endif //USE_IMGUI_BIND

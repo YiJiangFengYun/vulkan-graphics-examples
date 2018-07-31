@@ -20,6 +20,8 @@ struct SpotLight
     float _dummy_y;
     float _dummy_z;
     float _dummy_w;
+    vec3 strength;
+    float _dumy_w_2;
 };
 
 layout (binding = 1) uniform LightData {
@@ -68,7 +70,7 @@ void main()
         // Check if out of light area.
         float radius = lightData.lights[i].radius;
         strength = (max(radius - dist, 0.0)) / radius * strength;
-        resultColor.rgb *= strength;
+        resultColor.rgb *= strength * lightData.lights[i].strength.rgb;
         outFragColor.rgb += resultColor;
     }
 }

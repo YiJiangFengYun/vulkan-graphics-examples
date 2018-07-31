@@ -27,6 +27,7 @@ private:
     std::shared_ptr<vg::Material> m_pMaterial;
 
     float m_lightRange;
+    vg::Vector3 m_lightStrength;
     std::shared_ptr<vg::LightSpot3> m_pSpotLight;
 
     virtual void _init() override;

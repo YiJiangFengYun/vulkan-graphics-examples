@@ -29,6 +29,8 @@ private:
     float m_lightRange;
     vg::Vector3 m_lightStrength;
     std::shared_ptr<vg::LightSpot3> m_pSpotLight;
+    std::shared_ptr<vg::LightAmbient3> m_pAmbientLight;
+    vg::Vector3 m_ambientLightStrength;
 
     virtual void _init() override;
     virtual void _initState() override;

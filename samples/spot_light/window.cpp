@@ -17,6 +17,8 @@ Window::Window(uint32_t width
     , m_pSpotLight()
     , m_lightRange(DEFAULT_LIGHT_RANGE)
     , m_lightStrength(1.0f)
+    , m_pAmbientLight()
+    , m_ambientLightStrength(0.1f)
 {
     _init();
 }
@@ -31,6 +33,8 @@ Window::Window(std::shared_ptr<GLFWwindow> pWindow
     , m_pSpotLight()
     , m_lightRange(DEFAULT_LIGHT_RANGE)
     , m_lightStrength(1.0f)
+    , m_pAmbientLight()
+    , m_ambientLightStrength(0.1f)
 {
     _init();
 }
@@ -79,6 +83,9 @@ void Window::_createLights()
 {
     m_pSpotLight = std::shared_ptr<vg::LightSpot3>{ new vg::LightSpot3(glm::radians(45.0f), m_lightRange, 2048, 2048, vk::Format::eD16Unorm)};
     m_pSpotLight->setStrength(m_lightStrength);
+
+    m_pAmbientLight = std::shared_ptr<vg::LightAmbient3>{ new vg::LightAmbient3()};
+    m_pAmbientLight->setStrength(m_ambientLightStrength);
     _updateLights();
 }
 
@@ -138,15 +145,27 @@ void Window::_initScene()
     }
 
     {
-        const auto &light_type_info = typeid(vg::LightSpot3);
+        const auto &lightTypeInfo = typeid(vg::LightSpot3);
         vg::SceneLightRegisterInfo registerInfo = {
             0u,
             MAX_LIGHT_COUNT,
             vg::LightSpot3::registerInfo.dataSize,
             vg::LightSpot3::registerInfo.textureCount,
         };
-        m_pScene->registerLight(light_type_info, registerInfo);
+        m_pScene->registerLight(lightTypeInfo, registerInfo);
         m_pScene->addLight(m_pSpotLight.get());
+    }
+
+    {
+        const auto &lightTypeInfo = typeid(vg::LightAmbient3);
+        vg::SceneLightRegisterInfo registerInfo = {
+            1u,
+            1u,
+            vg::LightAmbient3::registerInfo.dataSize,
+            vg::LightAmbient3::registerInfo.textureCount,
+        };
+        m_pScene->registerLight(lightTypeInfo, registerInfo);
+        m_pScene->addLight(m_pAmbientLight.get());
     }
 }
 
@@ -197,6 +216,9 @@ void Window::_onUpdate()
     }
     if (ImGui::ColorPicker4("Light Strength", reinterpret_cast<float *>(&m_lightStrength))) {
         m_pSpotLight->setStrength(m_lightStrength);
+    }
+    if (ImGui::ColorPicker4("Ambient Light Strength", reinterpret_cast<float *>(&m_ambientLightStrength))) {
+        m_pAmbientLight->setStrength(m_ambientLightStrength);
     }
     ImGui::End();
 #endif //USE_IMGUI_BIND

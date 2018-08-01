@@ -1,4 +1,4 @@
-#include "spot_light/window.hpp"
+#include "spot_direct_light/window.hpp"
 
 #include <iostream>
 #include <typeinfo>
@@ -15,10 +15,12 @@ Window::Window(uint32_t width
     , m_assimpScene()
     , m_pMaterial()
     , m_pSpotLight()
+    , m_pDirectLight()
     , m_lightRange(DEFAULT_LIGHT_RANGE)
     , m_lightStrength(1.0f)
     , m_pAmbientLight()
     , m_ambientLightStrength(0.1f)
+    , m_useDirectLight(VG_FALSE)
 {
     _init();
 }
@@ -31,10 +33,12 @@ Window::Window(std::shared_ptr<GLFWwindow> pWindow
     , m_assimpScene()
     , m_pMaterial()
     , m_pSpotLight()
+    , m_pDirectLight()
     , m_lightRange(DEFAULT_LIGHT_RANGE)
     , m_lightStrength(1.0f)
     , m_pAmbientLight()
     , m_ambientLightStrength(0.1f)
+    , m_useDirectLight(VG_FALSE)
 {
     _init();
 }
@@ -84,6 +88,9 @@ void Window::_createLights()
     m_pSpotLight = std::shared_ptr<vg::LightSpot3>{ new vg::LightSpot3(glm::radians(45.0f), m_lightRange, 2048, 2048, vk::Format::eD16Unorm)};
     m_pSpotLight->setStrength(m_lightStrength);
 
+    m_pDirectLight = std::shared_ptr<vg::LightDirect3>{ new vg::LightDirect3(100.0f, 100.0f, m_lightRange, 2048, 2048, vk::Format::eD16Unorm)};
+    m_pDirectLight->setStrength(m_lightStrength);
+
     m_pAmbientLight = std::shared_ptr<vg::LightAmbient3>{ new vg::LightAmbient3()};
     m_pAmbientLight->setStrength(m_ambientLightStrength);
     _updateLights();
@@ -107,8 +114,8 @@ void Window::_createMaterial()
         auto pPass = pMaterial->getMainPass();
         
         //shader
-        pShader->load("shaders/spot_light/scene.vert.spv",
-            "shaders/spot_light/scene.frag.spv");
+        pShader->load("shaders/spot_direct_light/scene.vert.spv",
+            "shaders/spot_direct_light/scene.frag.spv");
         //pass
         vg::Pass::BuildInDataInfo::Component buildInDataCmps[3] = {
                 {vg::Pass::BuildInDataType::MATRIX_OBJECT_TO_NDC},
@@ -141,6 +148,7 @@ void Window::_initScene()
         object->setMaterialCount(1u);
         object->setMaterial(m_pMaterial.get());
         object->setLightingMaterial(typeid(vg::LightSpot3), vg::pDefaultLightingDepthMaterial.get());
+        object->setLightingMaterial(typeid(vg::LightDirect3), vg::pDefaultLightingDepthMaterial.get());
         m_pScene->addVisualObject(object.get());
     }
 
@@ -154,6 +162,17 @@ void Window::_initScene()
         };
         m_pScene->registerLight(lightTypeInfo, registerInfo);
         m_pScene->addLight(m_pSpotLight.get());
+    }
+
+    {
+        const auto &lightTypeInfo = typeid(vg::LightDirect3);
+        vg::SceneLightRegisterInfo registerInfo = {
+            0u,
+            MAX_LIGHT_COUNT,
+            vg::LightDirect3::registerInfo.dataSize,
+            vg::LightDirect3::registerInfo.textureCount,
+        };
+        m_pScene->registerLight(lightTypeInfo, registerInfo);
     }
 
     {
@@ -191,6 +210,7 @@ void Window::_updateLights()
     // auto translateMatrix = glm::translate(glm::mat4(1.0f), position);
     // auto lookAtMatrix = translateMatrix * rotationMatrix;
     m_pSpotLight->getTransform()->lookAt2(position, vg::Vector3(0.0f), vg::Vector3(0.0, 1.0, 0.0));
+    m_pDirectLight->getTransform()->lookAt2(position, vg::Vector3(0.0f), vg::Vector3(0.0, 1.0, 0.0));
 }
 
 void Window::_onPostReCreateSwapchain()
@@ -211,11 +231,34 @@ void Window::_onUpdate()
     ImGui::SetNextWindowPos(ImVec2(pos.x, pos.y + size.y + 10));
     ImGui::SetNextWindowSize(ImVec2(0, 0));
     ImGui::Begin("Settings", nullptr, ImGuiWindowFlags_AlwaysAutoResize | ImGuiWindowFlags_NoResize | ImGuiWindowFlags_NoMove);
+    std::array<const char *, 2u> lightNames = {
+        "Spot Light",
+        "Direct Light",
+    };
+    if (ImGui::Combo("Light Type", reinterpret_cast<int32_t *>(&m_useDirectLight), lightNames.data(), lightNames.size(), lightNames.size())) {
+        if (m_useDirectLight) {
+            if (m_pScene->isHasLight(m_pSpotLight.get())) {
+                m_pScene->removeLight(m_pSpotLight.get());
+            }
+            if (m_pScene->isHasLight(m_pDirectLight.get()) == VG_FALSE) {
+                m_pScene->addLight(m_pDirectLight.get());
+            }
+        } else {
+            if (m_pScene->isHasLight(m_pDirectLight.get())) {
+                m_pScene->removeLight(m_pDirectLight.get());
+            }
+            if (m_pScene->isHasLight(m_pSpotLight.get()) == VG_FALSE) {
+                m_pScene->addLight(m_pSpotLight.get());
+            }
+        }
+    }
     if (ImGui::SliderFloat("Light Range", &m_lightRange, MIN_LIGHT_RANGE, MAX_LIGHT_RANGE)) {
         m_pSpotLight->setRange(m_lightRange);
+        m_pDirectLight->setRange(m_lightRange);
     }
     if (ImGui::ColorPicker4("Light Strength", reinterpret_cast<float *>(&m_lightStrength))) {
         m_pSpotLight->setStrength(m_lightStrength);
+        m_pDirectLight->setStrength(m_lightStrength);
     }
     if (ImGui::ColorPicker4("Ambient Light Strength", reinterpret_cast<float *>(&m_ambientLightStrength))) {
         m_pAmbientLight->setStrength(m_ambientLightStrength);

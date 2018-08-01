@@ -29,6 +29,8 @@ private:
     float m_lightRange;
     vg::Vector3 m_lightStrength;
     std::shared_ptr<vg::LightSpot3> m_pSpotLight;
+    std::shared_ptr<vg::LightDirect3> m_pDirectLight;
+    vg::Bool32 m_useDirectLight;
     std::shared_ptr<vg::LightAmbient3> m_pAmbientLight;
     vg::Vector3 m_ambientLightStrength;
 

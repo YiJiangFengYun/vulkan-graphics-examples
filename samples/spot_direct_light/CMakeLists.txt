@@ -1,6 +1,6 @@
 # add the binary tree directory to the search path for include files
 # include_directories( ${CMAKE_CURRENT_BINARY_DIR} )
-set(EXE_NAME "spot_light")
+set(EXE_NAME "spot_direct_light")
 file(GLOB_RECURSE HEADERS *.hpp *.inl)
 file(GLOB_RECURSE SOURCES *.cpp)
 

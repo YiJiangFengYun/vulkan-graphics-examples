@@ -1,6 +1,6 @@
 #include <framework/framework.hpp>
-#include "spot_light/window.hpp"
-#include "spot_light/app.hpp"
+#include "spot_direct_light/window.hpp"
+#include "spot_direct_light/app.hpp"
 
 const uint32_t WINDOW_WIDTH = 1280;
 const uint32_t WINDOW_HEIGHT = 720;
@@ -14,7 +14,7 @@ int main() {
 
 
     App app;
-    app.init<Window>(WINDOW_WIDTH, WINDOW_HEIGHT, "spot light");
+    app.init<Window>(WINDOW_WIDTH, WINDOW_HEIGHT, "spot direct light");
 
     LOG(plog::debug) << "Initialization completed." << std::endl;
 

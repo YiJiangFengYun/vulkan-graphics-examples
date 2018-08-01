@@ -352,6 +352,17 @@ namespace vg
     }
 
     template <SpaceType SPACE_TYPE>
+    uint32_t Scene<SPACE_TYPE>::getLightGroupSize(const std::type_info &lightTypeInfo)
+    {
+        if (isHasRegisterLight(lightTypeInfo) == VG_FALSE) {
+            return 0u;
+        }
+        else {
+            return static_cast<uint32_t>(m_mapLightGroups[std::type_index(lightTypeInfo)].size());
+        }
+    }
+
+    template <SpaceType SPACE_TYPE>
     const std::vector<typename Scene<SPACE_TYPE>::LightType *> &Scene<SPACE_TYPE>::getLightGroup(const std::type_info &lightTypeInfo)
     {
         if (isHasRegisterLight(lightTypeInfo) == VG_FALSE) {

@@ -42,6 +42,7 @@ namespace vg
         const std::unordered_map<std::type_index, SceneLightRegisterInfo> getMapRegisteredLights() const;
         void registerLight(const std::type_info &lightTypeInfo, const SceneLightRegisterInfo &lightInfo);
         void unregisterLight(const std::type_info &lightTypeInfo);
+        virtual uint32_t getLightGroupSize(const std::type_info &lightTypeInfo) = 0;
         void beginRender();
         void endRender();
     protected:
@@ -102,6 +103,7 @@ namespace vg
         Bool32 isHasLight(const LightType *pTarget) const;
         void addLight(LightType *pTarget, LightType *pParent = nullptr);
         void removeLight(LightType *pTarget);
+        virtual uint32_t getLightGroupSize(const std::type_info &lightTypeInfo) override;
         const std::vector<LightType *> &getLightGroup(const std::type_info &lightTypeInfo);
 
         /*Get projective matrix with camera, it will change origin projective matrix of the camera

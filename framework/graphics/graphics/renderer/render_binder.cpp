@@ -337,6 +337,9 @@ namespace vg
         uint32_t totalTextureBindingCount = 0u;
         for (const auto pLightTypeInfo : arrRegisteredLights)
         {
+            const auto lightGroupSize = pScene->getLightGroupSize(*pLightTypeInfo);
+            if (lightGroupSize == 0u) continue;
+
             const auto &lightInfo = mapReigsteredLights[std::type_index(*pLightTypeInfo)];
             uint32_t maxLightCount = lightInfo.maxCount;
             uint32_t textureCount = lightInfo.textureCount;
@@ -363,19 +366,18 @@ namespace vg
         uint32_t lightBindingOffset = 0u;
         for (const auto pLightTypeInfo : arrRegisteredLights)
         {
+            const uint32_t lightGroupSize = pScene->getLightGroupSize(*pLightTypeInfo);
+            if (lightGroupSize == 0u) continue;
             const auto &lightInfo = mapReigsteredLights[std::type_index(*pLightTypeInfo)];
-            uint32_t lightGroupSize;
             BaseLight * const *lightGroup;
             if (pScene->getSpaceType() == SpaceType::SPACE_2) 
             {
                 auto &lightGroup2 = dynamic_cast<Scene<SpaceType::SPACE_2> *>(pScene)->getLightGroup(*pLightTypeInfo);
-                lightGroupSize = static_cast<uint32_t>(lightGroup2.size());
                 lightGroup = reinterpret_cast<BaseLight * const *>(lightGroup2.data());
             }
             else
             {
                 auto &lightGroup3 = dynamic_cast<Scene<SpaceType::SPACE_3> *>(pScene)->getLightGroup(*pLightTypeInfo);
-                lightGroupSize = static_cast<uint32_t>(lightGroup3.size());
                 lightGroup = reinterpret_cast<BaseLight * const *>(lightGroup3.data());
             }
 

@@ -1,4 +1,5 @@
 1.The Module of new own model format and The tool application transfer the new model format to the standardised model
 format (COLLADA).
-2.Perfect light system and Add some necessary light types.
-3.Delete "apply" mechanism mode.
+2.Delete "apply" mechanism mode.
+3.Separate scene data and render logic.
+4.Add scene directional light and cascaded shadow maps for scene directional light.

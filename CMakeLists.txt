@@ -2,6 +2,10 @@ cmake_minimum_required(VERSION 3.8.2)
 
 project(vulkan-graphics-samples)
 
+#include cmake codes
+list(APPEND CMAKE_MODULE_PATH "${CMAKE_CURRENT_SOURCE_DIR}/cmake")
+include(ResourceProcess)
+
 #Set project variables.
 #    Global
 set(PROJECT_NAME "vulkan-graphics-samples")
@@ -14,17 +18,24 @@ set(VERSION "${VERSION_MAJOR}.${VERSION_MINOR}")
 set(VERSION_FULL "${VERSION}.${VERSION_PATCH}${VERSION_EXTRA}")
 set(LIB_SUFFIX "" CACHE STRING "Takes an empty string or 64. Directory where lib will be installed: lib or lib64")
 
+#find neccessay packages
+find_package(Vulkan)
+find_package(Boost)
+find_package(Doxygen)
+
 # options
 # option(BUILD_SHARED_LIBS "Build shared libraries" OFF)
 option(USE_IMGUI_BIND "Build imgui bind" ON)
 option(BUILD_SAMPLES "Build the sample programs" ON)
 option(BUILD_TESTS "Build the test programs" ON)
+option(BUILD_DOCUMENTATION "Create and install the html based api documentation (requires Doxygen)" ${DOXYGEN_FOUND})
 if (MSVC)
     option(USE_MSVC_RUNTIME_LIBRARY_DLL "Use MSVC runtime library DLL" ON)
 endif()
 option(USE_D2D_WSI "Build the project using Direct to Display swapchain" OFF)
 option(USE_WAYLAND_WSI "Build the project using Wayland swapchain" OFF)
 
+#path variables
 set(PROJECT_DIR ${PROJECT_SOURCE_DIR})
 set(PROJECT_FRAMEWORK_DIR ${PROJECT_DIR}/framework)
 set(PROJECT_BIN_DIR ${PROJECT_DIR}/doc)
@@ -45,9 +56,6 @@ set(LIBUV_DIR ${PROJECT_LIBS_DIR}/libuv)
 set(PLOG_DIR ${PROJECT_LIBS_DIR}/plog)
 set(STB_DIR ${PROJECT_LIBS_DIR}/stb)
 set(GLI_DIR ${PROJECT_LIBS_DIR}/gli)
-
-# set(CMAKE_RUNTIME_OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR}/bin )
-# set(CMAKE_LIBRARY_OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR}/lib )
 
 set(LIBRARIES) #init variable
 add_subdirectory(libs)
@@ -75,7 +83,6 @@ add_subdirectory(libs)
 # set (CMAKE_CXX_STANDARD 11)
 
 # vulkan
-find_package(Vulkan)
 
 if (Vulkan_FOUND)
     set(Vulkan_BIN_DIR "${Vulkan_INCLUDE_DIR}/../Bin")
@@ -138,7 +145,6 @@ message(STATUS "Environment variable BOOST_LIBRARYDIR: $ENV{BOOST_LIBRARYDIR}")
 set(BOOST_ROOT $ENV{BOOST_ROOT})
 set(BOOST_INCLUDEDIR $ENV{BOOST_INCLUDEDIR})
 set(BOOST_LIBRARYDIR $ENV{BOOST_LIBRARYDIR})
-find_package(Boost)
 if (NOT Boost_FOUND)
     message(FATAL_ERROR "Could not find Boost library!")
 else()
@@ -148,14 +154,6 @@ else()
     message(STATUS "Boost_LIBRARIES: ${Boost_LIBRARIES}")
     message(STATUS "Boost_VERSION: ${Boost_VERSION}")
 endif()
-
-list(APPEND CMAKE_MODULE_PATH "${CMAKE_CURRENT_SOURCE_DIR}/cmake")
-include(ResourceProcess)
-
-# add the binary tree to the search path for include files
-# so that we will find config header files.
-set(PROJECT_CONFIG_HEADER_DIR "${PROJECT_BINARY_DIR}/config_headers")
-set(INCLUDE_DIRS ${INCLUDE_DIRS} ${PROJECT_CONFIG_HEADER_DIR})
 
 # generators
 add_subdirectory(generator)
@@ -179,9 +177,14 @@ if(BUILD_TESTS)
     add_subdirectory(test)
 endif()
 
+# doucments generation
+if (BUILD_DOCUMENTATION)
+    add_subdirectory(doc)
+endif(BUILD_DOCUMENTATION)
+
 # install
-install (FILES "${PROJECT_BINARY_DIR}/VGFConfig.hpp"
-  DESTINATION include)
+# install (FILES "${PROJECT_BINARY_DIR}/VGFConfig.hpp"
+#   DESTINATION include)
 
 
 

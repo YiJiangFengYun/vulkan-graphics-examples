@@ -27,12 +27,24 @@ struct PointLight
     float _dumy_w_2;
 };
 
+struct AmbientLight
+{
+    mat4 lightTransform;
+    vec3 strength;
+    float _dummy_w;
+};
+
 layout (binding = 1) uniform LightData {
     uint lightCount;
     float _dummy_y;
     float _dummy_z;
     float _dummy_w;
     PointLight lights[MAX_LIGHT_COUNT];
+    uint ambientLightCount;
+    float _dummy_y_2;
+    float _dummy_z_2;
+    float _dummy_w_2;
+    AmbientLight ambientLight;
 } lightData;
 
 layout (location = 0) out vec3 outNormal;

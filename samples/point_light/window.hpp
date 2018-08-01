@@ -36,6 +36,8 @@ private:
     float m_lightRange;
     vg::Vector3 m_lightStrength;
     std::shared_ptr<vg::LightPoint3> m_pPointLight;
+    std::shared_ptr<vg::LightAmbient3> m_pAmbientLight;
+    vg::Vector3 m_ambientLightStrength;
 
     float m_lightY;
 

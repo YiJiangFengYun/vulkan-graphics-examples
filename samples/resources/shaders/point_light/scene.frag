@@ -22,12 +22,24 @@ struct PointLight
     float _dumy_w_2;
 };
 
+struct AmbientLight
+{
+    mat4 lightTransform;
+    vec3 strength;
+    float _dummy_w;
+};
+
 layout (binding = 1) uniform LightData {
     uint lightCount;
     float _dummy_y;
     float _dummy_z;
     float _dummy_w;
     PointLight lights[MAX_LIGHT_COUNT];
+    uint ambientLightCount;
+    float _dummy_y_2;
+    float _dummy_z_2;
+    float _dummy_w_2;
+    AmbientLight ambientLight;
 } lightData;
 
 layout (location = 0) out vec4 outFragColor;
@@ -50,12 +62,16 @@ void main()
         float sampledDist = texture(shadowMaps[i], L).r;
         float dist = length(inLightVec[i]);
         // Check if fragment is in shadow
-        float shadow = (dist <= sampledDist + EPSILON) ? 1.0 : 0.1;
+        float shadow = (dist <= sampledDist + EPSILON) ? 1.0 : 0.0;
         // Check if out of light area.
         float radius = lightData.lights[i].radius;
         float strength = (max(radius - dist, 0.0)) / radius;
         resultColor.rgb *= shadow * strength * lightData.lights[i].strength;
         outFragColor.rgb += resultColor.rgb;
+    }
+
+    if (lightData.ambientLightCount > 0) {
+        outFragColor.rgb += inColor * lightData.ambientLight.strength;
     }
     
 }

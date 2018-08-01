@@ -58,8 +58,7 @@ namespace vg
     void LightSpot3::setFOV(float value)
     {
         m_fov = value;
-        auto range = m_range;
-        m_pProjector->updateProj(m_fov, 1.0f, std::min(1.0f, range), range);
+        _setProjector();
     }
 
     float LightSpot3::getRange() const

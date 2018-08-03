@@ -71,7 +71,7 @@ namespace vg
         , m_engineName(VG_ENGINE_NAME)
         , m_engineVersion()
     {
-        m_engineVersion = VK_MAKE_VERSION(std::stoi(VG_VERSION_MAJOR), std::stoi(VG_VERSION_MINOR), std::stoi(VG_VERSION_PATCH));
+        m_engineVersion = VK_MAKE_VERSION(std::stoi(ENGINE_VERSION_MAJOR), std::stoi(ENGINE_VERSION_MINOR), std::stoi(ENGINE_VERSION_PATCH));
     }
 
     Application::~Application()

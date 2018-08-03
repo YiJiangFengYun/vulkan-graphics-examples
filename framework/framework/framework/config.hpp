@@ -1,9 +1,2 @@
-#define VGF_VERSION_MAJOR "0"
-#define VGF_VERSION_MINOR "0"
-#define VGF_VERSION_PATCH "1"
-#define VGF_VERSION_EXTRA ""
-#define VGF_VERSION "0.0"
-#define VGF_VERSION_FULL "0.0.1"
-
 #define _VGF_PLOG_ID 301
 #define USE_IMGUI_BIND

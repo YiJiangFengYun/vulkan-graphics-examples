@@ -1,10 +1,14 @@
 set(LIBRARY_NAME "framework")
 
+set(GEN_ROOT_DIR "${CMAKE_CURRENT_BINARY_DIR}/src")
+set(GEN_SRC_DIR "${GEN_ROOT_DIR}/${LIBRARY_NAME}")
+
 configure_file(
     "${CMAKE_CURRENT_SOURCE_DIR}/config/config.hpp.in"
-    "${CMAKE_CURRENT_SOURCE_DIR}/${LIBRARY_NAME}/config.hpp"
+    "${GEN_SRC_DIR}/config.hpp"
 )
 set(INCLUDE_DIRS ${INCLUDE_DIRS} "${CMAKE_CURRENT_SOURCE_DIR}")
+set(INCLUDE_DIRS ${INCLUDE_DIRS} "${GEN_ROOT_DIR}")
 file(GLOB_RECURSE HEADERS "${LIBRARY_NAME}/*.hpp" "${LIBRARY_NAME}/*.inl")
 file(GLOB_RECURSE SOURCES "${LIBRARY_NAME}/*.cpp")
 include_directories(${INCLUDE_DIRS})

@@ -69,7 +69,7 @@ namespace vg
                 0,                                                    
                 vk::PipelineStageFlagBits::eTopOfPipe,                
                 vk::PipelineStageFlagBits::eEarlyFragmentTests | vk::PipelineStageFlagBits::eLateFragmentTests,    
-                vk::AccessFlagBits::eShaderRead,                                    
+                vk::AccessFlags(),                                    
                 vk::AccessFlagBits::eDepthStencilAttachmentRead | vk::AccessFlagBits::eDepthStencilAttachmentWrite,       
                 vk::DependencyFlagBits::eByRegion                     
             },
@@ -80,7 +80,7 @@ namespace vg
                 vk::PipelineStageFlagBits::eEarlyFragmentTests | vk::PipelineStageFlagBits::eLateFragmentTests,    
                 vk::PipelineStageFlagBits::eBottomOfPipe,             
                 vk::AccessFlagBits::eDepthStencilAttachmentRead | vk::AccessFlagBits::eDepthStencilAttachmentWrite,
-                vk::AccessFlagBits::eShaderRead,                      
+                vk::AccessFlags(),                      
                 vk::DependencyFlagBits::eByRegion         
             }
         };

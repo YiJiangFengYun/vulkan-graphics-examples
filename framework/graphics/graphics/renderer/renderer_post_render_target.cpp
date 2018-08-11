@@ -101,7 +101,7 @@ namespace vg
                 0,                                                    
                 vk::PipelineStageFlagBits::eTopOfPipe,                
                 vk::PipelineStageFlagBits::eColorAttachmentOutput, 
-                vk::AccessFlagBits::eShaderRead,                                    
+                vk::AccessFlags(),                                    
                 vk::AccessFlagBits::eColorAttachmentRead | vk::AccessFlagBits::eColorAttachmentWrite,       
                 vk::DependencyFlagBits::eByRegion                     
             },
@@ -112,7 +112,7 @@ namespace vg
                 vk::PipelineStageFlagBits::eColorAttachmentOutput,    
                 vk::PipelineStageFlagBits::eBottomOfPipe,             
                 vk::AccessFlagBits::eColorAttachmentRead | vk::AccessFlagBits::eColorAttachmentWrite,
-                vk::AccessFlagBits::eShaderRead,                      
+                vk::AccessFlags(),                      
                 vk::DependencyFlagBits::eByRegion         
             }
         };

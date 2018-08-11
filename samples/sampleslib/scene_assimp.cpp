@@ -128,6 +128,8 @@ namespace sampleslib
                 bindingDesc[0].binding = binding;
                 bindingDesc[0].stride = stride;
                 bindingDesc[0].inputRate = vk::VertexInputRate::eVertex;
+
+                uint32_t bindingBufferOffsets[1] = { 0u };
     
                 //Constructing pipeline vertex input state create info.
                 vk::PipelineVertexInputStateCreateInfo vertexInfo = {};
@@ -140,7 +142,7 @@ namespace sampleslib
                 vk::PipelineInputAssemblyStateCreateInfo iaInfo = {};
                 iaInfo.topology = vk::PrimitiveTopology::eTriangleList;
     
-                pSharedVertexData->updateDesData(vertexInfo);
+                pSharedVertexData->updateDesData(vertexInfo, bindingBufferOffsets);
                 pSharedIndexData->updateDesData(vk::IndexType::eUint32, iaInfo);
 
                 vertexSize = stride;
@@ -357,7 +359,7 @@ namespace sampleslib
                     if (vertexSubDataCount)
                     {
                         const auto &firstSubVertexData = pSharedVertexData->getSubVertexDatas()[0];
-                        pSharedVertexData->updateDesData(firstSubVertexData.vertexInputStateInfo);
+                        pSharedVertexData->updateDesData(firstSubVertexData.vertexInputStateInfo, firstSubVertexData.pBindingBufferOffsets);
                         pSharedVertexData->updateVertexCount(vertexCounts);
                         pSharedVertexData->updateBufferSize(vertexBufferSizes);
                     }

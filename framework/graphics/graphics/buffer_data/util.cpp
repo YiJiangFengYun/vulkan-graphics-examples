@@ -208,8 +208,7 @@ namespace vg
         uint32_t count = static_cast<uint32_t>(bindingDescCount);
         for (uint32_t i = 0; i < count; ++i) {
             vertexBuffers[i] = *(pVertexData->getBufferData().getBuffer());
-            offsets[i] = offset;
-            offset += bindingDescs[i].stride * subVertexData.vertexCount;
+            offsets[i] = offset + *(subVertexData.pBindingBufferOffsets + i);
         }
         
         commandBuffer.bindVertexBuffers(0u, vertexBuffers, offsets);

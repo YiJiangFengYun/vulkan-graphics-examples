@@ -14,10 +14,12 @@ namespace vg
         struct SubVertexData {
             uint32_t vertexCount;
             uint32_t bufferSize;
+            const uint32_t *pBindingBufferOffsets;
             vk::PipelineVertexInputStateCreateInfo vertexInputStateInfo;
 
             SubVertexData(uint32_t vertexCount = 0u
                 , uint32_t bufferSize = 0u
+                , const uint32_t *pBindingBufferOffsets = nullptr
                 , vk::PipelineVertexInputStateCreateInfo vertexInputStateInfo = vk::PipelineVertexInputStateCreateInfo());
         };
         
@@ -37,21 +39,17 @@ namespace vg
             , const void *memory
             , uint32_t size
             , Bool32 cacheMemory
-            , const vk::PipelineVertexInputStateCreateInfo &vertexInputStateInfo 
-            );
-        
-        template<typename VertexType>
-        void init(uint32_t vertexCount 
-            , const void *memory
-            , Bool32 cacheMemory
             , const vk::PipelineVertexInputStateCreateInfo &vertexInputStateInfo
+            , const uint32_t *pBindingBufferOffsets
             );
 
         void updateDesData(uint32_t subDataCount, const SubVertexData *pSubDatas);        
-        void updateDesData(const vk::PipelineVertexInputStateCreateInfo &vertexInputStateInfo);
-        void updateDesData(uint32_t vertexCount, uint32_t size, const vk::PipelineVertexInputStateCreateInfo &vertexInputStateInfo);
-        template<typename VertexType>
-        void updateDesData(uint32_t vertexCount, const vk::PipelineVertexInputStateCreateInfo &vertexInputStateInfo);
+        void updateDesData(uint32_t vertexCount, uint32_t bufferSize, const vk::PipelineVertexInputStateCreateInfo &vertexInputStateInfo
+            , const uint32_t *pBindingBufferOffsets
+        );
+        void updateDesData(const vk::PipelineVertexInputStateCreateInfo &vertexInputStateInfo
+            , const uint32_t *pBindingBufferOffsets
+        );
 
         void updateSubDataCount(uint32_t count);
         void updateVertexCount(fd::ArrayProxy<uint32_t> vertexCounts, uint32_t offset = 0u);
@@ -80,6 +78,7 @@ namespace vg
         
     private:
         struct _SubVertexData {
+            std::vector<uint32_t> bindingBufferOffsets;
             std::vector<vk::VertexInputBindingDescription> bindingDescs;
             std::vector<vk::VertexInputAttributeDescription> attrDescs;
             _SubVertexData();

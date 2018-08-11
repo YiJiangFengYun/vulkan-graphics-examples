@@ -249,7 +249,7 @@ namespace vgim
         if (vertexSubDataCount)
         {
             const auto &firstSubVertexData = pVertexData->getSubVertexDatas()[0];
-            pVertexData->updateDesData(firstSubVertexData.vertexInputStateInfo);
+            pVertexData->updateDesData(firstSubVertexData.vertexInputStateInfo, firstSubVertexData.pBindingBufferOffsets);
             pVertexData->updateVertexCount(vertexCounts);
             pVertexData->updateBufferSize(vertexBufferSizes);
         }
@@ -376,10 +376,11 @@ namespace vgim
        vertexInfo.pVertexBindingDescriptions = bindingDesc;
        vertexInfo.vertexAttributeDescriptionCount = 3;
        vertexInfo.pVertexAttributeDescriptions = attributeDesc;
+       uint32_t bindingBufferOffsets[1] = {0u};
 
        vk::PipelineInputAssemblyStateCreateInfo iaInfo = {};
        iaInfo.topology = vk::PrimitiveTopology::eTriangleList;
-       pVertexData->updateDesData(vertexInfo);
+       pVertexData->updateDesData(vertexInfo, bindingBufferOffsets);
        pIndexData->updateDesData(vk::IndexType::eUint16, iaInfo);
     }
 

@@ -76,7 +76,7 @@ namespace vg
         //light data buffer
         , m_lightDataBufferCache([](const vg::InstanceID &sceneID) {
             return std::shared_ptr<BufferData>{new BufferData(vk::BufferUsageFlagBits::eUniformBuffer
-                , vk::MemoryPropertyFlagBits::eHostVisible)
+                , vk::MemoryPropertyFlagBits::eHostVisible | vk::MemoryPropertyFlagBits::eHostCoherent)
             };
         })
         , m_lightTypeCount()

@@ -201,22 +201,25 @@ namespace vgim
         indexSubDataCount = 0u;
         uint32_t vertexOffset = 0u;
         uint32_t indexOffset = 0u;
+
         for (uint32_t i = 0; i < cmdListCount; ++i)
         {
             const ImDrawList* cmdList = drawData->CmdLists[i];
+            uint32_t vertexSize = static_cast<uint32_t>(cmdList->VtxBuffer.Size) * static_cast<uint32_t>(sizeof(ImDrawVert));
             vertexSlices[i].offset = vertexOffset;
-            vertexSlices[i].size = static_cast<uint32_t>(cmdList->VtxBuffer.Size) * static_cast<uint32_t>(sizeof(ImDrawVert));
+            vertexSlices[i].size = vertexSize;
             vertexSlices[i].pMemory = cmdList->VtxBuffer.Data;
 
+            uint32_t indexSize = static_cast<uint32_t>(cmdList->IdxBuffer.Size) * static_cast<uint32_t>(sizeof(ImDrawIdx));
             indexSlices[i].offset = indexOffset;
-            indexSlices[i].size = static_cast<uint32_t>(cmdList->IdxBuffer.Size) * static_cast<uint32_t>(sizeof(ImDrawIdx));
+            indexSlices[i].size = indexSize;
             indexSlices[i].pMemory = cmdList->IdxBuffer.Data;
 
-            vertexOffset += vertexSlices[i].size;
-            indexOffset += indexSlices[i].size;
+            vertexOffset += vertexSize;
+            indexOffset += indexSize;
 
             vertexCounts[vertexSubDataCount] = static_cast<uint32_t>(cmdList->VtxBuffer.Size);
-            vertexBufferSizes[vertexSubDataCount] = vertexCounts[vertexSubDataCount] * static_cast<uint32_t>(sizeof(ImDrawVert));
+            vertexBufferSizes[vertexSubDataCount] = vertexSize;
 
             uint32_t cmdCount = cmdList->CmdBuffer.Size;
             for (uint32_t cmdI = 0; cmdI < cmdCount; ++cmdI)
@@ -343,7 +346,11 @@ namespace vgim
 
     void _createMesh()
     {
-       m_pMesh = static_cast<std::shared_ptr<vg::DimSimpleMesh2>>(new vg::DimSimpleMesh2(vk::MemoryPropertyFlagBits::eHostVisible));
+       m_pMesh = static_cast<std::shared_ptr<vg::DimSimpleMesh2>>(
+           new vg::DimSimpleMesh2(
+               vk::MemoryPropertyFlagBits::eHostVisible | vk::MemoryPropertyFlagBits::eHostCoherent
+               )
+           );
        const auto& pVertexData = m_pMesh->getVertexData();
        const auto& pIndexData = m_pMesh->getIndexData();
        vk::VertexInputBindingDescription bindingDesc[1] = {};

@@ -112,29 +112,21 @@ namespace vg
                 VK_SUBPASS_EXTERNAL,                                  
                 0,                                                    
                 vk::PipelineStageFlagBits::eTopOfPipe,                
-                // vk::PipelineStageFlagBits::eEarlyFragmentTests | 
-                    // vk::PipelineStageFlagBits::eLateFragmentTests | 
-                    vk::PipelineStageFlagBits::eColorAttachmentOutput,    
-                vk::AccessFlagBits::eShaderRead,                                    
-                // vk::AccessFlagBits::eDepthStencilAttachmentRead | 
-                //     vk::AccessFlagBits::eDepthStencilAttachmentWrite |
-                    vk::AccessFlagBits::eColorAttachmentRead |
+                vk::PipelineStageFlagBits::eColorAttachmentOutput,    
+                vk::AccessFlags(),
+                vk::AccessFlagBits::eColorAttachmentRead |
                     vk::AccessFlagBits::eColorAttachmentWrite,
                 vk::DependencyFlagBits::eByRegion,
             },
             vk::SubpassDependency
             {
                 0,                                                    
-                VK_SUBPASS_EXTERNAL,                                  
-                // vk::PipelineStageFlagBits::eEarlyFragmentTests | 
-                    // vk::PipelineStageFlagBits::eLateFragmentTests | 
-                    vk::PipelineStageFlagBits::eColorAttachmentOutput,
+                VK_SUBPASS_EXTERNAL,                                
+                vk::PipelineStageFlagBits::eColorAttachmentOutput,
                 vk::PipelineStageFlagBits::eBottomOfPipe,             
-                // vk::AccessFlagBits::eDepthStencilAttachmentRead | 
-                //     vk::AccessFlagBits::eDepthStencilAttachmentWrite | 
-                    vk::AccessFlagBits::eColorAttachmentRead |
+                vk::AccessFlagBits::eColorAttachmentRead |
                     vk::AccessFlagBits::eColorAttachmentWrite,
-                vk::AccessFlagBits::eShaderRead,                      
+                vk::AccessFlags(),                      
                 vk::DependencyFlagBits::eByRegion         
             }
         };

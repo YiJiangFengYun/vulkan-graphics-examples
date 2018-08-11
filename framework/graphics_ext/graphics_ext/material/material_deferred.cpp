@@ -371,7 +371,7 @@ namespace vge
         dependencies[0].dstSubpass = 0;
         dependencies[0].srcStageMask = vk::PipelineStageFlagBits::eTopOfPipe;
         dependencies[0].dstStageMask = vk::PipelineStageFlagBits::eColorAttachmentOutput | vk::PipelineStageFlagBits::eLateFragmentTests;
-        dependencies[0].srcAccessMask = vk::AccessFlagBits::eShaderRead;
+        dependencies[0].srcAccessMask = vk::AccessFlags();
         dependencies[0].dstAccessMask = vk::AccessFlagBits::eColorAttachmentRead | vk::AccessFlagBits::eColorAttachmentWrite |
             vk::AccessFlagBits::eDepthStencilAttachmentRead | vk::AccessFlagBits::eDepthStencilAttachmentWrite;
         dependencies[0].dependencyFlags = vk::DependencyFlagBits::eByRegion;
@@ -382,15 +382,15 @@ namespace vge
         dependencies[1].dstStageMask = vk::PipelineStageFlagBits::eFragmentShader;
         dependencies[1].srcAccessMask = vk::AccessFlagBits::eColorAttachmentRead | vk::AccessFlagBits::eColorAttachmentWrite |
             vk::AccessFlagBits::eDepthStencilAttachmentRead | vk::AccessFlagBits::eDepthStencilAttachmentWrite;
-        dependencies[1].dstAccessMask = vk::AccessFlagBits::eShaderRead | vk::AccessFlagBits::eColorAttachmentRead | vk::AccessFlagBits::eColorAttachmentWrite;
+        dependencies[1].dstAccessMask = vk::AccessFlagBits::eShaderRead;
         dependencies[1].dependencyFlags = vk::DependencyFlagBits::eByRegion;
     
         dependencies[2].srcSubpass = 1;
         dependencies[2].dstSubpass = VK_SUBPASS_EXTERNAL;
         dependencies[2].srcStageMask = vk::PipelineStageFlagBits::eColorAttachmentOutput;
         dependencies[2].dstStageMask = vk::PipelineStageFlagBits::eBottomOfPipe;
-        dependencies[2].srcAccessMask = vk::AccessFlagBits::eShaderRead | vk::AccessFlagBits::eColorAttachmentRead | vk::AccessFlagBits::eColorAttachmentWrite;
-        dependencies[2].dstAccessMask = vk::AccessFlagBits::eShaderRead;
+        dependencies[2].srcAccessMask = vk::AccessFlagBits::eColorAttachmentRead | vk::AccessFlagBits::eColorAttachmentWrite;
+        dependencies[2].dstAccessMask = vk::AccessFlags();
         dependencies[2].dependencyFlags = vk::DependencyFlagBits::eByRegion;
         
     

@@ -252,7 +252,7 @@ namespace vg
         //Applied
         , m_sortDataSet(_compareDataInfo)
         , m_dataBuffer(vk::BufferUsageFlagBits::eUniformBuffer
-            , vk::MemoryPropertyFlagBits::eHostVisible)
+            , vk::MemoryPropertyFlagBits::eHostVisible | vk::MemoryPropertyFlagBits::eHostCoherent)
         , m_sortBufferTexInfosSet(_compareBufferTextureInfo)
         , m_descriptorSetChanged(VG_FALSE)
         , m_layoutBindingCount()

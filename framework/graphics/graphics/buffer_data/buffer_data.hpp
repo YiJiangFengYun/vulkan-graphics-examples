@@ -50,7 +50,7 @@ namespace vg {
         void *m_pMmemoryForHostVisible;
 
         Bool32 _isDeviceMemoryLocal() const;
-        void _createBuffer(fd::ArrayProxy<MemorySlice> memories, uint32_t memorySize);
+        void _createBuffer(fd::ArrayProxy<MemorySlice> memories, uint32_t bufferSize);
     };
 } //vg
 

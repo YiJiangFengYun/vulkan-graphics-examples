@@ -135,10 +135,10 @@ namespace vg
             vk::MemoryPropertyFlagBits::eDeviceLocal;
     }
         
-    void BufferData::_createBuffer(fd::ArrayProxy<MemorySlice> memories, uint32_t memorySize)
+    void BufferData::_createBuffer(fd::ArrayProxy<MemorySlice> memories, uint32_t bufferSize)
     {
         createBufferForBufferData(memories, 
-            memorySize, 
+            bufferSize,
             _isDeviceMemoryLocal(), 
             m_bufferUsageFlags,
             m_memoryPropertyFlags,

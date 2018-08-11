@@ -390,16 +390,21 @@ namespace vg
 
     void SepMesh::_createVertexData()
     {
+        auto pPhysicalDevice = pApp->getPhysicalDevice();
+        auto nonCoherentAtomSize = pPhysicalDevice->getProperties().limits.nonCoherentAtomSize;
         auto vertexCount = m_appliedVertexCount;
-        vk::PipelineVertexInputStateCreateInfo createInfo;
-        //get size of every vertex
-        uint32_t size = 0u;
+
+        uint32_t i = 0u;
+        std::vector<uint32_t> oneSepBufferSizes(m_layoutBindingInfos.size());
+        uint32_t vertexBufferSize = 0u;
         for (const auto& layoutInfo : m_layoutBindingInfos)
         {
-            size += MeshData::getDataBaseSize(layoutInfo.dataType);
+            oneSepBufferSizes[i] = MeshData::getDataBaseSize(layoutInfo.dataType) * vertexCount;
+            oneSepBufferSizes[i] = static_cast<uint32_t>(std::ceil(static_cast<float>(oneSepBufferSizes[i]) / static_cast<float>(nonCoherentAtomSize)) * nonCoherentAtomSize);
+            vertexBufferSize += oneSepBufferSizes[i];
+
+            ++i;
         }
-        //get vertex buffer size.
-        uint32_t vertexBufferSize = size * vertexCount;
         std::vector<vk::VertexInputBindingDescription> bindingdescs(m_layoutBindingInfos.size());
         uint32_t index = 0u;
         for (const auto& info : m_layoutBindingInfos)
@@ -421,20 +426,25 @@ namespace vg
             ++index;
         }
 
+        vk::PipelineVertexInputStateCreateInfo createInfo;
         createInfo.vertexBindingDescriptionCount = static_cast<uint32_t>(bindingdescs.size());
         createInfo.pVertexBindingDescriptions = bindingdescs.data();
         createInfo.vertexAttributeDescriptionCount = static_cast<uint32_t>(attriDescs.size());
         createInfo.pVertexAttributeDescriptions = attriDescs.data();
 
         void *stagingMemory = malloc(vertexBufferSize);
-        uint32_t offset = 0u;
+        std::vector<uint32_t> bindingOffsets(m_layoutBindingInfos.size());
+        uint32_t offset = 0;
+        i = 0;
         for (const auto& layoutInfo : m_layoutBindingInfos)
         {
             m_pData->memoryCopyData(layoutInfo.dataType, layoutInfo.name, stagingMemory, offset, 0u, vertexCount);
-            offset += MeshData::getDataBaseSize(layoutInfo.dataType) * vertexCount;
+            bindingOffsets[i] = offset;
+            offset += oneSepBufferSizes[i];
+            ++i;
         }
 
-        m_pVertexData->init(vertexCount, stagingMemory, vertexBufferSize, VG_FALSE, createInfo);
+        m_pVertexData->init(vertexCount, stagingMemory, vertexBufferSize, VG_FALSE, createInfo, bindingOffsets.data());
 
         free(stagingMemory);
     }
@@ -442,6 +452,8 @@ namespace vg
     void SepMesh::_createIndexData()
     {
         //get index buffer size
+        auto pPhysicalDevice = pApp->getPhysicalDevice();
+        auto nonCoherentAtomSize = pPhysicalDevice->getProperties().limits.nonCoherentAtomSize;
         uint32_t subCount = m_usingSubMeshInfos.size();
         uint32_t indexBufferSize = 0u;        
         std::vector<IndexData::SubIndexData> subDatas(subCount);
@@ -455,6 +467,8 @@ namespace vg
             subDatas[i].inputAssemblyStateInfo.topology = tranPrimitiveTopologyTypeToVK(m_usingSubMeshInfos[i].topology);
             indexBufferSize += subBufferSize;
         }
+
+        indexBufferSize = static_cast<uint32_t>(std::ceil(static_cast<float>(indexBufferSize) / static_cast<float>(nonCoherentAtomSize)) * nonCoherentAtomSize);
 
         void *stagingMemory = malloc(indexBufferSize);
         uint32_t offset = 0u;

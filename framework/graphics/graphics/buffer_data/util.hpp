@@ -8,7 +8,7 @@
 namespace vg
 {
     extern void createBufferForBufferData(fd::ArrayProxy<MemorySlice> memories
-        , uint32_t memorySize
+        , uint32_t bufferSize
         , Bool32 isDeviceMemoryLocal
         , vk::BufferUsageFlags targetUsage
         , vk::MemoryPropertyFlags memoryPropertyFlags

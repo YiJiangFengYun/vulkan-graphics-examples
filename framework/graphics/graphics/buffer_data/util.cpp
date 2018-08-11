@@ -1,5 +1,6 @@
 #include "graphics/buffer_data/util.hpp"
 
+#include <boost/format.hpp>
 #include "graphics/app/app.hpp"
 #include "graphics/util/find_memory.hpp"
 #include "graphics/util/single_time_command.hpp"
@@ -7,7 +8,7 @@
 namespace vg
 {
     void createBufferForBufferData(fd::ArrayProxy<MemorySlice> memories
-        , uint32_t memorySize
+        , uint32_t bufferSize
         , Bool32 isDeviceMemoryLocal
         , vk::BufferUsageFlags targetUsage
         , vk::MemoryPropertyFlags memoryPropertyFlags
@@ -18,7 +19,49 @@ namespace vg
         , void **resultMemoryForHostVisible
         )
     {
-        auto bufferSize = memorySize;
+        Bool32 isCoherent = (memoryPropertyFlags & vk::MemoryPropertyFlagBits::eHostCoherent) == vk::MemoryPropertyFlagBits::eHostCoherent;
+#ifdef DEBUG
+        //check arguments
+        if (isDeviceMemoryLocal == VG_FALSE && isCoherent == VG_FALSE)
+        {
+            auto pPhysicalDevice = pApp->getPhysicalDevice();
+            auto prop = pPhysicalDevice->getProperties();
+            auto nonCoherentAtomSize = prop.limits.nonCoherentAtomSize;
+
+            if (bufferSize % nonCoherentAtomSize != 0)
+            {
+                throw std::invalid_argument(
+                    boost::str(boost::format(
+                        "Size of buffer is %1%, which is not a multiple of VkPhysicalDeviceLimits::nonCoherentAtomSize(%2%).") %
+                        bufferSize %
+                        nonCoherentAtomSize)
+                );
+            }
+
+            for (const auto &memory : memories)
+            {
+                if (memory.offset % nonCoherentAtomSize != 0)
+                {
+                    throw std::invalid_argument(
+                        boost::str(boost::format(
+                            "Offset of memory slice is %1%, which is not a multiple of VkPhysicalDeviceLimits::nonCoherentAtomSize(%2%).") %
+                            memory.offset %
+                            nonCoherentAtomSize)
+                    );
+                }
+                if (memory.size % nonCoherentAtomSize != 0)
+                {
+                    throw std::invalid_argument(
+                        boost::str(boost::format(
+                            "Size of memory slice is %1%, which is not a multiple of VkPhysicalDeviceLimits::nonCoherentAtomSize(%2%).") %
+                            memory.size %
+                            nonCoherentAtomSize)
+                    );
+                }
+            }
+        }
+
+#endif // DEBUG
 
         if (isDeviceMemoryLocal == VG_TRUE)
         {
@@ -138,11 +181,14 @@ namespace vg
                 ranges[i].offset = offset;
                 ranges[i].size = size;
             }
-            auto pDevice = pApp->getDevice();
-            if (count)
+            if (isCoherent == VG_FALSE)
             {
-                pDevice->flushMappedMemoryRanges(ranges);                
-            }         
+                auto pDevice = pApp->getDevice();
+                if (count)
+                {
+                    pDevice->flushMappedMemoryRanges(ranges);
+                }
+            }
         }
     }
 

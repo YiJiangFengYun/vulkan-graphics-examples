@@ -334,7 +334,7 @@ namespace vg
         vk::SubmitInfo submitInfo = {
             info.waitSemaphoreCount,              //waitSemaphoreCount
             info.pWaitSemaphores,                 //pWaitSemaphores
-            waitStages,                           //pWaitDstStageMask
+            info.pWaitDstStageMask,               //pWaitDstStageMask
             1u,                                   //commandBufferCount
             m_pCommandBuffer.get(),               //pCommandBuffers
             info.signalSemaphoreCount,            //signalSemaphoreCount

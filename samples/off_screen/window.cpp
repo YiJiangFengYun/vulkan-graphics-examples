@@ -38,6 +38,7 @@ void Window::_init()
     _createTexture();
     _createMaterial();
     _createVisualObjects();
+    _createOffscreenSemaphores();
     _initScene();
 }
 
@@ -392,6 +393,15 @@ void Window::_initScene()
     }
 }
 
+void Window::_createOffscreenSemaphores()
+{
+    auto pDevice = vg::pApp->getDevice();
+    vk::SemaphoreCreateInfo createInfo = {
+        vk::SemaphoreCreateFlags()
+    };
+    m_pOffScreenFinishedSemaphore = fd::createSemaphore(pDevice, createInfo);
+}
+
 void Window::_onUpdate()
 {
     ParentWindowType::_onUpdate();
@@ -420,11 +430,26 @@ void Window::_doRender(vg::Renderer::RenderInfo &info
     infoOffscreen.sceneInfoCount = 1u;
     infoOffscreen.pSceneInfos = &tempSceneInfo;
     vg::Renderer::RenderResultInfo offscreenResultInfo;
-    
 
+    infoOffscreen.waitSemaphoreCount = 0u;
+    infoOffscreen.pWaitSemaphores = nullptr;
+    infoOffscreen.pWaitDstStageMask = nullptr;
+    infoOffscreen.signalSemaphoreCount = 1u;
+    infoOffscreen.pSignalSemaphores = m_pOffScreenFinishedSemaphore.get();
+    
     m_pOffScreenRenderer->render(infoOffscreen, offscreenResultInfo);
     drawCount += offscreenResultInfo.drawCount;
 
+    uint32_t waitSemaphoreCount = info.waitSemaphoreCount + 1;
+    std::vector<vk::Semaphore> waitSemaphores(waitSemaphoreCount);
+    std::vector<vk::PipelineStageFlags> waitStages(waitSemaphoreCount);
+    waitSemaphores[0] = *(info.pWaitSemaphores);
+    waitStages[0] = *(info.pWaitDstStageMask);
+    waitSemaphores[1] = *m_pOffScreenFinishedSemaphore;
+    waitStages[1] = vk::PipelineStageFlagBits::eFragmentShader;
+    info.waitSemaphoreCount = waitSemaphoreCount;
+    info.pWaitSemaphores = waitSemaphores.data();
+    info.pWaitDstStageMask = waitStages.data();
 
     vg::Renderer::RenderResultInfo tempResultInfo;
 

@@ -12,10 +12,10 @@ layout(binding = 0) uniform BuildIn {
     mat4 matrixModel;
     mat4 matrixView;
     mat4 matrixProj;
-    mat4 matrixInverse;
 } _buildIn;
 
 layout(binding = 1) uniform OtherInfo {
+    mat4 matrixInverse;
     vec4 lightPos;
 } otherInfo;
 
@@ -32,7 +32,7 @@ out gl_PerVertex
 
 void main() 
 {
-    mat4 matrixObjectToView = _buildIn.matrixView * _buildIn.matrixInverse * _buildIn.matrixModel;
+    mat4 matrixObjectToView = _buildIn.matrixView * otherInfo.matrixInverse * _buildIn.matrixModel;
     mat4 matrixObjectToNDC = _buildIn.matrixProj * matrixObjectToView;
     outNormal = mat3(matrixObjectToView) * inNormal;
     outColor = inColor;

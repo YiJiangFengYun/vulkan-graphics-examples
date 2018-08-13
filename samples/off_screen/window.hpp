@@ -38,6 +38,8 @@ private:
     std::shared_ptr<vg::Texture2D> m_pTexturePlane;    
     std::shared_ptr<vg::Material> m_pMaterialPlane;
 
+    std::shared_ptr<vk::Semaphore> m_pOffScreenFinishedSemaphore;
+
     struct OtherInfo
     {
         vg::Vector4 lightPos;
@@ -59,6 +61,7 @@ private:
     void _createMaterial();
     void _createVisualObjects();
     void _initScene();
+    void _createOffscreenSemaphores();
 
     virtual void _onUpdate() override;
 

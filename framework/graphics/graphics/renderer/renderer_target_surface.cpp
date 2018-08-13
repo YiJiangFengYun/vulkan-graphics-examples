@@ -95,30 +95,22 @@ namespace vg
             {
                 VK_SUBPASS_EXTERNAL,                                  //srcSubpass
                 0,                                                    //dstSubpass
-                vk::PipelineStageFlagBits::eTopOfPipe,                //srcStageMask
-                vk::PipelineStageFlagBits::eColorAttachmentOutput | 
-                    vk::PipelineStageFlagBits::eEarlyFragmentTests |
-                    vk::PipelineStageFlagBits::eLateFragmentTests,    //dstStageMask
-                vk::AccessFlagBits::eMemoryRead,                                    //srcAccessMask
+                vk::PipelineStageFlagBits::eColorAttachmentOutput,                //srcStageMask
+                vk::PipelineStageFlagBits::eColorAttachmentOutput,    //dstStageMask
+                vk::AccessFlags(),                                    //srcAccessMask
                 vk::AccessFlagBits::eColorAttachmentRead |
-                    vk::AccessFlagBits::eColorAttachmentWrite |
-                    vk::AccessFlagBits::eDepthStencilAttachmentRead |
-                    vk::AccessFlagBits::eDepthStencilAttachmentWrite,        //dstAccessMask
+                    vk::AccessFlagBits::eColorAttachmentWrite,        //dstAccessMask
                 vk::DependencyFlagBits::eByRegion                     //dependencyFlags
             },
             vk::SubpassDependency
             {
                 0,                                                    //srcSubpass
                 VK_SUBPASS_EXTERNAL,                                  //dstSubpass
-                vk::PipelineStageFlagBits::eColorAttachmentOutput |
-                    vk::PipelineStageFlagBits::eEarlyFragmentTests |
-                    vk::PipelineStageFlagBits::eLateFragmentTests,    //srcStageMask
-                vk::PipelineStageFlagBits::eBottomOfPipe,             //dstStageMask
+                vk::PipelineStageFlagBits::eColorAttachmentOutput,   //srcStageMask
+                vk::PipelineStageFlagBits::eColorAttachmentOutput,             //dstStageMask
                 vk::AccessFlagBits::eColorAttachmentRead |
-                    vk::AccessFlagBits::eColorAttachmentWrite |
-                    vk::AccessFlagBits::eDepthStencilAttachmentRead |
-                    vk::AccessFlagBits::eDepthStencilAttachmentWrite,        //srcAccessMask
-                vk::AccessFlagBits::eMemoryRead,                      //dstAccessMask
+                    vk::AccessFlagBits::eColorAttachmentWrite,        //srcAccessMask
+                vk::AccessFlags(),                      //dstAccessMask
                 vk::DependencyFlagBits::eByRegion                     //dependencyFlags
             }
         };

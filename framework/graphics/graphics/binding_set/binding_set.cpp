@@ -58,6 +58,7 @@ namespace vg
         , m_poolSizeInfos()
         , m_pDescriptorPool(nullptr)
         , m_pDescriptorSet(nullptr)
+        , m_descriptorSetStateID()
         
     {
     }
@@ -179,6 +180,11 @@ namespace vg
         return m_pDescriptorSet.get();
     }
 
+    BindingSet::DescriptorSetStateID BindingSet::getDescriptorSetStateID() const
+    {
+        return m_descriptorSetStateID;
+    }
+
     void BindingSet::apply()
     {
          const auto &data = m_data;
@@ -249,7 +255,8 @@ namespace vg
             m_dataContentChanges.clear();
         }
 
-        if (m_bufferChanged || m_textureChanged) {
+        if (m_bufferChanged || m_textureChanged) 
+        {
             auto &sortInfos = m_sortBufferTexInfosSet;
             sortInfos.clear();
             const auto &arrBufferNames = data.arrBufferNames;
@@ -367,7 +374,7 @@ namespace vg
                     if (sortInfo.isTexture == VG_TRUE)
                     {
                         const auto &textureData = *(reinterpret_cast<const BindingSetTextureData *>(sortInfo.pData));
-                        bindingInfo.descriptorType = textureData.descriptorType;
+                        bindingInfo.descriptorType = tranImageDescriptorTypeToVK(textureData.descriptorType);
                         bindingInfo.stageFlags = textureData.stageFlags;
                         auto textureCount = static_cast<uint32_t>(textureData.textures.size());
                         auto pDefaultTexture = getDefaultTexture(tranSamplerTextureTypeToVKImageViewType(textureData.textureType));
@@ -407,7 +414,7 @@ namespace vg
                     else
                     {
                         const auto &bufferData = *(reinterpret_cast<const BindingSetBufferData *>(sortInfo.pData));
-                        bindingInfo.descriptorType = bufferData.descriptorType;
+                        bindingInfo.descriptorType = tranBufferDescriptorTypeToVK(bufferData.descriptorType);
                         bindingInfo.stageFlags = bufferData.stageFlags;
                         auto bufferCount = static_cast<uint32_t>(bufferData.buffers.size());
                         bindingInfo.descriptorCount = bufferCount;
@@ -473,6 +480,7 @@ namespace vg
                         m_pDescriptorSetLayout = nullptr;
                     }
                     createdDescriptorSetLayout = VG_TRUE;
+                    _updateDescriptorSetStateID();
                     // Create descriptor set layout will make pipeline layout change.
                     // m_pipelineLayoutChanged = VG_TRUE;
                     // Create descriptor set layout will make descriptor sets change.
@@ -562,6 +570,7 @@ namespace vg
                     }
 
                     //Reallocate descriptor set will make descriptor sets change.
+                    _updateDescriptorSetStateID();
                     // m_descriptorSetsChanged = VG_TRUE;
                 }
             }
@@ -585,7 +594,28 @@ namespace vg
             }
 
             m_descriptorSetChanged = VG_FALSE;
-            
+        }
+    }
+
+    void BindingSet::beginRecord() const
+    {
+#ifdef DEBUG
+        if (m_dataChanged || m_dataContentChanged || m_textureChanged || m_bufferChanged || m_descriptorSetChanged)
+            throw std::runtime_error("Pass should apply change before used to render.");
+#endif //DEBUG
+    }
+        
+    void BindingSet::endRecord() const
+    {
+
+    }
+
+    void BindingSet::_updateDescriptorSetStateID()
+    {
+        ++m_descriptorSetStateID;
+        if ( m_descriptorSetStateID == std::numeric_limits<DescriptorSetStateID>::max())
+        {
+            m_descriptorSetStateID = 1;
         }
     }
     

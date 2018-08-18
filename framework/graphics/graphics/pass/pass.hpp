@@ -13,6 +13,7 @@
 #include "graphics/texture/texture_default.hpp"
 #include "graphics/pass/pass_push_constant.hpp"
 #include "graphics/pass/pass_specialization.hpp"
+#include "graphics/binding_set/binding_set.hpp"
 
 //to do 
 //specilazation constant and push constant
@@ -114,7 +115,8 @@ namespace vg
             _BuildInDataCache &operator=(const _BuildInDataCache &target);
         };
 
-        using PipelineStateID = uint32_t; 
+        using PipelineLayoutStateID = uint32_t;
+        using PipelineStateID = uint32_t;
         struct PushConstantUpdateInfo
         {
             vk::ShaderStageFlags stageFlags;
@@ -349,16 +351,13 @@ namespace vg
         const DepthBiasUpdateInfo &getDepthBiasUpdateInfo() const;
         void setDepthBiasUpdateInfo(const DepthBiasUpdateInfo &value);
 
-        const BufferData &getBufferData() const;
-        const vk::DescriptorSetLayout *getDescriptorSetLayout() const;
-        const vk::DescriptorPool *getDescriptorPool() const;
-        const vk::DescriptorSet *getDescriptorSet() const;
-        const vk::PipelineLayout *getPipelineLayout() const;
+        const BindingSet &getBindingSet() const;
         uint32_t getUsingDescriptorSetCount() const;
         const vk::DescriptorSet *getUsingDescriptorSets() const;
         uint32_t getUsingDescriptorDynamicOffsetCount() const;
         const uint32_t *getUsingDescriptorDynamicOffsets() const;
 
+        PipelineLayoutStateID getPipelineLayoutStateID() const;
         PipelineStateID getPipelineStateID() const;
 
         void apply();
@@ -366,12 +365,9 @@ namespace vg
         void beginRecord() const;
         void endRecord() const;
     private:
-        PassData m_data;
-        Bool32 m_dataChanged;
-        Bool32 m_dataContentChanged;
-        std::unordered_map<std::string, Bool32> m_dataContentChanges;
-        Bool32 m_textureChanged;
-        Bool32 m_bufferChanged;
+        BindingSet m_bindingSet;
+        BindingSet::DescriptorSetStateID m_bindingSetDescriptorSetStateID;
+        PassExtUniformBuffers m_extUniformBuffers;
         Bool32 m_extUniformBufferChanged;
 
         vk::PolygonMode m_polygonMode;
@@ -405,61 +401,6 @@ namespace vg
         DepthBiasUpdateInfo m_depthBiasUpdateInfo;
 
         ////////applied data
-
-        //Build in buffer.
-        struct DataSortInfo {
-            std::string name;
-            vk::ShaderStageFlags shaderStageFlags;
-            uint32_t layoutPriority;
-            uint32_t size;
-            uint32_t bufferSize;
-
-            DataSortInfo(std::string name = nullptr
-                , vk::ShaderStageFlags shaderStageFlags = vk::ShaderStageFlags()
-                , uint32_t layoutPriority = 0u
-                , uint32_t size = 0u
-                , uint32_t bufferSize = 0u
-                );
-        };
-        static Bool32 _compareDataInfo(const DataSortInfo &, const DataSortInfo &);
-        std::set<DataSortInfo, Bool32(*)(const DataSortInfo &, const DataSortInfo &)> m_sortDataSet;
-        BufferData m_dataBuffer;
-
-        //build in descriptor set layout.
-        struct BufferTextureSortInfo {
-            std::string name;
-            uint32_t bindingPriority;
-            Bool32 isTexture;
-            const void *pData;
-
-            BufferTextureSortInfo(std::string name = nullptr
-                , uint32_t bindingPriority = 0u
-                , Bool32 isTexture = VG_FALSE
-                , const void *pData = nullptr
-                );
-        };
-        static Bool32 _compareBufferTextureInfo(const BufferTextureSortInfo &, const BufferTextureSortInfo &);
-        std::set<BufferTextureSortInfo, Bool32(*)(const BufferTextureSortInfo &, const BufferTextureSortInfo &)> m_sortBufferTexInfosSet;
-        Bool32 m_descriptorSetChanged;
-        uint32_t m_layoutBindingCount;
-        std::vector<vk::DescriptorSetLayoutBinding> m_descriptorSetLayoutBindings;
-        struct UpdateDescriptorSetInfo {
-            std::vector<vk::DescriptorBufferInfo> bufferInfos;
-            std::vector<vk::DescriptorImageInfo> imageInfos;
-
-            UpdateDescriptorSetInfo(std::vector<vk::DescriptorBufferInfo> bufferInfos = std::vector<vk::DescriptorBufferInfo>()
-                , std::vector<vk::DescriptorImageInfo> imageInfos = std::vector<vk::DescriptorImageInfo>()
-                );
-        };
-        std::vector<UpdateDescriptorSetInfo> m_updateDescriptorSetInfos;
-        std::shared_ptr<vk::DescriptorSetLayout> m_pDescriptorSetLayout;
-
-        //build in descriptor pool.
-        std::unordered_map<vk::DescriptorType, uint32_t> m_poolSizeInfos;
-        std::shared_ptr<vk::DescriptorPool> m_pDescriptorPool;
-
-        //build in descriptor set
-        std::shared_ptr<vk::DescriptorSet> m_pDescriptorSet;
 
         //external uniform buffer.
         static Bool32 _compareExtUniformBufferInfo(const PassExtUniformBufferInfo &, const PassExtUniformBufferInfo &);
@@ -511,8 +452,7 @@ namespace vg
         std::unordered_map<vk::ShaderStageFlagBits, SpecializationAppliedData> m_mapSpecializationAppliedData;
 
         //pipeline layout
-        std::shared_ptr<vk::PipelineLayout> m_pPipelineLayout;
-        Bool32 m_pipelineLayoutChanged;
+        PipelineLayoutStateID m_pipelineLayoutStateID;
         PipelineStateID m_pipelineStateID;
 
         Shader *m_pShader;
@@ -522,7 +462,10 @@ namespace vg
         
         template <typename T>
         void _updateBuildInData(BuildInDataType type, T data);
+
+        void _updatePipelineLayoutStateID();
         void _updatePipelineStateID();
+        
         void _applyUniformBufferDynamicOffsets();
     };
 }

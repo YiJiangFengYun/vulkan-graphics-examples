@@ -8,7 +8,7 @@ namespace vg
 {
     class BindingSet {
     public:
-
+        using DescriptorSetStateID = uint32_t;
         BindingSet();
 
         Bool32 hasData(std::string name) const;
@@ -58,8 +58,12 @@ namespace vg
         const vk::DescriptorPool *getDescriptorPool() const;
         const vk::DescriptorSet *getDescriptorSet() const;
 
+        DescriptorSetStateID getDescriptorSetStateID() const;
+
         void apply();
 
+        void beginRecord() const;
+        void endRecord() const;
     private:
         BindingSetData m_data;
         Bool32 m_dataChanged;
@@ -121,6 +125,10 @@ namespace vg
 
         //build in descriptor set
         std::shared_ptr<vk::DescriptorSet> m_pDescriptorSet;
+
+        DescriptorSetStateID m_descriptorSetStateID;
+
+        void _updateDescriptorSetStateID();
     };
 } //vg
 

@@ -6,6 +6,30 @@
 #include "graphics/texture/texture.hpp"
 
 namespace vg {
+
+    enum class ImageDescriptorType
+    {
+        COMBINED_IMAGE_SAMPLER,        
+        INPUT_ATTACHMENT,
+        BEGIN_RANGE = COMBINED_IMAGE_SAMPLER,
+        END_RANGE = INPUT_ATTACHMENT,
+        RANGE_SIZE = (END_RANGE - BEGIN_RANGE + 1)
+    };
+
+    enum class BufferDescriptorType
+    {
+        UNIFORM_BUFFER,
+        BEGIN_RANGE = UNIFORM_BUFFER,
+        END_RANGE = UNIFORM_BUFFER,
+        RANGE_SIZE = (END_RANGE - BEGIN_RANGE + 1)
+    };
+
+    extern std::array<std::pair<ImageDescriptorType, vk::DescriptorType>, static_cast<size_t>(ImageDescriptorType::RANGE_SIZE)> arrImageDescriptorTypeToVK;
+    extern std::array<std::pair<BufferDescriptorType, vk::DescriptorType>, static_cast<size_t>(BufferDescriptorType::RANGE_SIZE)> arrBufferDescriptorTypeToVK;
+
+    extern vk::DescriptorType tranImageDescriptorTypeToVK(ImageDescriptorType type);
+    extern vk::DescriptorType tranBufferDescriptorTypeToVK(BufferDescriptorType type);
+    
     struct BindingSetDataInfo {
         uint32_t layoutPriority;
         vk::ShaderStageFlags shaderStageFlags;
@@ -44,13 +68,13 @@ namespace vg {
         uint32_t textureCount;
         const TextureInfo *pTextures;
         uint32_t bindingPriority;
-        vk::DescriptorType descriptorType;
+        ImageDescriptorType descriptorType;
         vk::ShaderStageFlags stageFlags;
         BindingSetTextureInfo(SamplerTextureType textureType = SamplerTextureType::TEX_1D
             , uint32_t textureCount = 0u
             , const TextureInfo *pTextures = nullptr
             , uint32_t bindingPriority = 0u
-            , vk::DescriptorType descriptorType = vk::DescriptorType::eCombinedImageSampler
+            , ImageDescriptorType descriptorType = ImageDescriptorType::COMBINED_IMAGE_SAMPLER
             , vk::ShaderStageFlags stageFlags = vk::ShaderStageFlagBits::eFragment
             );
         BindingSetTextureInfo(const BindingSetTextureInfo &);
@@ -61,12 +85,12 @@ namespace vg {
         SamplerTextureType textureType;
         std::vector<BindingSetTextureInfo::TextureInfo> textures;
         uint32_t bindingPriority;
-        vk::DescriptorType descriptorType;
+        ImageDescriptorType descriptorType;
         vk::ShaderStageFlags stageFlags;
         BindingSetTextureData(SamplerTextureType textureType = SamplerTextureType::TEX_1D
             , std::vector<BindingSetTextureInfo::TextureInfo> textures = {}
             , uint32_t bindingPriority = 0u
-            , vk::DescriptorType descriptorType = vk::DescriptorType::eCombinedImageSampler
+            , ImageDescriptorType descriptorType = ImageDescriptorType::COMBINED_IMAGE_SAMPLER
             , vk::ShaderStageFlags stageFlags = vk::ShaderStageFlagBits::eFragment
             );
         BindingSetTextureData(const BindingSetTextureData &);
@@ -91,12 +115,12 @@ namespace vg {
         uint32_t bufferCount;
         const BufferInfo *pBuffers;
         uint32_t bindingPriority;
-        vk::DescriptorType descriptorType;
+        BufferDescriptorType descriptorType;
         vk::ShaderStageFlags stageFlags;
         BindingSetBufferInfo(uint32_t bufferCount = 0u
             , const BufferInfo *pBuffers = nullptr
             , uint32_t bindingPriority = 0u
-            , vk::DescriptorType descriptorType = vk::DescriptorType::eUniformBuffer
+            , BufferDescriptorType descriptorType = BufferDescriptorType::UNIFORM_BUFFER
             , vk::ShaderStageFlags stageFlags = vk::ShaderStageFlags()
             );
         BindingSetBufferInfo(const BindingSetBufferInfo &);
@@ -106,11 +130,11 @@ namespace vg {
     struct BindingSetBufferData {
         std::vector<BindingSetBufferInfo::BufferInfo> buffers;
         uint32_t bindingPriority;
-        vk::DescriptorType descriptorType;
+        BufferDescriptorType descriptorType;
         vk::ShaderStageFlags stageFlags;
         BindingSetBufferData(std::vector<BindingSetBufferInfo::BufferInfo> buffers = {}
             , uint32_t bindingPriority = 0u
-            , vk::DescriptorType descriptorType = vk::DescriptorType::eUniformBuffer
+            , BufferDescriptorType descriptorType = BufferDescriptorType::UNIFORM_BUFFER
             , vk::ShaderStageFlags stageFlags = vk::ShaderStageFlags()
             );
         BindingSetBufferData(const BindingSetBufferData &);

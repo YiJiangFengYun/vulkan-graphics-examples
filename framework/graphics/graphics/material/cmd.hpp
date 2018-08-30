@@ -137,6 +137,7 @@ namespace vg
         CmdBuffer();
         uint32_t getCmdCount() const;
         const CmdInfo *getCmdInfos() const;
+        void empty();
         void begin();
         void addCmd(CmdInfo cmdInfo);
         void end();

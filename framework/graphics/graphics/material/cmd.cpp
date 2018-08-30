@@ -237,15 +237,18 @@ namespace vg
         , m_imageMemoryBarriers()
     {    
     }    
+
     uint32_t CmdBuffer::getCmdCount() const
     {
         return m_cmdInfoCount;
     }    
+
     const CmdInfo *CmdBuffer::getCmdInfos() const
     {
         return m_cmdInfos.data();
-    }    
-    void CmdBuffer::begin()
+    }
+
+    void CmdBuffer::empty()
     {
         m_cmdInfoCount =  0u;
 
@@ -259,7 +262,13 @@ namespace vg
         m_memoryBarrierCount = 0u;
         m_bufferMemoryBarrierCount = 0u;
         m_imageMemoryBarrierCount = 0u;
-    }    
+    }
+
+    void CmdBuffer::begin()
+    {
+        empty();
+    }
+
     void CmdBuffer::addCmd(CmdInfo cmdInfo)
     {
         addData<CmdInfo, nullptr_t, 0>(m_cmdInfoCount, 

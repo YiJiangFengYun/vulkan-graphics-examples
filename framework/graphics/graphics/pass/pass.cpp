@@ -798,22 +798,32 @@ namespace vg
         return m_bindingSet;
     }
 
-    uint32_t Pass::getUsingDescriptorSetCount() const
+    uint32_t Pass::getDescriptorSetLayoutCount() const
+    {
+        return static_cast<uint32_t>(m_descriptorSetLayouts.size());
+    }
+
+    const vk::DescriptorSetLayout *Pass::getDescriptorSetLayouts() const
+    {
+        return m_descriptorSetLayouts.data();
+    }
+
+    uint32_t Pass::getDescriptorSetCount() const
     {
         return static_cast<uint32_t>(m_descriptorSets.size());
     }
         
-    const vk::DescriptorSet *Pass::getUsingDescriptorSets() const
+    const vk::DescriptorSet *Pass::getDescriptorSets() const
     {
         return m_descriptorSets.data();
     }
 
-    uint32_t Pass::getUsingDescriptorDynamicOffsetCount() const
+    uint32_t Pass::getDescriptorDynamicOffsetCount() const
     {
         return static_cast<uint32_t>(m_dynamicOffsets.size());
     }
 
-    const uint32_t *Pass::getUsingDescriptorDynamicOffsets() const
+    const uint32_t *Pass::getDescriptorDynamicOffsets() const
     {
         return m_dynamicOffsets.data();
     }
@@ -1255,43 +1265,6 @@ namespace vg
         , matrixProjection(target.matrixProjection)
         , posViewer(target.posViewer)
     {
-    }
-
-    Pass::DataSortInfo::DataSortInfo(std::string name
-        , vk::ShaderStageFlags shaderStageFlags
-        , uint32_t layoutPriority
-        , uint32_t size
-        , uint32_t bufferSize
-        )
-        : name(name)
-        , shaderStageFlags(shaderStageFlags)
-        , layoutPriority(layoutPriority)
-        , size(size)
-        , bufferSize(bufferSize)
-    {
-
-    }
-
-    Pass::BufferTextureSortInfo::BufferTextureSortInfo(std::string name
-        , uint32_t bindingPriority
-        , Bool32 isTexture
-        , const void *pData
-        )
-        : name(name)
-        , bindingPriority(bindingPriority)
-        , isTexture(isTexture)
-        , pData(pData)
-    {
-
-    }
-
-    Pass::UpdateDescriptorSetInfo::UpdateDescriptorSetInfo(std::vector<vk::DescriptorBufferInfo> bufferInfos
-        , std::vector<vk::DescriptorImageInfo> imageInfos
-        )
-        :  bufferInfos(bufferInfos)
-        , imageInfos(imageInfos)
-    {
-
     }
 
     Pass::PushConstantSortInfo::PushConstantSortInfo(std::string name

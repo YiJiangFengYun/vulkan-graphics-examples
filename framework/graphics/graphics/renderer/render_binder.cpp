@@ -104,6 +104,8 @@ namespace vg
 
     void RenderBinder::_beginBind()
     {
+        m_bindedObjectCountForPreDepth = 0u;
+        m_bindedObjectCountForLighting = 0u;
         m_bindedObjectCount = 0u;
     }
 
@@ -976,7 +978,7 @@ namespace vg
                     result.pTrunkRenderPassCmdBuffer = pPreDepthCmdBuffer;
                     result.pBranchCmdBuffer = nullptr;
                     result.pTrunkWaitBarrierCmdBuffer = nullptr;
-                    _bindVisualObject(VG_FALSE, VG_TRUE, pVisualObject, info, &result);
+                    _bindVisualObject(nullptr, VG_TRUE, pVisualObject, info, &result);
                 }
     
                 if (pTrunkRenderPassCmdBuffer != nullptr)

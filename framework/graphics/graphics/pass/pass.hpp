@@ -352,10 +352,12 @@ namespace vg
         void setDepthBiasUpdateInfo(const DepthBiasUpdateInfo &value);
 
         const BindingSet &getBindingSet() const;
-        uint32_t getUsingDescriptorSetCount() const;
-        const vk::DescriptorSet *getUsingDescriptorSets() const;
-        uint32_t getUsingDescriptorDynamicOffsetCount() const;
-        const uint32_t *getUsingDescriptorDynamicOffsets() const;
+        uint32_t getDescriptorSetLayoutCount() const;
+        const vk::DescriptorSetLayout *getDescriptorSetLayouts() const;
+        uint32_t getDescriptorSetCount() const;
+        const vk::DescriptorSet *getDescriptorSets() const;
+        uint32_t getDescriptorDynamicOffsetCount() const;
+        const uint32_t *getDescriptorDynamicOffsets() const;
 
         PipelineLayoutStateID getPipelineLayoutStateID() const;
         PipelineStateID getPipelineStateID() const;

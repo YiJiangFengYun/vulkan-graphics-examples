@@ -1,15 +1,19 @@
 #include <stdlib.h>
 #include <stdio.h>
+#include <string>
+#include <boost/filesystem.hpp>
 
-FILE* open_or_exit(const char* fname, const char* mode)
+FILE* open_or_exit(const char* path, const char* mode)
 {
-    FILE* f;
-    errno_t err = fopen_s(&f, fname, mode);
-    if (err != 0) {
-        perror(fname);
+    auto boostPath = boost::filesystem::path(path);
+    boost::filesystem::create_directory(boostPath.parent_path());
+    FILE* fp = fopen(path, mode);
+    if ( !fp ) {
+        auto errStr = std::string("failed to open file ") + std::string(path);
+        perror(errStr.c_str());
         exit(1);
     }
-    return f;
+    return fp;
 }
 
 int main(int argc, char** argv)

@@ -1,5 +1,15 @@
+
+set(Boost_USE_STATIC_LIBS ON)
+find_package(Boost REQUIRED filesystem)
+
 set(GEN_NAME "embed_file_to_code")
 set(GEN_FOLDER_NAME "generator")
 file(GLOB_RECURSE SOURCES "*.cpp")
+set(INCLUDE_DIRS ${Boost_INCLUDE_DIRS})
+set(LIBRARIES ${Boost_LIBRARIES})
+message(STATUS "embed_file_to_code include dirs: ${INCLUDE_DIRS}")
+message(STATUS "embed_file_to_code libaries: ${LIBRARIES}")
+include_directories(${INCLUDE_DIRS})
 add_executable(${GEN_NAME} ${SOURCES})
+target_link_libraries(${GEN_NAME} ${LIBRARIES})
 set_property(TARGET ${GEN_NAME} PROPERTY FOLDER ${GEN_FOLDER_NAME})

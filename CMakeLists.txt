@@ -109,10 +109,21 @@ endif(WIN32)
 
 set(INCLUDE_DIRS ${INCLUDE_DIRS} ${Vulkan_INCLUDE_DIRS})
 set(LIBRARIES ${LIBRARIES} ${Vulkan_LIBRARIES})
+if(WIN32)
+    if(CMAKE_SIZEOF_VOID_P EQUAL 8)
+        # 64 bits
+        set(Vulkan_BIN_DIR "${Vulkan_INCLUDE_DIR}/../Bin")
+    elseif(CMAKE_SIZEOF_VOID_P EQUAL 4)
+        # 32 bits
+        set(Vulkan_BIN_DIR "${Vulkan_INCLUDE_DIR}/../Bin32")
+    endif()
+endif(WIN32)
+
 message(STATUS "Vulkan_INCLUDE_DIR: ${Vulkan_INCLUDE_DIR}")
 message(STATUS "Vulkan_INCLUDE_DIRS: ${Vulkan_INCLUDE_DIRS}")
 message(STATUS "Vulkan_LIBRARY: ${Vulkan_LIBRARY}")
 message(STATUS "Vulkan_LIBRARIES: ${Vulkan_LIBRARIES}")
+message(STATUS "Vulkan_BIN_DIR: ${Vulkan_BIN_DIR}")
 
 #find boost
 #now we only use boost head file code.

@@ -3,9 +3,9 @@
         {
             "name": "MinGW",
             "intelliSenseMode": "gcc-x64",
-            "compilerPath": "C:/mingw64/bin/gcc.exe",
+            "compilerPath": "${MINGW_ROOT}/bin/gcc.exe",
             "includePath": [
-                "${MINGW_ROOT}/lib/gcc/mingw32/8.2.0/include",
+                "${MINGW_ROOT}/lib/gcc/mingw32/${MINGW_GCC_VERSION}/include",
                 "${VK_SDK_PATH}/include",
                 "${BOOST_ROOT}/include",
                 "${workspaceRoot}/libs/glfw/include",

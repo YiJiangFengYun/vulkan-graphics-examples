@@ -71,13 +71,13 @@ namespace vg {
         PipelineCache();
         ~PipelineCache();
         /**
-         * When start of new frame calling this mehod to move cache to back and make cache
+         * When frame begin, this method is called to move cache to back and make cache
          * to empty. After rendering process, we will pick useful pipeline from back.
          **/
         void begin();
         std::shared_ptr<vk::Pipeline> caching(const Info &info);
         /**
-         * At end of render of frame, we call this method to delete all unuseful pipeline in back.
+         * At end of frame, this method is called to delete all useless pipeline in back.
          **/
         void end();
 

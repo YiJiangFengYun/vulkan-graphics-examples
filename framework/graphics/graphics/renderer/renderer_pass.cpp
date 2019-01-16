@@ -76,9 +76,18 @@ namespace vg
         _initBuildInData();
     }
         
-    RendererPass::RendererPass(vg::Pass pass)
+    RendererPass::RendererPass(const vg::Pass *pPass)
+        : m_pPass(pPass)
+        , m_buildInDataCache()
+        , m_bindingSet() 
     {
-        
+        _initBuildInData();
+    }
+
+    void RendererPass::setPass(const vg::Pass *pPass)
+    {
+        m_pPass = pPass;
+        _initBuildInData();
     }
 
     void RendererPass::setBuildInDataMatrix4x4(Pass::BuildInDataType type, Matrix4x4 matrix)
@@ -158,6 +167,53 @@ namespace vg
         {
             m_bindingSet.removeData(VG_PASS_BUILDIN_DATA_NAME);
         }
+    }
+
+    RendererPassCache::RendererPassCache()
+        : m_mapPasses()
+        , m_mapPassesBack()
+    {
+
+    }
+
+    RendererPassCache::~RendererPassCache()
+    {
+
+    }
+
+    void RendererPassCache::begin()
+    {
+        m_mapPassesBack = m_mapPasses;
+        m_mapPasses.clear();
+    }
+
+    RendererPass *RendererPassCache::caching(const Pass *pPass)
+    {
+        auto pOld = m_mapPassesBack[pPass->getID()];
+        RendererPass * pCurr;
+        if (pOld != nullptr) {
+            m_mapPasses[pPass->getID()] = pOld;
+            m_mapPassesBack.erase(pPass->getID());
+            pCurr = pOld.get();
+        } else {
+            auto pNew = _createNewRendererPass(pPass);
+            m_mapPasses[pPass->getID()] = pNew;
+            pCurr = pNew.get();
+        }
+
+        return pCurr;
+    }
+
+    void RendererPassCache::end()
+    {
+        //Delete useless renderer passes.
+        m_mapPassesBack.clear();
+    }
+
+    std::shared_ptr<RendererPass> RendererPassCache::_createNewRendererPass(const Pass *pPass)
+    {
+        auto pRendererPass = std::shared_ptr<RendererPass>{new RendererPass(pPass)};
+        return pRendererPass;
     }
 
 

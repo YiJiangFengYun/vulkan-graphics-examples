@@ -88,8 +88,8 @@ namespace vg
         };
 
         RendererPass();
-        RendererPass(vg::Pass pass);
-        void setPass(vg::Pass pass);
+        RendererPass(const vg::Pass *pPass);
+        void setPass(const vg::Pass *pPass);
 
         void setBuildInDataMatrix4x4(Pass::BuildInDataType type, Matrix4x4 matrix);
         void setBuildInDataVector4(Pass::BuildInDataType type, Vector4 vector);
@@ -104,6 +104,32 @@ namespace vg
         template <typename T>
         void _updateBuildInData(Pass::BuildInDataType type, T data);
 
+    };
+
+    class RendererPassCache
+    {
+    public:
+        RendererPassCache();
+        ~RendererPassCache();
+
+        /**
+         * When frame begin, It is called to move cache to back and make cache
+         * to empty. After rendering process, we will pick useful pipeline from back.
+         **/
+        void begin();
+
+        RendererPass *caching(const Pass *pPass);
+
+        /**
+         * When frame end,  it is called to delete all useless cached pass.
+         **/
+        void end();
+
+    private:
+        //Map between pass and renderer pass, key is instance ID of pass.
+        std::unordered_map<InstanceID, std::shared_ptr<RendererPass>> m_mapPasses;
+        std::unordered_map<InstanceID, std::shared_ptr<RendererPass>> m_mapPassesBack;
+        std::shared_ptr<RendererPass> _createNewRendererPass(const Pass *pPass);
     };
 } //vg
 

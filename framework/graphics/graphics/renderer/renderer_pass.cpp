@@ -187,14 +187,15 @@ namespace vg
         m_mapPasses.clear();
     }
 
-    RendererPass *RendererPassCache::caching(const Pass *pPass)
+    RendererPass *RendererPassCache::get(const Pass *pPass)
     {
-        auto pOld = m_mapPassesBack[pPass->getID()];
         RendererPass * pCurr;
-        if (pOld != nullptr) {
-            m_mapPasses[pPass->getID()] = pOld;
+        if (m_mapPasses[pPass->getID()] != nullptr) {
+            pCurr = m_mapPasses[pPass->getID()].get();
+        } else if (m_mapPassesBack[pPass->getID()] != nullptr) {
+            m_mapPasses[pPass->getID()] = m_mapPassesBack[pPass->getID()];
             m_mapPassesBack.erase(pPass->getID());
-            pCurr = pOld.get();
+            pCurr = m_mapPassesBack[pPass->getID()].get();
         } else {
             auto pNew = _createNewRendererPass(pPass);
             m_mapPasses[pPass->getID()] = pNew;

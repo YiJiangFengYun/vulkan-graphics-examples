@@ -118,7 +118,7 @@ namespace vg
          **/
         void begin();
 
-        RendererPass *caching(const Pass *pPass);
+        RendererPass *get(const Pass *pPass);
 
         /**
          * When frame end,  it is called to delete all useless cached pass.

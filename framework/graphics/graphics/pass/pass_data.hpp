@@ -7,25 +7,6 @@
 #include "graphics/texture/texture.hpp"
 #include "graphics/pass/pass_option.hpp"
 
-
-#define VG_PASS_BUILDIN_DATA_NAME "_BuildIn"
-
-#define VG_PASS_PRE_DEPTH_TEXTURE_NAME "_pre_depth_depth_tex"
-#define VG_PASS_POST_RENDER_TEXTURE_NAME "_post_render_tex"
-#define VG_PASS_LIGHT_DATA_BUFFER_NAME "_light_data_buffer"
-#define VG_PASS_LIGHT_TEXTURE_NAME "_light_texture"
-#define VG_PASS_LIGHT_RENDER_DATA_NAME "_light_render_data"
-
-#define VG_PASS_BUILDIN_DATA_LAYOUT_PRIORITY 0
-#define VG_PASS_LIGHT_RENDER_DATA_LAYOUT_PRIORITY 1
-#define VG_PASS_OTHER_DATA_MIN_LAYOUT_PRIORITY 2
-
-#define VG_PASS_PRE_DEPTH_TEXTURE_BINDING_PRIORITY 0
-#define VG_PASS_POST_RENDER_TEXTURE_BINDING_PRIORITY 1
-#define VG_PASS_LIGHT_DATA_BUFFER_BINDING_PRIORITY 2
-#define VG_PASS_LIGHT_TEXTURE_MIN_BINDING_PRIORITY 3
-#define VG_PASS_OTHER_MIN_BINDING_PRIORITY 100
-
 namespace vg
 {
     struct PassExtUniformBufferInfo 
@@ -59,7 +40,5 @@ namespace vg
         void setExtUniformBuffer(std::string name, const PassExtUniformBufferInfo &extUniformBufferInfo);
     };
 } //vg
-
-#include "graphics/pass/pass_data.inl"
 
 #endif //VG_PASS_DATA_HPP

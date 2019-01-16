@@ -23,15 +23,6 @@ namespace vg
         return *this;
     }
 
-    const std::array<uint32_t, static_cast<size_t>(Pass::BuildInDataType::COUNT)> Pass::buildInDataTypeSizes = {
-        sizeof(BuildInDataTypeTypeInfo<BuildInDataType::MATRIX_OBJECT_TO_NDC>::Type),
-        sizeof(BuildInDataTypeTypeInfo<BuildInDataType::MAIN_CLOLOR>::Type),
-        sizeof(BuildInDataTypeTypeInfo<BuildInDataType::MATRIX_OBJECT_TO_WORLD>::Type),
-        sizeof(BuildInDataTypeTypeInfo<BuildInDataType::MATRIX_OBJECT_TO_VIEW>::Type),
-        sizeof(BuildInDataTypeTypeInfo<BuildInDataType::MATRIX_VIEW>::Type),
-        sizeof(BuildInDataTypeTypeInfo<BuildInDataType::MATRIX_PROJECTION>::Type)
-    };
-
     Pass::PushConstantUpdateInfo::PushConstantUpdateInfo(vk::ShaderStageFlags stageFlags
         , uint32_t offset
         , uint32_t size
@@ -207,7 +198,6 @@ namespace vg
         , m_pushConstant()
         , m_buildInDataInfo()
         , m_buildInDataInfoComponents()
-        , m_buildInDataCache()
         , m_vertexInputFilterInfo()
         , m_vertexInputFilterLocations()
         , m_depthBiasInfo()
@@ -231,7 +221,6 @@ namespace vg
         
     {
         _initDefaultBuildInDataInfo();
-        _initBuildInData();
     }
 
     Pass::Pass(Shader *pShader)
@@ -376,13 +365,12 @@ namespace vg
 
     Color Pass::getMainColor() const
     {
-        return m_buildInDataCache.mainColor;
+        return m_mainColor;
     }
 
     void Pass::setMainColor(Color color)
     {
-        // m_buildInDataCache.mainColor = color;
-        _updateBuildInData(BuildInDataType::MAIN_CLOLOR, color);
+        m_mainColor = color;
     }
 
      void Pass::setBuildInDataInfo(BuildInDataInfo info)
@@ -392,24 +380,13 @@ namespace vg
         memcpy(m_buildInDataInfoComponents.data(), info.pComponent, 
             static_cast<size_t>(info.componentCount) * sizeof(BuildInDataInfo::Component));
         m_buildInDataInfo.pComponent = m_buildInDataInfoComponents.data();
-        _initBuildInData();
+        // _initBuildInData();
      }
 
      const Pass::BuildInDataInfo &Pass::getBuildInDataInfo() const
      {
          return m_buildInDataInfo;
      }
-
-    void Pass::setBuildInDataMatrix4x4(BuildInDataType type, Matrix4x4 matrix)
-    {
-        _updateBuildInData(type, matrix);
-    }
-
-
-    void Pass::setBuildInDataVector4(BuildInDataType type, Vector4 vector)
-    {
-        _updateBuildInData(type, vector);
-    }
 
 
     vk::PolygonMode Pass::getPolygonMode() const
@@ -1063,75 +1040,6 @@ namespace vg
         m_buildInDataInfo.pComponent = m_buildInDataInfoComponents.data();
     }
 
-    void Pass::_initBuildInData()
-    {
-        uint32_t size = 0u;
-        auto componentCount = m_buildInDataInfo.componentCount;
-        for (uint32_t componentIndex = 0; componentIndex < componentCount; ++componentIndex)
-        {
-            BuildInDataType type = (*(m_buildInDataInfo.pComponent + componentIndex)).type;
-            uint32_t count = static_cast<uint32_t>(BuildInDataType::COUNT);
-            for (uint32_t i = 0; i < count; ++i)
-            {
-                if (i == static_cast<uint32_t>(type))
-                {
-                    size += buildInDataTypeSizes[i];
-                    break;
-                }
-            }
-        }
-
-        if (size > 0)
-        {
-            PassDataInfo info = {
-                VG_PASS_BUILDIN_DATA_LAYOUT_PRIORITY,
-                vk::ShaderStageFlagBits::eAllGraphics,
-            };
-            PassDataSizeInfo sizeInfo = {
-                size,
-            };
-            if (hasData(VG_PASS_BUILDIN_DATA_NAME) == VG_FALSE)
-            {
-                addData(VG_PASS_BUILDIN_DATA_NAME, info, sizeInfo);
-            }
-            else
-            {
-                setData(VG_PASS_BUILDIN_DATA_NAME, info, sizeInfo);
-            }
-
-            uint32_t offset1 = 0u;
-            for (uint32_t componentIndex = 0; componentIndex < componentCount; ++componentIndex)
-            {
-                BuildInDataType type = (*(m_buildInDataInfo.pComponent + componentIndex)).type;
-                uint32_t count = static_cast<uint32_t>(BuildInDataType::COUNT);
-                uint32_t offset2= 0u;
-                for (uint32_t i = 0; i < count; ++i)
-                {
-                    if (i == static_cast<uint32_t>(type))
-                    {
-                        setData(VG_PASS_BUILDIN_DATA_NAME
-                            , ((char *)(&m_buildInDataCache) + offset2)
-                            , buildInDataTypeSizes[static_cast<uint32_t>(type)]
-                            , offset1);
-                        break;
-                    }
-                    else
-                    {
-                        offset2 += buildInDataTypeSizes[i];
-                    }
-                }
-                offset1 += buildInDataTypeSizes[static_cast<uint32_t>(type)];
-            }
-        }
-        else if (m_data.hasData(VG_PASS_BUILDIN_DATA_NAME))
-        {
-            m_data.removeData(VG_PASS_BUILDIN_DATA_NAME);
-        }
-        
-        
-        m_dataChanged = VG_TRUE;
-    }
-
     void Pass::_updatePipelineLayoutStateID()
     {
         ++m_pipelineLayoutStateID;
@@ -1211,60 +1119,6 @@ namespace vg
                 }
             }
         }
-    }
-    
-    Pass::_BuildInDataCache::_BuildInDataCache(Matrix4x4 matrixObjectToNDC
-        , Color mainColor
-        , Matrix4x4 matrixObjectToWorld
-        , Matrix4x4 matrixObjectToView
-        , Matrix4x4 matrixView
-        , Matrix4x4 matrixProjection
-        , Vector4 posViewer
-        )
-        : matrixObjectToNDC(matrixObjectToNDC)
-        , mainColor(mainColor)
-        , matrixObjectToWorld(matrixObjectToWorld)
-        , matrixObjectToView(matrixObjectToView)
-        , matrixView(matrixView)
-        , matrixProjection(matrixProjection)
-        , posViewer(posViewer)
-    {
-
-    }
-
-    Pass::_BuildInDataCache::_BuildInDataCache(const _BuildInDataCache &target)
-        : matrixObjectToNDC(target.matrixObjectToNDC)
-        , mainColor(target.mainColor)
-        , matrixObjectToWorld(target.matrixObjectToWorld)
-        , matrixObjectToView(target.matrixObjectToView)
-        , matrixView(target.matrixView)
-        , matrixProjection(target.matrixProjection)
-        , posViewer(target.posViewer)
-    {
-
-    }
-
-    Pass::_BuildInDataCache &Pass::_BuildInDataCache::operator=(const _BuildInDataCache &target)
-    {
-        matrixObjectToNDC = target.matrixObjectToNDC;
-        mainColor = target.mainColor;
-        matrixObjectToWorld = target.matrixObjectToWorld;
-        matrixObjectToView = target.matrixObjectToView;
-        matrixView = target.matrixView;
-        matrixProjection = target.matrixProjection;
-        posViewer = target.posViewer;
-        return *this;
-    }
-
-    Pass::_BuildInDataCache::_BuildInDataCache(const _BuildInDataCache &&target)
-        : matrixObjectToNDC(target.matrixObjectToNDC)
-        , mainColor(target.mainColor)
-        , matrixObjectToWorld(target.matrixObjectToWorld)
-        , matrixObjectToView(target.matrixObjectToView)
-        , matrixView(target.matrixView)
-        , matrixProjection(target.matrixProjection)
-        , posViewer(target.posViewer)
-    {
     }
 
     Pass::PushConstantSortInfo::PushConstantSortInfo(std::string name

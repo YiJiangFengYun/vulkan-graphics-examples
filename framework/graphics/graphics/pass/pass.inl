@@ -95,51 +95,5 @@ namespace vg
     {
         m_pushConstant.setPushConstantUpdate(name, offset, data);
     }
-
-    template <typename T>
-    void Pass::_updateBuildInData(BuildInDataType type, T data)
-    {
-        uint32_t count = static_cast<uint32_t>(BuildInDataType::COUNT);
-        uint32_t offset1 = 0u;
-        uint32_t i = 0u;
-        for (i = 0; i < count; ++i)
-        {
-            if (i != static_cast<uint32_t>(type))
-            {
-                offset1 += buildInDataTypeSizes[i];
-            }
-            else
-            {
-                break;
-            }
-        }
-
-        uint32_t offset2 = 0u;
-        uint32_t componentCount = m_buildInDataInfo.componentCount;
-        for (uint32_t componentIndex = 0u; componentIndex < componentCount; ++componentIndex)
-        {
-            Pass::BuildInDataType comType = (*(m_buildInDataInfo.pComponent + componentIndex)).type;
-            if (type != comType)
-            {
-                offset2 += buildInDataTypeSizes[static_cast<uint32_t>(comType)];
-            }
-            else
-            {
-                break;
-            }
-        }
-
-        if ( i < count)
-        {
-            size_t size = sizeof(T);
-            if (memcmp((char *)(&m_buildInDataCache) + offset1, &data, size) != 0) {
-                memcpy((char *)(&m_buildInDataCache) + offset1, &data, size);
-                setData(VG_PASS_BUILDIN_DATA_NAME
-                    , &data
-                    , size
-                    , offset2);
-            }
-        }
-    }
     
 } //namespace kgs

@@ -34,50 +34,6 @@ namespace vg
             COUNT = 7
         };
 
-        template<BuildInDataType type>
-        struct BuildInDataTypeTypeInfo
-        {
-            using Type = void;
-        };
-
-        template<>
-        struct BuildInDataTypeTypeInfo<BuildInDataType::MATRIX_OBJECT_TO_NDC>
-        {
-            using Type = Matrix4x4;
-        };
-
-        template<>
-        struct BuildInDataTypeTypeInfo<BuildInDataType::MAIN_CLOLOR>
-        {
-            using Type = Color;
-        };
-
-        template<>
-        struct BuildInDataTypeTypeInfo<BuildInDataType::MATRIX_OBJECT_TO_WORLD>
-        {
-            using Type = Matrix4x4;
-        };
-
-        template<>
-        struct BuildInDataTypeTypeInfo<BuildInDataType::MATRIX_OBJECT_TO_VIEW>
-        {
-            using Type = Matrix4x4;
-        };
-
-        template<>
-        struct BuildInDataTypeTypeInfo<BuildInDataType::MATRIX_VIEW>
-        {
-            using Type = Matrix4x4;
-        };
-
-        template<>
-        struct BuildInDataTypeTypeInfo<BuildInDataType::MATRIX_PROJECTION>
-        {
-            using Type = Matrix4x4;
-        };
-
-        static const std::array<uint32_t, static_cast<size_t>(BuildInDataType::COUNT)> buildInDataTypeSizes;
-
         struct BuildInDataInfo
         {
             struct Component {
@@ -89,30 +45,6 @@ namespace vg
             BuildInDataInfo(uint32_t componentCount = 0u, Component *pComponent = nullptr);
             BuildInDataInfo(const BuildInDataInfo &target);
             BuildInDataInfo &operator=(const BuildInDataInfo &target);
-        };
-
-        struct _BuildInDataCache
-        {
-            Matrix4x4 matrixObjectToNDC;
-            Color     mainColor;
-            Matrix4x4 matrixObjectToWorld;
-            Matrix4x4 matrixObjectToView;
-            Matrix4x4 matrixView;
-            Matrix4x4 matrixProjection;
-            Vector4 posViewer;
-
-            _BuildInDataCache(Matrix4x4 matrixObjectToNDC = Matrix4x4(1.0f)
-                , Color mainColor = Color(1.0f)
-                , Matrix4x4 matrixObjectToWorld = Matrix4x4(1.0f)
-                , Matrix4x4 matrixObjectToView = Matrix4x4(1.0f)
-                , Matrix4x4 matrixView = Matrix4x4(1.0f)
-                , Matrix4x4 matrixProjection = Matrix4x4(1.0f)
-                , Vector4 posViewer = Vector4(0.0f, 0.0f, 0.0f, 1.0f)
-                );
-
-            _BuildInDataCache(const _BuildInDataCache &target);
-            _BuildInDataCache(const _BuildInDataCache &&target);
-            _BuildInDataCache &operator=(const _BuildInDataCache &target);
         };
 
         using PipelineLayoutStateID = uint32_t;
@@ -245,9 +177,6 @@ namespace vg
         void setBuildInDataInfo(BuildInDataInfo info);
         const BuildInDataInfo &getBuildInDataInfo() const;
 
-        void setBuildInDataMatrix4x4(BuildInDataType type, Matrix4x4 matrix);
-        void setBuildInDataVector4(BuildInDataType type, Vector4 vector);
-
         vk::PolygonMode getPolygonMode() const;
         void setPolygonMode(vk::PolygonMode polygonMode);
 
@@ -367,6 +296,7 @@ namespace vg
         void beginRecord() const;
         void endRecord() const;
     private:
+        Color m_mainColor;
         BindingSet m_bindingSet;
         BindingSet::DescriptorSetStateID m_bindingSetDescriptorSetStateID;
         PassExtUniformBuffers m_extUniformBuffers;
@@ -394,7 +324,6 @@ namespace vg
 
         BuildInDataInfo m_buildInDataInfo;
         std::vector<BuildInDataInfo::Component> m_buildInDataInfoComponents;
-        _BuildInDataCache m_buildInDataCache;
 
         VertexInputFilterInfo m_vertexInputFilterInfo;
         std::vector<uint32_t> m_vertexInputFilterLocations;
@@ -460,10 +389,6 @@ namespace vg
         Shader *m_pShader;
 
         void _initDefaultBuildInDataInfo();
-        void _initBuildInData();
-        
-        template <typename T>
-        void _updateBuildInData(BuildInDataType type, T data);
 
         void _updatePipelineLayoutStateID();
         void _updatePipelineStateID();

@@ -7,13 +7,13 @@ layout (location = 0) in vec3 inPos;
 layout (location = 1) in vec3 inColor;
 layout (location = 2) in vec3 inNormal;
 
-layout (binding = 0) uniform BuildIn 
+layout (set = 0, binding = 0) uniform BuildIn 
 {
     mat4 matrixToNDC;
     mat4 matrixToWorld;
 } _buildIn;
 
-layout (binding = 1) uniform LightInfo
+layout (set = 1, binding = 0) uniform LightInfo
 {
     vec4 lightPos;
 } lightInfo;

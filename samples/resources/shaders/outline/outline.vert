@@ -6,12 +6,12 @@
 layout (location = 0) in vec4 inPos;
 layout (location = 2) in vec3 inNormal;
 
-layout (binding = 0) uniform Data 
+layout (set = 0, binding = 0) uniform Data 
 {
     mat4 matrixToNDC;
 } dataVert;
 
-layout (binding = 1) uniform SetInfo
+layout (set = 1, binding = 0) uniform SetInfo
 {
     vec4 outlineWidth;    //(float storaged in x position)
 } setInfo;

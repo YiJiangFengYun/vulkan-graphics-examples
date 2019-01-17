@@ -3,8 +3,8 @@
 #extension GL_ARB_separate_shader_objects : enable
 #extension GL_ARB_shading_language_420pack : enable
 
-layout (binding = 0) uniform sampler2D colorSampler;
-layout (binding = 1) uniform sampler2D depthSampler;
+layout (set = 1, binding = 0) uniform sampler2D colorSampler;
+layout (set = 1, binding = 1) uniform sampler2D depthSampler;
 
 layout (location = 0) in vec2 inUV;
 

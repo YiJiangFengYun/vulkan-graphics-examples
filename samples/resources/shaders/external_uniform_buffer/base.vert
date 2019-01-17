@@ -6,12 +6,12 @@
 layout (location = 0) in vec3 inPos;
 layout (location = 1) in vec3 inColor;
 
-layout(binding = 0) uniform BuildIn {
+layout(set = 0, binding = 0) uniform BuildIn {
     mat4 matrixProjection;
     mat4 matrixView;
 } _buildIn;
 
-layout (set = 1, binding = 2) uniform OtherInfo 
+layout (set = 1, binding = 0) uniform OtherInfo 
 {
     mat4 model;
 } otherInfo;

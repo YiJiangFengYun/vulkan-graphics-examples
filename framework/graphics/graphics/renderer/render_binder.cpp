@@ -202,7 +202,7 @@ namespace vg
                     nullptr,
                     vk::ImageLayout::eUndefined,
                 };
-                PassTextureInfo info = {
+                PassTextureInfo passInfo = {
                     vg::SamplerTextureType::TEX_2D,
                     1u,
                     &itemInfo,
@@ -210,15 +210,15 @@ namespace vg
                     vg::ImageDescriptorType::COMBINED_IMAGE_SAMPLER,
                     vk::ShaderStageFlagBits::eFragment,
                 };
-                if (pPass->hasTexture(VG_PASS_POST_RENDER_TEXTURE_NAME) == VG_FALSE)
+                auto pRenderPass = info.pRendererPassCache->get(pPass);
+                if (pRenderPass->getBindingSet().hasTexture(VG_PASS_POST_RENDER_TEXTURE_NAME) == VG_FALSE)
                 {
-                    pPass->addTexture(VG_PASS_POST_RENDER_TEXTURE_NAME, info);
+                    pRenderPass->getBindingSet().addTexture(VG_PASS_POST_RENDER_TEXTURE_NAME, passInfo);
                 }
                 else
                 {
-                    pPass->setTexture(VG_PASS_POST_RENDER_TEXTURE_NAME, info);
+                    pRenderPass->getBindingSet().setTexture(VG_PASS_POST_RENDER_TEXTURE_NAME, passInfo);
                 }
-                pPass->apply();
             }
 
             ;

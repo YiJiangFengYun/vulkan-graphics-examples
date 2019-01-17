@@ -158,6 +158,7 @@ namespace vg
 
         if (m_passPipelineLayoutStateID != pPass->getPipelineLayoutStateID()) {
             m_passPipelineLayoutStateID = pPass->getPipelineLayoutStateID();
+			descriptorSetsChanged = VG_TRUE; //temp code
             pipelineLayoutChanged = VG_TRUE;
         }
 

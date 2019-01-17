@@ -226,6 +226,13 @@ void Window::_createMaterial()
 
             uint32_t specializationData = NUM_LIGHTS;
 
+            vg::Pass::BuildInDataInfo buildInDataInfo = {
+                0u,
+                nullptr,
+            };
+            
+            pPass->setBuildInDataInfo(buildInDataInfo);
+
 			pPass->addSpecializationItem(vk::ShaderStageFlagBits::eFragment, "num_light", 0u, specializationData);
     
             vg::PassDataInfo otherDataInfo = {

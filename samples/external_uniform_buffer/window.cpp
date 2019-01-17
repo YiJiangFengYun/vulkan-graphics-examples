@@ -138,7 +138,9 @@ void Window::_initObjectsStateData()
 
 void Window::_createDynamicUniformData()
 {
-    m_pExtUniformData = std::shared_ptr<vg::UniformBufferData>{ new vg::UniformBufferData() };
+    m_pExtUniformData = std::shared_ptr<vg::UniformBufferData>{ 
+		new vg::UniformBufferData(vk::MemoryPropertyFlagBits::eHostVisible | vk::MemoryPropertyFlagBits::eHostCoherent) 
+	};
     std::array<vg::UniformBufferData::SubDataInfo, OBJECT_INSTANCE_COUNT> subDataInfos;
     std::array<vk::DescriptorSetLayoutBinding, OBJECT_INSTANCE_COUNT> bindingInfos;
     std::array<vg::UniformBufferData::DescriptorBufferInfo, OBJECT_INSTANCE_COUNT> bufferInfos;

@@ -136,6 +136,11 @@ namespace vg
         return m_pipelineStateID;
     }
 
+    BindingSet &RendererPass::getBindingSet()
+    {
+        return m_bindingSet;
+    }
+
     void RendererPass::_apply()
     {
         auto pPass = m_pPass;
@@ -332,7 +337,7 @@ namespace vg
         } else if (m_mapPassesBack[pPass->getID()] != nullptr) {
             m_mapPasses[pPass->getID()] = m_mapPassesBack[pPass->getID()];
             m_mapPassesBack.erase(pPass->getID());
-            pCurr = m_mapPassesBack[pPass->getID()].get();
+            pCurr = m_mapPasses[pPass->getID()].get();
         } else {
             auto pNew = _createNewRendererPass(pPass);
             m_mapPasses[pPass->getID()] = pNew;

@@ -224,4 +224,6 @@ namespace vg {
     };
 } //vg
 
+#include "graphics/binding_set/binding_set_data.inl"
+
 #endif //VG_BINDING_SET_DATA_HPP

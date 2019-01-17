@@ -85,7 +85,7 @@ namespace vg
         //Applied
         , m_sortDataSet(_compareDataInfo)
         , m_dataBuffer(vk::BufferUsageFlagBits::eUniformBuffer
-            , vk::MemoryPropertyFlagBits::eHostVisible)
+            , vk::MemoryPropertyFlagBits::eHostVisible | vk::MemoryPropertyFlagBits::eHostCoherent)
         , m_sortBufferTexInfosSet(_compareBufferTextureInfo)
         , m_descriptorSetChanged(VG_FALSE)
         , m_layoutBindingCount()
@@ -638,7 +638,7 @@ namespace vg
     {
 #ifdef DEBUG
         if (m_dataChanged || m_dataContentChanged || m_textureChanged || m_bufferChanged || m_descriptorSetChanged)
-            throw std::runtime_error("Pass should apply change before used to render.");
+            throw std::runtime_error("BindingSet should apply change before used to render.");
 #endif //DEBUG
     }
         

@@ -1146,13 +1146,13 @@ namespace vg
                             vg::BufferDescriptorType::UNIFORM_BUFFER,
                             vk::ShaderStageFlagBits::eVertex | vk::ShaderStageFlagBits::eFragment
                         };
-                        if (pPass->hasBuffer(VG_PASS_LIGHT_DATA_BUFFER_NAME) == VG_FALSE)
+                        if (pRendererPass->getBindingSet().hasBuffer(VG_PASS_LIGHT_DATA_BUFFER_NAME) == VG_FALSE)
                         {
-                            pPass->addBuffer(VG_PASS_LIGHT_DATA_BUFFER_NAME, info);
+							pRendererPass->getBindingSet().addBuffer(VG_PASS_LIGHT_DATA_BUFFER_NAME, info);
                         }
                         else
                         {
-                            pPass->setBuffer(VG_PASS_LIGHT_DATA_BUFFER_NAME, info);
+                            pRendererPass->getBindingSet().setBuffer(VG_PASS_LIGHT_DATA_BUFFER_NAME, info);
                         }
                         //light textures.
                         auto &lightPassTextureInfos = m_lightPassTextureInfos;
@@ -1160,13 +1160,13 @@ namespace vg
                         for (uint32_t textureInfoIndex = 0u; textureInfoIndex < textureInfoCount; ++textureInfoIndex)
                         {
                             std::string name = VG_PASS_LIGHT_TEXTURE_NAME + std::to_string(textureInfoIndex);
-                            if (pPass->hasTexture(name) == VG_FALSE) 
+                            if (pRendererPass->getBindingSet().hasTexture(name) == VG_FALSE) 
                             {
-                                pPass->addTexture(name, lightPassTextureInfos[textureInfoIndex]);
+                                pRendererPass->getBindingSet().addTexture(name, lightPassTextureInfos[textureInfoIndex]);
                             }
                             else
                             {
-                                pPass->setTexture(name, lightPassTextureInfos[textureInfoIndex]);
+                                pRendererPass->getBindingSet().setTexture(name, lightPassTextureInfos[textureInfoIndex]);
                             }
                         }
                     }
@@ -1187,13 +1187,13 @@ namespace vg
                             vg::ImageDescriptorType::COMBINED_IMAGE_SAMPLER,
                             vk::ShaderStageFlagBits::eFragment,
                         };
-                        if (pPass->hasTexture(VG_PASS_PRE_DEPTH_TEXTURE_NAME) == VG_FALSE)
+                        if (pRendererPass->getBindingSet().hasTexture(VG_PASS_PRE_DEPTH_TEXTURE_NAME) == VG_FALSE)
                         {
-                            pPass->addTexture(VG_PASS_PRE_DEPTH_TEXTURE_NAME, info);
+                            pRendererPass->getBindingSet().addTexture(VG_PASS_PRE_DEPTH_TEXTURE_NAME, info);
                         }
                         else
                         {
-                            pPass->setTexture(VG_PASS_PRE_DEPTH_TEXTURE_NAME, info);
+                            pRendererPass->getBindingSet().setTexture(VG_PASS_PRE_DEPTH_TEXTURE_NAME, info);
                         }
                     }
                 } else if (pLight != nullptr)
@@ -1204,15 +1204,15 @@ namespace vg
                         VG_PASS_LIGHT_RENDER_DATA_LAYOUT_PRIORITY,
                         vk::ShaderStageFlagBits::eAllGraphics
                     };
-                    if (pPass->hasData(VG_PASS_LIGHT_RENDER_DATA_NAME) == VG_FALSE)
+                    if (pRendererPass->getBindingSet().hasData(VG_PASS_LIGHT_RENDER_DATA_NAME) == VG_FALSE)
                     {
-                        pPass->addData(VG_PASS_LIGHT_RENDER_DATA_NAME, dataInfo, renderInfo.pData, renderInfo.dataSize);
+                        pRendererPass->getBindingSet().addData(VG_PASS_LIGHT_RENDER_DATA_NAME, dataInfo, renderInfo.pData, renderInfo.dataSize);
                     } else {
-                        pPass->setData(VG_PASS_LIGHT_RENDER_DATA_NAME, renderInfo.pData, renderInfo.dataSize, 0u);
+                        pRendererPass->getBindingSet().setData(VG_PASS_LIGHT_RENDER_DATA_NAME, renderInfo.pData, renderInfo.dataSize, 0u);
                     }
                 }
 
-                pPass->apply();
+                // pPass->apply();
             }
         }
     }

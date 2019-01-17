@@ -110,6 +110,8 @@ namespace vg
         const vk::PipelineLayout *getPipelineLayout() const;
         Pass::PipelineStateID getPipelineStateID() const;
 
+        BindingSet &getBindingSet();
+
     private:
         const Pass *m_pPass;
         Pass::PipelineLayoutStateID m_passPipelineLayoutStateID;

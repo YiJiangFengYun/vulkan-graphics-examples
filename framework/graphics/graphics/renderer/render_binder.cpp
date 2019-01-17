@@ -15,7 +15,8 @@ namespace vg
 #endif
         );
 
-    RenderBinderInfo::RenderBinderInfo(Bool32 lightingEnable
+    RenderBinderInfo::RenderBinderInfo(RendererPassCache *pRendererPassCache
+        , Bool32 lightingEnable
         , Bool32 shadowEnable
         , Bool32 preDepthEnable
         , Bool32 postRenderEnable
@@ -39,7 +40,8 @@ namespace vg
         , CmdBuffer *pTrunkRenderPassCmdBuffer
         , CmdBuffer *pPostRenderCmdBuffer
         )
-        : lightingEnable(lightingEnable)
+        : pRendererPassCache(pRendererPassCache)
+        , lightingEnable(lightingEnable)
         , shadowEnable(shadowEnable) 
         , preDepthEnable(preDepthEnable)
         , postRenderEnable(postRenderEnable)
@@ -67,7 +69,8 @@ namespace vg
     }
 
     RenderBinder::RenderBinder()
-        : m_bindedObjectsForLighting()
+        : m_pRendererPassCache()
+        , m_bindedObjectsForLighting()
         , m_bindedObjectCountForLighting(0u)
         , m_bindedObjectsForPreDepth()
         , m_bindedObjectCountForPreDepth(0u)
@@ -132,6 +135,7 @@ namespace vg
 
     void RenderBinder::_bind(RenderBinderInfo info)
     {
+        m_pRendererPassCache = info.pRendererPassCache;
         m_lightingEnable = info.lightingEnable;
         m_shadowEnable = info.shadowEnable;
         if (info.lightingEnable == VG_TRUE)
@@ -1044,6 +1048,7 @@ namespace vg
             for (uint32_t passIndex = 0u; passIndex < passCount; ++passIndex)
             {
                 auto pPass = pMaterial->getPassWithIndex(passIndex);
+                auto pRendererPass = m_pRendererPassCache->get(pPass);
 
                 Bool32 hasMatrixObjectToNDC = VG_FALSE;
                 Bool32 hasMatrixObjectToWorld = VG_FALSE;
@@ -1100,27 +1105,27 @@ namespace vg
                     Pass::BuildInDataType type = (*(info.pComponent + componentIndex)).type;
                     if (type == Pass::BuildInDataType::MATRIX_OBJECT_TO_NDC)
                     {
-                        pPass->setBuildInDataMatrix4x4(type, mvpMatrix);
+                        pRendererPass->setBuildInDataMatrix4x4(type, mvpMatrix);
                     }
                     else if (type == Pass::BuildInDataType::MATRIX_OBJECT_TO_WORLD)
                     {
-                        pPass->setBuildInDataMatrix4x4(type, modelMatrix);
+                        pRendererPass->setBuildInDataMatrix4x4(type, modelMatrix);
                     }
                     else if (type == Pass::BuildInDataType::MATRIX_OBJECT_TO_VIEW)
                     {
-                        pPass->setBuildInDataMatrix4x4(type, mvMatrix);
+                        pRendererPass->setBuildInDataMatrix4x4(type, mvMatrix);
                     }
                     else if (type == Pass::BuildInDataType::MATRIX_VIEW)
                     {
-                        pPass->setBuildInDataMatrix4x4(type, viewMatrix);
+                        pRendererPass->setBuildInDataMatrix4x4(type, viewMatrix);
                     }
                     else if (type == Pass::BuildInDataType::MATRIX_PROJECTION)
                     {
-                        pPass->setBuildInDataMatrix4x4(type, projMatrix);
+                        pRendererPass->setBuildInDataMatrix4x4(type, projMatrix);
                     }
                     else if (type == Pass::BuildInDataType::POS_VIEWER)
                     {
-                        pPass->setBuildInDataVector4(type, viewerPos);
+                        pRendererPass->setBuildInDataVector4(type, viewerPos);
                     }
                 }
 

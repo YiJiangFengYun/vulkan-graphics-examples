@@ -90,20 +90,46 @@ namespace vg
         RendererPass();
         RendererPass(const vg::Pass *pPass);
         void setPass(const vg::Pass *pPass);
+        const vg::Pass *getPass() const;
 
         void setBuildInDataMatrix4x4(Pass::BuildInDataType type, Matrix4x4 matrix);
         void setBuildInDataVector4(Pass::BuildInDataType type, Vector4 vector);
 
+        void beginRecord();
+        void endRecord();
+
+        uint32_t getDescriptorSetCount() const;
+        const vk::DescriptorSet *getDescriptorSets() const;
+        const vk::PipelineLayout *getPipelineLayout() const;
+        Pass::PipelineStateID getPipelineStateID() const;
+
     private:
-        const vg::Pass *m_pPass;
+        const Pass *m_pPass;
+        Pass::PipelineLayoutStateID m_passPipelineLayoutStateID;
+        Pass::PipelineStateID m_passPipelineStateID;
         _BuildInDataCache m_buildInDataCache;
         BindingSet m_bindingSet;
+        BindingSet::DescriptorSetStateID m_bindingSetDescriptorSetStateID;
+        Bool32 m_initedBuildInData;
+        Pass::BuildInDataInfo m_currBuildInDataInfo;
+
+        //all descriptor set layouts
+        std::vector<vk::DescriptorSetLayout> m_descriptorSetLayouts;
+        //all descriptor sets.
+        std::vector<vk::DescriptorSet> m_descriptorSets;
+
+        std::shared_ptr<vk::PipelineLayout> m_pPipelineLayout;
+
+        Pass::PipelineStateID m_pipelineStateID;
+
+        void _apply();
+
+        void _updatePipelineStateID();
 
         void _initBuildInData();
         
         template <typename T>
         void _updateBuildInData(Pass::BuildInDataType type, T data);
-
     };
 
     class RendererPassCache

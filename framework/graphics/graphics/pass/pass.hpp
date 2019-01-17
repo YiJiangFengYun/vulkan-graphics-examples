@@ -45,6 +45,8 @@ namespace vg
             BuildInDataInfo(uint32_t componentCount = 0u, Component *pComponent = nullptr);
             BuildInDataInfo(const BuildInDataInfo &target);
             BuildInDataInfo &operator=(const BuildInDataInfo &target);
+            Bool32 operator==(const BuildInDataInfo &target) const;
+            Bool32 operator!=(const BuildInDataInfo &target) const;
         };
 
         using PipelineLayoutStateID = uint32_t;
@@ -263,6 +265,7 @@ namespace vg
             , const T &data
             );
 
+        const std::vector<vk::PushConstantRange> &getPushConstantRanges() const;
         std::vector<PushConstantUpdateInfo> getPushconstantUpdates() const;
 
         uint32_t getInstanceCount() const;

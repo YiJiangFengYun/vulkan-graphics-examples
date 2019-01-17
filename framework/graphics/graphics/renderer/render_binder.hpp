@@ -12,10 +12,14 @@
 #include "graphics/render_target/pre_depth_target.hpp"
 #include "graphics/render_target/post_render_target.hpp"
 #include "graphics/util/frame_object_cache.hpp"
+#include "graphics/renderer/renderer_pass.hpp"
 
 namespace vg
 {
     struct RenderBinderInfo {
+
+        RendererPassCache *pRendererPassCache;
+
         Bool32 lightingEnable;
         Bool32 shadowEnable;
         Bool32 preDepthEnable;
@@ -40,7 +44,8 @@ namespace vg
         CmdBuffer *pTrunkRenderPassCmdBuffer;
         CmdBuffer *pPostRenderCmdBuffer;
 
-        RenderBinderInfo(Bool32 lightingEnable = VG_FALSE
+        RenderBinderInfo(RendererPassCache *pRendererPassCache
+            , Bool32 lightingEnable = VG_FALSE
             , Bool32 shadowEnable = VG_FALSE
             , Bool32 preDepthEnable = VG_FALSE
             , Bool32 postRenderEnable = VG_FALSE
@@ -65,6 +70,7 @@ namespace vg
             , CmdBuffer *pPostRenderCmdBuffer = nullptr
             );
     };
+
     class RenderBinder 
     {
     public:
@@ -77,6 +83,7 @@ namespace vg
         void end();
 
     private:
+        RendererPassCache *m_pRendererPassCache;
         // uint32_t m_framebufferWidth;
         // uint32_t m_framebufferHeight;
         std::vector<BaseVisualObject *> m_bindedObjectsForLighting;

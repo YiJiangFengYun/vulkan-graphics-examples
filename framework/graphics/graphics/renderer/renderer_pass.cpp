@@ -69,18 +69,26 @@ namespace vg
 ///RendererPass
     RendererPass::RendererPass()
         : m_pPass()
+        , m_passPipelineLayoutStateID()
+        , m_passPipelineStateID()
         , m_buildInDataCache()
         , m_bindingSet()
+        , m_bindingSetDescriptorSetStateID()
+        , m_initedBuildInData()
+        , m_currBuildInDataInfo()
+        , m_descriptorSetLayouts()
+        , m_descriptorSets()
+        , m_pPipelineLayout()
+        , m_pipelineStateID()
  
     {
         _initBuildInData();
     }
         
     RendererPass::RendererPass(const vg::Pass *pPass)
-        : m_pPass(pPass)
-        , m_buildInDataCache()
-        , m_bindingSet() 
+        : RendererPass()
     {
+        m_pPass = pPass;
         _initBuildInData();
     }
 
@@ -88,6 +96,11 @@ namespace vg
     {
         m_pPass = pPass;
         _initBuildInData();
+    }
+
+    const vg::Pass *RendererPass::getPass() const
+    {
+        return m_pPass;
     }
 
     void RendererPass::setBuildInDataMatrix4x4(Pass::BuildInDataType type, Matrix4x4 matrix)
@@ -101,71 +114,204 @@ namespace vg
         _updateBuildInData(type, vector);
     }
 
-    void RendererPass::_initBuildInData()
+    void RendererPass::beginRecord()
     {
-        Pass::BuildInDataInfo buildInDataInfo;
-        if (m_pPass != nullptr) buildInDataInfo = m_pPass->getBuildInDataInfo();
-        uint32_t size = 0u;
-        auto componentCount = buildInDataInfo.componentCount;
-        for (uint32_t componentIndex = 0; componentIndex < componentCount; ++componentIndex)
-        {
-            Pass::BuildInDataType type = (*(buildInDataInfo.pComponent + componentIndex)).type;
-            uint32_t count = static_cast<uint32_t>(Pass::BuildInDataType::COUNT);
-            for (uint32_t i = 0; i < count; ++i)
-            {
-                if (i == static_cast<uint32_t>(type))
-                {
-                    size += buildInDataTypeSizes[i];
-                    break;
-                }
-            }
+        _apply();
+        m_bindingSet.beginRecord();
+    }
+        
+    void RendererPass::endRecord()
+    {
+        m_bindingSet.endRecord();
+    }
+
+    uint32_t RendererPass::getDescriptorSetCount() const
+    {
+        return static_cast<uint32_t>(m_descriptorSets.size());
+    }
+        
+    const vk::DescriptorSet *RendererPass::getDescriptorSets() const
+    {
+        return m_descriptorSets.data();
+    }
+
+    const vk::PipelineLayout *RendererPass::getPipelineLayout() const
+    {
+        return m_pPipelineLayout.get();
+    }
+
+    Pass::PipelineStateID RendererPass::getPipelineStateID() const
+    {
+        return m_pipelineStateID;
+    }
+
+    void RendererPass::_apply()
+    {
+        auto pPass = m_pPass;
+        auto &bindingSet = m_bindingSet;
+        _initBuildInData();
+        bindingSet.apply();
+        Bool32 descriptorSetsChanged = VG_FALSE;
+        Bool32 pipelineLayoutChanged = VG_FALSE;
+        Bool32 pipelineChanged = VG_FALSE;
+        if (m_bindingSetDescriptorSetStateID != bindingSet.getDescriptorSetStateID()) {
+            m_bindingSetDescriptorSetStateID = bindingSet.getDescriptorSetStateID();
+            descriptorSetsChanged = VG_TRUE;
+            pipelineLayoutChanged = VG_TRUE;
         }
 
-        if (size > 0)
-        {
-            PassDataInfo info = {
-                VG_PASS_BUILDIN_DATA_LAYOUT_PRIORITY,
-                vk::ShaderStageFlagBits::eAllGraphics,
-            };
-            PassDataSizeInfo sizeInfo = {
-                size,
-            };
-            if (m_bindingSet.hasData(VG_PASS_BUILDIN_DATA_NAME) == VG_FALSE)
-            {
-                m_bindingSet.addData(VG_PASS_BUILDIN_DATA_NAME, info, sizeInfo);
-            }
-            else
-            {
-                m_bindingSet.setData(VG_PASS_BUILDIN_DATA_NAME, info, sizeInfo);
+        if (m_passPipelineLayoutStateID != pPass->getPipelineLayoutStateID()) {
+            m_passPipelineLayoutStateID = pPass->getPipelineLayoutStateID();
+            pipelineLayoutChanged = VG_TRUE;
+        }
+
+        if (m_passPipelineStateID != pPass->getPipelineStateID()) {
+            m_passPipelineStateID = pPass->getPipelineStateID();
+            pipelineChanged = VG_TRUE;
+        }
+
+        if (descriptorSetsChanged) {
+            auto pLayout = m_bindingSet.getDescriptorSetLayout();
+            auto pSet = m_bindingSet.getDescriptorSet();
+            uint32_t layoutCount = pLayout != nullptr ? 1 : 0;
+            uint32_t setCount = pSet != nullptr ? 1 : 0;
+            layoutCount += pPass->getDescriptorSetLayoutCount();
+            setCount += pPass->getDescriptorSetCount();
+
+            if (layoutCount != setCount) {
+                throw std::runtime_error(
+                    "Descriptor Set layout count of bindingSet is not equal to count of its descriptor set."
+                );
             }
 
-            uint32_t offset1 = 0u;
+            std::vector<vk::DescriptorSetLayout> setLayouts(layoutCount);
+            std::vector<vk::DescriptorSet> sets(layoutCount);
+
+            uint32_t index = 0u;
+            if (pLayout != nullptr) {
+                setLayouts[index] = *pLayout;
+                sets[index] = *pSet;
+                ++index;
+            }
+
+            auto count = m_pPass->getDescriptorSetLayoutCount();
+            for (auto i = 0; i < count; ++i) {
+                setLayouts[index] = *(pPass->getDescriptorSetLayouts() + i);
+                sets[index] = *(pPass->getDescriptorSets() + i);
+                ++index;
+            }
+
+            if (m_descriptorSetLayouts != setLayouts) {
+                pipelineLayoutChanged = VG_TRUE;
+                m_descriptorSetLayouts = setLayouts;
+            }
+
+            if (m_descriptorSets != sets) {
+                m_descriptorSets = sets;
+            }
+
+            descriptorSetsChanged = VG_FALSE;
+        }
+
+        if (pipelineLayoutChanged) {
+            vk::PipelineLayoutCreateInfo pipelineLayoutCreateInfo = {
+                vk::PipelineLayoutCreateFlags(),                         //flags
+                static_cast<uint32_t>(m_descriptorSetLayouts.size()),    //setLayoutCount
+                m_descriptorSetLayouts.data(),                           //pSetLayouts
+                static_cast<uint32_t>(pPass->getPushConstantRanges().size()),       //pushConstantRangeCount
+                pPass->getPushConstantRanges().data()                              //pPushConstantRanges
+            };
+
+            auto pDevice = pApp->getDevice();
+            m_pPipelineLayout = fd::createPipelineLayout(pDevice, pipelineLayoutCreateInfo);
+
+            pipelineLayoutChanged = VG_FALSE;
+        }
+
+        if (pipelineChanged) {
+            _updatePipelineStateID();
+            pipelineChanged = VG_FALSE;
+        }
+
+    }
+
+    void RendererPass::_updatePipelineStateID()
+    {
+         ++m_pipelineStateID;
+        if ( m_pipelineStateID == std::numeric_limits<Pass::PipelineStateID>::max())
+        {
+            m_pipelineStateID = 1;
+        }
+    }
+
+    void RendererPass::_initBuildInData()
+    {
+        uint32_t size = 0u;
+        Pass::BuildInDataInfo buildInDataInfo;
+        if (m_pPass == nullptr) buildInDataInfo = m_pPass->getBuildInDataInfo();
+        if (! m_initedBuildInData || m_currBuildInDataInfo != buildInDataInfo) {
+            if (! m_initedBuildInData) m_initedBuildInData = VG_TRUE;
+            auto componentCount = buildInDataInfo.componentCount;
             for (uint32_t componentIndex = 0; componentIndex < componentCount; ++componentIndex)
             {
                 Pass::BuildInDataType type = (*(buildInDataInfo.pComponent + componentIndex)).type;
                 uint32_t count = static_cast<uint32_t>(Pass::BuildInDataType::COUNT);
-                uint32_t offset2= 0u;
                 for (uint32_t i = 0; i < count; ++i)
                 {
                     if (i == static_cast<uint32_t>(type))
                     {
-                        m_bindingSet.setData(VG_PASS_BUILDIN_DATA_NAME
-                            , ((char *)(&m_buildInDataCache) + offset2)
-                            , buildInDataTypeSizes[static_cast<uint32_t>(type)]
-                            , offset1);
+                        size += buildInDataTypeSizes[i];
                         break;
                     }
-                    else
-                    {
-                        offset2 += buildInDataTypeSizes[i];
-                    }
                 }
-                offset1 += buildInDataTypeSizes[static_cast<uint32_t>(type)];
             }
-        }
-        else if (m_bindingSet.hasData(VG_PASS_BUILDIN_DATA_NAME))
-        {
-            m_bindingSet.removeData(VG_PASS_BUILDIN_DATA_NAME);
+    
+            if (size > 0)
+            {
+                PassDataInfo info = {
+                    VG_PASS_BUILDIN_DATA_LAYOUT_PRIORITY,
+                    vk::ShaderStageFlagBits::eAllGraphics,
+                };
+                PassDataSizeInfo sizeInfo = {
+                    size,
+                };
+                if (m_bindingSet.hasData(VG_PASS_BUILDIN_DATA_NAME) == VG_FALSE)
+                {
+                    m_bindingSet.addData(VG_PASS_BUILDIN_DATA_NAME, info, sizeInfo);
+                }
+                else
+                {
+                    m_bindingSet.setData(VG_PASS_BUILDIN_DATA_NAME, info, sizeInfo);
+                }
+    
+                uint32_t offset1 = 0u;
+                for (uint32_t componentIndex = 0; componentIndex < componentCount; ++componentIndex)
+                {
+                    Pass::BuildInDataType type = (*(buildInDataInfo.pComponent + componentIndex)).type;
+                    uint32_t count = static_cast<uint32_t>(Pass::BuildInDataType::COUNT);
+                    uint32_t offset2= 0u;
+                    for (uint32_t i = 0; i < count; ++i)
+                    {
+                        if (i == static_cast<uint32_t>(type))
+                        {
+                            m_bindingSet.setData(VG_PASS_BUILDIN_DATA_NAME
+                                , ((char *)(&m_buildInDataCache) + offset2)
+                                , buildInDataTypeSizes[static_cast<uint32_t>(type)]
+                                , offset1);
+                            break;
+                        }
+                        else
+                        {
+                            offset2 += buildInDataTypeSizes[i];
+                        }
+                    }
+                    offset1 += buildInDataTypeSizes[static_cast<uint32_t>(type)];
+                }
+            }
+            else if (m_bindingSet.hasData(VG_PASS_BUILDIN_DATA_NAME))
+            {
+                m_bindingSet.removeData(VG_PASS_BUILDIN_DATA_NAME);
+            }
         }
     }
 

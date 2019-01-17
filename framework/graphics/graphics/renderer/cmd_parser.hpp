@@ -4,6 +4,7 @@
 #include "graphics/global.hpp"
 #include "graphics/app/app.hpp"
 #include "graphics/renderer/pipeline_cache.hpp"
+#include "graphics/renderer/renderer_pass.hpp"
 #include "graphics/mesh/mesh.hpp"
 #include "graphics/buffer_data/util.hpp"
 #include "graphics/material/cmd.hpp"
@@ -22,6 +23,7 @@ namespace vg
         static void record(CmdBuffer *pCmdBuffer
             , vk::CommandBuffer *pCommandBuffer
             , PipelineCache *pPipelineCache
+            , RendererPassCache *pRendererPassCache
             , ResultInfo *pResult = nullptr
             );
             
@@ -41,6 +43,7 @@ namespace vg
         static void recordItem(const RenderPassInfo *pRenderPassInfo
             , vk::CommandBuffer *pCommandBuffer
             , PipelineCache *pPipelineCache
+            , RendererPassCache *pRendererPassCache
             , ResultInfo *pResult = nullptr);
 
         static void _createPipeline(const vk::RenderPass *pRenderPass,
@@ -52,6 +55,7 @@ namespace vg
 
         static void _recordCommandBuffer(vk::Pipeline *pPipeline,
             vk::CommandBuffer *pCommandBuffer,
+            RendererPassCache *pRendererPassCache,
             uint32_t framebufferWidth,
             uint32_t framebufferHeight,
             const BaseMesh *pMesh,

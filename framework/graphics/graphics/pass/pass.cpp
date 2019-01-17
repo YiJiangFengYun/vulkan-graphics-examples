@@ -23,6 +23,23 @@ namespace vg
         return *this;
     }
 
+    Bool32 Pass::BuildInDataInfo::operator==(const BuildInDataInfo &target) const
+    {
+        if (componentCount != target.componentCount) return VG_FALSE;
+        auto count = componentCount;
+        for (auto i = 0; i < count; ++i) {
+            if ((pComponent + i)->type != (target.pComponent + i)->type) {
+                return VG_FALSE;
+            }
+        }
+        return VG_TRUE;
+    }
+
+    Bool32 Pass::BuildInDataInfo::operator!=(const BuildInDataInfo &target) const
+    {
+        return ! ((*this) == target);
+    }
+
     Pass::PushConstantUpdateInfo::PushConstantUpdateInfo(vk::ShaderStageFlags stageFlags
         , uint32_t offset
         , uint32_t size
@@ -675,6 +692,11 @@ namespace vg
         m_pushConstant.setPushConstantUpdate(name, offset, pData, size);
     }
 
+    const std::vector<vk::PushConstantRange> &Pass::getPushConstantRanges() const
+    {
+        return m_pushConstantRanges;
+    }
+
     std::vector<Pass::PushConstantUpdateInfo> Pass::getPushconstantUpdates() const
     {
         std::vector<PushConstantUpdateInfo> updateInfos(m_sortedPushConstantItems.size());
@@ -1017,6 +1039,7 @@ namespace vg
 
     void Pass::beginRecord() const
     {
+		m_bindingSet.beginRecord();
 #ifdef DEBUG
         if (m_extUniformBufferChanged || m_descriptorSetsChanged || m_dynamicOffsetsChanged || 
             m_specializationChanged)
@@ -1026,7 +1049,7 @@ namespace vg
         
     void Pass::endRecord() const
     {
-
+		m_bindingSet.endRecord();
     }
 
     void Pass::_initDefaultBuildInDataInfo()

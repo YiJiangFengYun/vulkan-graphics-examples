@@ -5,14 +5,14 @@ namespace vg
     {
         Pass::BuildInDataInfo buildInDataInfo;
         if (m_pPass != nullptr) buildInDataInfo = m_pPass->getBuildInDataInfo();
-        uint32_t count = static_cast<uint32_t>(BuildInDataType::COUNT);
+        uint32_t count = static_cast<uint32_t>(Pass::BuildInDataType::COUNT);
         uint32_t offset1 = 0u;
         uint32_t i = 0u;
         for (i = 0; i < count; ++i)
         {
             if (i != static_cast<uint32_t>(type))
             {
-                offset1 += Pass::buildInDataTypeSizes[i];
+                offset1 += buildInDataTypeSizes[i];
             }
             else
             {
@@ -27,7 +27,7 @@ namespace vg
             Pass::BuildInDataType comType = (*(buildInDataInfo.pComponent + componentIndex)).type;
             if (type != comType)
             {
-                offset2 += Pass::buildInDataTypeSizes[static_cast<uint32_t>(comType)];
+                offset2 += buildInDataTypeSizes[static_cast<uint32_t>(comType)];
             }
             else
             {

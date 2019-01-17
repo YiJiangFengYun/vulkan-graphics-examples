@@ -3,15 +3,6 @@
 namespace vg
 {
 
-    const std::array<uint32_t, static_cast<size_t>(Pass::BuildInDataType::COUNT)> buildInDataTypeSizes = {
-        sizeof(BuildInDataTypeTypeInfo<Pass::BuildInDataType::MATRIX_OBJECT_TO_NDC>::Type),
-        sizeof(BuildInDataTypeTypeInfo<Pass::BuildInDataType::MAIN_CLOLOR>::Type),
-        sizeof(BuildInDataTypeTypeInfo<Pass::BuildInDataType::MATRIX_OBJECT_TO_WORLD>::Type),
-        sizeof(BuildInDataTypeTypeInfo<Pass::BuildInDataType::MATRIX_OBJECT_TO_VIEW>::Type),
-        sizeof(BuildInDataTypeTypeInfo<Pass::BuildInDataType::MATRIX_VIEW>::Type),
-        sizeof(BuildInDataTypeTypeInfo<Pass::BuildInDataType::MATRIX_PROJECTION>::Type)
-    };
-
     RendererPass::_BuildInDataCache::_BuildInDataCache(Matrix4x4 matrixObjectToNDC
         , Color mainColor
         , Matrix4x4 matrixObjectToWorld
@@ -195,7 +186,7 @@ namespace vg
             }
 
             auto count = m_pPass->getDescriptorSetLayoutCount();
-            for (auto i = 0; i < count; ++i) {
+            for (uint32_t i = 0; i < count; ++i) {
                 setLayouts[index] = *(pPass->getDescriptorSetLayouts() + i);
                 sets[index] = *(pPass->getDescriptorSets() + i);
                 ++index;
@@ -248,7 +239,7 @@ namespace vg
     {
         uint32_t size = 0u;
         Pass::BuildInDataInfo buildInDataInfo;
-        if (m_pPass == nullptr) buildInDataInfo = m_pPass->getBuildInDataInfo();
+        if (m_pPass != nullptr) buildInDataInfo = m_pPass->getBuildInDataInfo();
         if (! m_initedBuildInData || m_currBuildInDataInfo != buildInDataInfo) {
             if (! m_initedBuildInData) m_initedBuildInData = VG_TRUE;
             auto componentCount = buildInDataInfo.componentCount;

@@ -4,6 +4,21 @@
 
 namespace vg
 {
+    BindingSet::DataSortInfo::DataSortInfo(std::string name
+        , vk::ShaderStageFlags shaderStageFlags
+        , uint32_t layoutPriority
+        , uint32_t size
+        , uint32_t bufferSize
+        )
+        : name(name)
+        , shaderStageFlags(shaderStageFlags)
+        , layoutPriority(layoutPriority)
+        , size(size)
+        , bufferSize(bufferSize)
+    {
+
+    }
+
     Bool32 BindingSet::_compareDataInfo(const DataSortInfo &item1, const DataSortInfo &item2)
     {
         uint32_t shaderStageValue1;
@@ -32,9 +47,31 @@ namespace vg
         }
     }
 
+    BindingSet::BufferTextureSortInfo::BufferTextureSortInfo(std::string name
+        , uint32_t bindingPriority
+        , Bool32 isTexture
+        , const void *pData
+    )
+        : name(name)
+        , bindingPriority(bindingPriority)
+        , isTexture(isTexture)
+        , pData(pData)
+    {
+
+    }
+
     Bool32 BindingSet::_compareBufferTextureInfo(const BufferTextureSortInfo &item1, const BufferTextureSortInfo &item2)
     {
         return item1.bindingPriority < item2.bindingPriority;
+    }
+
+    BindingSet::UpdateDescriptorSetInfo::UpdateDescriptorSetInfo(std::vector<vk::DescriptorBufferInfo> bufferInfos
+        , std::vector<vk::DescriptorImageInfo> imageInfos
+    )
+        : bufferInfos(bufferInfos)
+        , imageInfos(imageInfos)
+    {
+
     }
 
     BindingSet::BindingSet() 

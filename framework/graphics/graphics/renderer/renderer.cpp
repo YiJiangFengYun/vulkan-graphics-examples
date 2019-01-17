@@ -455,6 +455,7 @@ namespace vg
             CMDParser::record(m_pLightDepthCmdBuffer.get()
                 , m_pCommandBuffer.get()
                 , &m_pipelineCache
+                , &m_rendererPassCache
                 , &cmdParseResult
             );
             resultInfo.drawCount += cmdParseResult.drawCount;
@@ -465,6 +466,7 @@ namespace vg
             CMDParser::record(m_pPreDepthCmdBuffer.get()
                 , m_pCommandBuffer.get()
                 , &m_pipelineCache
+                , &m_rendererPassCache
                 , &cmdParseResult
                 );
             resultInfo.drawCount += cmdParseResult.drawCount;
@@ -473,6 +475,7 @@ namespace vg
         CMDParser::record(&m_branchCmdBuffer,
             m_pCommandBuffer.get(),
             &m_pipelineCache,
+            &m_rendererPassCache,
             &cmdParseResult
             );
         resultInfo.drawCount += cmdParseResult.drawCount;
@@ -483,6 +486,7 @@ namespace vg
         CMDParser::record(&m_trunkRenderPassCmdBuffer
             , m_pCommandBuffer.get()
             , &m_pipelineCache
+            , &m_rendererPassCache
             , &cmdParseResult
             );
         resultInfo.drawCount += cmdParseResult.drawCount;
@@ -492,6 +496,7 @@ namespace vg
             CMDParser::record(m_pPostRenderCmdbuffer.get()
                 , m_pCommandBuffer.get()
                 , &m_pipelineCache
+                , &m_rendererPassCache
                 , &cmdParseResult
                 );
             resultInfo.drawCount += cmdParseResult.drawCount;

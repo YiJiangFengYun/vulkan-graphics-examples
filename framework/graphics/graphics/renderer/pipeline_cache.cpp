@@ -7,12 +7,14 @@ namespace vg
         , const VertexData *pVertexData
         , const IndexData *pIndexData
         , uint32_t indexSubIndex
+        , const RendererPass *pRendererPass
         )
         : renderPass(renderPass)
         , pPass(pPass)
         , pVertexData(pVertexData)
         , pIndexData(pIndexData)
         , indexSubIndex(indexSubIndex)
+        , pRendererPass(pRendererPass)
     {
 
     }
@@ -23,8 +25,9 @@ namespace vg
         , pVertexData(info.pVertexData)
         , pIndexData(info.pIndexData)
         , indexSubIndex(info.indexSubIndex)
+        , pRendererPass(info.pRendererPass)
 
-        , passPipelineStateID(info.pPass->getPipelineStateID())
+        , passPipelineStateID(info.pRendererPass->getPipelineStateID())
         , passSubPass(info.pPass->getSubpass())
         , inputAssemblyStateInfo()
         , vertexInputStateInfo()
@@ -176,7 +179,7 @@ namespace vg
         m_mapPipelineFull.clear();
     }
 
-    std::shared_ptr<vk::Pipeline> PipelineCache::caching(const Info & info)
+    std::shared_ptr<vk::Pipeline> PipelineCache::get(const Info & info)
     {
         //delete old pipeline.
 
@@ -232,9 +235,10 @@ namespace vg
         vk::GraphicsPipelineCreateInfo createInfo = {};
 
         //Construct shader stage create info.
-        const auto &pPass = info.pPass;
-        const auto &pShader = pPass->getShader();
-        auto &shaderStages = pShader->getShaderStageInfos();
+        auto pPass = info.pPass;
+        auto pRendererPass = info.pRendererPass;
+        auto pShader = pPass->getShader();
+        auto shaderStages = pShader->getShaderStageInfos();
 
         //Fill specialization data from pass.
         for (auto &shaderStage : shaderStages)
@@ -403,7 +407,7 @@ namespace vg
         };
         createInfo.pDynamicState = &dynamicStateCreateInfo;        
 
-        createInfo.layout = *pPass->getPipelineLayout();
+        createInfo.layout = *pRendererPass->getPipelineLayout();
 
         createInfo.renderPass = info.renderPass;
         createInfo.subpass = pPass->getSubpass();

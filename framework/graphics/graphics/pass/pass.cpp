@@ -27,7 +27,7 @@ namespace vg
     {
         if (componentCount != target.componentCount) return VG_FALSE;
         auto count = componentCount;
-        for (auto i = 0; i < count; ++i) {
+        for (uint32_t i = 0; i < count; ++i) {
             if ((pComponent + i)->type != (target.pComponent + i)->type) {
                 return VG_FALSE;
             }

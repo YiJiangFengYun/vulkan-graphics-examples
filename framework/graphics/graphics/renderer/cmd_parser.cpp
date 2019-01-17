@@ -165,6 +165,9 @@ namespace vg
         auto pPass = renderPassInfo.pPass;
         if (pPass != nullptr) pPass->beginRecord();
 
+        auto pRendererPass = pRendererPassCache->get(pPass);
+        if (pRendererPass) pRendererPass->beginRecord();
+
         auto pShader = pPass->getShader();
         auto stageInfos = pShader->getShaderStageInfos();
         if (stageInfos.size() != 0)
@@ -174,16 +177,17 @@ namespace vg
                 renderPassInfo.pMesh,
                 subMeshIndex, 
                 pPass, 
+                pRendererPass,
                 pPipelineCache,
                 pPipeline);
             _recordCommandBuffer(pPipeline.get(),
                 pCommandBuffer,
-                pRendererPassCache,
                 renderPassInfo.framebufferWidth,
                 renderPassInfo.framebufferHeight,
                 renderPassInfo.pMesh,
                 subMeshIndex, 
-                pPass, 
+                pPass,
+                pRendererPass,
                 renderPassInfo.viewport,
                 renderPassInfo.scissor,
                 renderPassInfo.pCmdDraw,
@@ -197,12 +201,14 @@ namespace vg
 
         if (pMesh != nullptr) pMesh->endRecord();
         if (pPass != nullptr) pPass->endRecord();
+        if (pRendererPass) pRendererPass->endRecord();
     }
 
     void CMDParser::_createPipeline(const vk::RenderPass *pRenderPass,
         const BaseMesh *pMesh,
         uint32_t subMeshIndex,
         const Pass *pPass,
+        const RendererPass *pRendererPass,
         PipelineCache *pPipelineCache,
         std::shared_ptr<vk::Pipeline> &pPipeline)
     {
@@ -215,26 +221,26 @@ namespace vg
             pPass,
             pContentMesh != nullptr ? pContentMesh->getVertexData() : nullptr,
             pContentMesh != nullptr ? pContentMesh->getIndexData() : nullptr,
-            subMeshIndex
+            subMeshIndex,
+            pRendererPass
         );
-        pPipeline = pPipelineCache->caching(info);
+        pPipeline = pPipelineCache->get(info);
     }
 
     void CMDParser::_recordCommandBuffer(vk::Pipeline *pPipeline,
         vk::CommandBuffer *pCommandBuffer,
-        RendererPassCache *pRendererPassCache,
         uint32_t framebufferWidth,
         uint32_t framebufferHeight,
         const BaseMesh *pMesh,
         uint32_t subMeshIndex,
         const Pass *pPass,
+        const RendererPass *pRendererPass,
         const fd::Viewport viewport,
         const fd::Rect2D scissor,
         const CmdDraw * pCmdDraw,
         const CmdDrawIndexed * pCmdDrawIndexed
         )
     {   
-        const auto pRendererPass = pRendererPassCache->get(pPass);
         const auto& viewportOfPass = pPass->getViewport();
         const auto& scissorOfPass = pPass->getScissor();
 

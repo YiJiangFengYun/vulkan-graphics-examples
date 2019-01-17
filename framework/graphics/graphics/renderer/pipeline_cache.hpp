@@ -7,6 +7,7 @@
 #include "graphics/pass/pass.hpp"
 #include "graphics/buffer_data/vertex_data.hpp"
 #include "graphics/buffer_data/index_data.hpp"
+#include "graphics/renderer/renderer_pass.hpp"
 
 namespace boost {
     template<> 
@@ -27,12 +28,14 @@ namespace vg {
             const VertexData *pVertexData;
             const IndexData *pIndexData;
             uint32_t indexSubIndex;
+            const RendererPass *pRendererPass;
 
             Info(vk::RenderPass renderPass = vk::RenderPass()
                 , const Pass *pPass = nullptr
                 , const VertexData *pVertexData = nullptr
                 , const IndexData *pIndexData = nullptr
                 , uint32_t indexSubIndex = 0u
+                , const RendererPass *pRendererPass = nullptr
                 );
         };
 
@@ -42,6 +45,7 @@ namespace vg {
             const VertexData *pVertexData;
             const IndexData *pIndexData;
             uint32_t indexSubIndex;
+            const RendererPass *pRendererPass;
 
             Pass::PipelineStateID passPipelineStateID;
             uint32_t passSubPass;
@@ -75,7 +79,7 @@ namespace vg {
          * to empty. After rendering process, we will pick useful pipeline from back.
          **/
         void begin();
-        std::shared_ptr<vk::Pipeline> caching(const Info &info);
+        std::shared_ptr<vk::Pipeline> get(const Info &info);
         /**
          * At end of frame, this method is called to delete all useless pipeline in back.
          **/

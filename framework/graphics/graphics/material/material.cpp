@@ -150,7 +150,7 @@ namespace vg
         }
     }
 
-    MaterialShowType Material::getShowType()
+    MaterialShowType Material::getShowType() const
     {
         return m_renderQueueType;
     }
@@ -160,7 +160,7 @@ namespace vg
         m_renderQueueType = type;
     }
 
-    uint32_t Material::getRenderPriority()
+    uint32_t Material::getRenderPriority() const
     {
         return m_renderPriority;
     }

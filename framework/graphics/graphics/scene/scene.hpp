@@ -42,9 +42,9 @@ namespace vg
         const std::unordered_map<std::type_index, SceneLightRegisterInfo> getMapRegisteredLights() const;
         void registerLight(const std::type_info &lightTypeInfo, const SceneLightRegisterInfo &lightInfo);
         void unregisterLight(const std::type_info &lightTypeInfo);
-        virtual uint32_t getLightGroupSize(const std::type_info &lightTypeInfo) = 0;
-        void beginRender();
-        void endRender();
+        virtual uint32_t getLightGroupSize(const std::type_info &lightTypeInfo) const = 0;
+        void beginRender() const;
+        void endRender() const;
     protected:
         Space m_space;
         std::vector<const std::type_info *> m_arrRegisteredLights;
@@ -52,8 +52,8 @@ namespace vg
 
         virtual void _registerLight(const std::type_info &lightTypeInfo, const SceneLightRegisterInfo &lightInfo);
         virtual void _unregisterLight(const std::type_info &lightTypeInfo);
-        virtual void _beginRender();
-        virtual void _endRender();
+        virtual void _beginRender() const;
+        virtual void _endRender() const;
     };
 
     template <SpaceType SPACE_TYPE>
@@ -103,8 +103,9 @@ namespace vg
         Bool32 isHasLight(const LightType *pTarget) const;
         void addLight(LightType *pTarget, LightType *pParent = nullptr);
         void removeLight(LightType *pTarget);
-        virtual uint32_t getLightGroupSize(const std::type_info &lightTypeInfo) override;
-        const std::vector<LightType *> &getLightGroup(const std::type_info &lightTypeInfo);
+        virtual uint32_t getLightGroupSize(const std::type_info &lightTypeInfo) const override;
+        const std::vector<LightType *> &getLightGroup(const std::type_info &lightTypeInfo) const;
+        std::vector<LightType *> &getLightGroup(const std::type_info &lightTypeInfo);
 
         /*Get projective matrix with camera, it will change origin projective matrix of the camera
           with handed type info.*/
@@ -142,8 +143,8 @@ namespace vg
         virtual void _registerLight(const std::type_info &lightTypeInfo, const SceneLightRegisterInfo &lightInfo) override;
         virtual void _unregisterLight(const std::type_info &lightTypeInfo) override;
 
-        virtual void _beginRender() override;
-        virtual void _endRender() override;
+        virtual void _beginRender() const override;
+        virtual void _endRender() const override;
     private:
         template <typename T>
         Bool32 _isHasObject(const T *pTarget

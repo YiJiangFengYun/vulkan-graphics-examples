@@ -13,6 +13,7 @@
 #include "graphics/render_target/post_render_target.hpp"
 #include "graphics/util/frame_object_cache.hpp"
 #include "graphics/renderer/renderer_pass.hpp"
+#include "graphics/renderer/object_data_cache.hpp"
 
 namespace vg
 {
@@ -26,9 +27,9 @@ namespace vg
         Bool32 postRenderEnable;
 
         Bool32 firstScene;
-        BaseScene *pScene;
+        const BaseScene *pScene;
         const BaseProjector *pProjector;
-        PostRender *pPostRender;
+        const PostRender *pPostRender;
 
         const PreDepthTarget *pPreDepthTarget;
         const PostRenderTarget *pPostRenderTarget;
@@ -51,9 +52,9 @@ namespace vg
             , Bool32 postRenderEnable = VG_FALSE
 
             , Bool32 firstScene = VG_TRUE
-            , BaseScene *pScene = nullptr
+            , const BaseScene *pScene = nullptr
             , const BaseProjector *pProjector = nullptr
-            , PostRender *pPostRender = nullptr
+            , const PostRender *pPostRender = nullptr
     
             , const PreDepthTarget *pPreDepthTarget = nullptr
             , const PostRenderTarget *pPostRenderTarget = nullptr
@@ -86,12 +87,14 @@ namespace vg
         RendererPassCache *m_pRendererPassCache;
         // uint32_t m_framebufferWidth;
         // uint32_t m_framebufferHeight;
-        std::vector<BaseVisualObject *> m_bindedObjectsForLighting;
+        std::vector<const BaseVisualObject *> m_bindedObjectsForLighting;
         uint32_t m_bindedObjectCountForLighting;
-        std::vector<BaseVisualObject *> m_bindedObjectsForPreDepth;
+        std::vector<const BaseVisualObject *> m_bindedObjectsForPreDepth;
         uint32_t m_bindedObjectCountForPreDepth;
-        std::vector<BaseVisualObject *> m_bindedObjects;
+        std::vector<const BaseVisualObject *> m_bindedObjects;
         uint32_t m_bindedObjectCount;
+
+        RendererObjectDataCache m_objectDataCache;
 
         //light data buffer.
         Bool32 m_lightingEnable;
@@ -108,18 +111,18 @@ namespace vg
 
         void _endBind();
 
-        void _bindForLightDepth(Scene<SpaceType::SPACE_3> *pScene
+        void _bindForLightDepth(const Scene<SpaceType::SPACE_3> *pScene
             , const Projector<SpaceType::SPACE_3> *pProjector
             , CmdBuffer *pPreDepthCmdBuffer = nullptr);
 
-        void _syncLightData(BaseScene *pScene);
+        void _syncLightData(const BaseScene *pScene);
 
         void _bindForRenderPassBegin(RenderBinderInfo info);
 
         void _bindForRenderPassEnd(RenderBinderInfo info);
 
-        void _bindScene2(BaseLight *pLight
-            , Scene<SpaceType::SPACE_2> *pScene
+        void _bindScene2(const BaseLight *pLight
+            , const Scene<SpaceType::SPACE_2> *pScene
             , const Projector<SpaceType::SPACE_2> *pProjector
             , const BaseRenderTarget *pPreDepthTarget = nullptr
             , const BaseRenderTarget *pRenderTarget = nullptr
@@ -130,8 +133,8 @@ namespace vg
             , CmdBuffer *pTrunkRenderPassCmdBuffer = nullptr
             );
 
-        void _bindScene3(BaseLight *pLight
-            , Scene<SpaceType::SPACE_3> *pScene
+        void _bindScene3(const BaseLight *pLight
+            , const Scene<SpaceType::SPACE_3> *pScene
             , const Projector<SpaceType::SPACE_3> *pProjector
             , const BaseRenderTarget *pPreDepthTarget = nullptr
             , const BaseRenderTarget *pRenderTarget = nullptr
@@ -142,9 +145,9 @@ namespace vg
             , CmdBuffer *pTrunkRenderPassCmdBuffer = nullptr
             );
             
-        void _setBuildInData(BaseLight *pLight
+        void _setBuildInData(const BaseLight *pLight
             , Bool32 isPreDepth
-            , BaseVisualObject * pVisualObject
+            , const BaseVisualObject * pVisualObject
             , Matrix4x4 modelMatrix
             , Matrix4x4 viewMatrix
             , Matrix4x4 projMatrix
@@ -152,9 +155,9 @@ namespace vg
             , Vector4 viewerPos
         );
 
-        void _bindVisualObject(BaseLight *pLight
+        void _bindVisualObject(const BaseLight *pLight
             , Bool32 isPreDepth
-            , BaseVisualObject *pVisublObject
+            , const BaseVisualObject *pVisublObject
             , BaseVisualObject::BindInfo & bindInfo
             , BaseVisualObject::BindResult *pResult
             );

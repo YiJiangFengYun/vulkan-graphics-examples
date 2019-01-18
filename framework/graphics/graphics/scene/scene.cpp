@@ -84,12 +84,12 @@ namespace vg
         _unregisterLight(lightTypeInfo);
     }
 
-    void BaseScene::beginRender()
+    void BaseScene::beginRender() const
     {
         _beginRender();
     }
 
-    void BaseScene::endRender()
+    void BaseScene::endRender() const
     {
         _endRender();
     }
@@ -121,11 +121,11 @@ namespace vg
         m_arrRegisteredLights.erase(iterator);
     }
 
-    void BaseScene::_beginRender()
+    void BaseScene::_beginRender() const
     {
     }
     
-    void BaseScene::_endRender()
+    void BaseScene::_endRender() const
     { 
         
     }
@@ -352,18 +352,43 @@ namespace vg
     }
 
     template <SpaceType SPACE_TYPE>
-    uint32_t Scene<SPACE_TYPE>::getLightGroupSize(const std::type_info &lightTypeInfo)
+    uint32_t Scene<SPACE_TYPE>::getLightGroupSize(const std::type_info &lightTypeInfo) const
     {
         if (isHasRegisterLight(lightTypeInfo) == VG_FALSE) {
             return 0u;
         }
         else {
-            return static_cast<uint32_t>(m_mapLightGroups[std::type_index(lightTypeInfo)].size());
+			const auto &iterator = m_mapLightGroups.find(std::type_index(lightTypeInfo));
+			if (iterator == m_mapLightGroups.cend()) {
+				return 0u;
+			}
+			else {
+				return iterator->second.size();
+			}
+            //return static_cast<uint32_t>(m_mapLightGroups[std::type_index(lightTypeInfo)].size());
         }
     }
 
     template <SpaceType SPACE_TYPE>
-    const std::vector<typename Scene<SPACE_TYPE>::LightType *> &Scene<SPACE_TYPE>::getLightGroup(const std::type_info &lightTypeInfo)
+    const std::vector<typename Scene<SPACE_TYPE>::LightType *> &Scene<SPACE_TYPE>::getLightGroup(const std::type_info &lightTypeInfo) const
+    {
+        if (isHasRegisterLight(lightTypeInfo) == VG_FALSE) {
+            throw std::invalid_argument("The light type don't be registered!");
+        }
+        else {
+			const auto &iterator = m_mapLightGroups.find(std::type_index(lightTypeInfo));
+			if (iterator == m_mapLightGroups.cend()) {
+				throw std::invalid_argument("The light group don't exist!");
+			}
+			else {
+				return iterator->second;
+			}
+            //return m_mapLightGroups[std::type_index(lightTypeInfo)];
+        }
+    }
+
+    template <SpaceType SPACE_TYPE>
+    std::vector<typename Scene<SPACE_TYPE>::LightType *> &Scene<SPACE_TYPE>::getLightGroup(const std::type_info &lightTypeInfo)
     {
         if (isHasRegisterLight(lightTypeInfo) == VG_FALSE) {
             throw std::invalid_argument("The light type don't be registered!");
@@ -387,7 +412,7 @@ namespace vg
     }
 
     template <SpaceType SPACE_TYPE>
-    void Scene<SPACE_TYPE>::_beginRender()
+    void Scene<SPACE_TYPE>::_beginRender() const
     {
         BaseScene::_beginRender();
         uint32_t len;
@@ -406,7 +431,7 @@ namespace vg
     }
     
     template <SpaceType SPACE_TYPE>
-    void Scene<SPACE_TYPE>::_endRender()
+    void Scene<SPACE_TYPE>::_endRender() const
     {
         uint32_t len;
         len = static_cast<uint32_t>(m_arrPVisualObjects.size());

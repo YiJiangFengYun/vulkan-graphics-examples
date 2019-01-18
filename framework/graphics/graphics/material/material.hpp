@@ -89,9 +89,9 @@ namespace vg
         const Pass *getMainPass() const;
         Pass *getMainPass();
         
-        MaterialShowType getShowType();
+        MaterialShowType getShowType() const;
         void setRenderQueueType(MaterialShowType type);
-        uint32_t getRenderPriority();
+        uint32_t getRenderPriority() const;
         void setRenderPriority(uint32_t priority);
         /*Call the apply methods of all passes in the material.*/
         virtual void apply();

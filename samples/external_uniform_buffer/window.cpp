@@ -152,7 +152,7 @@ void Window::_createDynamicUniformData()
         auto &subDataInfo = subDataInfos[i];
         auto &bindingInfo = bindingInfos[i];
 
-        bindingInfo.binding = 2u;
+        bindingInfo.binding = 0u;
         bindingInfo.descriptorType = vk::DescriptorType::eUniformBufferDynamic;
         bindingInfo.descriptorCount = 1u;
         bindingInfo.stageFlags = vk::ShaderStageFlagBits::eVertex;

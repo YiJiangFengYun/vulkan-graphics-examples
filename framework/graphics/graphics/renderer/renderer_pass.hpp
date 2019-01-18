@@ -75,7 +75,7 @@ namespace vg
 		sizeof(BuildInDataTypeTypeInfo<Pass::BuildInDataType::POS_VIEWER>::Type)
 	};
     
-    class RendererPass {
+    class RendererPass : public Base {
     public:
         struct _BuildInDataCache
         {
@@ -160,7 +160,10 @@ namespace vg
          **/
         void begin();
 
-        RendererPass *get(const Pass *pPass);
+        /**
+         *  Pass and object is two dependencies of renderer pass. 
+         **/
+        RendererPass *get(const Pass *pPass, InstanceID objectID);
 
         /**
          * When frame end,  it is called to delete all useless cached pass.
@@ -169,8 +172,8 @@ namespace vg
 
     private:
         //Map between pass and renderer pass, key is instance ID of pass.
-        std::unordered_map<InstanceID, std::shared_ptr<RendererPass>> m_mapPasses;
-        std::unordered_map<InstanceID, std::shared_ptr<RendererPass>> m_mapPassesBack;
+        std::unordered_map<std::string, std::shared_ptr<RendererPass>> m_mapPasses;
+        std::unordered_map<std::string, std::shared_ptr<RendererPass>> m_mapPassesBack;
         std::shared_ptr<RendererPass> _createNewRendererPass(const Pass *pPass);
     };
 } //vg

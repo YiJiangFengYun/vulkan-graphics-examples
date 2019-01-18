@@ -182,6 +182,7 @@ namespace vge
             renderPassInfo.subMeshIndex = info.subMeshIndex;
             renderPassInfo.viewport = viewport;
             renderPassInfo.scissor = scissor;
+            renderPassInfo.objectID = info.objectID;
     
             vg::CmdInfo cmdInfo;
             cmdInfo.pRenderPassInfo = &renderPassInfo;
@@ -204,6 +205,7 @@ namespace vge
             renderPassInfo.subMeshIndex = 0u;
             renderPassInfo.viewport = fd::Viewport();
             renderPassInfo.scissor = scissor;
+            renderPassInfo.objectID = info.objectID;
     
             vg::CmdDraw cmdDraw = {3,1,0,0};
             renderPassInfo.pCmdDraw = &cmdDraw;
@@ -236,6 +238,7 @@ namespace vge
             trunkRenderPassInfo.subMeshIndex = 0u;
             trunkRenderPassInfo.viewport = fd::Viewport();
             trunkRenderPassInfo.scissor = info.hasClipRect ? info.clipRect : fd::Rect2D();
+            trunkRenderPassInfo.objectID = info.objectID;
     
             vg::CmdInfo cmdInfo;
             cmdInfo.pRenderPassInfo = &trunkRenderPassInfo;

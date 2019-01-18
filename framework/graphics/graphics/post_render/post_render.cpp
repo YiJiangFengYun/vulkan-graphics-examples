@@ -82,6 +82,7 @@ namespace vg
             renderPassInfo.subMeshIndex = 0u;
             renderPassInfo.viewport = fd::Viewport();
             renderPassInfo.scissor = fd::Rect2D();
+            renderPassInfo.objectID = 0;
             renderPassInfo.pCmdDraw = &cmdDraw;
     
             vg::CmdInfo cmdInfo;

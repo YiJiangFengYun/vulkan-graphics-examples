@@ -25,27 +25,27 @@ namespace vg {
         struct Info {
             vk::RenderPass renderPass;
             const Pass *pPass;
+            const RendererPass *pRendererPass;
             const VertexData *pVertexData;
             const IndexData *pIndexData;
             uint32_t indexSubIndex;
-            const RendererPass *pRendererPass;
 
             Info(vk::RenderPass renderPass = vk::RenderPass()
                 , const Pass *pPass = nullptr
+                , const RendererPass *pRendererPass = nullptr
                 , const VertexData *pVertexData = nullptr
                 , const IndexData *pIndexData = nullptr
                 , uint32_t indexSubIndex = 0u
-                , const RendererPass *pRendererPass = nullptr
                 );
         };
 
         struct InfoFullKey {
             vk::RenderPass renderPass;
             const Pass *pPass;
+            const RendererPass *pRendererPass;
             const VertexData *pVertexData;
             const IndexData *pIndexData;
             uint32_t indexSubIndex;
-            const RendererPass *pRendererPass;
 
             Pass::PipelineStateID passPipelineStateID;
             uint32_t passSubPass;

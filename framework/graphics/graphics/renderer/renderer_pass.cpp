@@ -59,7 +59,8 @@ namespace vg
 
 ///RendererPass
     RendererPass::RendererPass()
-        : m_pPass()
+        : Base(BaseType::RENDERER_PASS)
+        , m_pPass()
         , m_passPipelineLayoutStateID()
         , m_passPipelineStateID()
         , m_buildInDataCache()
@@ -71,7 +72,6 @@ namespace vg
         , m_descriptorSets()
         , m_pPipelineLayout()
         , m_pipelineStateID()
- 
     {
         _initBuildInData();
     }
@@ -329,18 +329,19 @@ namespace vg
         m_mapPasses.clear();
     }
 
-    RendererPass *RendererPassCache::get(const Pass *pPass)
+    RendererPass *RendererPassCache::get(const Pass *pPass, InstanceID objectID)
     {
         RendererPass * pCurr;
-        if (m_mapPasses[pPass->getID()] != nullptr) {
-            pCurr = m_mapPasses[pPass->getID()].get();
-        } else if (m_mapPassesBack[pPass->getID()] != nullptr) {
-            m_mapPasses[pPass->getID()] = m_mapPassesBack[pPass->getID()];
-            m_mapPassesBack.erase(pPass->getID());
-            pCurr = m_mapPasses[pPass->getID()].get();
+        auto key = std::to_string(pPass->getID()) + "_" + std::to_string(objectID);
+        if (m_mapPasses[key] != nullptr) {
+            pCurr = m_mapPasses[key].get();
+        } else if (m_mapPassesBack[key] != nullptr) {
+            m_mapPasses[key] = m_mapPassesBack[key];
+            m_mapPassesBack.erase(key);
+            pCurr = m_mapPasses[key].get();
         } else {
             auto pNew = _createNewRendererPass(pPass);
-            m_mapPasses[pPass->getID()] = pNew;
+            m_mapPasses[key] = pNew;
             pCurr = pNew.get();
         }
 

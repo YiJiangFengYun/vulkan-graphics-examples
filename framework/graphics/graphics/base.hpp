@@ -26,6 +26,7 @@ namespace vg
         SCENE,
         SCENE_OBJECT,
 
+        RENDERER_PASS,
         RENDERER,
 
         APP,

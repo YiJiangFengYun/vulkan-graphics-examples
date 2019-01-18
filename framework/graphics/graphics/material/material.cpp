@@ -224,6 +224,7 @@ namespace vg
             trunkRenderPassInfo.subMeshIndex = info.subMeshIndex;
             trunkRenderPassInfo.viewport = fd::Viewport();
             trunkRenderPassInfo.scissor = info.hasClipRect ? info.clipRect : fd::Rect2D();
+            trunkRenderPassInfo.objectID = info.objectID;
             CmdInfo cmdInfo;
             cmdInfo.pRenderPassInfo = &trunkRenderPassInfo;
             result.pTrunkRenderPassCmdBuffer->addCmd(cmdInfo);

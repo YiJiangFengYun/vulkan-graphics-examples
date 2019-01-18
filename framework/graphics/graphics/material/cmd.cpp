@@ -158,6 +158,7 @@ namespace vg
         , uint32_t subMeshIndex
         , fd::Viewport viewport
         , fd::Rect2D scissor
+        , InstanceID objectID
         , const CmdDraw *pCmdDraw
         , const CmdDrawIndexed *pCmdDrawIndexed
         )
@@ -174,6 +175,7 @@ namespace vg
         , subMeshIndex(subMeshIndex)
         , viewport(viewport)
         , scissor(scissor)
+        , objectID(objectID)
         , pCmdDraw(pCmdDraw)
         , pCmdDrawIndexed(pCmdDrawIndexed)
     {    

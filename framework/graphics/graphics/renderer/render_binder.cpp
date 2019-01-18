@@ -210,7 +210,7 @@ namespace vg
                     vg::ImageDescriptorType::COMBINED_IMAGE_SAMPLER,
                     vk::ShaderStageFlagBits::eFragment,
                 };
-                auto pRenderPass = info.pRendererPassCache->get(pPass);
+                auto pRenderPass = info.pRendererPassCache->get(pPass, 0);
                 if (pRenderPass->getBindingSet().hasTexture(VG_PASS_POST_RENDER_TEXTURE_NAME) == VG_FALSE)
                 {
                     pRenderPass->getBindingSet().addTexture(VG_PASS_POST_RENDER_TEXTURE_NAME, passInfo);
@@ -1048,7 +1048,7 @@ namespace vg
             for (uint32_t passIndex = 0u; passIndex < passCount; ++passIndex)
             {
                 auto pPass = pMaterial->getPassWithIndex(passIndex);
-                auto pRendererPass = m_pRendererPassCache->get(pPass);
+                auto pRendererPass = m_pRendererPassCache->get(pPass, pVisualObject->getID());
 
                 Bool32 hasMatrixObjectToNDC = VG_FALSE;
                 Bool32 hasMatrixObjectToWorld = VG_FALSE;

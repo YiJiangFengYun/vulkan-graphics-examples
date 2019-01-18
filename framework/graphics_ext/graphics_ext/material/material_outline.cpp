@@ -64,6 +64,7 @@ namespace vge
             trunkRenderPassInfo.subMeshIndex = info.subMeshIndex;
             trunkRenderPassInfo.viewport = fd::Viewport();
             trunkRenderPassInfo.scissor = info.hasClipRect ? info.clipRect : fd::Rect2D();
+            trunkRenderPassInfo.objectID = info.objectID;
 
             vg::CmdInfo cmdInfo;
             cmdInfo.pRenderPassInfo = &trunkRenderPassInfo;
@@ -84,6 +85,7 @@ namespace vge
             trunkRenderPassInfo.pMesh = info.pMesh;
             trunkRenderPassInfo.subMeshIndex = info.subMeshIndex;
             trunkRenderPassInfo.viewport = fd::Viewport();
+            trunkRenderPassInfo.objectID = info.objectID;
 
             fd::Rect2D clipRect = fd::Rect2D();
             if (info.hasClipRect)

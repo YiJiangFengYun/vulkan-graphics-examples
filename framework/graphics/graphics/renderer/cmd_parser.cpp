@@ -165,7 +165,7 @@ namespace vg
         auto pPass = renderPassInfo.pPass;
         if (pPass != nullptr) pPass->beginRecord();
 
-        auto pRendererPass = pRendererPassCache->get(pPass);
+        auto pRendererPass = pRendererPassCache->get(pPass, pRenderPassInfo->objectID);
         if (pRendererPass) pRendererPass->beginRecord();
 
         auto pShader = pPass->getShader();
@@ -219,10 +219,10 @@ namespace vg
         PipelineCache::Info info(
             *pRenderPass,
             pPass,
+            pRendererPass,
             pContentMesh != nullptr ? pContentMesh->getVertexData() : nullptr,
             pContentMesh != nullptr ? pContentMesh->getIndexData() : nullptr,
-            subMeshIndex,
-            pRendererPass
+            subMeshIndex
         );
         pPipeline = pPipelineCache->get(info);
     }

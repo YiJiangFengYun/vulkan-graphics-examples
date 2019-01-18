@@ -59,13 +59,20 @@ namespace vg
         using Type = Matrix4x4;
     };
 
+    template<>
+    struct BuildInDataTypeTypeInfo<Pass::BuildInDataType::POS_VIEWER>
+    {
+        using Type = Vector4;
+    };
+
     const std::array<uint32_t, static_cast<size_t>(Pass::BuildInDataType::COUNT)> buildInDataTypeSizes = {
 		sizeof(BuildInDataTypeTypeInfo<Pass::BuildInDataType::MATRIX_OBJECT_TO_NDC>::Type),
 		sizeof(BuildInDataTypeTypeInfo<Pass::BuildInDataType::MAIN_CLOLOR>::Type),
 		sizeof(BuildInDataTypeTypeInfo<Pass::BuildInDataType::MATRIX_OBJECT_TO_WORLD>::Type),
 		sizeof(BuildInDataTypeTypeInfo<Pass::BuildInDataType::MATRIX_OBJECT_TO_VIEW>::Type),
 		sizeof(BuildInDataTypeTypeInfo<Pass::BuildInDataType::MATRIX_VIEW>::Type),
-		sizeof(BuildInDataTypeTypeInfo<Pass::BuildInDataType::MATRIX_PROJECTION>::Type)
+		sizeof(BuildInDataTypeTypeInfo<Pass::BuildInDataType::MATRIX_PROJECTION>::Type),
+		sizeof(BuildInDataTypeTypeInfo<Pass::BuildInDataType::POS_VIEWER>::Type)
 	};
     
     class RendererPass {

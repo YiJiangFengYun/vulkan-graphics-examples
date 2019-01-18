@@ -253,14 +253,13 @@ namespace vg
             {
                 Pass::BuildInDataType type = (*(buildInDataInfo.pComponent + componentIndex)).type;
                 uint32_t count = static_cast<uint32_t>(Pass::BuildInDataType::COUNT);
-                for (uint32_t i = 0; i < count; ++i)
-                {
-                    if (i == static_cast<uint32_t>(type))
-                    {
-                        size += buildInDataTypeSizes[i];
-                        break;
-                    }
-                }
+				uint32_t typeInt = static_cast<uint32_t>(type);
+				if (typeInt >= buildInDataTypeSizes.size())
+					throw std::runtime_error("The buildin type has not the corresponding item in buildInDataTypeSizes.");
+			    uint32_t currSize = buildInDataTypeSizes[typeInt];
+				if (currSize == 0)
+					throw std::runtime_error("The size of a item of buildInDataTypeSizes is zero.");
+				size += currSize;
             }
     
             if (size > 0)

@@ -263,8 +263,8 @@ namespace vgim
             pIndexData->updateBufferSize(indexBufferSizes);
             pIndexData->updateVertexDataIndex(indexVertexDataIndices);
 
-            /*pUIObject->setHasClipRect(VG_TRUE);
-            pUIObject->updateClipRects(indexRects);*/ //todo
+            pUIObject->setHasClipRect(VG_TRUE);
+            pUIObject->updateClipRects(indexRects);
         }
 
 

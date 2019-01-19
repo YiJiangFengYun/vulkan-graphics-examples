@@ -41,6 +41,16 @@ namespace vg
             ++offset;
         }
     }
+
+    void RendererObjectData::updateClipRects(const fd::Rect2D *pRects, uint32_t count, uint32_t offset )
+    {
+        if (clipRects.size() < offset + count) clipRects.resize(offset + count);
+        for (uint32_t i = 0; i < count; ++i)
+        {
+            clipRects[offset] = *(pRects + i);
+            ++offset;
+        }
+    }
         
     void RendererObjectData::updateClipRects(fd::Rect2D rect, uint32_t count, uint32_t offset)
     {

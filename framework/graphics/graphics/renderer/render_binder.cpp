@@ -2,6 +2,7 @@
 
 #include "graphics/util/gemo_util.hpp"
 #include "graphics/scene/light_3.hpp"
+#include "graphics/scene/visual_object_2.hpp"
 
 namespace vg
 {
@@ -750,6 +751,12 @@ namespace vg
             if (isHasBoundsOfChild == VG_FALSE)
             {
                 arrPVObjs[PVObjIndex++] = pVisualObjectOfChild;
+                const VisualObject2 *pObject = dynamic_cast<const VisualObject2 *>(pVisualObjectOfChild);
+                if (pObject->getHasClipRect()) {
+                    uint32_t subMeshCount = pVisualObjectOfChild->getSubMeshCount();
+                    pObjectRenderData->setHasClipRect(VG_TRUE);
+                    pObjectRenderData->updateClipRects(pObject->getClipRects(), subMeshCount, 0);
+                }
             } 
             else if (pVisualObjectOfChild->getIsVisibilityCheck() == VG_FALSE)
             {
@@ -775,9 +782,30 @@ namespace vg
                     clipRect.y = (clipRect.y + 1.0f) / 2.0f;
                     clipRect.width = clipRect.width / 2.0f;
                     clipRect.height = clipRect.height / 2.0f;
-                    uint32_t subMeshCount = pVisualObjectOfChild->getSubMeshCount();
-                    pObjectRenderData->setHasClipRect(VG_TRUE);
-                    pObjectRenderData->updateClipRects(clipRect, subMeshCount);
+                    const VisualObject2 *pObject = dynamic_cast<const VisualObject2 *>(pVisualObjectOfChild);
+                    if (pObject->getHasClipRect()) {
+                        uint32_t subMeshCount = pVisualObjectOfChild->getSubMeshCount();
+                        auto pRects = pObject->getClipRects();
+                        std::vector<fd::Rect2D> rects(subMeshCount);
+                        for (auto i = 0u; i < subMeshCount; ++i) {
+                            rects[i] = *(pRects + i);
+                            float minX = std::max(rects[i].x, clipRect.x);
+                            float minY = std::max(rects[i].y, clipRect.y);
+                            float maxX = std::min(rects[i].x + rects[i].width, clipRect.x + clipRect.width);
+                            float maxY = std::min(rects[i].y + rects[i].height, clipRect.y + clipRect.height);
+                            rects[i].setX(minX);
+                            rects[i].setY(minY);
+                            rects[i].setWidth(maxX - minX);
+                            rects[i].setHeight(maxY - minY);
+                        }
+
+                        pObjectRenderData->setHasClipRect(VG_TRUE);
+                        pObjectRenderData->updateClipRects(rects);
+                    } else {
+                        uint32_t subMeshCount = pVisualObjectOfChild->getSubMeshCount();
+                        pObjectRenderData->setHasClipRect(VG_TRUE);
+                        pObjectRenderData->updateClipRects(clipRect, subMeshCount);
+                    }
                 }
             }
         }

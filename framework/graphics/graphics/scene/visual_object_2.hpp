@@ -18,7 +18,26 @@ namespace vg
 
         }
 
+        Bool32 getHasClipRect() const;
+        void setHasClipRect(Bool32 value);
+        uint32_t getClipRectCount() const;
+        const fd::Rect2D *getClipRects() const;
+        void updateClipRects(fd::ArrayProxy<fd::Rect2D> rects, uint32_t offset = 0u);
+        void updateClipRects(fd::Rect2D rect, uint32_t count, uint32_t offset = 0u);
+
         virtual Matrix4x4 _getModelMatrix() const override;
+
+        virtual void setMesh(MeshDimType *pMesh) override;
+
+        virtual void setMesh(MeshDimType *pMesh
+            , uint32_t subMeshOffset
+            , uint32_t subMeshCount) override;
+
+        virtual void updateSubMeshInfo(uint32_t subMeshOffset, uint32_t subMeshCount) override;
+    private:
+        Bool32 m_hasClipRect;
+        //Valid range of ClipRect is [(0, 0), (1, 1)]
+        std::vector<fd::Rect2D> m_clipRects;
     };
 
 } //namespace kgs

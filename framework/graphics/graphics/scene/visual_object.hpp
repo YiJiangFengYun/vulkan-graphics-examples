@@ -69,7 +69,7 @@ namespace vg
         uint32_t getSubMeshOffset() const;
         uint32_t getSubMeshCount() const;
 
-        void updateSubMeshInfo(uint32_t subMeshOffset, uint32_t subMeshCount);
+        virtual void updateSubMeshInfo(uint32_t subMeshOffset, uint32_t subMeshCount);
 
         Bool32 getIsVisibilityCheck() const;
         void setIsVisibilityCheck(Bool32 value);
@@ -124,7 +124,7 @@ namespace vg
 
         }
 
-        void setMesh(MeshDimType *pMesh)
+        virtual void setMesh(MeshDimType *pMesh)
         {
             m_pMesh = pMesh;
             m_subMeshOffset = -1;
@@ -132,14 +132,14 @@ namespace vg
             //m_clipRects.resize(dynamic_cast<const ContentMesh *>(m_pMesh)->getSubMeshOffset());
         }
 
-        void setMesh(MeshDimType *pMesh
+        virtual void setMesh(MeshDimType *pMesh
             , uint32_t subMeshOffset
             , uint32_t subMeshCount)
         {
             m_pMesh = pMesh;
             m_subMeshOffset = subMeshOffset;
             m_subMeshCount = subMeshCount;
-            m_clipRects.resize(subMeshCount);
+            // m_clipRects.resize(subMeshCount);
         }
     protected:
         //aggregations

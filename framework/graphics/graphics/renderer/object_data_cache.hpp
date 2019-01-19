@@ -16,6 +16,7 @@ namespace vg
         uint32_t getClipRectCount() const;
         const fd::Rect2D *getClipRects() const;
         void updateClipRects(fd::ArrayProxy<fd::Rect2D> rects, uint32_t offset = 0u);
+        void updateClipRects(const fd::Rect2D *pRects, uint32_t count, uint32_t offset = 0u);
         void updateClipRects(fd::Rect2D rect, uint32_t count, uint32_t offset = 0u);
 
     };

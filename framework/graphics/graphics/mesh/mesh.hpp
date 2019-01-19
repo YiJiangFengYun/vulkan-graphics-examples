@@ -247,7 +247,7 @@ namespace vg
         static const MeshData::DataType ARRAY_DATA_TYPE = MeshConstInfo<meshDimType>::ARRAY_TYPE;
         using BaseValueType = typename MeshData::DataTypeInfo<ARRAY_DATA_TYPE>::BaseType;
         using ArrayValueType = typename MeshData::DataTypeInfo<ARRAY_DATA_TYPE>::ValueType;
-
+        using PointType = typename Mesh<meshDimType>::PointType;
         DimSepMesh(vk::MemoryPropertyFlags bufferMemoryPropertyFlags = vk::MemoryPropertyFlagBits::eDeviceLocal);
 
         virtual ~DimSepMesh();
@@ -286,6 +286,7 @@ namespace vg
     class DimSimpleMesh : public InternalContentMesh, public Mesh<meshDimType>
     {
     public: 
+        using PointType = typename Mesh<meshDimType>::PointType;
         DimSimpleMesh(vk::MemoryPropertyFlags bufferMemoryPropertyFlags = vk::MemoryPropertyFlagBits::eDeviceLocal);
         void setIsHasBounds(Bool32 isHasBounds);
         void setBounds(fd::Bounds<PointType> bounds);
@@ -296,6 +297,7 @@ namespace vg
     class DimSharedContentMesh : public ExternalContentMesh, public Mesh<meshDimType>
     {
     public:
+        using PointType = typename Mesh<meshDimType>::PointType;
         DimSharedContentMesh();
         DimSharedContentMesh(std::shared_ptr<VertexData> pVertexData
             , std::shared_ptr<IndexData> pIndexData

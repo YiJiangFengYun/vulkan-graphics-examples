@@ -96,6 +96,7 @@ namespace vg
         uint32_t subMeshIndex;
         fd::Viewport viewport;
         fd::Rect2D scissor;
+        InstanceID objectID;
         const CmdDraw *pCmdDraw;
         const CmdDrawIndexed *pCmdDrawIndexed;
             
@@ -112,6 +113,7 @@ namespace vg
             , uint32_t subMeshIndex = 0u
             , fd::Viewport viewport = fd::Viewport()
             , fd::Rect2D scissor = fd::Rect2D()
+            , InstanceID objectID = InstanceID()
             , const CmdDraw *pCmdDraw = nullptr
             , const CmdDrawIndexed *pCmdDrawIndexed = nullptr
             );
@@ -137,6 +139,7 @@ namespace vg
         CmdBuffer();
         uint32_t getCmdCount() const;
         const CmdInfo *getCmdInfos() const;
+        void empty();
         void begin();
         void addCmd(CmdInfo cmdInfo);
         void end();

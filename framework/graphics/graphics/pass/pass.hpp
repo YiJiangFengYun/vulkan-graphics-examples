@@ -13,6 +13,7 @@
 #include "graphics/texture/texture_default.hpp"
 #include "graphics/pass/pass_push_constant.hpp"
 #include "graphics/pass/pass_specialization.hpp"
+#include "graphics/binding_set/binding_set.hpp"
 
 //to do 
 //specilazation constant and push constant
@@ -33,50 +34,6 @@ namespace vg
             COUNT = 7
         };
 
-        template<BuildInDataType type>
-        struct BuildInDataTypeTypeInfo
-        {
-            using Type = void;
-        };
-
-        template<>
-        struct BuildInDataTypeTypeInfo<BuildInDataType::MATRIX_OBJECT_TO_NDC>
-        {
-            using Type = Matrix4x4;
-        };
-
-        template<>
-        struct BuildInDataTypeTypeInfo<BuildInDataType::MAIN_CLOLOR>
-        {
-            using Type = Color;
-        };
-
-        template<>
-        struct BuildInDataTypeTypeInfo<BuildInDataType::MATRIX_OBJECT_TO_WORLD>
-        {
-            using Type = Matrix4x4;
-        };
-
-        template<>
-        struct BuildInDataTypeTypeInfo<BuildInDataType::MATRIX_OBJECT_TO_VIEW>
-        {
-            using Type = Matrix4x4;
-        };
-
-        template<>
-        struct BuildInDataTypeTypeInfo<BuildInDataType::MATRIX_VIEW>
-        {
-            using Type = Matrix4x4;
-        };
-
-        template<>
-        struct BuildInDataTypeTypeInfo<BuildInDataType::MATRIX_PROJECTION>
-        {
-            using Type = Matrix4x4;
-        };
-
-        static const std::array<uint32_t, static_cast<size_t>(BuildInDataType::COUNT)> buildInDataTypeSizes;
-
         struct BuildInDataInfo
         {
             struct Component {
@@ -88,33 +45,12 @@ namespace vg
             BuildInDataInfo(uint32_t componentCount = 0u, Component *pComponent = nullptr);
             BuildInDataInfo(const BuildInDataInfo &target);
             BuildInDataInfo &operator=(const BuildInDataInfo &target);
+            Bool32 operator==(const BuildInDataInfo &target) const;
+            Bool32 operator!=(const BuildInDataInfo &target) const;
         };
 
-        struct _BuildInDataCache
-        {
-            Matrix4x4 matrixObjectToNDC;
-            Color     mainColor;
-            Matrix4x4 matrixObjectToWorld;
-            Matrix4x4 matrixObjectToView;
-            Matrix4x4 matrixView;
-            Matrix4x4 matrixProjection;
-            Vector4 posViewer;
-
-            _BuildInDataCache(Matrix4x4 matrixObjectToNDC = Matrix4x4(1.0f)
-                , Color mainColor = Color(1.0f)
-                , Matrix4x4 matrixObjectToWorld = Matrix4x4(1.0f)
-                , Matrix4x4 matrixObjectToView = Matrix4x4(1.0f)
-                , Matrix4x4 matrixView = Matrix4x4(1.0f)
-                , Matrix4x4 matrixProjection = Matrix4x4(1.0f)
-                , Vector4 posViewer = Vector4(0.0f, 0.0f, 0.0f, 1.0f)
-                );
-
-            _BuildInDataCache(const _BuildInDataCache &target);
-            _BuildInDataCache(const _BuildInDataCache &&target);
-            _BuildInDataCache &operator=(const _BuildInDataCache &target);
-        };
-
-        using PipelineStateID = uint32_t; 
+        using PipelineLayoutStateID = uint32_t;
+        using PipelineStateID = uint32_t;
         struct PushConstantUpdateInfo
         {
             vk::ShaderStageFlags stageFlags;
@@ -243,9 +179,6 @@ namespace vg
         void setBuildInDataInfo(BuildInDataInfo info);
         const BuildInDataInfo &getBuildInDataInfo() const;
 
-        void setBuildInDataMatrix4x4(BuildInDataType type, Matrix4x4 matrix);
-        void setBuildInDataVector4(BuildInDataType type, Vector4 vector);
-
         vk::PolygonMode getPolygonMode() const;
         void setPolygonMode(vk::PolygonMode polygonMode);
 
@@ -332,6 +265,7 @@ namespace vg
             , const T &data
             );
 
+        const std::vector<vk::PushConstantRange> &getPushConstantRanges() const;
         std::vector<PushConstantUpdateInfo> getPushconstantUpdates() const;
 
         uint32_t getInstanceCount() const;
@@ -349,16 +283,15 @@ namespace vg
         const DepthBiasUpdateInfo &getDepthBiasUpdateInfo() const;
         void setDepthBiasUpdateInfo(const DepthBiasUpdateInfo &value);
 
-        const BufferData &getBufferData() const;
-        const vk::DescriptorSetLayout *getDescriptorSetLayout() const;
-        const vk::DescriptorPool *getDescriptorPool() const;
-        const vk::DescriptorSet *getDescriptorSet() const;
-        const vk::PipelineLayout *getPipelineLayout() const;
-        uint32_t getUsingDescriptorSetCount() const;
-        const vk::DescriptorSet *getUsingDescriptorSets() const;
-        uint32_t getUsingDescriptorDynamicOffsetCount() const;
-        const uint32_t *getUsingDescriptorDynamicOffsets() const;
+        const BindingSet &getBindingSet() const;
+        uint32_t getDescriptorSetLayoutCount() const;
+        const vk::DescriptorSetLayout *getDescriptorSetLayouts() const;
+        uint32_t getDescriptorSetCount() const;
+        const vk::DescriptorSet *getDescriptorSets() const;
+        uint32_t getDescriptorDynamicOffsetCount() const;
+        const uint32_t *getDescriptorDynamicOffsets() const;
 
+        PipelineLayoutStateID getPipelineLayoutStateID() const;
         PipelineStateID getPipelineStateID() const;
 
         void apply();
@@ -366,12 +299,10 @@ namespace vg
         void beginRecord() const;
         void endRecord() const;
     private:
-        PassData m_data;
-        Bool32 m_dataChanged;
-        Bool32 m_dataContentChanged;
-        std::unordered_map<std::string, Bool32> m_dataContentChanges;
-        Bool32 m_textureChanged;
-        Bool32 m_bufferChanged;
+        Color m_mainColor;
+        BindingSet m_bindingSet;
+        BindingSet::DescriptorSetStateID m_bindingSetDescriptorSetStateID;
+        PassExtUniformBuffers m_extUniformBuffers;
         Bool32 m_extUniformBufferChanged;
 
         vk::PolygonMode m_polygonMode;
@@ -396,7 +327,6 @@ namespace vg
 
         BuildInDataInfo m_buildInDataInfo;
         std::vector<BuildInDataInfo::Component> m_buildInDataInfoComponents;
-        _BuildInDataCache m_buildInDataCache;
 
         VertexInputFilterInfo m_vertexInputFilterInfo;
         std::vector<uint32_t> m_vertexInputFilterLocations;
@@ -405,61 +335,6 @@ namespace vg
         DepthBiasUpdateInfo m_depthBiasUpdateInfo;
 
         ////////applied data
-
-        //Build in buffer.
-        struct DataSortInfo {
-            std::string name;
-            vk::ShaderStageFlags shaderStageFlags;
-            uint32_t layoutPriority;
-            uint32_t size;
-            uint32_t bufferSize;
-
-            DataSortInfo(std::string name = nullptr
-                , vk::ShaderStageFlags shaderStageFlags = vk::ShaderStageFlags()
-                , uint32_t layoutPriority = 0u
-                , uint32_t size = 0u
-                , uint32_t bufferSize = 0u
-                );
-        };
-        static Bool32 _compareDataInfo(const DataSortInfo &, const DataSortInfo &);
-        std::set<DataSortInfo, Bool32(*)(const DataSortInfo &, const DataSortInfo &)> m_sortDataSet;
-        BufferData m_dataBuffer;
-
-        //build in descriptor set layout.
-        struct BufferTextureSortInfo {
-            std::string name;
-            uint32_t bindingPriority;
-            Bool32 isTexture;
-            const void *pData;
-
-            BufferTextureSortInfo(std::string name = nullptr
-                , uint32_t bindingPriority = 0u
-                , Bool32 isTexture = VG_FALSE
-                , const void *pData = nullptr
-                );
-        };
-        static Bool32 _compareBufferTextureInfo(const BufferTextureSortInfo &, const BufferTextureSortInfo &);
-        std::set<BufferTextureSortInfo, Bool32(*)(const BufferTextureSortInfo &, const BufferTextureSortInfo &)> m_sortBufferTexInfosSet;
-        Bool32 m_descriptorSetChanged;
-        uint32_t m_layoutBindingCount;
-        std::vector<vk::DescriptorSetLayoutBinding> m_descriptorSetLayoutBindings;
-        struct UpdateDescriptorSetInfo {
-            std::vector<vk::DescriptorBufferInfo> bufferInfos;
-            std::vector<vk::DescriptorImageInfo> imageInfos;
-
-            UpdateDescriptorSetInfo(std::vector<vk::DescriptorBufferInfo> bufferInfos = std::vector<vk::DescriptorBufferInfo>()
-                , std::vector<vk::DescriptorImageInfo> imageInfos = std::vector<vk::DescriptorImageInfo>()
-                );
-        };
-        std::vector<UpdateDescriptorSetInfo> m_updateDescriptorSetInfos;
-        std::shared_ptr<vk::DescriptorSetLayout> m_pDescriptorSetLayout;
-
-        //build in descriptor pool.
-        std::unordered_map<vk::DescriptorType, uint32_t> m_poolSizeInfos;
-        std::shared_ptr<vk::DescriptorPool> m_pDescriptorPool;
-
-        //build in descriptor set
-        std::shared_ptr<vk::DescriptorSet> m_pDescriptorSet;
 
         //external uniform buffer.
         static Bool32 _compareExtUniformBufferInfo(const PassExtUniformBufferInfo &, const PassExtUniformBufferInfo &);
@@ -511,18 +386,16 @@ namespace vg
         std::unordered_map<vk::ShaderStageFlagBits, SpecializationAppliedData> m_mapSpecializationAppliedData;
 
         //pipeline layout
-        std::shared_ptr<vk::PipelineLayout> m_pPipelineLayout;
-        Bool32 m_pipelineLayoutChanged;
+        PipelineLayoutStateID m_pipelineLayoutStateID;
         PipelineStateID m_pipelineStateID;
 
         Shader *m_pShader;
 
         void _initDefaultBuildInDataInfo();
-        void _initBuildInData();
-        
-        template <typename T>
-        void _updateBuildInData(BuildInDataType type, T data);
+
+        void _updatePipelineLayoutStateID();
         void _updatePipelineStateID();
+        
         void _applyUniformBufferDynamicOffsets();
     };
 }

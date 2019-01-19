@@ -8,7 +8,10 @@ namespace vg
     enum class BaseType
     {
         UNDEFINED,
-        APP,
+
+        VERTEX_DATA,
+        INDEX_DATA,
+        UNIFORM_BUFFER_DATA,
 
         TEXTURE,
 
@@ -17,17 +20,16 @@ namespace vg
         PRE_DEPTH_PASS,
         MATERIAL,
 
-        VERTEX_DATA,
-        INDEX_DATA,
-        UNIFORM_BUFFER_DATA,
-
         MESH,
 
+        TRANSFORM,
         SCENE,
         SCENE_OBJECT,
-        TRANSFORM,
 
+        RENDERER_PASS,
         RENDERER,
+
+        APP,
     };
 
     using InstanceID = uint32_t;

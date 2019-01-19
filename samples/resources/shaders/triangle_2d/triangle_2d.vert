@@ -2,7 +2,7 @@
 #extension GL_ARB_separate_shader_objects : enable
 #extension GL_ARB_shading_language_420pack : enable
 
-layout(binding = 0) uniform BuildIn {
+layout(set = 0, binding = 0) uniform BuildIn {
     mat4 matrixObjectToNDC;
     vec4 mainColor;
     mat4 matrixObjectToView;

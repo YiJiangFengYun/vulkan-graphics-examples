@@ -2,28 +2,31 @@
 
 #include "graphics/util/gemo_util.hpp"
 #include "graphics/scene/light_3.hpp"
+#include "graphics/scene/visual_object_2.hpp"
 
 namespace vg
 {
-    void fillValidVisualObjects(std::vector<VisualObject<SpaceType::SPACE_2> *> &arrPVObjs
+    void fillValidVisualObjects(std::vector<const VisualObject<SpaceType::SPACE_2> *> &arrPVObjs
         , uint32_t &PVObjIndex
         , const Transform<SpaceType::SPACE_2> *pTransform
-        , Scene<SpaceType::SPACE_2> *pScene
+        , const Scene<SpaceType::SPACE_2> *pScene
         , const Projector<SpaceType::SPACE_2> *pProjector
+        , RendererObjectDataCache *pObjectDataCache
 #ifdef USE_WORLD_BOUNDS
         , const fd::Bounds<SpaceTypeInfo<SpaceType::SPACE_2>::PointType> *pBounds
 #endif
         );
 
-    RenderBinderInfo::RenderBinderInfo(Bool32 lightingEnable
+    RenderBinderInfo::RenderBinderInfo(RendererPassCache *pRendererPassCache
+        , Bool32 lightingEnable
         , Bool32 shadowEnable
         , Bool32 preDepthEnable
         , Bool32 postRenderEnable
 
         , Bool32 firstScene
-        , BaseScene *pScene
+        , const BaseScene *pScene
         , const BaseProjector *pProjector
-        , PostRender *pPostRender
+        , const PostRender *pPostRender
 
         , const PreDepthTarget *pPreDepthTarget
         , const PostRenderTarget *pPostRenderTarget
@@ -39,7 +42,8 @@ namespace vg
         , CmdBuffer *pTrunkRenderPassCmdBuffer
         , CmdBuffer *pPostRenderCmdBuffer
         )
-        : lightingEnable(lightingEnable)
+        : pRendererPassCache(pRendererPassCache)
+        , lightingEnable(lightingEnable)
         , shadowEnable(shadowEnable) 
         , preDepthEnable(preDepthEnable)
         , postRenderEnable(postRenderEnable)
@@ -67,7 +71,9 @@ namespace vg
     }
 
     RenderBinder::RenderBinder()
-        : m_bindedObjectsForLighting()
+        : m_pRendererPassCache()
+        , m_objectDataCache()
+        , m_bindedObjectsForLighting()
         , m_bindedObjectCountForLighting(0u)
         , m_bindedObjectsForPreDepth()
         , m_bindedObjectCountForPreDepth(0u)
@@ -88,6 +94,7 @@ namespace vg
     void RenderBinder::begin()
     {
         m_lightDataBufferCache.begin();
+        m_objectDataCache.begin();
     }
 
     void RenderBinder::bind(RenderBinderInfo info)
@@ -100,10 +107,13 @@ namespace vg
     void RenderBinder::end()
     {
         m_lightDataBufferCache.end();
+        m_objectDataCache.end();
     }
 
     void RenderBinder::_beginBind()
     {
+        m_bindedObjectCountForPreDepth = 0u;
+        m_bindedObjectCountForLighting = 0u;
         m_bindedObjectCount = 0u;
     }
 
@@ -130,6 +140,7 @@ namespace vg
 
     void RenderBinder::_bind(RenderBinderInfo info)
     {
+        m_pRendererPassCache = info.pRendererPassCache;
         m_lightingEnable = info.lightingEnable;
         m_shadowEnable = info.shadowEnable;
         if (info.lightingEnable == VG_TRUE)
@@ -141,7 +152,7 @@ namespace vg
         if (info.pScene->getSpaceType() == SpaceType::SPACE_2)
         {
             _bindScene2(nullptr,
-                dynamic_cast<Scene<SpaceType::SPACE_2> *>(info.pScene), 
+                dynamic_cast<const Scene<SpaceType::SPACE_2> *>(info.pScene), 
                 dynamic_cast<const Projector<SpaceType::SPACE_2> *>(info.pProjector),
                 info.preDepthEnable ? info.pPreDepthTarget : nullptr,
                 info.postRenderEnable ? 
@@ -158,13 +169,13 @@ namespace vg
         {
             if (info.lightingEnable == VG_TRUE && info.shadowEnable == VG_TRUE)
             {
-                _bindForLightDepth(dynamic_cast<Scene<SpaceType::SPACE_3> *>(info.pScene),
+                _bindForLightDepth(dynamic_cast<const Scene<SpaceType::SPACE_3> *>(info.pScene),
                     dynamic_cast<const Projector<SpaceType::SPACE_3> *>(info.pProjector),
                     info.pLightDepthCmdBuffer
                 );
             }
             _bindScene3(nullptr,
-                dynamic_cast<Scene<SpaceType::SPACE_3> *>(info.pScene), 
+                dynamic_cast<const Scene<SpaceType::SPACE_3> *>(info.pScene), 
                 dynamic_cast<const Projector<SpaceType::SPACE_3> *>(info.pProjector),
                 info.preDepthEnable ? info.pPreDepthTarget : nullptr,
                 info.postRenderEnable ? 
@@ -196,7 +207,7 @@ namespace vg
                     nullptr,
                     vk::ImageLayout::eUndefined,
                 };
-                PassTextureInfo info = {
+                PassTextureInfo passInfo = {
                     vg::SamplerTextureType::TEX_2D,
                     1u,
                     &itemInfo,
@@ -204,15 +215,15 @@ namespace vg
                     vg::ImageDescriptorType::COMBINED_IMAGE_SAMPLER,
                     vk::ShaderStageFlagBits::eFragment,
                 };
-                if (pPass->hasTexture(VG_PASS_POST_RENDER_TEXTURE_NAME) == VG_FALSE)
+                auto pRenderPass = info.pRendererPassCache->get(pPass, 0);
+                if (pRenderPass->getBindingSet().hasTexture(VG_PASS_POST_RENDER_TEXTURE_NAME) == VG_FALSE)
                 {
-                    pPass->addTexture(VG_PASS_POST_RENDER_TEXTURE_NAME, info);
+                    pRenderPass->getBindingSet().addTexture(VG_PASS_POST_RENDER_TEXTURE_NAME, passInfo);
                 }
                 else
                 {
-                    pPass->setTexture(VG_PASS_POST_RENDER_TEXTURE_NAME, info);
+                    pRenderPass->getBindingSet().setTexture(VG_PASS_POST_RENDER_TEXTURE_NAME, passInfo);
                 }
-                pPass->apply();
             }
 
             ;
@@ -235,7 +246,7 @@ namespace vg
         _bindForRenderPassEnd(info);
     }
 
-    void RenderBinder::_bindForLightDepth(Scene<SpaceType::SPACE_3> *pScene
+    void RenderBinder::_bindForLightDepth(const Scene<SpaceType::SPACE_3> *pScene
         , const Projector<SpaceType::SPACE_3> *pProjector
         , CmdBuffer *pPreDepthCmdBuffer
         )
@@ -307,7 +318,7 @@ namespace vg
         VG_LOG(plog::debug) << "End to bind for light depth." << std::endl;
     }
 
-    void RenderBinder::_syncLightData(BaseScene *pScene)
+    void RenderBinder::_syncLightData(const BaseScene *pScene)
     {
     VG_LOG(plog::debug) << "Begin to sync light data." << std::endl;
 #if defined(DEBUG) && defined(VG_ENABLE_COST_TIMER)
@@ -372,12 +383,12 @@ namespace vg
             BaseLight * const *lightGroup;
             if (pScene->getSpaceType() == SpaceType::SPACE_2) 
             {
-                auto &lightGroup2 = dynamic_cast<Scene<SpaceType::SPACE_2> *>(pScene)->getLightGroup(*pLightTypeInfo);
+                auto &lightGroup2 = dynamic_cast<const Scene<SpaceType::SPACE_2> *>(pScene)->getLightGroup(*pLightTypeInfo);
                 lightGroup = reinterpret_cast<BaseLight * const *>(lightGroup2.data());
             }
             else
             {
-                auto &lightGroup3 = dynamic_cast<Scene<SpaceType::SPACE_3> *>(pScene)->getLightGroup(*pLightTypeInfo);
+                auto &lightGroup3 = dynamic_cast<const Scene<SpaceType::SPACE_3> *>(pScene)->getLightGroup(*pLightTypeInfo);
                 lightGroup = reinterpret_cast<BaseLight * const *>(lightGroup3.data());
             }
 
@@ -536,8 +547,8 @@ namespace vg
         }
     }
 
-    void RenderBinder::_bindScene2(BaseLight *pLight
-        , Scene<SpaceType::SPACE_2> *pScene
+    void RenderBinder::_bindScene2(const BaseLight *pLight
+        , const Scene<SpaceType::SPACE_2> *pScene
         , const Projector<SpaceType::SPACE_2> *pProjector
         , const BaseRenderTarget *pPreDepthTarget
         , const BaseRenderTarget *pRenderTarget
@@ -582,7 +593,7 @@ namespace vg
 
         //flat visual objects and filter them that is out of projection with its bounds.
         //allocate enough space for array to storage points.
-        std::vector<SceneType::VisualObjectType *> validVisualObjects(visualObjectCount);
+        std::vector<const SceneType::VisualObjectType *> validVisualObjects(visualObjectCount);
         uint32_t validVisualObjectCount(0u);
         auto pRoot = pScene->pRootTransform;
         fillValidVisualObjects(validVisualObjects
@@ -590,6 +601,7 @@ namespace vg
             , pRoot.get()
             , pScene
             , pProjector
+            , &m_objectDataCache
 #ifdef USE_WORLD_BOUNDS
             , &boundsOfViewInWorld
 #endif //USE_WORLD_BOUNDS
@@ -609,6 +621,7 @@ namespace vg
         for (uint32_t i = 0u; i < validVisualObjectCount; ++i)
         {
             auto pVisualObject = validVisualObjects[i];
+            auto pObjectRenderData = m_objectDataCache.get(pVisualObject->getID());
             auto modelMatrix = tranMat3ToMat4(pVisualObject->getTransform()->getMatrixLocalToWorld());
             if (pPreDepthCmdBuffer != nullptr) 
             {
@@ -656,6 +669,8 @@ namespace vg
                     pPreDepthTarget->getFramebufferHeight(),
                     &projMatrix,
                     &viewMatrix,
+                    pObjectRenderData->hasClipRect,
+                    pObjectRenderData->clipRects
                     };
                 
                 BaseVisualObject::BindResult result;
@@ -672,6 +687,8 @@ namespace vg
                     pRenderTarget != nullptr ? pRenderTarget->getFramebufferHeight() : 0u,
                     &projMatrix,
                     &viewMatrix,
+                    pObjectRenderData->hasClipRect,
+                    pObjectRenderData->clipRects
                     };
     
                 BaseVisualObject::BindResult result;
@@ -695,17 +712,18 @@ namespace vg
 #endif //DEBUG and VG_ENABLE_COST_TIMER
     }
 
-    void fillValidVisualObjects(std::vector<VisualObject<SpaceType::SPACE_2> *> &arrPVObjs
+    void fillValidVisualObjects(std::vector<const VisualObject<SpaceType::SPACE_2> *> &arrPVObjs
         , uint32_t &PVObjIndex
         , const Transform<SpaceType::SPACE_2> *pTransform
-        , Scene<SpaceType::SPACE_2> *pScene
+        , const Scene<SpaceType::SPACE_2> *pScene
         , const Projector<SpaceType::SPACE_2> *pProjector
+        , RendererObjectDataCache *pObjectDataCache
 #ifdef USE_WORLD_BOUNDS
         , const fd::Bounds<SpaceTypeInfo<SpaceType::SPACE_2>::PointType> *pViewBoundsInWorld
 #endif
         )
     {
-        VisualObject<SpaceType::SPACE_2> *pVisualObjectOfChild;
+        const VisualObject<SpaceType::SPACE_2> *pVisualObjectOfChild;
         uint32_t childCount = pTransform->getChildCount();
         const Transform<SpaceType::SPACE_2> *pChild;
         for (uint32_t i = 0; i < childCount; ++i)
@@ -717,6 +735,7 @@ namespace vg
                 , pChild
                 , pScene
                 , pProjector
+                , pObjectDataCache
 #ifdef USE_WORLD_BOUNDS
                 , pViewBoundsInWorld
 #endif //USE_WORLD_BOUNDS
@@ -724,21 +743,29 @@ namespace vg
             //Own visual object is placed behind children's visual object.
             pVisualObjectOfChild = pScene->getVisualObjectWithTransform(pChild);
             if (pVisualObjectOfChild == nullptr) continue;
+			auto pObjectRenderData = pObjectDataCache->get(pVisualObjectOfChild->getID());
+
             
             auto pMeshOfChild = pVisualObjectOfChild->getMesh();
-            auto isHasBoundsOfChild = dynamic_cast<Mesh<MeshDimType::SPACE_2> *>(pMeshOfChild)->getIsHasBounds();
+            auto isHasBoundsOfChild = dynamic_cast<const Mesh<MeshDimType::SPACE_2> *>(pMeshOfChild)->getIsHasBounds();
             if (isHasBoundsOfChild == VG_FALSE)
             {
                 arrPVObjs[PVObjIndex++] = pVisualObjectOfChild;
+                const VisualObject2 *pObject = dynamic_cast<const VisualObject2 *>(pVisualObjectOfChild);
+                if (pObject->getHasClipRect()) {
+                    uint32_t subMeshCount = pVisualObjectOfChild->getSubMeshCount();
+                    pObjectRenderData->setHasClipRect(VG_TRUE);
+                    pObjectRenderData->updateClipRects(pObject->getClipRects(), subMeshCount, 0);
+                }
             } 
             else if (pVisualObjectOfChild->getIsVisibilityCheck() == VG_FALSE)
             {
                 arrPVObjs[PVObjIndex++] = pVisualObjectOfChild;
-                pVisualObjectOfChild->setHasClipRect(VG_FALSE);
+                // pVisualObjectOfChild->setHasClipRect(VG_FALSE);
             }
             else {
                 //Filter obj out of projection.
-                auto boundsOfChild = dynamic_cast<Mesh<MeshDimType::SPACE_2> *>(pMeshOfChild)->getBounds();
+                auto boundsOfChild = dynamic_cast<const Mesh<MeshDimType::SPACE_2> *>(pMeshOfChild)->getBounds();
 #ifdef USE_WORLD_BOUNDS
                 auto boundsOfChildInWorld = tranBoundsToNewSpace<Vector2>(boundsOfChild, pChild->getMatrixLocalToWorld(), VG_FALSE);
 #endif //USE_WORLD_BOUNDS
@@ -755,16 +782,37 @@ namespace vg
                     clipRect.y = (clipRect.y + 1.0f) / 2.0f;
                     clipRect.width = clipRect.width / 2.0f;
                     clipRect.height = clipRect.height / 2.0f;
-                    uint32_t subMeshCount = pVisualObjectOfChild->getSubMeshCount();
-                    pVisualObjectOfChild->setHasClipRect(VG_TRUE);
-                    pVisualObjectOfChild->updateClipRects(clipRect, subMeshCount);
+                    const VisualObject2 *pObject = dynamic_cast<const VisualObject2 *>(pVisualObjectOfChild);
+                    if (pObject->getHasClipRect()) {
+                        uint32_t subMeshCount = pVisualObjectOfChild->getSubMeshCount();
+                        auto pRects = pObject->getClipRects();
+                        std::vector<fd::Rect2D> rects(subMeshCount);
+                        for (auto i = 0u; i < subMeshCount; ++i) {
+                            rects[i] = *(pRects + i);
+                            float minX = std::max(rects[i].x, clipRect.x);
+                            float minY = std::max(rects[i].y, clipRect.y);
+                            float maxX = std::min(rects[i].x + rects[i].width, clipRect.x + clipRect.width);
+                            float maxY = std::min(rects[i].y + rects[i].height, clipRect.y + clipRect.height);
+                            rects[i].setX(minX);
+                            rects[i].setY(minY);
+                            rects[i].setWidth(maxX - minX);
+                            rects[i].setHeight(maxY - minY);
+                        }
+
+                        pObjectRenderData->setHasClipRect(VG_TRUE);
+                        pObjectRenderData->updateClipRects(rects);
+                    } else {
+                        uint32_t subMeshCount = pVisualObjectOfChild->getSubMeshCount();
+                        pObjectRenderData->setHasClipRect(VG_TRUE);
+                        pObjectRenderData->updateClipRects(clipRect, subMeshCount);
+                    }
                 }
             }
         }
     }
 
-    void RenderBinder::_bindScene3(BaseLight *pLight
-        , Scene<SpaceType::SPACE_3> *pScene
+    void RenderBinder::_bindScene3(const BaseLight *pLight
+        , const Scene<SpaceType::SPACE_3> *pScene
         , const Projector<SpaceType::SPACE_3> *pProjector
         , const BaseRenderTarget *pPreDepthTarget
         , const BaseRenderTarget *pRenderTarget
@@ -811,13 +859,14 @@ namespace vg
         visibilityCheckCostTimer.begin();
 #endif //DEBUG and VG_ENABLE_COST_TIMER
 
-        std::vector<SceneType::VisualObjectType *> validVisualObjects(visualObjectCount); //allocate enough space for array to storage points.
+        std::vector<const SceneType::VisualObjectType *> validVisualObjects(visualObjectCount); //allocate enough space for array to storage points.
         uint32_t validVisualObjectCount(0u);
         for (uint32_t i = 0; i < visualObjectCount; ++i)
         {
             auto pVisualObject = pScene->getVisualObjectWithIndex(i);
+            auto pObjectRenderData = m_objectDataCache.get(pVisualObject->getID());
             auto pMesh = pVisualObject->getMesh();
-            auto isHasBounds = dynamic_cast<SceneType::VisualObjectType::MeshDimType *>(pMesh)->getIsHasBounds();
+            auto isHasBounds = dynamic_cast<const SceneType::VisualObjectType::MeshDimType *>(pMesh)->getIsHasBounds();
             if (isHasBounds == VG_FALSE)
             {
                 validVisualObjects[validVisualObjectCount++] = pVisualObject;
@@ -825,11 +874,11 @@ namespace vg
             else if (pVisualObject->getIsVisibilityCheck() == VG_FALSE)
             {
                 validVisualObjects[validVisualObjectCount++] = pVisualObject;
-                pVisualObject->setHasClipRect(VG_FALSE);
+                pObjectRenderData->setHasClipRect(VG_FALSE);
             }
             else 
             {
-                auto bounds = dynamic_cast<SceneType::VisualObjectType::MeshDimType *>(pMesh)->getBounds();
+                auto bounds = dynamic_cast<const SceneType::VisualObjectType::MeshDimType *>(pMesh)->getBounds();
                 auto pTransform = pVisualObject->getTransform();
 #ifdef USE_WORLD_BOUNDS
                 auto boundsInWorld = tranBoundsToNewSpace<Vector3>(bounds, pTransform->getMatrixLocalToWorld(), VG_FALSE);      
@@ -850,8 +899,8 @@ namespace vg
                     clipRect.height = clipRect.height / 2.0f;
     
                     uint32_t subMeshCount = pVisualObject->getSubMeshCount();
-                    pVisualObject->setHasClipRect(VG_TRUE);
-                    pVisualObject->updateClipRects(clipRect, subMeshCount);
+                    pObjectRenderData->setHasClipRect(VG_TRUE);
+                    pObjectRenderData->updateClipRects(clipRect, subMeshCount);
                 }
                 
             }
@@ -872,7 +921,7 @@ namespace vg
             ++queueLengths[static_cast<size_t>(renderQueueType)];
         }
 
-        std::vector<std::vector<SceneType::VisualObjectType *>> queues(queueTypeCount);
+        std::vector<std::vector<const SceneType::VisualObjectType *>> queues(queueTypeCount);
         //Resize queues and reset quue counts to zero for preparing next use.
         for (uint32_t i = 0; i < queueTypeCount; ++i)
         {
@@ -891,7 +940,7 @@ namespace vg
         //sort transparent queue.
         std::sort(queues[static_cast<size_t>(RenderQueueType::TRANSPARENT)].begin(),
             queues[static_cast<size_t>(RenderQueueType::TRANSPARENT)].end(),
-            [&viewMatrix, &projMatrix](typename SceneType::ObjectType *pObject1, typename SceneType::ObjectType *pObject2)
+            [&viewMatrix, &projMatrix](const typename SceneType::ObjectType *pObject1, const typename SceneType::ObjectType *pObject2)
             {
                 auto modelMatrix1 = pObject1->getTransform()->getMatrixLocalToWorld();
                 auto mvMatrix1 = viewMatrix * modelMatrix1;
@@ -923,6 +972,7 @@ namespace vg
             for (uint32_t objectIndex = 0u; objectIndex < queueLength; ++objectIndex)
             {
                 auto pVisualObject = queues[typeIndex][objectIndex];
+                auto pObjectRenderData = m_objectDataCache.get(pVisualObject->getID());
                 auto modelMatrix = pVisualObject->getTransform()->getMatrixLocalToWorld();
                 if (pPreDepthCmdBuffer != nullptr) 
                 {
@@ -970,13 +1020,15 @@ namespace vg
                         pPreDepthTarget->getFramebufferHeight(),
                         &projMatrix,
                         &viewMatrix,
+                        pObjectRenderData->hasClipRect,
+                        pObjectRenderData->clipRects,
                         };
                     
                     BaseVisualObject::BindResult result;
                     result.pTrunkRenderPassCmdBuffer = pPreDepthCmdBuffer;
                     result.pBranchCmdBuffer = nullptr;
                     result.pTrunkWaitBarrierCmdBuffer = nullptr;
-                    _bindVisualObject(VG_FALSE, VG_TRUE, pVisualObject, info, &result);
+                    _bindVisualObject(nullptr, VG_TRUE, pVisualObject, info, &result);
                 }
     
                 if (pTrunkRenderPassCmdBuffer != nullptr)
@@ -986,6 +1038,8 @@ namespace vg
                         pRenderTarget != nullptr ? pRenderTarget->getFramebufferHeight() : 0u,
                         &projMatrix,
                         &viewMatrix,
+                        pObjectRenderData->hasClipRect,
+                        pObjectRenderData->clipRects,
                         };
         
                     BaseVisualObject::BindResult result;
@@ -1010,9 +1064,9 @@ namespace vg
 #endif //DEBUG and VG_ENABLE_COST_TIMER
     }
 
-    void RenderBinder::_setBuildInData(BaseLight *pLight
+    void RenderBinder::_setBuildInData(const BaseLight *pLight
         , Bool32 isPreDepth
-        , BaseVisualObject * pVisualObject
+        , const BaseVisualObject * pVisualObject
         , Matrix4x4 modelMatrix
         , Matrix4x4 viewMatrix
         , Matrix4x4 projMatrix
@@ -1023,7 +1077,7 @@ namespace vg
         uint32_t materialCount = pVisualObject->getMaterialCount();
         for (uint32_t materialIndex = 0u; materialIndex < materialCount; ++materialIndex)
         {
-            Material *pMaterial;
+            const Material *pMaterial;
             if (pLight != nullptr)
             {
                 const auto &typeInfo = typeid(*pLight);
@@ -1042,6 +1096,7 @@ namespace vg
             for (uint32_t passIndex = 0u; passIndex < passCount; ++passIndex)
             {
                 auto pPass = pMaterial->getPassWithIndex(passIndex);
+                auto pRendererPass = m_pRendererPassCache->get(pPass, pVisualObject->getID());
 
                 Bool32 hasMatrixObjectToNDC = VG_FALSE;
                 Bool32 hasMatrixObjectToWorld = VG_FALSE;
@@ -1098,27 +1153,27 @@ namespace vg
                     Pass::BuildInDataType type = (*(info.pComponent + componentIndex)).type;
                     if (type == Pass::BuildInDataType::MATRIX_OBJECT_TO_NDC)
                     {
-                        pPass->setBuildInDataMatrix4x4(type, mvpMatrix);
+                        pRendererPass->setBuildInDataMatrix4x4(type, mvpMatrix);
                     }
                     else if (type == Pass::BuildInDataType::MATRIX_OBJECT_TO_WORLD)
                     {
-                        pPass->setBuildInDataMatrix4x4(type, modelMatrix);
+                        pRendererPass->setBuildInDataMatrix4x4(type, modelMatrix);
                     }
                     else if (type == Pass::BuildInDataType::MATRIX_OBJECT_TO_VIEW)
                     {
-                        pPass->setBuildInDataMatrix4x4(type, mvMatrix);
+                        pRendererPass->setBuildInDataMatrix4x4(type, mvMatrix);
                     }
                     else if (type == Pass::BuildInDataType::MATRIX_VIEW)
                     {
-                        pPass->setBuildInDataMatrix4x4(type, viewMatrix);
+                        pRendererPass->setBuildInDataMatrix4x4(type, viewMatrix);
                     }
                     else if (type == Pass::BuildInDataType::MATRIX_PROJECTION)
                     {
-                        pPass->setBuildInDataMatrix4x4(type, projMatrix);
+                        pRendererPass->setBuildInDataMatrix4x4(type, projMatrix);
                     }
                     else if (type == Pass::BuildInDataType::POS_VIEWER)
                     {
-                        pPass->setBuildInDataVector4(type, viewerPos);
+                        pRendererPass->setBuildInDataVector4(type, viewerPos);
                     }
                 }
 
@@ -1139,13 +1194,13 @@ namespace vg
                             vg::BufferDescriptorType::UNIFORM_BUFFER,
                             vk::ShaderStageFlagBits::eVertex | vk::ShaderStageFlagBits::eFragment
                         };
-                        if (pPass->hasBuffer(VG_PASS_LIGHT_DATA_BUFFER_NAME) == VG_FALSE)
+                        if (pRendererPass->getBindingSet().hasBuffer(VG_PASS_LIGHT_DATA_BUFFER_NAME) == VG_FALSE)
                         {
-                            pPass->addBuffer(VG_PASS_LIGHT_DATA_BUFFER_NAME, info);
+							pRendererPass->getBindingSet().addBuffer(VG_PASS_LIGHT_DATA_BUFFER_NAME, info);
                         }
                         else
                         {
-                            pPass->setBuffer(VG_PASS_LIGHT_DATA_BUFFER_NAME, info);
+                            pRendererPass->getBindingSet().setBuffer(VG_PASS_LIGHT_DATA_BUFFER_NAME, info);
                         }
                         //light textures.
                         auto &lightPassTextureInfos = m_lightPassTextureInfos;
@@ -1153,13 +1208,13 @@ namespace vg
                         for (uint32_t textureInfoIndex = 0u; textureInfoIndex < textureInfoCount; ++textureInfoIndex)
                         {
                             std::string name = VG_PASS_LIGHT_TEXTURE_NAME + std::to_string(textureInfoIndex);
-                            if (pPass->hasTexture(name) == VG_FALSE) 
+                            if (pRendererPass->getBindingSet().hasTexture(name) == VG_FALSE) 
                             {
-                                pPass->addTexture(name, lightPassTextureInfos[textureInfoIndex]);
+                                pRendererPass->getBindingSet().addTexture(name, lightPassTextureInfos[textureInfoIndex]);
                             }
                             else
                             {
-                                pPass->setTexture(name, lightPassTextureInfos[textureInfoIndex]);
+                                pRendererPass->getBindingSet().setTexture(name, lightPassTextureInfos[textureInfoIndex]);
                             }
                         }
                     }
@@ -1180,13 +1235,13 @@ namespace vg
                             vg::ImageDescriptorType::COMBINED_IMAGE_SAMPLER,
                             vk::ShaderStageFlagBits::eFragment,
                         };
-                        if (pPass->hasTexture(VG_PASS_PRE_DEPTH_TEXTURE_NAME) == VG_FALSE)
+                        if (pRendererPass->getBindingSet().hasTexture(VG_PASS_PRE_DEPTH_TEXTURE_NAME) == VG_FALSE)
                         {
-                            pPass->addTexture(VG_PASS_PRE_DEPTH_TEXTURE_NAME, info);
+                            pRendererPass->getBindingSet().addTexture(VG_PASS_PRE_DEPTH_TEXTURE_NAME, info);
                         }
                         else
                         {
-                            pPass->setTexture(VG_PASS_PRE_DEPTH_TEXTURE_NAME, info);
+                            pRendererPass->getBindingSet().setTexture(VG_PASS_PRE_DEPTH_TEXTURE_NAME, info);
                         }
                     }
                 } else if (pLight != nullptr)
@@ -1197,22 +1252,22 @@ namespace vg
                         VG_PASS_LIGHT_RENDER_DATA_LAYOUT_PRIORITY,
                         vk::ShaderStageFlagBits::eAllGraphics
                     };
-                    if (pPass->hasData(VG_PASS_LIGHT_RENDER_DATA_NAME) == VG_FALSE)
+                    if (pRendererPass->getBindingSet().hasData(VG_PASS_LIGHT_RENDER_DATA_NAME) == VG_FALSE)
                     {
-                        pPass->addData(VG_PASS_LIGHT_RENDER_DATA_NAME, dataInfo, renderInfo.pData, renderInfo.dataSize);
+                        pRendererPass->getBindingSet().addData(VG_PASS_LIGHT_RENDER_DATA_NAME, dataInfo, renderInfo.pData, renderInfo.dataSize);
                     } else {
-                        pPass->setData(VG_PASS_LIGHT_RENDER_DATA_NAME, renderInfo.pData, renderInfo.dataSize, 0u);
+                        pRendererPass->getBindingSet().setData(VG_PASS_LIGHT_RENDER_DATA_NAME, renderInfo.pData, renderInfo.dataSize, 0u);
                     }
                 }
 
-                pPass->apply();
+                // pPass->apply();
             }
         }
     }
 
-    void RenderBinder::_bindVisualObject(BaseLight *pLight
+    void RenderBinder::_bindVisualObject(const BaseLight *pLight
         , Bool32 isPreDepth
-        , BaseVisualObject *pVisublObject
+        , const BaseVisualObject *pVisublObject
         , BaseVisualObject::BindInfo & bindInfo
         , BaseVisualObject::BindResult *pResult
         )

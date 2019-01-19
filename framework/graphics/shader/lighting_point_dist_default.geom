@@ -8,7 +8,7 @@
 
 layout(triangles) in;
 
-layout (binding = 0) uniform BuildIn
+layout (set = 0, binding = 0) uniform BuildIn
 {
     mat4 matrixToWorld;
     mat4 matrixToView;

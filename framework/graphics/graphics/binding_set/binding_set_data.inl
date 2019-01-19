@@ -1,7 +1,7 @@
 namespace vg
 {
     template<typename T>
-    void PassData::addData(const std::string name, const PassDataInfo &info, const T &value)
+    void BindingSetData::addData(const std::string name, const BindingSetDataInfo &info, const T &value)
     {
         std::vector<Byte> temp(sizeof(T));
         memcpy(temp.data(), &value, sizeof(T));
@@ -15,7 +15,7 @@ namespace vg
     }
 
     template <typename T>
-    T PassData::getData(const std::string name) const
+    T BindingSetData::getData(const std::string name) const
     {
         const auto& bytes = getValue(name, mapDatas);
         T t;
@@ -24,7 +24,7 @@ namespace vg
     }
 
     template<typename T>
-    void PassData::setData(const std::string name, const T &value)
+    void BindingSetData::setData(const std::string name, const T &value)
     {
         std::vector<Byte> temp(sizeof(T));
         memcpy(temp.data(), &value, sizeof(T));
@@ -37,7 +37,7 @@ namespace vg
     }
 
     template<typename T>
-    void PassData::addData(const std::string name, const PassDataInfo &info, const std::vector<T> &values)
+    void BindingSetData::addData(const std::string name, const BindingSetDataInfo &info, const std::vector<T> &values)
     {
         std::vector<Byte> temp(sizeof(T) * values.size());
         memcpy(temp.data(), values.data(), temp.size());
@@ -51,7 +51,7 @@ namespace vg
     }
 
     template <typename T>
-    std::vector<T> PassData::getData(const std::string name, const uint32_t count) const
+    std::vector<T> BindingSetData::getData(const std::string name, const uint32_t count) const
     {
         const auto& bytes = getValue(name, mapDatas);
         std::vector<T> ts(count);
@@ -60,7 +60,7 @@ namespace vg
     }
 
     template<typename T>
-    void PassData::setData(const std::string name, const std::vector<T> &values)
+    void BindingSetData::setData(const std::string name, const std::vector<T> &values)
     {
         std::vector<Byte> temp(sizeof(T) * values.size());
         memcpy(temp.data(), values.data(), temp.size());
@@ -73,7 +73,7 @@ namespace vg
     }
 
     template<typename T>
-    void PassData::addData(const std::string name, const PassDataInfo &info, const T * const pSrc, const uint32_t count)
+    void BindingSetData::addData(const std::string name, const BindingSetDataInfo &info, const T * const pSrc, const uint32_t count)
     {
         std::vector<Byte> temp(sizeof(T) * count);
         if (count != 0u && pSrc != nullptr) memcpy(temp.data(), pSrc, temp.size());
@@ -87,7 +87,7 @@ namespace vg
     }
 
     template<typename T>
-    void PassData::getData(const std::string name, const T * const pDst, const uint32_t count)
+    void BindingSetData::getData(const std::string name, const T * const pDst, const uint32_t count)
     {
         const auto& bytes = getValue(name, mapDatas);
         size_t size = sizeof(T) * count;
@@ -95,7 +95,7 @@ namespace vg
     }
 
     template<typename T>
-    void PassData::setData(const std::string name, const T * const pSrc, const uint32_t count)
+    void BindingSetData::setData(const std::string name, const T * const pSrc, const uint32_t count)
     {
         std::vector<Byte> temp(sizeof(T) * count);
         if (count != 0u && pSrc != nullptr) memcpy(temp.data(), pSrc, temp.size());

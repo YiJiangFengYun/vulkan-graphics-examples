@@ -10,6 +10,7 @@ namespace vg
     void CMDParser::record(CmdBuffer *pCmdBuffer
         , vk::CommandBuffer *pCommandBuffer
         , PipelineCache *pPipelineCache
+        , RendererPassCache *pRendererPassCache
         , ResultInfo *pResult
         )
     {
@@ -43,9 +44,9 @@ namespace vg
                     RenderPassInfo tempRenderPassInfo = *pRenderPassInfo;
                     if (tempRenderPassInfo.pRenderPass == nullptr)tempRenderPassInfo.pRenderPass = pRenderPass;
                     if (tempRenderPassInfo.pFramebuffer == nullptr)tempRenderPassInfo.pFramebuffer = pFramebuffer;
-                    recordItem(&tempRenderPassInfo, pCommandBuffer, pPipelineCache, pResult);
+                    recordItem(&tempRenderPassInfo, pCommandBuffer, pPipelineCache, pRendererPassCache, pResult);
                 } else {
-                    recordItem(pRenderPassInfo, pCommandBuffer, pPipelineCache, pResult);
+                    recordItem(pRenderPassInfo, pCommandBuffer, pPipelineCache, pRendererPassCache, pResult);
                 }
             
                 lastSubPassIndex = pRenderPassInfo->subPassIndex;
@@ -150,6 +151,7 @@ namespace vg
     void CMDParser::recordItem(const RenderPassInfo *pRenderPassInfo
         ,  vk::CommandBuffer *pCommandBuffer
         , PipelineCache *pPipelineCache
+        , RendererPassCache *pRendererPassCache
         , ResultInfo *pResult)
     {
         const auto &renderPassInfo = *pRenderPassInfo;
@@ -163,6 +165,9 @@ namespace vg
         auto pPass = renderPassInfo.pPass;
         if (pPass != nullptr) pPass->beginRecord();
 
+        auto pRendererPass = pRendererPassCache->get(pPass, pRenderPassInfo->objectID);
+        if (pRendererPass) pRendererPass->beginRecord();
+
         auto pShader = pPass->getShader();
         auto stageInfos = pShader->getShaderStageInfos();
         if (stageInfos.size() != 0)
@@ -172,6 +177,7 @@ namespace vg
                 renderPassInfo.pMesh,
                 subMeshIndex, 
                 pPass, 
+                pRendererPass,
                 pPipelineCache,
                 pPipeline);
             _recordCommandBuffer(pPipeline.get(),
@@ -180,7 +186,8 @@ namespace vg
                 renderPassInfo.framebufferHeight,
                 renderPassInfo.pMesh,
                 subMeshIndex, 
-                pPass, 
+                pPass,
+                pRendererPass,
                 renderPassInfo.viewport,
                 renderPassInfo.scissor,
                 renderPassInfo.pCmdDraw,
@@ -194,12 +201,14 @@ namespace vg
 
         if (pMesh != nullptr) pMesh->endRecord();
         if (pPass != nullptr) pPass->endRecord();
+        if (pRendererPass) pRendererPass->endRecord();
     }
 
     void CMDParser::_createPipeline(const vk::RenderPass *pRenderPass,
         const BaseMesh *pMesh,
         uint32_t subMeshIndex,
         const Pass *pPass,
+        const RendererPass *pRendererPass,
         PipelineCache *pPipelineCache,
         std::shared_ptr<vk::Pipeline> &pPipeline)
     {
@@ -210,11 +219,12 @@ namespace vg
         PipelineCache::Info info(
             *pRenderPass,
             pPass,
+            pRendererPass,
             pContentMesh != nullptr ? pContentMesh->getVertexData() : nullptr,
             pContentMesh != nullptr ? pContentMesh->getIndexData() : nullptr,
             subMeshIndex
         );
-        pPipeline = pPipelineCache->caching(info);
+        pPipeline = pPipelineCache->get(info);
     }
 
     void CMDParser::_recordCommandBuffer(vk::Pipeline *pPipeline,
@@ -224,12 +234,13 @@ namespace vg
         const BaseMesh *pMesh,
         uint32_t subMeshIndex,
         const Pass *pPass,
+        const RendererPass *pRendererPass,
         const fd::Viewport viewport,
         const fd::Rect2D scissor,
         const CmdDraw * pCmdDraw,
         const CmdDrawIndexed * pCmdDrawIndexed
         )
-    {        
+    {   
         const auto& viewportOfPass = pPass->getViewport();
         const auto& scissorOfPass = pPass->getScissor();
 
@@ -271,23 +282,23 @@ namespace vg
             finalScissor.width = size.x;
             finalScissor.height = size.y;
         }
-
+        
         vk::Rect2D vkScissor = {
             {                               //offset
-                static_cast<int32_t>(std::floorf((float)framebufferWidth * viewportOfPass.x + 
+                static_cast<int32_t>(std::floor((float)framebufferWidth * viewportOfPass.x + 
                     (float)framebufferWidth * viewportOfPass.width * finalScissor.x)),    //x
-                static_cast<int32_t>(std::floorf((float)framebufferHeight * viewportOfPass.y +
+                static_cast<int32_t>(std::floor((float)framebufferHeight * viewportOfPass.y +
                     (float)framebufferHeight * viewportOfPass.height * finalScissor.y))    //y
             },
             {                               //extent
-                static_cast<uint32_t>(std::ceilf((float)framebufferWidth * viewportOfPass.width * finalScissor.width)),   //width
-                static_cast<uint32_t>(std::ceilf((float)framebufferHeight * viewportOfPass.height * finalScissor.height))  //height
+                static_cast<uint32_t>(std::ceil((float)framebufferWidth * viewportOfPass.width * finalScissor.width)),   //width
+                static_cast<uint32_t>(std::ceil((float)framebufferHeight * viewportOfPass.height * finalScissor.height))  //height
             }
         };
 
         pCommandBuffer->setScissor(0, vkScissor);
 
-        auto pPipelineLayout = pPass->getPipelineLayout();    
+        auto pPipelineLayout = pRendererPass->getPipelineLayout();    
 
         //push constants
         auto pushConstantUpdates = pPass->getPushconstantUpdates();
@@ -317,10 +328,10 @@ namespace vg
 
         pCommandBuffer->bindPipeline(vk::PipelineBindPoint::eGraphics, *pPipeline);
 
-        uint32_t descriptSetCount = pPass->getUsingDescriptorSetCount();
-        auto pDescriptorSets = pPass->getUsingDescriptorSets();
-        uint32_t dynamicOffsetCount = pPass->getUsingDescriptorDynamicOffsetCount();
-        auto pDynamicOffsets = pPass->getUsingDescriptorDynamicOffsets();
+        uint32_t descriptSetCount = pRendererPass->getDescriptorSetCount();
+        auto pDescriptorSets = pRendererPass->getDescriptorSets();
+        uint32_t dynamicOffsetCount = pRendererPass->getPass()->getDescriptorDynamicOffsetCount();
+        auto pDynamicOffsets = pRendererPass->getPass()->getDescriptorDynamicOffsets();
 
         pCommandBuffer->bindDescriptorSets(vk::PipelineBindPoint::eGraphics, *pPipelineLayout, 
             0u, descriptSetCount, pDescriptorSets, dynamicOffsetCount, pDynamicOffsets);

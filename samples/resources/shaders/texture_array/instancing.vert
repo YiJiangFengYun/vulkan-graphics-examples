@@ -12,12 +12,12 @@ struct Instance
     vec4 arrayIndex;
 };
 
-layout(binding = 0) uniform BuildIn {
+layout(set = 0, binding = 0) uniform BuildIn {
     mat4 matrixProjection;
     mat4 matrixView;
 } _buildIn;
 
-layout(binding = 1) uniform OtherInfo {
+layout(set = 1, binding = 0) uniform OtherInfo {
     Instance instance[8];
 } otherInfo;
 

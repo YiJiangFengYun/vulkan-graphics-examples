@@ -15,6 +15,7 @@
 #include "graphics/renderer/renderer_pre_depth_target.hpp"
 #include "graphics/renderer/renderer_post_render_target.hpp"
 #include "graphics/renderer/render_binder.hpp"
+#include "graphics/renderer/renderer_pass.hpp"
 
 //todo: batch mesh,
 //todo: cache graphics pipeline.
@@ -26,14 +27,14 @@ namespace vg
     {
     public:
         struct SceneInfo {
-            BaseScene *pScene;
-            BaseCamera *pCamera;
+            const BaseScene *pScene;
+            const BaseCamera *pCamera;
             Bool32 preDepth;
-            PostRender * pPostRender;
-            SceneInfo(BaseScene *pScene = nullptr
-                , BaseCamera *pCamera = nullptr
+            const PostRender * pPostRender;
+            SceneInfo(const BaseScene *pScene = nullptr
+                , const BaseCamera *pCamera = nullptr
                 , Bool32 preDepth = VG_FALSE
-                , PostRender * pPostRender = nullptr);
+                , const PostRender * pPostRender = nullptr);
         };
 
         struct RenderInfo {
@@ -91,13 +92,16 @@ namespace vg
         const fd::CostTimer &getPreparingRenderCostTimer() const;
 #endif //DEBUG and VG_ENABLE_COST_TIMER
     protected:
-        const RendererTarget *m_pRendererTarget;
-        std::shared_ptr<vk::CommandPool> m_pCommandPool;
-        std::shared_ptr<vk::CommandBuffer> m_pCommandBuffer;
-        PipelineCache m_pipelineCache;
-
         uint32_t m_framebufferWidth;
         uint32_t m_framebufferHeight;
+
+        const RendererTarget *m_pRendererTarget;
+
+        std::shared_ptr<vk::CommandPool> m_pCommandPool;
+        std::shared_ptr<vk::CommandBuffer> m_pCommandBuffer;
+
+        PipelineCache m_pipelineCache;
+        RendererPassCache m_rendererPassCache;
         
         RenderBinder m_renderBinder;
 

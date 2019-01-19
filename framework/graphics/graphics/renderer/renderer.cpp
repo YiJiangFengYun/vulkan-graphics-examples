@@ -9,10 +9,10 @@
 
 namespace vg
 {
-    Renderer::SceneInfo::SceneInfo(BaseScene *pScene
-        , BaseCamera *pCamera
+    Renderer::SceneInfo::SceneInfo(const BaseScene *pScene
+        , const BaseCamera *pCamera
         , Bool32 preDepth
-        , PostRender * pPostRender
+        , const PostRender * pPostRender
         )
         : pScene(pScene)
         , pCamera(pCamera)
@@ -53,6 +53,7 @@ namespace vg
         : Base(BaseType::RENDERER)
         , m_pRendererTarget()
         , m_pipelineCache()
+        , m_rendererPassCache()
         , m_trunkRenderPassCmdBuffer()
         , m_trunkWaitBarrierCmdBuffer()
         , m_branchCmdBuffer()
@@ -278,6 +279,7 @@ namespace vg
         renderBeginCostTimer.begin();
 #endif //DEBUG and VG_ENABLE_COST_TIMER
         m_pipelineCache.begin();
+        m_rendererPassCache.begin();
         m_renderBinder.begin();
         uint32_t count = info.sceneInfoCount;
         for (uint32_t i = 0; i < count; ++i)
@@ -358,8 +360,9 @@ namespace vg
             pScene->endRender();
         }
 
-        m_pipelineCache.end();
         m_renderBinder.end();
+        m_rendererPassCache.end();
+        m_pipelineCache.end();
 #if defined(DEBUG) && defined(VG_ENABLE_COST_TIMER)
         renderEndCostTimer.end();
         VG_COST_TIME_LOG(plog::debug) << "Render end cost time: " 
@@ -410,6 +413,7 @@ namespace vg
         }
 
         RenderBinderInfo bindInfo = {
+            &m_rendererPassCache,
             lightingEnable,
             shadowEnable,
             preDepthEnable,
@@ -451,6 +455,7 @@ namespace vg
             CMDParser::record(m_pLightDepthCmdBuffer.get()
                 , m_pCommandBuffer.get()
                 , &m_pipelineCache
+                , &m_rendererPassCache
                 , &cmdParseResult
             );
             resultInfo.drawCount += cmdParseResult.drawCount;
@@ -461,6 +466,7 @@ namespace vg
             CMDParser::record(m_pPreDepthCmdBuffer.get()
                 , m_pCommandBuffer.get()
                 , &m_pipelineCache
+                , &m_rendererPassCache
                 , &cmdParseResult
                 );
             resultInfo.drawCount += cmdParseResult.drawCount;
@@ -469,6 +475,7 @@ namespace vg
         CMDParser::record(&m_branchCmdBuffer,
             m_pCommandBuffer.get(),
             &m_pipelineCache,
+            &m_rendererPassCache,
             &cmdParseResult
             );
         resultInfo.drawCount += cmdParseResult.drawCount;
@@ -479,6 +486,7 @@ namespace vg
         CMDParser::record(&m_trunkRenderPassCmdBuffer
             , m_pCommandBuffer.get()
             , &m_pipelineCache
+            , &m_rendererPassCache
             , &cmdParseResult
             );
         resultInfo.drawCount += cmdParseResult.drawCount;
@@ -488,6 +496,7 @@ namespace vg
             CMDParser::record(m_pPostRenderCmdbuffer.get()
                 , m_pCommandBuffer.get()
                 , &m_pipelineCache
+                , &m_rendererPassCache
                 , &cmdParseResult
                 );
             resultInfo.drawCount += cmdParseResult.drawCount;

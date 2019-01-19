@@ -8,7 +8,7 @@ layout (location = 1) in vec2 inUV;
 layout (location = 2) in vec3 inColor;
 layout (location = 3) in vec3 inNormal;
 
-layout (binding = 0) uniform BuildIn 
+layout (set = 0, binding = 0) uniform BuildIn 
 {
     mat4 matrixObjectToNDC;
     mat4 matrixObjectToWorld;
@@ -34,7 +34,7 @@ struct AmbientLight
     float _dummy_w;
 };
 
-layout (binding = 1) uniform LightData {
+layout (set = 0, binding = 1) uniform LightData {
     uint lightCount;
     float _dummy_y;
     float _dummy_z;

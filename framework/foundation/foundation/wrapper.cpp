@@ -14,7 +14,7 @@ namespace fd
         });
     }
 
-    std::shared_ptr<vk::Device> createDevice(const const vk::PhysicalDevice *pPhysicalDevice,
+    std::shared_ptr<vk::Device> createDevice(const vk::PhysicalDevice *pPhysicalDevice,
         const vk::DeviceCreateInfo & createInfo, vk::Optional<const vk::AllocationCallbacks> allocator)
     {
         auto device = pPhysicalDevice->createDevice(createInfo, allocator);

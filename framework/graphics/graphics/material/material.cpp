@@ -150,7 +150,7 @@ namespace vg
         }
     }
 
-    MaterialShowType Material::getShowType()
+    MaterialShowType Material::getShowType() const
     {
         return m_renderQueueType;
     }
@@ -160,7 +160,7 @@ namespace vg
         m_renderQueueType = type;
     }
 
-    uint32_t Material::getRenderPriority()
+    uint32_t Material::getRenderPriority() const
     {
         return m_renderPriority;
     }
@@ -224,6 +224,7 @@ namespace vg
             trunkRenderPassInfo.subMeshIndex = info.subMeshIndex;
             trunkRenderPassInfo.viewport = fd::Viewport();
             trunkRenderPassInfo.scissor = info.hasClipRect ? info.clipRect : fd::Rect2D();
+            trunkRenderPassInfo.objectID = info.objectID;
             CmdInfo cmdInfo;
             cmdInfo.pRenderPassInfo = &trunkRenderPassInfo;
             result.pTrunkRenderPassCmdBuffer->addCmd(cmdInfo);

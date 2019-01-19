@@ -138,7 +138,9 @@ void Window::_initObjectsStateData()
 
 void Window::_createDynamicUniformData()
 {
-    m_pExtUniformData = std::shared_ptr<vg::UniformBufferData>{ new vg::UniformBufferData() };
+    m_pExtUniformData = std::shared_ptr<vg::UniformBufferData>{ 
+		new vg::UniformBufferData(vk::MemoryPropertyFlagBits::eHostVisible | vk::MemoryPropertyFlagBits::eHostCoherent) 
+	};
     std::array<vg::UniformBufferData::SubDataInfo, OBJECT_INSTANCE_COUNT> subDataInfos;
     std::array<vk::DescriptorSetLayoutBinding, OBJECT_INSTANCE_COUNT> bindingInfos;
     std::array<vg::UniformBufferData::DescriptorBufferInfo, OBJECT_INSTANCE_COUNT> bufferInfos;
@@ -150,7 +152,7 @@ void Window::_createDynamicUniformData()
         auto &subDataInfo = subDataInfos[i];
         auto &bindingInfo = bindingInfos[i];
 
-        bindingInfo.binding = 2u;
+        bindingInfo.binding = 0u;
         bindingInfo.descriptorType = vk::DescriptorType::eUniformBufferDynamic;
         bindingInfo.descriptorCount = 1u;
         bindingInfo.stageFlags = vk::ShaderStageFlagBits::eVertex;

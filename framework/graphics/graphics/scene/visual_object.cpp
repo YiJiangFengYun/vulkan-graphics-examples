@@ -6,11 +6,15 @@ namespace vg
         , uint32_t framebufferHeight
         , const Matrix4x4 *pProjMatrix
         , const Matrix4x4 *pViewMatrix
+        , Bool32 hasClipRect
+        , std::vector<fd::Rect2D> clipRects
         )
         : framebufferWidth(framebufferWidth)
         , framebufferHeight(framebufferHeight)
         , pProjMatrix(pProjMatrix)
         , pViewMatrix(pViewMatrix)
+        , hasClipRect(hasClipRect)
+        , clipRects(clipRects)
     {
     }
 
@@ -35,8 +39,6 @@ namespace vg
         , m_subMeshOffset(-1)
         , m_subMeshCount(-1)
         , m_isVisibilityCheck(VG_TRUE)
-        , m_hasClipRect(VG_FALSE)
-        , m_clipRects()
     {
 
     }
@@ -192,7 +194,6 @@ namespace vg
     {
         m_subMeshOffset = subMeshOffset;
         m_subMeshCount = static_cast<int32_t>(subMeshCount);
-        m_clipRects.resize(subMeshCount);
     }
 
     Bool32 BaseVisualObject::getIsVisibilityCheck() const
@@ -203,47 +204,6 @@ namespace vg
     void BaseVisualObject::setIsVisibilityCheck(Bool32 value)
     {
         m_isVisibilityCheck = value;
-    }
-
-    Bool32 BaseVisualObject::getHasClipRect() const
-    {
-        return m_hasClipRect;
-    }
-
-    void BaseVisualObject::setHasClipRect(Bool32 value)
-    {
-        m_hasClipRect = value;
-    }
-
-    uint32_t BaseVisualObject::getClipRectCount() const
-    {
-        return static_cast<uint32_t>(m_clipRects.size());
-    }
-        
-    const fd::Rect2D *BaseVisualObject::getClipRects() const
-    {
-        return m_clipRects.data();
-    }
-
-    void BaseVisualObject::updateClipRects(fd::ArrayProxy<fd::Rect2D> rects, uint32_t offset)
-    {
-        uint32_t count = static_cast<uint32_t>(rects.size());
-        _asyncMeshData();
-        for (uint32_t i = 0; i < count; ++i)
-        {
-            m_clipRects[offset] = *(rects.data() + i);
-            ++offset;
-        }
-    }
-        
-    void BaseVisualObject::updateClipRects(fd::Rect2D rect, uint32_t count, uint32_t offset)
-    {
-        _asyncMeshData();
-        for (uint32_t i = 0; i < count; ++i)
-        {
-            m_clipRects[offset] = rect;
-            ++offset;
-        }
     }
 
     void BaseVisualObject::beginBindForPreDepth(const BindInfo info, BindResult *pResult) const
@@ -268,8 +228,8 @@ namespace vg
                 &modelMatrix,
                 m_pMesh,
                 subMeshIndex,
-                m_hasClipRect,
-                m_hasClipRect ? *(m_clipRects.data() + i) : fd::Rect2D(),
+                info.hasClipRect,
+                info.hasClipRect ? *(info.clipRects.data() + i) : fd::Rect2D(),
                 };
     
             Material::BindResult resultForVisualizer;
@@ -325,8 +285,8 @@ namespace vg
                 &modelMatrix,
                 m_pMesh,
                 subMeshIndex,
-                m_hasClipRect,
-                m_hasClipRect ? *(m_clipRects.data() + i) : fd::Rect2D(),
+                info.hasClipRect,
+                info.hasClipRect ? *(info.clipRects.data() + i) : fd::Rect2D(),
                 };
     
             Material::BindResult resultForVisualizer;
@@ -388,8 +348,8 @@ namespace vg
                 &modelMatrix,
                 m_pMesh,
                 subMeshIndex,
-                m_hasClipRect,
-                m_hasClipRect ? *(m_clipRects.data() + i) : fd::Rect2D(),
+                info.hasClipRect,
+                info.hasClipRect ? *(info.clipRects.data() + i) : fd::Rect2D(),
                 };
     
             Material::BindResult resultForVisualizer;
@@ -428,16 +388,16 @@ namespace vg
         }
     }
 
-    void BaseVisualObject::_asyncMeshData()
-    {
-        if (m_subMeshCount < 0)
-        {
-            if (m_clipRects.size() < dynamic_cast<const ContentMesh *>(m_pMesh)->getSubMeshCount())
-            {
-                m_clipRects.resize(dynamic_cast<const ContentMesh *>(m_pMesh)->getSubMeshCount());
-            }
-        }
-    }
+    // void BaseVisualObject::_asyncMeshData()
+    // {
+    //     if (m_subMeshCount < 0)
+    //     {
+    //         if (m_clipRects.size() < dynamic_cast<const ContentMesh *>(m_pMesh)->getSubMeshCount())
+    //         {
+    //             m_clipRects.resize(dynamic_cast<const ContentMesh *>(m_pMesh)->getSubMeshCount());
+    //         }
+    //     }
+    // }
 
     void BaseVisualObject::_resizeLightingMaterialMap()
     {

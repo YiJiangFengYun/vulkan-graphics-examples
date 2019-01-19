@@ -3,7 +3,7 @@
 #extension GL_ARB_shading_language_420pack : enable
         
 layout (location = 0) in vec3 inPos;
-layout (binding = 0) uniform BuildIn
+layout (set = 0, binding = 0) uniform BuildIn
 {
     mat4 matrixToNDC;
 } _buildIn;

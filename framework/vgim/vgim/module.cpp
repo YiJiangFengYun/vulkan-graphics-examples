@@ -492,6 +492,8 @@ namespace vgim
         {
             pPass->setTexture(name, info);
         }
+
+        m_pMaterial->apply();
     }
 
     void _destroyFontTexture()

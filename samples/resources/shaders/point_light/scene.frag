@@ -29,7 +29,7 @@ struct AmbientLight
     float _dummy_w;
 };
 
-layout (binding = 1) uniform LightData {
+layout (set = 0, binding = 1) uniform LightData {
     uint lightCount;
     float _dummy_y;
     float _dummy_z;
@@ -44,7 +44,7 @@ layout (binding = 1) uniform LightData {
 
 layout (location = 0) out vec4 outFragColor;
 
-layout (binding = 2) uniform samplerCube shadowMaps[MAX_LIGHT_COUNT];
+layout (set = 0, binding = 2) uniform samplerCube shadowMaps[MAX_LIGHT_COUNT];
 
 void main() 
 {   

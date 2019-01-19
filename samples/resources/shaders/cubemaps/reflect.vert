@@ -6,12 +6,12 @@
 layout (location = 0) in vec3 inPos;
 layout (location = 1) in vec3 inNormal;
 
-layout(binding = 0) uniform BuildIn {
+layout(set = 0, binding = 0) uniform BuildIn {
     mat4 matrixObjectToNDC;
     mat4 matrixObjectToView;
 } _buildIn;
 
-layout(binding = 1) uniform OtherInfo {
+layout(set = 1, binding = 0) uniform OtherInfo {
     float lodBias;
 } otherInfo;
 

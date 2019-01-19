@@ -1,12 +1,12 @@
 namespace fd
 {
-    template <typename VecType = glm::vec3>
+    template <typename VecType>
     Ray<VecType>::Ray()
     {
 
     }
 
-    template <typename VecType = glm::vec3>
+    template <typename VecType>
     Ray<VecType>::Ray(ValueType origin, ValueType direction)
         : m_origin(origin)
         , m_direction(direction)
@@ -19,7 +19,7 @@ namespace fd
 #endif // DEBUG
     }
 
-    template <typename VecType = glm::vec3>
+    template <typename VecType>
     Ray<VecType>::Ray(const Ray<ValueType>& target)
         : m_origin(target.m_origin)
         , m_direction(target.m_direction)
@@ -29,7 +29,7 @@ namespace fd
     {
     }
 
-    template <typename VecType = glm::vec3>
+    template <typename VecType>
     Ray<VecType>& Ray<VecType>::operator =(const Ray<ValueType>& target)
     {
         m_origin = target.m_origin;
@@ -40,47 +40,47 @@ namespace fd
         return *this;
     }
 
-    template <typename VecType = glm::vec3>
+    template <typename VecType>
     typename Ray<VecType>::ValueType Ray<VecType>::getOrigin() const
     {
         return m_origin;
     }
 
-    template <typename VecType = glm::vec3>
+    template <typename VecType>
     void Ray<VecType>::setOrigin(ValueType origin)
     {
         m_origin = origin;
         m_isUpdateCache = true;
     }
 
-    template <typename VecType = glm::vec3>
+    template <typename VecType>
     typename Ray<VecType>::ValueType Ray<VecType>::getDirection() const
     {
         return m_direction;
     }
 
-    template <typename VecType = glm::vec3>
+    template <typename VecType>
     void Ray<VecType>::setDirection(ValueType direction)
     {
         m_direction = direction;
         m_isUpdateCache = true;
     }
 
-    template <typename VecType = glm::vec3>
+    template <typename VecType>
     typename Ray<VecType>::ValueType Ray<VecType>::getInvDir()
     {
         _updateCache();
         return m_invDir;
     }
 
-    template <typename VecType = glm::vec3>
+    template <typename VecType>
     typename Ray<VecType>::ValueType Ray<VecType>::getSigns()
     {
         _updateCache();
         return m_signs;
     }
 
-    template <typename VecType = glm::vec3>
+    template <typename VecType>
     typename Ray<VecType>::ValueType Ray<VecType>::getPoint(VecValueType distance) const
     {
         ValueType direction = m_direction;
@@ -90,7 +90,7 @@ namespace fd
         return direction;
     }
 
-    template <typename VecType = glm::vec3>
+    template <typename VecType>
     void Ray<VecType>::_updateCache()
     {
         if (m_isUpdateCache)
@@ -109,13 +109,13 @@ namespace fd
                 m_invDir[i] = 1 / m_direction[i];
                 //negative is 0 and positive is 1, it is better to be used as array index.
                 m_signs[i] = m_direction[i] < 0 ? 
-                    static_cast<typename VecValueType>(-1) :
-                    static_cast<typename VecValueType>(1);
+                    static_cast<typename Ray<VecType>::VecValueType>(-1) :
+                    static_cast<typename Ray<VecType>::VecValueType>(1);
             }
         }
     }
 
-    template <typename VecType = glm::vec3>
+    template <typename VecType>
     Bounds<VecType>::Bounds()
         : m_min(0u)
         , m_max(0u)
@@ -123,7 +123,7 @@ namespace fd
         _updateSize();
     }
 
-    template <typename VecType = glm::vec3>
+    template <typename VecType>
     Bounds<VecType>::Bounds(ValueType min, ValueType max)
         : m_min(min)
         , m_max(max)
@@ -131,7 +131,7 @@ namespace fd
         _updateSize();
     }
 
-    template <typename VecType = glm::vec3>
+    template <typename VecType>
     Bounds<VecType>::Bounds(const Bounds<ValueType>& target)
         : m_min(target.m_min)
         , m_max(target.m_max)
@@ -139,13 +139,13 @@ namespace fd
     {
     }
 
-    template <typename VecType = glm::vec3>
+    template <typename VecType>
     Bounds<VecType>::~Bounds()
     {
 
     }
 
-    template <typename VecType = glm::vec3>
+    template <typename VecType>
     Bounds<VecType>& Bounds<VecType>::operator =(const Bounds<ValueType>& target)
     {
         m_min = target.m_min;
@@ -154,13 +154,13 @@ namespace fd
         return *this;
     }
 
-    template <typename VecType = glm::vec3>
+    template <typename VecType>
     typename Bounds<VecType>::ValueType Bounds<VecType>::getMin() const { return m_min; }
 
-    template <typename VecType = glm::vec3>
+    template <typename VecType>
     typename Bounds<VecType>::ValueType Bounds<VecType>::getMax() const { return m_max; }
 
-    template <typename VecType = glm::vec3>
+    template <typename VecType>
     void Bounds<VecType>::setMinMax(ValueType min, ValueType max)
     {
         m_min = min;
@@ -168,10 +168,10 @@ namespace fd
         _updateSize();
     }
 
-    template <typename VecType = glm::vec3>
+    template <typename VecType>
     typename Bounds<VecType>::ValueType Bounds<VecType>::getSize() { return m_size; }
 
-    template <typename VecType = glm::vec3>
+    template <typename VecType>
     void Bounds<VecType>::setSize(ValueType size)
     {
 #ifdef DEBUG
@@ -185,7 +185,7 @@ namespace fd
         _updateMax();
     }
 
-    template <typename VecType = glm::vec3>
+    template <typename VecType>
     typename Bounds<VecType>::ValueType Bounds<VecType>::getClosestPoint(ValueType point) const
     {
         LengthType length = ValueType::length();
@@ -199,7 +199,7 @@ namespace fd
         return result;
     }
 
-    template <typename VecType = glm::vec3>
+    template <typename VecType>
     Bool32 Bounds<VecType>::isContains(ValueType point) const
     {
         LengthType length = ValueType::length();
@@ -211,7 +211,7 @@ namespace fd
         return true;
     }
 
-    template <typename VecType = glm::vec3>
+    template <typename VecType>
     void Bounds<VecType>::expand(VecValueType amount)
     {
         VecValueType halt = amount / 2;
@@ -224,7 +224,7 @@ namespace fd
         }
     }
 
-    template <typename VecType = glm::vec3>
+    template <typename VecType>
     typename Bounds<VecType>::VecValueType Bounds<VecType>::intersectRay(Ray<ValueType> ray, Bool32 isOnlyForward) const
     {
 
@@ -281,7 +281,7 @@ namespace fd
 
     }
 
-    template <typename VecType = glm::vec3>
+    template <typename VecType>
     Bool32 Bounds<VecType>::isIntersects(Bounds<ValueType> bounds) const
     {
         LengthType length = ValueType::length();
@@ -293,7 +293,7 @@ namespace fd
         return true;
     }
 
-    template <typename VecType = glm::vec3>
+    template <typename VecType>
     Bool32 Bounds<VecType>::intersects(Bounds<ValueType> bounds, Bounds<ValueType> *intersection) const
     {
         LengthType length = ValueType::length();
@@ -326,7 +326,7 @@ namespace fd
         return isInter;
     }
 
-    template <typename VecType = glm::vec3>
+    template <typename VecType>
     typename Bounds<VecType>::VecValueType Bounds<VecType>::getSqrDistance(ValueType point) const
     {
         ValueType closestPoint = getClosestPoint(point);
@@ -334,7 +334,7 @@ namespace fd
         return glm::dot(closestPoint, closestPoint);
     }
 
-    template <typename VecType = glm::vec3>
+    template <typename VecType>
     void Bounds<VecType>::_updateSize()
     {
         LengthType length = ValueType::length();
@@ -351,7 +351,7 @@ namespace fd
 #endif // DEBUG
     }
 
-    template <typename VecType = glm::vec3>
+    template <typename VecType>
     void Bounds<VecType>::_updateMax()
     {
         LengthType length = ValueType::length();

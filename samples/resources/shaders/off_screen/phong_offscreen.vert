@@ -8,13 +8,13 @@ layout (location = 1) in vec2 inUV;
 layout (location = 2) in vec3 inColor;
 layout (location = 3) in vec3 inNormal;
 
-layout(binding = 0) uniform BuildIn {
+layout(set = 0, binding = 0) uniform BuildIn {
     mat4 matrixModel;
     mat4 matrixView;
     mat4 matrixProj;
 } _buildIn;
 
-layout(binding = 1) uniform OtherInfo {
+layout(set = 1, binding = 0) uniform OtherInfo {
     mat4 matrixInverse;
     vec4 lightPos;
 } otherInfo;

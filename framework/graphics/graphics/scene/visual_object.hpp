@@ -19,11 +19,14 @@ namespace vg
             uint32_t framebufferHeight;
             const Matrix4x4 *pProjMatrix;
             const Matrix4x4 *pViewMatrix;
-
+            Bool32 hasClipRect;
+            std::vector<fd::Rect2D> clipRects;
             BindInfo(uint32_t framebufferWidth = 0u
                 , uint32_t framebufferHeight = 0u
                 , const Matrix4x4 *pProjMatrix = nullptr
                 , const Matrix4x4 *pViewMatrix = nullptr
+                , Bool32 hasClipRect = VG_FALSE
+                , std::vector<fd::Rect2D> clipRects = std::vector<fd::Rect2D>()
                 );
         };
     
@@ -66,17 +69,17 @@ namespace vg
         uint32_t getSubMeshOffset() const;
         uint32_t getSubMeshCount() const;
 
-        void updateSubMeshInfo(uint32_t subMeshOffset, uint32_t subMeshCount);
+        virtual void updateSubMeshInfo(uint32_t subMeshOffset, uint32_t subMeshCount);
 
         Bool32 getIsVisibilityCheck() const;
         void setIsVisibilityCheck(Bool32 value);
 
-        Bool32 getHasClipRect() const;
-        void setHasClipRect(Bool32 value);
-        uint32_t getClipRectCount() const;
-        const fd::Rect2D *getClipRects() const;
-        void updateClipRects(fd::ArrayProxy<fd::Rect2D> rects, uint32_t offset = 0u);
-        void updateClipRects(fd::Rect2D rect, uint32_t count, uint32_t offset = 0u);
+        // Bool32 getHasClipRect() const;
+        // void setHasClipRect(Bool32 value);
+        // uint32_t getClipRectCount() const;
+        // const fd::Rect2D *getClipRects() const;
+        // void updateClipRects(fd::ArrayProxy<fd::Rect2D> rects, uint32_t offset = 0u);
+        // void updateClipRects(fd::Rect2D rect, uint32_t count, uint32_t offset = 0u);
 
         void beginBindForPreDepth(const BindInfo info, BindResult *pResult) const;
         void endBindForPreDepth() const;
@@ -95,10 +98,10 @@ namespace vg
         int32_t m_subMeshOffset;
         int32_t m_subMeshCount;
         Bool32 m_isVisibilityCheck;
-        Bool32 m_hasClipRect;
+        // Bool32 m_hasClipRect;
         //Valid range of ClipRect is [(0, 0), (1, 1)]
-        std::vector<fd::Rect2D> m_clipRects;
-        void _asyncMeshData();
+        // std::vector<fd::Rect2D> m_clipRects;
+        // void _asyncMeshData();
         void _resizeLightingMaterialMap();
         virtual Matrix4x4 _getModelMatrix() const = 0;
 
@@ -121,22 +124,22 @@ namespace vg
 
         }
 
-        void setMesh(MeshDimType *pMesh)
+        virtual void setMesh(MeshDimType *pMesh)
         {
             m_pMesh = pMesh;
             m_subMeshOffset = -1;
             m_subMeshCount = -1;
-            m_clipRects.resize(dynamic_cast<const ContentMesh *>(m_pMesh)->getSubMeshOffset());
+            //m_clipRects.resize(dynamic_cast<const ContentMesh *>(m_pMesh)->getSubMeshOffset());
         }
 
-        void setMesh(MeshDimType *pMesh
+        virtual void setMesh(MeshDimType *pMesh
             , uint32_t subMeshOffset
             , uint32_t subMeshCount)
         {
             m_pMesh = pMesh;
             m_subMeshOffset = subMeshOffset;
             m_subMeshCount = subMeshCount;
-            m_clipRects.resize(subMeshCount);
+            // m_clipRects.resize(subMeshCount);
         }
     protected:
         //aggregations

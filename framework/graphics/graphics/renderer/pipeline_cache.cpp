@@ -4,12 +4,14 @@ namespace vg
 {
     PipelineCache::Info::Info(vk::RenderPass renderPass
         , const Pass *pPass
+        , const RendererPass *pRendererPass        
         , const VertexData *pVertexData
         , const IndexData *pIndexData
         , uint32_t indexSubIndex
         )
         : renderPass(renderPass)
         , pPass(pPass)
+        , pRendererPass(pRendererPass)
         , pVertexData(pVertexData)
         , pIndexData(pIndexData)
         , indexSubIndex(indexSubIndex)
@@ -20,11 +22,12 @@ namespace vg
     PipelineCache::InfoFullKey::InfoFullKey(Info info)
         : renderPass(info.renderPass)
         , pPass(info.pPass)
+        , pRendererPass(info.pRendererPass)
         , pVertexData(info.pVertexData)
         , pIndexData(info.pIndexData)
         , indexSubIndex(info.indexSubIndex)
 
-        , passPipelineStateID(info.pPass->getPipelineStateID())
+        , passPipelineStateID(info.pRendererPass->getPipelineStateID())
         , passSubPass(info.pPass->getSubpass())
         , inputAssemblyStateInfo()
         , vertexInputStateInfo()
@@ -56,6 +59,7 @@ namespace vg
     PipelineCache::InfoFullKey::InfoFullKey(const InfoFullKey & target)
         : renderPass(target.renderPass)
         , pPass(target.pPass)
+        , pRendererPass(target.pRendererPass)
         , pVertexData(target.pVertexData)
         , pIndexData(target.pIndexData)
         , indexSubIndex(target.indexSubIndex)
@@ -76,6 +80,7 @@ namespace vg
     {
         renderPass = target.renderPass;
         pPass = target.pPass;
+        pRendererPass = target.pRendererPass;
         pVertexData = target.pVertexData;
         pIndexData = target.pIndexData;
         indexSubIndex = target.indexSubIndex;
@@ -97,6 +102,7 @@ namespace vg
         std::size_t seed = 0;
         boost::hash_combine(seed, info.renderPass);
         boost::hash_combine(seed, info.pPass->getID());
+        boost::hash_combine(seed, info.pRendererPass->getID());
         boost::hash_combine(seed, info.pVertexData != nullptr ? info.pVertexData->getID() : 0);
         boost::hash_combine(seed, info.pIndexData != nullptr ? info.pIndexData->getID() : 0);
         boost::hash_combine(seed, info.indexSubIndex);
@@ -107,6 +113,7 @@ namespace vg
     {
         if (lhs.renderPass != rhs.renderPass) return VG_FALSE;
         if (lhs.pPass->getID() != rhs.pPass->getID()) return VG_FALSE;
+        if (lhs.pRendererPass->getID() != rhs.pRendererPass->getID()) return VG_FALSE;
         if (lhs.pVertexData != nullptr && rhs.pVertexData != nullptr)
         {
             if (lhs.pVertexData->getID() != rhs.pVertexData->getID()) return VG_FALSE;
@@ -176,7 +183,7 @@ namespace vg
         m_mapPipelineFull.clear();
     }
 
-    std::shared_ptr<vk::Pipeline> PipelineCache::caching(const Info & info)
+    std::shared_ptr<vk::Pipeline> PipelineCache::get(const Info & info)
     {
         //delete old pipeline.
 
@@ -232,9 +239,10 @@ namespace vg
         vk::GraphicsPipelineCreateInfo createInfo = {};
 
         //Construct shader stage create info.
-        const auto &pPass = info.pPass;
-        const auto &pShader = pPass->getShader();
-        auto &shaderStages = pShader->getShaderStageInfos();
+        auto pPass = info.pPass;
+        auto pRendererPass = info.pRendererPass;
+        auto pShader = pPass->getShader();
+        auto shaderStages = pShader->getShaderStageInfos();
 
         //Fill specialization data from pass.
         for (auto &shaderStage : shaderStages)
@@ -403,7 +411,7 @@ namespace vg
         };
         createInfo.pDynamicState = &dynamicStateCreateInfo;        
 
-        createInfo.layout = *pPass->getPipelineLayout();
+        createInfo.layout = *pRendererPass->getPipelineLayout();
 
         createInfo.renderPass = info.renderPass;
         createInfo.subpass = pPass->getSubpass();

@@ -7,7 +7,7 @@
             "includePath": [
                 "${MINGW_ROOT}/lib/gcc/mingw32/${MINGW_GCC_VERSION}/include",
                 "${VK_SDK_PATH}/include",
-                "${BOOST_ROOT}/include",
+                "${BOOST_ROOT}",
                 "${workspaceRoot}/libs/glfw/include",
                 "${workspaceRoot}/libs/gli",
                 "${workspaceRoot}/libs/glm",
@@ -20,7 +20,6 @@
                 "${workspaceFolder}/framework/graphics",
                 "${workspaceFolder}/build/framework/graphics/src",
                 "${workspaceFolder}/framework/graphics_ext",
-                "${workspaceFolder}/build/framework/graphics_ext/src",
                 "${workspaceFolder}/framework/vgim",
                 "${workspaceFolder}/build/framework/vgim/src",
                 "${workspaceFolder}/framework/framework",
